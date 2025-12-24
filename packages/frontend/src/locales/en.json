@@ -4804,6 +4804,17 @@
       "serviceType": "Service Type",
       "instanceId": "Instance ID",
       "eventType": "Event Type"
+    },
+    "eventTypes": {
+      "REGISTER": "Registered",
+      "UNREGISTER": "Unregistered",
+      "READY": "Ready",
+      "INITIALIZING": "Initializing",
+      "SHUTTING_DOWN": "Shutting Down",
+      "TERMINATED": "Terminated",
+      "ERROR": "Error",
+      "TIMEOUT": "Timeout",
+      "NO_RESPONSE": "No Response"
     }
   },
   "projects": {

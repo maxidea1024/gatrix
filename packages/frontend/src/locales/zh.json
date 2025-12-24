@@ -4863,6 +4863,17 @@
       "serviceType": "服务类型",
       "instanceId": "实例 ID",
       "eventType": "事件类型"
+    },
+    "eventTypes": {
+      "REGISTER": "注册",
+      "UNREGISTER": "注销",
+      "READY": "在线",
+      "INITIALIZING": "初始化",
+      "SHUTTING_DOWN": "关闭中",
+      "TERMINATED": "已终止",
+      "ERROR": "错误",
+      "TIMEOUT": "超时",
+      "NO_RESPONSE": "无响应"
     }
   }
 }

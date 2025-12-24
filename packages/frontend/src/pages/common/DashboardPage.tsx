@@ -1535,11 +1535,16 @@ const DashboardPage: React.FC = () => {
                         {recentLifecycleEvents.map((event, index) => {
                           const getEventColor = (type: string) => {
                             switch (type) {
-                              case 'REGISTER': return theme.palette.success.main;
-                              case 'UNREGISTER': return theme.palette.text.disabled;
-                              case 'TIMEOUT': return theme.palette.warning.main;
-                              case 'ERROR': return theme.palette.error.main;
-                              default: return theme.palette.primary.main;
+                              case 'REGISTER': return 'success';
+                              case 'READY': return 'success';
+                              case 'INITIALIZING': return 'info';
+                              case 'UNREGISTER': return 'default';
+                              case 'SHUTTING_DOWN': return 'warning';
+                              case 'TERMINATED': return 'default';
+                              case 'TIMEOUT': return 'warning';
+                              case 'NO_RESPONSE': return 'warning';
+                              case 'ERROR': return 'error';
+                              default: return 'primary';
                             }
                           };
 
@@ -1550,39 +1555,40 @@ const DashboardPage: React.FC = () => {
                                 sx={{ py: 1, cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
                                 onClick={() => navigate('/admin/server-lifecycle')}
                               >
-                                <ListItemIcon sx={{ minWidth: 36 }}>
-                                  <Avatar
-                                    sx={{
-                                      width: 28,
-                                      height: 28,
-                                      bgcolor: alpha(getEventColor(event.eventType), 0.1),
-                                      color: getEventColor(event.eventType),
-                                    }}
-                                  >
-                                    <HistoryIcon sx={{ fontSize: 16 }} />
-                                  </Avatar>
-                                </ListItemIcon>
                                 <ListItemText
                                   primary={
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                        {t(`serverLifecycle.eventTypes.${event.eventType}`)}
-                                      </Typography>
-                                      <Typography variant="body2" color="text.secondary">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                                      <Chip
+                                        label={t(`serverLifecycle.eventTypes.${event.eventType}`, { defaultValue: event.eventType })}
+                                        size="small"
+                                        color={getEventColor(event.eventType) as any}
+                                        sx={{ height: 22, fontSize: '0.7rem', fontWeight: 600 }}
+                                      />
+                                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
                                         {event.serviceType}
                                       </Typography>
+                                      {event.serviceGroup && (
+                                        <Typography variant="caption" color="text.secondary">
+                                          ({event.serviceGroup})
+                                        </Typography>
+                                      )}
                                     </Box>
                                   }
                                   secondary={
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.2 }}>
-                                      <Typography variant="caption" color="text.disabled" sx={{ fontFamily: 'monospace' }}>
-                                        {event.instanceId.substring(0, 8)}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
+                                      {event.hostname && (
+                                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+                                          {event.hostname}
+                                        </Typography>
+                                      )}
+                                      <Typography variant="caption" color="text.disabled" sx={{ fontFamily: 'monospace', fontSize: '0.65rem' }}>
+                                        {event.instanceId}
                                       </Typography>
                                       <Typography variant="caption" color="text.secondary">
                                         {formatRelativeTime(event.createdAt)}
                                       </Typography>
                                       {event.cloudRegion && (
-                                        <Typography variant="caption" sx={{ bgcolor: 'action.selected', px: 0.5, borderRadius: 0.5 }}>
+                                        <Typography variant="caption" sx={{ bgcolor: 'action.selected', px: 0.5, borderRadius: 0.5, fontSize: '0.65rem' }}>
                                           {event.cloudRegion}
                                         </Typography>
                                       )}

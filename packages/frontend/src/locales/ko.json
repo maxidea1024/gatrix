@@ -4389,6 +4389,17 @@
       "serviceType": "서비스 타입",
       "instanceId": "인스턴스 ID",
       "eventType": "이벤트 타입"
+    },
+    "eventTypes": {
+      "REGISTER": "등록",
+      "UNREGISTER": "해제",
+      "READY": "온라인",
+      "INITIALIZING": "초기화",
+      "SHUTTING_DOWN": "종료중",
+      "TERMINATED": "종료됨",
+      "ERROR": "오류",
+      "TIMEOUT": "타임아웃",
+      "NO_RESPONSE": "응답 없음"
     }
   },
   "REWARD_TYPE_POINT": "포인트",
