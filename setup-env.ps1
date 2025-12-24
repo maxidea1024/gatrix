@@ -304,11 +304,27 @@ function Create-EnvFile {
             if ($Environment -eq "development") {
                 # Development: include port number, use HOST address (not localhost)
                 $newLines += "VITE_GRAFANA_URL=$($script:ProtocolToUse)://$HostAddress`:44000"
+                $newLines += "GRAFANA_URL=$($script:ProtocolToUse)://$HostAddress`:44000"
             }
             else {
-                # Production: Grafana accessed via /grafana subpath (handled by load balancer)
-                $newLines += "VITE_GRAFANA_URL=$($script:ProtocolToUse)://$HostAddress`:44000"
+                # Production: Use the Nginx proxy subpath /grafana for better embedding support
+                $newLines += "VITE_GRAFANA_URL=/grafana"
+                $newLines += "GRAFANA_URL=$($script:ProtocolToUse)://$HostAddress`:43000/grafana"
             }
+        }
+        elseif ($line -match "^GRAFANA_DOMAIN=") {
+            $newLines += "GRAFANA_DOMAIN=$HostAddress"
+        }
+        elseif ($line -match "^GRAFANA_ROOT_URL=") {
+            if ($Environment -eq "development") {
+                $newLines += "GRAFANA_ROOT_URL=$($script:ProtocolToUse)://$HostAddress`:44000/"
+            }
+            else {
+                $newLines += "GRAFANA_ROOT_URL=$($script:ProtocolToUse)://$HostAddress`:43000/grafana/"
+            }
+        }
+        elseif ($line -match "^GRAFANA_TRUSTED_ORIGINS=") {
+            $newLines += "GRAFANA_TRUSTED_ORIGINS=*"
         }
         elseif ($line -match "^VITE_BULL_BOARD_URL=") {
             if ($Environment -eq "development") {
@@ -328,7 +344,8 @@ function Create-EnvFile {
             # Set Edge HTTPS enforcement based on protocol
             if ($script:ProtocolToUse -eq "https") {
                 $newLines += "EDGE_FORCE_HTTPS=true"
-            } else {
+            }
+            else {
                 $newLines += "EDGE_FORCE_HTTPS=false"
             }
         }

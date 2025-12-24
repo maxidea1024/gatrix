@@ -216,14 +216,24 @@ create_env_file() {
   sed -i.bak "s|^DEFAULT_LANGUAGE=.*|DEFAULT_LANGUAGE=$DEFAULT_LANGUAGE|" "$ENV_FILE"
 
   # Set Grafana URL based on environment
-  # In production, Grafana is typically accessed through a subpath or subdomain
   if [ "$ENVIRONMENT" = "development" ]; then
     # Development: include port number, use HOST address (not localhost)
+    # In development, we usually access Grafana directly on its port
     sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=$PROTOCOL://$HOST:44000|" "$ENV_FILE"
+    sed -i.bak "s|^GRAFANA_URL=.*|GRAFANA_URL=$PROTOCOL://$HOST:44000|" "$ENV_FILE"
+    sed -i.bak "s|^GRAFANA_ROOT_URL=.*|GRAFANA_ROOT_URL=$PROTOCOL://$HOST:44000/|" "$ENV_FILE"
   else
-    # Production: Grafana accessed via /grafana subpath (handled by load balancer)
-    sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=$PROTOCOL://$HOST:44000|" "$ENV_FILE"
+    # Production: Use the Nginx proxy subpath /grafana for better embedding support
+    # This matches the proxy configuration in packages/frontend/nginx.conf
+    sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=/grafana|" "$ENV_FILE"
+    sed -i.bak "s|^GRAFANA_URL=.*|GRAFANA_URL=$PROTOCOL://$HOST:43000/grafana|" "$ENV_FILE"
+    sed -i.bak "s|^GRAFANA_ROOT_URL=.*|GRAFANA_ROOT_URL=$PROTOCOL://$HOST:43000/grafana/|" "$ENV_FILE"
   fi
+
+  # Set Grafana Security & Domain settings
+  sed -i.bak "s|^GRAFANA_DOMAIN=.*|GRAFANA_DOMAIN=$HOST|" "$ENV_FILE"
+  # Use * to allow all for trusted origins to avoid "Origin not allowed" during embedding
+  sed -i.bak "s|^GRAFANA_TRUSTED_ORIGINS=.*|GRAFANA_TRUSTED_ORIGINS=*|" "$ENV_FILE"
 
   # Set Bull Board URL based on environment
   if [ "$ENVIRONMENT" = "development" ]; then
