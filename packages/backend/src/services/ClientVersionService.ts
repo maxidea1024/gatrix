@@ -5,29 +5,9 @@ import logger from '../config/logger';
 import { applyMaintenanceStatusCalculationToArray, applyMaintenanceStatusCalculation } from '../utils/maintenanceUtils';
 import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import VarsModel from '../models/Vars';
+import { resolvePassiveData } from '../utils/passiveDataUtils';
 
-/**
- * Parse semver string to numeric array [major, minor, patch]
- */
-function parseSemver(version: string): [number, number, number] {
-  const match = version.match(/^(\d+)\.(\d+)\.(\d+)/);
-  if (!match) return [0, 0, 0];
-  return [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])];
-}
 
-/**
- * Compare two semver versions
- * Returns: 1 if a > b, -1 if a < b, 0 if equal
- */
-function compareSemver(a: string, b: string): number {
-  const [aMajor, aMinor, aPatch] = parseSemver(a);
-  const [bMajor, bMinor, bPatch] = parseSemver(b);
-
-  if (aMajor !== bMajor) return aMajor > bMajor ? 1 : -1;
-  if (aMinor !== bMinor) return aMinor > bMinor ? 1 : -1;
-  if (aPatch !== bPatch) return aPatch > bPatch ? 1 : -1;
-  return 0;
-}
 
 export interface ClientVersionFilters {
   version?: string | string[];
@@ -86,26 +66,13 @@ async function prepareClientVersionForSDK(
   version: ClientVersionAttributes,
   environmentId?: string
 ): Promise<any> {
-  // Get clientVersionPassiveData from KV settings
+  // Get clientVersionPassiveData from KV settings and resolve by version
   let passiveData: Record<string, any> = {};
   try {
     const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', environmentId);
-    if (passiveDataStr) {
-      let parsed = JSON.parse(passiveDataStr);
-      // Handle double-encoded JSON string
-      if (typeof parsed === 'string') {
-        try {
-          parsed = JSON.parse(parsed);
-        } catch (e) {
-          // ignore
-        }
-      }
-      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-        passiveData = parsed;
-      }
-    }
+    passiveData = resolvePassiveData(passiveDataStr, version.clientVersion);
   } catch (error) {
-    logger.warn('Failed to parse clientVersionPassiveData for SDK event:', error);
+    logger.warn('Failed to resolve clientVersionPassiveData for SDK event:', error);
   }
 
   // Parse customPayload
@@ -363,7 +330,7 @@ export class ClientVersionService {
     const result = await ClientVersionModel.create(data);
 
     // Invalidate client version cache (including ETag cache for SDK)
-    await pubSubService.invalidateByPattern('client_version:.*');
+    await pubSubService.invalidateByPattern('*client_version:*');
     if (result.environmentId) {
       await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${result.environmentId}`);
     }
@@ -473,7 +440,7 @@ export class ClientVersionService {
     }
 
     // Invalidate client version cache (including ETag cache for SDK - all environments for bulk op)
-    await pubSubService.invalidateByPattern('client_version:.*');
+    await pubSubService.invalidateByPattern('*client_version:*');
     await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
 
     // Publish generic update event (bulk op)
@@ -502,7 +469,7 @@ export class ClientVersionService {
     }
 
     // Invalidate client version cache
-    await pubSubService.invalidateByPattern('client_version:.*');
+    await pubSubService.invalidateByPattern('*client_version:*');
 
     const updatedClientVersion = await this.getClientVersionById(id);
 
@@ -562,7 +529,7 @@ export class ClientVersionService {
       });
 
       // Invalidate client version cache (including ETag cache - all environments for deletion)
-      await pubSubService.invalidateByPattern('client_version:.*');
+      await pubSubService.invalidateByPattern('*client_version:*');
       await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
     }
 
@@ -583,7 +550,7 @@ export class ClientVersionService {
       });
 
       // Invalidate client version cache (including ETag cache - all environments for bulk op)
-      await pubSubService.invalidateByPattern('client_version:.*');
+      await pubSubService.invalidateByPattern('*client_version:*');
       await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
     }
 

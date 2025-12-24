@@ -208,8 +208,7 @@ export class PlanningDataController {
 
     const result = await PlanningDataService.uploadPlanningData(environmentId, req.files as any);
 
-    // Invalidate cache across all servers
-    await pubSubService.invalidateByPattern('planning_data*');
+    await pubSubService.invalidateByPattern('*planning_data*');
 
     logger.info('Planning data cache invalidated across all servers', { environmentId });
 

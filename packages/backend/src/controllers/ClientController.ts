@@ -10,6 +10,7 @@ import { asyncHandler } from '../utils/asyncHandler';
 import VarsModel from '../models/Vars';
 import { IpWhitelistService } from '../services/IpWhitelistService';
 import { SDKRequest } from '../middleware/apiTokenAuth';
+import { resolvePassiveData } from '../utils/passiveDataUtils';
 
 export class ClientController {
   /**
@@ -115,26 +116,13 @@ export class ClientController {
       });
     }
 
-    // Get clientVersionPassiveData from KV settings for the specific environment
+    // Get clientVersionPassiveData from KV settings for the specific environment and resolve by version
     let passiveData = {};
     try {
       const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', envId);
-      if (passiveDataStr) {
-        let parsed = JSON.parse(passiveDataStr);
-        // Handle double-encoded JSON string
-        if (typeof parsed === 'string') {
-          try {
-            parsed = JSON.parse(parsed);
-          } catch (e) {
-            // ignore
-          }
-        }
-        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-          passiveData = parsed;
-        }
-      }
+      passiveData = resolvePassiveData(passiveDataStr, record.clientVersion);
     } catch (error) {
-      logger.warn(`Failed to parse clientVersionPassiveData for environment ${envId || 'default'}:`, error);
+      logger.warn(`Failed to resolve clientVersionPassiveData for environment ${envId || 'default'}:`, error);
     }
 
     // Parse customPayload

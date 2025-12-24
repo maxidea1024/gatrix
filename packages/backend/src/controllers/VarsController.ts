@@ -36,7 +36,7 @@ export class VarsController {
          * because this data is merged into the client version metadata.
          * TODO: Refactor this to use a more formal dependency tracking.
          */
-        await pubSubService.invalidateByPattern('client_version:*');
+        await pubSubService.invalidateByPattern('*client_version:*');
         await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
 
         // Force all SDKs (Edge, Game Servers) to refresh their client versions
@@ -172,7 +172,7 @@ export class VarsController {
          * TODO: Refactor this to use a more formal dependency tracking or specific invalidation event.
          */
         // Invalidate all client version caches since meta field includes clientVersionPassiveData
-        await pubSubService.invalidateByPattern('client_version:*');
+        await pubSubService.invalidateByPattern('*client_version:*');
         // Also invalidate Server SDK ETag cache (Edge)
         await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
 

@@ -611,7 +611,7 @@ export class ClientVersionController {
 
       // Clear all client version related cache
       const { pubSubService } = require('../services/PubSubService');
-      await pubSubService.invalidateByPattern('client_version:.*');
+      await pubSubService.invalidateByPattern('*client_version:*');
 
       logger.info(`Reset all client versions: ${deletedCount} records deleted, cache cleared`);
 
