@@ -1968,7 +1968,7 @@ const ServerListPage: React.FC = () => {
     { id: 'group', labelKey: 'serverList.table.group', visible: true },
     { id: 'environment', labelKey: 'serverList.table.environment', visible: true },
     { id: 'cloudProvider', labelKey: 'serverList.table.cloudProvider', visible: false },
-    { id: 'cloudRegion', labelKey: 'serverList.table.cloudRegion', visible: true },
+    { id: 'cloudRegion', labelKey: 'serverList.table.cloudRegion', visible: false },
     { id: 'cloudZone', labelKey: 'serverList.table.cloudZone', visible: false },
     { id: 'labels', labelKey: 'serverList.table.labels', visible: true },
     { id: 'instanceId', labelKey: 'serverList.table.instanceId', visible: true },

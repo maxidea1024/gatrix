@@ -1553,7 +1553,7 @@ const DashboardPage: React.FC = () => {
                               <ListItem
                                 disablePadding
                                 sx={{ py: 1, cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
-                                onClick={() => navigate('/admin/server-lifecycle')}
+                                onClick={() => navigate(`/admin/server-lifecycle?instanceId=${encodeURIComponent(event.instanceId)}`)}
                               >
                                 <ListItemText
                                   primary={

@@ -178,14 +178,21 @@ interface FormatRelativeTimeOptions {
  * 상대 시간 포맷 (예: "2 minutes ago", "Just now")
  * @param date 날짜/시간 값
  * @param options 옵션 (showSeconds: 초단위 표시 여부)
+ * @param language 언어 코드 (옵션, i18n의 현재 언어)
  */
 export const formatRelativeTime = (
   date: string | Date | null | undefined,
-  options?: FormatRelativeTimeOptions
+  options?: FormatRelativeTimeOptions,
+  language?: string
 ): string => {
   if (!date) return '-';
 
   try {
+    // Set dayjs locale based on language
+    if (language) {
+      getDateLocale(language);
+    }
+
     const d = toDayjs(date);
     if (!d) return '-';
 

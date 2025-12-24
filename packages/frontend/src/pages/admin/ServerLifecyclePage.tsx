@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
     Box,
     Typography,
@@ -42,7 +43,9 @@ import {
     DragIndicator as DragIndicatorIcon,
     Visibility as VisibilityIcon,
     VisibilityOff as VisibilityOffIcon,
+    ContentCopy as ContentCopyIcon,
 } from '@mui/icons-material';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import useSWR from 'swr';
@@ -141,11 +144,21 @@ interface EventRowProps {
     event: ServerLifecycleEvent;
     visibleColumns: string[];
     index: number;
+    enqueueSnackbar: (message: string, options?: any) => void;
 }
 
-const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index }) => {
+const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enqueueSnackbar }) => {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
+
+    // Copy helper function
+    const handleCopy = (text: string) => {
+        copyToClipboardWithNotification(
+            text,
+            () => enqueueSnackbar(t('common.copied'), { variant: 'success' }),
+            () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+        );
+    };
 
     // Event type color based on status
     const getEventColor = (type: string) => {
@@ -296,42 +309,176 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index }) => 
                             </Typography>
                             <Paper variant="outlined" sx={{ p: 2, bgcolor: 'action.hover' }}>
                                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
+                                    {/* Instance ID */}
                                     <Box>
                                         <Typography variant="caption" color="textSecondary" display="block">{t('serverLifecycle.instanceId')}</Typography>
-                                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.instanceId}</Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.instanceId}</Typography>
+                                            <IconButton size="small" onClick={() => handleCopy(event.instanceId)} sx={{ p: 0.25 }}>
+                                                <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                            </IconButton>
+                                        </Box>
                                     </Box>
+                                    {/* Service */}
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary" display="block">{t('serverLifecycle.service')}</Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Typography variant="body2">{event.serviceType}</Typography>
+                                            <IconButton size="small" onClick={() => handleCopy(event.serviceType)} sx={{ p: 0.25 }}>
+                                                <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                            </IconButton>
+                                        </Box>
+                                    </Box>
+                                    {/* Group */}
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary" display="block">{t('serverLifecycle.group')}</Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Typography variant="body2">{event.serviceGroup || '-'}</Typography>
+                                            {event.serviceGroup && (
+                                                <IconButton size="small" onClick={() => handleCopy(event.serviceGroup!)} sx={{ p: 0.25 }}>
+                                                    <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                                </IconButton>
+                                            )}
+                                        </Box>
+                                    </Box>
+                                    {/* Hostname */}
                                     <Box>
                                         <Typography variant="caption" color="textSecondary" display="block">{t('serverList.hostname')}</Typography>
-                                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.hostname || '-'}</Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.hostname || '-'}</Typography>
+                                            {event.hostname && (
+                                                <IconButton size="small" onClick={() => handleCopy(event.hostname!)} sx={{ p: 0.25 }}>
+                                                    <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                                </IconButton>
+                                            )}
+                                        </Box>
                                     </Box>
+                                    {/* Environment */}
                                     <Box>
                                         <Typography variant="caption" color="textSecondary" display="block">{t('serverLifecycle.environment')}</Typography>
-                                        <Typography variant="body2">{event.environmentName || event.environmentId || '-'}</Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Typography variant="body2">{event.environmentName || event.environmentId || '-'}</Typography>
+                                            {(event.environmentName || event.environmentId) && (
+                                                <IconButton size="small" onClick={() => handleCopy(event.environmentName || event.environmentId!)} sx={{ p: 0.25 }}>
+                                                    <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                                </IconButton>
+                                            )}
+                                        </Box>
                                     </Box>
+                                    {/* External Address */}
                                     <Box>
                                         <Typography variant="caption" color="textSecondary" display="block">{t('serverList.externalAddress')}</Typography>
-                                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.externalAddress || '-'}</Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.externalAddress || '-'}</Typography>
+                                            {event.externalAddress && (
+                                                <IconButton size="small" onClick={() => handleCopy(event.externalAddress!)} sx={{ p: 0.25 }}>
+                                                    <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                                </IconButton>
+                                            )}
+                                        </Box>
                                     </Box>
+                                    {/* Internal Address */}
                                     <Box>
                                         <Typography variant="caption" color="textSecondary" display="block">{t('serverList.internalAddress')}</Typography>
-                                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.internalAddress || '-'}</Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.internalAddress || '-'}</Typography>
+                                            {event.internalAddress && (
+                                                <IconButton size="small" onClick={() => handleCopy(event.internalAddress!)} sx={{ p: 0.25 }}>
+                                                    <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                                </IconButton>
+                                            )}
+                                        </Box>
                                     </Box>
+                                    {/* Ports */}
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary" display="block">{t('serverList.ports')}</Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                                                {event.ports ? Object.entries(event.ports).map(([k, v]) => `${k}:${v}`).join(', ') : '-'}
+                                            </Typography>
+                                            {event.ports && Object.keys(event.ports).length > 0 && (
+                                                <IconButton size="small" onClick={() => handleCopy(JSON.stringify(event.ports))} sx={{ p: 0.25 }}>
+                                                    <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                                </IconButton>
+                                            )}
+                                        </Box>
+                                    </Box>
+                                    {/* Cloud Info */}
                                     <Box>
                                         <Typography variant="caption" color="textSecondary" display="block">{t('serverLifecycle.cloudInfo')}</Typography>
-                                        <Typography variant="body2">
-                                            {event.cloudProvider || '-'} / {event.cloudRegion || '-'} / {event.cloudZone || '-'}
-                                        </Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Typography variant="body2">
+                                                {event.cloudProvider || '-'} / {event.cloudRegion || '-'} / {event.cloudZone || '-'}
+                                            </Typography>
+                                            {(event.cloudProvider || event.cloudRegion || event.cloudZone) && (
+                                                <IconButton size="small" onClick={() => handleCopy(`${event.cloudProvider || ''} / ${event.cloudRegion || ''} / ${event.cloudZone || ''}`)} sx={{ p: 0.25 }}>
+                                                    <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                                </IconButton>
+                                            )}
+                                        </Box>
                                     </Box>
+                                    {/* SDK Version */}
                                     <Box>
-                                        <Typography variant="caption" color="textSecondary" display="block">SDK / App Version</Typography>
-                                        <Typography variant="body2">
-                                            {event.sdkVersion || '-'} / {event.appVersion || '-'}
-                                        </Typography>
+                                        <Typography variant="caption" color="textSecondary" display="block">SDK Version</Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Typography variant="body2">{event.sdkVersion || '-'}</Typography>
+                                            {event.sdkVersion && (
+                                                <IconButton size="small" onClick={() => handleCopy(event.sdkVersion!)} sx={{ p: 0.25 }}>
+                                                    <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                                </IconButton>
+                                            )}
+                                        </Box>
                                     </Box>
+                                    {/* App Version */}
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary" display="block">{t('serverList.appVersion')}</Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Typography variant="body2">{event.appVersion || '-'}</Typography>
+                                            {event.appVersion && (
+                                                <IconButton size="small" onClick={() => handleCopy(event.appVersion!)} sx={{ p: 0.25 }}>
+                                                    <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                                </IconButton>
+                                            )}
+                                        </Box>
+                                    </Box>
+                                    {/* Uptime */}
                                     <Box>
                                         <Typography variant="caption" color="textSecondary" display="block">{t('serverLifecycle.uptime')}</Typography>
                                         <Typography variant="body2">{formatUptime(event.uptimeSeconds)}</Typography>
                                     </Box>
+                                    {/* Created At */}
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary" display="block">{t('serverLifecycle.timestamp')}</Typography>
+                                        <RelativeTime date={event.createdAt} />
+                                    </Box>
+                                    {/* Labels */}
+                                    {event.labels && Object.keys(event.labels).length > 0 && (
+                                        <Box sx={{ gridColumn: 'span 3' }}>
+                                            <Typography variant="caption" color="textSecondary" display="block">{t('serverList.labels')}</Typography>
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+                                                {Object.entries(event.labels).map(([k, v]) => (
+                                                    <Chip key={k} label={`${k}: ${v}`} size="small" variant="outlined" />
+                                                ))}
+                                                <IconButton size="small" onClick={() => handleCopy(JSON.stringify(event.labels, null, 2))} sx={{ p: 0.25 }}>
+                                                    <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                                </IconButton>
+                                            </Box>
+                                        </Box>
+                                    )}
+                                    {/* Metadata */}
+                                    {event.metadata && Object.keys(event.metadata).length > 0 && (
+                                        <Box sx={{ gridColumn: 'span 3' }}>
+                                            <Typography variant="caption" color="textSecondary" display="block">{t('serverLifecycle.metadata')}</Typography>
+                                            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5, mt: 0.5 }}>
+                                                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem', whiteSpace: 'pre-wrap' }}>
+                                                    {JSON.stringify(event.metadata, null, 2)}
+                                                </Typography>
+                                                <IconButton size="small" onClick={() => handleCopy(JSON.stringify(event.metadata, null, 2))} sx={{ p: 0.25 }}>
+                                                    <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                                </IconButton>
+                                            </Box>
+                                        </Box>
+                                    )}
                                 </Box>
 
                                 {event.errorMessage && (
@@ -378,6 +525,7 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index }) => 
 const ServerLifecyclePage: React.FC = () => {
     const { t } = useTranslation();
     const { enqueueSnackbar } = useSnackbar();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     // Pagination
     const [page, setPage] = useState(0);
@@ -389,6 +537,12 @@ const ServerLifecyclePage: React.FC = () => {
 
     // Dynamic filters with debouncing to prevent refresh during typing
     const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(() => {
+        // Check for URL instanceId parameter first
+        const urlInstanceId = searchParams.get('instanceId');
+        if (urlInstanceId) {
+            return [{ key: 'instanceId', value: urlInstanceId }];
+        }
+
         try {
             const saved = localStorage.getItem('serverLifecyclePage.activeFilters');
             return saved ? JSON.parse(saved) : [];
@@ -397,6 +551,15 @@ const ServerLifecyclePage: React.FC = () => {
         }
     });
     const debouncedActiveFilters = useDebounce(activeFilters, 500);
+
+    // Clear URL params after initial load to avoid persisting in URL
+    useEffect(() => {
+        const urlInstanceId = searchParams.get('instanceId');
+        if (urlInstanceId) {
+            // Clear the URL parameter after applying filter
+            setSearchParams({}, { replace: true });
+        }
+    }, []);
 
     // Sorting - default to timestamp descending (most recent first)
     const [sortBy, setSortBy] = useState<string>('createdAt');
@@ -528,6 +691,11 @@ const ServerLifecyclePage: React.FC = () => {
         {
             key: 'serviceGroup',
             label: t('serverLifecycle.group'),
+            type: 'text',
+        },
+        {
+            key: 'appVersion',
+            label: t('serverList.appVersion'),
             type: 'text',
         },
         {
@@ -840,7 +1008,7 @@ const ServerLifecyclePage: React.FC = () => {
                     </TableHead>
                     <TableBody>
                         {(data?.data || []).map((event: ServerLifecycleEvent, index: number) => (
-                            <EventRow key={event.id} event={event} visibleColumns={visibleColumns} index={index} />
+                            <EventRow key={event.id} event={event} visibleColumns={visibleColumns} index={index} enqueueSnackbar={enqueueSnackbar} />
                         ))}
                         {!isLoading && (!data?.data || data.data.length === 0) && (
                             <EmptyTableRow colSpan={visibleColumns.length + 1} message={t('serverLifecycle.noEvents')} />

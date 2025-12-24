@@ -58,8 +58,8 @@ const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
   updateInterval,
   showSeconds = false,
 }) => {
-  const { t } = useTranslation();
-  const [relativeText, setRelativeText] = useState(() => formatRelativeTime(date, { showSeconds }));
+  const { t, i18n } = useTranslation();
+  const [relativeText, setRelativeText] = useState(() => formatRelativeTime(date, { showSeconds }, i18n.language));
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Memoize the parsed date to avoid recalculating
@@ -70,9 +70,9 @@ const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
 
   // Update the relative time text only if it actually changed
   const updateRelativeTime = useCallback(() => {
-    const newText = formatRelativeTime(date, { showSeconds });
+    const newText = formatRelativeTime(date, { showSeconds }, i18n.language);
     setRelativeText(prev => prev === newText ? prev : newText);
-  }, [date, showSeconds]);
+  }, [date, showSeconds, i18n.language]);
 
   useEffect(() => {
     // Initial update
@@ -97,7 +97,7 @@ const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
         intervalRef.current = null;
       }
     };
-  }, [parsedDate, updateInterval, updateRelativeTime, showSeconds]);
+  }, [parsedDate, updateInterval, updateRelativeTime, showSeconds, i18n.language]);
 
   // Handle invalid or missing date
   if (!date || relativeText === '-') {
