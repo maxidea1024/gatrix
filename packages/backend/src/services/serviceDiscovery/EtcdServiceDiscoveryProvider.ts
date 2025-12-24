@@ -283,6 +283,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       }
 
       if (input.status !== undefined) {
+        // 'heartbeat' is not a real status - it's just a keep-alive signal
+        // We store it as 'heartbeat' in the database so that watchers can distinguish it
+        // from a status change to 'ready'. Readers will normalize this to 'ready'.
         instance.status = input.status;
       }
 
@@ -361,7 +364,11 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       for (const key of keys) {
         const value = await this.client.get(key).string();
         if (value) {
-          instances.push(JSON.parse(value));
+          const data = JSON.parse(value);
+          if (data.status === 'heartbeat') {
+            data.status = 'ready';
+          }
+          instances.push(data);
         }
       }
 
@@ -409,7 +416,13 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
     try {
       const value = await this.client.get(key).string();
-      return value ? JSON.parse(value) : null;
+      if (!value) return null;
+
+      const data = JSON.parse(value);
+      if (data.status === 'heartbeat') {
+        data.status = 'ready';
+      }
+      return data;
     } catch (error) {
       logger.error(`Failed to get service ${serviceType}:${instanceId}:`, error);
       throw error;

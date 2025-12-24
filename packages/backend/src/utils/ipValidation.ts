@@ -16,23 +16,22 @@ export function isValidIPv4(ip: string): boolean {
  * Validates if a string is a valid IPv6 address
  */
 export function isValidIPv6(ip: string): boolean {
-  const ipv6Regex = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1$|^::$/;
   // More comprehensive IPv6 validation
   try {
     const parts = ip.split(':');
     if (parts.length > 8) return false;
-    
+
     // Handle compressed notation
     if (ip.includes('::')) {
       const doubleParts = ip.split('::');
       if (doubleParts.length > 2) return false;
     }
-    
+
     for (const part of parts) {
       if (part === '') continue; // Allow empty parts for compressed notation
       if (!/^[0-9a-fA-F]{1,4}$/.test(part)) return false;
     }
-    
+
     return true;
   } catch {
     return false;
@@ -52,16 +51,16 @@ export function isValidIP(ip: string): boolean {
 export function isValidCIDR(cidr: string): boolean {
   const parts = cidr.split('/');
   if (parts.length !== 2) return false;
-  
+
   const [ip, prefixStr] = parts;
   const prefix = parseInt(prefixStr, 10);
-  
+
   // Validate IP part
   if (!isValidIP(ip)) return false;
-  
+
   // Validate prefix
   if (isNaN(prefix)) return false;
-  
+
   if (isValidIPv4(ip)) {
     // IPv4 prefix should be 0-32
     return prefix >= 0 && prefix <= 32;
@@ -69,7 +68,7 @@ export function isValidCIDR(cidr: string): boolean {
     // IPv6 prefix should be 0-128
     return prefix >= 0 && prefix <= 128;
   }
-  
+
   return false;
 }
 
@@ -78,15 +77,15 @@ export function isValidCIDR(cidr: string): boolean {
  */
 export function isValidIPOrCIDR(input: string): boolean {
   if (!input || typeof input !== 'string') return false;
-  
+
   // Trim whitespace
   input = input.trim();
-  
+
   // Check if it's a CIDR notation
   if (input.includes('/')) {
     return isValidCIDR(input);
   }
-  
+
   // Check if it's a regular IP address
   return isValidIP(input);
 }
@@ -101,13 +100,13 @@ export function normalizeIPOrCIDR(input: string): string {
   if (!input || typeof input !== 'string') {
     throw new GatrixError('Invalid IP address or CIDR notation', 400);
   }
-  
+
   const normalized = input.trim().toLowerCase();
-  
+
   if (!isValidIPOrCIDR(normalized)) {
     throw new GatrixError('Invalid IP address or CIDR notation format', 400);
   }
-  
+
   return normalized;
 }
 
@@ -118,25 +117,25 @@ export function ipMatchesCIDR(ip: string, cidr: string): boolean {
   try {
     // For simplicity, we'll use a basic implementation
     // In production, you might want to use a library like 'ip-range-check'
-    
+
     if (!cidr.includes('/')) {
       // If it's not CIDR, just compare directly
       return ip === cidr;
     }
-    
+
     const [network, prefixStr] = cidr.split('/');
     const prefix = parseInt(prefixStr, 10);
-    
+
     if (isValidIPv4(ip) && isValidIPv4(network)) {
       return ipv4MatchesCIDR(ip, network, prefix);
     }
-    
+
     // For IPv6, we'll implement a basic check
     // In production, consider using a proper library
     if (isValidIPv6(ip) && isValidIPv6(network)) {
       return ipv6MatchesCIDR(ip, network, prefix);
     }
-    
+
     return false;
   } catch {
     return false;
@@ -150,7 +149,7 @@ function ipv4MatchesCIDR(ip: string, network: string, prefix: number): boolean {
   const ipNum = ipv4ToNumber(ip);
   const networkNum = ipv4ToNumber(network);
   const mask = (0xffffffff << (32 - prefix)) >>> 0;
-  
+
   return (ipNum & mask) === (networkNum & mask);
 }
 
@@ -167,17 +166,17 @@ function ipv4ToNumber(ip: string): number {
 function ipv6MatchesCIDR(ip: string, network: string, prefix: number): boolean {
   // This is a simplified implementation
   // For production use, consider using a proper IPv6 library
-  
+
   // Expand both addresses to full form
   const expandedIP = expandIPv6(ip);
   const expandedNetwork = expandIPv6(network);
-  
+
   if (!expandedIP || !expandedNetwork) return false;
-  
+
   // Convert to binary and compare prefix bits
   const ipBinary = ipv6ToBinary(expandedIP);
   const networkBinary = ipv6ToBinary(expandedNetwork);
-  
+
   return ipBinary.substring(0, prefix) === networkBinary.substring(0, prefix);
 }
 
@@ -196,7 +195,7 @@ function expandIPv6(ip: string): string | null {
       const expanded = [...left, ...middle, ...right];
       ip = expanded.join(':');
     }
-    
+
     // Pad each part to 4 digits
     return ip.split(':').map(part => part.padStart(4, '0')).join(':');
   } catch {
@@ -208,7 +207,7 @@ function expandIPv6(ip: string): string | null {
  * Converts IPv6 address to binary string
  */
 function ipv6ToBinary(ip: string): string {
-  return ip.split(':').map(part => 
+  return ip.split(':').map(part =>
     parseInt(part, 16).toString(2).padStart(16, '0')
   ).join('');
 }
@@ -218,7 +217,7 @@ function ipv6ToBinary(ip: string): string {
  */
 export function getIPDescription(input: string): string {
   if (!input) return 'Invalid';
-  
+
   if (input.includes('/')) {
     const [ip, prefix] = input.split('/');
     if (isValidIPv4(ip)) {

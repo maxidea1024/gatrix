@@ -283,7 +283,7 @@
     "variantUpdated": "변형이 업데이트되었습니다",
     "variantDeleted": "변형이 삭제되었습니다",
     "deploymentHistory": "배포 히스토리",
-    "version": "버전",
+    "version": "Version",
     "message": "메시지",
     "deployedBy": "배포자",
     "deployedAt": "배포일시",
@@ -292,10 +292,10 @@
     "rollback": "롤백",
     "confirmRollback": "정말로 이 버전으로 롤백하시겠습니까",
     "rollbackWarning": "이 작업은 새로운 배포를 생성하여 선택한 버전의 설정을 복원합니다.",
-    "rollbackSuccess": "롤백이 성공적으로 완료되었습니다",
-    "rollbackError": "롤백에 실패했습니다",
+    "rollbackSuccess": "Rollback completed successfully",
+    "rollbackError": "Failed to rollback deployment",
     "loadDeploymentsError": "배포 히스토리를 불러오는데 실패했습니다",
-    "deploymentDetails": "배포 상세정보",
+    "deploymentDetails": "Deployment Details",
     "currentVersion": "현재 버전",
     "targetVersion": "대상 버전",
     "configurationDiff": "설정 차이",
@@ -408,19 +408,14 @@
       "keyNameInvalid": "키 이름은 영문자로 시작하고 영문자, 숫자, 밑줄만 포함할 수 있습니다",
       "defaultValueRequired": "기본값은 필수 입력 항목입니다"
     },
-    "rollbackSuccess": "Rollback completed successfully",
-    "rollbackError": "Failed to rollback deployment",
-    "deploymentDetails": "Deployment Details",
     "versionDetails": "Version Details",
     "configSnapshot": "Config Snapshot",
     "deploymentInfo": "Deployment Information",
     "versionInfo": "Version Information",
     "configId": "Config ID",
-    "version": "Version",
     "changeDescription": "Change Description",
     "createdAt": "Created At",
     "publishedAt": "Published At",
-    "value": "값",
     "noDescription": "설명 없음",
     "noValue": "미설정",
     "configs": "Configs",
@@ -1087,7 +1082,7 @@
     "addTemplate": "메시지 템플릿 추가"
   },
   "maintenance": {
-    "description": "서비스 점검을 설정하고, 점검 메시지와 일정(시작/종료)을 관리합니다.",
+    "description": "점검 기간과 메시지를 설정하세요.",
     "applyEndsAt": "종료 시간 적용",
     "confirmStartKeyword": "점검 시작",
     "confirmStopKeyword": "점검 종료",
@@ -1174,11 +1169,11 @@
     "start": "점검 시작",
     "statusOff": "정상",
     "statusOn": "점검 중",
-    "statusActive": "진행 중",
+    "statusActive": "진행중",
     "statusScheduled": "예약됨",
     "statusInactive": "비활성",
     "stop": "점검 종료",
-    "title": "서비스 점검",
+    "title": "점검 설정",
     "type": "점검 유형",
     "types": {
       "emergency": "긴급 점검",
@@ -1187,14 +1182,12 @@
     "useTemplate": "템플릿 사용",
     "useLanguageSpecificMessages": "언어별 점검 메시지 사용",
     "languageSpecificMessages": "언어별 점검 메시지",
-    "supportsMultiLanguageHelp": "언어별로 다른 점검 메시지를 설정할 수 있습니다",
+    "supportsMultiLanguageHelp": "활성화하면 언어별로 다른 점검 메시지를 설정할 수 있습니다",
     "translate": "자동 번역",
     "translateTooltip": "기본 점검 메시지를 다른 언어로 자동 번역합니다",
     "maintenancePeriodLabel": "점검 기간",
     "immediateStartLabel": "즉시 시작",
     "manualStopLabel": "수동 종료",
-    "title": "점검 설정",
-    "description": "점검 기간과 메시지를 설정하세요.",
     "startDate": "점검 시작일",
     "startDateHelp": "비워두면 즉시 시작, 시간 설정 시 지정된 시간에 자동 시작합니다.",
     "endDate": "점검 종료일",
@@ -1202,9 +1195,7 @@
     "defaultMessage": "기본 점검 메시지",
     "defaultMessageHelp": "모든 언어에서 사용할 기본 점검 메시지를 입력하세요",
     "supportsMultiLanguage": "다국어 점검 메시지 사용",
-    "supportsMultiLanguageHelp": "활성화하면 언어별로 다른 점검 메시지를 설정할 수 있습니다",
-    "languageSpecificMessages": "언어별 점검 메시지",
-    "noTemplateSelected": "선택된 템플릿 없음",
+    "noTemplateSelected": "템플릿을 선택해주세요",
     "scheduledLabel": "예약됨",
     "emergencyLabel": "긴급",
     "regularLabel": "정기",
@@ -1218,12 +1209,9 @@
     "tooltipStartTime": "시작시간",
     "tooltipEndTime": "종료시간",
     "tooltipStatus": "상태",
-    "statusActive": "진행중",
-    "statusScheduled": "예약됨",
     "durationIndefinite": "무기한",
     "clickToManageTooltip": "클릭하여 점검 설정 열기",
-    "templatePreview": "템플릿 미리보기",
-    "noTemplateSelected": "템플릿을 선택해주세요"
+    "templatePreview": "템플릿 미리보기"
   },
   "scheduler": {
     "title": "스케줄 관리",
@@ -1820,8 +1808,7 @@
       "couponSystem": "유연한 쿠폰 생성 및 사용 관리",
       "securityTools": "IP/계정 화이트리스트 및 접근 제어"
     },
-    "learnMore": "더 알아보기",
-    "backToLogin": "로그인으로 돌아가기"
+    "learnMore": "더 알아보기"
   },
   "about": {
     "heroTitle": "게임 운영, 좀 더 편하게",
@@ -2056,7 +2043,7 @@
     }
   },
   "common": {
-    "targetSettings": "타겟 설정",
+    "targetSettings": "대상 지정",
     "action": "작업",
     "actions": "작업",
     "add": "추가",
@@ -2143,7 +2130,7 @@
     "end": "종료",
     "error": "오류",
     "expand": "펼치기",
-    "example": "예시",
+    "example": "예제",
     "export": "내보내기",
     "exporting": "내보내는 중",
     "filter": {
@@ -2189,6 +2176,7 @@
     "play": "재생",
     "previous": "이전",
     "refresh": "새로고침",
+    "refreshed": "새로고침됨",
     "repeat": "반복",
     "required": "필수",
     "optional": "선택사항",
@@ -2296,7 +2284,6 @@
     "demoteUser": "사용자 강등",
     "promoteUserConfirm": "{{name}} 사용자를 관리자로 승격하시겠습니까?",
     "demoteUserConfirm": "{{name}} 사용자를 일반 사용자로 강등하시겠습니까?",
-    "targetSettings": "대상 지정",
     "userPromoted": "사용자가 관리자로 승격되었습니다",
     "userDemoted": "사용자가 일반 사용자로 강등되었습니다",
     "userPromoteFailed": "사용자 승격에 실패했습니다",
@@ -2314,7 +2301,6 @@
     "note": "참고",
     "fieldName": "필드명",
     "isRequired": "필수입니다",
-    "example": "예제",
     "loadError": "데이터를 불러오는데 실패했습니다",
     "deleting": "삭제 중",
     "sdkGuide": {
@@ -2738,6 +2724,7 @@
     "planningData": "기획데이터",
     "serverManagement": "서버관리",
     "serverList": "서버목록",
+    "serverLifecycle": "서버 실행 이력",
     "openApi": "Open API",
     "banners": "배너 관리",
     "environments": "환경 관리"
@@ -3657,14 +3644,7 @@
       "fieldShowOnce": "한 번만 표시 여부",
       "errorResponses": "오류 응답 예시",
       "errorResponsesDesc": "다양한 오류 상황에 대한 응답 예시입니다.",
-      "apiTest": "API 테스트",
-      "parameters": "파라미터",
-      "request": "요청",
-      "response": "응답",
-      "status": "상태",
-      "time": "시간",
-      "headers": "헤더",
-      "body": "본문"
+      "apiTest": "API 테스트"
     }
   },
   "coupons": {
@@ -3761,7 +3741,6 @@
         "descriptionHelp": "쿠폰 설명을 입력합니다.",
         "codeHelp": "쿠폰 코드를 입력합니다. (대문자 영문 A-Z, 숫자 0-9만 가능)",
         "typeCannotBeChanged": "쿠폰 유형은 생성 후 변경할 수 없습니다.",
-        "perUserLimitHelp": "각 사용자가 이 쿠폰을 사용할 수 있는 횟수입니다.",
         "maxTotalUsesHelp": "전체 사용자 기준 총 사용 횟수 제한입니다. 무제한으로 설정할 수 있습니다.",
         "unlimited": "무제한",
         "startsAtHelp": "쿠폰이 유효해지는 시작 일시를 선택합니다. (선택사항) 비워두면 즉시 사용 가능합니다.",
@@ -4204,7 +4183,9 @@
       "npcNotFound": "⚠️ NPC가 OceanNpc 테이블에 존재하지 않습니다"
     },
     "errors": {
-      "loadStatsFailed": "기획데이터 통계를 불러오는데 실패했습니다",
+      "loadRewardTypesFailed": "보상 타입 목록을 불러오는데 실패했습니다",
+      "loadItemsFailed": "아이템 목록을 불러오는데 실패했습니다",
+      "loadStatsFailed": "통계를 불러오는데 실패했습니다",
       "rebuildFailed": "데이터 다시 불러오기에 실패했습니다"
     },
     "upload": {
@@ -4242,13 +4223,7 @@
     "testComponent": {
       "title": "테스트 컴포넌트 (데이터 확인용)"
     },
-    "noData": "데이터가 없습니다",
-    "errors": {
-      "loadRewardTypesFailed": "보상 타입 목록을 불러오는데 실패했습니다",
-      "loadItemsFailed": "아이템 목록을 불러오는데 실패했습니다",
-      "loadStatsFailed": "통계를 불러오는데 실패했습니다",
-      "rebuildFailed": "데이터 다시 불러오기에 실패했습니다"
-    }
+    "noData": "데이터가 없습니다"
   },
   "rewards": {
     "rewardType": "보상 타입",
@@ -4310,10 +4285,10 @@
     "status": {
       "initializing": "초기화 중",
       "ready": "온라인",
-      "shuttingDown": "종료 중",
+      "shutting-down": "종료중",
       "error": "오류",
       "terminated": "종료됨",
-      "noResponse": "응답 없음",
+      "no-response": "응답없음",
       "busy": "비지"
     },
     "statusTooltip": {
@@ -4380,6 +4355,40 @@
       "copyHostname": "호스트명 복사",
       "copyAddress": "IP 주소 복사",
       "healthCheck": "상태 확인"
+    },
+    "hostname": "호스트명",
+    "externalAddress": "공인 IP",
+    "internalAddress": "내부 IP",
+    "ports": "포트",
+    "cloudProvider": "클라우드 프로바이더",
+    "cloudRegion": "클라우드 리전",
+    "cloudZone": "클라우드 존",
+    "serverVersion": "서버 버전",
+    "labels": "레이블",
+    "appVersion": "앱 버전"
+  },
+  "serverLifecycle": {
+    "title": "서버 실행 이력",
+    "subtitle": "서버의 상태 변화 이력을 모니터링합니다.",
+    "searchPlaceholder": "서비스 타입, 인스턴스 ID로 검색...",
+    "eventType": "이벤트 타입",
+    "service": "서비스",
+    "group": "그룹",
+    "uptime": "업타임",
+    "heartbeats": "하트비트",
+    "timestamp": "발생 시각",
+    "details": "상세 정보",
+    "metadata": "메타데이터",
+    "instanceId": "인스턴스 ID",
+    "environment": "환경",
+    "cloudInfo": "클라우드 정보",
+    "error": "오류 메시지",
+    "callStack": "콜 스택",
+    "noEvents": "표시할 이벤트가 없습니다.",
+    "filters": {
+      "serviceType": "서비스 타입",
+      "instanceId": "인스턴스 ID",
+      "eventType": "이벤트 타입"
     }
   },
   "REWARD_TYPE_POINT": "포인트",
@@ -4488,7 +4497,6 @@
   "Restore system data from a backup file": "백업 파일에서 시스템 데이터를 복원합니다",
   "Warning: Importing data will OVERWRITE all existing data and cannot be undone.": "경고: 데이터 가져오기는 모든 기존 데이터를 덮어쓰며 되돌릴 수 없습니다.",
   "Select Backup File (.zip)": "백업 파일 선택 (.zip)",
-  "Import Data": "데이터 가져오기",
   "Importing...": "가져오는 중...",
   "Confirm Data Import": "데이터 가져오기 확인",
   "Are you sure you want to import this data? This action will overwrite all existing database records and files. This cannot be undone.": "정말로 이 데이터를 가져오시겠습니까? 이 작업은 모든 기존 데이터베이스 레코드와 파일을 덮어씁니다. 이 작업은 되돌릴 수 없습니다.",
@@ -4578,7 +4586,6 @@
     "addFirstFrame": "첫 프레임 추가",
     "noFrames": "프레임이 없습니다. 프레임을 추가하여 시작하세요.",
     "frameSettings": "프레임 설정",
-    "addFrame": "프레임 추가",
     "editFrame": "프레임 수정",
     "imageUrl": "이미지 URL",
     "frameType": "타입",
@@ -4767,7 +4774,6 @@
     "deleteSuccess": "환경이 삭제되었습니다",
     "deleteFailed": "환경 삭제에 실패했습니다",
     "cannotDeleteSystem": "시스템 정의 환경은 삭제할 수 없습니다",
-    "cannotDeleteDefault": "기본 환경은 삭제할 수 없습니다",
     "hasRelatedData": "환경에 연관된 데이터가 있어 삭제할 수 없습니다",
     "hasRelatedDataWarning": "이 환경에는 연관된 데이터가 있습니다. 삭제하면 모든 데이터가 함께 삭제됩니다.",
     "noRelatedData": "이 환경에는 연관된 데이터가 없습니다. 안전하게 삭제할 수 있습니다.",

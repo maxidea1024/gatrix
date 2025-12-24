@@ -44,6 +44,7 @@ import { AuthService } from '@/services/auth';
 import { useSnackbar } from 'notistack';
 import { api } from '@/services/api';
 import { Permission, getPermissionLabelKey, PERMISSION_CATEGORIES } from '@/types/permissions';
+import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 
 interface Environment {
   id: string;
@@ -369,7 +370,11 @@ const ProfilePage: React.FC = () => {
                 {user.lastLoginAt && (
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography variant="body2" color="text.secondary">{t('profile.lastLogin')}</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>{new Date(user.lastLoginAt).toLocaleString()}</Typography>
+                    <Tooltip title={formatDateTimeDetailed(user.lastLoginAt)} arrow>
+                      <Typography variant="body2" sx={{ fontWeight: 500, cursor: 'help' }}>
+                        {formatRelativeTime(user.lastLoginAt)}
+                      </Typography>
+                    </Tooltip>
                   </Box>
                 )}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

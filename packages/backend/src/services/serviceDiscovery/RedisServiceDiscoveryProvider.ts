@@ -339,6 +339,9 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
       }
 
       if (input.status !== undefined) {
+        // 'heartbeat' is not a real status - it's just a keep-alive signal
+        // We store it as 'heartbeat' in the database so that watchers can distinguish it
+        // from a status change to 'ready'. Readers will normalize this to 'ready'.
         stat.status = input.status;
       }
 
@@ -376,10 +379,16 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
       await this.client.set(statKey, JSON.stringify(stat), 'EX', ttl);
 
       // Publish update event (merge meta + stat for compatibility)
-      const instance: ServiceInstance = { ...meta, ...stat };
+      const eventInstance: ServiceInstance = { ...meta, ...stat };
+
+      // If original status was 'heartbeat', pass it in the event so listeners (like lifecycle recorder) can skip it
+      if (input.status === 'heartbeat') {
+        eventInstance.status = 'heartbeat';
+      }
+
       await this.publishEvent({
         type: 'put',
-        instance,
+        instance: eventInstance,
       });
 
       logger.debug(`Service status updated: ${serviceType}:${input.instanceId} -> ${stat.status}`);
@@ -524,6 +533,11 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
 
       const meta = JSON.parse(metaValue);
       const stat = JSON.parse(statValue);
+
+      // Normalize 'heartbeat' status to 'ready' for readers
+      if (stat.status === 'heartbeat') {
+        stat.status = 'ready';
+      }
 
       // Merge meta + stat
       return { ...meta, ...stat };

@@ -73,6 +73,14 @@ class SDKManager {
     };
 
     try {
+      let serverVersion = '0.0.0';
+      try {
+        const packageJson = require('../../package.json');
+        serverVersion = packageJson.version || '0.0.0';
+      } catch (err) {
+        logger.warn('Failed to load package.json version, using default 0.0.0');
+      }
+
       this.sdk = new GatrixServerSDK(sdkConfig);
       await this.sdk.initialize();
       logger.info('GatrixServerSDK initialized successfully', {
@@ -85,6 +93,7 @@ class SDKManager {
         labels: {
           service: 'edge',
           group: config.group,
+          appVersion: serverVersion,
         },
         ports: {
           externalApi: config.port,
@@ -98,6 +107,7 @@ class SDKManager {
       });
       logger.info('Edge service registered to Service Discovery via SDK', {
         instanceId: result.instanceId,
+        version: serverVersion,
       });
     } catch (error) {
       logger.error('Failed to initialize GatrixServerSDK:', error);

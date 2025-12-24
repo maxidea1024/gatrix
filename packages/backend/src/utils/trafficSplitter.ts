@@ -350,7 +350,6 @@ export class TrafficSplitterUtils {
     }
 
     // Calculate statistics
-    const expectedCount = sampleSize / 100;
     const mean = sampleSize / 100;
 
     const variance = buckets.reduce((sum, count) => {
@@ -427,8 +426,6 @@ export class TrafficSplitterUtils {
       expected[variant.id.toString()] = variant.trafficPercentage;
     });
 
-    let controlCount = 0;
-
     // Generate samples
     for (let i = 0; i < sampleSize; i++) {
       const userId = `user_${i}`;
@@ -436,8 +433,6 @@ export class TrafficSplitterUtils {
 
       if (selectedVariant) {
         variantCounts[selectedVariant.id.toString()]++;
-      } else {
-        controlCount++;
       }
     }
 

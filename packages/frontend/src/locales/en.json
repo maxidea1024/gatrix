@@ -408,19 +408,14 @@
       "keyNameInvalid": "Key name must start with a letter and contain only letters, numbers, and underscores",
       "defaultValueRequired": "Default value is required"
     },
-    "rollbackSuccess": "Rollback completed successfully",
-    "rollbackError": "Failed to rollback deployment",
-    "deploymentDetails": "Deployment Details",
     "versionDetails": "Version Details",
     "configSnapshot": "Config Snapshot",
     "deploymentInfo": "Deployment Information",
     "versionInfo": "Version Information",
     "configId": "Config ID",
-    "version": "Version",
     "changeDescription": "Change Description",
     "createdAt": "Created At",
     "publishedAt": "Published At",
-    "value": "Value",
     "noDescription": "No description",
     "noValue": "No value",
     "configs": "Configs",
@@ -1087,7 +1082,7 @@
     "addTemplate": "Add Message Template"
   },
   "maintenance": {
-    "description": "Manage service maintenance mode and user notification messages",
+    "description": "Set the maintenance period and message.",
     "applyEndsAt": "Apply End Time",
     "confirmStartKeyword": "Start Maintenance",
     "confirmStopKeyword": "Stop Maintenance",
@@ -1178,7 +1173,7 @@
     "statusScheduled": "Scheduled",
     "statusInactive": "Inactive",
     "stop": "Stop Maintenance",
-    "title": "Service Maintenance",
+    "title": "Maintenance Settings",
     "type": "Maintenance Type",
     "types": {
       "emergency": "Emergency Maintenance",
@@ -1186,15 +1181,13 @@
     },
     "useTemplate": "Use Template",
     "useLanguageSpecificMessages": "Use Language-specific Messages",
-    "languageSpecificMessages": "Language-specific Messages",
-    "supportsMultiLanguageHelp": "Enable different maintenance messages per language",
+    "languageSpecificMessages": "Language-Specific Maintenance Messages",
+    "supportsMultiLanguageHelp": "Enable to set different maintenance messages for each language",
     "translate": "Auto Translate",
     "translateTooltip": "Automatically translate the default maintenance message to other languages",
     "maintenancePeriodLabel": "Maintenance Period",
     "immediateStartLabel": "Start Immediately",
     "manualStopLabel": "Stop Manually",
-    "title": "Maintenance Settings",
-    "description": "Set the maintenance period and message.",
     "startDate": "Maintenance Start Date",
     "startDateHelp": "If left empty, maintenance starts immediately. If set, maintenance starts automatically at the specified time.",
     "endDate": "Maintenance End Date",
@@ -1202,9 +1195,7 @@
     "defaultMessage": "Default Maintenance Message",
     "defaultMessageHelp": "Enter the default maintenance message to be used in all languages",
     "supportsMultiLanguage": "Use Multi-Language Maintenance Messages",
-    "supportsMultiLanguageHelp": "Enable to set different maintenance messages for each language",
-    "languageSpecificMessages": "Language-Specific Maintenance Messages",
-    "noTemplateSelected": "No template selected",
+    "noTemplateSelected": "Please select a template",
     "scheduledLabel": "Scheduled",
     "emergencyLabel": "Emergency",
     "regularLabel": "Regular",
@@ -1218,12 +1209,9 @@
     "tooltipStartTime": "Start Time",
     "tooltipEndTime": "End Time",
     "tooltipStatus": "Status",
-    "statusActive": "Active",
-    "statusScheduled": "Scheduled",
     "durationIndefinite": "Indefinite",
     "clickToManageTooltip": "Click to open maintenance settings",
-    "templatePreview": "Template Preview",
-    "noTemplateSelected": "Please select a template"
+    "templatePreview": "Template Preview"
   },
   "scheduler": {
     "title": "Schedule Management",
@@ -1820,8 +1808,7 @@
       "couponSystem": "Flexible coupon generation & redemption",
       "securityTools": "IP/Account whitelist & access control"
     },
-    "learnMore": "Learn More",
-    "backToLogin": "Back to Login"
+    "learnMore": "Learn More"
   },
   "about": {
     "heroTitle": "Game Ops, Made Easier",
@@ -2189,6 +2176,7 @@
     "play": "Play",
     "previous": "Previous",
     "refresh": "Refresh",
+    "refreshed": "Refreshed",
     "repeat": "Repeat",
     "required": "Required",
     "optional": "Optional",
@@ -2296,7 +2284,6 @@
     "demoteUser": "Demote User",
     "promoteUserConfirm": "Are you sure you want to promote {{name}} to admin?",
     "demoteUserConfirm": "Are you sure you want to demote {{name}} from admin?",
-    "targetSettings": "Target Settings",
     "userPromoted": "User has been promoted to admin",
     "userDemoted": "User has been demoted from admin",
     "userPromoteFailed": "Failed to promote user",
@@ -2314,7 +2301,6 @@
     "note": "Note",
     "fieldName": "Field Name",
     "isRequired": "is required",
-    "example": "Example",
     "loadError": "Failed to load data",
     "deleting": "Deleting",
     "sdkGuide": {
@@ -2723,6 +2709,7 @@
     "monitoring": "Monitoring",
     "grafana": "Monitoring",
     "realtimeEvents": "Realtime Events",
+    "serverLifecycle": "Server LifeCycle",
     "itemRewards": "Item Rewards",
     "serviceNotices": "Service Notices",
     "ingamePopupNotices": "In-game Popup Notices",
@@ -3656,14 +3643,7 @@
       "fieldShowOnce": "Show once per user",
       "errorResponses": "Error Response Examples",
       "errorResponsesDesc": "Response examples for various error scenarios.",
-      "apiTest": "API Test",
-      "parameters": "Parameters",
-      "request": "Request",
-      "response": "Response",
-      "status": "Status",
-      "time": "Time",
-      "headers": "Headers",
-      "body": "Body"
+      "apiTest": "API Test"
     }
   },
   "coupons": {
@@ -3760,7 +3740,6 @@
         "descriptionHelp": "Provide a brief description for this coupon.",
         "codeHelp": "Enter a coupon code. (Uppercase letters A-Z and numbers 0-9 only)",
         "typeCannotBeChanged": "Coupon type cannot be changed after creation.",
-        "perUserLimitHelp": "Number of times each user can use this coupon.",
         "maxTotalUsesHelp": "Total usage limit across all users. Set to unlimited if not restricted.",
         "unlimited": "Unlimited",
         "startsAtHelp": "Select when the coupon becomes valid. (Optional) If left empty, the coupon is immediately available.",
@@ -4206,8 +4185,10 @@
       "npcNotFound": "⚠️ NPC not found in OceanNpc table"
     },
     "errors": {
-      "loadStatsFailed": "Failed to load planning data statistics",
-      "rebuildFailed": "Failed to rebuild data"
+      "loadRewardTypesFailed": "Failed to load reward types",
+      "loadItemsFailed": "Failed to load items",
+      "loadStatsFailed": "Failed to load statistics",
+      "rebuildFailed": "Failed to reload data"
     },
     "upload": {
       "title": "Upload Planning Data",
@@ -4244,13 +4225,7 @@
     "testComponent": {
       "title": "Test Component (Data Verification)"
     },
-    "noData": "No data available",
-    "errors": {
-      "loadRewardTypesFailed": "Failed to load reward types",
-      "loadItemsFailed": "Failed to load items",
-      "loadStatsFailed": "Failed to load statistics",
-      "rebuildFailed": "Failed to reload data"
-    }
+    "noData": "No data available"
   },
   "rewards": {
     "rewardType": "Reward Type",
@@ -4312,10 +4287,11 @@
     "status": {
       "initializing": "Initializing",
       "ready": "Online",
-      "shuttingDown": "Shutting Down",
+      "shutting-down": "Shutting Down",
       "error": "Error",
       "terminated": "Terminated",
-      "noResponse": "No Response"
+      "no-response": "No Response",
+      "busy": "Busy"
     },
     "statusTooltip": {
       "initializing": "The server is starting up and loading configuration. It will automatically transition to 'Online' when ready.",
@@ -4380,7 +4356,17 @@
       "copyHostname": "Copy Hostname",
       "copyAddress": "Copy IP Address",
       "healthCheck": "Health Check"
-    }
+    },
+    "hostname": "Hostname",
+    "externalAddress": "External IP",
+    "internalAddress": "Internal IP",
+    "ports": "Ports",
+    "cloudProvider": "Cloud Provider",
+    "cloudRegion": "Cloud Region",
+    "cloudZone": "Cloud Zone",
+    "serverVersion": "Server Version",
+    "labels": "Labels",
+    "appVersion": "App Version"
   },
   "REWARD_TYPE_POINT": "Point",
   "REWARD_TYPE_ITEM": "Item",
@@ -4577,7 +4563,6 @@
     "addFirstFrame": "Add First Frame",
     "noFrames": "No frames. Add a frame to get started.",
     "frameSettings": "Frame Settings",
-    "addFrame": "Add Frame",
     "editFrame": "Edit Frame",
     "imageUrl": "Image URL",
     "frameType": "Type",
@@ -4703,7 +4688,7 @@
     "delete": "Delete Environment",
     "deleteConfirm": "Are you sure you want to delete this environment?",
     "cannotDeleteSystemDefined": "Cannot delete system-defined environment",
-    "cannotDeleteDefault": "Cannot delete default environment",
+    "cannotDeleteDefault": "Default environment cannot be deleted",
     "cannotDeleteWithData": "Cannot delete environment with existing data",
     "copyEnvironment": "Copy Environment",
     "copyEnvironmentDescription": "Copy data from one environment to another",
@@ -4766,7 +4751,6 @@
     "deleteSuccess": "Environment deleted successfully",
     "deleteFailed": "Failed to delete environment",
     "cannotDeleteSystem": "System-defined environments cannot be deleted",
-    "cannotDeleteDefault": "Default environment cannot be deleted",
     "hasRelatedData": "Cannot delete environment with related data",
     "hasRelatedDataWarning": "This environment has related data. Deleting it will also delete all associated data.",
     "noRelatedData": "This environment has no related data. It can be safely deleted.",
@@ -4797,6 +4781,30 @@
     "hideSuccess": "Environment is now hidden",
     "showSuccess": "Environment is now visible",
     "toggleVisibilityFailed": "Failed to toggle environment visibility"
+  },
+  "serverLifecycle": {
+    "title": "Server LifeCycle Events",
+    "subtitle": "Monitor server status change history.",
+    "searchPlaceholder": "Search by service type, instance ID...",
+    "eventType": "Event Type",
+    "service": "Service",
+    "group": "Group",
+    "uptime": "Uptime",
+    "heartbeats": "Heartbeats",
+    "timestamp": "Timestamp",
+    "details": "Details",
+    "metadata": "Metadata",
+    "instanceId": "Instance ID",
+    "environment": "Environment",
+    "cloudInfo": "Cloud Information",
+    "error": "Error Message",
+    "callStack": "Call Stack",
+    "noEvents": "No events to display.",
+    "filters": {
+      "serviceType": "Service Type",
+      "instanceId": "Instance ID",
+      "eventType": "Event Type"
+    }
   },
   "projects": {
     "title": "Projects",

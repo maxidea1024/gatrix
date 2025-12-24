@@ -94,6 +94,7 @@ export const adminPanelMenuItems: MenuItem[] = [
   {
     text: 'sidebar.serverManagement', icon: <DnsIcon />, adminOnly: true, requiredPermission: [PERMISSIONS.SERVERS_VIEW, PERMISSIONS.SERVERS_MANAGE], children: [
       { text: 'sidebar.serverList', icon: <ServerIcon />, path: '/admin/server-list', adminOnly: true, requiredPermission: [PERMISSIONS.SERVERS_VIEW, PERMISSIONS.SERVERS_MANAGE] },
+      { text: 'sidebar.serverLifecycle', icon: <HistoryIcon />, path: '/admin/server-lifecycle', adminOnly: true, requiredPermission: PERMISSIONS.SERVERS_VIEW },
     ]
   },
   {
@@ -214,9 +215,13 @@ export interface NavItem {
 }
 
 // MenuItem을 NavItem으로 변환 (재귀적)
-export const menuItemToNavItem = (item: MenuItem, parentPath?: string): NavItem => {
+export const menuItemToNavItem = (item: MenuItem, _parentPath?: string): NavItem => {
   // 아이콘 이름 추출 (예: <DashboardIcon /> -> 'Dashboard')
-  const iconName = item.icon.type.name?.replace('Icon', '') || 'Dashboard';
+  let iconName = 'Dashboard';
+  const type = item.icon.type as any;
+  if (type) {
+    iconName = (type.displayName || type.name || 'Dashboard').replace('Icon', '');
+  }
 
   // id 생성: path가 있으면 path 기반, 없으면 text 기반
   const id = item.path
@@ -243,6 +248,6 @@ export const menuItemToNavItem = (item: MenuItem, parentPath?: string): NavItem 
 // Sidebar.tsx용 네비게이션 아이템 생성
 export const getNavigationItems = (isAdmin: boolean): NavItem[] => {
   const items = getAllMenuItems(isAdmin);
-  return items.map(menuItemToNavItem);
+  return items.map(item => menuItemToNavItem(item));
 };
 

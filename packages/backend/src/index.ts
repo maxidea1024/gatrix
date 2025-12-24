@@ -15,6 +15,7 @@ let setDatabaseTimezoneToUTC: any;
 let appInstance: any;
 let SSENotificationService: any;
 let httpServer: any;
+let lifecycleCleanupScheduler: any;
 
 // Backend service instance ID for service discovery
 let backendInstanceId: string | null = null;
@@ -125,7 +126,16 @@ const gracefulShutdown = async (signal: string) => {
       }
     }
 
-    // 8. Clear etcd cleanup interval
+    // 8. Stop lifecycle cleanup scheduler
+    if (lifecycleCleanupScheduler) {
+      try {
+        lifecycleCleanupScheduler.stopLifecycleCleanupScheduler();
+      } catch (error) {
+        if (logger) logger.warn('Error stopping lifecycle cleanup scheduler:', error);
+      }
+    }
+
+    // 9. Clear etcd cleanup interval
     if ((global as any).etcdCleanupInterval) {
       clearInterval((global as any).etcdCleanupInterval);
       if (logger) logger.info('etcd cleanup interval cleared');
@@ -322,6 +332,15 @@ const startServer = async () => {
       logger.warn('Service Discovery initialization failed, continuing:', error);
     }
 
+    // Start lifecycle event cleanup scheduler
+    try {
+      lifecycleCleanupScheduler = await import('./services/lifecycleCleanupScheduler');
+      lifecycleCleanupScheduler.startLifecycleCleanupScheduler();
+      logger.info('Lifecycle event cleanup scheduler started');
+    } catch (error) {
+      logger.warn('Lifecycle cleanup scheduler failed to start, continuing:', error);
+    }
+
     // Start HTTP server (WebSocket? 梨꾪똿?쒕쾭?먯꽌 吏곸젒 泥섎━)
     const server = createServer(app);
     httpServer = server; // Store reference for graceful shutdown
@@ -338,6 +357,13 @@ const startServer = async () => {
       // Must be done AFTER server starts listening
       try {
         const { GatrixServerSDK } = await import('@gatrix/server-sdk');
+        let serverVersion = '0.0.0';
+        try {
+          const packageJson = await import('../package.json');
+          serverVersion = packageJson.version || '0.0.0';
+        } catch (err) {
+          logger.warn('Failed to load package.json version, using default 0.0.0');
+        }
 
         const backendUrl = `http://localhost:${config.port}`;
         const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
@@ -374,6 +400,7 @@ const startServer = async () => {
           labels: {
             service: 'backend',
             group: process.env.SERVICE_GROUP || 'gatrix',
+            appVersion: serverVersion,
           },
           ports: {
             internalApi: config.port,
@@ -388,6 +415,7 @@ const startServer = async () => {
         backendInstanceId = result.instanceId;
         logger.info('Backend service registered to Service Discovery via SDK', {
           instanceId: backendInstanceId,
+          version: serverVersion,
         });
       } catch (error) {
         logger.warn('Backend service registration failed, continuing', { error: error instanceof Error ? error.message : String(error) });

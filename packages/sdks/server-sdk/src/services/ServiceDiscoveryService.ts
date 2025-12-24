@@ -407,8 +407,9 @@ export class ServiceDiscoveryService {
         this.isUpdating = true;
 
         // Include registration backup data for auto-register if service is missing from etcd
+        // Use 'heartbeat' status to distinguish from actual status changes
         await this.updateStatus({
-          status: 'ready',
+          status: 'heartbeat',
           autoRegisterIfMissing: true,
           hostname: this.registrationBackup?.hostname,
           internalAddress: this.registrationBackup?.internalAddress,

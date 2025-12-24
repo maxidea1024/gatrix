@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import VarsModel from '../models/Vars';
+import Environment from '../models/Environment';
 import { pubSubService } from '../services/PubSubService';
 import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 
@@ -26,6 +27,40 @@ export class VarsController {
       }
       const userId = (req as any).user?.userId || (req as any).user?.id;
       await VarsModel.set(key, toStore, userId);
+
+      // Invalidate related caches when specific KV items are updated via setVar
+      if (key === '$clientVersionPassiveData' || key === 'kv:clientVersionPassiveData') {
+        /**
+         * NOTE: This is a temporary workaround for an edge case.
+         * When $clientVersionPassiveData is updated, we MUST invalidate all client version caches
+         * because this data is merged into the client version metadata.
+         * TODO: Refactor this to use a more formal dependency tracking.
+         */
+        await pubSubService.invalidateByPattern('client_version:*');
+        await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
+
+        // Force all SDKs (Edge, Game Servers) to refresh their client versions
+        // by emitting a 'client_version.updated' event for each environment
+
+        try {
+          // Only emit event for the current environment
+          const currentEnvId = (req as any).environment?.id || await import('../utils/environmentContext').then(m => m.getCurrentEnvironmentId());
+          const currentEnv = await Environment.query().findById(currentEnvId);
+
+          if (currentEnv) {
+            await pubSubService.publishSDKEvent({
+              type: 'client_version.updated',
+              data: {
+                id: -1, // Dummy ID to trigger refresh of the list for this environment
+                environment: currentEnv.environmentName
+              }
+            });
+          }
+        } catch (err) {
+          // Log error but don't fail the request
+          console.error('Failed to broadcast client version update events', err);
+        }
+      }
       res.json({ success: true, message: 'Variable saved', data: { key, value: incoming } });
     } catch (e) { next(e); }
   }
@@ -129,10 +164,39 @@ export class VarsController {
 
       // Invalidate related caches when specific KV items are updated
       if (fullKey === '$clientVersionPassiveData' || fullKey === 'kv:clientVersionPassiveData') {
+        /**
+         * NOTE: This is a temporary workaround for an edge case.
+         * When $clientVersionPassiveData is updated, we MUST invalidate all client version caches
+         * because this data is merged into the client version metadata.
+         * Without this invalidation, Edge servers or other consumers might serve stale client info.
+         * TODO: Refactor this to use a more formal dependency tracking or specific invalidation event.
+         */
         // Invalidate all client version caches since meta field includes clientVersionPassiveData
         await pubSubService.invalidateByPattern('client_version:*');
         // Also invalidate Server SDK ETag cache (Edge)
         await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
+
+        // Force all SDKs (Edge, Game Servers) to refresh their client versions
+        // by emitting a 'client_version.updated' event for each environment
+
+        try {
+          // Only emit event for the current environment
+          const currentEnvId = (req as any).environment?.id || await import('../utils/environmentContext').then(m => m.getCurrentEnvironmentId());
+          const currentEnv = await Environment.query().findById(currentEnvId);
+
+          if (currentEnv) {
+            await pubSubService.publishSDKEvent({
+              type: 'client_version.updated',
+              data: {
+                id: -1, // Dummy ID to trigger refresh of the list for this environment
+                environment: currentEnv.environmentName
+              }
+            });
+          }
+        } catch (err) {
+          // Log error but don't fail the request
+          console.error('Failed to broadcast client version update events', err);
+        }
       }
 
       // Invalidate platform/channel caches when they are updated

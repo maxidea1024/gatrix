@@ -330,7 +330,7 @@
     "deleteVariantConfirm": "确定要删除此变体吗",
     "deleteVariantWarning": "此操作无法撤消。",
     "variantName": "变体名称",
-    "value": "值",
+    "value": "Value",
     "weight": "权重",
     "valueHelp": "输入 true、false、42、'text' 或 JSON 对象",
     "weightHelp": "选择此变体的概率 (0-100%)",
@@ -338,7 +338,7 @@
     "variantUpdated": "变体更新成功",
     "variantDeleted": "变体删除成功",
     "deploymentHistory": "部署历史",
-    "version": "版本",
+    "version": "Version",
     "message": "消息",
     "deployedBy": "部署者",
     "deployedAt": "部署时间",
@@ -347,10 +347,10 @@
     "rollback": "回滚",
     "confirmRollback": "确定要回滚到此版本吗",
     "rollbackWarning": "这将创建一个新的部署，恢复所选版本的配置。",
-    "rollbackSuccess": "回滚成功完成",
-    "rollbackError": "回滚部署失败",
+    "rollbackSuccess": "Rollback completed successfully",
+    "rollbackError": "Failed to rollback deployment",
     "loadDeploymentsError": "加载部署历史失败",
-    "deploymentDetails": "部署详情",
+    "deploymentDetails": "Deployment Details",
     "currentVersion": "当前版本",
     "targetVersion": "目标版本",
     "configurationDiff": "配置差异",
@@ -463,19 +463,14 @@
       "keyNameInvalid": "配置键格式无效。必须以字母开头，只能包含字母、数字和下划线",
       "defaultValueRequired": "默认值是必填项"
     },
-    "rollbackSuccess": "Rollback completed successfully",
-    "rollbackError": "Failed to rollback deployment",
-    "deploymentDetails": "Deployment Details",
     "versionDetails": "Version Details",
     "configSnapshot": "Config Snapshot",
     "deploymentInfo": "Deployment Information",
     "versionInfo": "Version Information",
     "configId": "Config ID",
-    "version": "Version",
     "changeDescription": "Change Description",
     "createdAt": "Created At",
     "publishedAt": "Published At",
-    "value": "Value",
     "noDescription": "No description",
     "noValue": "No value",
     "configs": "Configs",
@@ -1142,7 +1137,7 @@
     "addTemplate": "添加消息模板"
   },
   "maintenance": {
-    "description": "服务维护模式管理及用户通知消息设置",
+    "description": "设置维护期间和消息。",
     "applyEndsAt": "应用结束时间",
     "confirmStartKeyword": "开始维护",
     "confirmStopKeyword": "结束维护",
@@ -1233,7 +1228,7 @@
     "statusScheduled": "已安排",
     "statusInactive": "未激活",
     "stop": "停止维护",
-    "title": "服务维护",
+    "title": "维护设置",
     "type": "维护类型",
     "types": {
       "emergency": "紧急维护",
@@ -1241,15 +1236,13 @@
     },
     "useTemplate": "使用模板",
     "useLanguageSpecificMessages": "使用多语言维护消息",
-    "languageSpecificMessages": "多语言维护消息",
-    "supportsMultiLanguageHelp": "为每种语言启用不同的维护消息",
+    "languageSpecificMessages": "语言特定的维护消息",
+    "supportsMultiLanguageHelp": "启用以为每种语言设置不同的维护消息",
     "translate": "自动翻译",
     "translateTooltip": "自动将默认维护消息翻译为其他语言",
     "maintenancePeriodLabel": "维护期间",
     "immediateStartLabel": "立即开始",
     "manualStopLabel": "手动停止",
-    "title": "维护设置",
-    "description": "设置维护期间和消息。",
     "startDate": "维护开始日期",
     "startDateHelp": "如果留空，维护立即开始。如果设置时间，维护将在指定时间自动开始。",
     "endDate": "维护结束日期",
@@ -1257,9 +1250,7 @@
     "defaultMessage": "默认维护消息",
     "defaultMessageHelp": "输入所有语言中使用的默认维护消息",
     "supportsMultiLanguage": "使用多语言维护消息",
-    "supportsMultiLanguageHelp": "启用以为每种语言设置不同的维护消息",
-    "languageSpecificMessages": "语言特定的维护消息",
-    "noTemplateSelected": "未选择模板",
+    "noTemplateSelected": "请选择模板",
     "scheduledLabel": "已安排",
     "emergencyLabel": "紧急",
     "regularLabel": "定期",
@@ -1273,12 +1264,9 @@
     "tooltipStartTime": "开始时间",
     "tooltipEndTime": "结束时间",
     "tooltipStatus": "状态",
-    "statusActive": "进行中",
-    "statusScheduled": "已安排",
     "durationIndefinite": "无限期",
     "clickToManageTooltip": "点击打开维护设置",
-    "templatePreview": "模板预览",
-    "noTemplateSelected": "请选择模板"
+    "templatePreview": "模板预览"
   },
   "scheduler": {
     "title": "调度器管理",
@@ -1875,8 +1863,7 @@
       "couponSystem": "灵活的兑换码生成与使用管理",
       "securityTools": "IP/账号白名单及访问控制"
     },
-    "learnMore": "了解更多",
-    "backToLogin": "返回登录"
+    "learnMore": "了解更多"
   },
   "about": {
     "heroTitle": "游戏运营，更轻松",
@@ -2367,7 +2354,6 @@
     "note": "注意",
     "fieldName": "字段名称",
     "isRequired": "是必需的",
-    "example": "示例",
     "loadError": "加载数据失败",
     "deleting": "删除中",
     "sdkGuide": {
@@ -2375,7 +2361,8 @@
     },
     "relativeTime": {
       "secondsAgo": "{{seconds}}秒前"
-    }
+    },
+    "refreshed": "已刷新"
   },
   "createdAt": "createdAt",
   "dashboard": {
@@ -2791,7 +2778,8 @@
     "serverList": "服务器列表",
     "openApi": "Open API",
     "banners": "横幅管理",
-    "environments": "环境管理"
+    "environments": "环境管理",
+    "serverLifecycle": "服务器运行历史"
   },
   "signUpPrompt": {
     "backToLogin": "返回登录",
@@ -3702,7 +3690,6 @@
       "errorResponses": "错误响应示例",
       "errorResponsesDesc": "各种错误场景的响应示例。",
       "apiTest": "API 测试",
-      "parameters": "参数",
       "request": "请求",
       "response": "响应",
       "status": "状态",
@@ -3766,7 +3753,6 @@
         "descriptionHelp": "输入优惠券描述。",
         "codeHelp": "输入优惠券代码。(仅限大写字母A-Z和数字0-9)",
         "typeCannotBeChanged": "优惠券类型创建后无法更改。",
-        "perUserLimitHelp": "每个用户可以使用此优惠券的次数。",
         "maxTotalUsesHelp": "所有用户的总使用次数限制。可以设置为无限制。",
         "unlimited": "无限制",
         "startsAtHelp": "选择优惠券生效的开始时间。(可选) 如果留空，优惠券将立即可用。",
@@ -4253,7 +4239,9 @@
       "npcNotFound": "⚠️ NPC在OceanNpc表中不存在"
     },
     "errors": {
-      "loadStatsFailed": "加载策划数据统计失败",
+      "loadRewardTypesFailed": "加载奖励类型失败",
+      "loadItemsFailed": "加载物品失败",
+      "loadStatsFailed": "加载统计信息失败",
       "rebuildFailed": "重新加载数据失败"
     },
     "upload": {
@@ -4291,13 +4279,7 @@
     "testComponent": {
       "title": "测试组件（数据验证）"
     },
-    "noData": "没有可用数据",
-    "errors": {
-      "loadRewardTypesFailed": "加载奖励类型失败",
-      "loadItemsFailed": "加载物品失败",
-      "loadStatsFailed": "加载统计信息失败",
-      "rebuildFailed": "重新加载数据失败"
-    }
+    "noData": "没有可用数据"
   },
   "rewards": {
     "rewardType": "奖励类型",
@@ -4359,10 +4341,10 @@
     "status": {
       "initializing": "初始化中",
       "ready": "在线",
-      "shuttingDown": "关闭中",
+      "shutting-down": "关闭中",
       "error": "错误",
       "terminated": "已终止",
-      "noResponse": "无响应"
+      "no-response": "无响应"
     },
     "statusTooltip": {
       "initializing": "服务器正在启动并加载配置。准备就绪后将自动转换为'在线'状态。",
@@ -4427,7 +4409,17 @@
       "copyHostname": "复制主机名",
       "copyAddress": "复制 IP 地址",
       "healthCheck": "健康检查"
-    }
+    },
+    "hostname": "主机名",
+    "externalAddress": "公网 IP",
+    "internalAddress": "内网 IP",
+    "ports": "端口",
+    "cloudProvider": "云提供商",
+    "cloudRegion": "云区域",
+    "cloudZone": "可用区",
+    "serverVersion": "服务器版本",
+    "labels": "标签",
+    "appVersion": "应用版本"
   },
   "REWARD_TYPE_POINT": "点数",
   "REWARD_TYPE_ITEM": "道具",
@@ -4749,7 +4741,7 @@
     "delete": "删除环境",
     "deleteConfirm": "确定要删除此环境吗？",
     "cannotDeleteSystemDefined": "无法删除系统定义的环境",
-    "cannotDeleteDefault": "无法删除默认环境",
+    "cannotDeleteDefault": "默认环境无法删除",
     "cannotDeleteWithData": "无法删除包含数据的环境",
     "copyEnvironment": "复制环境",
     "copyEnvironmentDescription": "将一个环境的数据复制到另一个环境",
@@ -4812,7 +4804,6 @@
     "deleteSuccess": "环境删除成功",
     "deleteFailed": "环境删除失败",
     "cannotDeleteSystem": "系统定义的环境无法删除",
-    "cannotDeleteDefault": "默认环境无法删除",
     "hasRelatedData": "无法删除有关联数据的环境",
     "hasRelatedDataWarning": "此环境有关联数据。删除后所有关联数据也将被删除。",
     "noRelatedData": "此环境没有关联数据，可以安全删除。",
@@ -4849,5 +4840,29 @@
     "create": "创建项目",
     "edit": "编辑项目",
     "delete": "删除项目"
+  },
+  "serverLifecycle": {
+    "title": "服务器生命周期事件",
+    "subtitle": "监控服务器状态变化历史。",
+    "searchPlaceholder": "按服务类型、实例ID搜索...",
+    "eventType": "事件类型",
+    "service": "服务",
+    "group": "分组",
+    "uptime": "运行时间",
+    "heartbeats": "心跳",
+    "timestamp": "发生时间",
+    "details": "详细信息",
+    "metadata": "元数据",
+    "instanceId": "实例 ID",
+    "environment": "环境",
+    "cloudInfo": "云信息",
+    "error": "错误信息",
+    "callStack": "调用堆栈",
+    "noEvents": "没有可显示的事件。",
+    "filters": {
+      "serviceType": "服务类型",
+      "instanceId": "实例 ID",
+      "eventType": "事件类型"
+    }
   }
 }

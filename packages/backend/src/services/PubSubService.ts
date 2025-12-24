@@ -298,8 +298,29 @@ export class PubSubService extends EventEmitter {
    * Invalidate cache by pattern
    */
   async invalidateByPattern(pattern: string): Promise<void> {
-    // Invalidate local cache immediately
+    // Invalidate local cache immediately (L1 + Registry)
     await cacheService.deleteByPattern(pattern);
+
+    // Direct Redis deletion to handle persistent keys that might not be in local registry (e.g. after restart)
+    try {
+      const client = redisClient.getClient();
+      if (client && client.isOpen) {
+        // Keyv default namespace is 'keyv'
+        // We need to match 'keyv:pattern'
+        // Note: This assumes default Keyv namespace. If CacheService changes, this needs update.
+        const keyvPattern = `keyv:${pattern}`;
+
+        // Use KEYS to find matching keys (Note: SCAN would be better for massive datasets but KEYS is acceptable here for administrative ops)
+        const keys = await client.keys(keyvPattern);
+
+        if (keys.length > 0) {
+          await client.del(keys);
+          logger.info(`Direct Redis invalidation: deleted ${keys.length} keys matching ${keyvPattern}`);
+        }
+      }
+    } catch (error) {
+      logger.error('Failed to perform direct Redis invalidation:', error);
+    }
 
     // Broadcast to other instances via queue
     await this.addCacheInvalidationJob({

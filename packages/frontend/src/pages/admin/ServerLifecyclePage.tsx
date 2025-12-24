@@ -1,0 +1,866 @@
+import React, { useState, useCallback, useMemo } from 'react';
+import {
+    Box,
+    Typography,
+    Card,
+    CardContent,
+    TableContainer,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody,
+    TableSortLabel,
+    Chip,
+    IconButton,
+    Paper,
+    Collapse,
+    LinearProgress,
+    TextField,
+    InputAdornment,
+    Tooltip,
+    Popover,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    Checkbox,
+    Button,
+    ClickAwayListener,
+} from '@mui/material';
+import {
+    Refresh as RefreshIcon,
+    Info as InfoIcon,
+    KeyboardArrowDown as KeyboardArrowDownIcon,
+    KeyboardArrowUp as KeyboardArrowUpIcon,
+    History as HistoryIcon,
+    Cloud as CloudIcon,
+    Code as CodeIcon,
+    ErrorOutline as ErrorOutlineIcon,
+    Search as SearchIcon,
+    ViewColumn as ViewColumnIcon,
+    DragIndicator as DragIndicatorIcon,
+    Visibility as VisibilityIcon,
+    VisibilityOff as VisibilityOffIcon,
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import useSWR from 'swr';
+import { RelativeTime } from '../../components/common/RelativeTime';
+import serverLifecycleService, { ServerLifecycleEvent } from '../../services/serverLifecycleService';
+import SimplePagination from '../../components/common/SimplePagination';
+import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
+import { useDebounce } from '../../hooks/useDebounce';
+import EmptyTableRow from '../../components/common/EmptyTableRow';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    useSortable,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+
+// Column definition interface
+interface ColumnConfig {
+    id: string;
+    labelKey: string;
+    visible: boolean;
+    width?: string;
+}
+
+// Sortable column item
+interface SortableColumnItemProps {
+    column: ColumnConfig;
+    onToggleVisibility: (id: string) => void;
+}
+
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+    const { t } = useTranslation();
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: column.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+        <ListItem
+            ref={setNodeRef}
+            style={style}
+            disablePadding
+            secondaryAction={
+                <Box {...attributes} {...listeners} sx={{ cursor: 'grab', display: 'flex', alignItems: 'center', '&:active': { cursor: 'grabbing' } }}>
+                    <DragIndicatorIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
+                </Box>
+            }
+        >
+            <ListItemButton
+                dense
+                onClick={() => onToggleVisibility(column.id)}
+                sx={{ pr: 6 }}
+            >
+                <Checkbox
+                    edge="start"
+                    checked={column.visible}
+                    tabIndex={-1}
+                    disableRipple
+                    size="small"
+                    icon={<VisibilityOffIcon fontSize="small" />}
+                    checkedIcon={<VisibilityIcon fontSize="small" />}
+                />
+                <ListItemText
+                    primary={t(column.labelKey)}
+                    slotProps={{ primary: { variant: 'body2' } }}
+                />
+            </ListItemButton>
+        </ListItem>
+    );
+};
+
+// Event row component
+interface EventRowProps {
+    event: ServerLifecycleEvent;
+    visibleColumns: string[];
+    index: number;
+}
+
+const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index }) => {
+    const { t } = useTranslation();
+    const [open, setOpen] = useState(false);
+
+    // Event type color based on status
+    const getEventColor = (type: string) => {
+        switch (type.toUpperCase()) {
+            case 'INITIALIZING': return 'info';
+            case 'READY': return 'success';
+            case 'SHUTTING_DOWN': return 'warning';
+            case 'TERMINATED': return 'default';
+            case 'ERROR': return 'error';
+            case 'NO_RESPONSE': return 'warning';
+            default: return 'primary';
+        }
+    };
+
+    const formatUptime = (seconds: number) => {
+        if (!seconds) return '-';
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        return `${h}h ${m}m ${s}s`;
+    };
+
+    // Get localized event type label
+    const getEventTypeLabel = (eventType: string) => {
+        const statusKey = eventType.toLowerCase().replace('_', '-');
+        return t(`serverList.status.${statusKey}`, { defaultValue: eventType });
+    };
+
+    const renderCell = (columnId: string) => {
+        switch (columnId) {
+            case 'eventType':
+                return (
+                    <Chip
+                        label={getEventTypeLabel(event.eventType)}
+                        color={getEventColor(event.eventType) as any}
+                        size="small"
+                        sx={{ fontWeight: 'bold', minWidth: 90 }}
+                    />
+                );
+            case 'service':
+                return (
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        {event.serviceType}
+                    </Typography>
+                );
+            case 'group':
+                return <Typography variant="body2">{event.serviceGroup || '-'}</Typography>;
+            case 'hostname':
+                return <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.hostname || '-'}</Typography>;
+            case 'externalAddress':
+                return <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.externalAddress || '-'}</Typography>;
+            case 'internalAddress':
+                return <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.internalAddress || '-'}</Typography>;
+            case 'cloudRegion':
+                return (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {event.cloudRegion ? (
+                            <Chip
+                                icon={<CloudIcon style={{ fontSize: 14 }} />}
+                                label={event.cloudRegion}
+                                size="small"
+                                variant="outlined"
+                            />
+                        ) : '-'}
+                    </Box>
+                );
+            case 'appVersion':
+                return (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {event.appVersion ? (
+                            <Chip
+                                icon={<CodeIcon style={{ fontSize: 14 }} />}
+                                label={event.appVersion}
+                                size="small"
+                                variant="outlined"
+                            />
+                        ) : '-'}
+                    </Box>
+                );
+            case 'environment':
+                return <Typography variant="body2">{event.environmentName || event.environmentId || '-'}</Typography>;
+            case 'instanceId':
+                return <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.instanceId}</Typography>;
+            case 'ports':
+                return (
+                    <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                        {event.ports ? Object.entries(event.ports).map(([k, v]) => `${k}:${v}`).join(', ') : '-'}
+                    </Typography>
+                );
+            case 'cloudProvider':
+                return <Typography variant="body2">{event.cloudProvider || '-'}</Typography>;
+            case 'cloudZone':
+                return <Typography variant="body2">{event.cloudZone || '-'}</Typography>;
+            case 'labels':
+                return (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {event.labels ? Object.entries(event.labels)
+                            .filter(([k]) => !['service', 'group', 'environment'].includes(k))
+                            .slice(0, 3)
+                            .map(([k, v]) => (
+                                <Chip key={k} label={`${k}: ${v}`} size="small" variant="outlined" />
+                            )) : '-'}
+                    </Box>
+                );
+            case 'uptime':
+                return <Typography variant="body2">{formatUptime(event.uptimeSeconds)}</Typography>;
+            case 'timestamp':
+                return <RelativeTime date={event.createdAt} />;
+            default:
+                return null;
+        }
+    };
+
+    // Striped row background
+    const isOdd = index % 2 === 1;
+
+    return (
+        <>
+            <TableRow
+                hover
+                sx={{
+                    '& > *': { borderBottom: 'unset' },
+                    cursor: 'pointer',
+                    bgcolor: (theme) =>
+                        index % 2 === 0
+                            ? 'transparent'
+                            : theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.02)'
+                                : 'rgba(0, 0, 0, 0.02)',
+                }}
+                onClick={() => setOpen(!open)}
+            >
+                <TableCell width="50">
+                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); setOpen(!open); }}>
+                        {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                    </IconButton>
+                </TableCell>
+                {visibleColumns.map((colId) => (
+                    <TableCell key={colId}>{renderCell(colId)}</TableCell>
+                ))}
+            </TableRow>
+            <TableRow>
+                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={visibleColumns.length + 1}>
+                    <Collapse in={open} timeout="auto" unmountOnExit>
+                        <Box sx={{ margin: 2 }}>
+                            <Typography variant="subtitle2" gutterBottom component="div" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <InfoIcon fontSize="small" /> {t('serverLifecycle.details')}
+                            </Typography>
+                            <Paper variant="outlined" sx={{ p: 2, bgcolor: 'action.hover' }}>
+                                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary" display="block">{t('serverLifecycle.instanceId')}</Typography>
+                                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.instanceId}</Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary" display="block">{t('serverList.hostname')}</Typography>
+                                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.hostname || '-'}</Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary" display="block">{t('serverLifecycle.environment')}</Typography>
+                                        <Typography variant="body2">{event.environmentName || event.environmentId || '-'}</Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary" display="block">{t('serverList.externalAddress')}</Typography>
+                                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.externalAddress || '-'}</Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary" display="block">{t('serverList.internalAddress')}</Typography>
+                                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.internalAddress || '-'}</Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary" display="block">{t('serverLifecycle.cloudInfo')}</Typography>
+                                        <Typography variant="body2">
+                                            {event.cloudProvider || '-'} / {event.cloudRegion || '-'} / {event.cloudZone || '-'}
+                                        </Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary" display="block">SDK / App Version</Typography>
+                                        <Typography variant="body2">
+                                            {event.sdkVersion || '-'} / {event.appVersion || '-'}
+                                        </Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary" display="block">{t('serverLifecycle.uptime')}</Typography>
+                                        <Typography variant="body2">{formatUptime(event.uptimeSeconds)}</Typography>
+                                    </Box>
+                                </Box>
+
+                                {event.errorMessage && (
+                                    <Box sx={{ mt: 2 }}>
+                                        <Typography variant="subtitle2" color="error.main" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <ErrorOutlineIcon fontSize="small" /> {t('serverLifecycle.error')}
+                                        </Typography>
+                                        <Paper variant="outlined" sx={{ p: 1, mt: 0.5, bgcolor: 'error.light', color: 'error.contrastText' }}>
+                                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{event.errorMessage}</Typography>
+                                        </Paper>
+                                    </Box>
+                                )}
+
+                                {event.errorStack && (
+                                    <Box sx={{ mt: 2 }}>
+                                        <Typography variant="caption" color="textSecondary" display="block">{t('serverLifecycle.callStack')}</Typography>
+                                        <Box
+                                            sx={{
+                                                mt: 0.5,
+                                                p: 1,
+                                                bgcolor: 'grey.900',
+                                                color: 'grey.100',
+                                                borderRadius: 1,
+                                                maxHeight: 200,
+                                                overflow: 'auto',
+                                                fontFamily: 'monospace',
+                                                fontSize: '0.75rem',
+                                                whiteSpace: 'pre-wrap'
+                                            }}
+                                        >
+                                            {event.errorStack}
+                                        </Box>
+                                    </Box>
+                                )}
+                            </Paper>
+                        </Box>
+                    </Collapse>
+                </TableCell>
+            </TableRow>
+        </>
+    );
+};
+
+const ServerLifecyclePage: React.FC = () => {
+    const { t } = useTranslation();
+    const { enqueueSnackbar } = useSnackbar();
+
+    // Pagination
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(20);
+
+    // Search with debounce
+    const [searchQuery, setSearchQuery] = useState('');
+    const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
+    // Dynamic filters with debouncing to prevent refresh during typing
+    const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(() => {
+        try {
+            const saved = localStorage.getItem('serverLifecyclePage.activeFilters');
+            return saved ? JSON.parse(saved) : [];
+        } catch {
+            return [];
+        }
+    });
+    const debouncedActiveFilters = useDebounce(activeFilters, 500);
+
+    // Sorting - default to timestamp descending (most recent first)
+    const [sortBy, setSortBy] = useState<string>('createdAt');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+    // Column settings - comprehensive list matching server list view
+    const defaultColumns: ColumnConfig[] = [
+        { id: 'eventType', labelKey: 'serverLifecycle.eventType', visible: true },
+        { id: 'service', labelKey: 'serverLifecycle.service', visible: true },
+        { id: 'group', labelKey: 'serverLifecycle.group', visible: true },
+        { id: 'environment', labelKey: 'serverLifecycle.environment', visible: false },
+        { id: 'instanceId', labelKey: 'serverLifecycle.instanceId', visible: false },
+        { id: 'hostname', labelKey: 'serverList.hostname', visible: true },
+        { id: 'externalAddress', labelKey: 'serverList.externalAddress', visible: false },
+        { id: 'internalAddress', labelKey: 'serverList.internalAddress', visible: true },
+        { id: 'ports', labelKey: 'serverList.ports', visible: false },
+        { id: 'cloudProvider', labelKey: 'serverList.cloudProvider', visible: false },
+        { id: 'cloudRegion', labelKey: 'serverList.cloudRegion', visible: false },
+        { id: 'cloudZone', labelKey: 'serverList.cloudZone', visible: false },
+        { id: 'appVersion', labelKey: 'serverList.appVersion', visible: true },
+        { id: 'labels', labelKey: 'serverList.labels', visible: false },
+        { id: 'uptime', labelKey: 'serverLifecycle.uptime', visible: true },
+        { id: 'timestamp', labelKey: 'serverLifecycle.timestamp', visible: true },
+    ];
+
+    const [columns, setColumns] = useState<ColumnConfig[]>(() => {
+        const saved = localStorage.getItem('serverLifecycleColumns');
+        if (saved) {
+            try {
+                const savedColumns = JSON.parse(saved);
+                const mergedColumns = savedColumns.map((savedCol: ColumnConfig) => {
+                    const defaultCol = defaultColumns.find(c => c.id === savedCol.id);
+                    return defaultCol ? { ...defaultCol, ...savedCol } : savedCol;
+                });
+                const savedIds = new Set(savedColumns.map((c: ColumnConfig) => c.id));
+                const newColumns = defaultColumns.filter(c => !savedIds.has(c.id));
+                return [...mergedColumns, ...newColumns];
+            } catch {
+                return defaultColumns;
+            }
+        }
+        return defaultColumns;
+    });
+
+    const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    );
+
+    // Visible columns
+    const visibleColumns = useMemo(() =>
+        columns.filter(c => c.visible).map(c => c.id),
+        [columns]
+    );
+
+    // SWR fetcher
+    const fetcher = useCallback(async () => {
+        const params: any = { page: page + 1, limit: rowsPerPage };
+
+        if (debouncedSearchQuery) {
+            params.search = debouncedSearchQuery;
+        }
+
+        debouncedActiveFilters.forEach(f => {
+            if (f.value) params[f.key] = f.value;
+        });
+
+        // Add sorting
+        params.sortBy = sortBy;
+        params.sortOrder = sortOrder;
+
+        return await serverLifecycleService.getEvents(params);
+    }, [page, rowsPerPage, debouncedSearchQuery, debouncedActiveFilters, sortBy, sortOrder]);
+
+    const { data, isLoading, mutate } = useSWR(
+        `server-lifecycle-events-${page}-${rowsPerPage}-${debouncedSearchQuery}-${JSON.stringify(debouncedActiveFilters)}-${sortBy}-${sortOrder}`,
+        fetcher,
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+            refreshInterval: 0,
+        }
+    );
+
+    // Filter definitions - added hostname, externalAddress, internalAddress filters
+    const filterDefinitions: FilterDefinition[] = useMemo(() => [
+        {
+            key: 'serviceType',
+            label: t('serverLifecycle.filters.serviceType'),
+            type: 'text',
+        },
+        {
+            key: 'eventType',
+            label: t('serverLifecycle.filters.eventType'),
+            type: 'multiselect',
+            operator: 'any_of',
+            allowOperatorToggle: false,
+            options: [
+                { label: t('serverList.status.initializing', { defaultValue: 'Initializing' }), value: 'INITIALIZING' },
+                { label: t('serverList.status.ready', { defaultValue: 'Ready' }), value: 'READY' },
+                { label: t('serverList.status.shutting_down', { defaultValue: 'Shutting Down' }), value: 'SHUTTING_DOWN' },
+                { label: t('serverList.status.error', { defaultValue: 'Error' }), value: 'ERROR' },
+                { label: t('serverList.status.terminated', { defaultValue: 'Terminated' }), value: 'TERMINATED' },
+                { label: t('serverList.status.no-response', { defaultValue: 'No Response' }), value: 'NO_RESPONSE' },
+            ],
+        },
+        {
+            key: 'instanceId',
+            label: t('serverLifecycle.instanceId'),
+            type: 'text',
+        },
+        {
+            key: 'hostname',
+            label: t('serverList.hostname'),
+            type: 'text',
+        },
+        {
+            key: 'externalAddress',
+            label: t('serverList.externalAddress'),
+            type: 'text',
+        },
+        {
+            key: 'internalAddress',
+            label: t('serverList.internalAddress'),
+            type: 'text',
+        },
+        {
+            key: 'serviceGroup',
+            label: t('serverLifecycle.group'),
+            type: 'text',
+        },
+        {
+            key: 'cloudProvider',
+            label: t('serverList.cloudProvider'),
+            type: 'text',
+        },
+        {
+            key: 'cloudRegion',
+            label: t('serverList.cloudRegion'),
+            type: 'text',
+        },
+    ], [t]);
+
+    // Handlers
+    const handleRefresh = useCallback(() => {
+        mutate();
+    }, [mutate]);
+
+    const handleFilterAdd = useCallback((filter: ActiveFilter) => {
+        const newFilters = [...activeFilters, filter];
+        setActiveFilters(newFilters);
+        localStorage.setItem('serverLifecyclePage.activeFilters', JSON.stringify(newFilters));
+        setPage(0);
+    }, [activeFilters]);
+
+    const handleFilterRemove = useCallback((filterKey: string) => {
+        const newFilters = activeFilters.filter(f => f.key !== filterKey);
+        setActiveFilters(newFilters);
+        localStorage.setItem('serverLifecyclePage.activeFilters', JSON.stringify(newFilters));
+        setPage(0);
+    }, [activeFilters]);
+
+    const handleFilterChange = useCallback((filterKey: string, value: any) => {
+        const newFilters = activeFilters.map(f =>
+            f.key === filterKey ? { ...f, value } : f
+        );
+        setActiveFilters(newFilters);
+        localStorage.setItem('serverLifecyclePage.activeFilters', JSON.stringify(newFilters));
+        setPage(0);
+    }, [activeFilters]);
+
+    const handleOperatorChange = useCallback((filterKey: string, operator: 'any_of' | 'include_all') => {
+        const newFilters = activeFilters.map(f =>
+            f.key === filterKey ? { ...f, operator } : f
+        );
+        setActiveFilters(newFilters);
+        localStorage.setItem('serverLifecyclePage.activeFilters', JSON.stringify(newFilters));
+    }, [activeFilters]);
+
+    const handleToggleColumnVisibility = useCallback((columnId: string) => {
+        const newColumns = columns.map(col =>
+            col.id === columnId ? { ...col, visible: !col.visible } : col
+        );
+        setColumns(newColumns);
+        localStorage.setItem('serverLifecycleColumns', JSON.stringify(newColumns));
+    }, [columns]);
+
+    const handleResetColumns = useCallback(() => {
+        setColumns(defaultColumns);
+        localStorage.setItem('serverLifecycleColumns', JSON.stringify(defaultColumns));
+    }, []);
+
+    const handleColumnDragEnd = useCallback((event: DragEndEvent) => {
+        const { active, over } = event;
+        if (over && active.id !== over.id) {
+            const oldIndex = columns.findIndex((col) => col.id === active.id);
+            const newIndex = columns.findIndex((col) => col.id === over.id);
+            const newColumns = arrayMove(columns, oldIndex, newIndex);
+            setColumns(newColumns);
+            localStorage.setItem('serverLifecycleColumns', JSON.stringify(newColumns));
+        }
+    }, [columns]);
+
+    const handlePageChange = useCallback((_: unknown, newPage: number) => {
+        setPage(newPage);
+    }, []);
+
+    const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        const newRowsPerPage = parseInt(event.target.value, 10);
+        setRowsPerPage(newRowsPerPage);
+        setPage(0);
+    }, []);
+
+    // Column to API field mapping for sorting
+    const columnToSortField: Record<string, string> = {
+        eventType: 'eventType',
+        service: 'serviceType',
+        group: 'serviceGroup',
+        hostname: 'hostname',
+        cloudRegion: 'cloudRegion',
+        appVersion: 'appVersion',
+        uptime: 'uptimeSeconds',
+        timestamp: 'createdAt',
+    };
+
+    const handleSort = useCallback((columnId: string) => {
+        const sortField = columnToSortField[columnId];
+        if (!sortField) return; // Column not sortable
+
+        if (sortBy === sortField) {
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortBy(sortField);
+            setSortOrder('desc');
+        }
+        setPage(0);
+    }, [sortBy, sortOrder]);
+
+    return (
+        <Box sx={{ p: 3 }}>
+            {/* Header */}
+            <Box sx={{ mb: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <HistoryIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+                        <Box>
+                            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                                {t('serverLifecycle.title')}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                                {t('serverLifecycle.subtitle')}
+                            </Typography>
+                        </Box>
+                    </Box>
+                </Box>
+            </Box>
+
+            {/* Filters */}
+            <Card sx={{ mb: 3 }}>
+                <CardContent>
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
+                            {/* Search */}
+                            <TextField
+                                placeholder={t('serverLifecycle.searchPlaceholder')}
+                                size="small"
+                                sx={{
+                                    minWidth: 200,
+                                    flexGrow: 1,
+                                    maxWidth: 320,
+                                    '& .MuiOutlinedInput-root': {
+                                        height: '40px',
+                                        borderRadius: '20px',
+                                        bgcolor: 'background.paper',
+                                        transition: 'all 0.2s ease-in-out',
+                                        '& fieldset': {
+                                            borderColor: 'divider',
+                                        },
+                                        '&:hover': {
+                                            bgcolor: 'action.hover',
+                                            '& fieldset': {
+                                                borderColor: 'primary.light',
+                                            }
+                                        },
+                                        '&.Mui-focused': {
+                                            bgcolor: 'background.paper',
+                                            boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                                            '& fieldset': {
+                                                borderColor: 'primary.main',
+                                                borderWidth: '1px',
+                                            }
+                                        }
+                                    },
+                                    '& .MuiInputBase-input': {
+                                        fontSize: '0.875rem',
+                                    }
+                                }}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                slotProps={{
+                                    input: {
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                            </InputAdornment>
+                                        ),
+                                    },
+                                }}
+                            />
+
+                            {/* Dynamic Filter Bar */}
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+                                <DynamicFilterBar
+                                    availableFilters={filterDefinitions}
+                                    activeFilters={activeFilters}
+                                    onFilterAdd={handleFilterAdd}
+                                    onFilterRemove={handleFilterRemove}
+                                    onFilterChange={handleFilterChange}
+                                    onOperatorChange={handleOperatorChange}
+                                />
+
+                                {/* Column Settings Button */}
+                                <Tooltip title={t('common.columnSettings')}>
+                                    <IconButton
+                                        onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                                        sx={{
+                                            bgcolor: 'background.paper',
+                                            border: 1,
+                                            borderColor: 'divider',
+                                            '&:hover': { bgcolor: 'action.hover' },
+                                        }}
+                                    >
+                                        <ViewColumnIcon />
+                                    </IconButton>
+                                </Tooltip>
+
+                                {/* Refresh Button */}
+                                <Tooltip title={t('common.refresh')}>
+                                    <IconButton
+                                        onClick={handleRefresh}
+                                        disabled={isLoading}
+                                        sx={{
+                                            bgcolor: 'background.paper',
+                                            border: 1,
+                                            borderColor: 'divider',
+                                            '&:hover': { bgcolor: 'action.hover' },
+                                        }}
+                                    >
+                                        <RefreshIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </Box>
+                        </Box>
+                    </Box>
+                </CardContent>
+            </Card>
+
+            {/* Column Settings Popover */}
+            <Popover
+                open={Boolean(columnSettingsAnchor)}
+                anchorEl={columnSettingsAnchor}
+                onClose={() => setColumnSettingsAnchor(null)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                disableScrollLock
+                hideBackdrop
+                slotProps={{ paper: { elevation: 8 } }}
+            >
+                <ClickAwayListener onClickAway={() => setColumnSettingsAnchor(null)}>
+                    <Box sx={{ p: 2, minWidth: 250 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                            <Typography variant="subtitle2">{t('common.columnSettings')}</Typography>
+                            <Button size="small" onClick={handleResetColumns}>
+                                {t('common.reset')}
+                            </Button>
+                        </Box>
+                        <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            modifiers={[restrictToVerticalAxis]}
+                            onDragEnd={handleColumnDragEnd}
+                        >
+                            <SortableContext
+                                items={columns.map(c => c.id)}
+                                strategy={verticalListSortingStrategy}
+                            >
+                                <List dense disablePadding>
+                                    {columns.map((column) => (
+                                        <SortableColumnItem
+                                            key={column.id}
+                                            column={column}
+                                            onToggleVisibility={handleToggleColumnVisibility}
+                                        />
+                                    ))}
+                                </List>
+                            </SortableContext>
+                        </DndContext>
+                    </Box>
+                </ClickAwayListener>
+            </Popover>
+
+            {/* Table */}
+            <TableContainer component={Paper} elevation={2} sx={{ borderRadius: 2, position: 'relative' }}>
+                {isLoading && <LinearProgress sx={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 1 }} color="primary" />}
+                <Table
+                    aria-label="server lifecycle table"
+                    size="small"
+                    sx={{
+                        opacity: isLoading ? 0.5 : 1,
+                        transition: 'opacity 0.15s ease-in-out',
+                        pointerEvents: isLoading ? 'none' : 'auto',
+                    }}
+                >
+                    <TableHead sx={{ bgcolor: 'action.hover' }}>
+                        <TableRow>
+                            <TableCell width="50" />
+                            {visibleColumns.map((colId) => {
+                                const col = columns.find(c => c.id === colId);
+                                const sortField = columnToSortField[colId];
+                                const isSortable = !!sortField;
+                                const isActive = sortBy === sortField;
+                                return col ? (
+                                    <TableCell key={colId} sx={{ fontWeight: 600 }}>
+                                        {isSortable ? (
+                                            <TableSortLabel
+                                                active={isActive}
+                                                direction={isActive ? sortOrder : 'desc'}
+                                                onClick={() => handleSort(colId)}
+                                            >
+                                                {t(col.labelKey)}
+                                            </TableSortLabel>
+                                        ) : (
+                                            t(col.labelKey)
+                                        )}
+                                    </TableCell>
+                                ) : null;
+                            })}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {(data?.data || []).map((event: ServerLifecycleEvent, index: number) => (
+                            <EventRow key={event.id} event={event} visibleColumns={visibleColumns} index={index} />
+                        ))}
+                        {!isLoading && (!data?.data || data.data.length === 0) && (
+                            <EmptyTableRow colSpan={visibleColumns.length + 1} message={t('serverLifecycle.noEvents')} />
+                        )}
+                    </TableBody>
+                </Table>
+                {data && (
+                    <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
+                        <SimplePagination
+                            count={data.total}
+                            page={page}
+                            rowsPerPage={rowsPerPage}
+                            onPageChange={handlePageChange}
+                            onRowsPerPageChange={handleRowsPerPageChange}
+                        />
+                    </Box>
+                )}
+            </TableContainer>
+        </Box>
+    );
+};
+
+export default ServerLifecyclePage;

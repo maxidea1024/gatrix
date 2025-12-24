@@ -90,14 +90,26 @@ router.get('/sse', authenticateSSE, async (req, res) => {
 
     // Send initial services
     const services = await serviceDiscoveryService.getServices();
-    res.write(`data: ${JSON.stringify({ type: 'init', data: services })}\n\n`);
+    // Normalize heartbeat status to ready for UI
+    const normalizedServices = services.map(s => {
+      if (s.status === 'heartbeat') {
+        return { ...s, status: 'ready' as const };
+      }
+      return s;
+    });
+    res.write(`data: ${JSON.stringify({ type: 'init', data: normalizedServices })}\n\n`);
 
     // Watch for changes and get unwatch function
     let unwatch: (() => void) | null = null;
     try {
       unwatch = await serviceDiscoveryService.watchServices((event) => {
         try {
-          res.write(`data: ${JSON.stringify({ type: event.type, data: event.instance })}\n\n`);
+          const instance = { ...event.instance };
+          // Normalize heartbeat status to ready for UI
+          if (instance.status === 'heartbeat') {
+            instance.status = 'ready' as any;
+          }
+          res.write(`data: ${JSON.stringify({ type: event.type, data: instance })}\n\n`);
         } catch (error) {
           logger.error('Failed to send SSE event:', error);
         }

@@ -13,15 +13,135 @@ import {
   ServiceInstance,
   WatchCallback,
   UpdateServiceStatusInput,
+  WatchEvent,
 } from '../types/serviceDiscovery';
 import config from '../config';
+import Environment from '../models/Environment';
+import ServerLifecycleEvent from '../models/ServerLifecycleEvent';
 
 class ServiceDiscoveryService {
   private provider: IServiceDiscoveryProvider;
+  private lastSeenStatus: Map<string, string> = new Map(); // instanceId -> status
 
   constructor() {
     this.provider = ServiceDiscoveryFactory.getInstance();
     logger.info('ServiceDiscoveryService initialized (monitoring mode)');
+
+    // Start background event recording
+    this.startEventRecording().catch(err => {
+      logger.error('Failed to start background event recording:', err);
+    });
+  }
+
+  /**
+   * Start background event recording
+   * Watches for all service changes and saves them to the database
+   */
+  private async startEventRecording(): Promise<void> {
+    await this.watchServices(async (event: WatchEvent) => {
+      try {
+        await this.recordLifecycleEvent(event);
+      } catch (err) {
+        logger.error('Error recording lifecycle event:', err);
+      }
+    });
+
+    logger.info('Background event recording started');
+  }
+
+  /**
+   * Record a lifecycle event to the database
+   */
+  private async recordLifecycleEvent(event: WatchEvent): Promise<void> {
+    const { type, instance } = event;
+    const instanceId = instance.instanceId;
+    const currentStatus = (instance.status || '').toLowerCase();
+
+    // Handle delete events - clean up tracking and return
+    if (type === 'delete') {
+      this.lastSeenStatus.delete(instanceId);
+      return;
+    }
+
+    // Skip recording heartbeats (not a real status change, just keep-alive)
+    if (currentStatus === 'heartbeat') {
+      return;
+    }
+
+    // Only record if status has changed (prevent duplicate READY events during heartbeats)
+    const lastStatus = this.lastSeenStatus.get(instanceId);
+    if (lastStatus === currentStatus) {
+      return;
+    }
+
+    const labels = instance.labels;
+    const envName = labels.environment || labels.env || 'development';
+
+    // Resolve environment ID
+    const env = await Environment.getByName(envName);
+    const environmentId = env ? env.id : (await Environment.getDefault())?.id;
+
+    if (!environmentId) {
+      logger.warn(`Could not resolve environment for event: ${envName}`, { labels });
+      return;
+    }
+
+    // Update last seen status if we're going to record
+    this.lastSeenStatus.set(instanceId, currentStatus);
+
+    // Determine event type - use actual status as event type
+    const eventType = currentStatus.toUpperCase().replace('-', '_'); // e.g., 'ready' -> 'READY', 'no-response' -> 'NO_RESPONSE'
+
+    // Calculate uptime if available
+    let uptimeSeconds = 0;
+    if (instance.stats?.uptime) {
+      uptimeSeconds = Math.floor(Number(instance.stats.uptime));
+    } else if (instance.createdAt) {
+      const created = new Date(instance.createdAt).getTime();
+      const now = new Date().getTime();
+      uptimeSeconds = Math.floor((now - created) / 1000);
+    }
+
+    // Extract error info
+    let errorMessage = instance.stats?.lastError || instance.meta?.terminationError;
+    let errorStack: string | undefined;
+
+    if (errorMessage && typeof errorMessage === 'object') {
+      errorStack = errorMessage.stack;
+      errorMessage = errorMessage.message || errorMessage.toString();
+    } else if (instance.stats?.lastErrorStack) {
+      errorStack = instance.stats.lastErrorStack;
+    }
+
+    await ServerLifecycleEvent.recordEvent({
+      environmentId,
+      instanceId: instance.instanceId,
+      serviceType: labels.service,
+      serviceGroup: labels.group,
+      hostname: instance.hostname,
+      externalAddress: instance.externalAddress,
+      internalAddress: instance.internalAddress,
+      ports: instance.ports,
+      cloudProvider: labels.cloudProvider || instance.meta?.cloudProvider,
+      cloudRegion: labels.cloudRegion || instance.meta?.cloudRegion,
+      cloudZone: labels.cloudZone || instance.meta?.cloudZone,
+      labels: instance.labels,
+      appVersion: labels.version || labels.appVersion || instance.meta?.version,
+      sdkVersion: labels.sdkVersion || instance.meta?.sdkVersion,
+      eventType,
+      instanceStatus: instance.status,
+      uptimeSeconds,
+      heartbeatCount: instance.stats?.heartbeatCount || 0,
+      lastHeartbeatAt: instance.updatedAt,
+      errorMessage,
+      errorStack,
+      metadata: {
+        stats: instance.stats,
+        meta: instance.meta,
+      }
+    });
+
+    logger.info(`Server lifecycle event recorded: ${labels.service}:${instanceId} -> ${eventType}`);
   }
 
   /**

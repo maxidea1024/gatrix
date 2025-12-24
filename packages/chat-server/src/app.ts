@@ -300,6 +300,13 @@ class ChatServerApp {
 
           // Register Chat Server service to Service Discovery via SDK
           try {
+            let serverVersion = '0.0.0';
+            try {
+              const packageJson = require('../package.json');
+              serverVersion = packageJson.version || '0.0.0';
+            } catch (err) {
+              logger.warn('Failed to load package.json version, using default 0.0.0');
+            }
             const backendUrl = process.env.GATRIX_URL || 'http://localhost:55000';
             const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
 
@@ -340,6 +347,7 @@ class ChatServerApp {
               labels: {
                 service: 'chat',
                 group: process.env.SERVICE_GROUP || 'gatrix',
+                appVersion: serverVersion,
               },
               ports: {
                 internalApi: config.port,
@@ -353,6 +361,7 @@ class ChatServerApp {
 
             logger.info('Chat Server service registered to Service Discovery via SDK', {
               instanceId: result.instanceId,
+              version: serverVersion,
             });
           } catch (error: any) {
             logger.warn('Chat Server service registration failed, continuing', { error: error instanceof Error ? error.message : String(error) });

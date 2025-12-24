@@ -90,6 +90,7 @@ const config = {
     heartbeatTTL: parseInt(process.env.SERVICE_DISCOVERY_HEARTBEAT_TTL || '30', 10), // Heartbeat TTL in seconds
     inactiveKeepTTL: parseInt(process.env.SERVICE_DISCOVERY_INACTIVE_KEEP_TTL || '60', 10), // How long to keep inactive services (terminated, error, no-response) visible in UI
     terminatedMarkerTTL: parseInt(process.env.SERVICE_DISCOVERY_TERMINATED_MARKER_TTL || '300', 10), // Terminated marker TTL in seconds (300 seconds / 5 minutes for audit trail)
+    lifecycleEventRetentionDays: parseInt(process.env.SERVER_LIFECYCLE_RETENTION_DAYS || '14', 10), // How many days to retain lifecycle events (default: 14 days)
   },
 
   // Monitoring configuration
