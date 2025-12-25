@@ -4285,11 +4285,11 @@
     "status": {
       "initializing": "초기화 중",
       "ready": "온라인",
-      "shutting-down": "종료중",
+      "shuttingDown": "종료중",
       "error": "오류",
       "terminated": "종료됨",
-      "no-response": "응답없음",
-      "busy": "비지"
+      "noResponse": "응답 없음",
+      "busy": "처리 중"
     },
     "statusTooltip": {
       "initializing": "서버가 시작되어 설정을 로드하는 중입니다. 준비가 완료되면 자동으로 '온라인' 상태로 전환됩니다.",

@@ -2662,6 +2662,7 @@ const ServerListPage: React.FC = () => {
     error: t('serverList.status.error'),
     terminated: t('serverList.status.terminated'),
     'no-response': t('serverList.status.noResponse'),
+    busy: t('serverList.status.busy'),
   };
 
   // Filter configuration

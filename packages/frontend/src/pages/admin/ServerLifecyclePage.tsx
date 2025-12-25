@@ -662,10 +662,10 @@ const ServerLifecyclePage: React.FC = () => {
             options: [
                 { label: t('serverList.status.initializing', { defaultValue: 'Initializing' }), value: 'INITIALIZING' },
                 { label: t('serverList.status.ready', { defaultValue: 'Ready' }), value: 'READY' },
-                { label: t('serverList.status.shutting_down', { defaultValue: 'Shutting Down' }), value: 'SHUTTING_DOWN' },
+                { label: t('serverList.status.shuttingDown', { defaultValue: 'Shutting Down' }), value: 'SHUTTING_DOWN' },
                 { label: t('serverList.status.error', { defaultValue: 'Error' }), value: 'ERROR' },
                 { label: t('serverList.status.terminated', { defaultValue: 'Terminated' }), value: 'TERMINATED' },
-                { label: t('serverList.status.no-response', { defaultValue: 'No Response' }), value: 'NO_RESPONSE' },
+                { label: t('serverList.status.noResponse', { defaultValue: 'No Response' }), value: 'NO_RESPONSE' },
             ],
         },
         {
