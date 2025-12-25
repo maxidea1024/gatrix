@@ -58,6 +58,7 @@
     "prom-client": "^13.2.0",
     "rate-limiter-flexible": "^2.4.2",
     "socket.io": "^4.7.5",
+    "socket.io-adapter": "^2.5.5",
     "uuid": "^9.0.1",
     "winston": "^3.11.0",
     "winston-daily-rotate-file": "^5.0.0"

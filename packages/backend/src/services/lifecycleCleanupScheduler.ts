@@ -1,4 +1,4 @@
-import config from '../config';
+import { config } from '../config';
 import ServerLifecycleEvent from '../models/ServerLifecycleEvent';
 import logger from '../config/logger';
 
@@ -9,7 +9,7 @@ let cleanupInterval: ReturnType<typeof setInterval> | null = null;
  * Runs once per day to delete old lifecycle events
  */
 export function startLifecycleCleanupScheduler(): void {
-    const retentionDays = config.serviceDiscovery.lifecycleEventRetentionDays;
+    const retentionDays = config.serviceDiscovery?.lifecycleEventRetentionDays ?? 14;
 
     logger.info(`Starting lifecycle event cleanup scheduler (retention: ${retentionDays} days)`);
 
