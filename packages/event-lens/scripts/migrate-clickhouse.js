@@ -9,10 +9,12 @@ const LOCK_TIMEOUT = 300; // 5 minutes in seconds
 
 const client = createClient({
   url: `http://${process.env.CLICKHOUSE_HOST || 'localhost'}:${process.env.CLICKHOUSE_PORT || '8123'}`,
-  database: process.env.CLICKHOUSE_DATABASE || 'event_lens',
+  // Don't specify database initially to avoid 'UNKNOWN_DATABASE' error if it doesn't exist
   username: process.env.CLICKHOUSE_USERNAME || 'default',
   password: process.env.CLICKHOUSE_PASSWORD || '',
 });
+
+const targetDatabase = process.env.CLICKHOUSE_DATABASE || 'event_lens';
 
 async function acquireLock(connection) {
   try {
@@ -78,9 +80,17 @@ async function migrate() {
     try {
       // 데이터베이스 생성
       await client.exec({
-        query: `CREATE DATABASE IF NOT EXISTS ${process.env.CLICKHOUSE_DATABASE || 'event_lens'}`,
+        query: `CREATE DATABASE IF NOT EXISTS ${targetDatabase}`,
       });
-      console.log('✅ ClickHouse database created');
+      console.log(`✅ ClickHouse database created: ${targetDatabase}`);
+
+      // Re-initialize client with the target database
+      const dbClient = createClient({
+        url: `http://${process.env.CLICKHOUSE_HOST || 'localhost'}:${process.env.CLICKHOUSE_PORT || '8123'}`,
+        database: targetDatabase,
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || '',
+      });
 
       // 마이그레이션 파일 읽기
       const migrationsDir = path.join(__dirname, '../migrations/clickhouse');
@@ -100,7 +110,7 @@ async function migrate() {
 
         for (const statement of statements) {
           if (statement) {
-            await client.exec({ query: statement });
+            await dbClient.exec({ query: statement });
           }
         }
 
