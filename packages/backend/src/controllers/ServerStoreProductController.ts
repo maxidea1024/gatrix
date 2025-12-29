@@ -121,7 +121,7 @@ export class ServerStoreProductController {
       const lang = parseLanguage(req.query.language);
 
       await respondWithEtagCache(res, {
-        cacheKey: `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment.id}:${lang}`,
+        cacheKey: `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment.id}`,
         ttlMs: DEFAULT_CONFIG.STORE_PRODUCT_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {

@@ -30,6 +30,8 @@ app.use(
         imgSrc: ["'self'", 'data:', 'https:', 'http:'],
         fontSrc: ["'self'", 'https:', 'http:', 'data:'],
         connectSrc: ["'self'"],
+        // Disable upgrade-insecure-requests for HTTP environments
+        upgradeInsecureRequests: forceHttps ? [] : null,
       },
     },
     // Disable HTTPS-related headers for HTTP environments

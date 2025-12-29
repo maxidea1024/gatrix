@@ -623,7 +623,7 @@
         const categoryIcon = getCategoryIcon(notice.category);
         const unreadIcon = getUnreadIcon();
 
-        html += '<div class="notice-item' + (selectedNotice && selectedNotice.id === notice.id ? ' active' : '') + '" data-notice-id="' + notice.id + '" onclick="selectNoticeById(' + notice.id + ')">';
+        html += '<div class="notice-item' + (selectedNotice && selectedNotice.id === notice.id ? ' active' : '') + '" data-notice-id="' + notice.id + '">';
         html += '<div class="notice-item-content">';
         html += '<div class="notice-item-header">';
         html += '<div class="notice-item-icon" style="color: #D4A574;">' + categoryIcon + '</div>';
@@ -635,6 +635,14 @@
       });
 
       sidebar.innerHTML = html;
+
+      // Add click event listeners to notice items (Event Delegation)
+      sidebar.querySelectorAll('.notice-item').forEach(function (item) {
+        item.addEventListener('click', function () {
+          const noticeId = parseInt(this.getAttribute('data-notice-id'));
+          selectNoticeById(noticeId);
+        });
+      });
     }
 
     // Select notice by ID
