@@ -1175,6 +1175,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   // Quill formats
   const formats = [
+    'font',
     'header',
     'size',
     'bold',
@@ -1237,6 +1238,64 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       headerPicker.setAttribute('title', t('richTextEditor.header'));
     }
   }, [t, readOnly]);
+
+  // Handle font picker to prevent selection loss
+  useEffect(() => {
+    if (!quillRef.current || readOnly) return;
+
+    const editor = quillRef.current.getEditor();
+    const toolbar = editor.getModule('toolbar') as any;
+    if (!toolbar || !toolbar.container) return;
+
+    const container = toolbar.container as HTMLElement;
+    const fontPicker = container.querySelector('.ql-font');
+    if (!fontPicker) return;
+
+    // Handle font picker item clicks
+    const handleFontItemClick = (e: Event) => {
+      const target = e.target as HTMLElement;
+      const pickerItem = target.closest('.ql-picker-item') as HTMLElement;
+
+      if (pickerItem) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Get font value from data-value attribute
+        const fontValue = pickerItem.getAttribute('data-value');
+
+        // Restore saved selection and apply font
+        const selection = savedSelectionRef.current;
+        if (selection && selection.length > 0) {
+          // Apply font to saved selection
+          editor.formatText(selection.index, selection.length, 'font', fontValue || false);
+          // Restore selection
+          editor.setSelection(selection.index, selection.length);
+        }
+
+        // Close the picker
+        fontPicker.classList.remove('ql-expanded');
+
+        // Focus back to editor
+        editor.focus();
+      }
+    };
+
+    // Prevent mousedown from stealing focus
+    const handleMouseDown = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('.ql-picker-options')) {
+        e.preventDefault();
+      }
+    };
+
+    fontPicker.addEventListener('mousedown', handleMouseDown, true);
+    fontPicker.addEventListener('click', handleFontItemClick, true);
+
+    return () => {
+      fontPicker.removeEventListener('mousedown', handleMouseDown, true);
+      fontPicker.removeEventListener('click', handleFontItemClick, true);
+    };
+  }, [readOnly]);
 
   return (
     <Box sx={{ position: 'relative' }}>
@@ -1306,6 +1365,16 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           '& .ql-picker-options': {
             backgroundColor: theme.palette.background.paper,
             border: `1px solid ${theme.palette.divider}`,
+            zIndex: 9999,
+            position: 'absolute',
+          },
+          // Font picker specific styling
+          '& .ql-font.ql-picker': {
+            '& .ql-picker-options': {
+              zIndex: 99999,
+              maxHeight: '200px',
+              overflowY: 'auto',
+            },
           },
           '& .ql-toolbar button:hover, & .ql-toolbar button:focus': {
             color: theme.palette.primary.main,

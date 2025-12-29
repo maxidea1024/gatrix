@@ -90,6 +90,7 @@ router.get('/:environment/service-notices', async (req: Request, res: Response) 
 
     const environment = req.params.environment;
     const platform = req.query.platform as string | undefined;
+    const fields = req.query.fields as string | undefined;
 
     // Get service notices from cache for this environment
     const envNotices = sdk.getServiceNotices(environment);
@@ -102,6 +103,16 @@ router.get('/:environment/service-notices', async (req: Request, res: Response) 
       );
     }
 
+    // If fields=summary, exclude content for lighter payload (for list view)
+    let responseNotices = filteredNotices;
+    if (fields === 'summary') {
+      responseNotices = filteredNotices.map((n: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { content, ...summary } = n;
+        return summary;
+      });
+    }
+
     // Record cache hit/miss
     if (filteredNotices.length > 0) {
       recordCacheHit('public_service_notices');
@@ -112,7 +123,8 @@ router.get('/:environment/service-notices', async (req: Request, res: Response) 
     logger.debug('Public service notices retrieved', {
       environment,
       platform,
-      count: filteredNotices.length,
+      fields,
+      count: responseNotices.length,
     });
 
     // Disable HTTP caching so browser always gets fresh data from SDK cache
@@ -124,8 +136,8 @@ router.get('/:environment/service-notices', async (req: Request, res: Response) 
     res.json({
       success: true,
       data: {
-        notices: filteredNotices,
-        total: filteredNotices.length,
+        notices: responseNotices,
+        total: responseNotices.length,
       },
     });
   } catch (error) {
@@ -135,6 +147,93 @@ router.get('/:environment/service-notices', async (req: Request, res: Response) 
       error: {
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Failed to retrieve service notices',
+      },
+    });
+  }
+});
+
+/**
+ * @openapi
+ * /public/{environment}/service-notices/{noticeId}:
+ *   get:
+ *     tags: [EdgePublic]
+ *     summary: Get single service notice detail
+ *     description: Returns full content of a specific service notice. No authentication required.
+ *     parameters:
+ *       - in: path
+ *         name: environment
+ *         required: true
+ *         schema: { type: string }
+ *         description: Environment name (e.g., 'staging', 'production')
+ *       - in: path
+ *         name: noticeId
+ *         required: true
+ *         schema: { type: integer }
+ *         description: Notice ID
+ *     responses:
+ *       200:
+ *         description: Service notice detail
+ *       404:
+ *         description: Notice not found
+ */
+router.get('/:environment/service-notices/:noticeId', async (req: Request, res: Response) => {
+  try {
+    const sdk = getSDKOrError(res);
+    if (!sdk) return;
+
+    const environment = req.params.environment;
+    const noticeId = parseInt(req.params.noticeId, 10);
+
+    if (isNaN(noticeId)) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_PARAMETER',
+          message: 'Invalid notice ID',
+        },
+      });
+      return;
+    }
+
+    // Get service notices from cache for this environment
+    const envNotices = sdk.getServiceNotices(environment);
+    const notice = envNotices.find((n: { id: number }) => n.id === noticeId);
+
+    if (!notice) {
+      res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Service notice not found',
+        },
+      });
+      return;
+    }
+
+    recordCacheHit('public_service_notice_detail');
+
+    logger.debug('Public service notice detail retrieved', {
+      environment,
+      noticeId,
+    });
+
+    // Disable HTTP caching
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    res.removeHeader('ETag');
+
+    res.json({
+      success: true,
+      data: notice,
+    });
+  } catch (error) {
+    logger.error('Error getting service notice detail:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to retrieve service notice',
       },
     });
   }

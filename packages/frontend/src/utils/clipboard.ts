@@ -11,6 +11,8 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
   if (!text) return false;
 
   console.log('[Clipboard] Starting copy, text length:', text.length);
+  console.log('[Clipboard] isSecureContext:', window.isSecureContext);
+  console.log('[Clipboard] protocol:', window.location.protocol);
 
   // Try modern Clipboard API first (HTTPS/localhost only)
   if (navigator.clipboard && window.isSecureContext) {
@@ -24,7 +26,23 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
     }
   }
 
-  // Fallback method for non-HTTPS environments or if modern API fails
+  // For HTTP environments, execCommand often returns true but doesn't actually copy
+  // In this case, we need to use a manual prompt fallback
+  const isInsecureContext = !window.isSecureContext || window.location.protocol === 'http:';
+
+  if (isInsecureContext) {
+    console.log('[Clipboard] HTTP environment detected, using prompt fallback');
+    // Show prompt dialog where user can copy with Ctrl+C
+    const result = window.prompt(
+      'HTTP 환경에서는 자동 복사가 지원되지 않습니다.\n아래 URL을 선택 후 Ctrl+C로 복사해주세요:\n\n(Automatic copy is not supported in HTTP environment.\nPlease select and copy with Ctrl+C)',
+      text
+    );
+    // If user clicked OK or Cancel, we consider it "handled"
+    // We return true because the user had the opportunity to copy
+    return result !== null;
+  }
+
+  // Fallback method for other cases
   try {
     console.log('[Clipboard] Using fallback method (execCommand)...');
     const textArea = document.createElement('textarea');

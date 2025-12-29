@@ -313,6 +313,49 @@
       color: #d32f2f;
     }
 
+    /* Full-screen loading overlay */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #E8DDD0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.3s ease-out;
+    }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(107, 93, 82, 0.2);
+      border-top-color: #6B5D52;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .loading-text {
+      margin-top: 16px;
+      font-size: 1rem;
+      color: #6B5D52;
+      font-weight: 500;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
     /*
      * Note: Always use horizontal layout (sidebar left, content right)
      * for UE4 webview compatibility. Sidebar uses percentage width
@@ -402,12 +445,18 @@
 </head>
 
 <body>
+  <!-- Full-screen loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading...</div>
+  </div>
+
   <div class="container">
     <div class="sidebar" id="sidebar">
-      <div class="loading">Loading...</div>
+      <!-- Content loaded dynamically -->
     </div>
     <div class="content" id="content">
-      <div class="loading">Select a notice</div>
+      <!-- Content loaded dynamically -->
     </div>
   </div>
 
@@ -428,6 +477,8 @@
     let notices = [];
     let selectedNotice = null;
     let readNotices = new Set();
+    let noticeContentCache = {}; // Cache for notice content by ID
+    let currentEnvironment = null; // Store environment for API calls
 
     // Initialize
     document.addEventListener('DOMContentLoaded', function () {
@@ -532,10 +583,23 @@
       };
     }
 
+    // Hide loading overlay
+    function hideLoadingOverlay() {
+      const overlay = document.getElementById('loadingOverlay');
+      if (overlay) {
+        overlay.classList.add('hidden');
+        // Remove from DOM after transition
+        setTimeout(function () {
+          overlay.style.display = 'none';
+        }, 300);
+      }
+    }
+
     // Load notices from Edge API
     function loadNotices() {
       const sidebar = document.getElementById('sidebar');
-      sidebar.innerHTML = '<div class="loading">Loading notices...</div>';
+      const loadStartTime = Date.now();
+      const MIN_LOADING_TIME = 2000; // Minimum 2 seconds loading time
 
       // Build query string with parameters
       const urlParams = getUrlParams();
@@ -543,13 +607,15 @@
       // Environment is required - show error if not provided
       if (!urlParams.environment) {
         sidebar.innerHTML = '<div class="error">Environment parameter is required. Please specify ?environment=xxx in the URL.</div>';
+        hideLoadingOverlay();
         return;
       }
 
-      // Build API URL with environment in path
+      // Build API URL with environment in path - use fields=summary to exclude content
       const apiUrl = NOTICES_ENDPOINT_BASE + '/' + encodeURIComponent(urlParams.environment) + '/service-notices';
+      currentEnvironment = urlParams.environment;
 
-      let queryString = '?limit=100';
+      let queryString = '?limit=100&fields=summary';
       if (urlParams.platform) {
         queryString += '&platform=' + encodeURIComponent(urlParams.platform);
       }
@@ -558,6 +624,19 @@
       }
       if (urlParams.subChannel) {
         queryString += '&subchannel=' + encodeURIComponent(urlParams.subChannel);
+      }
+
+      // Helper function to ensure minimum loading time
+      function ensureMinLoadingTime() {
+        return new Promise(function (resolve) {
+          const elapsed = Date.now() - loadStartTime;
+          const remaining = MIN_LOADING_TIME - elapsed;
+          if (remaining > 0) {
+            setTimeout(resolve, remaining);
+          } else {
+            resolve();
+          }
+        });
       }
 
       fetch(apiUrl + queryString)
@@ -580,15 +659,25 @@
           renderNoticeList(notices);
 
           if (notices.length > 0) {
-            selectNotice(notices[0]);
+            selectNoticeById(notices[0].id);
           } else {
             document.getElementById('sidebar').innerHTML = '<div class="empty">No notices</div>';
             document.getElementById('content').innerHTML = '<div class="empty">No active notices</div>';
           }
+
+          // Wait for minimum loading time before hiding overlay
+          return ensureMinLoadingTime();
+        })
+        .then(function () {
+          hideLoadingOverlay();
         })
         .catch(function (error) {
           console.error('Error loading notices:', error);
           sidebar.innerHTML = '<div class="error">Failed to load notices</div>';
+          // Still wait for minimum loading time on error
+          ensureMinLoadingTime().then(function () {
+            hideLoadingOverlay();
+          });
         });
     }
 
@@ -645,16 +734,11 @@
       });
     }
 
-    // Select notice by ID
+    // Select notice by ID - loads content from API if not cached
     function selectNoticeById(noticeId) {
       const notice = notices.find(function (n) { return n.id === noticeId; });
-      if (notice) {
-        selectNotice(notice);
-      }
-    }
+      if (!notice) return;
 
-    // Select and display notice
-    function selectNotice(notice) {
       selectedNotice = notice;
 
       // Mark as read
@@ -669,7 +753,7 @@
         }
       }
 
-      // Update active state
+      // Update active state in sidebar
       document.querySelectorAll('.notice-item').forEach(function (item) {
         item.classList.remove('active');
       });
@@ -679,7 +763,43 @@
         noticeItem.classList.add('active');
       }
 
-      // Render content
+      // Check if content is already cached
+      if (noticeContentCache[noticeId]) {
+        renderNoticeContent(notice, noticeContentCache[noticeId]);
+        return;
+      }
+
+      // Show loading state in content area
+      const content = document.getElementById('content');
+      content.innerHTML = '<div class="loading">Loading...</div>';
+
+      // Fetch notice detail from API
+      const apiUrl = NOTICES_ENDPOINT_BASE + '/' + encodeURIComponent(currentEnvironment) + '/service-notices/' + noticeId;
+
+      fetch(apiUrl)
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error('Failed to load notice');
+          }
+          return response.json();
+        })
+        .then(function (data) {
+          if (data.success && data.data) {
+            // Cache the content
+            noticeContentCache[noticeId] = data.data.content;
+            renderNoticeContent(notice, data.data.content);
+          } else {
+            content.innerHTML = '<div class="error">Failed to load notice content</div>';
+          }
+        })
+        .catch(function (error) {
+          console.error('Error loading notice:', error);
+          content.innerHTML = '<div class="error">Failed to load notice content</div>';
+        });
+    }
+
+    // Render notice content
+    function renderNoticeContent(notice, contentHtml) {
       const content = document.getElementById('content');
       const createdDate = formatDateTime(notice.createdAt);
 
@@ -691,7 +811,7 @@
       html += '</div>';
       html += '</div>';
       html += '<div class="content-body">';
-      html += '<div class="content-text">' + notice.content + '</div>';
+      html += '<div class="content-text">' + contentHtml + '</div>';
       html += '</div>';
 
       content.innerHTML = html;
