@@ -25,7 +25,7 @@ export class WebSocketService {
   constructor(server: http.Server, app: express.Application) {
     this.app = app;
     this.serverId = process.env.SERVER_ID || `chat-server-${process.pid}`;
-    
+
     this.io = new SocketIOServer(server, {
       cors: {
         origin: config.cors.origin,
@@ -51,8 +51,8 @@ export class WebSocketService {
     try {
       const pubClient = redisManager.getPubClient();
       const subClient = redisManager.getSubClient();
-      
-      this.io.adapter(createAdapter(pubClient, subClient));
+
+      this.io.adapter(createAdapter(pubClient, subClient) as any);
       logger.info('Redis adapter configured for Socket.IO');
     } catch (error) {
       logger.error('Failed to setup Redis adapter:', error);
@@ -105,7 +105,7 @@ export class WebSocketService {
     this.io.use(async (socket, next) => {
       const userId = (socket as any).userId;
       const rateLimitKey = `rate_limit:${userId}:${Date.now()}`;
-      
+
       try {
         const cacheService = CacheService.getInstance();
         const currentStr = await cacheService.get<string>(rateLimitKey);
@@ -116,7 +116,7 @@ export class WebSocketService {
         if (current > config.rateLimit.maxRequests) {
           return next(new Error('Rate limit exceeded'));
         }
-        
+
         next();
       } catch (error) {
         logger.error('Rate limiting error:', error);
@@ -144,7 +144,7 @@ export class WebSocketService {
   private async handleConnection(socket: Socket): Promise<void> {
     const userId = (socket as any).userId;
     const userInfo = (socket as any).userInfo;
-    
+
     try {
       // 사용자 연결 정보 저장
       const socketUser: SocketUser = {
@@ -159,7 +159,7 @@ export class WebSocketService {
       };
 
       this.connectedUsers.set(socket.id, socketUser);
-      
+
       // 사용자별 소켓 매핑
       if (!this.userSockets.has(userId)) {
         this.userSockets.set(userId, new Set());
@@ -309,11 +309,11 @@ export class WebSocketService {
 
     socket.join(`channel:${channelId}`);
     socketUser.channels.add(channelId);
-    
+
     // 캐시에 채널 멤버십 저장
     const cacheService = CacheService.getInstance();
     await cacheService.set(`channel_member:${channelId}:${socketUser.userId}`, true, 24 * 60 * 60 * 1000); // 24시간
-    
+
     // 채널 참여 알림
     await this.broadcastService.broadcastToChannel(
       channelId,
@@ -332,11 +332,11 @@ export class WebSocketService {
   private async handleLeaveChannel(socket: Socket, socketUser: SocketUser, channelId: number): Promise<void> {
     socket.leave(`channel:${channelId}`);
     socketUser.channels.delete(channelId);
-    
+
     // 캐시에서 채널 멤버십 제거
     const cacheService = CacheService.getInstance();
     await cacheService.delete(`channel_member:${channelId}:${socketUser.userId}`);
-    
+
     // 채널 나가기 알림
     await this.broadcastService.broadcastToChannel(
       channelId,
@@ -489,7 +489,7 @@ export class WebSocketService {
   private async handleDisconnection(socket: Socket, socketUser: SocketUser, reason: string): Promise<void> {
     // 연결된 사용자 목록에서 제거
     this.connectedUsers.delete(socket.id);
-    
+
     // 사용자별 소켓 매핑에서 제거
     const userSocketSet = this.userSockets.get(socketUser.userId);
     if (userSocketSet) {
@@ -522,7 +522,7 @@ export class WebSocketService {
 
   private getDeviceType(userAgent?: string): 'web' | 'mobile' | 'desktop' {
     if (!userAgent) return 'web';
-    
+
     if (/Mobile|Android|iPhone|iPad/.test(userAgent)) {
       return 'mobile';
     } else if (/Electron/.test(userAgent)) {
@@ -534,7 +534,7 @@ export class WebSocketService {
   private updateServerMetrics(): void {
     const connectedCount = this.connectedUsers.size;
     const channelCounts = new Map<number, number>();
-    
+
     // 채널별 연결 수 계산
     for (const socketUser of this.connectedUsers.values()) {
       for (const channelId of socketUser.channels) {
@@ -594,10 +594,10 @@ export class WebSocketService {
 
   public async shutdown(): Promise<void> {
     logger.info('Shutting down WebSocket service...');
-    
+
     // 모든 연결 종료
     this.io.disconnectSockets(true);
-    
+
     // BroadcastService singleton 정리
     BroadcastService.clearInstance();
 
