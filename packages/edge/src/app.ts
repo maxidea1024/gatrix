@@ -20,23 +20,28 @@ const forceHttps = process.env.EDGE_FORCE_HTTPS !== 'false';
 
 // Security middleware
 // Configure helmet with relaxed CSP for static HTML pages that use inline scripts
+const cspDirectives: Record<string, string[] | null | undefined> = {
+  defaultSrc: ["'self'"],
+  scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for game webview pages
+  styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
+  imgSrc: ["'self'", 'data:', 'https:', 'http:'],
+  fontSrc: ["'self'", 'https:', 'http:', 'data:'],
+  connectSrc: ["'self'"],
+};
+
+// Only add upgrade-insecure-requests for HTTPS environments
+if (forceHttps) {
+  cspDirectives.upgradeInsecureRequests = [];
+}
+
 app.use(
   helmet({
     contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for game webview pages
-        styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
-        imgSrc: ["'self'", 'data:', 'https:', 'http:'],
-        fontSrc: ["'self'", 'https:', 'http:', 'data:'],
-        connectSrc: ["'self'"],
-        // Disable upgrade-insecure-requests for HTTP environments
-        upgradeInsecureRequests: forceHttps ? [] : null,
-      },
+      directives: cspDirectives as any,
     },
     // Disable HTTPS-related headers for HTTP environments
     hsts: forceHttps, // HTTP Strict Transport Security
-    crossOriginOpenerPolicy: forceHttps ? { policy: 'same-origin' } : false,
+    crossOriginOpenerPolicy: forceHttps ? { policy: 'same-origin' as const } : false,
     crossOriginEmbedderPolicy: false, // Disable to allow loading external resources
     originAgentCluster: false, // Disable to avoid origin-keying issues in HTTP
   })

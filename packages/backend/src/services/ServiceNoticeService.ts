@@ -472,9 +472,13 @@ class ServiceNoticeService {
       throw new Error('Service notice not found');
     }
 
-    // Publish SDK Event
+    // Invalidate ETag cache and publish SDK Event
     try {
       const env = await Environment.query().findById(envId);
+
+      // Invalidate ETag cache so SDK fetches fresh data
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${envId}`);
+
       await pubSubService.publishSDKEvent({
         type: 'service_notice.updated',
         data: {

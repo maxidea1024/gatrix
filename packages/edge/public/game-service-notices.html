@@ -305,12 +305,30 @@
       align-items: center;
       justify-content: center;
       height: 100%;
-      font-size: 1rem;
+      font-size: 2rem;
       color: #6B5D52;
     }
 
     .error {
       color: #d32f2f;
+      font-size: 2.5rem;
+    }
+
+    /* Content area loading spinner */
+    .content-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+
+    .content-spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(107, 93, 82, 0.2);
+      border-top-color: #6B5D52;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
 
     /* Full-screen loading overlay */
@@ -341,13 +359,6 @@
       border-top-color: #6B5D52;
       border-radius: 50%;
       animation: spin 1s linear infinite;
-    }
-
-    .loading-text {
-      margin-top: 16px;
-      font-size: 1rem;
-      color: #6B5D52;
-      font-weight: 500;
     }
 
     @keyframes spin {
@@ -448,7 +459,6 @@
   <!-- Full-screen loading overlay -->
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-spinner"></div>
-    <div class="loading-text">Loading...</div>
   </div>
 
   <div class="container">
@@ -604,9 +614,9 @@
       // Build query string with parameters
       const urlParams = getUrlParams();
 
-      // Environment is required - show error if not provided
+      // Environment is required - show warning icon
       if (!urlParams.environment) {
-        sidebar.innerHTML = '<div class="error">Environment parameter is required. Please specify ?environment=xxx in the URL.</div>';
+        sidebar.innerHTML = '<div class="error">⚠️</div>';
         hideLoadingOverlay();
         return;
       }
@@ -661,8 +671,8 @@
           if (notices.length > 0) {
             selectNoticeById(notices[0].id);
           } else {
-            document.getElementById('sidebar').innerHTML = '<div class="empty">No notices</div>';
-            document.getElementById('content').innerHTML = '<div class="empty">No active notices</div>';
+            document.getElementById('sidebar').innerHTML = '<div class="empty">📭</div>';
+            document.getElementById('content').innerHTML = '<div class="empty">📭</div>';
           }
 
           // Wait for minimum loading time before hiding overlay
@@ -673,7 +683,7 @@
         })
         .catch(function (error) {
           console.error('Error loading notices:', error);
-          sidebar.innerHTML = '<div class="error">Failed to load notices</div>';
+          sidebar.innerHTML = '<div class="error">⚠️</div>';
           // Still wait for minimum loading time on error
           ensureMinLoadingTime().then(function () {
             hideLoadingOverlay();
@@ -702,7 +712,7 @@
       const sidebar = document.getElementById('sidebar');
 
       if (noticeList.length === 0) {
-        sidebar.innerHTML = '<div class="empty">No notices</div>';
+        sidebar.innerHTML = '<div class="empty">📭</div>';
         return;
       }
 
@@ -769,12 +779,27 @@
         return;
       }
 
-      // Show loading state in content area
+      // Show header immediately, only show spinner in body area (prevents flicker)
       const content = document.getElementById('content');
-      content.innerHTML = '<div class="loading">Loading...</div>';
+      const createdDate = formatDateTime(notice.createdAt);
+
+      let html = '<div class="content-header">';
+      html += '<div class="content-title">' + escapeHtml(notice.title) + '</div>';
+      html += '<div class="content-meta">';
+      html += '<span class="content-category">' + notice.category.toUpperCase() + '</span>';
+      html += '<span>' + createdDate + '</span>';
+      html += '</div>';
+      html += '</div>';
+      html += '<div class="content-body">';
+      html += '<div class="content-loading"><div class="content-spinner"></div></div>';
+      html += '</div>';
+      content.innerHTML = html;
 
       // Fetch notice detail from API
       const apiUrl = NOTICES_ENDPOINT_BASE + '/' + encodeURIComponent(currentEnvironment) + '/service-notices/' + noticeId;
+
+      const loadStartTime = Date.now();
+      const MIN_CONTENT_LOADING_TIME = 1250; // 1.25 seconds
 
       fetch(apiUrl)
         .then(function (response) {
@@ -784,17 +809,33 @@
           return response.json();
         })
         .then(function (data) {
+          // Ensure minimum loading time
+          const elapsed = Date.now() - loadStartTime;
+          const remaining = MIN_CONTENT_LOADING_TIME - elapsed;
+
+          if (remaining > 0) {
+            return new Promise(function (resolve) {
+              setTimeout(function () { resolve(data); }, remaining);
+            });
+          }
+          return data;
+        })
+        .then(function (data) {
           if (data.success && data.data) {
             // Cache the content
             noticeContentCache[noticeId] = data.data.content;
             renderNoticeContent(notice, data.data.content);
           } else {
-            content.innerHTML = '<div class="error">Failed to load notice content</div>';
+            // Only update body, keep header
+            const bodyEl = content.querySelector('.content-body');
+            if (bodyEl) bodyEl.innerHTML = '<div class="error">⚠️</div>';
           }
         })
         .catch(function (error) {
           console.error('Error loading notice:', error);
-          content.innerHTML = '<div class="error">Failed to load notice content</div>';
+          // Only update body, keep header
+          const bodyEl = content.querySelector('.content-body');
+          if (bodyEl) bodyEl.innerHTML = '<div class="error">⚠️</div>';
         });
     }
 

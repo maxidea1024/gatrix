@@ -152,6 +152,10 @@ class BannerService {
           const env = await Environment.query().findById(banner.environmentId);
           environment = env?.environmentName;
         }
+
+        // Invalidate cache (including ETag cache for SDK)
+        await this.invalidateCache(banner.environmentId);
+
         await pubSubService.publishSDKEvent({
           type: 'banner.created',
           data: {
@@ -372,6 +376,9 @@ class BannerService {
     try {
       const newBannerId = ulid();
       const banner = await BannerModel.duplicate(bannerId, newBannerId, createdBy);
+
+      // Invalidate cache (including ETag cache for SDK)
+      await this.invalidateCache(banner.environmentId);
 
       return banner;
     } catch (error) {
