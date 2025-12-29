@@ -4341,10 +4341,11 @@
     "status": {
       "initializing": "初始化中",
       "ready": "在线",
-      "shutting-down": "关闭中",
+      "shuttingDown": "关闭中",
       "error": "错误",
       "terminated": "已终止",
-      "no-response": "无响应"
+      "noResponse": "无响应",
+      "busy": "繁忙"
     },
     "statusTooltip": {
       "initializing": "服务器正在启动并加载配置。准备就绪后将自动转换为'在线'状态。",
@@ -4352,7 +4353,8 @@
       "shuttingDown": "服务器正在进行正常关闭。新连接可能会被拒绝。",
       "error": "服务器遇到错误，可能无法正常运行。请检查服务器日志以获取详细信息。",
       "terminated": "服务器已关闭或已停止。这是最终状态。",
-      "noResponse": "服务器在预期时间内未发送心跳。服务器可能无响应或存在网络问题。"
+      "noResponse": "服务器在预期时间内未发送心跳。服务器可能无响应或存在网络问题。",
+      "busy": "服务器当前正忙于处理请求。"
     },
     "tooltip": {
       "addressExt": "地址 (外部)",
