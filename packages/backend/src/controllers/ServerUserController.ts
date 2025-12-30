@@ -2,6 +2,13 @@ import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
 import { UserModel } from '../models/User';
 import logger from '../config/logger';
+import {
+  sendBadRequest,
+  sendNotFound,
+  sendInternalError,
+  sendSuccessResponse,
+  ErrorCodes,
+} from '../utils/apiResponse';
 
 export interface ServerUserRequest extends Request {
   apiToken?: any;
@@ -14,42 +21,29 @@ class ServerUserController {
       const userId = parseInt(req.params.id);
 
       if (isNaN(userId)) {
-        return res.status(400).json({
-          success: false,
-          error: 'Invalid user ID'
-        });
+        return sendBadRequest(res, 'Invalid user ID', { field: 'id' });
       }
 
       const user = await UserService.getUserById(userId);
-      
+
       if (!user) {
-        return res.status(404).json({
-          success: false,
-          error: 'User not found'
-        });
+        return sendNotFound(res, 'User not found', ErrorCodes.USER_NOT_FOUND);
       }
 
-      res.json({
-        success: true,
-        data: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          avatarUrl: user.avatarUrl,
-          role: user.role,
-          status: user.status,
-          lastLoginAt: user.lastLoginAt,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt
-        }
+      return sendSuccessResponse(res, {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+        role: user.role,
+        status: user.status,
+        lastLoginAt: user.lastLoginAt,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
       });
 
     } catch (error) {
-      logger.error('Failed to get user by ID:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Internal server error'
-      });
+      return sendInternalError(res, 'Failed to get user by ID', error, ErrorCodes.RESOURCE_FETCH_FAILED);
     }
   }
 
@@ -59,35 +53,23 @@ class ServerUserController {
       const { userIds } = req.body;
 
       if (!Array.isArray(userIds)) {
-        return res.status(400).json({
-          success: false,
-          error: 'userIds must be an array'
-        });
+        return sendBadRequest(res, 'userIds must be an array', { field: 'userIds' });
       }
 
       if (userIds.length === 0) {
-        return res.json({
-          success: true,
-          data: []
-        });
+        return sendSuccessResponse(res, []);
       }
 
       // 최대 100개까지만 허용
       if (userIds.length > 100) {
-        return res.status(400).json({
-          success: false,
-          error: 'Maximum 100 user IDs allowed'
-        });
+        return sendBadRequest(res, 'Maximum 100 user IDs allowed', { maxAllowed: 100, received: userIds.length });
       }
 
       // 모든 ID가 숫자인지 확인
       const validUserIds = userIds.filter(id => Number.isInteger(id) && id > 0);
-      
+
       if (validUserIds.length === 0) {
-        return res.json({
-          success: true,
-          data: []
-        });
+        return sendSuccessResponse(res, []);
       }
 
       // 사용자 정보 조회
@@ -114,17 +96,10 @@ class ServerUserController {
         }
       }
 
-      res.json({
-        success: true,
-        data: users
-      });
+      return sendSuccessResponse(res, users);
 
     } catch (error) {
-      logger.error('Failed to get users by IDs:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Internal server error'
-      });
+      return sendInternalError(res, 'Failed to get users by IDs', error, ErrorCodes.RESOURCE_FETCH_FAILED);
     }
   }
 
@@ -156,21 +131,14 @@ class ServerUserController {
         updatedAt: user.updatedAt
       }));
 
-      res.json({
-        success: true,
-        data: {
-          users: syncUsers,
-          syncAt: new Date().toISOString(),
-          lastSyncAt: since.toISOString(),
-          total: syncUsers.length
-        }
+      return sendSuccessResponse(res, {
+        users: syncUsers,
+        syncAt: new Date().toISOString(),
+        lastSyncAt: since.toISOString(),
+        total: syncUsers.length
       });
     } catch (error) {
-      logger.error('Failed to sync users:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Internal server error'
-      });
+      return sendInternalError(res, 'Failed to sync users', error, ErrorCodes.RESOURCE_FETCH_FAILED);
     }
   }
 }
