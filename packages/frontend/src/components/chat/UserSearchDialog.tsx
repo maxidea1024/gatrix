@@ -27,6 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { debounce } from 'lodash';
 import { apiService } from '../../services/api';
+import { ErrorCodes } from '@gatrix/shared';
 
 interface User {
   id: number;
@@ -258,14 +259,14 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
       const errorMessage = error?.error?.message || error?.message || '';
 
       switch (errorCode) {
-        case 'CHANNEL_MEMBER_EXISTS':
-        case 'ALREADY_MEMBER':
+        case ErrorCodes.CHANNEL_MEMBER_EXISTS:
+        case ErrorCodes.ALREADY_MEMBER:
           // 이미 멤버인 경우 - 멤버 목록 새로고침
           await fetchChannelMembers();
           enqueueSnackbar(t('chat.alreadyMember'), { variant: 'info' });
           break;
-        case 'INVITATION_PENDING':
-        case 'ALREADY_INVITED':
+        case ErrorCodes.INVITATION_PENDING:
+        case ErrorCodes.ALREADY_INVITED:
           // 이미 초대된 경우 - pending invitation 목록 새로고침
           await fetchPendingInvitations();
           enqueueSnackbar(t('chat.alreadyInvited'), { variant: 'warning' });

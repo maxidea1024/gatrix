@@ -47,6 +47,7 @@
     "node": ">=22.0.0"
   },
   "dependencies": {
+    "@gatrix/shared": "file:../../shared",
     "axios": "^1.7.9",
     "ioredis": "^5.8.2",
     "prom-client": "^15.1.3",

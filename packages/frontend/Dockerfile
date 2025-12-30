@@ -12,6 +12,7 @@ RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
 # Copy package files
 COPY package.json yarn.lock* ./
 COPY packages/frontend/package.json ./packages/frontend/
+COPY packages/shared/package.json ./packages/shared/
 
 # Skip Cypress binary download - not needed in production Docker image
 ENV CYPRESS_INSTALL_BINARY=0

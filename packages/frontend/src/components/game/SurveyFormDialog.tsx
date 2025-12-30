@@ -34,6 +34,7 @@ import { useGameWorld } from '../../contexts/GameWorldContext';
 import surveyService, { Survey, TriggerCondition, ParticipationReward, ChannelSubchannelData } from '../../services/surveyService';
 import RewardSelector from './RewardSelector';
 import TargetSettingsGroup from './TargetSettingsGroup';
+import { ErrorCodes } from '@gatrix/shared';
 
 interface SurveyFormDialogProps {
   open: boolean;
@@ -321,11 +322,11 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
 
       // Use error code for specific handling
       switch (errorCode) {
-        case 'RESOURCE_ALREADY_EXISTS':
-        case 'SURVEY_ALREADY_EXISTS':
+        case ErrorCodes.RESOURCE_ALREADY_EXISTS:
+        case ErrorCodes.SURVEY_ALREADY_EXISTS:
           errorMessage = t('surveys.platformSurveyIdExists');
           break;
-        case 'VALIDATION_ERROR':
+        case ErrorCodes.VALIDATION_ERROR:
           if (backendMessage.includes('trigger')) {
             errorMessage = t('surveys.triggerConditionRequired');
           } else {
