@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
 import ServerLifecycleEvent from '../models/ServerLifecycleEvent';
-import logger from '../config/logger';
+import {
+    sendInternalError,
+    sendSuccessResponse,
+    ErrorCodes,
+} from '../utils/apiResponse';
 
 class ServerLifecycleController {
     /**
@@ -73,19 +77,14 @@ class ServerLifecycleController {
 
             const events = await query.page(Number(page) - 1, Number(limit));
 
-            res.json({
-                success: true,
+            return sendSuccessResponse(res, {
                 data: events.results,
                 total: events.total,
                 page: Number(page),
                 limit: Number(limit),
             });
-        } catch (error: any) {
-            logger.error('Failed to get server lifecycle events:', error);
-            res.status(500).json({
-                success: false,
-                error: error.message || 'Failed to get server lifecycle events',
-            });
+        } catch (error) {
+            return sendInternalError(res, 'Failed to get server lifecycle events', error, ErrorCodes.RESOURCE_FETCH_FAILED);
         }
     }
 
@@ -101,16 +100,9 @@ class ServerLifecycleController {
                 .orderBy('createdAt', 'desc')
                 .limit(limit);
 
-            res.json({
-                success: true,
-                data: recentEvents,
-            });
-        } catch (error: any) {
-            logger.error('Failed to get server lifecycle summary:', error);
-            res.status(500).json({
-                success: false,
-                error: error.message || 'Failed to get server lifecycle summary',
-            });
+            return sendSuccessResponse(res, recentEvents);
+        } catch (error) {
+            return sendInternalError(res, 'Failed to get server lifecycle summary', error, ErrorCodes.RESOURCE_FETCH_FAILED);
         }
     }
 }

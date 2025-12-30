@@ -11,6 +11,13 @@ import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
 import { EnvironmentRequest } from '../middleware/environmentResolver';
 import { AuthenticatedRequest } from '../types/auth';
 import { GatrixError } from '../middleware/errorHandler';
+import {
+  sendBadRequest,
+  sendNotFound,
+  sendUnauthorized,
+  sendSuccessResponse,
+  ErrorCodes,
+} from '../utils/apiResponse';
 
 // Validation schemas
 const createIngamePopupNoticeSchema = Joi.object({
@@ -113,10 +120,7 @@ class IngamePopupNoticeController {
 
       const result = await IngamePopupNoticeService.getIngamePopupNotices(page, limit, filters);
 
-      res.json({
-        success: true,
-        ...result
-      });
+      return sendSuccessResponse(res, result);
     } catch (error) {
       next(error);
     }
@@ -138,16 +142,10 @@ class IngamePopupNoticeController {
       const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(id, environment);
 
       if (!notice) {
-        return res.status(404).json({
-          success: false,
-          error: { message: 'Ingame popup notice not found' }
-        });
+        return sendNotFound(res, 'Ingame popup notice not found', ErrorCodes.RESOURCE_NOT_FOUND);
       }
 
-      res.json({
-        success: true,
-        notice
-      });
+      return sendSuccessResponse(res, { notice });
     } catch (error) {
       next(error);
     }
@@ -168,20 +166,14 @@ class IngamePopupNoticeController {
       const { error, value } = createIngamePopupNoticeSchema.validate(req.body);
 
       if (error) {
-        return res.status(400).json({
-          success: false,
-          error: { message: error.details[0].message }
-        });
+        return sendBadRequest(res, error.details[0].message, { validation: error.details });
       }
 
       const data: CreateIngamePopupNoticeData = value;
       const createdBy = req.user?.userId;
 
       if (!createdBy) {
-        return res.status(401).json({
-          success: false,
-          error: { message: 'Unauthorized' }
-        });
+        return sendUnauthorized(res, 'Unauthorized', ErrorCodes.UNAUTHORIZED);
       }
 
       const notice = await IngamePopupNoticeService.createIngamePopupNotice(data, createdBy, environment);
@@ -195,10 +187,7 @@ class IngamePopupNoticeController {
 
       await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
 
-      res.status(201).json({
-        success: true,
-        notice
-      });
+      return sendSuccessResponse(res, { notice }, 'Ingame popup notice created successfully', 201);
     } catch (error) {
       next(error);
     }
@@ -220,20 +209,14 @@ class IngamePopupNoticeController {
       const { error, value } = updateIngamePopupNoticeSchema.validate(req.body);
 
       if (error) {
-        return res.status(400).json({
-          success: false,
-          error: { message: error.details[0].message }
-        });
+        return sendBadRequest(res, error.details[0].message, { validation: error.details });
       }
 
       const data: UpdateIngamePopupNoticeData = value;
       const updatedBy = req.user?.userId;
 
       if (!updatedBy) {
-        return res.status(401).json({
-          success: false,
-          error: { message: 'Unauthorized' }
-        });
+        return sendUnauthorized(res, 'Unauthorized', ErrorCodes.UNAUTHORIZED);
       }
 
       const notice = await IngamePopupNoticeService.updateIngamePopupNotice(id, data, updatedBy, environment);
@@ -247,10 +230,7 @@ class IngamePopupNoticeController {
 
       await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
 
-      res.json({
-        success: true,
-        notice
-      });
+      return sendSuccessResponse(res, { notice }, 'Ingame popup notice updated successfully');
     } catch (error) {
       next(error);
     }
@@ -280,10 +260,7 @@ class IngamePopupNoticeController {
 
       await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
 
-      res.json({
-        success: true,
-        message: 'Ingame popup notice deleted successfully'
-      });
+      return sendSuccessResponse(res, undefined, 'Ingame popup notice deleted successfully');
     } catch (error) {
       next(error);
     }
@@ -303,20 +280,14 @@ class IngamePopupNoticeController {
       }
 
       if (!Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({
-          success: false,
-          error: { message: 'Invalid or empty ids array' }
-        });
+        return sendBadRequest(res, 'Invalid or empty ids array', { field: 'ids' });
       }
 
       await IngamePopupNoticeService.deleteMultipleIngamePopupNotices(ids, environment);
 
       await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
 
-      res.json({
-        success: true,
-        message: `${ids.length} ingame popup notice(s) deleted successfully`
-      });
+      return sendSuccessResponse(res, undefined, `${ids.length} ingame popup notice(s) deleted successfully`);
     } catch (error) {
       next(error);
     }
@@ -339,10 +310,7 @@ class IngamePopupNoticeController {
 
       await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
 
-      res.json({
-        success: true,
-        notice
-      });
+      return sendSuccessResponse(res, { notice }, 'Ingame popup notice status toggled successfully');
     } catch (error) {
       next(error);
     }
@@ -405,19 +373,13 @@ class IngamePopupNoticeController {
       const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(id, environment);
 
       if (!notice) {
-        return res.status(404).json({
-          success: false,
-          error: { message: 'Ingame popup notice not found' }
-        });
+        return sendNotFound(res, 'Ingame popup notice not found', ErrorCodes.RESOURCE_NOT_FOUND);
       }
 
       // Format notice for Server SDK response
       const formattedNotice = IngamePopupNoticeService.formatNoticeForServerSDK(notice);
 
-      res.json({
-        success: true,
-        data: { notice: formattedNotice }
-      });
+      return sendSuccessResponse(res, { notice: formattedNotice });
     } catch (error) {
       next(error);
     }

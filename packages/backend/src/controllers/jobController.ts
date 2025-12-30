@@ -2,7 +2,15 @@ import { Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { JobModel, CreateJobData, UpdateJobData } from '../models/Job';
 import { JobTypeModel } from '../models/JobType';
-import logger from '../config/logger';
+import {
+  sendBadRequest,
+  sendNotFound,
+  sendConflict,
+  sendInternalError,
+  sendSuccessResponse,
+  sendErrorResponse,
+  ErrorCodes,
+} from '../utils/apiResponse';
 
 // Job 목록 조회
 export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
@@ -37,8 +45,7 @@ export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
 
     const result = await JobModel.findAllWithPagination(filters);
 
-    res.json({
-      success: true,
+    return sendSuccessResponse(res, {
       data: result.jobs,
       pagination: {
         total: result.total,
@@ -49,12 +56,7 @@ export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
       }
     });
   } catch (error) {
-    logger.error('Error getting jobs:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to get jobs',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    });
+    return sendInternalError(res, 'Failed to get jobs', error, ErrorCodes.RESOURCE_FETCH_FAILED);
   }
 };
 
@@ -65,32 +67,19 @@ export const getJob = async (req: AuthenticatedRequest, res: Response) => {
     const jobId = parseInt(id);
 
     if (isNaN(jobId)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid job ID'
-      });
+      return sendBadRequest(res, 'Invalid job ID', { field: 'id' });
     }
 
     const environment = req.environment || 'development';
     const job = await JobModel.findById(jobId, environment);
 
     if (!job) {
-      return res.status(404).json({
-        success: false,
-        message: 'Job not found'
-      });
+      return sendNotFound(res, 'Job not found', ErrorCodes.RESOURCE_NOT_FOUND);
     }
-    res.json({
-      success: true,
-      data: job
-    });
+
+    return sendSuccessResponse(res, job);
   } catch (error) {
-    logger.error('Error getting job:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to get job',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    });
+    return sendInternalError(res, 'Failed to get job', error, ErrorCodes.RESOURCE_FETCH_FAILED);
   }
 };
 
@@ -108,19 +97,13 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
 
     // 필수 필드 검증
     if (!name || !jobTypeId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Name and jobTypeId are required'
-      });
+      return sendBadRequest(res, 'Name and jobTypeId are required', { fields: ['name', 'jobTypeId'] });
     }
 
     // Job 타입 존재 여부 확인
     const jobType = await JobTypeModel.findById(jobTypeId);
     if (!jobType) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid job type'
-      });
+      return sendBadRequest(res, 'Invalid job type', { field: 'jobTypeId' });
     }
 
     const environment = req.environment || 'development';
@@ -128,11 +111,7 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
     // Job 이름 중복 검증
     const existingJob = await JobModel.findByName(name, environment);
     if (existingJob) {
-      return res.status(409).json({
-        success: false,
-        message: 'Job name already exists',
-        error: { message: 'A job with this name already exists' }
-      });
+      return sendConflict(res, 'A job with this name already exists', ErrorCodes.RESOURCE_ALREADY_EXISTS);
     }
 
     // 사용자 ID 가져오기 (인증된 사용자)
@@ -152,18 +131,9 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
 
     const createdJob = await JobModel.create(jobData);
 
-    res.status(201).json({
-      success: true,
-      data: createdJob,
-      message: 'Job created successfully'
-    });
+    return sendSuccessResponse(res, createdJob, 'Job created successfully', 201);
   } catch (error) {
-    logger.error('Error creating job:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to create job',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    });
+    return sendInternalError(res, 'Failed to create job', error, ErrorCodes.RESOURCE_CREATE_FAILED);
   }
 };
 
@@ -174,10 +144,7 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
     const jobId = parseInt(id);
 
     if (isNaN(jobId)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid job ID'
-      });
+      return sendBadRequest(res, 'Invalid job ID', { field: 'id' });
     }
 
     const environment = req.environment || 'development';
@@ -185,10 +152,7 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
     // Job 존재 여부 확인
     const existingJob = await JobModel.findById(jobId, environment);
     if (!existingJob) {
-      return res.status(404).json({
-        success: false,
-        message: 'Job not found'
-      });
+      return sendNotFound(res, 'Job not found', ErrorCodes.RESOURCE_NOT_FOUND);
     }
 
     const {
@@ -206,11 +170,7 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
     // Job 이름 중복 검증 (이름이 변경되는 경우에만)
     const existingJobByName = await JobModel.findByName(name, environment);
     if (existingJobByName && existingJobByName.id !== jobId) {
-      return res.status(409).json({
-        success: false,
-        message: 'Job name already exists',
-        error: { message: 'A job with this name already exists' }
-      });
+      return sendConflict(res, 'A job with this name already exists', ErrorCodes.RESOURCE_ALREADY_EXISTS);
     }
 
     const updateData: UpdateJobData = {
@@ -225,18 +185,9 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
 
     const updatedJob = await JobModel.update(jobId, updateData, environment);
 
-    res.json({
-      success: true,
-      data: updatedJob,
-      message: 'Job updated successfully'
-    });
+    return sendSuccessResponse(res, updatedJob, 'Job updated successfully');
   } catch (error) {
-    logger.error('Error updating job:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update job',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    });
+    return sendInternalError(res, 'Failed to update job', error, ErrorCodes.RESOURCE_UPDATE_FAILED);
   }
 };
 
@@ -247,10 +198,7 @@ export const deleteJob = async (req: AuthenticatedRequest, res: Response) => {
     const jobId = parseInt(id);
 
     if (isNaN(jobId)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid job ID'
-      });
+      return sendBadRequest(res, 'Invalid job ID', { field: 'id' });
     }
 
     const environment = req.environment || 'development';
@@ -258,63 +206,25 @@ export const deleteJob = async (req: AuthenticatedRequest, res: Response) => {
     // Job 존재 여부 확인
     const existingJob = await JobModel.findById(jobId, environment);
     if (!existingJob) {
-      return res.status(404).json({
-        success: false,
-        message: 'Job not found'
-      });
+      return sendNotFound(res, 'Job not found', ErrorCodes.RESOURCE_NOT_FOUND);
     }
 
     await JobModel.delete(jobId, environment);
 
-    res.json({
-      success: true,
-      message: 'Job deleted successfully'
-    });
+    return sendSuccessResponse(res, undefined, 'Job deleted successfully');
   } catch (error) {
-    logger.error('Error deleting job:', error);
-
-    res.status(500).json({
-      success: false,
-      message: 'Failed to delete job',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    });
+    return sendInternalError(res, 'Failed to delete job', error, ErrorCodes.RESOURCE_DELETE_FAILED);
   }
 };
 
 // Job 수동 실행 (임시 구현)
-export const executeJob = async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    res.status(501).json({
-      success: false,
-      message: 'Job execution not implemented yet'
-    });
-  } catch (error) {
-    logger.error('Error executing job:', error);
-
-    res.status(500).json({
-      success: false,
-      message: 'Failed to execute job',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    });
-  }
+export const executeJob = async (_req: AuthenticatedRequest, res: Response) => {
+  return sendErrorResponse(res, 501, 'NOT_IMPLEMENTED', 'Job execution not implemented yet');
 };
 
 // Job 실행 이력 조회 (임시 구현)
-export const getJobExecutions = async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    res.json({
-      success: true,
-      data: []
-    });
-  } catch (error) {
-    logger.error('Error getting job executions:', error);
-
-    res.status(500).json({
-      success: false,
-      message: 'Failed to get job executions',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    });
-  }
+export const getJobExecutions = async (_req: AuthenticatedRequest, res: Response) => {
+  return sendSuccessResponse(res, []);
 };
 
 // Job 태그 설정
@@ -324,26 +234,14 @@ export const setJobTags = async (req: AuthenticatedRequest, res: Response) => {
     const { tagIds } = req.body;
 
     if (!Array.isArray(tagIds)) {
-      return res.status(400).json({
-        success: false,
-        message: 'tagIds must be an array',
-      });
+      return sendBadRequest(res, 'tagIds must be an array', { field: 'tagIds' });
     }
 
     await JobModel.setTags(parseInt(id), tagIds);
 
-    res.json({
-      success: true,
-      message: 'Tags updated successfully',
-    });
+    return sendSuccessResponse(res, undefined, 'Tags updated successfully');
   } catch (error) {
-    logger.error('Error setting job tags:', error);
-
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update tags',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    return sendInternalError(res, 'Failed to update tags', error, ErrorCodes.RESOURCE_UPDATE_FAILED);
   }
 };
 
@@ -353,17 +251,8 @@ export const getJobTags = async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
     const tags = await JobModel.getTags(parseInt(id));
 
-    res.json({
-      success: true,
-      data: tags,
-    });
+    return sendSuccessResponse(res, tags);
   } catch (error) {
-    logger.error('Error getting job tags:', error);
-
-    res.status(500).json({
-      success: false,
-      message: 'Failed to get tags',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    return sendInternalError(res, 'Failed to get tags', error, ErrorCodes.RESOURCE_FETCH_FAILED);
   }
 };

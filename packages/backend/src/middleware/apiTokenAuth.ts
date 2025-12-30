@@ -7,6 +7,7 @@ import { HEADERS, HEADER_VALUES } from '../constants/headers';
 import {
   isValidEnvironment
 } from '../utils/environmentContext';
+import { ErrorCodes } from '../utils/apiResponse';
 
 // Unsecured tokens for testing purposes
 const UNSECURED_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
@@ -47,7 +48,10 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: 'API token is required'
+        error: {
+          code: ErrorCodes.AUTH_TOKEN_MISSING,
+          message: 'API token is required'
+        }
       });
     }
 
@@ -97,7 +101,10 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
       if (!apiToken) {
         return res.status(401).json({
           success: false,
-          message: 'Invalid or expired API token'
+          error: {
+            code: ErrorCodes.AUTH_TOKEN_INVALID,
+            message: 'Invalid or expired API token'
+          }
         });
       }
 
@@ -118,7 +125,10 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     if (isExpired) {
       return res.status(401).json({
         success: false,
-        message: 'API token is inactive or expired'
+        error: {
+          code: ErrorCodes.AUTH_TOKEN_EXPIRED,
+          message: 'API token is inactive or expired'
+        }
       });
     }
 
@@ -144,7 +154,10 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     if (!apiToken.allowAllEnvironments && environments.length === 0) {
       return res.status(403).json({
         success: false,
-        message: 'API token has no environment access configured'
+        error: {
+          code: ErrorCodes.ENV_ACCESS_DENIED,
+          message: 'API token has no environment access configured'
+        }
       });
     }
 
@@ -157,7 +170,10 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     logger.error('Error authenticating API token:', error);
     res.status(500).json({
       success: false,
-      message: 'Authentication error'
+      error: {
+        code: ErrorCodes.INTERNAL_SERVER_ERROR,
+        message: 'Authentication error'
+      }
     });
   }
 };
@@ -173,7 +189,10 @@ export const requireTokenType = (tokenType: 'client' | 'server' | 'admin') => {
     if (!apiToken) {
       return res.status(401).json({
         success: false,
-        message: 'API token not found'
+        error: {
+          code: ErrorCodes.AUTH_TOKEN_MISSING,
+          message: 'API token not found'
+        }
       });
     }
 
@@ -185,7 +204,10 @@ export const requireTokenType = (tokenType: 'client' | 'server' | 'admin') => {
     if (apiToken.tokenType !== tokenType) {
       return res.status(403).json({
         success: false,
-        message: `Invalid token type. Required: ${tokenType}, got: ${apiToken.tokenType}`
+        error: {
+          code: ErrorCodes.AUTH_PERMISSION_DENIED,
+          message: `Invalid token type. Required: ${tokenType}, got: ${apiToken.tokenType}`
+        }
       });
     }
 
@@ -202,7 +224,10 @@ export const validateApplicationName = (req: SDKRequest, res: Response, next: Ne
   if (!appName) {
     return res.status(400).json({
       success: false,
-      message: 'X-Application-Name header is required'
+      error: {
+        code: ErrorCodes.BAD_REQUEST,
+        message: 'X-Application-Name header is required'
+      }
     });
   }
 
@@ -210,7 +235,10 @@ export const validateApplicationName = (req: SDKRequest, res: Response, next: Ne
   if (!/^[a-zA-Z0-9_-]+$/.test(appName) || appName.length > 100) {
     return res.status(400).json({
       success: false,
-      message: 'Invalid application name format'
+      error: {
+        code: ErrorCodes.VALIDATION_ERROR,
+        message: 'Invalid application name format'
+      }
     });
   }
 
@@ -269,7 +297,10 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
     if (!environmentName) {
       return res.status(400).json({
         success: false,
-        message: 'Environment is required (via X-Environment header)'
+        error: {
+          code: ErrorCodes.ENV_INVALID,
+          message: 'Environment is required (via X-Environment header)'
+        }
       });
     }
 
@@ -283,7 +314,10 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
       if (!foundEnv) {
         return res.status(404).json({
           success: false,
-          message: `Environment not found: ${environmentName}`
+          error: {
+            code: ErrorCodes.ENV_NOT_FOUND,
+            message: `Environment not found: ${environmentName}`
+          }
         });
       }
 
@@ -327,11 +361,14 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
 
         return res.status(403).json({
           success: false,
-          message: 'API token does not have access to this environment',
-          debug: {
-            tokenId: apiToken.id,
-            tokenName: apiToken.tokenName,
-            environment: environmentName,
+          error: {
+            code: ErrorCodes.ENV_ACCESS_DENIED,
+            message: 'API token does not have access to this environment',
+            details: {
+              tokenId: apiToken.id,
+              tokenName: apiToken.tokenName,
+              environment: environmentName,
+            }
           }
         });
       }
@@ -342,7 +379,10 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
     logger.error('Error setting SDK environment:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to set environment'
+      error: {
+        code: ErrorCodes.INTERNAL_SERVER_ERROR,
+        message: 'Failed to set environment'
+      }
     });
   }
 };
@@ -370,14 +410,20 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
     if (!apiToken) {
       return res.status(401).json({
         success: false,
-        message: 'API token is required'
+        error: {
+          code: ErrorCodes.AUTH_TOKEN_MISSING,
+          message: 'API token is required'
+        }
       });
     }
 
     if (!appName) {
       return res.status(401).json({
         success: false,
-        message: 'Application name is required'
+        error: {
+          code: ErrorCodes.BAD_REQUEST,
+          message: 'Application name is required'
+        }
       });
     }
 
@@ -426,7 +472,10 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
       if (!validatedToken) {
         return res.status(401).json({
           success: false,
-          message: 'Invalid or expired API token'
+          error: {
+            code: ErrorCodes.AUTH_TOKEN_INVALID,
+            message: 'Invalid or expired API token'
+          }
         });
       }
 
@@ -434,7 +483,10 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
       if (validatedToken.tokenType !== 'server' && validatedToken.tokenType !== 'all') {
         return res.status(403).json({
           success: false,
-          message: 'Server API token required'
+          error: {
+            code: ErrorCodes.AUTH_PERMISSION_DENIED,
+            message: 'Server API token required'
+          }
         });
       }
 
@@ -450,7 +502,10 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
     logger.error('Server API token authentication error:', error);
     return res.status(500).json({
       success: false,
-      message: 'Authentication failed'
+      error: {
+        code: ErrorCodes.INTERNAL_SERVER_ERROR,
+        message: 'Authentication failed'
+      }
     });
   }
 };
