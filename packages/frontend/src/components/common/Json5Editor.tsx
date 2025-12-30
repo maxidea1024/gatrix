@@ -8,6 +8,7 @@ import { linter, lintGutter } from '@codemirror/lint';
 import { openSearchPanel, gotoLine } from '@codemirror/search';
 import { undo, redo, selectAll } from '@codemirror/commands';
 import JSON5 from 'json5';
+import { copyToClipboard } from '../../utils/clipboard';
 import { useTranslation } from 'react-i18next';
 import ContentCutIcon from '@mui/icons-material/ContentCut';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -71,7 +72,7 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
     const view = editorViewRef.current;
     if (view) {
       const selection = view.state.sliceDoc(view.state.selection.main.from, view.state.selection.main.to);
-      navigator.clipboard.writeText(selection);
+      copyToClipboard(selection);
       view.dispatch({
         changes: { from: view.state.selection.main.from, to: view.state.selection.main.to, insert: '' }
       });
@@ -83,7 +84,7 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
     const view = editorViewRef.current;
     if (view) {
       const selection = view.state.sliceDoc(view.state.selection.main.from, view.state.selection.main.to);
-      navigator.clipboard.writeText(selection);
+      copyToClipboard(selection);
     }
     handleCloseContextMenu();
   }, [handleCloseContextMenu]);
@@ -166,7 +167,7 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
       if (update.docChanged && !isUpdatingRef.current) {
         const newValue = update.state.doc.toString();
         onChange(newValue);
-        
+
         // Real-time JSON5 validation
         try {
           const trimmed = newValue.trim();
