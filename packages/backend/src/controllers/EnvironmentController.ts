@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import { Environment } from '../models/Environment';
 import { RemoteConfigSegment } from '../models/RemoteConfigSegment';
-import { asyncHandler } from '../utils/asyncHandler';
+import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import logger from '../config/logger';
 import { EnvironmentCopyService, CopyOptions } from '../services/EnvironmentCopyService';
 import { initializeSystemKV } from '../utils/systemKV';
 import { pubSubService } from '../services/PubSubService';
+import { ErrorCodes } from '../utils/apiResponse';
 
 export class EnvironmentController {
   /**
@@ -47,10 +48,7 @@ export class EnvironmentController {
       });
 
     if (!env) {
-      return res.status(404).json({
-        success: false,
-        message: 'Environment not found'
-      });
+      throw new GatrixError('Environment not found', 404, true, ErrorCodes.ENV_NOT_FOUND);
     }
 
     const stats = await env.getStats();
@@ -83,20 +81,14 @@ export class EnvironmentController {
     const userId = (req.user as any)?.userId;
 
     if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message: 'User not authenticated'
-      });
+      throw new GatrixError('User not authenticated', 401, true, ErrorCodes.UNAUTHORIZED);
     }
 
     // Validate base environment if provided
     if (baseEnvironment) {
       const baseEnv = await Environment.query().findById(baseEnvironment);
       if (!baseEnv) {
-        return res.status(400).json({
-          success: false,
-          message: 'Base environment not found'
-        });
+        throw new GatrixError('Base environment not found', 400, true, ErrorCodes.ENV_NOT_FOUND);
       }
     }
 
@@ -204,18 +196,12 @@ export class EnvironmentController {
     const userId = (req.user as any)?.userId;
 
     if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message: 'User not authenticated'
-      });
+      throw new GatrixError('User not authenticated', 401, true, ErrorCodes.UNAUTHORIZED);
     }
 
     const env = await Environment.query().findById(environment);
     if (!env) {
-      return res.status(404).json({
-        success: false,
-        message: 'Environment not found'
-      });
+      throw new GatrixError('Environment not found', 404, true, ErrorCodes.ENV_NOT_FOUND);
     }
 
     // Prevent modifying hidden status for system environments like gatrix-env
