@@ -16,8 +16,18 @@ export class ServerGameWorldController {
    * Returns all visible game worlds sorted by displayOrder with tags and all maintenance messages
    */
   static async getGameWorlds(req: EnvironmentRequest, res: Response) {
-    const environment = req.environment!;
+    const environment = req.environment;
     try {
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'MISSING_ENVIRONMENT',
+            message: 'Environment is required',
+          },
+        });
+      }
+
       // Helper function to convert MySQL BOOLEAN (0/1) to boolean
       const toBoolean = (value: any): boolean => {
         if (typeof value === 'boolean') return value;
@@ -41,13 +51,13 @@ export class ServerGameWorldController {
       };
 
       await respondWithEtagCache(res, {
-        cacheKey: `${SERVER_SDK_ETAG.GAME_WORLDS}:${environment.id}`,
+        cacheKey: `${SERVER_SDK_ETAG.GAME_WORLDS}:${environment}`,
         ttlMs: DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
           // Fetch visible game worlds sorted by displayOrder ASC for this environment
           const allWorlds = await GameWorldService.getAllGameWorlds({
-            environmentId: environment.id,
+            environment: environment,
             isVisible: true,
           });
 
@@ -100,7 +110,7 @@ export class ServerGameWorldController {
             }),
           );
 
-          logger.info(`Server SDK: Retrieved ${worldsWithTags.length} visible game worlds`);
+          logger.info(`Server SDK: Retrieved ${worldsWithTags.length} visible game worlds for environment ${environment}`);
 
           return {
             success: true,
@@ -129,7 +139,18 @@ export class ServerGameWorldController {
   static async getGameWorldById(req: EnvironmentRequest, res: Response) {
     try {
       const { id } = req.params;
+      const environment = req.environment;
       const worldId = parseInt(id);
+
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'MISSING_ENVIRONMENT',
+            message: 'Environment is required',
+          },
+        });
+      }
 
       if (isNaN(worldId)) {
         return res.status(400).json({
@@ -142,9 +163,9 @@ export class ServerGameWorldController {
         });
       }
 
-      const world = await GameWorldService.getGameWorldById(worldId);
+      const world = await GameWorldService.getGameWorldById(worldId, environment);
 
-      logger.info(`Server SDK: Retrieved game world ${worldId}`);
+      logger.info(`Server SDK: Retrieved game world ${worldId} for environment ${environment}`);
 
       // Helper function to convert MySQL BOOLEAN (0/1) to boolean
       const toBoolean = (value: any): boolean => {
@@ -233,6 +254,17 @@ export class ServerGameWorldController {
   static async getGameWorldByWorldId(req: EnvironmentRequest, res: Response) {
     try {
       const { worldId } = req.params;
+      const environment = req.environment;
+
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'MISSING_ENVIRONMENT',
+            message: 'Environment is required',
+          },
+        });
+      }
 
       if (!worldId || typeof worldId !== 'string') {
         return res.status(400).json({
@@ -245,9 +277,9 @@ export class ServerGameWorldController {
         });
       }
 
-      const world = await GameWorldService.getGameWorldByWorldId(worldId);
+      const world = await GameWorldService.getGameWorldByWorldId(worldId, environment);
 
-      logger.info(`Server SDK: Retrieved game world by worldId: ${worldId}`);
+      logger.info(`Server SDK: Retrieved game world by worldId: ${worldId} for environment ${environment}`);
 
       // Helper function to convert MySQL BOOLEAN (0/1) to boolean
       const toBoolean = (value: any): boolean => {
@@ -323,6 +355,7 @@ export class ServerGameWorldController {
     }
   }
 }
+
 
 export default ServerGameWorldController;
 

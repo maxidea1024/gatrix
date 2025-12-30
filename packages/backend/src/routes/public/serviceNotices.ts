@@ -36,6 +36,9 @@ router.get('/', async (req, res) => {
         : (req.query.subchannel as string).split(',').filter(s => s.trim());
     }
 
+    // Environment from query or default to production
+    const environment = (req.query.environment as string) || 'production';
+
     // Public endpoint only returns active notices
     const filters = {
       isActive: true, // Always filter for active notices only
@@ -48,6 +51,7 @@ router.get('/', async (req, res) => {
       subchannel,
       subchannelOperator: req.query.subchannelOperator as 'any_of' | 'include_all' | undefined,
       search: req.query.search as string,
+      environment,
     };
 
     const result = await ServiceNoticeService.getServiceNotices(page, limit, filters);
@@ -72,7 +76,8 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const notice = await ServiceNoticeService.getServiceNoticeById(id);
+    const environment = (req.query.environment as string) || 'production';
+    const notice = await ServiceNoticeService.getServiceNoticeById(id, environment);
 
     if (!notice) {
       return res.status(404).json({

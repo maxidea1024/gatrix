@@ -31,10 +31,10 @@ export class RemoteConfigSDKController {
 
     try {
       // Get cache key
-      const cacheKey = `remote_config:client:${environment.environmentName}`;
-      
+      const cacheKey = `remote_config:client:${environment}`;
+
       // Try to get from cache first
-      const cached = await CacheService.get<{etag: string; data: any}>(cacheKey);
+      const cached = await CacheService.get<{ etag: string; data: any }>(cacheKey);
       if (cached) {
         const cachedEtag = cached.etag;
 
@@ -50,7 +50,7 @@ export class RemoteConfigSDKController {
 
       // Get published client templates
       const templates = await RemoteConfigTemplate.getPublishedByEnvironment(
-        environment.id,
+        environment,
         'client'
       );
 
@@ -60,7 +60,7 @@ export class RemoteConfigSDKController {
         segments: {},
         campaigns: [],
         metadata: {
-          environment: environment.environmentName,
+          environment: environment,
           lastUpdated: new Date().toISOString(),
           templateCount: templates.length
         }
@@ -81,7 +81,7 @@ export class RemoteConfigSDKController {
 
       // Generate ETag
       const responseEtag = `"${Date.now()}-${templates.length}"`;
-      
+
       // Cache the response
       await CacheService.set(cacheKey, {
         data: {
@@ -93,7 +93,7 @@ export class RemoteConfigSDKController {
 
       res.set('ETag', responseEtag);
       res.set('Cache-Control', 'public, max-age=300');
-      
+
       res.json({
         success: true,
         data: combinedConfig
@@ -125,10 +125,10 @@ export class RemoteConfigSDKController {
 
     try {
       // Get cache key
-      const cacheKey = `remote_config:server:${environment.environmentName}`;
-      
+      const cacheKey = `remote_config:server:${environment}`;
+
       // Try to get from cache first
-      const cached = await CacheService.get<{etag: string; data: any}>(cacheKey);
+      const cached = await CacheService.get<{ etag: string; data: any }>(cacheKey);
       if (cached) {
         const cachedEtag = cached.etag;
 
@@ -144,7 +144,7 @@ export class RemoteConfigSDKController {
 
       // Get published server templates
       const templates = await RemoteConfigTemplate.getPublishedByEnvironment(
-        environment.id,
+        environment,
         'server'
       );
 
@@ -154,7 +154,7 @@ export class RemoteConfigSDKController {
         segments: {},
         campaigns: [],
         metadata: {
-          environment: environment.environmentName,
+          environment: environment,
           lastUpdated: new Date().toISOString(),
           templateCount: templates.length
         }
@@ -175,7 +175,7 @@ export class RemoteConfigSDKController {
 
       // Generate ETag
       const responseEtag = `"${Date.now()}-${templates.length}"`;
-      
+
       // Cache the response
       await CacheService.set(cacheKey, {
         data: {
@@ -187,7 +187,7 @@ export class RemoteConfigSDKController {
 
       res.set('ETag', responseEtag);
       res.set('Cache-Control', 'public, max-age=300');
-      
+
       res.json({
         success: true,
         data: combinedConfig
@@ -226,7 +226,7 @@ export class RemoteConfigSDKController {
     try {
       // Get client templates
       const templates = await RemoteConfigTemplate.getPublishedByEnvironment(
-        environment.id,
+        environment,
         'client'
       );
 
@@ -297,7 +297,7 @@ export class RemoteConfigSDKController {
       // TODO: Implement metrics storage
       // For now, just log the metrics
       logger.info('Metrics received:', {
-        environment: environment.environmentName,
+        environment: environment,
         tokenType: apiToken.tokenType,
         metricsCount: metrics.length
       });
@@ -317,5 +317,6 @@ export class RemoteConfigSDKController {
     }
   });
 }
+
 
 export default RemoteConfigSDKController;

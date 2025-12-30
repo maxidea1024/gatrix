@@ -1,11 +1,10 @@
 import db from '../config/knex';
-import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export type VarValueType = 'string' | 'number' | 'boolean' | 'color' | 'object' | 'array';
 
 export interface VarItem {
   id: number;
-  environmentId: string;
+  environment: string;
   varKey: string;
   varValue: string | null;
   valueType: VarValueType;
@@ -34,30 +33,27 @@ export interface UpdateVarData {
 }
 
 export default class VarsModel {
-  static async get(key: string, environmentId?: string): Promise<string | null> {
-    const envId = environmentId ?? getCurrentEnvironmentId();
+  static async get(key: string, environment: string): Promise<string | null> {
     const result = await db('g_vars')
       .select('varValue')
       .where('varKey', key)
-      .where('environmentId', envId)
+      .where('environment', environment)
       .first();
 
     return result?.varValue ?? null;
   }
 
-  static async set(key: string, value: string | null, userId: number, environmentId?: string): Promise<void> {
-    const envId = environmentId ?? getCurrentEnvironmentId();
+  static async set(key: string, value: string | null, userId: number, environment: string): Promise<void> {
     await db('g_vars')
-      .insert({ varKey: key, varValue: value, createdBy: userId, environmentId: envId })
-      .onConflict(['varKey', 'environmentId'])
+      .insert({ varKey: key, varValue: value, createdBy: userId, environment: environment })
+      .onConflict(['varKey', 'environment'])
       .merge({ varValue: value, updatedBy: userId });
   }
 
   /**
    * Get all KV items (keys starting with 'kv:' or '$')
    */
-  static async getAllKV(environmentId?: string): Promise<VarItem[]> {
-    const envId = environmentId ?? getCurrentEnvironmentId();
+  static async getAllKV(environment: string): Promise<VarItem[]> {
     const results = await db('g_vars as v')
       .leftJoin('g_users as creator', 'v.createdBy', 'creator.id')
       .leftJoin('g_users as updater', 'v.updatedBy', 'updater.id')
@@ -66,7 +62,7 @@ export default class VarsModel {
         'creator.name as createdByName',
         'updater.name as updatedByName'
       )
-      .where('v.environmentId', envId)
+      .where('v.environment', environment)
       .where((builder) => {
         builder.where('v.varKey', 'like', 'kv:%').orWhere('v.varKey', 'like', '$%');
       })
@@ -83,8 +79,7 @@ export default class VarsModel {
   /**
    * Get a single KV item by key
    */
-  static async getKV(key: string, environmentId?: string): Promise<VarItem | null> {
-    const envId = environmentId ?? getCurrentEnvironmentId();
+  static async getKV(key: string, environment: string): Promise<VarItem | null> {
     const result = await db('g_vars as v')
       .leftJoin('g_users as creator', 'v.createdBy', 'creator.id')
       .leftJoin('g_users as updater', 'v.updatedBy', 'updater.id')
@@ -94,7 +89,7 @@ export default class VarsModel {
         'updater.name as updatedByName'
       )
       .where('v.varKey', key)
-      .where('v.environmentId', envId)
+      .where('v.environment', environment)
       .first();
 
     if (!result) {
@@ -112,8 +107,7 @@ export default class VarsModel {
   /**
    * Create a new KV item
    */
-  static async createKV(data: CreateVarData, userId: number, environmentId?: string): Promise<VarItem> {
-    const envId = environmentId ?? getCurrentEnvironmentId();
+  static async createKV(data: CreateVarData, userId: number, environment: string): Promise<VarItem> {
     // Ensure key starts with 'kv:'
     const key = data.varKey.startsWith('kv:') ? data.varKey : `kv:${data.varKey}`;
 
@@ -124,10 +118,10 @@ export default class VarsModel {
       description: data.description || null,
       isSystemDefined: false,
       createdBy: userId,
-      environmentId: envId,
+      environment: environment,
     });
 
-    const created = await this.getKV(key, envId);
+    const created = await this.getKV(key, environment);
     if (!created) {
       throw new Error('Failed to create KV item');
     }
@@ -137,10 +131,9 @@ export default class VarsModel {
   /**
    * Update an existing KV item
    */
-  static async updateKV(key: string, data: UpdateVarData, userId: number, environmentId?: string): Promise<VarItem> {
-    const envId = environmentId ?? getCurrentEnvironmentId();
+  static async updateKV(key: string, data: UpdateVarData, userId: number, environment: string): Promise<VarItem> {
     // Check if item exists and is not system-defined for type changes
-    const existing = await this.getKV(key, envId);
+    const existing = await this.getKV(key, environment);
     if (!existing) {
       throw new Error('KV item not found');
     }
@@ -165,10 +158,10 @@ export default class VarsModel {
 
     await db('g_vars')
       .where('varKey', key)
-      .where('environmentId', envId)
+      .where('environment', environment)
       .update(updateData);
 
-    const updated = await this.getKV(key, envId);
+    const updated = await this.getKV(key, environment);
     if (!updated) {
       throw new Error('Failed to update KV item');
     }
@@ -178,9 +171,8 @@ export default class VarsModel {
   /**
    * Delete a KV item (only if not system-defined)
    */
-  static async deleteKV(key: string, environmentId?: string): Promise<void> {
-    const envId = environmentId ?? getCurrentEnvironmentId();
-    const existing = await this.getKV(key, envId);
+  static async deleteKV(key: string, environment: string): Promise<void> {
+    const existing = await this.getKV(key, environment);
     if (!existing) {
       throw new Error('KV item not found');
     }
@@ -191,7 +183,7 @@ export default class VarsModel {
 
     await db('g_vars')
       .where('varKey', key)
-      .where('environmentId', envId)
+      .where('environment', environment)
       .delete();
   }
 
@@ -204,21 +196,20 @@ export default class VarsModel {
     key: string,
     value: string | null,
     valueType: VarValueType,
+    environment: string,
     description?: string,
-    isCopyable: boolean = true,
-    environmentId?: string
+    isCopyable: boolean = true
   ): Promise<void> {
-    const envId = environmentId ?? getCurrentEnvironmentId();
     const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
 
     // Check if item already exists
-    const existing = await this.getKV(fullKey, envId);
+    const existing = await this.getKV(fullKey, environment);
 
     if (existing) {
       // Item exists: only update description and ensure isSystemDefined is true
       await db('g_vars')
         .where('varKey', fullKey)
-        .where('environmentId', envId)
+        .where('environment', environment)
         .update({
           description: description || existing.description || null,
           isSystemDefined: true,
@@ -234,7 +225,7 @@ export default class VarsModel {
         isSystemDefined: true,
         isCopyable,
         createdBy: 1, // System user
-        environmentId: envId,
+        environment: environment,
       });
     }
   }

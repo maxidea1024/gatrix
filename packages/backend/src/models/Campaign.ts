@@ -14,7 +14,7 @@ export class CampaignModel {
   static async list(
     page: number = 1,
     limit: number = 10,
-    filters: { search?: string; isActive?: boolean } = {}
+    filters: { environment: string; search?: string; isActive?: boolean }
   ): Promise<{
     campaigns: Campaign[];
     total: number;
@@ -23,19 +23,21 @@ export class CampaignModel {
   }> {
     try {
       const offset = (page - 1) * limit;
-      
+      const { environment } = filters;
+
       let query = db('g_remote_config_campaigns as c')
         .leftJoin('g_users as creator', 'c.createdBy', 'creator.id')
         .select([
           'c.*',
           'creator.name as createdByName'
-        ]);
+        ])
+        .where('c.environment', environment);
 
       // Apply filters
       if (filters.search) {
-        query = query.where(function() {
+        query = query.where(function () {
           this.where('c.campaignName', 'like', `%${filters.search}%`)
-              .orWhere('c.description', 'like', `%${filters.search}%`);
+            .orWhere('c.description', 'like', `%${filters.search}%`);
         });
       }
 
@@ -71,7 +73,7 @@ export class CampaignModel {
   /**
    * Get campaign by ID with relations
    */
-  static async findById(id: number, includeConfigs: boolean = true): Promise<Campaign | null> {
+  static async findById(id: number, environment: string, includeConfigs: boolean = true): Promise<Campaign | null> {
     try {
       const campaign = await db('g_remote_config_campaigns as c')
         .leftJoin('g_users as creator', 'c.createdBy', 'creator.id')
@@ -80,6 +82,7 @@ export class CampaignModel {
           'creator.name as createdByName'
         ])
         .where('c.id', id)
+        .where('c.environment', environment)
         .first();
 
       if (!campaign) {
@@ -97,7 +100,8 @@ export class CampaignModel {
             'rc.keyName as configKeyName',
             'rc.valueType as configValueType'
           ])
-          .where('cc.campaignId', id);
+          .where('cc.campaignId', id)
+          .where('rc.environment', environment);
 
         transformedCampaign.configs = configs.map(this.transformCampaignConfig);
       }
@@ -112,9 +116,10 @@ export class CampaignModel {
   /**
    * Create new campaign
    */
-  static async create(data: CreateCampaignData): Promise<Campaign> {
+  static async create(data: CreateCampaignData, environment: string): Promise<Campaign> {
     try {
       const [insertId] = await db('g_remote_config_campaigns').insert({
+        environment,
         campaignName: data.campaignName,
         description: data.description || null,
         startDate: data.startDate ? new Date(data.startDate) : null,
@@ -127,12 +132,12 @@ export class CampaignModel {
         createdBy: data.createdBy || null
       });
 
-      const created = await this.findById(insertId, false);
+      const created = await this.findById(insertId, environment, false);
       if (!created) {
         throw new Error('Failed to retrieve created campaign');
       }
 
-      logger.info(`Campaign created: ${data.campaignName} (ID: ${insertId})`);
+      logger.info(`Campaign created: ${data.campaignName} (ID: ${insertId}, Env: ${environment})`);
       return created;
     } catch (error) {
       logger.error('Error creating campaign:', error);
@@ -143,7 +148,7 @@ export class CampaignModel {
   /**
    * Update campaign
    */
-  static async update(id: number, data: Partial<CreateCampaignData>): Promise<Campaign> {
+  static async update(id: number, environment: string, data: Partial<CreateCampaignData>): Promise<Campaign> {
     try {
       const updateData: any = {};
 
@@ -157,14 +162,17 @@ export class CampaignModel {
       if (data.status !== undefined) updateData.status = data.status;
       if (data.isActive !== undefined) updateData.isActive = data.isActive;
 
-      await db('g_remote_config_campaigns').where('id', id).update(updateData);
+      await db('g_remote_config_campaigns')
+        .where('id', id)
+        .where('environment', environment)
+        .update(updateData);
 
-      const updated = await this.findById(id, false);
+      const updated = await this.findById(id, environment, false);
       if (!updated) {
         throw new Error('Failed to retrieve updated campaign');
       }
 
-      logger.info(`Campaign updated: ID ${id}`);
+      logger.info(`Campaign updated: ID ${id}, Env: ${environment}`);
       return updated;
     } catch (error) {
       logger.error('Error updating campaign:', error);
@@ -175,10 +183,13 @@ export class CampaignModel {
   /**
    * Delete campaign
    */
-  static async delete(id: number): Promise<void> {
+  static async delete(id: number, environment: string): Promise<void> {
     try {
-      await db('g_remote_config_campaigns').where('id', id).del();
-      logger.info(`Campaign deleted: ID ${id}`);
+      await db('g_remote_config_campaigns')
+        .where('id', id)
+        .where('environment', environment)
+        .del();
+      logger.info(`Campaign deleted: ID ${id}, Env: ${environment}`);
     } catch (error) {
       logger.error('Error deleting campaign:', error);
       throw error;
@@ -188,8 +199,18 @@ export class CampaignModel {
   /**
    * Add config to campaign
    */
-  static async addConfig(data: CreateCampaignConfigData): Promise<CampaignConfig> {
+  static async addConfig(data: CreateCampaignConfigData, environment: string): Promise<CampaignConfig> {
     try {
+      // Verify campaign exists in environment
+      const campaign = await db('g_remote_config_campaigns')
+        .where('id', data.campaignId)
+        .where('environment', environment)
+        .first();
+
+      if (!campaign) {
+        throw new Error('Campaign not found in environment');
+      }
+
       const [insertId] = await db('g_remote_config_campaign_configs').insert({
         campaignId: data.campaignId,
         configId: data.configId,
@@ -204,6 +225,7 @@ export class CampaignModel {
           'rc.valueType as configValueType'
         ])
         .where('cc.id', insertId)
+        .where('rc.environment', environment)
         .first();
 
       if (!created) {
@@ -220,14 +242,24 @@ export class CampaignModel {
   /**
    * Remove config from campaign
    */
-  static async removeConfig(campaignId: number, configId: number): Promise<void> {
+  static async removeConfig(campaignId: number, configId: number, environment: string): Promise<void> {
     try {
+      // Verify campaign exists in environment
+      const campaign = await db('g_remote_config_campaigns')
+        .where('id', campaignId)
+        .where('environment', environment)
+        .first();
+
+      if (!campaign) {
+        throw new Error('Campaign not found in environment');
+      }
+
       await db('g_remote_config_campaign_configs')
         .where('campaignId', campaignId)
         .where('configId', configId)
         .del();
-      
-      logger.info(`Config ${configId} removed from campaign ${campaignId}`);
+
+      logger.info(`Config ${configId} removed from campaign ${campaignId} in Env: ${environment}`);
     } catch (error) {
       logger.error('Error removing config from campaign:', error);
       throw error;
@@ -240,6 +272,7 @@ export class CampaignModel {
   private static transformCampaign(row: any): Campaign {
     return {
       id: row.id,
+      environment: row.environment,
       campaignName: row.campaignName,
       description: row.description,
       startDate: row.startDate,

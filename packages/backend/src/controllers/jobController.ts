@@ -1,10 +1,11 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { AuthenticatedRequest } from '../middleware/auth';
 import { JobModel, CreateJobData, UpdateJobData } from '../models/Job';
 import { JobTypeModel } from '../models/JobType';
 import logger from '../config/logger';
 
 // Job 목록 조회
-export const getJobs = async (req: Request, res: Response) => {
+export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const {
       jobTypeId,
@@ -15,7 +16,8 @@ export const getJobs = async (req: Request, res: Response) => {
       page
     } = req.query;
 
-    const filters: any = {};
+    const environment = req.environment || 'development';
+    const filters: any = { environment };
     if (jobTypeId) filters.jobTypeId = parseInt(jobTypeId as string);
     if (isEnabled !== undefined) filters.isEnabled = isEnabled === 'true';
     if (search) filters.search = search as string;
@@ -57,7 +59,7 @@ export const getJobs = async (req: Request, res: Response) => {
 };
 
 // Job 상세 조회
-export const getJob = async (req: Request, res: Response) => {
+export const getJob = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
     const jobId = parseInt(id);
@@ -69,7 +71,8 @@ export const getJob = async (req: Request, res: Response) => {
       });
     }
 
-    const job = await JobModel.findById(jobId);
+    const environment = req.environment || 'development';
+    const job = await JobModel.findById(jobId, environment);
 
     if (!job) {
       return res.status(404).json({
@@ -92,7 +95,7 @@ export const getJob = async (req: Request, res: Response) => {
 };
 
 // Job 생성
-export const createJob = async (req: Request, res: Response) => {
+export const createJob = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const {
       name,
@@ -120,8 +123,10 @@ export const createJob = async (req: Request, res: Response) => {
       });
     }
 
+    const environment = req.environment || 'development';
+
     // Job 이름 중복 검증
-    const existingJob = await JobModel.findByName(name);
+    const existingJob = await JobModel.findByName(name, environment);
     if (existingJob) {
       return res.status(409).json({
         success: false,
@@ -141,7 +146,8 @@ export const createJob = async (req: Request, res: Response) => {
       isEnabled,
       tagIds,
       createdBy: userId,
-      updatedBy: userId
+      updatedBy: userId,
+      environment
     };
 
     const createdJob = await JobModel.create(jobData);
@@ -162,7 +168,7 @@ export const createJob = async (req: Request, res: Response) => {
 };
 
 // Job 수정
-export const updateJob = async (req: Request, res: Response) => {
+export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
     const jobId = parseInt(id);
@@ -174,8 +180,10 @@ export const updateJob = async (req: Request, res: Response) => {
       });
     }
 
+    const environment = req.environment || 'development';
+
     // Job 존재 여부 확인
-    const existingJob = await JobModel.findById(jobId);
+    const existingJob = await JobModel.findById(jobId, environment);
     if (!existingJob) {
       return res.status(404).json({
         success: false,
@@ -196,7 +204,7 @@ export const updateJob = async (req: Request, res: Response) => {
     const userId = (req as any).user?.userId;
 
     // Job 이름 중복 검증 (이름이 변경되는 경우에만)
-    const existingJobByName = await JobModel.findByName(name);
+    const existingJobByName = await JobModel.findByName(name, environment);
     if (existingJobByName && existingJobByName.id !== jobId) {
       return res.status(409).json({
         success: false,
@@ -215,7 +223,7 @@ export const updateJob = async (req: Request, res: Response) => {
       updatedBy: userId
     };
 
-    const updatedJob = await JobModel.update(jobId, updateData);
+    const updatedJob = await JobModel.update(jobId, updateData, environment);
 
     res.json({
       success: true,
@@ -233,7 +241,7 @@ export const updateJob = async (req: Request, res: Response) => {
 };
 
 // Job 삭제
-export const deleteJob = async (req: Request, res: Response) => {
+export const deleteJob = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
     const jobId = parseInt(id);
@@ -245,8 +253,10 @@ export const deleteJob = async (req: Request, res: Response) => {
       });
     }
 
+    const environment = req.environment || 'development';
+
     // Job 존재 여부 확인
-    const existingJob = await JobModel.findById(jobId);
+    const existingJob = await JobModel.findById(jobId, environment);
     if (!existingJob) {
       return res.status(404).json({
         success: false,
@@ -254,7 +264,7 @@ export const deleteJob = async (req: Request, res: Response) => {
       });
     }
 
-    await JobModel.delete(jobId);
+    await JobModel.delete(jobId, environment);
 
     res.json({
       success: true,
@@ -272,7 +282,7 @@ export const deleteJob = async (req: Request, res: Response) => {
 };
 
 // Job 수동 실행 (임시 구현)
-export const executeJob = async (req: Request, res: Response) => {
+export const executeJob = async (req: AuthenticatedRequest, res: Response) => {
   try {
     res.status(501).json({
       success: false,
@@ -290,7 +300,7 @@ export const executeJob = async (req: Request, res: Response) => {
 };
 
 // Job 실행 이력 조회 (임시 구현)
-export const getJobExecutions = async (req: Request, res: Response) => {
+export const getJobExecutions = async (req: AuthenticatedRequest, res: Response) => {
   try {
     res.json({
       success: true,
@@ -308,7 +318,7 @@ export const getJobExecutions = async (req: Request, res: Response) => {
 };
 
 // Job 태그 설정
-export const setJobTags = async (req: Request, res: Response) => {
+export const setJobTags = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { tagIds } = req.body;
@@ -338,7 +348,7 @@ export const setJobTags = async (req: Request, res: Response) => {
 };
 
 // Job 태그 조회
-export const getJobTags = async (req: Request, res: Response) => {
+export const getJobTags = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
     const tags = await JobModel.getTags(parseInt(id));

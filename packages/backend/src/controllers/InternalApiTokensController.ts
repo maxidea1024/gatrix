@@ -45,28 +45,14 @@ class InternalApiTokensController {
       const tokenIds = tokens.map((t: any) => t.id);
       const environmentAssignments = tokenIds.length > 0
         ? await knex('g_api_access_token_environments')
-            .whereIn('tokenId', tokenIds)
-            .select('tokenId', 'environmentId')
+          .whereIn('tokenId', tokenIds)
+          .select('tokenId', 'environment')
         : [];
-
-      // Get environment details
-      const envIds = [...new Set(environmentAssignments.map((e: any) => e.environmentId))];
-      const environments = envIds.length > 0
-        ? await knex('g_environments')
-            .whereIn('id', envIds)
-            .select('id', 'environmentName')
-        : [];
-
-      const envMap = environments.reduce((acc: any, env: any) => {
-        acc[env.id] = env.environmentName;
-        return acc;
-      }, {});
 
       // Group environment names by token
       const envByToken = environmentAssignments.reduce((acc: any, env: any) => {
         if (!acc[env.tokenId]) acc[env.tokenId] = [];
-        const envName = envMap[env.environmentId];
-        if (envName) acc[env.tokenId].push(envName);
+        acc[env.tokenId].push(env.environment);
         return acc;
       }, {});
 

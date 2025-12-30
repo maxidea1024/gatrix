@@ -10,9 +10,7 @@ import {
   ConfigVersionStatus,
   ConfigRule,
   ConfigVariant,
-  CreateConfigVersionData
 } from '../types/remoteConfig';
-import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export class RemoteConfigModel {
   /**
@@ -21,11 +19,11 @@ export class RemoteConfigModel {
   static async list(
     page: number = 1,
     limit: number = 10,
-    filters: RemoteConfigFilters = {}
+    filters: RemoteConfigFilters = { environment: '' }
   ): Promise<RemoteConfigListResponse> {
     try {
       const offset = (page - 1) * limit;
-      const envId = filters.environmentId ?? getCurrentEnvironmentId();
+      const environment = filters.environment;
 
       let query = db('g_remote_configs as rc')
         .leftJoin('g_users as creator', 'rc.createdBy', 'creator.id')
@@ -37,13 +35,13 @@ export class RemoteConfigModel {
           'updater.name as updatedByName',
           'updater.email as updatedByEmail'
         ])
-        .where('rc.environmentId', envId);
+        .where('rc.environment', environment);
 
       // Apply filters
       if (filters.search) {
-        query = query.where(function() {
+        query = query.where(function () {
           this.where('rc.keyName', 'like', `%${filters.search}%`)
-              .orWhere('rc.description', 'like', `%${filters.search}%`);
+            .orWhere('rc.description', 'like', `%${filters.search}%`);
         });
       }
 
@@ -127,9 +125,8 @@ export class RemoteConfigModel {
   /**
    * Get remote config by ID with relations
    */
-  static async findById(id: number, includeRelations: boolean = true, environmentId?: string): Promise<RemoteConfig | null> {
+  static async findById(id: number, includeRelations: boolean = true, environment: string): Promise<RemoteConfig | null> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
       const config = await db('g_remote_configs as rc')
         .leftJoin('g_users as creator', 'rc.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'rc.updatedBy', 'updater.id')
@@ -141,7 +138,7 @@ export class RemoteConfigModel {
           'updater.email as updatedByEmail'
         ])
         .where('rc.id', id)
-        .where('rc.environmentId', envId)
+        .where('rc.environment', environment)
         .first();
 
       if (!config) {
@@ -210,9 +207,8 @@ export class RemoteConfigModel {
   /**
    * Get remote config by key name
    */
-  static async findByKey(keyName: string, environmentId?: string): Promise<RemoteConfig | null> {
+  static async findByKey(keyName: string, environment: string): Promise<RemoteConfig | null> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
       const config = await db('g_remote_configs as rc')
         .leftJoin('g_users as creator', 'rc.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'rc.updatedBy', 'updater.id')
@@ -224,7 +220,7 @@ export class RemoteConfigModel {
           'updater.email as updatedByEmail'
         ])
         .where('rc.keyName', keyName)
-        .where('rc.environmentId', envId)
+        .where('rc.environment', environment)
         .first();
 
       return config ? this.transformConfig(config) : null;
@@ -237,11 +233,11 @@ export class RemoteConfigModel {
   /**
    * Create new remote config
    */
-  static async create(data: CreateRemoteConfigData): Promise<RemoteConfig> {
+  static async create(data: CreateRemoteConfigData & { environment: string }): Promise<RemoteConfig> {
     try {
-      const envId = getCurrentEnvironmentId();
+      const environment = data.environment;
       const [insertId] = await db('g_remote_configs').insert({
-        environmentId: envId,
+        environment: environment,
         keyName: data.keyName,
         defaultValue: data.defaultValue || null,
         valueType: data.valueType,
@@ -250,7 +246,7 @@ export class RemoteConfigModel {
         createdBy: data.createdBy || null
       });
 
-      const created = await this.findById(insertId, false, envId);
+      const created = await this.findById(insertId, false, environment);
       if (!created) {
         throw new Error('Failed to retrieve created remote config');
       }
@@ -268,9 +264,8 @@ export class RemoteConfigModel {
   /**
    * Update remote config
    */
-  static async update(id: number, data: UpdateRemoteConfigData, environmentId?: string): Promise<RemoteConfig> {
+  static async update(id: number, data: UpdateRemoteConfigData, environment: string): Promise<RemoteConfig> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
       const updateData: any = {};
 
       if (data.keyName !== undefined) updateData.keyName = data.keyName;
@@ -280,9 +275,9 @@ export class RemoteConfigModel {
       if (data.isActive !== undefined) updateData.isActive = data.isActive;
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
-      await db('g_remote_configs').where('id', id).where('environmentId', envId).update(updateData);
+      await db('g_remote_configs').where('id', id).where('environment', environment).update(updateData);
 
-      const updated = await this.findById(id, false, envId);
+      const updated = await this.findById(id, false, environment);
       if (!updated) {
         throw new Error('Failed to retrieve updated remote config');
       }
@@ -298,10 +293,9 @@ export class RemoteConfigModel {
   /**
    * Delete remote config
    */
-  static async delete(id: number, environmentId?: string): Promise<void> {
+  static async delete(id: number, environment: string): Promise<void> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
-      await db('g_remote_configs').where('id', id).where('environmentId', envId).del();
+      await db('g_remote_configs').where('id', id).where('environment', environment).del();
       logger.info(`Remote config deleted: ID ${id}`);
     } catch (error) {
       logger.error('Error deleting remote config:', error);
@@ -315,6 +309,7 @@ export class RemoteConfigModel {
   private static transformConfig(row: any): RemoteConfig {
     return {
       id: row.id,
+      environment: row.environment,
       keyName: row.keyName,
       defaultValue: row.defaultValue,
       valueType: row.valueType,

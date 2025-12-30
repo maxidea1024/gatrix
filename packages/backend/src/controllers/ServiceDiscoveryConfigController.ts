@@ -11,11 +11,12 @@ export class ServiceDiscoveryConfigController {
    */
   static async getConfig(req: Request, res: Response) {
     try {
+      const environment = 'development'; // Global settings stored in development environment
       const [mode, etcdHosts, defaultTtl, heartbeatInterval] = await Promise.all([
-        VarsModel.get('serviceDiscovery.mode'),
-        VarsModel.get('serviceDiscovery.etcdHosts'),
-        VarsModel.get('serviceDiscovery.defaultTtl'),
-        VarsModel.get('serviceDiscovery.heartbeatInterval'),
+        VarsModel.get('serviceDiscovery.mode', environment),
+        VarsModel.get('serviceDiscovery.etcdHosts', environment),
+        VarsModel.get('serviceDiscovery.defaultTtl', environment),
+        VarsModel.get('serviceDiscovery.heartbeatInterval', environment),
       ]);
 
       res.json({
@@ -42,6 +43,7 @@ export class ServiceDiscoveryConfigController {
   static async updateConfig(req: Request, res: Response) {
     try {
       const { mode, etcdHosts, defaultTtl, heartbeatInterval } = req.body;
+      const environment = 'development'; // Global settings stored in development environment
 
       // Validate mode
       if (mode && !['redis', 'etcd'].includes(mode)) {
@@ -72,19 +74,19 @@ export class ServiceDiscoveryConfigController {
       const updates: Promise<void>[] = [];
 
       if (mode !== undefined) {
-        updates.push(VarsModel.set('serviceDiscovery.mode', mode, userId));
+        updates.push(VarsModel.set('serviceDiscovery.mode', mode, userId, environment));
       }
 
       if (etcdHosts !== undefined) {
-        updates.push(VarsModel.set('serviceDiscovery.etcdHosts', etcdHosts, userId));
+        updates.push(VarsModel.set('serviceDiscovery.etcdHosts', etcdHosts, userId, environment));
       }
 
       if (defaultTtl !== undefined) {
-        updates.push(VarsModel.set('serviceDiscovery.defaultTtl', defaultTtl.toString(), userId));
+        updates.push(VarsModel.set('serviceDiscovery.defaultTtl', defaultTtl.toString(), userId, environment));
       }
 
       if (heartbeatInterval !== undefined) {
-        updates.push(VarsModel.set('serviceDiscovery.heartbeatInterval', heartbeatInterval.toString(), userId));
+        updates.push(VarsModel.set('serviceDiscovery.heartbeatInterval', heartbeatInterval.toString(), userId, environment));
       }
 
       await Promise.all(updates);

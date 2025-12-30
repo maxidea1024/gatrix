@@ -12,22 +12,22 @@ router.use((req, res, next) => {
 
 // 메�??�이???�우??(/:id보다 먼�? ?�의?�야 ??
 // ?�랫??목록 조회 (관리자�?
-router.get('/meta/platforms', requireAdmin as any, ClientVersionController.getPlatforms);
+router.get('/meta/platforms', requireAdmin as any, ClientVersionController.getPlatforms as any);
 
 // ?�용 가?�한 버전 목록 조회 (관리자�?
-router.get('/meta/versions', requireAdmin as any, ClientVersionController.getAvailableVersions);
+router.get('/meta/versions', requireAdmin as any, ClientVersionController.getAvailableVersions as any);
 
 // ?�라?�언??버전 목록 조회 (관리자�?
-router.get('/', requireAdmin as any, ClientVersionController.getClientVersions);
+router.get('/', requireAdmin as any, ClientVersionController.getClientVersions as any);
 
 // ?�라?�언??버전 ?�보?�기 (관리자�?
-router.get('/export', requireAdmin as any, ClientVersionController.exportClientVersions);
+router.get('/export', requireAdmin as any, ClientVersionController.exportClientVersions as any);
 
 // ?�괄 ?�태 변�?(관리자�?
-router.patch('/bulk-status', requireAdmin as any, ClientVersionController.bulkUpdateStatus);
+router.patch('/bulk-status', requireAdmin as any, ClientVersionController.bulkUpdateStatus as any);
 
 // ?�라?�언??버전 ?�세 조회 (관리자�?
-router.get('/:id', requireAdmin as any, ClientVersionController.getClientVersionById);
+router.get('/:id', requireAdmin as any, ClientVersionController.getClientVersionById as any);
 
 // ?�라?�언??버전 ?�성 (관리자�?
 router.post('/',
@@ -38,7 +38,7 @@ router.post('/',
     getResourceId: (req) => req.body?.version,
     getNewValues: (req) => req.body,
   }) as any,
-  ClientVersionController.createClientVersion
+  ClientVersionController.createClientVersion as any
 );
 
 // ?�라?�언??버전 간편 ?�성 (관리자�?
@@ -52,7 +52,7 @@ router.post('/bulk',
     // ?�답?�서 ?�성??�?번째 ?�라?�언??버전??ID�??�용
     getResourceIdFromResponse: (res: any) => res?.data?.[0]?.id,
   }) as any,
-  ClientVersionController.bulkCreateClientVersions
+  ClientVersionController.bulkCreateClientVersions as any
 );
 
 // ?�라?�언??버전 ?�정 (관리자�?
@@ -64,7 +64,7 @@ router.put('/:id',
     getResourceId: (req) => req.params?.id,
     getNewValues: (req) => req.body,
   }) as any,
-  ClientVersionController.updateClientVersion
+  ClientVersionController.updateClientVersion as any
 );
 
 // ?�라?�언??버전 ??�� (관리자�?
@@ -76,14 +76,14 @@ router.delete('/:id',
     getResourceId: (req) => req.params?.id,
     getNewValues: () => ({}),
   }) as any,
-  ClientVersionController.deleteClientVersion
+  ClientVersionController.deleteClientVersion as any
 );
 
 // ?�그 관???�우??(관리자�?
-router.get('/:id/tags', requireAdmin as any, ClientVersionController.getTags);
-router.put('/:id/tags', requireAdmin as any, ClientVersionController.setTags);
+router.get('/:id/tags', requireAdmin as any, ClientVersionController.getTags as any);
+router.put('/:id/tags', requireAdmin as any, ClientVersionController.setTags as any);
 
 // Reset all client versions and cache (for testing)
-router.delete('/reset/all', requireAdmin as any, ClientVersionController.resetAllClientVersions);
+router.delete('/reset/all', requireAdmin as any, ClientVersionController.resetAllClientVersions as any);
 
 export default router;

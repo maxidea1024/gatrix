@@ -1,21 +1,23 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import VarsModel from '../models/Vars';
-import Environment from '../models/Environment';
 import { pubSubService } from '../services/PubSubService';
 import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
+import { AuthenticatedRequest } from '../types/auth';
 
 export class VarsController {
-  static async getVar(req: Request, res: Response, next: NextFunction) {
+  static async getVar(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
-      const value = await VarsModel.get(key);
+      const environment = req.environment || 'development';
+      const value = await VarsModel.get(key, environment);
       res.json({ success: true, data: { key, value } });
     } catch (e) { next(e); }
   }
 
-  static async setVar(req: Request, res: Response, next: NextFunction) {
+  static async setVar(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
+      const environment = req.environment || 'development';
       const incoming = req.body?.value ?? null;
       let toStore: string | null = null;
       if (incoming === null || incoming === undefined) {
@@ -25,8 +27,8 @@ export class VarsController {
       } else {
         toStore = JSON.stringify(incoming);
       }
-      const userId = (req as any).user?.userId || (req as any).user?.id;
-      await VarsModel.set(key, toStore, userId);
+      const userId = req.user?.userId || (req as any).user?.id || 1;
+      await VarsModel.set(key, toStore, userId, environment);
 
       // Invalidate related caches when specific KV items are updated via setVar
       if (key === '$clientVersionPassiveData' || key === 'kv:clientVersionPassiveData') {
@@ -43,19 +45,14 @@ export class VarsController {
         // by emitting a 'client_version.updated' event for each environment
 
         try {
-          // Only emit event for the current environment
-          const currentEnvId = (req as any).environment?.id || await import('../utils/environmentContext').then(m => m.getCurrentEnvironmentId());
-          const currentEnv = await Environment.query().findById(currentEnvId);
-
-          if (currentEnv) {
-            await pubSubService.publishSDKEvent({
-              type: 'client_version.updated',
-              data: {
-                id: -1, // Dummy ID to trigger refresh of the list for this environment
-                environment: currentEnv.environmentName
-              }
-            });
-          }
+          // environment is already the name string
+          await pubSubService.publishSDKEvent({
+            type: 'client_version.updated',
+            data: {
+              id: -1, // Dummy ID to trigger refresh of the list for this environment
+              environment: environment
+            }
+          });
         } catch (err) {
           // Log error but don't fail the request
           console.error('Failed to broadcast client version update events', err);
@@ -71,9 +68,10 @@ export class VarsController {
    * Get all KV items
    * GET /api/v1/admin/vars/kv
    */
-  static async getAllKV(req: Request, res: Response, next: NextFunction) {
+  static async getAllKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const items = await VarsModel.getAllKV();
+      const environment = req.environment || 'development';
+      const items = await VarsModel.getAllKV(environment);
       res.json({ success: true, data: items });
     } catch (e) {
       next(e);
@@ -84,11 +82,12 @@ export class VarsController {
    * Get a single KV item
    * GET /api/v1/admin/vars/kv/:key
    */
-  static async getKV(req: Request, res: Response, next: NextFunction) {
+  static async getKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
+      const environment = req.environment || 'development';
       const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
-      const item = await VarsModel.getKV(fullKey);
+      const item = await VarsModel.getKV(fullKey, environment);
 
       if (!item) {
         return res.status(404).json({ success: false, message: 'KV item not found' });
@@ -110,9 +109,10 @@ export class VarsController {
    * Create a new KV item
    * POST /api/v1/admin/vars/kv
    */
-  static async createKV(req: Request, res: Response, next: NextFunction) {
+  static async createKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const { varKey, varValue, valueType, description } = req.body;
+      const environment = req.environment || 'development';
 
       if (!varKey || !valueType) {
         return res.status(400).json({
@@ -122,10 +122,11 @@ export class VarsController {
         });
       }
 
-      const userId = (req as any).user?.userId || (req as any).user?.id;
+      const userId = req.user?.userId || (req as any).user?.id || 1;
       const item = await VarsModel.createKV(
         { varKey, varValue, valueType, description },
-        userId
+        userId,
+        environment
       );
 
       res.status(201).json({
@@ -149,17 +150,19 @@ export class VarsController {
    * Update an existing KV item
    * PUT /api/v1/admin/vars/kv/:key
    */
-  static async updateKV(req: Request, res: Response, next: NextFunction) {
+  static async updateKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
+      const environment = req.environment || 'development';
       const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
       const { varValue, valueType, description } = req.body;
 
-      const userId = (req as any).user?.userId || (req as any).user?.id;
+      const userId = req.user?.userId || (req as any).user?.id || 1;
       const item = await VarsModel.updateKV(
         fullKey,
         { varValue, valueType, description },
-        userId
+        userId,
+        environment
       );
 
       // Invalidate related caches when specific KV items are updated
@@ -180,19 +183,14 @@ export class VarsController {
         // by emitting a 'client_version.updated' event for each environment
 
         try {
-          // Only emit event for the current environment
-          const currentEnvId = (req as any).environment?.id || await import('../utils/environmentContext').then(m => m.getCurrentEnvironmentId());
-          const currentEnv = await Environment.query().findById(currentEnvId);
-
-          if (currentEnv) {
-            await pubSubService.publishSDKEvent({
-              type: 'client_version.updated',
-              data: {
-                id: -1, // Dummy ID to trigger refresh of the list for this environment
-                environment: currentEnv.environmentName
-              }
-            });
-          }
+          // environment is already the name string
+          await pubSubService.publishSDKEvent({
+            type: 'client_version.updated',
+            data: {
+              id: -1, // Dummy ID to trigger refresh of the list for this environment
+              environment: environment
+            }
+          });
         } catch (err) {
           // Log error but don't fail the request
           console.error('Failed to broadcast client version update events', err);
@@ -238,12 +236,13 @@ export class VarsController {
    * Delete a KV item
    * DELETE /api/v1/admin/vars/kv/:key
    */
-  static async deleteKV(req: Request, res: Response, next: NextFunction) {
+  static async deleteKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
+      const environment = req.environment || 'development';
       const fullKey = key.startsWith('kv:') ? key : `kv:${key}`;
 
-      await VarsModel.deleteKV(fullKey);
+      await VarsModel.deleteKV(fullKey, environment);
 
       res.json({
         success: true,
@@ -268,3 +267,4 @@ export class VarsController {
     }
   }
 }
+

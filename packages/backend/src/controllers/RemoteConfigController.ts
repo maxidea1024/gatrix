@@ -31,6 +31,7 @@ export class RemoteConfigController {
       }
 
       const filters: RemoteConfigFilters = {
+        environment: (req.query.environment as string) || 'development',
         search: req.query.search as string,
         valueType: req.query.valueType as any,
         isActive: isActiveFilter,
@@ -58,9 +59,10 @@ export class RemoteConfigController {
     try {
       const id = parseInt(req.params.id);
       const includeRelations = req.query.include !== 'false';
+      const environment = (req.query.environment as string) || 'development';
 
-      const config = await RemoteConfigModel.findById(id, includeRelations);
-      
+      const config = await RemoteConfigModel.findById(id, includeRelations, environment);
+
       if (!config) {
         throw new GatrixError('Remote config not found', 404);
       }
@@ -84,7 +86,8 @@ export class RemoteConfigController {
   static async create(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
-      
+      const environment = req.body.environment || 'development';
+
       const data: CreateRemoteConfigData = {
         keyName: req.body.keyName,
         defaultValue: req.body.defaultValue,
@@ -104,12 +107,12 @@ export class RemoteConfigController {
       }
 
       // Check if key already exists
-      const existing = await RemoteConfigModel.findByKey(data.keyName);
+      const existing = await RemoteConfigModel.findByKey(data.keyName, environment);
       if (existing) {
         throw new GatrixError('Remote config with this key already exists', 409);
       }
 
-      const config = await RemoteConfigModel.create(data);
+      const config = await RemoteConfigModel.create({ ...data, environment });
 
       // Send notification via PubSub (multi-instance)
       await pubSubService.publishNotification({
@@ -138,6 +141,7 @@ export class RemoteConfigController {
     try {
       const id = parseInt(req.params.id);
       const userId = (req as any).user?.id;
+      const environment = req.body.environment || 'development';
 
       const data: UpdateRemoteConfigData = {
         keyName: req.body.keyName,
@@ -149,21 +153,21 @@ export class RemoteConfigController {
       };
 
       // Check if config exists
-      const existing = await RemoteConfigModel.findById(id, false);
+      const existing = await RemoteConfigModel.findById(id, false, environment);
       if (!existing) {
         throw new GatrixError('Remote config not found', 404);
       }
 
       // Check if key name is being changed and if it conflicts
       if (data.keyName && data.keyName !== existing.keyName) {
-        const conflicting = await RemoteConfigModel.findByKey(data.keyName);
+        const conflicting = await RemoteConfigModel.findByKey(data.keyName, environment);
         if (conflicting && conflicting.id !== id) {
           throw new GatrixError('Remote config with this key already exists', 409);
         }
       }
 
       // Git-style update: Create new draft version instead of updating existing
-      const config = await RemoteConfigModel.update(id, data);
+      const config = await RemoteConfigModel.update(id, data, environment);
 
       // Version management removed - configs are now managed through template versions
       // Changes will be captured when publish is called
@@ -194,14 +198,15 @@ export class RemoteConfigController {
   static async delete(req: Request, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id);
+      const environment = (req.query.environment as string) || (req.body.environment as string) || 'development';
 
       // Check if config exists
-      const existing = await RemoteConfigModel.findById(id, false);
+      const existing = await RemoteConfigModel.findById(id, false, environment);
       if (!existing) {
         throw new GatrixError('Remote config not found', 404);
       }
 
-      await RemoteConfigModel.delete(id);
+      await RemoteConfigModel.delete(id, environment);
 
       // Send notification via PubSub (multi-instance)
       await pubSubService.publishNotification({

@@ -1,14 +1,23 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import ServiceNoticeService from '../services/ServiceNoticeService';
+import { AuthenticatedRequest } from '../types/auth';
 
 class ServiceNoticeController {
   /**
    * Get service notices with pagination and filters
    */
-  async getServiceNotices(req: Request, res: Response) {
+  getServiceNotices = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
+      const environment = req.environment;
+
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          message: 'Environment is required',
+        });
+      }
 
       // Parse platform - can be string or array
       let platform: string | string[] | undefined;
@@ -45,6 +54,7 @@ class ServiceNoticeController {
         subchannel,
         subchannelOperator: req.query.subchannelOperator as 'any_of' | 'include_all' | undefined,
         search: req.query.search as string,
+        environment,
       };
 
       const result = await ServiceNoticeService.getServiceNotices(page, limit, filters);
@@ -65,10 +75,19 @@ class ServiceNoticeController {
   /**
    * Get service notice by ID
    */
-  async getServiceNoticeById(req: Request, res: Response) {
+  getServiceNoticeById = async (req: AuthenticatedRequest, res: Response, next: any) => {
     try {
       const id = parseInt(req.params.id);
-      const notice = await ServiceNoticeService.getServiceNoticeById(id);
+      const environment = req.environment;
+
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          message: 'Environment is required',
+        });
+      }
+
+      const notice = await ServiceNoticeService.getServiceNoticeById(id, environment);
 
       if (!notice) {
         return res.status(404).json({
@@ -93,9 +112,17 @@ class ServiceNoticeController {
   /**
    * Create service notice
    */
-  async createServiceNotice(req: Request, res: Response) {
+  createServiceNotice = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const data = req.body;
+      const environment = req.environment;
+
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          message: 'Environment is required',
+        });
+      }
 
       // Debug logging
       console.log('Received service notice data:', JSON.stringify(data, null, 2));
@@ -116,8 +143,6 @@ class ServiceNoticeController {
         });
       }
 
-      // endDate is now optional - null means no end date (permanent notice)
-
       if (!data.title) {
         return res.status(400).json({
           success: false,
@@ -132,7 +157,7 @@ class ServiceNoticeController {
         });
       }
 
-      const notice = await ServiceNoticeService.createServiceNotice(data);
+      const notice = await ServiceNoticeService.createServiceNotice(data, environment);
 
       res.status(201).json({
         success: true,
@@ -150,12 +175,20 @@ class ServiceNoticeController {
   /**
    * Update service notice
    */
-  async updateServiceNotice(req: Request, res: Response) {
+  updateServiceNotice = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       const data = req.body;
+      const environment = req.environment;
 
-      const notice = await ServiceNoticeService.updateServiceNotice(id, data);
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          message: 'Environment is required',
+        });
+      }
+
+      const notice = await ServiceNoticeService.updateServiceNotice(id, data, environment);
 
       res.json({
         success: true,
@@ -173,10 +206,19 @@ class ServiceNoticeController {
   /**
    * Delete service notice
    */
-  async deleteServiceNotice(req: Request, res: Response) {
+  deleteServiceNotice = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      await ServiceNoticeService.deleteServiceNotice(id);
+      const environment = req.environment;
+
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          message: 'Environment is required',
+        });
+      }
+
+      await ServiceNoticeService.deleteServiceNotice(id, environment);
 
       res.json({
         success: true,
@@ -193,9 +235,17 @@ class ServiceNoticeController {
   /**
    * Delete multiple service notices
    */
-  async deleteMultipleServiceNotices(req: Request, res: Response) {
+  deleteMultipleServiceNotices = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { ids } = req.body;
+      const environment = req.environment;
+
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          message: 'Environment is required',
+        });
+      }
 
       if (!Array.isArray(ids) || ids.length === 0) {
         return res.status(400).json({
@@ -204,7 +254,7 @@ class ServiceNoticeController {
         });
       }
 
-      await ServiceNoticeService.deleteMultipleServiceNotices(ids);
+      await ServiceNoticeService.deleteMultipleServiceNotices(ids, environment);
 
       res.json({
         success: true,
@@ -221,10 +271,19 @@ class ServiceNoticeController {
   /**
    * Toggle active status
    */
-  async toggleActive(req: Request, res: Response) {
+  toggleActive = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      const notice = await ServiceNoticeService.toggleActive(id);
+      const environment = req.environment;
+
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          message: 'Environment is required',
+        });
+      }
+
+      const notice = await ServiceNoticeService.toggleActive(id, environment);
 
       res.json({
         success: true,
@@ -241,4 +300,3 @@ class ServiceNoticeController {
 }
 
 export default new ServiceNoticeController();
-

@@ -4,8 +4,9 @@ import { UserModel } from '../models/User';
 import { GatrixError } from './errorHandler';
 import logger from '../config/logger';
 
-export interface AuthenticatedRequest extends Request {
-  user?: JwtPayload;
+import { AppUser, AuthenticatedRequest as BaseAuthenticatedRequest } from '../types/auth';
+
+export interface AuthenticatedRequest extends BaseAuthenticatedRequest {
   userDetails?: any;
 }
 

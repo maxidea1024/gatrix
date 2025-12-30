@@ -17,10 +17,20 @@ export class ServerServiceNoticeController {
    */
   static async getServiceNotices(req: EnvironmentRequest, res: Response) {
     try {
-      const environment = req.environment!;
+      const environment = req.environment;
+
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'MISSING_ENVIRONMENT',
+            message: 'Environment is required',
+          },
+        });
+      }
 
       await respondWithEtagCache(res, {
-        cacheKey: `${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environment.id}`,
+        cacheKey: `${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environment}`,
         ttlMs: DEFAULT_CONFIG.SERVICE_NOTICE_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
@@ -43,12 +53,12 @@ export class ServerServiceNoticeController {
           const result = await ServiceNoticeService.getServiceNotices(
             1,
             1000,
-            { isActive: true, environmentId: environment.id }
+            { isActive: true, environment: environment }
           );
 
           const activeNotices = filterActiveNotices(result.notices);
 
-          logger.info(`Server SDK: Retrieved ${activeNotices.length} active service notices for environment ${environment.environmentName}`);
+          logger.info(`Server SDK: Retrieved ${activeNotices.length} active service notices for environment ${environment}`);
 
           return {
             success: true,
@@ -78,7 +88,18 @@ export class ServerServiceNoticeController {
   static async getServiceNoticeById(req: EnvironmentRequest, res: Response) {
     try {
       const { id } = req.params;
+      const environment = req.environment;
       const noticeId = parseInt(id);
+
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'MISSING_ENVIRONMENT',
+            message: 'Environment is required',
+          },
+        });
+      }
 
       if (isNaN(noticeId)) {
         return res.status(400).json({
@@ -91,7 +112,7 @@ export class ServerServiceNoticeController {
         });
       }
 
-      const notice = await ServiceNoticeService.getServiceNoticeById(noticeId);
+      const notice = await ServiceNoticeService.getServiceNoticeById(noticeId, environment);
 
       if (!notice) {
         return res.status(404).json({
@@ -103,7 +124,7 @@ export class ServerServiceNoticeController {
         });
       }
 
-      logger.info(`Server SDK: Retrieved service notice ${noticeId}`);
+      logger.info(`Server SDK: Retrieved service notice ${noticeId} for environment ${environment}`);
 
       res.json({
         success: true,
@@ -121,6 +142,7 @@ export class ServerServiceNoticeController {
     }
   }
 }
+
 
 export default ServerServiceNoticeController;
 

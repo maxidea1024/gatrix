@@ -10,13 +10,13 @@ const router = Router() as any;
  * Get all valid CMS CashShop products for the current environment
  */
 router.get('/', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const environmentId = req.environmentId;
-  if (!environmentId) {
-    throw new GatrixError('Environment ID is required', 400);
+  const environment = req.environment;
+  if (!environment) {
+    throw new GatrixError('Environment is required', 400);
   }
 
   // Get all products with multi-language structure
-  const products = await CmsCashShopService.getProducts(environmentId);
+  const products = await CmsCashShopService.getProducts(environment);
 
   res.json({
     success: true,

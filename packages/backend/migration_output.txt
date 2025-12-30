@@ -1,0 +1,545 @@
+yarn run v1.22.22
+$ ts-node src/database/migrate.ts up
+2025-12-29 20:46:14 [info]: Starting database migrations...
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:14 [error]: Database query error:
+{
+  "service": "gatrix-backend",
+  "code": "ECONNREFUSED",
+  "stack": "Error\n    at PromisePool.execute (C:\\work\\uwo\\gatrix\\node_modules\\mysql2\\lib\\promise\\pool.js:54:22)\n    at Database.query (C:\\work\\uwo\\gatrix\\packages\\backend\\src\\config\\database.ts:38:38)\n    at Migration.getExecutedMigrations (C:\\work\\uwo\\gatrix\\packages\\backend\\src\\database\\Migration.ts:106:35)\n    at Migration.getStatus (C:\\work\\uwo\\gatrix\\packages\\backend\\src\\database\\Migration.ts:252:43)\n    at runMigrations (C:\\work\\uwo\\gatrix\\packages\\backend\\src\\database\\migrate.ts:12:36)\n    at main (C:\\work\\uwo\\gatrix\\packages\\backend\\src\\database\\migrate.ts:73:13)\n    at Object.<anonymous> (C:\\work\\uwo\\gatrix\\packages\\backend\\src\\database\\migrate.ts:97:3)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Module.m._compile (C:\\work\\uwo\\gatrix\\node_modules\\ts-node\\src\\index.ts:1618:23)\n    at node:internal/modules/cjs/loader:1895:10",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:14 [error]: Error getting executed migrations:
+{
+  "service": "gatrix-backend",
+  "code": "ECONNREFUSED",
+  "stack": "Error\n    at PromisePool.execute (C:\\work\\uwo\\gatrix\\node_modules\\mysql2\\lib\\promise\\pool.js:54:22)\n    at Database.query (C:\\work\\uwo\\gatrix\\packages\\backend\\src\\config\\database.ts:38:38)\n    at Migration.getExecutedMigrations (C:\\work\\uwo\\gatrix\\packages\\backend\\src\\database\\Migration.ts:106:35)\n    at Migration.getStatus (C:\\work\\uwo\\gatrix\\packages\\backend\\src\\database\\Migration.ts:252:43)\n    at runMigrations (C:\\work\\uwo\\gatrix\\packages\\backend\\src\\database\\migrate.ts:12:36)\n    at main (C:\\work\\uwo\\gatrix\\packages\\backend\\src\\database\\migrate.ts:73:13)\n    at Object.<anonymous> (C:\\work\\uwo\\gatrix\\packages\\backend\\src\\database\\migrate.ts:97:3)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Module.m._compile (C:\\work\\uwo\\gatrix\\node_modules\\ts-node\\src\\index.ts:1618:23)\n    at node:internal/modules/cjs/loader:1895:10",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]: Found 84 pending migrations:
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 001_initial_schema
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 002_add_maintenance_fields
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 002_create_mails_table
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 003_add_gameworld_custom_payload
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 003_remote_config_v2_system
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 004_add_maintenance_template_id
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 004_remote_config_v2_seed_data
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 005_remote_config_final_system
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 007_add_service_maintenance
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 007_create_crashes_tables
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 007_create_invitations_table
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 007_create_surveys
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 008_add_firstline_to_crash_events
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 008_add_survey_targeting
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 008_create_reward_templates
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 008_make_invitation_email_optional
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 009_add_survey_channel_targeting
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 009_create_api_access_tokens
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 010_create_service_notices
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 011_add_kv_support_to_vars
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 012_create_coupon_system
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 013_fix_tag_assignments_entity_id
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 013_optimize_coupon_indexes
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 013_rename_coupon_name_description
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 014_add_coupon_count_cache
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 014_add_coupon_generation_status
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 015_optimize_coupon_pagination
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 016_fix_reward_templates_schema
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 017_remove_old_reward_template_columns
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 018_add_coupon_reward_email_fields
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 019_add_coupon_code_pattern
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 020_add_coupon_character_limit
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 021_add_coupon_inverted_targeting
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 021_make_coupon_startsAt_nullable
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 022_add_platforms_and_channels_kv
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 023_add_copyable_flag_and_rename_kv_keys
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 024_remove_market_types_kv
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 025_add_coupon_user_targeting
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 026_add_ingame_popup_notice_targeting
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 027_add_channel_to_coupon_target_subchannels
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 028_update_surveys_targeting_fields
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 029_make_ingame_popup_notices_startdate_nullable
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 030_make_service_notices_startdate_nullable
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 031_drop_old_token_table
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 032_remove_permissions_column
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 033_rename_token_hash_to_token_value
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 034_add_reward_template_id_to_surveys
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 035_add_channel_targeting_to_service_notices
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 036_add_totalCount_to_coupon_settings
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 036_add_world_server_address
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 036_make_service_notices_enddate_nullable
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 037_make_ingame_popup_notices_enddate_nullable
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 038_make_world_server_address_required
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 039_seed_default_tags
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 040_create_monitoring_alerts_table
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 041_update_world_server_address_comment
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 042_add_gameworld_maintenance_options
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 043_add_gameworld_infra_settings
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 044_change_infrasettings_to_text
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 046_create_banners_table
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 047_add_banner_name_unique_constraint
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 048_extend_environments_for_multi_env
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 049_add_environment_id_to_tables
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 050_create_api_token_environments
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 051_fix_unique_constraints_for_multi_env
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 052_create_user_environments
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 053_add_environment_id_to_rc_tables
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 054_fix_remaining_unique_constraints
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 055_create_user_permissions
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 056_add_crash_event_user_agent
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 057_add_superadmin_wildcard_permission
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 058_seed_kvs_for_system_envs
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 059_make_tags_global
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 060_create_store_products
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 061_add_cms_product_id_to_store_products
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 062_add_edge_all_token_types
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 063_add_multilang_to_store_products
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 064_add_hidden_system_env
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 065_fix_client_version_unique_constraint
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 066_create_server_lifecycle_events
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 067_add_lifecycle_network_columns
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 068_rename_serverversion_to_appversion
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 069_refactor_lifecycle_environment
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [info]:   - 070_refactor_all_environment_ids
+{
+  "service": "gatrix-backend",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+2025-12-29 20:46:20 [error]: Migration failed:
+{
+  "service": "gatrix-backend",
+  "code": "ECONNREFUSED",
+  "fatal": true,
+  "stack": "AggregateError\n    at internalConnectMultiple (node:net:1139:18)\n    at afterConnectMultiple (node:net:1714:7)",
+  "hostname": "DESKTOP-2FFOGVN",
+  "internalIp": "10.10.30.84"
+}
+error Command failed with exit code 1.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

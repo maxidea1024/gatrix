@@ -11,6 +11,7 @@ export type ContextFieldType = 'string' | 'number' | 'boolean' | 'array';
 // Main Remote Config
 export interface RemoteConfig {
   id: number;
+  environment: string;
   keyName: string;
   defaultValue?: string;
   valueType: ConfigValueType;
@@ -62,7 +63,7 @@ export interface ConfigVersion {
   publishedAt?: string;
   createdBy?: number;
   createdAt: string;
-  
+
   // Relations
   createdByName?: string;
   config?: RemoteConfig;
@@ -87,7 +88,7 @@ export interface ContextField {
   validationRules?: any;
   createdBy?: number;
   createdAt: string;
-  
+
   // Relations
   createdByName?: string;
 }
@@ -169,6 +170,7 @@ export interface CreateConfigVariantData {
 // Campaigns
 export interface Campaign {
   id: number;
+  environment: string;
   campaignName: string;
   description?: string;
   startDate?: string;
@@ -233,7 +235,7 @@ export interface Deployment {
   deployedBy?: number;
   deployedAt: string;
   rollbackDeploymentId?: number;
-  
+
   // Relations
   deployedByName?: string;
   rollbackDeployment?: Deployment;
@@ -281,7 +283,7 @@ export interface RemoteConfigListResponse {
 }
 
 export interface RemoteConfigFilters {
-  environmentId?: string;
+  environment: string;
   search?: string;
   valueType?: ConfigValueType;
   isActive?: boolean;

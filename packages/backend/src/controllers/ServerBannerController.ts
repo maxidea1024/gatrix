@@ -17,16 +17,26 @@ export class ServerBannerController {
    */
   static async getBanners(req: EnvironmentRequest, res: Response) {
     try {
-      const environment = req.environment!;
+      const environment = req.environment;
+
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'MISSING_ENVIRONMENT',
+            message: 'Environment is required',
+          },
+        });
+      }
 
       await respondWithEtagCache(res, {
-        cacheKey: `${SERVER_SDK_ETAG.BANNERS}:${environment.id}`,
+        cacheKey: `${SERVER_SDK_ETAG.BANNERS}:${environment}`,
         ttlMs: DEFAULT_CONFIG.BANNER_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
-          const banners = await BannerModel.findPublished(environment.id);
+          const banners = await BannerModel.findPublished(environment);
 
-          logger.info(`Server SDK: Retrieved ${banners.length} published banners for environment ${environment.environmentName}`);
+          logger.info(`Server SDK: Retrieved ${banners.length} published banners for environment ${environment}`);
 
           return {
             success: true,
@@ -56,6 +66,17 @@ export class ServerBannerController {
   static async getBannerById(req: EnvironmentRequest, res: Response) {
     try {
       const { bannerId } = req.params;
+      const environment = req.environment;
+
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'MISSING_ENVIRONMENT',
+            message: 'Environment is required',
+          },
+        });
+      }
 
       if (!bannerId) {
         return res.status(400).json({
@@ -68,7 +89,7 @@ export class ServerBannerController {
         });
       }
 
-      const banner = await BannerModel.findById(bannerId);
+      const banner = await BannerModel.findById(bannerId, environment);
 
       if (!banner) {
         return res.status(404).json({
@@ -91,7 +112,7 @@ export class ServerBannerController {
         });
       }
 
-      logger.info(`Server SDK: Retrieved banner ${bannerId}`);
+      logger.info(`Server SDK: Retrieved banner ${bannerId} for environment ${environment}`);
 
       res.json({
         success: true,
@@ -111,6 +132,7 @@ export class ServerBannerController {
     }
   }
 }
+
 
 export default ServerBannerController;
 

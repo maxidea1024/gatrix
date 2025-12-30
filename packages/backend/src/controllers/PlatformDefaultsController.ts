@@ -21,8 +21,9 @@ export class PlatformDefaultsController {
    * GET /api/v1/admin/platform-defaults
    */
   static getAllDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const defaults = await PlatformDefaultsService.getAllDefaults();
-    
+    const environment = req.environment || 'development';
+    const defaults = await PlatformDefaultsService.getAllDefaults(environment);
+
     res.json({
       success: true,
       data: defaults,
@@ -35,13 +36,14 @@ export class PlatformDefaultsController {
    */
   static getPlatformDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { platform } = req.params;
-    
+    const environment = req.environment || 'development';
+
     if (!platform) {
       throw new GatrixError('Platform parameter is required', 400);
     }
 
-    const defaults = await PlatformDefaultsService.getPlatformDefaults(platform);
-    
+    const defaults = await PlatformDefaultsService.getPlatformDefaults(platform, environment);
+
     res.json({
       success: true,
       data: {
@@ -57,7 +59,8 @@ export class PlatformDefaultsController {
    */
   static setPlatformDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { platform } = req.params;
-    
+    const environment = req.environment || 'development';
+
     if (!platform) {
       throw new GatrixError('Platform parameter is required', 400);
     }
@@ -69,8 +72,8 @@ export class PlatformDefaultsController {
     }
 
     const defaults: PlatformDefaults = value;
-    
-    await PlatformDefaultsService.setPlatformDefaults(platform, defaults, (req.user as any).userId);
+
+    await PlatformDefaultsService.setPlatformDefaults(platform, defaults, (req.user as any).userId, environment);
 
     res.json({
       success: true,
@@ -87,6 +90,8 @@ export class PlatformDefaultsController {
    * PUT /api/v1/admin/platform-defaults
    */
   static setAllDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environment = req.environment || 'development';
+
     // Validate request body
     const { error, value } = allDefaultsSchema.validate(req.body);
     if (error) {
@@ -95,7 +100,7 @@ export class PlatformDefaultsController {
 
     const defaultsMap: PlatformDefaultsMap = value;
 
-    await PlatformDefaultsService.setAllDefaults(defaultsMap, (req.user as any).userId);
+    await PlatformDefaultsService.setAllDefaults(defaultsMap, (req.user as any).userId, environment);
 
     res.json({
       success: true,
@@ -110,12 +115,13 @@ export class PlatformDefaultsController {
    */
   static deletePlatformDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { platform } = req.params;
-    
+    const environment = req.environment || 'development';
+
     if (!platform) {
       throw new GatrixError('Platform parameter is required', 400);
     }
 
-    await PlatformDefaultsService.deletePlatformDefaults(platform, (req.user as any).userId);
+    await PlatformDefaultsService.deletePlatformDefaults(platform, (req.user as any).userId, environment);
 
     res.json({
       success: true,

@@ -1,0 +1,754 @@
+﻿yarn run v1.22.22
+$ tsc --noEmit
+src/controllers/ClientController.ts(114,95): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/ClientController.ts(157,39): error TS2345: Argument of type 'SDKRequest' is not assignable to parameter of type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+  Types of property 'environment' are incompatible.
+    Type 'Environment | undefined' is not assignable to type 'string | undefined'.
+      Type 'Environment' is not assignable to type 'string'.
+src/controllers/EnvironmentController.ts(105,9): error TS2561: Object literal may only specify known properties, but 'environmentName' does not exist in type 'Omit<EnvironmentData, "createdAt" | "updatedAt" | "id">'. Did you mean to write 'environment'?
+src/controllers/EnvironmentController.ts(174,38): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/EnvironmentController.ts(223,47): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/EnvironmentController.ts(241,55): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/EnvironmentController.ts(278,36): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/EnvironmentController.ts(314,13): error TS7022: 'environment' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+src/controllers/EnvironmentController.ts(314,27): error TS2448: Block-scoped variable 'environment' used before its declaration.
+src/controllers/EnvironmentController.ts(328,26): error TS2304: Cannot find name 'environmentName'.
+src/controllers/EnvironmentController.ts(423,79): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/EnvironmentController.ts(467,10): error TS2304: Cannot find name 'environmentName'.
+src/controllers/EnvironmentController.ts(544,61): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/EnvironmentController.ts(544,89): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/EnvironmentController.ts(596,32): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/EnvironmentController.ts(601,32): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/MaintenanceController.ts(35,47): error TS2345: Argument of type 'Environment | undefined' is not assignable to parameter of type 'string | undefined'.
+  Type 'Environment' is not assignable to type 'string'.
+src/controllers/MaintenanceController.ts(36,61): error TS2345: Argument of type 'Environment | undefined' is not assignable to parameter of type 'string | undefined'.
+  Type 'Environment' is not assignable to type 'string'.
+src/controllers/RemoteConfigSDKController.ts(34,60): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/RemoteConfigSDKController.ts(63,36): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/RemoteConfigSDKController.ts(128,60): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/RemoteConfigSDKController.ts(157,36): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/RemoteConfigSDKController.ts(300,34): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/RemoteConfigTemplateController.ts(89,62): error TS2345: Argument of type 'Environment | undefined' is not assignable to parameter of type 'MaybeCompositeId'.
+  Type 'undefined' is not assignable to type 'MaybeCompositeId'.
+src/controllers/RemoteConfigTemplateController.ts(89,62): error TS2448: Block-scoped variable 'environment' used before its declaration.
+src/controllers/RemoteConfigTemplateController.ts(98,9): error TS2561: Object literal may only specify known properties, but 'environmentId' does not exist in type 'Omit<RemoteConfigTemplateData, "createdAt" | "updatedAt" | "version" | "id">'. Did you mean to write 'environment'?
+src/controllers/RemoteConfigTemplateController.ts(110,36): error TS2322: Type 'Environment' is not assignable to type 'string'.
+src/controllers/RemoteConfigTemplateController.ts(123,38): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/RemoteConfigTemplateController.ts(134,71): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/RemoteConfigTemplateController.ts(188,11): error TS2322: Type 'Environment' is not assignable to type 'string'.
+src/controllers/RemoteConfigTemplateController.ts(202,48): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/RemoteConfigTemplateController.ts(420,73): error TS2304: Cannot find name 'environment'.
+src/controllers/ServerBannerController.ts(29,112): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/ServerClientVersionController.ts(93,119): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/ServerEnvironmentController.ts(24,26): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/ServerLifecycleController.ts(48,70): error TS2304: Cannot find name 'environmentId'.
+src/controllers/ServerServiceNoticeController.ts(51,123): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/ServerStoreProductController.ts(143,118): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/VarsController.ts(55,41): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/controllers/VarsController.ts(192,41): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/middleware/apiTokenAuth.ts(22,18): error TS2430: Interface 'SDKRequest' incorrectly extends interface 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+  Types of property 'environment' are incompatible.
+    Type 'Environment | undefined' is not assignable to type 'string | undefined'.
+      Type 'Environment' is not assignable to type 'string'.
+src/middleware/apiTokenAuth.ts(25,3): error TS2300: Duplicate identifier 'environment'.
+src/middleware/apiTokenAuth.ts(26,3): error TS2300: Duplicate identifier 'environment'.
+src/middleware/apiTokenAuth.ts(26,3): error TS2717: Subsequent property declarations must have the same type.  Property 'environment' must be of type 'Environment | undefined', but here has type 'string | undefined'.
+src/middleware/apiTokenAuth.ts(249,9): error TS2451: Cannot redeclare block-scoped variable 'environment'.
+src/middleware/apiTokenAuth.ts(254,10): error TS2304: Cannot find name 'environmentId'.
+src/middleware/apiTokenAuth.ts(255,7): error TS2304: Cannot find name 'environmentId'.
+src/middleware/apiTokenAuth.ts(259,10): error TS2304: Cannot find name 'environmentId'.
+src/middleware/apiTokenAuth.ts(282,11): error TS2304: Cannot find name 'environmentId'.
+src/middleware/apiTokenAuth.ts(287,10): error TS2304: Cannot find name 'environmentId'.
+src/middleware/apiTokenAuth.ts(295,7): error TS2304: Cannot find name 'environmentId'.
+src/middleware/apiTokenAuth.ts(298,10): error TS2304: Cannot find name 'environmentId'.
+src/middleware/apiTokenAuth.ts(308,9): error TS2451: Cannot redeclare block-scoped variable 'environment'.
+src/middleware/apiTokenAuth.ts(326,7): error TS2322: Type 'Environment' is not assignable to type 'string'.
+src/middleware/apiTokenAuth.ts(333,23): error TS2339: Property 'id' does not exist on type 'string'.
+src/middleware/apiTokenAuth.ts(333,30): error TS2304: Cannot find name 'environmentId'.
+src/middleware/apiTokenAuth.ts(334,55): error TS2339: Property 'id' does not exist on type 'string'.
+src/middleware/apiTokenAuth.ts(340,5): error TS2304: Cannot find name 'environmentId'.
+src/middleware/apiTokenAuth.ts(340,33): error TS2339: Property 'id' does not exist on type 'string'.
+src/middleware/apiTokenAuth.ts(341,5): error TS2322: Type 'string' is not assignable to type 'Environment'.
+src/middleware/apiTokenAuth.ts(364,24): error TS2304: Cannot find name 'environmentId'.
+src/middleware/apiTokenAuth.ts(376,26): error TS2304: Cannot find name 'environmentId'.
+src/middleware/apiTokenAuth.ts(377,13): error TS1117: An object literal cannot have multiple properties with the same name.
+src/middleware/apiTokenAuth.ts(377,38): error TS2339: Property 'environment' does not exist on type 'string'.
+src/middleware/environmentMiddleware.ts(27,7): error TS2300: Duplicate identifier 'environment'.
+src/middleware/environmentMiddleware.ts(28,7): error TS2300: Duplicate identifier 'environment'.
+src/middleware/environmentMiddleware.ts(50,11): error TS2451: Cannot redeclare block-scoped variable 'environment'.
+src/middleware/environmentMiddleware.ts(60,25): error TS2304: Cannot find name 'environmentId'.
+src/middleware/environmentMiddleware.ts(64,11): error TS2451: Cannot redeclare block-scoped variable 'environment'.
+src/middleware/environmentMiddleware.ts(70,37): error TS2339: Property 'environment' does not exist on type 'string'.
+src/middleware/environmentMiddleware.ts(74,35): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/middleware/environmentMiddleware.ts(94,13): error TS2451: Cannot redeclare block-scoped variable 'environment'.
+src/middleware/environmentMiddleware.ts(96,13): error TS2451: Cannot redeclare block-scoped variable 'environment'.
+src/middleware/environmentMiddleware.ts(101,62): error TS2339: Property 'environmentType' does not exist on type 'string'.
+src/middleware/environmentMiddleware.ts(104,69): error TS2339: Property 'environmentType' does not exist on type 'string'.
+src/middleware/environmentMiddleware.ts(130,11): error TS2451: Cannot redeclare block-scoped variable 'environment'.
+src/middleware/environmentMiddleware.ts(132,11): error TS2451: Cannot redeclare block-scoped variable 'environment'.
+src/middleware/environmentMiddleware.ts(137,22): error TS2339: Property 'environmentType' does not exist on type 'string'.
+src/middleware/environmentMiddleware.ts(139,23): error TS2339: Property 'requiresApproval' does not exist on type 'string'.
+src/middleware/environmentResolver.ts(12,3): error TS2300: Duplicate identifier 'environment'.
+src/middleware/environmentResolver.ts(13,3): error TS2300: Duplicate identifier 'environment'.
+src/middleware/environmentResolver.ts(13,3): error TS2717: Subsequent property declarations must have the same type.  Property 'environment' must be of type 'Environment | undefined', but here has type 'string | undefined'.
+src/middleware/environmentResolver.ts(58,5): error TS2322: Type 'string' is not assignable to type 'Environment'.
+src/models/AccountWhitelist.ts(164,21): error TS2304: Cannot find name 'environmentId'.
+src/models/AccountWhitelist.ts(199,21): error TS2304: Cannot find name 'environmentId'.
+src/models/AccountWhitelist.ts(225,21): error TS2304: Cannot find name 'environmentId'.
+src/models/AccountWhitelist.ts(279,21): error TS2304: Cannot find name 'environmentId'.
+src/models/AccountWhitelist.ts(296,21): error TS2304: Cannot find name 'environmentId'.
+src/models/AccountWhitelist.ts(354,21): error TS2304: Cannot find name 'environmentId'.
+src/models/ApiAccessToken.ts(353,55): error TS2304: Cannot find name 'environmentId'.
+src/models/Banner.ts(197,21): error TS2304: Cannot find name 'environmentId'.
+src/models/Banner.ts(235,21): error TS2304: Cannot find name 'environmentId'.
+src/models/Banner.ts(291,21): error TS2304: Cannot find name 'environmentId'.
+src/models/Banner.ts(329,21): error TS2304: Cannot find name 'environmentId'.
+src/models/Banner.ts(339,21): error TS2304: Cannot find name 'environmentId'.
+src/models/Banner.ts(363,21): error TS2304: Cannot find name 'environmentId'.
+src/models/Banner.ts(393,21): error TS2304: Cannot find name 'environmentId'.
+src/models/ClientVersion.ts(487,21): error TS2304: Cannot find name 'environmentId'.
+src/models/Environment.ts(32,14): error TS2420: Class 'Environment' incorrectly implements interface 'EnvironmentData'.
+  Property 'environment' is missing in type 'Environment' but required in type 'EnvironmentData'.
+src/models/Environment.ts(122,25): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/models/GameWorld.ts(144,21): error TS2304: Cannot find name 'environmentId'.
+src/models/GameWorld.ts(160,9): error TS2339: Property 'environmentId' does not exist on type 'GameWorldListParams'.
+src/models/GameWorld.ts(398,21): error TS2304: Cannot find name 'environmentId'.
+src/models/IpWhitelist.ts(134,21): error TS2304: Cannot find name 'environmentId'.
+src/models/IpWhitelist.ts(156,21): error TS2304: Cannot find name 'environmentId'.
+src/models/IpWhitelist.ts(173,21): error TS2304: Cannot find name 'environmentId'.
+src/models/IpWhitelist.ts(191,21): error TS2304: Cannot find name 'environmentId'.
+src/models/IpWhitelist.ts(220,21): error TS2304: Cannot find name 'environmentId'.
+src/models/Job.ts(213,21): error TS2304: Cannot find name 'environmentId'.
+src/models/Job.ts(304,21): error TS2304: Cannot find name 'environmentId'.
+src/models/Job.ts(353,21): error TS2304: Cannot find name 'environmentId'.
+src/models/Job.ts(415,21): error TS2304: Cannot find name 'environmentId'.
+src/models/JobType.ts(62,21): error TS2304: Cannot find name 'environmentId'.
+src/models/JobType.ts(96,21): error TS2304: Cannot find name 'environmentId'.
+src/models/JobType.ts(123,21): error TS2304: Cannot find name 'environmentId'.
+src/models/JobType.ts(177,21): error TS2304: Cannot find name 'environmentId'.
+src/models/JobType.ts(217,21): error TS2304: Cannot find name 'environmentId'.
+src/models/JobType.ts(232,21): error TS2304: Cannot find name 'environmentId'.
+src/models/MessageTemplate.ts(188,21): error TS2304: Cannot find name 'environmentId'.
+src/models/MessageTemplate.ts(224,21): error TS2304: Cannot find name 'environmentId'.
+src/models/MessageTemplate.ts(279,21): error TS2304: Cannot find name 'environmentId'.
+src/models/MessageTemplate.ts(323,21): error TS2304: Cannot find name 'environmentId'.
+src/models/RemoteConfig.ts(132,21): error TS2304: Cannot find name 'environmentId'.
+src/models/RemoteConfig.ts(215,21): error TS2304: Cannot find name 'environmentId'.
+src/models/RemoteConfig.ts(273,21): error TS2304: Cannot find name 'environmentId'.
+src/models/RemoteConfig.ts(303,21): error TS2304: Cannot find name 'environmentId'.
+src/models/RemoteConfigChangeRequest.ts(47,3): error TS2416: Property 'environment' in type 'RemoteConfigChangeRequest' is not assignable to the same property in base type 'RemoteConfigChangeRequestData'.
+  Type 'Environment | undefined' is not assignable to type 'string'.
+    Type 'undefined' is not assignable to type 'string'.
+src/models/RemoteConfigChangeRequest.ts(135,27): error TS2589: Type instantiation is excessively deep and possibly infinite.
+src/models/RemoteConfigChangeRequest.ts(135,46): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(insert: PartialModelObject<RemoteConfigChangeRequest>): QueryBuilder<RemoteConfigChangeRequest, RemoteConfigChangeRequest>', gave the following error.
+    Argument of type '{ status: "pending" | "approved"; approvedBy: number | undefined; approvedAt: Date | undefined; environment: string; description?: string | undefined; templateId: number; requestType: ChangeRequestType; proposedChanges: any; requestedBy: number; currentData?: any; rejectionReason?: string | undefined; }' is not assignable to parameter of type 'PartialModelObject<RemoteConfigChangeRequest>'.
+      Types of property 'environment' are incompatible.
+        Type 'string' is not assignable to type 'Environment'.
+  Overload 2 of 3, '(insert: PartialModelObject<RemoteConfigChangeRequest>[]): QueryBuilder<RemoteConfigChangeRequest, RemoteConfigChangeRequest[]>', gave the following error.
+    Object literal may only specify known properties, and 'status' does not exist in type 'PartialModelObject<RemoteConfigChangeRequest>[]'.
+src/models/RemoteConfigChangeRequest.ts(170,9): error TS2304: Cannot find name 'environment'.
+src/models/RemoteConfigChangeRequest.ts(171,44): error TS2304: Cannot find name 'environment'.
+src/models/RemoteConfigSegment.ts(46,3): error TS2416: Property 'environment' in type 'RemoteConfigSegment' is not assignable to the same property in base type 'RemoteConfigSegmentData'.
+  Type 'Environment | undefined' is not assignable to type 'string'.
+    Type 'undefined' is not assignable to type 'string'.
+src/models/RemoteConfigSegment.ts(164,38): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(insert: PartialModelObject<RemoteConfigSegment>): QueryBuilder<RemoteConfigSegment, RemoteConfigSegment>', gave the following error.
+    Argument of type 'Omit<RemoteConfigSegmentData, "createdAt" | "updatedAt" | "id">' is not assignable to parameter of type 'PartialModelObject<RemoteConfigSegment>'.
+      Types of property 'environment' are incompatible.
+        Type 'string' is not assignable to type 'Environment'.
+  Overload 2 of 3, '(insert: PartialModelObject<RemoteConfigSegment>[]): QueryBuilder<RemoteConfigSegment, RemoteConfigSegment[]>', gave the following error.
+    Argument of type 'Omit<RemoteConfigSegmentData, "createdAt" | "updatedAt" | "id">' is not assignable to parameter of type 'PartialModelObject<RemoteConfigSegment>[]'.
+      Type 'Omit<RemoteConfigSegmentData, "createdAt" | "updatedAt" | "id">' is missing the following properties from type 'PartialModelObject<RemoteConfigSegment>[]': length, pop, push, concat, and 29 more.
+src/models/RemoteConfigSegment.ts(176,46): error TS2345: Argument of type '{ updatedBy: number; updatedAt: Date; id?: number | undefined; environment?: string | undefined; segmentName?: string | undefined; displayName?: string | undefined; description?: string | undefined; segmentConditions?: SegmentConditions | undefined; isActive?: boolean | undefined; createdBy?: number | undefined; cre...' is not assignable to parameter of type 'PartialModelObject<RemoteConfigSegment>'.
+  Types of property 'environment' are incompatible.
+    Type 'string | undefined' is not assignable to type 'Environment | undefined'.
+      Type 'string' is not assignable to type 'Environment'.
+src/models/RemoteConfigSegment.ts(352,11): error TS2561: Object literal may only specify known properties, but 'environmentId' does not exist in type 'Omit<RemoteConfigSegmentData, "createdAt" | "updatedAt" | "id">'. Did you mean to write 'environment'?
+src/models/RemoteConfigSegment.ts(352,11): error TS18004: No value exists in scope for the shorthand property 'environmentId'. Either declare one or provide an initializer.
+src/models/RemoteConfigTemplate.ts(65,3): error TS2416: Property 'environment' in type 'RemoteConfigTemplate' is not assignable to the same property in base type 'RemoteConfigTemplateData'.
+  Type 'Environment | undefined' is not assignable to type 'string'.
+    Type 'undefined' is not assignable to type 'string'.
+src/models/RemoteConfigTemplate.ts(223,31): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(insert: PartialModelObject<RemoteConfigTemplate>): QueryBuilder<RemoteConfigTemplate, RemoteConfigTemplate>', gave the following error.
+    Argument of type '{ version: number; status: TemplateStatus; environment: string; description?: string | undefined; metadata?: any; createdBy: number; updatedBy?: number | undefined; templateName: string; displayName: string; ... 4 more ...; archivedAt?: Date | undefined; }' is not assignable to parameter of type 'PartialModelObject<RemoteConfigTemplate>'.
+      Types of property 'environment' are incompatible.
+        Type 'string' is not assignable to type 'Environment'.
+  Overload 2 of 3, '(insert: PartialModelObject<RemoteConfigTemplate>[]): QueryBuilder<RemoteConfigTemplate, RemoteConfigTemplate[]>', gave the following error.
+    Object literal may only specify known properties, and 'version' does not exist in type 'PartialModelObject<RemoteConfigTemplate>[]'.
+src/models/ServerLifecycleEvent.ts(31,14): error TS2420: Class 'ServerLifecycleEvent' incorrectly implements interface 'ServerLifecycleEventData'.
+  Property 'environment' is missing in type 'ServerLifecycleEvent' but required in type 'ServerLifecycleEventData'.
+src/models/Vars.ts(38,19): error TS2304: Cannot find name 'environmentId'.
+src/models/Vars.ts(49,19): error TS2304: Cannot find name 'environmentId'.
+src/models/Vars.ts(60,19): error TS2304: Cannot find name 'environmentId'.
+src/models/Vars.ts(87,19): error TS2304: Cannot find name 'environmentId'.
+src/models/Vars.ts(116,19): error TS2304: Cannot find name 'environmentId'.
+src/models/Vars.ts(141,19): error TS2304: Cannot find name 'environmentId'.
+src/models/Vars.ts(182,19): error TS2304: Cannot find name 'environmentId'.
+src/models/Vars.ts(211,19): error TS2304: Cannot find name 'environmentId'.
+src/routes/admin/cmsCashShop.ts(14,8): error TS2304: Cannot find name 'environmentId'.
+src/routes/admin/cmsCashShop.ts(19,57): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/client/client.ts(371,31): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/client/client.ts(373,28): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/client/client.ts(375,28): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/client/client.ts(377,34): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/client/client.ts(394,21): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/client/client.ts(408,40): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/client/client.ts(409,40): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/client/client.ts(410,39): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/client/client.ts(414,3): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/client/client.ts(435,24): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/client/client.ts(436,34): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/client/index.ts(17,26): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/client/index.ts(20,26): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/client/index.ts(23,25): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(30,32): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(33,45): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(40,21): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(56,29): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(60,30): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(63,27): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(64,26): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(65,29): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(68,31): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(69,36): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(72,34): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(73,30): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(76,31): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(77,33): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(78,28): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(79,31): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(80,29): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(90,31): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(91,30): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(94,43): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(97,33): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(98,48): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(99,37): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(102,42): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(103,46): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(106,38): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(107,29): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(108,33): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(111,32): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(114,33): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(117,37): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(118,41): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(121,37): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(122,41): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(125,29): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(126,39): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(129,36): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/index.ts(130,40): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/serviceDiscovery.ts(96,27): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/serviceDiscovery.ts(115,26): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/serviceDiscovery.ts(197,28): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/serviceDiscovery.ts(248,24): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/serviceDiscovery.ts(320,17): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/routes/server/serviceDiscovery.ts(368,41): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to parameter of type 'RequestHandlerParams<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+      Type '((req: SDKRequest, res: Response<any, Record<string, any>>, next: NextFunction) => void)[]' is not assignable to type '(ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>)[]'.
+        Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> | RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<...>>'.
+          Type '(req: SDKRequest, res: Response, next: NextFunction) => void' is not assignable to type 'ErrorRequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+            Types of parameters 'res' and 'req' are incompatible.
+              Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is missing the following properties from type 'Response<any, Record<string, any>>': status, sendStatus, links, send, and 60 more.
+src/services/BannerService.ts(153,30): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/BannerService.ts(216,30): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/BannerService.ts(264,30): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/BannerService.ts(306,30): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/BannerService.ts(350,30): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/ClientVersionService.ts(343,28): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/ClientVersionService.ts(451,26): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/ClientVersionService.ts(487,30): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/ClientVersionService.ts(522,28): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/CouponSettingsService.ts(138,19): error TS2552: Cannot find name 'environmentId'. Did you mean 'environment'?
+src/services/CouponSettingsService.ts(278,19): error TS2552: Cannot find name 'environmentId'. Did you mean 'environment'?
+src/services/CouponSettingsService.ts(353,19): error TS2552: Cannot find name 'environmentId'. Did you mean 'environment'?
+src/services/CouponSettingsService.ts(406,19): error TS2552: Cannot find name 'environmentId'. Did you mean 'environment'?
+src/services/CouponSettingsService.ts(762,10): error TS2552: Cannot find name 'environmentId'. Did you mean 'environment'?
+src/services/EnvironmentCopyService.ts(452,11): error TS2589: Type instantiation is excessively deep and possibly infinite.
+src/services/EnvironmentCopyService.ts(453,13): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(insert: PartialModelObject<RemoteConfigTemplate>): QueryBuilder<RemoteConfigTemplate, RemoteConfigTemplate>', gave the following error.
+    Type 'string' is not assignable to type 'Environment'.
+  Overload 2 of 3, '(insert: PartialModelObject<RemoteConfigTemplate>[]): QueryBuilder<RemoteConfigTemplate, RemoteConfigTemplate[]>', gave the following error.
+    Object literal may only specify known properties, and 'environment' does not exist in type 'PartialModelObject<RemoteConfigTemplate>[]'.
+src/services/EnvironmentCopyService.ts(508,11): error TS2589: Type instantiation is excessively deep and possibly infinite.
+src/services/EnvironmentCopyService.ts(509,13): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(insert: PartialModelObject<RemoteConfigSegment>): QueryBuilder<RemoteConfigSegment, RemoteConfigSegment>', gave the following error.
+    Type 'string' is not assignable to type 'Environment'.
+  Overload 2 of 3, '(insert: PartialModelObject<RemoteConfigSegment>[]): QueryBuilder<RemoteConfigSegment, RemoteConfigSegment[]>', gave the following error.
+    Object literal may only specify known properties, and 'environment' does not exist in type 'PartialModelObject<RemoteConfigSegment>[]'.
+src/services/GameWorldService.ts(98,20): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/IngamePopupNoticeService.ts(86,20): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/IngamePopupNoticeService.ts(200,19): error TS2552: Cannot find name 'environmentId'. Did you mean 'environment'?
+src/services/IngamePopupNoticeService.ts(218,19): error TS2552: Cannot find name 'environmentId'. Did you mean 'environment'?
+src/services/IngamePopupNoticeService.ts(280,19): error TS2552: Cannot find name 'environmentId'. Did you mean 'environment'?
+src/services/IngamePopupNoticeService.ts(402,19): error TS2552: Cannot find name 'environmentId'. Did you mean 'environment'?
+src/services/IngamePopupNoticeService.ts(425,19): error TS2552: Cannot find name 'environmentId'. Did you mean 'environment'?
+src/services/IngamePopupNoticeService.ts(454,19): error TS2304: Cannot find name 'environmentId'.
+src/services/IpWhitelistService.ts(55,20): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/jobs/CouponGenerationJob.ts(78,12): error TS2304: Cannot find name 'environmentId'.
+src/services/jobs/CouponGenerationJob.ts(125,54): error TS2304: Cannot find name 'environmentId'.
+src/services/RewardTemplateService.ts(130,19): error TS2304: Cannot find name 'environmentId'.
+src/services/RewardTemplateService.ts(190,19): error TS2304: Cannot find name 'environmentId'.
+src/services/RewardTemplateService.ts(245,19): error TS2304: Cannot find name 'environmentId'.
+src/services/RewardTemplateService.ts(276,19): error TS2304: Cannot find name 'environmentId'.
+src/services/serviceDiscoveryService.ts(84,10): error TS2304: Cannot find name 'environmentId'.
+src/services/serviceDiscoveryService.ts(117,7): error TS2561: Object literal may only specify known properties, but 'environmentId' does not exist in type 'ServerLifecycleEventData'. Did you mean to write 'environment'?
+src/services/serviceDiscoveryService.ts(117,7): error TS18004: No value exists in scope for the shorthand property 'environmentId'. Either declare one or provide an initializer.
+src/services/ServiceNoticeService.ts(209,19): error TS2304: Cannot find name 'environmentId'.
+src/services/ServiceNoticeService.ts(244,19): error TS2304: Cannot find name 'environmentId'.
+src/services/ServiceNoticeService.ts(290,29): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/ServiceNoticeService.ts(307,19): error TS2304: Cannot find name 'environmentId'.
+src/services/ServiceNoticeService.ts(390,29): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/ServiceNoticeService.ts(407,19): error TS2304: Cannot find name 'environmentId'.
+src/services/ServiceNoticeService.ts(421,29): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/ServiceNoticeService.ts(437,19): error TS2304: Cannot find name 'environmentId'.
+src/services/ServiceNoticeService.ts(450,29): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/ServiceNoticeService.ts(464,19): error TS2304: Cannot find name 'environmentId'.
+src/services/ServiceNoticeService.ts(486,29): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/StoreProductService.ts(201,19): error TS2304: Cannot find name 'environmentId'.
+src/services/StoreProductService.ts(229,19): error TS2304: Cannot find name 'environmentId'.
+src/services/StoreProductService.ts(294,19): error TS2304: Cannot find name 'environmentId'.
+src/services/StoreProductService.ts(339,31): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/StoreProductService.ts(363,19): error TS2304: Cannot find name 'environmentId'.
+src/services/StoreProductService.ts(470,31): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/StoreProductService.ts(495,19): error TS2304: Cannot find name 'environmentId'.
+src/services/StoreProductService.ts(521,31): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/StoreProductService.ts(540,19): error TS2304: Cannot find name 'environmentId'.
+src/services/StoreProductService.ts(569,35): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/StoreProductService.ts(598,19): error TS2304: Cannot find name 'environmentId'.
+src/services/StoreProductService.ts(622,35): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/StoreProductService.ts(654,19): error TS2304: Cannot find name 'environmentId'.
+src/services/StoreProductService.ts(696,36): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/StoreProductService.ts(698,16): error TS2304: Cannot find name 'environmentName'.
+src/services/StoreProductService.ts(710,28): error TS2304: Cannot find name 'environmentName'.
+src/services/StoreProductService.ts(718,26): error TS2304: Cannot find name 'environmentName'.
+src/services/StoreProductService.ts(744,19): error TS2304: Cannot find name 'environmentId'.
+src/services/StoreProductService.ts(781,19): error TS2304: Cannot find name 'environmentId'.
+src/services/StoreProductService.ts(922,19): error TS2304: Cannot find name 'environmentId'.
+src/services/SurveyService.ts(114,20): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/services/SurveyService.ts(207,19): error TS2304: Cannot find name 'environmentId'.
+src/services/SurveyService.ts(253,19): error TS2304: Cannot find name 'environmentId'.
+src/services/SurveyService.ts(299,19): error TS2304: Cannot find name 'environmentId'.
+src/services/SurveyService.ts(372,19): error TS2304: Cannot find name 'environmentId'.
+src/services/SurveyService.ts(453,19): error TS2304: Cannot find name 'environmentId'.
+src/services/WhitelistService.ts(28,20): error TS2339: Property 'environment' does not exist on type 'Environment'.
+src/utils/environmentContext.ts(80,25): error TS2304: Cannot find name 'environmentId'.
+src/utils/environmentContext.ts(89,17): error TS2304: Cannot find name 'environmentId'.
+src/utils/systemKV.ts(112,9): error TS2304: Cannot find name 'environmentId'.
+node.exe : error Command failed with exit code 2.
+위치 C:\Users\jhseo\AppData\Roaming\npm\yarn.ps1:24 문자
+:5
++     & "node$exe"  "$basedir/node_modules/yarn/bin/
+yarn.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error  
+   Command failed with exit code 2.:String) [], Re  
+  moteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

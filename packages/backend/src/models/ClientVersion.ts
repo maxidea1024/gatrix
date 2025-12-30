@@ -1,9 +1,8 @@
 import db from '../config/knex';
 import logger from '../config/logger';
-import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export interface ClientVersionFilters {
-  environmentId?: string; // ULID
+  environment: string;
   clientVersion?: string | string[];
   platform?: string | string[];
   clientStatus?: string | string[];
@@ -33,7 +32,7 @@ export enum ClientStatus {
 
 export interface ClientVersionAttributes {
   id?: number;
-  environmentId?: string; // ULID
+  environment: string;
   clientVersion: string;
   platform: string;
   clientStatus: ClientStatus;
@@ -76,10 +75,11 @@ export interface BulkCreateClientVersionRequest {
 
 export class ClientVersionModel {
   // 사용 가능한 버전 목록 조회 (distinct)
-  static async getDistinctVersions(): Promise<string[]> {
+  static async getDistinctVersions(environment: string): Promise<string[]> {
     try {
       const result = await db('g_client_versions')
         .distinct('clientVersion')
+        .where('environment', environment)
         .orderBy('clientVersion', 'desc');
 
       return result.map(row => row.clientVersion);
@@ -89,20 +89,20 @@ export class ClientVersionModel {
     }
   }
 
-  static async findAll(filters?: ClientVersionFilters): Promise<ClientVersionListResult> {
+  static async findAll(filters: ClientVersionFilters): Promise<ClientVersionListResult> {
     try {
       // 기본값 설정
       const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 10;
       const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
       const sortBy = filters?.sortBy || 'clientVersion';
       const sortOrder = filters?.sortOrder || 'DESC';
-      const envId = filters?.environmentId ?? getCurrentEnvironmentId();
+      const environment = filters.environment;
 
       // 기본 쿼리 빌더 with environment filter
       const baseQuery = () => db('g_client_versions as cv')
         .leftJoin('g_users as creator', 'cv.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'cv.updatedBy', 'updater.id')
-        .where('cv.environmentId', envId);
+        .where('cv.environment', environment);
 
       // 필터 적용 함수
       const applyFilters = (query: any) => {
@@ -225,7 +225,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async findById(id: number, trx?: any): Promise<any | null> {
+  static async findById(id: number, environment: string, trx?: any): Promise<any | null> {
     try {
       const query = trx ? trx('g_client_versions as cv') : db('g_client_versions as cv');
       const clientVersion = await query
@@ -239,6 +239,7 @@ export class ClientVersionModel {
           'updater.email as updatedByEmail'
         ])
         .where('cv.id', id)
+        .where('cv.environment', environment)
         .first();
 
       if (!clientVersion) {
@@ -265,17 +266,15 @@ export class ClientVersionModel {
     }
   }
 
-  static async create(data: any): Promise<any> {
+  static async create(data: any, environment: string): Promise<any> {
     try {
-      const envId = data.environmentId ?? getCurrentEnvironmentId();
-
       return await db.transaction(async (trx) => {
         // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
-        const { tags, maintenanceLocales, environmentId: _envId, ...clientVersionData } = data;
+        const { tags, maintenanceLocales, ...clientVersionData } = data;
 
         const [insertId] = await trx('g_client_versions').insert({
           ...clientVersionData,
-          environmentId: envId,
+          environment: environment,
           createdAt: new Date(),
           updatedAt: new Date()
         });
@@ -295,7 +294,7 @@ export class ClientVersionModel {
           await trx('g_client_version_maintenance_locales').insert(localeInserts);
         }
 
-        return await this.findById(insertId, trx);
+        return await this.findById(insertId, environment, trx);
       });
     } catch (error) {
       logger.error('Error creating client version:', error);
@@ -303,7 +302,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async update(id: number, data: any): Promise<any> {
+  static async update(id: number, data: any, environment: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
         // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
@@ -311,6 +310,7 @@ export class ClientVersionModel {
 
         await trx('g_client_versions')
           .where('id', id)
+          .where('environment', environment)
           .update({
             ...clientVersionData,
             updatedAt: new Date()
@@ -339,7 +339,7 @@ export class ClientVersionModel {
           }
         }
 
-        return await this.findById(id, trx);
+        return await this.findById(id, environment, trx);
       });
     } catch (error) {
       logger.error('Error updating client version:', error);
@@ -347,9 +347,9 @@ export class ClientVersionModel {
     }
   }
 
-  static async delete(id: number): Promise<void> {
+  static async delete(id: number, environment: string): Promise<void> {
     try {
-      await db('g_client_versions').where('id', id).del();
+      await db('g_client_versions').where('id', id).where('environment', environment).del();
     } catch (error) {
       logger.error('Error deleting client version:', error);
       throw error;
@@ -359,25 +359,19 @@ export class ClientVersionModel {
 
 
   // 추가 메서드들
-  static async bulkCreate(data: ClientVersionCreationAttributes[]): Promise<any> {
+  static async bulkCreate(data: ClientVersionCreationAttributes[], environment: string): Promise<any> {
     try {
       const insertedIds: number[] = [];
-
-      // Get environment ID from context
-      const envId = getCurrentEnvironmentId();
-      if (!envId) {
-        throw new Error('Environment ID is required for bulk creating client versions');
-      }
 
       // 먼저 모든 데이터를 삽입
       await db.transaction(async (trx) => {
         for (const item of data) {
           // tags 필드는 별도 테이블에서 관리하므로 제거
-          const { tags, environmentId: _envId, ...clientVersionData } = item as any;
+          const { maintenanceLocales, ...clientVersionData } = item as any;
 
           const [insertId] = await trx('g_client_versions').insert({
             ...clientVersionData,
-            environmentId: envId,
+            environment: environment,
             createdAt: new Date(),
             updatedAt: new Date()
           });
@@ -388,7 +382,7 @@ export class ClientVersionModel {
       // 트랜잭션 완료 후 생성된 데이터 조회
       const results = [];
       for (const id of insertedIds) {
-        const clientVersion = await this.findById(id);
+        const clientVersion = await this.findById(id, environment);
         if (clientVersion) {
           results.push(clientVersion);
         } else {
@@ -405,7 +399,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async bulkUpdateStatus(data: any): Promise<any> {
+  static async bulkUpdateStatus(data: any, environment: string): Promise<any> {
     try {
       const updateData: any = {
         clientStatus: data.clientStatus,
@@ -432,6 +426,7 @@ export class ClientVersionModel {
 
       await db('g_client_versions')
         .whereIn('id', data.ids)
+        .where('environment', environment)
         .update(updateData);
 
       // 언어별 메시지 처리
@@ -468,11 +463,12 @@ export class ClientVersionModel {
     }
   }
 
-  static async getPlatforms(): Promise<string[]> {
+  static async getPlatforms(environment: string): Promise<string[]> {
     try {
       const result = await db('g_client_versions')
         .distinct('platform')
         .select('platform')
+        .where('environment', environment)
         .whereNotNull('platform')
         .orderBy('platform');
       return result.map(row => row.platform);
@@ -482,14 +478,16 @@ export class ClientVersionModel {
     }
   }
 
-  static async checkDuplicate(platform: string, clientVersion: string, excludeId?: number, environmentId?: string): Promise<boolean> {
+  static async checkDuplicate(platform: string, clientVersion: string, excludeId?: number, environment?: string): Promise<boolean> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
+      if (!environment) {
+        throw new Error('Environment is required for checking duplicate client versions');
+      }
 
       let query = db('g_client_versions')
         .where('platform', platform)
         .where('clientVersion', clientVersion)
-        .where('environmentId', envId);
+        .where('environment', environment);
 
       if (excludeId) {
         query = query.where('id', '!=', excludeId);

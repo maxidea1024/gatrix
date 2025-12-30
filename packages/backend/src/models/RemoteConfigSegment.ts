@@ -15,7 +15,7 @@ export interface SegmentConditions {
 
 export interface RemoteConfigSegmentData {
   id?: number;
-  environmentId: string; // ULID
+  environment: string;
   segmentName: string;
   displayName: string;
   description?: string;
@@ -31,7 +31,7 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
   static tableName = 'g_remote_config_segments';
 
   id!: number;
-  environmentId!: string; // ULID
+  environment!: string;
   segmentName!: string;
   displayName!: string;
   description?: string;
@@ -43,17 +43,17 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
   updatedAt?: Date;
 
   // Relations
-  environment?: Environment;
+  environmentModel?: Environment;
   creator?: User;
   updater?: User;
 
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['environmentId', 'segmentName', 'displayName', 'segmentConditions', 'createdBy'],
+      required: ['environment', 'segmentName', 'displayName', 'segmentConditions', 'createdBy'],
       properties: {
         id: { type: 'integer' },
-        environmentId: { type: 'string' },
+        environment: { type: 'string' },
         segmentName: {
           type: 'string',
           minLength: 1,
@@ -74,12 +74,12 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
 
   static get relationMappings() {
     return {
-      environment: {
+      environmentModel: {
         relation: Model.BelongsToOneRelation,
         modelClass: Environment,
         join: {
-          from: 'g_remote_config_segments.environmentId',
-          to: 'g_environments.id'
+          from: 'g_remote_config_segments.environment',
+          to: 'g_environments.environment'
         }
       },
       creator: {
@@ -113,9 +113,9 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
   /**
    * Get segment by environment and name
    */
-  static async getByEnvironmentAndName(environmentId: string, segmentName: string): Promise<RemoteConfigSegment | undefined> {
+  static async getByEnvironmentAndName(environment: string, segmentName: string): Promise<RemoteConfigSegment | undefined> {
     return await this.query()
-      .where('environmentId', environmentId)
+      .where('environment', environment)
       .where('segmentName', segmentName)
       .first();
   }
@@ -123,9 +123,9 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
   /**
    * Get active segments for environment
    */
-  static async getActiveByEnvironment(environmentId: number): Promise<RemoteConfigSegment[]> {
+  static async getActiveByEnvironment(environment: string): Promise<RemoteConfigSegment[]> {
     return await this.query()
-      .where('environmentId', environmentId)
+      .where('environment', environment)
       .where('isActive', true)
       .orderBy('displayName');
   }
@@ -133,9 +133,9 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
   /**
    * Get all segments for environment
    */
-  static async getAllByEnvironment(environmentId: string): Promise<RemoteConfigSegment[]> {
+  static async getAllByEnvironment(environment: string): Promise<RemoteConfigSegment[]> {
     return await this.query()
-      .where('environmentId', environmentId)
+      .where('environment', environment)
       .withGraphFetched('[creator(basicInfo), updater(basicInfo)]')
       .modifiers({
         basicInfo: (builder) => builder.select('id', 'username', 'email')
@@ -153,7 +153,7 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
     }
 
     // Check if segment already exists
-    const existing = await this.getByEnvironmentAndName(data.environmentId, data.segmentName);
+    const existing = await this.getByEnvironmentAndName(data.environment, data.segmentName);
     if (existing) {
       throw new Error(`Segment '${data.segmentName}' already exists in this environment`);
     }
@@ -342,14 +342,14 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
   /**
    * Create predefined segments for environment
    */
-  static async createPredefinedSegments(environmentId: string, createdBy: number): Promise<RemoteConfigSegment[]> {
+  static async createPredefinedSegments(environment: string, createdBy: number): Promise<RemoteConfigSegment[]> {
     const predefined = this.getPredefinedSegments();
     const segments: RemoteConfigSegment[] = [];
 
     for (const segmentData of predefined) {
       try {
         const segment = await this.createSegment({
-          environmentId,
+          environment,
           ...segmentData,
           isActive: true,
           createdBy

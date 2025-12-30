@@ -1,7 +1,6 @@
 import db from '../config/knex';
 import logger from '../config/logger';
 import { convertDateFieldsForMySQL } from '../utils/dateUtils';
-import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export interface GameWorldMaintenanceLocale {
   id?: number;
@@ -16,7 +15,7 @@ export interface GameWorldMaintenanceLocale {
 
 export interface GameWorld {
   id: number;
-  environmentId: string; // Environment this world belongs to (ULID)
+  environment: string;
   worldId: string;
   name: string;
   isVisible: boolean;
@@ -47,7 +46,6 @@ export interface GameWorld {
 }
 
 export interface CreateGameWorldData {
-  environmentId?: string; // Environment to create in (defaults to current context)
   worldId: string;
   name: string;
   isVisible?: boolean;
@@ -94,7 +92,7 @@ export interface UpdateGameWorldData {
 }
 
 export interface GameWorldListParams {
-  environmentId?: string; // Filter by environment (defaults to current context)
+  environment: string;
   search?: string;
   isVisible?: boolean;
   isMaintenance?: boolean;
@@ -102,9 +100,9 @@ export interface GameWorldListParams {
 }
 
 export class GameWorldModel {
-  static async findById(id: number): Promise<GameWorld | null> {
+  static async findById(id: number, environment: string): Promise<GameWorld | null> {
     try {
-      return await this.findByIdWith(db, id);
+      return await this.findByIdWith(db, id, environment);
     } catch (error) {
       logger.error('Error finding game world by ID:', error);
       throw error;
@@ -112,7 +110,7 @@ export class GameWorldModel {
   }
 
   // Use provided connection/transaction to ensure visibility inside transactions
-  static async findByIdWith(conn: any, id: number): Promise<GameWorld | null> {
+  static async findByIdWith(conn: any, id: number, environment: string): Promise<GameWorld | null> {
     const gameWorld = await conn('g_game_worlds as gw')
       .leftJoin('g_users as c', 'gw.createdBy', 'c.id')
       .leftJoin('g_users as u', 'gw.updatedBy', 'u.id')
@@ -122,6 +120,7 @@ export class GameWorldModel {
         'u.name as updatedByName'
       ])
       .where('gw.id', id)
+      .where('gw.environment', environment)
       .first();
 
     if (!gameWorld) {
@@ -139,12 +138,11 @@ export class GameWorldModel {
     } as any;
   }
 
-  static async findByWorldId(worldId: string, environmentId?: string): Promise<GameWorld | null> {
+  static async findByWorldId(worldId: string, environment: string): Promise<GameWorld | null> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
       const gameWorld = await db('g_game_worlds')
         .where('worldId', worldId)
-        .where('environmentId', envId)
+        .where('environment', environment)
         .first();
 
       return gameWorld || null;
@@ -154,18 +152,15 @@ export class GameWorldModel {
     }
   }
 
-  static async list(params: GameWorldListParams = {}): Promise<GameWorld[]> {
+  static async list(params: GameWorldListParams): Promise<GameWorld[]> {
     try {
       const {
-        environmentId,
+        environment,
         search = '',
         isVisible,
         isMaintenance,
         tags,
       } = params;
-
-      // Get environment ID from params or current context
-      const envId = environmentId ?? getCurrentEnvironmentId();
 
       // Convert raw SQL to knex query builder
       let query = db('g_game_worlds as gw')
@@ -178,11 +173,11 @@ export class GameWorldModel {
           'u.name as updatedByName',
           'u.email as updatedByEmail'
         ])
-        .where('gw.environmentId', envId); // Filter by environment
+        .where('gw.environment', environment); // Filter by environment
 
       // Apply search filter
       if (search) {
-        query = query.where(function() {
+        query = query.where(function () {
           this.where('gw.name', 'like', `%${search}%`)
             .orWhere('gw.worldId', 'like', `%${search}%`)
             .orWhere('gw.description', 'like', `%${search}%`)
@@ -204,7 +199,7 @@ export class GameWorldModel {
       if (tags) {
         const tagArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
         if (tagArray.length > 0) {
-          query = query.where(function() {
+          query = query.where(function () {
             tagArray.forEach((tag, index) => {
               if (index === 0) {
                 this.where('gw.tags', 'like', `%${tag}%`);
@@ -239,17 +234,14 @@ export class GameWorldModel {
     }
   }
 
-  static async create(worldData: CreateGameWorldData): Promise<GameWorld> {
+  static async create(worldData: CreateGameWorldData, environment: string): Promise<GameWorld> {
     try {
-      // Get environment ID from data or current context
-      const envId = worldData.environmentId ?? getCurrentEnvironmentId();
-
       // Get the next display order if not provided (within the same environment)
       let displayOrder = worldData.displayOrder;
       if (displayOrder === undefined) {
         // Get the maximum display order to place new world at the top (when sorted DESC)
         const maxOrderResult = await db('g_game_worlds')
-          .where('environmentId', envId)
+          .where('environment', environment)
           .max('displayOrder as maxOrder')
           .first();
         displayOrder = (maxOrderResult?.maxOrder || 0) + 10;
@@ -262,10 +254,10 @@ export class GameWorldModel {
 
       return await db.transaction(async (trx) => {
         // maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
-        const { maintenanceLocales, environmentId: _envId, ...gameWorldData } = worldData;
+        const { maintenanceLocales, ...gameWorldData } = worldData;
 
         const insertData = {
-          environmentId: envId, // Set environment ID
+          environment: environment,
           worldId: gameWorldData.worldId,
           name: gameWorldData.name,
           isVisible: gameWorldData.isVisible ?? true,
@@ -305,7 +297,7 @@ export class GameWorldModel {
         }
 
         // Use the same transaction connection to ensure visibility before commit
-        const world = await this.findByIdWith(trx, insertId);
+        const world = await this.findByIdWith(trx, insertId, environment);
         if (!world) {
           throw new Error('Failed to create game world');
         }
@@ -318,7 +310,7 @@ export class GameWorldModel {
     }
   }
 
-  static async update(id: number, worldData: UpdateGameWorldData): Promise<GameWorld | null> {
+  static async update(id: number, worldData: UpdateGameWorldData, environment: string): Promise<GameWorld | null> {
     try {
       return await db.transaction(async (trx) => {
         // maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
@@ -345,6 +337,7 @@ export class GameWorldModel {
 
           await trx('g_game_worlds')
             .where('id', id)
+            .where('environment', environment)
             .update(convertedUpdateData);
         }
 
@@ -372,7 +365,7 @@ export class GameWorldModel {
         }
 
         // Use findByIdWith to read updated data within the same transaction
-        return this.findByIdWith(trx, id);
+        return this.findByIdWith(trx, id, environment);
       });
     } catch (error) {
       logger.error('Error updating game world:', error);
@@ -380,10 +373,11 @@ export class GameWorldModel {
     }
   }
 
-  static async delete(id: number): Promise<boolean> {
+  static async delete(id: number, environment: string): Promise<boolean> {
     try {
       const result = await db('g_game_worlds')
         .where('id', id)
+        .where('environment', environment)
         .del();
 
       return result > 0;
@@ -393,19 +387,15 @@ export class GameWorldModel {
     }
   }
 
-  static async exists(worldId: string, excludeId?: number, environmentId?: string): Promise<boolean> {
+  static async exists(worldId: string, id: number, environment: string): Promise<boolean> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
-      let query = db('g_game_worlds')
+      const result = await db('g_game_worlds')
         .where('worldId', worldId)
-        .where('environmentId', envId)
-        .count('* as count');
+        .where('environment', environment)
+        .whereNot('id', id)
+        .count('* as count')
+        .first();
 
-      if (excludeId) {
-        query = query.whereNot('id', excludeId);
-      }
-
-      const result = await query.first();
       return Number(result?.count || 0) > 0;
     } catch (error) {
       logger.error('Error checking game world existence:', error);
@@ -413,23 +403,20 @@ export class GameWorldModel {
     }
   }
 
-  static async updateDisplayOrders(orderUpdates: { id: number; displayOrder: number }[]): Promise<void> {
+  static async updateDisplayOrders(orderUpdates: { id: number; displayOrder: number }[], environment: string): Promise<void> {
     try {
-      // logger.info('Updating display orders for game worlds:', orderUpdates);
-
       await db.transaction(async (trx) => {
         for (const update of orderUpdates) {
           const result = await trx('g_game_worlds')
             .where('id', update.id)
+            .where('environment', environment)
             .update({
               displayOrder: update.displayOrder,
               updatedAt: db.fn.now()
             });
 
-          // logger.info(`Updated world ${update.id} with displayOrder ${update.displayOrder}, affected rows: ${result}`);
-
           if (result === 0) {
-            throw new Error(`No game world found with id ${update.id}`);
+            throw new Error(`No game world found with id ${update.id} in environment ${environment}`);
           }
         }
       });
@@ -441,14 +428,15 @@ export class GameWorldModel {
     }
   }
 
-  static async moveUp(id: number): Promise<boolean> {
+  static async moveUp(id: number, environment: string): Promise<boolean> {
     try {
       // Get current world
-      const currentWorld = await this.findById(id);
+      const currentWorld = await this.findById(id, environment);
       if (!currentWorld) return false;
 
       // Find the world with the next lower displayOrder
       const prevWorld = await db('g_game_worlds')
+        .where('environment', environment)
         .where('displayOrder', '<', currentWorld.displayOrder)
         .orderBy('displayOrder', 'desc')
         .first();
@@ -458,10 +446,12 @@ export class GameWorldModel {
       // Swap display orders
       await db('g_game_worlds')
         .where('id', currentWorld.id)
+        .where('environment', environment)
         .update({ displayOrder: prevWorld.displayOrder });
 
       await db('g_game_worlds')
         .where('id', prevWorld.id)
+        .where('environment', environment)
         .update({ displayOrder: currentWorld.displayOrder });
 
       return true;
@@ -471,14 +461,15 @@ export class GameWorldModel {
     }
   }
 
-  static async moveDown(id: number): Promise<boolean> {
+  static async moveDown(id: number, environment: string): Promise<boolean> {
     try {
       // Get current world
-      const currentWorld = await this.findById(id);
+      const currentWorld = await this.findById(id, environment);
       if (!currentWorld) return false;
 
       // Find the world with the next higher displayOrder
       const nextWorld = await db('g_game_worlds')
+        .where('environment', environment)
         .where('displayOrder', '>', currentWorld.displayOrder)
         .orderBy('displayOrder', 'asc')
         .first();
@@ -488,10 +479,12 @@ export class GameWorldModel {
       // Swap display orders
       await db('g_game_worlds')
         .where('id', currentWorld.id)
+        .where('environment', environment)
         .update({ displayOrder: nextWorld.displayOrder });
 
       await db('g_game_worlds')
         .where('id', nextWorld.id)
+        .where('environment', environment)
         .update({ displayOrder: currentWorld.displayOrder });
 
       return true;

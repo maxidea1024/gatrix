@@ -1,8 +1,9 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { CampaignModel } from '../models/Campaign';
 import { VariantModel } from '../models/Variant';
 import logger from '../config/logger';
 import { GatrixError } from '../middleware/errorHandler';
+import { AuthenticatedRequest } from '../types/auth';
 import {
   CreateCampaignData,
   CreateCampaignConfigData,
@@ -13,15 +14,20 @@ export class CampaignController {
   /**
    * Get all campaigns with pagination and filters
    */
-  static async list(req: Request, res: Response): Promise<void> {
+  static async list(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
+      const environment = req.environment;
+      if (!environment) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const search = req.query.search as string;
-      const isActive = req.query.isActive === 'true' ? true : 
-                      req.query.isActive === 'false' ? false : undefined;
+      const isActive = req.query.isActive === 'true' ? true :
+        req.query.isActive === 'false' ? false : undefined;
 
-      const result = await CampaignModel.list(page, limit, { search, isActive });
+      const result = await CampaignModel.list(page, limit, { environment, search, isActive });
 
       res.json({
         success: true,
@@ -29,6 +35,7 @@ export class CampaignController {
       });
     } catch (error) {
       logger.error('Error in CampaignController.list:', error);
+      if (error instanceof GatrixError) throw error;
       throw new GatrixError('Failed to fetch campaigns', 500);
     }
   }
@@ -36,10 +43,15 @@ export class CampaignController {
   /**
    * Get campaign by ID
    */
-  static async getById(req: Request, res: Response): Promise<void> {
+  static async getById(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id);
-      const campaign = await CampaignModel.findById(id, true);
+      const environment = req.environment;
+      if (!environment) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const campaign = await CampaignModel.findById(id, environment, true);
 
       if (!campaign) {
         throw new GatrixError('Campaign not found', 404);
@@ -61,9 +73,14 @@ export class CampaignController {
   /**
    * Create new campaign
    */
-  static async create(req: Request, res: Response): Promise<void> {
+  static async create(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
-      const userId = (req as any).user?.id;
+      const environment = req.environment;
+      if (!environment) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const userId = req.user?.userId;
       const data: CreateCampaignData = {
         ...req.body,
         createdBy: userId
@@ -83,7 +100,7 @@ export class CampaignController {
         }
       }
 
-      const campaign = await CampaignModel.create(data);
+      const campaign = await CampaignModel.create(data, environment);
 
       res.status(201).json({
         success: true,
@@ -102,9 +119,14 @@ export class CampaignController {
   /**
    * Update campaign
    */
-  static async update(req: Request, res: Response): Promise<void> {
+  static async update(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id);
+      const environment = req.environment;
+      if (!environment) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
       const data = req.body;
 
       // Validate dates if provided
@@ -116,7 +138,7 @@ export class CampaignController {
         }
       }
 
-      const campaign = await CampaignModel.update(id, data);
+      const campaign = await CampaignModel.update(id, environment, data);
 
       res.json({
         success: true,
@@ -135,17 +157,21 @@ export class CampaignController {
   /**
    * Delete campaign
    */
-  static async delete(req: Request, res: Response): Promise<void> {
+  static async delete(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id);
+      const environment = req.environment;
+      if (!environment) {
+        throw new GatrixError('Environment is required', 400);
+      }
 
       // Check if campaign exists
-      const campaign = await CampaignModel.findById(id, false);
+      const campaign = await CampaignModel.findById(id, environment, false);
       if (!campaign) {
         throw new GatrixError('Campaign not found', 404);
       }
 
-      await CampaignModel.delete(id);
+      await CampaignModel.delete(id, environment);
 
       res.json({
         success: true,
@@ -163,9 +189,14 @@ export class CampaignController {
   /**
    * Add config to campaign
    */
-  static async addConfig(req: Request, res: Response): Promise<void> {
+  static async addConfig(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const campaignId = parseInt(req.params.id);
+      const environment = req.environment;
+      if (!environment) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
       const data: CreateCampaignConfigData = {
         campaignId,
         ...req.body
@@ -177,12 +208,12 @@ export class CampaignController {
       }
 
       // Check if campaign exists
-      const campaign = await CampaignModel.findById(campaignId, false);
+      const campaign = await CampaignModel.findById(campaignId, environment, false);
       if (!campaign) {
         throw new GatrixError('Campaign not found', 404);
       }
 
-      const campaignConfig = await CampaignModel.addConfig(data);
+      const campaignConfig = await CampaignModel.addConfig(data, environment);
 
       res.status(201).json({
         success: true,
@@ -201,18 +232,22 @@ export class CampaignController {
   /**
    * Remove config from campaign
    */
-  static async removeConfig(req: Request, res: Response): Promise<void> {
+  static async removeConfig(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const campaignId = parseInt(req.params.id);
       const configId = parseInt(req.params.configId);
+      const environment = req.environment;
+      if (!environment) {
+        throw new GatrixError('Environment is required', 400);
+      }
 
       // Check if campaign exists
-      const campaign = await CampaignModel.findById(campaignId, false);
+      const campaign = await CampaignModel.findById(campaignId, environment, false);
       if (!campaign) {
         throw new GatrixError('Campaign not found', 404);
       }
 
-      await CampaignModel.removeConfig(campaignId, configId);
+      await CampaignModel.removeConfig(campaignId, configId, environment);
 
       res.json({
         success: true,
@@ -230,7 +265,7 @@ export class CampaignController {
   /**
    * Get variants for a config
    */
-  static async getVariants(req: Request, res: Response): Promise<void> {
+  static async getVariants(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const configId = parseInt(req.params.configId);
       const variants = await VariantModel.getVariantsByConfigId(configId);
@@ -252,9 +287,9 @@ export class CampaignController {
   /**
    * Create variant for a config
    */
-  static async createVariant(req: Request, res: Response): Promise<void> {
+  static async createVariant(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
-      const userId = (req as any).user?.id;
+      const userId = req.user?.userId;
       const configId = parseInt(req.params.configId);
       const data: CreateConfigVariantData = {
         configId,
@@ -286,7 +321,7 @@ export class CampaignController {
   /**
    * Update variant
    */
-  static async updateVariant(req: Request, res: Response): Promise<void> {
+  static async updateVariant(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const variantId = parseInt(req.params.variantId);
       const data = req.body;
@@ -310,7 +345,7 @@ export class CampaignController {
   /**
    * Delete variant
    */
-  static async deleteVariant(req: Request, res: Response): Promise<void> {
+  static async deleteVariant(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const variantId = parseInt(req.params.variantId);
 

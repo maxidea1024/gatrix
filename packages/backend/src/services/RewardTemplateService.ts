@@ -3,7 +3,6 @@ import database from '../config/database';
 import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { TagService } from './TagService';
-import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export interface ParticipationReward {
   rewardType: string;
@@ -13,6 +12,7 @@ export interface ParticipationReward {
 
 export interface RewardTemplate {
   id: string;
+  environment: string;
   name: string;
   description?: string;
   rewardItems: ParticipationReward[];
@@ -40,7 +40,7 @@ export interface UpdateRewardTemplateInput {
 }
 
 export interface GetRewardTemplatesParams {
-  environmentId?: string;
+  environment: string;
   page?: number;
   limit?: number;
   search?: string;
@@ -59,20 +59,20 @@ class RewardTemplateService {
   /**
    * Get all reward templates with pagination
    */
-  static async getRewardTemplates(params?: GetRewardTemplatesParams): Promise<GetRewardTemplatesResponse> {
+  static async getRewardTemplates(params: GetRewardTemplatesParams): Promise<GetRewardTemplatesResponse> {
     const pool = database.getPool();
-    const page = params?.page || 1;
-    const limit = params?.limit || 10;
-    const search = params?.search || '';
-    const sortBy = params?.sortBy || 'createdAt';
-    const sortOrder = (params?.sortOrder || 'desc').toUpperCase();
-    const envId = params?.environmentId ?? getCurrentEnvironmentId();
+    const page = params.page || 1;
+    const limit = params.limit || 10;
+    const search = params.search || '';
+    const sortBy = params.sortBy || 'createdAt';
+    const sortOrder = (params.sortOrder || 'desc').toUpperCase();
+    const environment = params.environment;
 
     const offset = (page - 1) * limit;
 
     try {
-      const whereConditions: string[] = ['environmentId = ?'];
-      const queryParams: any[] = [envId];
+      const whereConditions: string[] = ['environment = ?'];
+      const queryParams: any[] = [environment];
 
       if (search) {
         whereConditions.push('(name LIKE ? OR description LIKE ?)');
@@ -125,13 +125,12 @@ class RewardTemplateService {
   /**
    * Get reward template by ID
    */
-  static async getRewardTemplateById(id: string, environmentId?: string): Promise<RewardTemplate> {
+  static async getRewardTemplateById(id: string, environment: string): Promise<RewardTemplate> {
     const pool = database.getPool();
-    const envId = environmentId ?? getCurrentEnvironmentId();
     try {
       const [templates] = await pool.execute<any[]>(
-        'SELECT * FROM g_reward_templates WHERE id = ? AND environmentId = ?',
-        [id, envId]
+        'SELECT * FROM g_reward_templates WHERE id = ? AND environment = ?',
+        [id, environment]
       );
 
       if (templates.length === 0) {
@@ -155,19 +154,18 @@ class RewardTemplateService {
   /**
    * Create a new reward template
    */
-  static async createRewardTemplate(input: CreateRewardTemplateInput): Promise<RewardTemplate> {
+  static async createRewardTemplate(input: CreateRewardTemplateInput, environment: string): Promise<RewardTemplate> {
     const pool = database.getPool();
     const id = ulid();
-    const envId = getCurrentEnvironmentId();
 
     try {
       await pool.execute(
         `INSERT INTO g_reward_templates
-         (id, environmentId, name, description, rewardItems, tags, createdBy, createdAt, updatedAt)
+         (id, environment, name, description, rewardItems, tags, createdBy, createdAt, updatedAt)
          VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
         [
           id,
-          envId,
+          environment,
           input.name,
           input.description || null,
           JSON.stringify(input.rewardItems),
@@ -176,7 +174,7 @@ class RewardTemplateService {
         ]
       );
 
-      return this.getRewardTemplateById(id, envId);
+      return this.getRewardTemplateById(id, environment);
     } catch (error) {
       logger.error('Failed to create reward template', { error, input });
       throw new GatrixError('Failed to create reward template', 500);
@@ -186,12 +184,11 @@ class RewardTemplateService {
   /**
    * Update a reward template
    */
-  static async updateRewardTemplate(id: string, input: UpdateRewardTemplateInput, environmentId?: string): Promise<RewardTemplate> {
+  static async updateRewardTemplate(id: string, input: UpdateRewardTemplateInput, environment: string): Promise<RewardTemplate> {
     const pool = database.getPool();
-    const envId = environmentId ?? getCurrentEnvironmentId();
     try {
       // Check if template exists
-      await this.getRewardTemplateById(id, envId);
+      await this.getRewardTemplateById(id, environment);
 
       const updates: string[] = [];
       const params: any[] = [];
@@ -223,14 +220,14 @@ class RewardTemplateService {
 
       updates.push('updatedAt = NOW()');
 
-      params.push(id, envId);
+      params.push(id, environment);
 
       await pool.execute(
-        `UPDATE g_reward_templates SET ${updates.join(', ')} WHERE id = ? AND environmentId = ?`,
+        `UPDATE g_reward_templates SET ${updates.join(', ')} WHERE id = ? AND environment = ?`,
         params
       );
 
-      return this.getRewardTemplateById(id, envId);
+      return this.getRewardTemplateById(id, environment);
     } catch (error) {
       if (error instanceof GatrixError) throw error;
       logger.error('Failed to update reward template', { error, id, input });
@@ -241,16 +238,15 @@ class RewardTemplateService {
   /**
    * Check if a reward template is referenced by surveys or coupons
    */
-  static async checkReferences(templateId: string, environmentId?: string): Promise<{ surveys: any[], coupons: any[] }> {
+  static async checkReferences(templateId: string, environment: string): Promise<{ surveys: any[], coupons: any[] }> {
     const pool = database.getPool();
-    const envId = environmentId ?? getCurrentEnvironmentId();
     try {
       // Check coupons that reference this template
       const [coupons] = await pool.execute<any[]>(
         `SELECT id, code, type, name, rewardTemplateId
          FROM g_coupon_settings
-         WHERE rewardTemplateId = ? AND environmentId = ?`,
-        [templateId, envId]
+         WHERE rewardTemplateId = ? AND environment = ?`,
+        [templateId, environment]
       );
 
       return {
@@ -272,16 +268,15 @@ class RewardTemplateService {
   /**
    * Delete a reward template
    */
-  static async deleteRewardTemplate(id: string, environmentId?: string): Promise<void> {
+  static async deleteRewardTemplate(id: string, environment: string): Promise<void> {
     const pool = database.getPool();
-    const envId = environmentId ?? getCurrentEnvironmentId();
     try {
       // Check if template exists
-      await this.getRewardTemplateById(id, envId);
+      await this.getRewardTemplateById(id, environment);
 
       await pool.execute(
-        'DELETE FROM g_reward_templates WHERE id = ? AND environmentId = ?',
-        [id, envId]
+        'DELETE FROM g_reward_templates WHERE id = ? AND environment = ?',
+        [id, environment]
       );
     } catch (error) {
       if (error instanceof GatrixError) throw error;
@@ -292,4 +287,3 @@ class RewardTemplateService {
 }
 
 export default RewardTemplateService;
-

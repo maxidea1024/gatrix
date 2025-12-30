@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { asyncHandler, GatrixError } from '../middleware/errorHandler';
-import { AuthenticatedRequest } from '../middleware/auth';
+import { AuthenticatedRequest } from '../types/auth';
 import RewardTemplateService from '../services/RewardTemplateService';
 import { TagService } from '../services/TagService';
 
@@ -11,8 +11,14 @@ export class RewardTemplateController {
    */
   static getRewardTemplates = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { page, limit, search, sortBy, sortOrder } = req.query;
+    const environment = req.environment;
+
+    if (!environment) {
+      throw new GatrixError('Environment is required', 400);
+    }
 
     const result = await RewardTemplateService.getRewardTemplates({
+      environment,
       page: page ? parseInt(page as string) : undefined,
       limit: limit ? parseInt(limit as string) : undefined,
       search: search as string,
@@ -33,12 +39,17 @@ export class RewardTemplateController {
    */
   static getRewardTemplateById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
+    const environment = req.environment;
 
     if (!id) {
       throw new GatrixError('Reward template ID is required', 400);
     }
 
-    const template = await RewardTemplateService.getRewardTemplateById(id);
+    if (!environment) {
+      throw new GatrixError('Environment is required', 400);
+    }
+
+    const template = await RewardTemplateService.getRewardTemplateById(id, environment);
 
     res.json({
       success: true,
@@ -52,10 +63,15 @@ export class RewardTemplateController {
    * POST /api/v1/admin/reward-templates
    */
   static createRewardTemplate = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
+    const authenticatedUserId = req.user?.userId;
+    const environment = req.environment;
 
     if (!authenticatedUserId) {
       throw new GatrixError('User authentication required', 401);
+    }
+
+    if (!environment) {
+      throw new GatrixError('Environment is required', 400);
     }
 
     const { name, description, rewardItems, tagIds } = req.body;
@@ -92,7 +108,7 @@ export class RewardTemplateController {
       description: description ? description.trim() : undefined,
       rewardItems,
       createdBy: authenticatedUserId,
-    });
+    }, environment);
 
     // Set tags for the template
     if (Array.isArray(tagIds) && tagIds.length > 0) {
@@ -115,7 +131,8 @@ export class RewardTemplateController {
    */
   static updateRewardTemplate = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
+    const authenticatedUserId = req.user?.userId;
+    const environment = req.environment;
 
     if (!id) {
       throw new GatrixError('Reward template ID is required', 400);
@@ -123,6 +140,10 @@ export class RewardTemplateController {
 
     if (!authenticatedUserId) {
       throw new GatrixError('User authentication required', 401);
+    }
+
+    if (!environment) {
+      throw new GatrixError('Environment is required', 400);
     }
 
     const { name, description, rewardItems, tagIds } = req.body;
@@ -161,7 +182,7 @@ export class RewardTemplateController {
       description: description ? description.trim() : undefined,
       rewardItems,
       updatedBy: authenticatedUserId,
-    });
+    }, environment);
 
     // Set tags for the template
     if (Array.isArray(tagIds)) {
@@ -184,12 +205,17 @@ export class RewardTemplateController {
    */
   static checkReferences = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
+    const environment = req.environment;
 
     if (!id) {
       throw new GatrixError('Reward template ID is required', 400);
     }
 
-    const references = await RewardTemplateService.checkReferences(id);
+    if (!environment) {
+      throw new GatrixError('Environment is required', 400);
+    }
+
+    const references = await RewardTemplateService.checkReferences(id, environment);
 
     res.json({
       success: true,
@@ -204,12 +230,17 @@ export class RewardTemplateController {
    */
   static deleteRewardTemplate = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
+    const environment = req.environment;
 
     if (!id) {
       throw new GatrixError('Reward template ID is required', 400);
     }
 
-    await RewardTemplateService.deleteRewardTemplate(id);
+    if (!environment) {
+      throw new GatrixError('Environment is required', 400);
+    }
+
+    await RewardTemplateService.deleteRewardTemplate(id, environment);
 
     res.json({
       success: true,
@@ -219,4 +250,3 @@ export class RewardTemplateController {
 }
 
 export default RewardTemplateController;
-

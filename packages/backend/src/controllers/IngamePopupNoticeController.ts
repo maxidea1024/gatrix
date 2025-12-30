@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import Joi from 'joi';
 import IngamePopupNoticeService, {
   CreateIngamePopupNoticeData,
@@ -9,6 +9,8 @@ import { pubSubService } from '../services/PubSubService';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
 import { EnvironmentRequest } from '../middleware/environmentResolver';
+import { AuthenticatedRequest } from '../types/auth';
+import { GatrixError } from '../middleware/errorHandler';
 
 // Validation schemas
 const createIngamePopupNoticeSchema = Joi.object({
@@ -60,12 +62,17 @@ class IngamePopupNoticeController {
    * Get ingame popup notices with pagination and filters
    * GET /api/v1/admin/ingame-popup-notices
    */
-  async getIngamePopupNotices(req: Request, res: Response, next: NextFunction) {
+  async getIngamePopupNotices(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
+      const environment = req.environment;
 
-      const filters: IngamePopupNoticeFilters = {};
+      if (!environment) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const filters: IngamePopupNoticeFilters = { environment };
 
       if (req.query.isActive !== undefined) {
         filters.isActive = req.query.isActive === 'true';
@@ -119,10 +126,16 @@ class IngamePopupNoticeController {
    * Get ingame popup notice by ID
    * GET /api/v1/admin/ingame-popup-notices/:id
    */
-  async getIngamePopupNoticeById(req: Request, res: Response, next: NextFunction) {
+  async getIngamePopupNoticeById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const id = parseInt(req.params.id);
-      const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(id);
+      const environment = req.environment;
+
+      if (!environment) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(id, environment);
 
       if (!notice) {
         return res.status(404).json({
@@ -144,8 +157,14 @@ class IngamePopupNoticeController {
    * Create ingame popup notice
    * POST /api/v1/admin/ingame-popup-notices
    */
-  async createIngamePopupNotice(req: Request, res: Response, next: NextFunction) {
+  async createIngamePopupNotice(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
+      const environment = req.environment;
+
+      if (!environment) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
       const { error, value } = createIngamePopupNoticeSchema.validate(req.body);
 
       if (error) {
@@ -156,7 +175,7 @@ class IngamePopupNoticeController {
       }
 
       const data: CreateIngamePopupNoticeData = value;
-      const createdBy = (req as any).user?.userId;
+      const createdBy = req.user?.userId;
 
       if (!createdBy) {
         return res.status(401).json({
@@ -165,7 +184,7 @@ class IngamePopupNoticeController {
         });
       }
 
-      const notice = await IngamePopupNoticeService.createIngamePopupNotice(data, createdBy);
+      const notice = await IngamePopupNoticeService.createIngamePopupNotice(data, createdBy, environment);
 
       // Publish event for SDK real-time updates
       await pubSubService.publishNotification({
@@ -174,9 +193,7 @@ class IngamePopupNoticeController {
         targetChannels: ['popup', 'admin'],
       });
 
-
-
-      await pubSubService.invalidateKey(SERVER_SDK_ETAG.POPUP_NOTICES);
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
 
       res.status(201).json({
         success: true,
@@ -191,9 +208,15 @@ class IngamePopupNoticeController {
    * Update ingame popup notice
    * PUT /api/v1/admin/ingame-popup-notices/:id
    */
-  async updateIngamePopupNotice(req: Request, res: Response, next: NextFunction) {
+  async updateIngamePopupNotice(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const id = parseInt(req.params.id);
+      const environment = req.environment;
+
+      if (!environment) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
       const { error, value } = updateIngamePopupNoticeSchema.validate(req.body);
 
       if (error) {
@@ -204,7 +227,7 @@ class IngamePopupNoticeController {
       }
 
       const data: UpdateIngamePopupNoticeData = value;
-      const updatedBy = (req as any).user?.userId;
+      const updatedBy = req.user?.userId;
 
       if (!updatedBy) {
         return res.status(401).json({
@@ -213,7 +236,7 @@ class IngamePopupNoticeController {
         });
       }
 
-      const notice = await IngamePopupNoticeService.updateIngamePopupNotice(id, data, updatedBy);
+      const notice = await IngamePopupNoticeService.updateIngamePopupNotice(id, data, updatedBy, environment);
 
       // Publish event for SDK real-time updates
       await pubSubService.publishNotification({
@@ -222,9 +245,7 @@ class IngamePopupNoticeController {
         targetChannels: ['popup', 'admin'],
       });
 
-
-
-      await pubSubService.invalidateKey(SERVER_SDK_ETAG.POPUP_NOTICES);
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
 
       res.json({
         success: true,
@@ -239,10 +260,16 @@ class IngamePopupNoticeController {
    * Delete ingame popup notice
    * DELETE /api/v1/admin/ingame-popup-notices/:id
    */
-  async deleteIngamePopupNotice(req: Request, res: Response, next: NextFunction) {
+  async deleteIngamePopupNotice(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const id = parseInt(req.params.id);
-      await IngamePopupNoticeService.deleteIngamePopupNotice(id);
+      const environment = req.environment;
+
+      if (!environment) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      await IngamePopupNoticeService.deleteIngamePopupNotice(id, environment);
 
       // Publish event for SDK real-time updates
       await pubSubService.publishNotification({
@@ -251,9 +278,7 @@ class IngamePopupNoticeController {
         targetChannels: ['popup', 'admin'],
       });
 
-
-
-      await pubSubService.invalidateKey(SERVER_SDK_ETAG.POPUP_NOTICES);
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
 
       res.json({
         success: true,
@@ -268,9 +293,14 @@ class IngamePopupNoticeController {
    * Delete multiple ingame popup notices
    * POST /api/v1/admin/ingame-popup-notices/bulk-delete
    */
-  async deleteMultipleIngamePopupNotices(req: Request, res: Response, next: NextFunction) {
+  async deleteMultipleIngamePopupNotices(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const { ids } = req.body;
+      const environment = req.environment;
+
+      if (!environment) {
+        throw new GatrixError('Environment is required', 400);
+      }
 
       if (!Array.isArray(ids) || ids.length === 0) {
         return res.status(400).json({
@@ -279,9 +309,9 @@ class IngamePopupNoticeController {
         });
       }
 
-      await IngamePopupNoticeService.deleteMultipleIngamePopupNotices(ids);
+      await IngamePopupNoticeService.deleteMultipleIngamePopupNotices(ids, environment);
 
-      await pubSubService.invalidateKey(SERVER_SDK_ETAG.POPUP_NOTICES);
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
 
       res.json({
         success: true,
@@ -296,12 +326,18 @@ class IngamePopupNoticeController {
    * Toggle active status
    * PATCH /api/v1/admin/ingame-popup-notices/:id/toggle-active
    */
-  async toggleActive(req: Request, res: Response, next: NextFunction) {
+  async toggleActive(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const id = parseInt(req.params.id);
-      const notice = await IngamePopupNoticeService.toggleActive(id);
+      const environment = req.environment;
 
-      await pubSubService.invalidateKey(SERVER_SDK_ETAG.POPUP_NOTICES);
+      if (!environment) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const notice = await IngamePopupNoticeService.toggleActive(id, environment);
+
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
 
       res.json({
         success: true,
@@ -321,13 +357,13 @@ class IngamePopupNoticeController {
     try {
       const environment = req.environment!;
       const filters: IngamePopupNoticeFilters = {
-        environmentId: environment.id,
+        environment,
         isActive: true,
         currentlyVisible: true,
       };
 
       await respondWithEtagCache(res, {
-        cacheKey: `${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment.id}`,
+        cacheKey: `${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`,
         ttlMs: DEFAULT_CONFIG.POPUP_NOTICE_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
@@ -365,7 +401,8 @@ class IngamePopupNoticeController {
   async getServerIngamePopupNoticeById(req: EnvironmentRequest, res: Response, next: NextFunction) {
     try {
       const id = parseInt(req.params.id);
-      const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(id);
+      const environment = req.environment!;
+      const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(id, environment);
 
       if (!notice) {
         return res.status(404).json({
@@ -388,4 +425,3 @@ class IngamePopupNoticeController {
 }
 
 export default new IngamePopupNoticeController();
-

@@ -56,8 +56,7 @@ export class ClientController {
     }
 
     // Environment is resolved by clientSDKAuth middleware
-    const environment = req.environment;
-    const envId = environment?.id;
+    const environment = req.environment || 'development';
 
     // Validate status parameter if provided
     const validStatuses = Object.values(ClientStatus);
@@ -81,8 +80,8 @@ export class ClientController {
     const statusKey = statusFilter ? `:${statusFilter}` : '';
     const baseCacheKey = `client_version:${platform}:${versionKey}${statusKey}${lang ? `:${lang}` : ''}`;
 
-    // Scoping cache by environment ID
-    const cacheKey = envId ? withEnvironment(envId, baseCacheKey) : baseCacheKey;
+    // Scoping cache by environment
+    const cacheKey = environment ? withEnvironment(environment, baseCacheKey) : baseCacheKey;
 
     // Try to get from cache first
     const cachedData = await cacheService.get(cacheKey);
@@ -101,17 +100,17 @@ export class ClientController {
     let record;
     if (isLatestRequest) {
       // Get the latest version for the platform (with optional status filter and environment)
-      record = await ClientVersionService.findLatestByPlatform(platform, statusFilter, envId);
+      record = await ClientVersionService.findLatestByPlatform(platform, statusFilter, environment);
     } else {
       // Get exact version match
-      record = await ClientVersionService.findByExact(platform, version, envId);
+      record = await ClientVersionService.findByExact(platform, version, environment);
     }
 
     if (!record) {
       return res.status(404).json({
         success: false,
         message: isLatestRequest
-          ? `No client version found for platform: ${platform} in environment: ${environment?.environmentName || 'default'}${statusFilter ? ` with status: ${statusFilter}` : ''}`
+          ? `No client version found for platform: ${platform} in environment: ${environment}${statusFilter ? ` with status: ${statusFilter}` : ''}`
           : 'Client version not found',
       });
     }
@@ -119,10 +118,10 @@ export class ClientController {
     // Get clientVersionPassiveData from KV settings for the specific environment and resolve by version
     let passiveData = {};
     try {
-      const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', envId);
+      const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', environment);
       passiveData = resolvePassiveData(passiveDataStr, record.clientVersion);
     } catch (error) {
-      logger.warn(`Failed to resolve clientVersionPassiveData for environment ${envId || 'default'}:`, error);
+      logger.warn(`Failed to resolve clientVersionPassiveData for environment ${environment}:`, error);
     }
 
     // Parse customPayload
@@ -159,7 +158,7 @@ export class ClientController {
     let patchAddress = record.patchAddress;
 
     if (clientIp) {
-      const isWhitelisted = await IpWhitelistService.isIpWhitelisted(clientIp);
+      const isWhitelisted = await IpWhitelistService.isIpWhitelisted(clientIp, environment);
       if (isWhitelisted) {
         // Use whitelist addresses if available
         if (record.gameServerAddressForWhiteList) {
@@ -227,8 +226,8 @@ export class ClientController {
    * GET /api/v1/client/game-worlds
    */
   static getGameWorlds = asyncHandler(async (req: SDKRequest, res: Response) => {
-    const envId = req.environment?.id;
-    const cacheKey = envId ? withEnvironment(envId, GAME_WORLDS.PUBLIC) : GAME_WORLDS.PUBLIC;
+    const environment = req.environment || 'development';
+    const cacheKey = environment ? withEnvironment(environment, GAME_WORLDS.PUBLIC) : GAME_WORLDS.PUBLIC;
 
     // Try to get from cache first
     const cachedData = await cacheService.get(cacheKey);
@@ -248,7 +247,7 @@ export class ClientController {
     const worlds = await GameWorldService.getAllGameWorlds({
       isVisible: true,
       isMaintenance: false,
-      environmentId: envId,
+      environment: environment,
     });
 
     // Transform data for client consumption (remove sensitive fields)
@@ -303,7 +302,8 @@ export class ClientController {
    * POST /api/v1/client/invalidate-cache
    */
   static invalidateCache = asyncHandler(async (req: SDKRequest, res: Response) => {
-    await GameWorldService.invalidateCache();
+    const environment = req.environment || 'development';
+    await GameWorldService.invalidateCache(environment);
 
     res.json({
       success: true,

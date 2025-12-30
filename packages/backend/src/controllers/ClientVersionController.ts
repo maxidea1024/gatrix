@@ -1,4 +1,5 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { AuthenticatedRequest } from '../types/auth';
 import Joi from 'joi';
 import ClientVersionService, { ClientVersionFilters, ClientVersionPagination, BulkStatusUpdateRequest } from '../services/ClientVersionService';
 import { ClientStatus } from '../models/ClientVersion';
@@ -237,9 +238,10 @@ const bulkCreateClientVersionSchema = Joi.object({
 
 export class ClientVersionController {
   // 사용 가능한 버전 목록 조회 (distinct)
-  static async getAvailableVersions(req: Request, res: Response) {
+  static async getAvailableVersions(req: AuthenticatedRequest, res: Response) {
     try {
-      const versions = await ClientVersionService.getAvailableVersions();
+      const environment = req.environment || 'development';
+      const versions = await ClientVersionService.getAvailableVersions(environment);
       res.json({
         success: true,
         data: versions,
@@ -254,7 +256,7 @@ export class ClientVersionController {
   }
 
   // 클라이언트 버전 목록 조회
-  static async getClientVersions(req: Request, res: Response) {
+  static async getClientVersions(req: AuthenticatedRequest, res: Response) {
     const { error, value } = getClientVersionsQuerySchema.validate(req.query);
     if (error) {
       return res.status(400).json({
@@ -291,7 +293,8 @@ export class ClientVersionController {
       }
     });
 
-    const result = await ClientVersionService.getAllClientVersions(filters, pagination);
+    const environment = req.environment || 'development';
+    const result = await ClientVersionService.getAllClientVersions(environment, filters, pagination);
 
     res.json({
       success: true,
@@ -300,7 +303,7 @@ export class ClientVersionController {
   }
 
   // 클라이언트 버전 상세 조회
-  static async getClientVersionById(req: Request, res: Response) {
+  static async getClientVersionById(req: AuthenticatedRequest, res: Response) {
     const id = parseInt(req.params.id);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -309,7 +312,8 @@ export class ClientVersionController {
       });
     }
 
-    const clientVersion = await ClientVersionService.getClientVersionById(id);
+    const environment = req.environment || 'development';
+    const clientVersion = await ClientVersionService.getClientVersionById(id, environment);
     if (!clientVersion) {
       return res.status(404).json({
         success: false,
@@ -324,7 +328,7 @@ export class ClientVersionController {
   }
 
   // 클라이언트 버전 생성
-  static async createClientVersion(req: Request, res: Response) {
+  static async createClientVersion(req: AuthenticatedRequest, res: Response) {
     const { error, value } = createClientVersionSchema.validate(req.body);
     if (error) {
       return res.status(400).json({
@@ -350,7 +354,8 @@ export class ClientVersionController {
       updatedBy: userId,
     };
 
-    const clientVersion = await ClientVersionService.createClientVersion(clientVersionData);
+    const environment = req.environment || 'development';
+    const clientVersion = await ClientVersionService.createClientVersion(clientVersionData, environment);
 
     res.status(201).json({
       success: true,
@@ -359,7 +364,7 @@ export class ClientVersionController {
   }
 
   // 클라이언트 버전 간편 생성
-  static async bulkCreateClientVersions(req: Request, res: Response) {
+  static async bulkCreateClientVersions(req: AuthenticatedRequest, res: Response) {
     const { error, value } = bulkCreateClientVersionSchema.validate(req.body);
     if (error) {
       return res.status(400).json({
@@ -376,6 +381,7 @@ export class ClientVersionController {
       });
     }
 
+    const environment = req.environment || 'development';
     const bulkCreateData = {
       ...value,
       // Convert ISO 8601 datetime to MySQL DATETIME format
@@ -383,11 +389,12 @@ export class ClientVersionController {
       maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
       createdBy: userId,
       updatedBy: userId,
+      environment,
     };
 
     let clientVersions;
     try {
-      clientVersions = await ClientVersionService.bulkCreateClientVersions(bulkCreateData);
+      clientVersions = await ClientVersionService.bulkCreateClientVersions(bulkCreateData, environment);
     } catch (error: any) {
       if (error.message && error.message.includes('Duplicate client versions found')) {
         throw new GatrixError(error.message, 409);
@@ -403,7 +410,7 @@ export class ClientVersionController {
   }
 
   // 클라이언트 버전 수정
-  static async updateClientVersion(req: Request, res: Response) {
+  static async updateClientVersion(req: AuthenticatedRequest, res: Response) {
     const id = parseInt(req.params.id);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -437,7 +444,8 @@ export class ClientVersionController {
       updatedBy: userId,
     };
 
-    const clientVersion = await ClientVersionService.updateClientVersion(id, updateData);
+    const environment = req.environment || 'development';
+    const clientVersion = await ClientVersionService.updateClientVersion(id, updateData, environment);
     if (!clientVersion) {
       return res.status(404).json({
         success: false,
@@ -452,7 +460,7 @@ export class ClientVersionController {
   }
 
   // 클라이언트 버전 삭제
-  static async deleteClientVersion(req: Request, res: Response) {
+  static async deleteClientVersion(req: AuthenticatedRequest, res: Response) {
     const id = parseInt(req.params.id);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -461,7 +469,8 @@ export class ClientVersionController {
       });
     }
 
-    const deleted = await ClientVersionService.deleteClientVersion(id);
+    const environment = req.environment || 'development';
+    const deleted = await ClientVersionService.deleteClientVersion(id, environment);
     if (!deleted) {
       return res.status(404).json({
         success: false,
@@ -476,7 +485,7 @@ export class ClientVersionController {
   }
 
   // 일괄 상태 변경
-  static async bulkUpdateStatus(req: Request, res: Response) {
+  static async bulkUpdateStatus(req: AuthenticatedRequest, res: Response) {
     const { error, value } = bulkUpdateStatusSchema.validate(req.body);
     if (error) {
       return res.status(400).json({
@@ -501,7 +510,8 @@ export class ClientVersionController {
       updatedBy: userId,
     };
 
-    const updatedCount = await ClientVersionService.bulkUpdateStatus(bulkUpdateData);
+    const environment = req.environment || 'development';
+    const updatedCount = await ClientVersionService.bulkUpdateStatus(bulkUpdateData, environment);
 
     res.json({
       success: true,
@@ -512,8 +522,9 @@ export class ClientVersionController {
   }
 
   // 채널 목록 조회
-  static async getPlatforms(req: Request, res: Response) {
-    const platforms = await ClientVersionService.getPlatforms();
+  static async getPlatforms(req: AuthenticatedRequest, res: Response) {
+    const environment = req.environment || 'development';
+    const platforms = await ClientVersionService.getPlatforms(environment);
 
     res.json({
       success: true,
@@ -522,7 +533,7 @@ export class ClientVersionController {
   }
 
   // 클라이언트 버전 태그 설정
-  static async setTags(req: Request, res: Response) {
+  static async setTags(req: AuthenticatedRequest, res: Response) {
     try {
       const { id } = req.params;
       const { tagIds } = req.body;
@@ -550,7 +561,7 @@ export class ClientVersionController {
   }
 
   // 클라이언트 버전 태그 조회
-  static async getTags(req: Request, res: Response) {
+  static async getTags(req: AuthenticatedRequest, res: Response) {
     try {
       const { id } = req.params;
       const tags = await ClientVersionModel.getTags(parseInt(id));
@@ -569,7 +580,7 @@ export class ClientVersionController {
   }
 
   // 클라이언트 버전 내보내기 (CSV)
-  static async exportClientVersions(req: Request, res: Response) {
+  static async exportClientVersions(req: AuthenticatedRequest, res: Response) {
     const { error, value } = exportClientVersionsQuerySchema.validate(req.query);
     if (error) {
       return res.status(400).json({
@@ -579,8 +590,9 @@ export class ClientVersionController {
     }
 
     try {
+      const environment = req.environment || 'development';
       // 모든 데이터를 가져오기 위해 매우 큰 limit 사용
-      const result = await ClientVersionService.getAllClientVersions(value, {
+      const result = await ClientVersionService.getAllClientVersions(environment, value, {
         page: 1,
         limit: 50000, // 충분히 큰 값
         sortBy: 'createdAt',
@@ -604,7 +616,7 @@ export class ClientVersionController {
    * Reset all client versions and clear cache (for testing)
    * DELETE /api/v1/admin/client-versions/reset/all
    */
-  static async resetAllClientVersions(req: Request, res: Response) {
+  static async resetAllClientVersions(req: AuthenticatedRequest, res: Response) {
     try {
       // Delete all client versions
       const deletedCount = await ClientVersionModel.deleteAll();

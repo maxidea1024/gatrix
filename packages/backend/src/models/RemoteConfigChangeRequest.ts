@@ -10,7 +10,7 @@ export type ChangeRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancell
 export interface RemoteConfigChangeRequestData {
   id?: number;
   templateId: number;
-  environmentId: string; // ULID
+  environment: string;
   requestType: ChangeRequestType;
   status: ChangeRequestStatus;
   proposedChanges: any;
@@ -29,7 +29,7 @@ export class RemoteConfigChangeRequest extends Model implements RemoteConfigChan
 
   id!: number;
   templateId!: number;
-  environmentId!: string; // ULID
+  environment!: string;
   requestType!: ChangeRequestType;
   status!: ChangeRequestStatus;
   proposedChanges!: any;
@@ -44,18 +44,18 @@ export class RemoteConfigChangeRequest extends Model implements RemoteConfigChan
 
   // Relations
   template?: RemoteConfigTemplate;
-  environment?: Environment;
+  environmentModel?: Environment;
   requester?: User;
   approver?: User;
 
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['templateId', 'environmentId', 'requestType', 'proposedChanges', 'requestedBy'],
+      required: ['templateId', 'environment', 'requestType', 'proposedChanges', 'requestedBy'],
       properties: {
         id: { type: 'integer' },
         templateId: { type: 'integer' },
-        environmentId: { type: 'string', minLength: 26, maxLength: 26 }, // ULID
+        environment: { type: 'string' },
         requestType: { type: 'string', enum: ['create', 'update', 'delete', 'import'] },
         status: { type: 'string', enum: ['pending', 'approved', 'rejected', 'cancelled'] },
         proposedChanges: { type: 'object' },
@@ -81,12 +81,12 @@ export class RemoteConfigChangeRequest extends Model implements RemoteConfigChan
           to: 'g_remote_config_templates.id'
         }
       },
-      environment: {
+      environmentModel: {
         relation: Model.BelongsToOneRelation,
         modelClass: Environment,
         join: {
-          from: 'g_remote_config_change_requests.environmentId',
-          to: 'g_environments.id'
+          from: 'g_remote_config_change_requests.environment',
+          to: 'g_environments.environment'
         }
       },
       requester: {
@@ -122,7 +122,7 @@ export class RemoteConfigChangeRequest extends Model implements RemoteConfigChan
    */
   static async createChangeRequest(data: Omit<RemoteConfigChangeRequestData, 'id' | 'status' | 'createdAt' | 'updatedAt'>): Promise<RemoteConfigChangeRequest> {
     // Check if environment requires approval
-    const environment = await Environment.query().findById(data.environmentId);
+    const environment = await Environment.query().findById(data.environment);
     if (!environment) {
       throw new Error('Environment not found');
     }
@@ -150,9 +150,9 @@ export class RemoteConfigChangeRequest extends Model implements RemoteConfigChan
   /**
    * Get pending requests for environment
    */
-  static async getPendingForEnvironment(environmentId: number): Promise<RemoteConfigChangeRequest[]> {
+  static async getPendingForEnvironment(environment: string): Promise<RemoteConfigChangeRequest[]> {
     return await this.query()
-      .where('environmentId', environmentId)
+      .where('environment', environment)
       .where('status', 'pending')
       .withGraphFetched('[template, requester(basicInfo)]')
       .modifiers({
@@ -164,15 +164,15 @@ export class RemoteConfigChangeRequest extends Model implements RemoteConfigChan
   /**
    * Get requests by status
    */
-  static async getByStatus(status: ChangeRequestStatus, environmentId?: number): Promise<RemoteConfigChangeRequest[]> {
+  static async getByStatus(status: ChangeRequestStatus, environment?: string): Promise<RemoteConfigChangeRequest[]> {
     let query = this.query().where('status', status);
-    
-    if (environmentId) {
-      query = query.where('environmentId', environmentId);
+
+    if (environment) {
+      query = query.where('environment', environment);
     }
 
     return await query
-      .withGraphFetched('[template, environment, requester(basicInfo), approver(basicInfo)]')
+      .withGraphFetched('[template, environmentModel, requester(basicInfo), approver(basicInfo)]')
       .modifiers({
         basicInfo: (builder) => builder.select('id', 'username', 'email')
       })
@@ -293,7 +293,7 @@ export class RemoteConfigChangeRequest extends Model implements RemoteConfigChan
         changeRequestId: this.id,
         action,
         templateId: this.templateId,
-        environmentId: this.environmentId,
+        environment: this.environment,
         requestType: this.requestType,
         approvedBy: this.approvedBy,
         rejectionReason: this.rejectionReason

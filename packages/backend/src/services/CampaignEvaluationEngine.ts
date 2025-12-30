@@ -27,40 +27,43 @@ export class CampaignEvaluationEngine {
    * Evaluate all active campaigns for a user and return config values
    */
   static async evaluateForUser(
-    userId: string, 
+    environment: string,
+    userId: string,
     userContext: UserContext,
     configIds?: number[]
   ): Promise<Record<string, EvaluationResult>> {
     try {
       const now = new Date();
-      
+
       // Get all active campaigns that are currently running
       const campaignQuery = db('g_remote_config_campaigns as c')
+        .where('c.environment', environment)
         .where('c.isActive', true)
         .where('c.status', 'running')
-        .where(function() {
+        .where(function () {
           this.whereNull('c.startDate').orWhere('c.startDate', '<=', now);
         })
-        .where(function() {
+        .where(function () {
           this.whereNull('c.endDate').orWhere('c.endDate', '>=', now);
         })
         .orderBy('c.priority', 'desc')
         .orderBy('c.createdAt', 'asc');
 
       const activeCampaigns = await campaignQuery;
-      
+
       // Get all configs (either specified ones or all active configs)
       let configQuery = db('g_remote_configs as rc')
+        .where('rc.environment', environment)
         .where('rc.isActive', true);
-      
+
       if (configIds && configIds.length > 0) {
         configQuery = configQuery.whereIn('rc.id', configIds);
       }
-      
+
       const configs = await configQuery;
-      
+
       const results: Record<string, EvaluationResult> = {};
-      
+
       // Initialize with default values
       for (const config of configs) {
         results[config.keyName] = {
@@ -70,7 +73,7 @@ export class CampaignEvaluationEngine {
           priority: 0
         };
       }
-      
+
       // Evaluate campaigns in priority order
       for (const campaign of activeCampaigns) {
         // Check if user matches campaign conditions
@@ -84,12 +87,13 @@ export class CampaignEvaluationEngine {
               'rc.valueType'
             ])
             .where('cc.campaignId', campaign.id)
+            .where('rc.environment', environment)
             .orderBy('cc.priority', 'desc');
-          
+
           // Apply campaign values (higher priority campaigns override lower ones)
           for (const campaignConfig of campaignConfigs) {
             const configKey = campaignConfig.keyName;
-            
+
             if (results[configKey] && campaign.priority >= results[configKey].priority) {
               results[configKey] = {
                 configId: campaignConfig.configId,
@@ -103,43 +107,99 @@ export class CampaignEvaluationEngine {
           }
         }
       }
-      
-      logger.info(`Evaluated ${Object.keys(results).length} configs for user ${userId}`);
+
+      logger.info(`Evaluated ${Object.keys(results).length} configs for user ${userId} in Env: ${environment}`);
       return results;
-      
+
     } catch (error) {
-      logger.error('Error evaluating campaigns for user:', error);
+      logger.error('Error evaluating campaigns for user:', error, { environment, userId });
       throw error;
     }
+  }
+
+  /**
+   * Get active campaigns for a specific time
+   */
+  static async getActiveCampaigns(environment: string, timestamp: Date = new Date()): Promise<Campaign[]> {
+    try {
+      const campaigns = await db('g_remote_config_campaigns as c')
+        .leftJoin('g_users as creator', 'c.createdBy', 'creator.id')
+        .select([
+          'c.*',
+          'creator.name as createdByName'
+        ])
+        .where('c.environment', environment)
+        .where('c.isActive', true)
+        .where('c.status', 'running')
+        .where(function () {
+          this.whereNull('c.startDate').orWhere('c.startDate', '<=', timestamp);
+        })
+        .where(function () {
+          this.whereNull('c.endDate').orWhere('c.endDate', '>=', timestamp);
+        })
+        .orderBy('c.priority', 'desc')
+        .orderBy('c.createdAt', 'asc');
+
+      return campaigns.map(this.transformCampaign);
+    } catch (error) {
+      logger.error('Error getting active campaigns:', error, { environment });
+      throw error;
+    }
+  }
+
+  /**
+   * Transform database row to Campaign object
+   */
+  private static transformCampaign(row: any): Campaign {
+    return {
+      id: row.id,
+      environment: row.environment,
+      campaignName: row.campaignName,
+      description: row.description,
+      startDate: row.startDate,
+      endDate: row.endDate,
+      targetConditions: typeof row.targetConditions === 'string' ?
+        JSON.parse(row.targetConditions) : row.targetConditions,
+      trafficPercentage: parseFloat(row.trafficPercentage) || 100.00,
+      priority: row.priority || 0,
+      status: row.status || 'draft',
+      isActive: Boolean(row.isActive),
+      createdBy: row.createdBy,
+      updatedBy: row.updatedBy,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      createdByName: row.createdByName,
+      updatedByName: row.updatedByName
+    };
   }
 
   /**
    * Evaluate target conditions for a campaign
    */
   private static async evaluateTargetConditions(
-    campaign: Campaign, 
+    campaign: Campaign,
     userContext: UserContext
   ): Promise<boolean> {
     try {
       if (!campaign.targetConditions) {
         return true; // No conditions = applies to all users
       }
-      
-      const conditions = typeof campaign.targetConditions === 'string' 
-        ? JSON.parse(campaign.targetConditions) 
+
+      const conditions = typeof campaign.targetConditions === 'string'
+        ? JSON.parse(campaign.targetConditions)
         : campaign.targetConditions;
-      
+
       // Evaluate each condition
       for (const [key, expectedValue] of Object.entries(conditions)) {
         const userValue = this.getUserContextValue(userContext, key);
-        
+
         if (!this.evaluateCondition(userValue, expectedValue)) {
           return false;
         }
       }
-      
+
       return true;
-      
+
     } catch (error) {
       logger.error('Error evaluating target conditions:', error);
       return false; // Fail safe - don't apply campaign if evaluation fails
@@ -199,19 +259,19 @@ export class CampaignEvaluationEngine {
    */
   private static compareVersions(version1: string, version2: string): number {
     if (!version1 || !version2) return 0;
-    
+
     const v1parts = version1.split('.').map(Number);
     const v2parts = version2.split('.').map(Number);
     const maxLength = Math.max(v1parts.length, v2parts.length);
-    
+
     for (let i = 0; i < maxLength; i++) {
       const v1part = v1parts[i] || 0;
       const v2part = v2parts[i] || 0;
-      
+
       if (v1part > v2part) return 1;
       if (v1part < v2part) return -1;
     }
-    
+
     return 0;
   }
 
@@ -220,7 +280,7 @@ export class CampaignEvaluationEngine {
    */
   private static parseConfigValue(value: string, valueType: string): any {
     if (!value) return null;
-    
+
     try {
       switch (valueType) {
         case 'boolean':
@@ -238,35 +298,6 @@ export class CampaignEvaluationEngine {
     } catch (error) {
       logger.warn(`Failed to parse config value: ${value} as ${valueType}`);
       return value; // Return as string if parsing fails
-    }
-  }
-
-  /**
-   * Get active campaigns for a specific time
-   */
-  static async getActiveCampaigns(timestamp: Date = new Date()): Promise<Campaign[]> {
-    try {
-      const campaigns = await db('g_remote_config_campaigns as c')
-        .leftJoin('g_users as creator', 'c.createdBy', 'creator.id')
-        .select([
-          'c.*',
-          'creator.name as createdByName'
-        ])
-        .where('c.isActive', true)
-        .where('c.status', 'running')
-        .where(function() {
-          this.whereNull('c.startDate').orWhere('c.startDate', '<=', timestamp);
-        })
-        .where(function() {
-          this.whereNull('c.endDate').orWhere('c.endDate', '>=', timestamp);
-        })
-        .orderBy('c.priority', 'desc')
-        .orderBy('c.createdAt', 'asc');
-
-      return campaigns.map(this.transformCampaign);
-    } catch (error) {
-      logger.error('Error getting active campaigns:', error);
-      throw error;
     }
   }
 
@@ -317,37 +348,12 @@ export class CampaignEvaluationEngine {
         return Array.isArray(userValue) && !userValue.includes(value);
       case 'contains_any':
         return Array.isArray(userValue) && Array.isArray(value) &&
-               value.some(v => userValue.includes(v));
+          value.some(v => userValue.includes(v));
       case 'contains_all':
         return Array.isArray(userValue) && Array.isArray(value) &&
-               value.every(v => userValue.includes(v));
+          value.every(v => userValue.includes(v));
       default:
         return false;
     }
-  }
-
-  /**
-   * Transform database row to Campaign object
-   */
-  private static transformCampaign(row: any): Campaign {
-    return {
-      id: row.id,
-      campaignName: row.campaignName,
-      description: row.description,
-      startDate: row.startDate,
-      endDate: row.endDate,
-      targetConditions: typeof row.targetConditions === 'string' ?
-        JSON.parse(row.targetConditions) : row.targetConditions,
-      trafficPercentage: parseFloat(row.trafficPercentage) || 100.00,
-      priority: row.priority || 0,
-      status: row.status || 'draft',
-      isActive: Boolean(row.isActive),
-      createdBy: row.createdBy,
-      updatedBy: row.updatedBy,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-      createdByName: row.createdByName,
-      updatedByName: row.updatedByName
-    };
   }
 }

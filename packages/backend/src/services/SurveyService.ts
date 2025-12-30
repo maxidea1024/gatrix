@@ -1,8 +1,6 @@
 import db from '../config/knex';
 import { GatrixError } from '../middleware/errorHandler';
 import { ulid } from 'ulid';
-import { getCurrentEnvironmentId } from '../utils/environmentContext';
-import { Environment } from '../models/Environment';
 import { pubSubService } from './PubSubService';
 
 export interface TriggerCondition {
@@ -26,7 +24,7 @@ export interface ChannelSubchannelData {
  */
 export interface Survey {
   id: string;
-  environmentId?: string;
+  environment: string;
   platformSurveyId: string;
   surveyTitle: string;
   surveyContent?: string;
@@ -76,6 +74,7 @@ export interface CreateSurveyInput {
   targetWorlds?: string[] | null;
   targetWorldsInverted?: boolean;
   createdBy?: number;
+  environment: string;
 }
 
 export interface UpdateSurveyInput {
@@ -102,26 +101,6 @@ export interface UpdateSurveyInput {
 
 export class SurveyService {
   /**
-   * Helper to resolve environment name from ID (which might be ULID or composite string)
-   */
-  private static async resolveEnvironmentName(envId: string): Promise<string> {
-    if (!envId) return '';
-
-    try {
-      // Try to get from Environment model first
-      const env = await Environment.query().findById(envId);
-      if (env) {
-        return env.environmentName;
-      }
-      // Fallback: assume format {name}.{ulid} or just use as is if split fails
-      return envId.split('.')[0];
-    } catch (error) {
-      // Fallback on error
-      return envId.split('.')[0];
-    }
-  }
-
-  /**
    * Get all surveys with pagination
    */
   static async getSurveys(params: {
@@ -129,15 +108,15 @@ export class SurveyService {
     limit?: number;
     isActive?: boolean;
     search?: string;
-    environmentId?: string;
+    environment: string;
   }): Promise<{ surveys: Survey[]; total: number; page: number; limit: number }> {
     const page = params.page || 1;
     const limit = params.limit || 20;
     const offset = (page - 1) * limit;
-    const envId = params.environmentId ?? getCurrentEnvironmentId();
+    const environment = params.environment;
 
-    let query = db('g_surveys').where('environmentId', envId);
-    let countQuery = db('g_surveys').where('environmentId', envId);
+    let query = db('g_surveys').where('environment', environment);
+    let countQuery = db('g_surveys').where('environment', environment);
 
     if (params.isActive !== undefined) {
       query = query.where('isActive', params.isActive);
@@ -203,9 +182,8 @@ export class SurveyService {
   /**
    * Get survey by ID
    */
-  static async getSurveyById(id: string, environmentId?: string): Promise<Survey> {
-    const envId = environmentId ?? getCurrentEnvironmentId();
-    const row = await db('g_surveys').where('id', id).where('environmentId', envId).first();
+  static async getSurveyById(id: string, environment: string): Promise<Survey> {
+    const row = await db('g_surveys').where('id', id).where('environment', environment).first();
 
     if (!row) {
       throw new GatrixError('Survey not found', 404);
@@ -249,9 +227,8 @@ export class SurveyService {
   /**
    * Get survey by platform survey ID
    */
-  static async getSurveyByPlatformId(platformSurveyId: string, environmentId?: string): Promise<Survey> {
-    const envId = environmentId ?? getCurrentEnvironmentId();
-    const row = await db('g_surveys').where('platformSurveyId', platformSurveyId).where('environmentId', envId).first();
+  static async getSurveyByPlatformId(platformSurveyId: string, environment: string): Promise<Survey> {
+    const row = await db('g_surveys').where('platformSurveyId', platformSurveyId).where('environment', environment).first();
 
     if (!row) {
       throw new GatrixError('Survey not found', 404);
@@ -295,8 +272,8 @@ export class SurveyService {
   /**
    * Create a new survey
    */
-  static async createSurvey(input: CreateSurveyInput, environmentId?: string): Promise<Survey> {
-    const envId = environmentId ?? getCurrentEnvironmentId();
+  static async createSurvey(input: CreateSurveyInput): Promise<Survey> {
+    const environment = input.environment;
 
     // Validate trigger conditions
     if (!input.triggerConditions || input.triggerConditions.length === 0) {
@@ -311,7 +288,7 @@ export class SurveyService {
     // Check if platformSurveyId already exists in this environment
     const existing = await db('g_surveys')
       .where('platformSurveyId', input.platformSurveyId)
-      .where('environmentId', envId)
+      .where('environment', environment)
       .first();
 
     if (existing) {
@@ -323,7 +300,7 @@ export class SurveyService {
 
     await db('g_surveys').insert({
       id,
-      environmentId: envId,
+      environment: environment,
       platformSurveyId: input.platformSurveyId,
       surveyTitle: input.surveyTitle,
       surveyContent: input.surveyContent || null,
@@ -344,18 +321,17 @@ export class SurveyService {
       createdBy: input.createdBy || null,
     });
 
-    const survey = await this.getSurveyById(id, envId);
+    const survey = await this.getSurveyById(id, environment);
 
     // Publish SDK event
     try {
-      const envName = await this.resolveEnvironmentName(envId);
       await pubSubService.publishSDKEvent({
         type: 'survey.created',
         data: {
           id: survey.id,
           timestamp: Date.now(),
           isActive: survey.isActive,
-          environment: envName
+          environment: environment
         }
       });
     } catch (err) {
@@ -368,16 +344,15 @@ export class SurveyService {
   /**
    * Update a survey
    */
-  static async updateSurvey(id: string, input: UpdateSurveyInput, environmentId?: string): Promise<Survey> {
-    const envId = environmentId ?? getCurrentEnvironmentId();
+  static async updateSurvey(id: string, input: UpdateSurveyInput, environment: string): Promise<Survey> {
     // Check if survey exists
-    await this.getSurveyById(id, envId);
+    await this.getSurveyById(id, environment);
 
     // If platformSurveyId is being updated, check for duplicates in this environment
     if (input.platformSurveyId) {
       const existing = await db('g_surveys')
         .where('platformSurveyId', input.platformSurveyId)
-        .where('environmentId', envId)
+        .where('environment', environment)
         .whereNot('id', id)
         .first();
 
@@ -423,20 +398,19 @@ export class SurveyService {
       throw new GatrixError('No fields to update', 400);
     }
 
-    await db('g_surveys').where('id', id).where('environmentId', envId).update(updateData);
+    await db('g_surveys').where('id', id).where('environment', environment).update(updateData);
 
-    const survey = await this.getSurveyById(id, envId);
+    const survey = await this.getSurveyById(id, environment);
 
     // Publish SDK event
     try {
-      const envName = await this.resolveEnvironmentName(envId);
       await pubSubService.publishSDKEvent({
         type: 'survey.updated',
         data: {
           id: survey.id,
           timestamp: Date.now(),
           isActive: survey.isActive,
-          environment: envName
+          environment: environment
         }
       });
     } catch (err) {
@@ -449,18 +423,8 @@ export class SurveyService {
   /**
    * Delete a survey
    */
-  static async deleteSurvey(id: string, environmentId?: string): Promise<void> {
-    const envId = environmentId ?? getCurrentEnvironmentId();
-
-    // Resolve env name before deletion is tricky if resolving relies on data, 
-    // but here we resolve from envId which comes from context or param.
-    // So valid.
-    let envName = '';
-    try {
-      envName = await this.resolveEnvironmentName(envId);
-    } catch (e) { }
-
-    const result = await db('g_surveys').where('id', id).where('environmentId', envId).del();
+  static async deleteSurvey(id: string, environment: string): Promise<void> {
+    const result = await db('g_surveys').where('id', id).where('environment', environment).del();
 
     if (result === 0) {
       throw new GatrixError('Survey not found', 404);
@@ -473,7 +437,7 @@ export class SurveyService {
         data: {
           id,
           timestamp: Date.now(),
-          environment: envName
+          environment: environment
         }
       });
     } catch (err) {
@@ -484,8 +448,9 @@ export class SurveyService {
   /**
    * Get survey configuration from g_vars
    */
-  static async getSurveyConfig(): Promise<SurveyConfig> {
+  static async getSurveyConfig(environment: string): Promise<SurveyConfig> {
     const rows = await db('g_vars')
+      .where('environment', environment)
       .whereIn('varKey', ['survey.baseSurveyUrl', 'survey.baseJoinedUrl', 'survey.linkCaption', 'survey.joinedSecretKey']);
 
     const config: any = {};
@@ -506,7 +471,7 @@ export class SurveyService {
   /**
    * Update survey configuration in g_vars
    */
-  static async updateSurveyConfig(input: Partial<SurveyConfig>): Promise<SurveyConfig> {
+  static async updateSurveyConfig(input: Partial<SurveyConfig>, environment: string): Promise<SurveyConfig> {
     const updates: Array<{ key: string; value: string }> = [];
 
     if (input.baseSurveyUrl !== undefined) {
@@ -529,29 +494,27 @@ export class SurveyService {
     // Update each var using raw query for ON DUPLICATE KEY UPDATE
     for (const update of updates) {
       await db.raw(
-        `INSERT INTO g_vars (varKey, varValue, description, createdBy)
-         VALUES (?, ?, ?, 1)
+        `INSERT INTO g_vars (environment, varKey, varValue, description, createdBy)
+         VALUES (?, ?, ?, ?, 1)
          ON DUPLICATE KEY UPDATE varValue = VALUES(varValue), updatedBy = 1`,
-        [update.key, update.value, `Survey configuration: ${update.key}`]
+        [environment, update.key, update.value, `Survey configuration: ${update.key}`]
       );
     }
 
     // Publish SDK event
     try {
-      const envId = getCurrentEnvironmentId();
-      const envName = await this.resolveEnvironmentName(envId);
       await pubSubService.publishSDKEvent({
         type: 'survey.settings.updated',
         data: {
           id: 0,
           timestamp: Date.now(),
-          environment: envName
+          environment: environment
         }
       });
     } catch (err) {
       // ignore
     }
 
-    return await this.getSurveyConfig();
+    return await this.getSurveyConfig(environment);
   }
 }

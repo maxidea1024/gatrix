@@ -60,7 +60,7 @@ export class CouponRedeemService {
   /**
    * Redeem a coupon code
    */
-  static async redeemCoupon(code: string, request: RedeemRequest): Promise<RedeemResponse> {
+  static async redeemCoupon(code: string, request: RedeemRequest, environment: string): Promise<RedeemResponse> {
     // Validate input
     if (!request.userId || !request.userName) {
       throw new GatrixError('userId and userName are required', 400, true, CouponErrorCode.INVALID_PARAMETERS);
@@ -74,7 +74,11 @@ export class CouponRedeemService {
 
     return await db.transaction(async (trx) => {
       // 1. Find coupon code with lock
-      const coupon = await trx('g_coupons').where('code', code).forUpdate().first();
+      const coupon = await trx('g_coupons')
+        .where('code', code)
+        .where('environment', environment)
+        .forUpdate()
+        .first();
 
       if (!coupon) {
         throw new GatrixError('Coupon code not found', 404, true, CouponErrorCode.CODE_NOT_FOUND);
@@ -86,7 +90,10 @@ export class CouponRedeemService {
       }
 
       // 3. Get coupon setting
-      const setting = await trx('g_coupon_settings').where('id', coupon.settingId).first();
+      const setting = await trx('g_coupon_settings')
+        .where('id', coupon.settingId)
+        .where('environment', environment)
+        .first();
 
       if (!setting) {
         throw new GatrixError('Coupon setting not found', 404, true, CouponErrorCode.CODE_NOT_FOUND);
@@ -193,13 +200,18 @@ export class CouponRedeemService {
         userId: request.userId,
         settingId: setting.id,
         sequence,
+        environment
       });
 
       // 12. Build response
       let reward: any[] = [];
 
       if (setting.rewardTemplateId) {
-        const template = await trx('g_reward_templates').where('id', setting.rewardTemplateId).select('rewardItems').first();
+        const template = await trx('g_reward_templates')
+          .where('id', setting.rewardTemplateId)
+          .where('environment', environment)
+          .select('rewardItems')
+          .first();
 
         if (template) {
           const rewardItems = typeof template.rewardItems === 'string' ? JSON.parse(template.rewardItems) : template.rewardItems;
@@ -327,4 +339,3 @@ export class CouponRedeemService {
     }
   }
 }
-

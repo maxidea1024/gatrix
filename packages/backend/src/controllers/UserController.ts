@@ -56,7 +56,7 @@ const createUserSchema = Joi.object({
 
 const setEnvironmentAccessSchema = Joi.object({
   allowAllEnvironments: Joi.boolean().required(),
-  environmentIds: Joi.array().items(Joi.string().min(1).max(127)).default([]),
+  environments: Joi.array().items(Joi.string().min(1).max(127)).default([]),
 });
 
 export class UserController {
@@ -87,7 +87,7 @@ export class UserController {
     }
 
     const { tagIds, ...userData } = value;
-    const createdBy = (req.user as any).id;
+    const createdBy = req.user?.userId;
 
     // 사용자 생성
     let user = await UserService.createUser({
@@ -98,7 +98,7 @@ export class UserController {
     // 태그 설정
     if (tagIds && tagIds.length > 0) {
       console.log('Setting user tags for new user:', { userId: user.id, tagIds, createdBy });
-      await UserTagService.setUserTags(user.id, tagIds, createdBy);
+      await UserTagService.setUserTags(user.id, tagIds, createdBy!);
       console.log('User tags set successfully for new user');
 
       // 태그 설정 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
@@ -144,7 +144,7 @@ export class UserController {
 
     console.log('Validated value:', value);
     const { tagIds, ...userData } = value;
-    const updatedBy = (req.user as any).id;
+    const updatedBy = req.user?.userId;
 
     console.log('Update user request:', { userId, tagIds, userData, updatedBy });
 
@@ -160,7 +160,7 @@ export class UserController {
     // 태그 설정 (tagIds가 제공된 경우에만)
     if (tagIds !== undefined) {
       console.log('Setting user tags:', { userId, tagIds, updatedBy });
-      await UserTagService.setUserTags(userId, tagIds, updatedBy);
+      await UserTagService.setUserTags(userId, tagIds, updatedBy!);
       console.log('User tags set successfully');
 
       // 태그 업데이트 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
@@ -431,9 +431,9 @@ export class UserController {
     }
 
     const { tagIds } = value;
-    const updatedBy = (req.user as any).id;
+    const updatedBy = req.user?.userId;
 
-    await UserTagService.setUserTags(userId, tagIds, updatedBy);
+    await UserTagService.setUserTags(userId, tagIds, updatedBy!);
 
     res.json({
       success: true,
@@ -454,9 +454,9 @@ export class UserController {
     }
 
     const { tagId } = value;
-    const createdBy = (req.user as any).id;
+    const createdBy = req.user?.userId;
 
-    await UserTagService.addUserTag(userId, tagId, createdBy);
+    await UserTagService.addUserTag(userId, tagId, createdBy!);
 
     res.json({
       success: true,
@@ -568,10 +568,10 @@ export class UserController {
       throw new GatrixError(error.details[0].message, 400);
     }
 
-    const { allowAllEnvironments, environmentIds } = value;
+    const { allowAllEnvironments, environments } = value;
     const updatedBy = req.user!.userId;
 
-    await UserModel.setEnvironmentAccess(userId, allowAllEnvironments, environmentIds, updatedBy);
+    await UserModel.setEnvironmentAccess(userId, allowAllEnvironments, environments, updatedBy);
 
     res.json({
       success: true,
@@ -585,13 +585,13 @@ export class UserController {
   static getMyEnvironmentAccess = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user!.userId;
 
-    const accessibleEnvs = await UserModel.getAccessibleEnvironmentIds(userId);
+    const accessibleEnvs = await UserModel.getAccessibleEnvironments(userId);
 
     res.json({
       success: true,
       data: {
         allowAllEnvironments: accessibleEnvs === 'all',
-        environmentIds: accessibleEnvs === 'all' ? [] : accessibleEnvs
+        environments: accessibleEnvs === 'all' ? [] : accessibleEnvs
       }
     });
   });

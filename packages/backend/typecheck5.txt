@@ -1,0 +1,16 @@
+﻿yarn run v1.22.22
+$ tsc --noEmit
+src/controllers/PlatformDefaultsController.ts(24,52): error TS2554: Expected 1 arguments, but got 0.
+src/controllers/PlatformDefaultsController.ts(43,52): error TS2554: Expected 2 arguments, but got 1.
+src/controllers/PlatformDefaultsController.ts(73,35): error TS2554: Expected 4 arguments, but got 3.
+src/controllers/PlatformDefaultsController.ts(98,35): error TS2554: Expected 3 arguments, but got 2.
+src/controllers/PlatformDefaultsController.ts(118,35): error TS2554: Expected 3 arguments, but got 2.
+src/index.ts(291,13): error TS2554: Expected 1 arguments, but got 0.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
+node.exe : error Command failed with exit code 2.
+위치 C:\Users\jhseo\AppData\Roaming\npm\yarn.ps1:24 문자:5
++     & "node$exe"  "$basedir/node_modules/yarn/bin/yarn.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error     Command failed with exit code 2.:String) [], Re    moteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

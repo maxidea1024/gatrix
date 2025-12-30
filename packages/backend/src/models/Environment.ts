@@ -10,8 +10,7 @@ export const SYSTEM_DEFINED_ENVIRONMENTS = ['development', 'qa', 'production'] a
 export type SystemDefinedEnvironment = typeof SYSTEM_DEFINED_ENVIRONMENTS[number];
 
 export interface EnvironmentData {
-  id?: string; // ULID (26 characters)
-  environmentName: string;
+  environment: string;
   displayName: string;
   description?: string;
   environmentType: EnvironmentType;
@@ -31,9 +30,9 @@ export interface EnvironmentData {
 
 export class Environment extends Model implements EnvironmentData {
   static tableName = 'g_environments';
+  static idColumn = 'environment';
 
-  id!: string; // ULID
-  environmentName!: string;
+  environment!: string;
   displayName!: string;
   description?: string;
   environmentType!: EnvironmentType;
@@ -53,15 +52,14 @@ export class Environment extends Model implements EnvironmentData {
   // Relations
   creator?: User;
   updater?: User;
-  project?: any; // Will be typed after Project model is created
+  project?: any;
 
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['environmentName', 'displayName', 'createdBy'],
+      required: ['environment', 'displayName', 'createdBy'],
       properties: {
-        id: { type: 'string', minLength: 1, maxLength: 127 }, // Format: {environmentName}.{ulid}
-        environmentName: {
+        environment: {
           type: 'string',
           minLength: 1,
           maxLength: 100,
@@ -117,10 +115,6 @@ export class Environment extends Model implements EnvironmentData {
   }
 
   $beforeInsert() {
-    if (!this.id) {
-      // Generate ID in format: {environmentName}.{ulid}
-      this.id = `${this.environmentName}.${ulid()}`;
-    }
     this.createdAt = new Date();
     this.updatedAt = new Date();
   }
@@ -131,6 +125,7 @@ export class Environment extends Model implements EnvironmentData {
 
   /**
    * Get default environment
+   * @deprecated Use explicit environment instead
    */
   static async getDefault(): Promise<Environment | undefined> {
     return await this.query().where('isDefault', true).first();
@@ -139,15 +134,15 @@ export class Environment extends Model implements EnvironmentData {
   /**
    * Get environment by name
    */
-  static async getByName(environmentName: string): Promise<Environment | undefined> {
-    return await this.query().where('environmentName', environmentName).first();
+  static async getByName(environment: string): Promise<Environment | undefined> {
+    return await this.query().where('environment', environment).first();
   }
 
   /**
    * Get all active environments ordered by displayOrder (excluding hidden ones by default)
    */
   static async getAll(includeHidden: boolean = false): Promise<Environment[]> {
-    const query = this.query().orderBy('displayOrder', 'asc').orderBy('environmentName');
+    const query = this.query().orderBy('displayOrder', 'asc').orderBy('environment');
 
     if (!includeHidden) {
       query.where('isHidden', false);
@@ -196,16 +191,16 @@ export class Environment extends Model implements EnvironmentData {
   /**
    * Create new environment
    */
-  static async createEnvironment(data: Omit<EnvironmentData, 'id' | 'createdAt' | 'updatedAt'>): Promise<Environment> {
+  static async createEnvironment(data: Omit<EnvironmentData, 'createdAt' | 'updatedAt'>): Promise<Environment> {
     // Validate environment name
-    if (!this.isValidEnvironmentName(data.environmentName)) {
+    if (!this.isValidEnvironmentName(data.environment)) {
       throw new Error('Invalid environment name. Use only lowercase letters, numbers, underscore, and hyphen.');
     }
 
     // Check if environment already exists
-    const existing = await this.getByName(data.environmentName);
+    const existing = await this.getByName(data.environment);
     if (existing) {
-      throw new Error(`Environment '${data.environmentName}' already exists`);
+      throw new Error(`Environment '${data.environment}' already exists`);
     }
 
     // If this is set as default, unset other defaults
@@ -255,20 +250,20 @@ export class Environment extends Model implements EnvironmentData {
     const { default: knex } = await import('../config/knex');
     const maxItems = 10; // Limit items for display
 
-    // Helper function to safely get rows with environmentId column
+    // Helper function to safely get rows with environment column
     const safeQuery = async <T>(
       tableName: string,
       selectColumns: string[],
       modifyQuery?: (builder: any) => void
     ): Promise<{ count: number; items: T[] }> => {
       try {
-        // Check if table has environmentId column
-        const columns = await knex.raw(`SHOW COLUMNS FROM ${tableName} LIKE 'environmentId'`);
+        // Check if table has environment column
+        const columns = await knex.raw(`SHOW COLUMNS FROM ${tableName} LIKE 'environment'`);
         if (columns[0].length === 0) {
           return { count: 0, items: [] };
         }
 
-        const query = knex(tableName).where('environmentId', this.id);
+        const query = knex(tableName).where('environment', this.environment);
         if (modifyQuery) {
           modifyQuery(query);
         }
@@ -308,12 +303,6 @@ export class Environment extends Model implements EnvironmentData {
       safeQuery<{ id: string; name: string }>('g_remote_config_templates', ['id', 'name']),
       safeQuery<{ id: string; worldId: string; name: string }>('g_game_worlds', ['id', 'worldId', 'name']),
       safeQuery<{ id: string; name: string }>('g_remote_config_segments', ['id', 'name']),
-      // Tags are global now, but if column exists we count, otherwise 0.
-      // Since we just removed environmentId from tags in logic, safeQuery might fail or return 0 if column missing.
-      // But typically safeQuery checks for column existence.
-      // The user wants tags to be global, so getting "related data" for environment might not make sense for tags anymore.
-      // However, for consistency, if column remains (rollback) it counts.
-      // If column is gone (migration applied), safeQuery returns 0.
       safeQuery<{ id: string; name: string }>('g_tags', ['id', 'name']),
       safeQuery<{ id: string; varKey: string }>('g_vars', ['id', 'varKey'], (qb) => {
         qb.where(function (this: any) {
@@ -373,7 +362,7 @@ export class Environment extends Model implements EnvironmentData {
   }
 
   /**
-   * Get related data counts only (for backward compatibility and delete check)
+   * Get related data counts only
    */
   async getRelatedDataCounts(): Promise<{
     templates: number;
@@ -416,7 +405,6 @@ export class Environment extends Model implements EnvironmentData {
 
   /**
    * Delete environment (only if no data exists and not system-defined)
-   * This will check all related tables before allowing deletion
    */
   async deleteEnvironment(force: boolean = false): Promise<void> {
     const { default: knex } = await import('../config/knex');
@@ -443,16 +431,14 @@ export class Environment extends Model implements EnvironmentData {
 
     // If force delete, remove all related data in correct order
     if (force && relatedData.total > 0) {
-      // Delete in order to respect foreign key constraints
-      // Note: g_api_access_token_environments has ON DELETE CASCADE so it's handled automatically
-      const environmentId = this.id;
+      const environment = this.environment;
 
-      // Helper to safely delete from a table if it has environmentId column
+      // Helper to safely delete from a table if it has environment column
       const safeDelete = async (trx: any, tableName: string): Promise<void> => {
         try {
-          const columns = await trx.raw(`SHOW COLUMNS FROM ${tableName} LIKE 'environmentId'`);
+          const columns = await trx.raw(`SHOW COLUMNS FROM ${tableName} LIKE 'environment'`);
           if (columns[0].length > 0) {
-            await trx(tableName).where('environmentId', environmentId).del();
+            await trx(tableName).where('environment', environment).del();
           }
         } catch {
           // Table doesn't exist or other error, skip
@@ -460,10 +446,10 @@ export class Environment extends Model implements EnvironmentData {
       };
 
       await knex.transaction(async (trx) => {
-        // Delete remote config related data first (template versions depend on templates)
+        // Delete remote config related data first
         try {
           await trx('g_remote_config_template_versions')
-            .whereIn('templateId', trx('g_remote_config_templates').select('id').where('environmentId', environmentId))
+            .whereIn('templateId', trx('g_remote_config_templates').select('id').where('environment', environment))
             .del();
         } catch {
           // Template versions table might not exist
@@ -486,7 +472,7 @@ export class Environment extends Model implements EnvironmentData {
         await safeDelete(trx, 'g_client_versions');
 
         // Finally delete the environment itself
-        await trx('g_environments').where('id', environmentId).del();
+        await trx('g_environments').where('environment', environment).del();
       });
     } else {
       // No related data, just delete
@@ -505,7 +491,7 @@ export class Environment extends Model implements EnvironmentData {
     const { RemoteConfigTemplate } = require('./RemoteConfigTemplate');
 
     const templateStats = await RemoteConfigTemplate.query()
-      .where('environmentId', this.id)
+      .where('environment', this.environment)
       .select('status')
       .groupBy('status')
       .count('* as count');
@@ -516,7 +502,7 @@ export class Environment extends Model implements EnvironmentData {
     return {
       templateCount: totalTemplates,
       publishedTemplates: parseInt(publishedTemplates as string),
-      pendingApprovals: 0 // Change requests are not environment-specific
+      pendingApprovals: 0
     };
   }
 }
