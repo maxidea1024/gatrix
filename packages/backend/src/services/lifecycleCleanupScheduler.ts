@@ -1,85 +1,52 @@
 import { config } from '../config';
 import ServerLifecycleEvent from '../models/ServerLifecycleEvent';
 import logger from '../config/logger';
-import redisClient from '../config/redis';
-
-let cleanupInterval: ReturnType<typeof setInterval> | null = null;
-
-// Lock key for distributed cleanup
-const CLEANUP_LOCK_KEY = 'gatrix:lifecycle-cleanup:lock';
-// Lock TTL in seconds (5 minutes to allow for long-running cleanup operations)
-const LOCK_TTL_SECONDS = 300;
+import { queueService } from './QueueService';
 
 /**
- * Start the lifecycle event cleanup scheduler
- * Runs periodically to delete old lifecycle events
- * Uses distributed locking via Redis to prevent multiple backend instances from running cleanup simultaneously
+ * Initialize lifecycle cleanup job
+ * Registers a daily repeatable job in BullMQ scheduler queue
+ * This ensures only one instance runs the cleanup across all backend instances
  */
-export function startLifecycleCleanupScheduler(): void {
+export async function initializeLifecycleCleanupJob(): Promise<void> {
     const retentionDays = config.serviceDiscovery?.lifecycleEventRetentionDays ?? 14;
 
-    logger.info(`Starting lifecycle event cleanup scheduler (retention: ${retentionDays} days)`);
+    logger.info(`Initializing lifecycle event cleanup job (retention: ${retentionDays} days)`);
 
-    // Run cleanup immediately on startup (with lock)
-    runCleanupWithLock(retentionDays);
+    try {
+        // Check if job already exists
+        const repeatables = await queueService.listRepeatable('scheduler');
+        const exists = repeatables.some((r) => r.name === 'lifecycle:cleanup');
 
-    // Schedule cleanup to run every hour (to check if cleanup is needed)
-    // The actual cleanup will only run once per day due to the lock mechanism
-    const ONE_HOUR_MS = 60 * 60 * 1000;
-    cleanupInterval = setInterval(() => {
-        runCleanupWithLock(retentionDays);
-    }, ONE_HOUR_MS);
-}
-
-/**
- * Stop the lifecycle event cleanup scheduler
- */
-export function stopLifecycleCleanupScheduler(): void {
-    if (cleanupInterval) {
-        clearInterval(cleanupInterval);
-        cleanupInterval = null;
-        logger.info('Stopped lifecycle event cleanup scheduler');
+        if (!exists) {
+            // Register daily cleanup job at 3:00 AM
+            await queueService.addJob('scheduler', 'lifecycle:cleanup', { retentionDays }, {
+                repeat: { pattern: '0 3 * * *' } // Every day at 3:00 AM
+            });
+            logger.info('Registered repeatable job: lifecycle:cleanup (daily at 3:00 AM)');
+        } else {
+            logger.info('Repeatable job already exists: lifecycle:cleanup');
+        }
+    } catch (error) {
+        logger.error('Failed to register lifecycle cleanup job:', error);
     }
 }
 
 /**
- * Run the cleanup operation with distributed locking
- * Only one backend instance will run the cleanup at a time
+ * Process lifecycle cleanup job
+ * Called by QueueService when the scheduled job runs
  */
-async function runCleanupWithLock(retentionDays: number): Promise<void> {
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    const dailyLockKey = `${CLEANUP_LOCK_KEY}:${today}`;
-
+export async function processLifecycleCleanupJob(retentionDays: number): Promise<number> {
     try {
-        // Try to acquire the daily lock
-        // If we get the lock, no other instance has run cleanup today
-        const acquired = await redisClient.acquireLock(dailyLockKey, LOCK_TTL_SECONDS);
-
-        if (!acquired) {
-            logger.debug('Lifecycle cleanup already running or completed today by another instance');
-            return;
-        }
-
-        logger.info('Acquired lifecycle cleanup lock, running cleanup...');
-
-        // Run the actual cleanup
         const deletedCount = await ServerLifecycleEvent.deleteOldEvents(retentionDays);
         if (deletedCount > 0) {
             logger.info(`Deleted ${deletedCount} lifecycle events older than ${retentionDays} days`);
         } else {
             logger.debug('No old lifecycle events to delete');
         }
-
-        // Keep the lock until end of day to prevent other instances from running
-        // The lock will auto-expire after LOCK_TTL_SECONDS if not released
-        // We intentionally don't release it to prevent re-runs within the same day
+        return deletedCount;
     } catch (error) {
-        logger.error('Failed to run lifecycle cleanup with lock:', error);
-        // Release the lock on error so another instance can try
-        try {
-            await redisClient.releaseLock(dailyLockKey);
-        } catch (releaseError) {
-            logger.error('Failed to release cleanup lock:', releaseError);
-        }
+        logger.error('Failed to run lifecycle cleanup:', error);
+        throw error;
     }
 }

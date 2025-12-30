@@ -253,20 +253,26 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     } catch (error: any) {
       console.error('Invite error:', error);
 
-      // 오류 메시지 처리 (한 번만 표시)
-      const errorMessage = error.message || '';
+      // Use error code for specific handling
+      const errorCode = error?.error?.code || error?.code || '';
+      const errorMessage = error?.error?.message || error?.message || '';
 
-      if (errorMessage.includes('already a member')) {
-        // 이미 멤버인 경우 - 멤버 목록 새로고침
-        await fetchChannelMembers();
-        enqueueSnackbar(t('chat.alreadyMember'), { variant: 'info' });
-      } else if (errorMessage.includes('already has a pending invitation')) {
-        // 이미 초대된 경우 - pending invitation 목록 새로고침
-        await fetchPendingInvitations();
-        enqueueSnackbar(t('chat.alreadyInvited'), { variant: 'warning' });
-      } else {
-        // 기타 오류
-        enqueueSnackbar(errorMessage || t('chat.invitationFailed'), { variant: 'error' });
+      switch (errorCode) {
+        case 'CHANNEL_MEMBER_EXISTS':
+        case 'ALREADY_MEMBER':
+          // 이미 멤버인 경우 - 멤버 목록 새로고침
+          await fetchChannelMembers();
+          enqueueSnackbar(t('chat.alreadyMember'), { variant: 'info' });
+          break;
+        case 'INVITATION_PENDING':
+        case 'ALREADY_INVITED':
+          // 이미 초대된 경우 - pending invitation 목록 새로고침
+          await fetchPendingInvitations();
+          enqueueSnackbar(t('chat.alreadyInvited'), { variant: 'warning' });
+          break;
+        default:
+          // 기타 오류
+          enqueueSnackbar(errorMessage || t('chat.invitationFailed'), { variant: 'error' });
       }
     } finally {
       setInvitingUsers(prev => {

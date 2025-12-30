@@ -432,6 +432,14 @@ export class QueueService {
           logger.info('campaign-check completed', { jobId: job.id });
           break;
         }
+        case 'lifecycle:cleanup': {
+          // Dynamic import to avoid circular dependency
+          const { processLifecycleCleanupJob } = await import('./lifecycleCleanupScheduler');
+          const retentionDays = job.data?.payload?.retentionDays ?? 14;
+          const deleted = await processLifecycleCleanupJob(retentionDays);
+          logger.info('lifecycle:cleanup completed', { jobId: job.id, deleted });
+          break;
+        }
         default: {
           logger.info('Unhandled scheduler job type, logging only', { jobId: job.id, jobType, payload: job.data?.payload });
         }

@@ -321,13 +321,13 @@ const startServer = async () => {
       logger.warn('Service Discovery initialization failed, continuing:', error);
     }
 
-    // Start lifecycle event cleanup scheduler
+    // Register lifecycle event cleanup job (BullMQ-based)
     try {
       lifecycleCleanupScheduler = await import('./services/lifecycleCleanupScheduler');
-      lifecycleCleanupScheduler.startLifecycleCleanupScheduler();
-      logger.info('Lifecycle event cleanup scheduler started');
+      await lifecycleCleanupScheduler.initializeLifecycleCleanupJob();
+      logger.info('Lifecycle event cleanup job registered');
     } catch (error) {
-      logger.warn('Lifecycle cleanup scheduler failed to start, continuing:', error);
+      logger.warn('Lifecycle cleanup job registration failed, continuing:', error);
     }
 
     // Start HTTP server (WebSocket? 梨꾪똿?쒕쾭?먯꽌 吏곸젒 泥섎━)
