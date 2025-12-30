@@ -3542,6 +3542,7 @@
     "editNoticeSubtitle": "Edit popup notice information",
     "searchPlaceholder": "Search by content or description",
     "noNotices": "No popup notices registered",
+    "noNoticesFound": "No popup notices found.",
     "isActive": "Active",
     "isActiveHelp": "Set the activation status of the popup notice",
     "content": "Content",

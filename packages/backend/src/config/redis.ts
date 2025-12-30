@@ -94,6 +94,37 @@ export class RedisClient {
     }
   }
 
+  /**
+   * Acquire a distributed lock using Redis SETNX
+   * @param lockKey - The key for the lock
+   * @param ttlSeconds - Time-to-live for the lock in seconds
+   * @returns true if lock was acquired, false otherwise
+   */
+  public async acquireLock(lockKey: string, ttlSeconds: number): Promise<boolean> {
+    try {
+      const result = await this.client.set(lockKey, Date.now().toString(), {
+        NX: true, // Only set if key doesn't exist
+        EX: ttlSeconds, // Set expiration time
+      });
+      return result === 'OK';
+    } catch (error) {
+      logger.error('Redis acquireLock error:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Release a distributed lock
+   * @param lockKey - The key for the lock
+   */
+  public async releaseLock(lockKey: string): Promise<void> {
+    try {
+      await this.client.del(lockKey);
+    } catch (error) {
+      logger.error('Redis releaseLock error:', error);
+    }
+  }
+
   public async disconnect(): Promise<void> {
     try {
       await this.client.disconnect();

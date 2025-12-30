@@ -3594,6 +3594,7 @@
     "editNoticeSubtitle": "编辑弹窗公告信息",
     "searchPlaceholder": "按内容或描述搜索",
     "noNotices": "没有注册的弹窗公告",
+    "noNoticesFound": "未找到弹窗公告。",
     "isActive": "启用状态",
     "isActiveHelp": "设置弹窗公告的激活状态",
     "content": "内容",

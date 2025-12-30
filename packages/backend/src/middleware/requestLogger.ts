@@ -7,7 +7,39 @@ export interface RequestWithStartTime extends Request {
   startTime?: number;
 }
 
+/**
+ * Check if request logging is enabled for this service
+ * Each service can be configured separately via environment variables:
+ * - BACKEND_REQUEST_LOGGING_ENABLED: Enable/disable for backend (default: true)
+ * - CHAT_SERVER_REQUEST_LOGGING_ENABLED: Enable/disable for chat-server (default: true)
+ * - EDGE_REQUEST_LOGGING_ENABLED: Enable/disable for edge (default: true)
+ * 
+ * Global fallback: REQUEST_LOGGING_ENABLED
+ */
+const isRequestLoggingEnabled = (): boolean => {
+  // Check service-specific environment variable first
+  const backendEnabled = process.env.BACKEND_REQUEST_LOGGING_ENABLED;
+  if (backendEnabled !== undefined) {
+    return backendEnabled.toLowerCase() === 'true';
+  }
+
+  // Fallback to global setting
+  const globalEnabled = process.env.REQUEST_LOGGING_ENABLED;
+  if (globalEnabled !== undefined) {
+    return globalEnabled.toLowerCase() === 'true';
+  }
+
+  // Default: enabled
+  return true;
+};
+
 export const requestLogger = (req: RequestWithStartTime, res: Response, next: NextFunction): void => {
+  // Skip logging if disabled
+  if (!isRequestLoggingEnabled()) {
+    next();
+    return;
+  }
+
   req.startTime = Date.now();
 
   const isDevelopment = process.env.NODE_ENV === 'development';
@@ -42,7 +74,7 @@ export const requestLogger = (req: RequestWithStartTime, res: Response, next: Ne
 
   // Override res.end to log response
   const originalEnd = res.end;
-  res.end = function(chunk?: any, encoding?: any): Response {
+  res.end = function (chunk?: any, encoding?: any): Response {
     const duration = req.startTime ? Date.now() - req.startTime : 0;
 
     const responseLogData: any = {
