@@ -45,6 +45,7 @@ import { useSnackbar } from 'notistack';
 import { environmentService, Environment, CreateEnvironmentData, UpdateEnvironmentData, EnvironmentRelatedData } from '../../services/environmentService';
 import EnvironmentCopyDialog from '../../components/EnvironmentCopyDialog';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 
 const EnvironmentsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -402,8 +403,11 @@ const EnvironmentsPage: React.FC = () => {
                           <IconButton
                             size="small"
                             onClick={() => {
-                              navigator.clipboard.writeText(env.environmentName);
-                              enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                              copyToClipboardWithNotification(
+                                env.environmentName,
+                                () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                              );
                             }}
                             sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
                           >

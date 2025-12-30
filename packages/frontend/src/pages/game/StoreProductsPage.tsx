@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { PERMISSIONS } from '@/types/permissions';
 import {
@@ -23,6 +23,7 @@ import {
   Switch,
   Divider,
 } from '@mui/material';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -948,8 +949,11 @@ const StoreProductsPage: React.FC = () => {
                                     <IconButton
                                       size="small"
                                       onClick={() => {
-                                        navigator.clipboard.writeText(String(product.cmsProductId));
-                                        enqueueSnackbar(t('common.copied'), { variant: 'success' });
+                                        copyToClipboardWithNotification(
+                                          String(product.cmsProductId),
+                                          () => enqueueSnackbar(t('common.copied'), { variant: 'success' }),
+                                          () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                        );
                                       }}
                                       sx={{ p: 0.25 }}
                                     >
@@ -990,8 +994,11 @@ const StoreProductsPage: React.FC = () => {
                                   <IconButton
                                     size="small"
                                     onClick={() => {
-                                      navigator.clipboard.writeText(product.productId);
-                                      enqueueSnackbar(t('common.copied'), { variant: 'success' });
+                                      copyToClipboardWithNotification(
+                                        product.productId,
+                                        () => enqueueSnackbar(t('common.copied'), { variant: 'success' }),
+                                        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                      );
                                     }}
                                     sx={{ p: 0.25 }}
                                   >
@@ -1028,8 +1035,11 @@ const StoreProductsPage: React.FC = () => {
                                   <IconButton
                                     size="small"
                                     onClick={() => {
-                                      navigator.clipboard.writeText(displayName);
-                                      enqueueSnackbar(t('common.copied'), { variant: 'success' });
+                                      copyToClipboardWithNotification(
+                                        displayName,
+                                        () => enqueueSnackbar(t('common.copied'), { variant: 'success' }),
+                                        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                      );
                                     }}
                                     sx={{ p: 0.25 }}
                                   >

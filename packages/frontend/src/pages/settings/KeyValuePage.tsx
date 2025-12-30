@@ -33,6 +33,7 @@ import EmptyTableRow from '@/components/common/EmptyTableRow';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import KeyValueFormDrawer from '@/components/settings/KeyValueFormDrawer';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 
 import { useEnvironment } from '@/contexts/EnvironmentContext';
 
@@ -114,8 +115,11 @@ const KeyValuePage: React.FC = () => {
 
   // Handle copy key name
   const handleCopyKeyName = (keyName: string) => {
-    navigator.clipboard.writeText(keyName);
-    enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+    copyToClipboardWithNotification(
+      keyName,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   // Get chip color based on type
