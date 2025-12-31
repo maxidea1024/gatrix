@@ -324,13 +324,16 @@ function loadJson5File(filePath) {
 
 /**
  * String format function (from mutil.ts)
+ * Replaces all occurrences of {0}, {1}, etc. with corresponding args
  */
 function stringFormat(formatted, args) {
   if (!formatted || !args) {
     return formatted;
   }
   for (let i = 0; i < args.length; i++) {
-    formatted = formatted.replace('{' + i + '}', args[i]);
+    // Use regex with global flag to replace ALL occurrences of {i}
+    const regex = new RegExp('\\{' + i + '\\}', 'g');
+    formatted = formatted.replace(regex, args[i]);
   }
   return formatted;
 }
@@ -2407,13 +2410,13 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir, loc
     const baseEntry = {};
     for (const [key, value] of Object.entries(item)) {
       if (key !== 'name' && key !== 'nameKr' && key !== 'nameEn' && key !== 'nameCn' &&
-          key !== 'desc' && key !== 'descKr' && key !== 'descEn' && key !== 'descCn' &&
-          key !== 'description' && key !== 'descriptionKr' && key !== 'descriptionEn' && key !== 'descriptionCn' &&
-          key !== 'mateName' && key !== 'mateNameKr' && key !== 'mateNameEn' && key !== 'mateNameCn' &&
-          key !== 'npcName' && key !== 'npcNameKr' && key !== 'npcNameEn' && key !== 'npcNameCn' &&
-          key !== 'townNames' && key !== 'townNamesKr' && key !== 'townNamesEn' && key !== 'townNamesCn' &&
-          key !== 'worldBuffNames' &&
-          key !== 'towns') { // exclude nested towns and worldBuffNames to localize per-language below
+        key !== 'desc' && key !== 'descKr' && key !== 'descEn' && key !== 'descCn' &&
+        key !== 'description' && key !== 'descriptionKr' && key !== 'descriptionEn' && key !== 'descriptionCn' &&
+        key !== 'mateName' && key !== 'mateNameKr' && key !== 'mateNameEn' && key !== 'mateNameCn' &&
+        key !== 'npcName' && key !== 'npcNameKr' && key !== 'npcNameEn' && key !== 'npcNameCn' &&
+        key !== 'townNames' && key !== 'townNamesKr' && key !== 'townNamesEn' && key !== 'townNamesCn' &&
+        key !== 'worldBuffNames' &&
+        key !== 'towns') { // exclude nested towns and worldBuffNames to localize per-language below
         baseEntry[key] = value;
       }
     }
