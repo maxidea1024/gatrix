@@ -14,12 +14,12 @@
  */
 
 exports.up = async function (connection) {
-    console.log('Creating extended schema for multi-environment support...');
+  console.log('Creating extended schema for multi-environment support...');
 
-    // ========================================
-    // 1. Projects table
-    // ========================================
-    await connection.execute(`
+  // ========================================
+  // 1. Projects table
+  // ========================================
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_projects (
       id VARCHAR(127) NOT NULL PRIMARY KEY,
       projectName VARCHAR(100) NOT NULL UNIQUE,
@@ -39,12 +39,12 @@ exports.up = async function (connection) {
       CONSTRAINT fk_projects_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-    console.log('✓ g_projects table created');
+  console.log('✓ g_projects table created');
 
-    // ========================================
-    // 2. Environments table (environment as primary key)
-    // ========================================
-    await connection.execute(`
+  // ========================================
+  // 2. Environments table (environment as primary key)
+  // ========================================
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_environments (
       environment VARCHAR(100) NOT NULL PRIMARY KEY COMMENT 'Environment name (lowercase, numbers, underscore, hyphen)',
       displayName VARCHAR(200) NOT NULL,
@@ -68,12 +68,12 @@ exports.up = async function (connection) {
       CONSTRAINT fk_env_project FOREIGN KEY (projectId) REFERENCES g_projects(id) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-    console.log('✓ g_environments table created');
+  console.log('✓ g_environments table created');
 
-    // ========================================
-    // 3. API Access Tokens
-    // ========================================
-    await connection.execute(`
+  // ========================================
+  // 3. API Access Tokens
+  // ========================================
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_api_access_tokens (
       id VARCHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       tokenName VARCHAR(255) NOT NULL,
@@ -98,12 +98,12 @@ exports.up = async function (connection) {
       CONSTRAINT fk_api_tokens_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-    console.log('✓ g_api_access_tokens table created');
+  console.log('✓ g_api_access_tokens table created');
 
-    // ========================================
-    // 4. API Access Token Environments (Many-to-Many)
-    // ========================================
-    await connection.execute(`
+  // ========================================
+  // 4. API Access Token Environments (Many-to-Many)
+  // ========================================
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_api_access_token_environments (
       id VARCHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       tokenId VARCHAR(26) NOT NULL,
@@ -115,12 +115,12 @@ exports.up = async function (connection) {
       CONSTRAINT fk_token_env_environment FOREIGN KEY (environment) REFERENCES g_environments(environment) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-    console.log('✓ g_api_access_token_environments table created');
+  console.log('✓ g_api_access_token_environments table created');
 
-    // ========================================
-    // 5. User Environments (Many-to-Many)
-    // ========================================
-    await connection.execute(`
+  // ========================================
+  // 5. User Environments (Many-to-Many)
+  // ========================================
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_user_environments (
       id VARCHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       userId INT NOT NULL,
@@ -132,12 +132,12 @@ exports.up = async function (connection) {
       CONSTRAINT fk_user_env_environment FOREIGN KEY (environment) REFERENCES g_environments(environment) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-    console.log('✓ g_user_environments table created');
+  console.log('✓ g_user_environments table created');
 
-    // ========================================
-    // 6. User Permissions
-    // ========================================
-    await connection.execute(`
+  // ========================================
+  // 6. User Permissions
+  // ========================================
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_user_permissions (
       id VARCHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       userId INT NOT NULL,
@@ -154,12 +154,12 @@ exports.up = async function (connection) {
       CONSTRAINT fk_user_perm_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-    console.log('✓ g_user_permissions table created');
+  console.log('✓ g_user_permissions table created');
 
-    // ========================================
-    // 7. Server Lifecycle Events
-    // ========================================
-    await connection.execute(`
+  // ========================================
+  // 7. Server Lifecycle Events
+  // ========================================
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_server_lifecycle_events (
       id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
       environment VARCHAR(100) NOT NULL,
@@ -189,12 +189,12 @@ exports.up = async function (connection) {
       CONSTRAINT fk_lifecycle_environment FOREIGN KEY (environment) REFERENCES g_environments(environment) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-    console.log('✓ g_server_lifecycle_events table created');
+  console.log('✓ g_server_lifecycle_events table created');
 
-    // ========================================
-    // 8. Remote Config Templates
-    // ========================================
-    await connection.execute(`
+  // ========================================
+  // 8. Remote Config Templates
+  // ========================================
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_remote_config_templates (
       id VARCHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       environment VARCHAR(100) NOT NULL,
@@ -218,12 +218,12 @@ exports.up = async function (connection) {
       CONSTRAINT fk_rc_templates_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-    console.log('✓ g_remote_config_templates table created');
+  console.log('✓ g_remote_config_templates table created');
 
-    // ========================================
-    // 9. Remote Config Metrics
-    // ========================================
-    await connection.execute(`
+  // ========================================
+  // 9. Remote Config Metrics
+  // ========================================
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_remote_config_metrics (
       id VARCHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       environment VARCHAR(100) NOT NULL,
@@ -238,12 +238,12 @@ exports.up = async function (connection) {
       CONSTRAINT fk_rc_metrics_environment FOREIGN KEY (environment) REFERENCES g_environments(environment) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-    console.log('✓ g_remote_config_metrics table created');
+  console.log('✓ g_remote_config_metrics table created');
 
-    // ========================================
-    // 10. Banners
-    // ========================================
-    await connection.execute(`
+  // ========================================
+  // 10. Banners
+  // ========================================
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_banners (
       bannerId VARCHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       environment VARCHAR(100) NOT NULL,
@@ -274,12 +274,12 @@ exports.up = async function (connection) {
       CONSTRAINT fk_banners_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-    console.log('✓ g_banners table created');
+  console.log('✓ g_banners table created');
 
-    // ========================================
-    // 11. Monitoring Alerts
-    // ========================================
-    await connection.execute(`
+  // ========================================
+  // 11. Monitoring Alerts
+  // ========================================
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_monitoring_alerts (
       id VARCHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       alertType VARCHAR(50) NOT NULL,
@@ -299,12 +299,65 @@ exports.up = async function (connection) {
       INDEX idx_created_at (createdAt)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-    console.log('✓ g_monitoring_alerts table created');
+  console.log('✓ g_monitoring_alerts table created');
 
-    // ========================================
-    // 12. Store Products
-    // ========================================
-    await connection.execute(`
+  // ========================================
+  // 12. Mails table (internal messaging system)
+  // ========================================
+  await connection.execute(`
+    CREATE TABLE IF NOT EXISTS g_mails (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      
+      -- Sender information (NULL for system messages)
+      senderId INT NULL,
+      senderName VARCHAR(255) NULL,
+      
+      -- Recipient information
+      recipientId INT NOT NULL,
+      
+      -- Mail content
+      subject VARCHAR(500) NOT NULL,
+      content TEXT NOT NULL,
+      contentType VARCHAR(50) NOT NULL DEFAULT 'text',
+      
+      -- Mail metadata
+      mailType VARCHAR(50) NOT NULL DEFAULT 'user',
+      priority VARCHAR(20) NOT NULL DEFAULT 'normal',
+      category VARCHAR(100) NULL,
+      
+      -- Mail status
+      isRead BOOLEAN NOT NULL DEFAULT FALSE,
+      readAt TIMESTAMP NULL,
+      isDeleted BOOLEAN NOT NULL DEFAULT FALSE,
+      deletedAt TIMESTAMP NULL,
+      isStarred BOOLEAN NOT NULL DEFAULT FALSE,
+      
+      -- Additional data (JSON)
+      mailData JSON NULL,
+      
+      -- Timestamps
+      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      
+      -- Indexes
+      INDEX idx_recipient (recipientId, isDeleted, createdAt),
+      INDEX idx_sender (senderId, createdAt),
+      INDEX idx_read_status (recipientId, isRead, isDeleted),
+      INDEX idx_mail_type (mailType, recipientId),
+      INDEX idx_category (category, recipientId),
+      INDEX idx_starred (recipientId, isStarred, isDeleted),
+      
+      -- Foreign keys
+      FOREIGN KEY (senderId) REFERENCES g_users(id) ON DELETE SET NULL,
+      FOREIGN KEY (recipientId) REFERENCES g_users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
+  console.log('✓ g_mails table created');
+
+  // ========================================
+  // 13. Store Products
+  // ========================================
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_store_products (
       id VARCHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       environment VARCHAR(100) NOT NULL,
@@ -335,261 +388,280 @@ exports.up = async function (connection) {
       CONSTRAINT fk_store_products_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-    console.log('✓ g_store_products table created');
+  console.log('✓ g_store_products table created');
 
-    // ========================================
-    // 13. Add allowAllEnvironments column to g_users
-    // ========================================
-    try {
-        const [cols] = await connection.execute(
-            `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+  // ========================================
+  // 13. Add allowAllEnvironments column to g_users
+  // ========================================
+  try {
+    const [cols] = await connection.execute(
+      `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'g_users'`
-        );
-        const existingCols = cols.map(c => c.COLUMN_NAME);
+    );
+    const existingCols = cols.map(c => c.COLUMN_NAME);
 
-        if (!existingCols.includes('allowAllEnvironments')) {
-            await connection.execute(`
+    if (!existingCols.includes('allowAllEnvironments')) {
+      await connection.execute(`
         ALTER TABLE g_users 
         ADD COLUMN allowAllEnvironments BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'If true, user can access all environments'
       `);
-            console.log('✓ Added allowAllEnvironments column to g_users');
-        }
-    } catch (err) {
-        console.log(`  Skipping g_users allowAllEnvironments: ${err.message}`);
+      console.log('✓ Added allowAllEnvironments column to g_users');
     }
+  } catch (err) {
+    console.log(`  Skipping g_users allowAllEnvironments: ${err.message}`);
+  }
 
-    // ========================================
-    // 14. Add environment column to existing tables
-    // ========================================
-    const tablesToAddEnv = [
-        { table: 'g_game_worlds', afterColumn: 'id' },
-        { table: 'g_client_versions', afterColumn: 'id' },
-        { table: 'g_service_notices', afterColumn: 'id' },
-        { table: 'g_ingame_popup_notices', afterColumn: 'id' },
-        { table: 'g_surveys', afterColumn: 'id' },
-        { table: 'g_coupon_settings', afterColumn: 'id' },
-        { table: 'g_jobs', afterColumn: 'id' },
-        { table: 'g_vars', afterColumn: 'id' },
-        { table: 'g_message_templates', afterColumn: 'id' },
-        { table: 'g_remote_config_segments', afterColumn: 'id' },
-        { table: 'g_remote_config_campaigns', afterColumn: 'id' },
-    ];
+  // ========================================
+  // 14. Add environment column to existing tables
+  // ========================================
+  const tablesToAddEnv = [
+    { table: 'g_game_worlds', afterColumn: 'id' },
+    { table: 'g_client_versions', afterColumn: 'id' },
+    { table: 'g_service_notices', afterColumn: 'id' },
+    { table: 'g_ingame_popup_notices', afterColumn: 'id' },
+    { table: 'g_surveys', afterColumn: 'id' },
+    { table: 'g_coupon_settings', afterColumn: 'id' },
+    { table: 'g_jobs', afterColumn: 'id' },
+    { table: 'g_vars', afterColumn: 'id' },
+    { table: 'g_message_templates', afterColumn: 'id' },
+    { table: 'g_remote_config_segments', afterColumn: 'id' },
+    { table: 'g_remote_config_campaigns', afterColumn: 'id' },
+  ];
 
-    for (const { table, afterColumn } of tablesToAddEnv) {
-        try {
-            // Check if column exists
-            const [columns] = await connection.execute(
-                `SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.COLUMNS 
+  for (const { table, afterColumn } of tablesToAddEnv) {
+    try {
+      // Check if column exists
+      const [columns] = await connection.execute(
+        `SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.COLUMNS 
          WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = 'environment'`,
-                [table]
-            );
+        [table]
+      );
 
-            if (columns[0].cnt === 0) {
-                await connection.execute(`
+      if (columns[0].cnt === 0) {
+        // Add environment column without foreign key first
+        await connection.execute(`
           ALTER TABLE ${table}
           ADD COLUMN environment VARCHAR(100) NOT NULL DEFAULT 'development' AFTER ${afterColumn}
         `);
+        console.log(`✓ Added environment column to ${table}`);
+      }
 
-                // Add foreign key
-                const fkName = `fk_${table.replace('g_', '')}_environment`;
-                await connection.execute(`
+      // Check if foreign key exists
+      const [fks] = await connection.execute(
+        `SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS 
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? 
+         AND CONSTRAINT_NAME LIKE '%environment%' AND CONSTRAINT_TYPE = 'FOREIGN KEY'`,
+        [table]
+      );
+
+      if (fks[0].cnt === 0) {
+        // Clean up invalid environment values before adding foreign key
+        await connection.execute(`
+          UPDATE ${table} t
+          SET t.environment = 'development'
+          WHERE t.environment NOT IN (SELECT e.environment FROM g_environments e)
+        `);
+        console.log(`  ✓ Cleaned invalid environment values in ${table}`);
+
+        // Now add foreign key
+        const fkName = `fk_${table.replace('g_', '')}_environment`;
+        await connection.execute(`
           ALTER TABLE ${table}
           ADD CONSTRAINT ${fkName} FOREIGN KEY (environment) 
           REFERENCES g_environments(environment) ON DELETE CASCADE ON UPDATE CASCADE
         `);
-
-                console.log(`✓ Added environment column to ${table}`);
-            }
-        } catch (err) {
-            console.log(`  Skipping ${table}: ${err.message}`);
-        }
+        console.log(`  ✓ Added foreign key constraint to ${table}`);
+      }
+    } catch (err) {
+      console.log(`  Skipping ${table}: ${err.message}`);
     }
+  }
 
-    // ========================================
-    // 14. Add columns to g_game_worlds
-    // ========================================
-    try {
-        const [cols] = await connection.execute(
-            `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+  // ========================================
+  // 14. Add columns to g_game_worlds
+  // ========================================
+  try {
+    const [cols] = await connection.execute(
+      `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'g_game_worlds'`
-        );
-        const existingCols = cols.map(c => c.COLUMN_NAME);
+    );
+    const existingCols = cols.map(c => c.COLUMN_NAME);
 
-        if (!existingCols.includes('serverAddress')) {
-            await connection.execute(`
+    if (!existingCols.includes('serverAddress')) {
+      await connection.execute(`
         ALTER TABLE g_game_worlds 
         ADD COLUMN serverAddress VARCHAR(500) NOT NULL DEFAULT '' COMMENT 'Game server address for SDK clients'
       `);
-        }
-        if (!existingCols.includes('maintenanceStartDate')) {
-            await connection.execute(`
+    }
+    if (!existingCols.includes('maintenanceStartDate')) {
+      await connection.execute(`
         ALTER TABLE g_game_worlds 
         ADD COLUMN maintenanceStartDate TIMESTAMP NULL COMMENT 'Scheduled maintenance start time'
       `);
-        }
-        if (!existingCols.includes('maintenanceEndDate')) {
-            await connection.execute(`
+    }
+    if (!existingCols.includes('maintenanceEndDate')) {
+      await connection.execute(`
         ALTER TABLE g_game_worlds 
         ADD COLUMN maintenanceEndDate TIMESTAMP NULL COMMENT 'Scheduled maintenance end time'
       `);
-        }
-        if (!existingCols.includes('maintenanceOptions')) {
-            await connection.execute(`
+    }
+    if (!existingCols.includes('maintenanceOptions')) {
+      await connection.execute(`
         ALTER TABLE g_game_worlds 
         ADD COLUMN maintenanceOptions JSON NULL COMMENT 'Maintenance options (allowWhitelist, showCountdown, countdownSeconds)'
       `);
-        }
-        if (!existingCols.includes('infraSettings')) {
-            await connection.execute(`
+    }
+    if (!existingCols.includes('infraSettings')) {
+      await connection.execute(`
         ALTER TABLE g_game_worlds 
         ADD COLUMN infraSettings TEXT NULL COMMENT 'Infrastructure settings (JSON or YAML)'
       `);
-        }
-        console.log('✓ Extended g_game_worlds columns');
-    } catch (err) {
-        console.log(`  Skipping g_game_worlds extensions: ${err.message}`);
     }
+    console.log('✓ Extended g_game_worlds columns');
+  } catch (err) {
+    console.log(`  Skipping g_game_worlds extensions: ${err.message}`);
+  }
 
-    // ========================================
-    // 15. Fix unique constraints for multi-env
-    // ========================================
-    try {
-        // g_client_versions: unique per environment + platform + version
-        await connection.execute(`
+  // ========================================
+  // 15. Fix unique constraints for multi-env
+  // ========================================
+  try {
+    // g_client_versions: unique per environment + platform + version
+    await connection.execute(`
       ALTER TABLE g_client_versions DROP INDEX unique_platform_version
     `).catch(() => { });
-        await connection.execute(`
+    await connection.execute(`
       ALTER TABLE g_client_versions 
       ADD UNIQUE KEY unique_env_platform_version (environment, platform, clientVersion)
     `).catch(() => { });
 
-        // g_vars: unique per environment + varKey
-        await connection.execute(`
+    // g_vars: unique per environment + varKey
+    await connection.execute(`
       ALTER TABLE g_vars DROP INDEX varKey
     `).catch(() => { });
-        await connection.execute(`
+    await connection.execute(`
       ALTER TABLE g_vars 
       ADD UNIQUE KEY unique_env_varkey (environment, varKey)
     `).catch(() => { });
 
-        // g_game_worlds: unique per environment + worldId
-        await connection.execute(`
+    // g_game_worlds: unique per environment + worldId
+    await connection.execute(`
       ALTER TABLE g_game_worlds DROP INDEX worldId
     `).catch(() => { });
-        await connection.execute(`
+    await connection.execute(`
       ALTER TABLE g_game_worlds 
       ADD UNIQUE KEY unique_env_worldid (environment, worldId)
     `).catch(() => { });
 
-        // g_jobs: unique per environment + name
-        await connection.execute(`
+    // g_jobs: unique per environment + name
+    await connection.execute(`
       ALTER TABLE g_jobs 
       ADD UNIQUE KEY unique_env_name (environment, name)
     `).catch(() => { });
 
-        // g_message_templates: unique per environment + name
-        await connection.execute(`
+    // g_message_templates: unique per environment + name
+    await connection.execute(`
       ALTER TABLE g_message_templates DROP INDEX name
     `).catch(() => { });
-        await connection.execute(`
+    await connection.execute(`
       ALTER TABLE g_message_templates 
       ADD UNIQUE KEY unique_env_name (environment, name)
     `).catch(() => { });
 
-        console.log('✓ Fixed unique constraints for multi-environment');
-    } catch (err) {
-        console.log(`  Unique constraint updates: ${err.message}`);
-    }
+    console.log('✓ Fixed unique constraints for multi-environment');
+  } catch (err) {
+    console.log(`  Unique constraint updates: ${err.message}`);
+  }
 
-    // ========================================
-    // 16. Add channel targeting to service notices
-    // ========================================
-    try {
-        const [cols] = await connection.execute(
-            `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+  // ========================================
+  // 16. Add channel targeting to service notices
+  // ========================================
+  try {
+    const [cols] = await connection.execute(
+      `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'g_service_notices'`
-        );
-        const existingCols = cols.map(c => c.COLUMN_NAME);
+    );
+    const existingCols = cols.map(c => c.COLUMN_NAME);
 
-        if (!existingCols.includes('targetChannels')) {
-            await connection.execute(`
+    if (!existingCols.includes('targetChannels')) {
+      await connection.execute(`
         ALTER TABLE g_service_notices 
         ADD COLUMN targetChannels JSON NULL COMMENT 'Target channels for the notice'
       `);
-        }
-        if (!existingCols.includes('targetChannelsInverted')) {
-            await connection.execute(`
+    }
+    if (!existingCols.includes('targetChannelsInverted')) {
+      await connection.execute(`
         ALTER TABLE g_service_notices 
         ADD COLUMN targetChannelsInverted BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Invert channel targeting'
       `);
-        }
-        console.log('✓ Added channel targeting to g_service_notices');
-    } catch (err) {
-        console.log(`  Skipping service notices channel targeting: ${err.message}`);
     }
+    console.log('✓ Added channel targeting to g_service_notices');
+  } catch (err) {
+    console.log(`  Skipping service notices channel targeting: ${err.message}`);
+  }
 
-    // ========================================
-    // 17. Add userAgent to crash_events
-    // ========================================
-    try {
-        await connection.execute(`
+  // ========================================
+  // 17. Add userAgent to crash_events
+  // ========================================
+  try {
+    await connection.execute(`
       ALTER TABLE crash_events 
       ADD COLUMN userAgent TEXT NULL COMMENT 'User agent string'
     `);
-        console.log('✓ Added userAgent to crash_events');
-    } catch (err) {
-        // Column might already exist
-    }
+    console.log('✓ Added userAgent to crash_events');
+  } catch (err) {
+    // Column might already exist
+  }
 
-    // ========================================
-    // 18. Add rewardTemplateId to g_surveys
-    // ========================================
-    try {
-        const [cols] = await connection.execute(
-            `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+  // ========================================
+  // 18. Add rewardTemplateId to g_surveys
+  // ========================================
+  try {
+    const [cols] = await connection.execute(
+      `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'g_surveys'`
-        );
-        const existingCols = cols.map(c => c.COLUMN_NAME);
+    );
+    const existingCols = cols.map(c => c.COLUMN_NAME);
 
-        if (!existingCols.includes('rewardTemplateId')) {
-            await connection.execute(`
+    if (!existingCols.includes('rewardTemplateId')) {
+      await connection.execute(`
         ALTER TABLE g_surveys 
         ADD COLUMN rewardTemplateId VARCHAR(26) NULL COMMENT 'Reference to reward template'
       `);
-        }
-        console.log('✓ Added rewardTemplateId to g_surveys');
-    } catch (err) {
-        // Column might already exist
     }
+    console.log('✓ Added rewardTemplateId to g_surveys');
+  } catch (err) {
+    // Column might already exist
+  }
 
-    // ========================================
-    // 19. Add channel to g_coupon_target_subchannels
-    // ========================================
-    try {
-        await connection.execute(`
+  // ========================================
+  // 19. Add channel to g_coupon_target_subchannels
+  // ========================================
+  try {
+    await connection.execute(`
       ALTER TABLE g_coupon_target_subchannels 
       ADD COLUMN channel VARCHAR(64) NULL COMMENT 'Parent channel for subchannel targeting'
     `);
-        console.log('✓ Added channel to g_coupon_target_subchannels');
-    } catch (err) {
-        // Column might already exist
-    }
+    console.log('✓ Added channel to g_coupon_target_subchannels');
+  } catch (err) {
+    // Column might already exist
+  }
 
-    // ========================================
-    // 20. Insert default project
-    // ========================================
-    const { ulid } = require('ulid');
-    const defaultProjectId = ulid();
+  // ========================================
+  // 20. Insert default project
+  // ========================================
+  const { ulid } = require('ulid');
+  const defaultProjectId = ulid();
 
-    await connection.execute(`
+  await connection.execute(`
     INSERT IGNORE INTO g_projects (id, projectName, displayName, description, isDefault, createdBy)
     VALUES (?, 'default', 'Default Project', 'Default project for all environments', TRUE, 1)
   `, [defaultProjectId]);
 
-    // ========================================
-    // 21. Insert predefined environments
-    // ========================================
-    await connection.execute(`
+  // ========================================
+  // 21. Insert predefined environments
+  // ========================================
+  await connection.execute(`
     INSERT IGNORE INTO g_environments 
     (environment, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
     VALUES 
@@ -599,94 +671,94 @@ exports.up = async function (connection) {
     ('gatrix-env', 'Gatrix Internal', 'Hidden internal environment for Gatrix system', 'development', TRUE, FALSE, 999, '#607D8B', ?, FALSE, 1, 1)
   `, [defaultProjectId, defaultProjectId, defaultProjectId, defaultProjectId]);
 
-    // Set gatrix-env as hidden
-    await connection.execute(`
+  // Set gatrix-env as hidden
+  await connection.execute(`
     UPDATE g_environments SET isHidden = TRUE WHERE environment = 'gatrix-env'
   `);
 
-    console.log('✓ Predefined environments created');
+  console.log('✓ Predefined environments created');
 
-    // ========================================
-    // 22. Seed system KVs for environments
-    // ========================================
-    const systemKvs = [
-        { key: 'kv:platforms', value: '["pc","android","ios","harmonyos","pc-wegame"]', type: 'array', desc: 'Supported platforms' },
-        { key: 'kv:channels', value: '[]', type: 'array', desc: 'Supported channels' },
-        { key: '$clientVersionPassiveData', value: '{}', type: 'object', desc: 'Client version passive data' },
-    ];
+  // ========================================
+  // 22. Seed system KVs for environments
+  // ========================================
+  const systemKvs = [
+    { key: 'kv:platforms', value: '["pc","android","ios","harmonyos","pc-wegame"]', type: 'array', desc: 'Supported platforms' },
+    { key: 'kv:channels', value: '[]', type: 'array', desc: 'Supported channels' },
+    { key: '$clientVersionPassiveData', value: '{}', type: 'object', desc: 'Client version passive data' },
+  ];
 
-    const [envs] = await connection.execute(`SELECT environment FROM g_environments WHERE isHidden = FALSE`);
+  const [envs] = await connection.execute(`SELECT environment FROM g_environments WHERE isHidden = FALSE`);
 
-    for (const env of envs) {
-        for (const kv of systemKvs) {
-            await connection.execute(`
+  for (const env of envs) {
+    for (const kv of systemKvs) {
+      await connection.execute(`
         INSERT IGNORE INTO g_vars (varKey, varValue, valueType, description, isSystemDefined, isCopyable, environment, createdBy)
         VALUES (?, ?, ?, ?, TRUE, FALSE, ?, 1)
       `, [kv.key, kv.value, kv.type, kv.desc, env.environment]);
-        }
     }
-    console.log('✓ System KVs seeded for environments');
+  }
+  console.log('✓ System KVs seeded for environments');
 
-    // ========================================
-    // 23. Seed default tags
-    // ========================================
-    const defaultTags = [
-        { name: 'Android', color: '#3DDC84' },
-        { name: 'iOS', color: '#000000' },
-        { name: 'PC', color: '#0078D7' },
-        { name: 'HarmonyOS', color: '#FF6B6B' },
-        { name: 'PC-Wegame', color: '#FFB800' },
-    ];
+  // ========================================
+  // 23. Seed default tags
+  // ========================================
+  const defaultTags = [
+    { name: 'Android', color: '#3DDC84' },
+    { name: 'iOS', color: '#000000' },
+    { name: 'PC', color: '#0078D7' },
+    { name: 'HarmonyOS', color: '#FF6B6B' },
+    { name: 'PC-Wegame', color: '#FFB800' },
+  ];
 
-    for (const tag of defaultTags) {
-        await connection.execute(`
+  for (const tag of defaultTags) {
+    await connection.execute(`
       INSERT IGNORE INTO g_tags (name, color, description, createdBy)
       VALUES (?, ?, ?, 1)
     `, [tag.name, tag.color, `Default tag for ${tag.name} platform`]);
-    }
-    console.log('✓ Default tags seeded');
+  }
+  console.log('✓ Default tags seeded');
 
-    // ========================================
-    // 24. Add superadmin wildcard permission
-    // ========================================
-    const [adminUsers] = await connection.execute(`SELECT id FROM g_users WHERE role = 'admin'`);
+  // ========================================
+  // 24. Add superadmin wildcard permission
+  // ========================================
+  const [adminUsers] = await connection.execute(`SELECT id FROM g_users WHERE role = 'admin'`);
 
-    for (const admin of adminUsers) {
-        for (const env of envs) {
-            await connection.execute(`
+  for (const admin of adminUsers) {
+    for (const env of envs) {
+      await connection.execute(`
         INSERT IGNORE INTO g_user_permissions (id, userId, environment, permission, createdBy)
         VALUES (?, ?, ?, '*', 1)
       `, [ulid(), admin.id, env.environment]);
-        }
     }
-    console.log('✓ Superadmin permissions granted');
+  }
+  console.log('✓ Superadmin permissions granted');
 
-    console.log('🎉 Extended schema creation completed successfully!');
+  console.log('🎉 Extended schema creation completed successfully!');
 };
 
 exports.down = async function (connection) {
-    console.log('Rolling back extended schema...');
+  console.log('Rolling back extended schema...');
 
-    // Drop tables in reverse order
-    const tables = [
-        'g_store_products',
-        'g_monitoring_alerts',
-        'g_banners',
-        'g_remote_config_metrics',
-        'g_remote_config_templates',
-        'g_server_lifecycle_events',
-        'g_user_permissions',
-        'g_user_environments',
-        'g_api_access_token_environments',
-        'g_api_access_tokens',
-        'g_environments',
-        'g_projects',
-    ];
+  // Drop tables in reverse order
+  const tables = [
+    'g_store_products',
+    'g_monitoring_alerts',
+    'g_banners',
+    'g_remote_config_metrics',
+    'g_remote_config_templates',
+    'g_server_lifecycle_events',
+    'g_user_permissions',
+    'g_user_environments',
+    'g_api_access_token_environments',
+    'g_api_access_tokens',
+    'g_environments',
+    'g_projects',
+  ];
 
-    for (const table of tables) {
-        await connection.execute(`DROP TABLE IF EXISTS ${table}`);
-        console.log(`✓ Dropped table: ${table}`);
-    }
+  for (const table of tables) {
+    await connection.execute(`DROP TABLE IF EXISTS ${table}`);
+    console.log(`✓ Dropped table: ${table}`);
+  }
 
-    console.log('✓ Extended schema rollback completed');
+  console.log('✓ Extended schema rollback completed');
 };

@@ -72,6 +72,65 @@ docker-compose --version
 - 성능 및 보안 최적화
 - 프로덕션 배포에 적합
 
+### 로컬 개발 워크플로우 (권장)
+
+Docker로 모든 서비스를 실행하면 빌드 시간이 오래 걸립니다. **더 빠른 개발을 위해 인프라(MySQL, Redis, etcd 등)만 Docker로 실행하고, 개발 서비스(backend, frontend 등)는 로컬에서 `yarn dev`로 실행**하는 것을 권장합니다.
+
+#### 장점:
+- ⚡ **빠른 코드 반영** - Hot reload로 변경사항 즉시 확인
+- 🚀 **빌드 시간 절약** - Docker 이미지 빌드 없이 바로 테스트
+- 🔍 **디버깅 용이** - 로컬에서 직접 디버깅 가능
+
+#### 1단계: 인프라 서비스 시작
+
+```bash
+# 인프라만 Docker로 시작 (MySQL, Redis, etcd, ClickHouse, Grafana, Prometheus 등)
+docker compose -f docker-compose-infra.yml up -d
+```
+
+#### 2단계: 로컬 환경변수 설정
+
+`.env.local.example`을 참고하여 `.env.local` 파일을 생성하거나, 각 패키지의 환경변수를 설정합니다.
+
+**주요 차이점:** Docker 네트워크 대신 localhost 포트 사용
+- `DB_HOST=localhost`, `DB_PORT=43306`
+- `REDIS_HOST=localhost`, `REDIS_PORT=46379`
+- `ETCD_HOSTS=http://localhost:42379`
+
+#### 3단계: 서비스 로컬 실행
+
+**터미널 1 - Backend:**
+```bash
+yarn workspace @gatrix/backend dev
+```
+
+**터미널 2 - Frontend:**
+```bash
+yarn workspace @gatrix/frontend dev
+```
+
+**터미널 3 - Edge (선택사항):**
+```bash
+yarn workspace @gatrix/edge dev
+```
+
+**터미널 4 - Chat Server (선택사항):**
+```bash
+yarn workspace @gatrix/chat-server dev
+```
+
+**터미널 5 - Event Lens (선택사항):**
+```bash
+yarn workspace @gatrix/event-lens dev
+```
+
+#### 4단계: 접속
+
+- **Frontend:** http://localhost:3000
+- **Backend API:** http://localhost:5000
+- **Grafana:** http://localhost:44000
+
+
 ### 1단계: 설정 파일 생성
 
 설정 스크립트를 실행하여 보안 암호화 키가 포함된 `.env` 파일을 자동으로 생성합니다.
