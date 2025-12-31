@@ -7,6 +7,7 @@
       "contentsTerms": [
         {
           "Id": "number",
+          "Target": "number",
           "Count": "number"
         }
       ]
@@ -153,12 +154,12 @@
     },
     "38420010": {
       "id": 38420010,
-      "name": "등대",
-      "isNotYetDev": 2,
+      "name": "도전",
+      "isNotYetDev": 0,
       "contentsTerms": [
         {
           "Id": 81000001,
-          "Count": 99
+          "Count": 5
         }
       ]
     },

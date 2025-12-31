@@ -700,7 +700,8 @@
       "HotSpotResetType": 0,
       "productDesc": "선물 상자를 제공합니다.",
       "viewSchedule": true,
-      "recommendationOrderHiddenView": true
+      "recommendationOrderHiddenView": true,
+      "percentageType": 0
     },
     "10500002": {
       "id": 10500002,
@@ -727,7 +728,8 @@
       "HotSpotResetType": 0,
       "productDesc": "일반 문장 선택 교환권을 제공합니다.",
       "viewSchedule": true,
-      "recommendationOrderHiddenView": true
+      "recommendationOrderHiddenView": true,
+      "percentageType": 0
     },
     "10500003": {
       "id": 10500003,
@@ -754,7 +756,8 @@
       "HotSpotResetType": 0,
       "productDesc": "특수 문장 선택 교환권을 제공합니다.",
       "viewSchedule": true,
-      "recommendationOrderHiddenView": true
+      "recommendationOrderHiddenView": true,
+      "percentageType": 0
     },
     "10500004": {
       "id": 10500004,
@@ -781,7 +784,8 @@
       "HotSpotResetType": 0,
       "productDesc": "특수 무늬 선택 교환권을 제공합니다.",
       "viewSchedule": true,
-      "recommendationOrderHiddenView": true
+      "recommendationOrderHiddenView": true,
+      "percentageType": 0
     },
     "10500005": {
       "id": 10500005,
@@ -808,10 +812,11 @@
       "productRewardFixedId": 95700106,
       "durationDays": 30,
       "HotSpotResetType": 0,
-      "productIcon": "Icon_Item_23430018_Sprite",
+      "productIcon": "WT_CashShop_UserTitle_Sprite",
       "productDesc": "30일간 이용할 수 있는 대가 칭호를 제공합니다.",
       "viewSchedule": true,
-      "recommendationOrderHiddenView": true
+      "recommendationOrderHiddenView": true,
+      "percentageType": 0
     },
     "10500006": {
       "id": 10500006,
@@ -839,7 +844,8 @@
       "HotSpotResetType": 0,
       "productDesc": "행동력을 제공합니다.",
       "viewSchedule": true,
-      "recommendationOrderHiddenView": true
+      "recommendationOrderHiddenView": true,
+      "percentageType": 0
     },
     "10500007": {
       "id": 10500007,
@@ -865,7 +871,8 @@
       "HotSpotResetType": 0,
       "productDesc": "특별한 사탕을 제공합니다.",
       "viewSchedule": true,
-      "recommendationOrderHiddenView": true
+      "recommendationOrderHiddenView": true,
+      "percentageType": 0
     },
     "10500010": {
       "id": 10500010,
@@ -893,7 +900,8 @@
       "HotSpotResetType": 0,
       "productDesc": "연맹의 동화 어음을 제공합니다. 투자에 사용할 수 있습니다.",
       "viewSchedule": true,
-      "recommendationOrderHiddenView": true
+      "recommendationOrderHiddenView": true,
+      "percentageType": 0
     },
     "10503001": {
       "id": 10503001,
@@ -926,7 +934,8 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19999,
       "recommendationOrder2": 29999,
-      "recommendationOrder3": 39999
+      "recommendationOrder3": 39999,
+      "percentageType": 0
     },
     "10503002": {
       "id": 10503002,
@@ -1078,7 +1087,8 @@
       "productDesc": "[[BigR]]을 두 배로 획득할 수 있는 상품입니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 200
     },
     "10503007": {
       "id": 10503007,
@@ -1113,7 +1123,8 @@
       "productDesc": "[[BigR]]을 두 배로 획득할 수 있는 상품입니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 200
     },
     "10503008": {
       "id": 10503008,
@@ -1148,7 +1159,8 @@
       "productDesc": "[[BigR]]을 두 배로 획득할 수 있는 상품입니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 200
     },
     "10503009": {
       "id": 10503009,
@@ -1183,7 +1195,8 @@
       "productDesc": "[[BigR]]을 두 배로 획득할 수 있는 상품입니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 200
     },
     "10503010": {
       "id": 10503010,
@@ -1224,7 +1237,8 @@
       "recommendationOrder1": 19998,
       "recommendationOrder2": 29998,
       "recommendationOrder3": 39998,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 200
     },
     "10504001": {
       "id": 10504001,
@@ -1390,8 +1404,7 @@
       "productDesc": "소탕권 묶음을 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 1410
+      "percentageType": 0
     },
     "10504005": {
       "id": 10504005,
@@ -1419,8 +1432,7 @@
       "productDesc": "염료&원단 상자를 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 330
+      "percentageType": 0
     },
     "10504006": {
       "id": 10504006,
@@ -1448,8 +1460,7 @@
       "productDesc": "교본 선택 교환권을 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 910
+      "percentageType": 0
     },
     "10504007": {
       "id": 10504007,
@@ -1477,8 +1488,7 @@
       "productDesc": "특수 교본을 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 330
+      "percentageType": 0
     },
     "10504101": {
       "id": 10504101,
@@ -1509,8 +1519,7 @@
       "productDesc": "24시간 분량의 가속권을 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 1230
+      "percentageType": 0
     },
     "10504102": {
       "id": 10504102,
@@ -1538,8 +1547,7 @@
       "productDesc": "항해사 공용 계약서 선택권을 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 270
+      "percentageType": 0
     },
     "10504301": {
       "id": 10504301,
@@ -1587,8 +1595,7 @@
       "eventImage": "WT_CN_RecommandedBanner003_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 1230
+      "percentageType": 0
     },
     "10504302": {
       "id": 10504302,
@@ -1659,8 +1666,7 @@
       "eventImage": "WT_CN_RecommandedBanner004_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 360
+      "percentageType": 0
     },
     "10504501": {
       "id": 10504501,
@@ -1690,8 +1696,7 @@
       "productDesc": "선박 외형을 제공합니다. 선박 외형은 기함에만 장착 가능하며 장착 위치 별로 한 종류만 적용할 수 있습니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 1000
+      "percentageType": 0
     },
     "10504502": {
       "id": 10504502,
@@ -1721,8 +1726,7 @@
       "productDesc": "선박 외형을 제공합니다. 선박 외형은 기함에만 장착 가능하며 장착 위치 별로 한 종류만 적용할 수 있습니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 1090
+      "percentageType": 0
     },
     "10505001": {
       "id": 10505001,
@@ -1774,7 +1778,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19997,
       "percentageType": 2,
-      "percentageValue": 1000
+      "percentageValue": 1416
     },
     "10505002": {
       "id": 10505002,
@@ -1827,7 +1831,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19996,
       "percentageType": 2,
-      "percentageValue": 1090
+      "percentageValue": 333
     },
     "10505003": {
       "id": 10505003,
@@ -1879,7 +1883,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19995,
       "percentageType": 2,
-      "percentageValue": 1000
+      "percentageValue": 916
     },
     "10505004": {
       "id": 10505004,
@@ -1932,7 +1936,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19994,
       "percentageType": 2,
-      "percentageValue": 310
+      "percentageValue": 333
     },
     "10505005": {
       "id": 10505005,
@@ -1984,7 +1988,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19993,
       "percentageType": 2,
-      "percentageValue": 310
+      "percentageValue": 1233
     },
     "10505006": {
       "id": 10505006,
@@ -2037,7 +2041,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19992,
       "percentageType": 2,
-      "percentageValue": 310
+      "percentageValue": 277
     },
     "10505007": {
       "id": 10505007,
@@ -2089,7 +2093,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19991,
       "percentageType": 2,
-      "percentageValue": 310
+      "percentageValue": 1233
     },
     "10505008": {
       "id": 10505008,
@@ -2141,7 +2145,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19990,
       "percentageType": 2,
-      "percentageValue": 350
+      "percentageValue": 361
     },
     "10505009": {
       "id": 10505009,
@@ -2193,7 +2197,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19989,
       "percentageType": 2,
-      "percentageValue": 350
+      "percentageValue": 1000
     },
     "10505010": {
       "id": 10505010,
@@ -2245,7 +2249,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19988,
       "percentageType": 2,
-      "percentageValue": 350
+      "percentageValue": 1090
     },
     "10505011": {
       "id": 10505011,
@@ -2297,7 +2301,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19987,
       "percentageType": 2,
-      "percentageValue": 350
+      "percentageValue": 1000
     },
     "10505012": {
       "id": 10505012,
@@ -2349,7 +2353,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19986,
       "percentageType": 2,
-      "percentageValue": 390
+      "percentageValue": 1090
     },
     "10505013": {
       "id": 10505013,
@@ -2401,7 +2405,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19985,
       "percentageType": 2,
-      "percentageValue": 390
+      "percentageValue": 1000
     },
     "10505101": {
       "id": 10505101,
@@ -2452,7 +2456,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29997,
       "percentageType": 2,
-      "percentageValue": 390
+      "percentageValue": 312
     },
     "10505102": {
       "id": 10505102,
@@ -2503,7 +2507,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29996,
       "percentageType": 2,
-      "percentageValue": 390
+      "percentageValue": 312
     },
     "10505103": {
       "id": 10505103,
@@ -2554,7 +2558,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29995,
       "percentageType": 2,
-      "percentageValue": 460
+      "percentageValue": 312
     },
     "10505104": {
       "id": 10505104,
@@ -2605,7 +2609,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29994,
       "percentageType": 2,
-      "percentageValue": 460
+      "percentageValue": 312
     },
     "10505105": {
       "id": 10505105,
@@ -2656,7 +2660,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29993,
       "percentageType": 2,
-      "percentageValue": 460
+      "percentageValue": 351
     },
     "10505106": {
       "id": 10505106,
@@ -2707,7 +2711,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29992,
       "percentageType": 2,
-      "percentageValue": 460
+      "percentageValue": 351
     },
     "10505107": {
       "id": 10505107,
@@ -2758,7 +2762,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29991,
       "percentageType": 2,
-      "percentageValue": 1650
+      "percentageValue": 351
     },
     "10505108": {
       "id": 10505108,
@@ -2808,7 +2812,8 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29990,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 351
     },
     "10505109": {
       "id": 10505109,
@@ -2858,7 +2863,8 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29989,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 397
     },
     "10505110": {
       "id": 10505110,
@@ -2908,7 +2914,8 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29988,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 397
     },
     "10505111": {
       "id": 10505111,
@@ -2959,7 +2966,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29987,
       "percentageType": 2,
-      "percentageValue": 200
+      "percentageValue": 397
     },
     "10505112": {
       "id": 10505112,
@@ -3009,7 +3016,8 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29986,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 397
     },
     "10505113": {
       "id": 10505113,
@@ -3060,7 +3068,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29985,
       "percentageType": 2,
-      "percentageValue": 210
+      "percentageValue": 463
     },
     "10505114": {
       "id": 10505114,
@@ -3111,7 +3119,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29984,
       "percentageType": 2,
-      "percentageValue": 200
+      "percentageValue": 463
     },
     "10505115": {
       "id": 10505115,
@@ -3161,7 +3169,8 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29983,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 463
     },
     "10505116": {
       "id": 10505116,
@@ -3212,7 +3221,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29982,
       "percentageType": 2,
-      "percentageValue": 210
+      "percentageValue": 463
     },
     "10505201": {
       "id": 10505201,
@@ -3255,7 +3264,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19984,
       "percentageType": 2,
-      "percentageValue": 200
+      "percentageValue": 1650
     },
     "10505202": {
       "id": 10505202,
@@ -3351,8 +3360,7 @@
       "eventImage": "WT_CN_RecommandedBanner005_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 210
+      "percentageType": 0
     },
     "10506002": {
       "id": 10506002,
@@ -3384,8 +3392,7 @@
       "productDesc": "항해사 1, 2단계 승급 재료를 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 200
+      "percentageType": 0
     },
     "10506003": {
       "id": 10506003,
@@ -3453,8 +3460,7 @@
       "eventImage": "WT_CN_RecommandedBanner006_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 210
+      "percentageType": 0
     },
     "10506005": {
       "id": 10506005,
@@ -3486,8 +3492,7 @@
       "productDesc": "항해사 1, 2단계 승급 재료를 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 200
+      "percentageType": 0
     },
     "10506006": {
       "id": 10506006,
@@ -3556,8 +3561,7 @@
       "eventImage": "WT_CN_RecommandedBanner007_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 210
+      "percentageType": 0
     },
     "10506008": {
       "id": 10506008,
@@ -3590,8 +3594,7 @@
       "productDesc": "항해사 1, 2단계 승급 재료를 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 160
+      "percentageType": 0
     },
     "10506009": {
       "id": 10506009,
@@ -3624,8 +3627,7 @@
       "productDesc": "항해사 3, 4단계 승급 재료를 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 130
+      "percentageType": 0
     },
     "10506010": {
       "id": 10506010,
@@ -3662,8 +3664,7 @@
       "eventImage": "WT_CN_RecommandedBanner008_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 150
+      "percentageType": 0
     },
     "10506011": {
       "id": 10506011,
@@ -3696,8 +3697,7 @@
       "productDesc": "항해사 1, 2단계 승급 재료를 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 130
+      "percentageType": 0
     },
     "10506012": {
       "id": 10506012,
@@ -3730,8 +3730,7 @@
       "productDesc": "항해사 3, 4단계 승급 재료를 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 120
+      "percentageType": 0
     },
     "10506013": {
       "id": 10506013,
@@ -3768,8 +3767,7 @@
       "eventImage": "WT_CN_RecommandedBanner009_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 130
+      "percentageType": 0
     },
     "10506014": {
       "id": 10506014,
@@ -3802,8 +3800,7 @@
       "productDesc": "항해사 1, 2단계 승급 재료를 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 120
+      "percentageType": 0
     },
     "10506015": {
       "id": 10506015,
@@ -3836,8 +3833,7 @@
       "productDesc": "항해사 3, 4단계 승급 재료를 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 120
+      "percentageType": 0
     },
     "10507001": {
       "id": 10507001,
@@ -3867,7 +3863,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
-      "percentageValue": 140
+      "percentageValue": 166
     },
     "10507002": {
       "id": 10507002,
@@ -3897,7 +3893,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
-      "percentageValue": 160
+      "percentageValue": 133
     },
     "10507003": {
       "id": 10507003,
@@ -3927,7 +3923,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
-      "percentageValue": 160
+      "percentageValue": 125
     },
     "10507004": {
       "id": 10507004,
@@ -3957,7 +3953,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
-      "percentageValue": 190
+      "percentageValue": 135
     },
     "10507005": {
       "id": 10507005,
@@ -3987,7 +3983,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
-      "percentageValue": 160
+      "percentageValue": 120
     },
     "10507006": {
       "id": 10507006,
@@ -4017,7 +4013,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
-      "percentageValue": 170
+      "percentageValue": 111
     },
     "10507007": {
       "id": 10507007,
@@ -4049,7 +4045,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
-      "percentageValue": 1760
+      "percentageValue": 125
     },
     "10507008": {
       "id": 10507008,
@@ -4080,12 +4076,13 @@
       "productDesc": "30시간 분량의 가속권을 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 125
     },
     "10507009": {
       "id": 10507009,
       "productName": "월간 가속 패키지({0}시간)",
-      "productNameFormatText": "250",
+      "productNameFormatText": "240",
       "isSoldOutMake": true,
       "isToBuy": true,
       "isRefund": true,
@@ -4112,7 +4109,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
-      "percentageValue": 220
+      "percentageValue": 117
     },
     "10507010": {
       "id": 10507010,
@@ -4141,7 +4138,8 @@
       "productDesc": "소탕권 묶음을 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 166
     },
     "10507011": {
       "id": 10507011,
@@ -4171,7 +4169,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
-      "percentageValue": 370
+      "percentageValue": 166
     },
     "10507012": {
       "id": 10507012,
@@ -4200,7 +4198,8 @@
       "productDesc": "소탕권 묶음을 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 156
     },
     "10507013": {
       "id": 10507013,
@@ -4219,7 +4218,7 @@
       "saleType": 3,
       "saleTypeVal": 1,
       "chinaPrice": 12,
-      "productLocalBitflag": 192,
+      "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.12",
       "salePointType": 2,
       "isEndDateMake": false,
@@ -4229,8 +4228,7 @@
       "productDesc": "항해사 경험치 영약을 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 290
+      "percentageType": 0
     },
     "10507014": {
       "id": 10507014,
@@ -4249,7 +4247,7 @@
       "saleType": 4,
       "saleTypeVal": 1,
       "chinaPrice": 128,
-      "productLocalBitflag": 192,
+      "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.128",
       "salePointType": 2,
       "isEndDateMake": false,
@@ -4369,8 +4367,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder3": 39995,
-      "percentageType": 2,
-      "percentageValue": 250
+      "percentageType": 0
     },
     "10510004": {
       "id": 10510004,
@@ -4405,8 +4402,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder3": 39994,
-      "percentageType": 2,
-      "percentageValue": 250
+      "percentageType": 0
     },
     "10510005": {
       "id": 10510005,
@@ -4441,8 +4437,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder3": 39993,
-      "percentageType": 2,
-      "percentageValue": 250
+      "percentageType": 0
     },
     "10510006": {
       "id": 10510006,
@@ -4477,8 +4472,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder3": 39992,
-      "percentageType": 2,
-      "percentageValue": 250
+      "percentageType": 0
     },
     "10510007": {
       "id": 10510007,
@@ -4516,8 +4510,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder3": 39991,
-      "percentageType": 2,
-      "percentageValue": 1660
+      "percentageType": 0
     },
     "10510201": {
       "id": 10510201,
@@ -4552,8 +4545,7 @@
       "productDesc": "구입 즉시 석양 항해사를 제공하고, 이후 이틀동안 추가 보상을 얻을 수 있습니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 200
+      "percentageType": 0
     },
     "10510202": {
       "id": 10510202,
@@ -4588,8 +4580,7 @@
       "productDesc": "구입 즉시 석양 항해사 전용 장비를 제공하고, 이후 이틀동안 추가 보상을 얻을 수 있습니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 310
+      "percentageType": 0
     },
     "10510203": {
       "id": 10510203,
@@ -4624,8 +4615,7 @@
       "productDesc": "구입 즉시 적룡호 선박을 제공하고, 이후 이틀동안 추가 보상을 얻을 수 있습니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 200
+      "percentageType": 0
     },
     "10511001": {
       "id": 10511001,
@@ -4668,7 +4658,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29978,
       "percentageType": 2,
-      "percentageValue": 320
+      "percentageValue": 200
     },
     "10511002": {
       "id": 10511002,
@@ -4711,7 +4701,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29977,
       "percentageType": 2,
-      "percentageValue": 160
+      "percentageValue": 200
     },
     "10511003": {
       "id": 10511003,
@@ -4754,7 +4744,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29976,
       "percentageType": 2,
-      "percentageValue": 160
+      "percentageValue": 200
     },
     "10511004": {
       "id": 10511004,
@@ -4797,7 +4787,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29975,
       "percentageType": 2,
-      "percentageValue": 160
+      "percentageValue": 200
     },
     "10511005": {
       "id": 10511005,
@@ -4840,7 +4830,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29974,
       "percentageType": 2,
-      "percentageValue": 100
+      "percentageValue": 200
     },
     "10511006": {
       "id": 10511006,
@@ -4883,7 +4873,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29973,
       "percentageType": 2,
-      "percentageValue": 100
+      "percentageValue": 200
     },
     "10511007": {
       "id": 10511007,
@@ -4926,7 +4916,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29972,
       "percentageType": 2,
-      "percentageValue": 100
+      "percentageValue": 200
     },
     "10511008": {
       "id": 10511008,
@@ -4969,7 +4959,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29971,
       "percentageType": 2,
-      "percentageValue": 120
+      "percentageValue": 200
     },
     "10511009": {
       "id": 10511009,
@@ -5012,7 +5002,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29970,
       "percentageType": 2,
-      "percentageValue": 230
+      "percentageValue": 200
     },
     "10511010": {
       "id": 10511010,
@@ -5054,7 +5044,8 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29969,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 200
     },
     "10511101": {
       "id": 10511101,
@@ -5094,7 +5085,8 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19982,
       "passGroup": 1,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 2058
     },
     "10511102": {
       "id": 10511102,
@@ -5196,7 +5188,8 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19980,
       "passGroup": 2,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 2009
     },
     "10511202": {
       "id": 10511202,
@@ -5241,9 +5234,6 @@
         },
         {
           "Id": 38042918,
-          "IsDaily": false
-        },
-        {
           "IsDaily": false
         }
       ],
@@ -5295,7 +5285,8 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19978,
       "passGroup": 3,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 2011
     },
     "10511204": {
       "id": 10511204,
@@ -5388,7 +5379,8 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19976,
       "passGroup": 4,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 483
     },
     "10511302": {
       "id": 10511302,
@@ -5436,8 +5428,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19975,
       "passGroup": 4,
-      "percentageType": 2,
-      "percentageValue": 200
+      "percentageType": 0
     },
     "10512001": {
       "id": 10512001,
@@ -5473,7 +5464,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
-      "percentageValue": 200
+      "percentageValue": 250
     },
     "10512002": {
       "id": 10512002,
@@ -5506,7 +5497,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
-      "percentageValue": 200
+      "percentageValue": 251
     },
     "10512003": {
       "id": 10512003,
@@ -5539,7 +5530,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
-      "percentageValue": 200
+      "percentageValue": 250
     },
     "10512004": {
       "id": 10512004,
@@ -5572,7 +5563,7 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
-      "percentageValue": 200
+      "percentageValue": 250
     },
     "10512005": {
       "id": 10512005,
@@ -5605,8 +5596,7 @@
       "eventDesc": "##",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 200
+      "percentageType": 0
     },
     "10512006": {
       "id": 10512006,
@@ -5641,8 +5631,7 @@
       "eventDesc": "##",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 200
+      "percentageType": 0
     },
     "10512007": {
       "id": 10512007,
@@ -5676,8 +5665,7 @@
       "eventDesc": "##",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 200
+      "percentageType": 0
     },
     "10512008": {
       "id": 10512008,
@@ -5712,8 +5700,7 @@
       "eventDesc": "##",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 200
+      "percentageType": 0
     },
     "10512009": {
       "id": 10512009,
@@ -5750,8 +5737,7 @@
       "eventImage": "WT_CN_RecommandedBanner025_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 200
+      "percentageType": 0
     },
     "10512010": {
       "id": 10512010,
@@ -5785,7 +5771,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29981,
       "percentageType": 2,
-      "percentageValue": 2050
+      "percentageValue": 166
     },
     "10512011": {
       "id": 10512011,
@@ -5818,7 +5804,8 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29980,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 166
     },
     "10512012": {
       "id": 10512012,
@@ -5852,7 +5839,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29979,
       "percentageType": 2,
-      "percentageValue": 2000
+      "percentageValue": 166
     },
     "10512013": {
       "id": 10512013,
@@ -5916,8 +5903,7 @@
       "eventDesc": "##",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 2010
+      "percentageType": 0
     },
     "10512015": {
       "id": 10512015,
@@ -5988,7 +5974,8 @@
       "eventImage": "WT_CN_RecommandedBanner027_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 230
     }
   }
 }

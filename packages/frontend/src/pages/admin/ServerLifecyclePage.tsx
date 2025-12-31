@@ -239,7 +239,7 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                     </Box>
                 );
             case 'environment':
-                return <Typography variant="body2">{event.environmentName || event.environmentId || '-'}</Typography>;
+                return <Typography variant="body2">{event.environment || '-'}</Typography>;
             case 'instanceId':
                 return <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{event.instanceId}</Typography>;
             case 'ports':
@@ -357,9 +357,9 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                                     <Box>
                                         <Typography variant="caption" color="textSecondary" display="block">{t('serverLifecycle.environment')}</Typography>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                            <Typography variant="body2">{event.environmentName || event.environmentId || '-'}</Typography>
-                                            {(event.environmentName || event.environmentId) && (
-                                                <IconButton size="small" onClick={() => handleCopy(event.environmentName || event.environmentId!)} sx={{ p: 0.25 }}>
+                                            <Typography variant="body2">{event.environment || '-'}</Typography>
+                                            {event.environment && (
+                                                <IconButton size="small" onClick={() => handleCopy(event.environment!)} sx={{ p: 0.25 }}>
                                                     <ContentCopyIcon sx={{ fontSize: 14 }} />
                                                 </IconButton>
                                             )}

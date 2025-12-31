@@ -701,7 +701,7 @@ const DashboardPage: React.FC = () => {
         // Filter to accessible environments
         const accessibleEnvs = access?.allowAllEnvironments
           ? allEnvs
-          : allEnvs.filter((env: Environment) => access?.environmentIds?.includes(env.id));
+          : allEnvs.filter((env: Environment) => access?.environmentIds?.includes(env.environment));
 
         // Show all accessible environments
         const displayEnvs = accessibleEnvs;
@@ -712,7 +712,7 @@ const DashboardPage: React.FC = () => {
         // Fetch counts for each environment
         const countsPromises = displayEnvs.map(async (env: Environment) => {
           try {
-            const res = await api.get(`/admin/environments/${env.id}/related-data`);
+            const res = await api.get(`/admin/environments/${env.environment}/related-data`);
             const rawData = res?.data?.relatedData;
             // Extract count from each { count, items } object
             const counts = rawData ? {
@@ -1054,15 +1054,15 @@ const DashboardPage: React.FC = () => {
 
               // Sort environments to put current environment first
               const sortedEnvs = [...environmentsWithCounts].sort((a, b) => {
-                if (a.id === currentEnvironmentId) return -1;
-                if (b.id === currentEnvironmentId) return 1;
+                if (a.environment === currentEnvironmentId) return -1;
+                if (b.environment === currentEnvironmentId) return 1;
                 return 0;
               });
 
               return sortedEnvs.map((env) => {
-                const isCurrentEnv = env.id === currentEnvironmentId;
+                const isCurrentEnv = env.environment === currentEnvironmentId;
                 return (
-                  <Grid key={env.id} size={{ xs: 12, sm: smSize, md: mdSize }}>
+                  <Grid key={env.environment} size={{ xs: 12, sm: smSize, md: mdSize }}>
                     <Card
                       sx={{
                         height: '100%',
@@ -1112,7 +1112,7 @@ const DashboardPage: React.FC = () => {
                             <Tooltip title={t('environments.switchTo', { name: env.displayName || env.environmentName })}>
                               <IconButton
                                 size="small"
-                                onClick={() => switchEnvironment(env.id)}
+                                onClick={() => switchEnvironment(env.environment)}
                                 sx={{
                                   ml: 0.5,
                                   p: 0.5,
@@ -1160,8 +1160,8 @@ const DashboardPage: React.FC = () => {
                               <Box
                                 key={item.label}
                                 onClick={() => {
-                                  if (env.id !== currentEnvironmentId) {
-                                    switchEnvironment(env.id);
+                                  if (env.environment !== currentEnvironmentId) {
+                                    switchEnvironment(env.environment);
                                   }
                                   navigate(item.path);
                                 }}

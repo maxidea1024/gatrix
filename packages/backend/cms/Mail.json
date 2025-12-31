@@ -1102,6 +1102,60 @@
       "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600135
     },
+    "92000145": {
+      "id": 92000145,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "discovery_rank_reward27",
+      "languageMailTitle": [
+        "주간 발견순위 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 발견순위 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95600133
+    },
+    "92000146": {
+      "id": 92000146,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "discovery_rank_reward28",
+      "languageMailTitle": [
+        "주간 발견순위 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 발견순위 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95600134
+    },
+    "92000147": {
+      "id": 92000147,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "discovery_rank_reward29",
+      "languageMailTitle": [
+        "주간 발견순위 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 발견순위 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95600135
+    },
     "92000201": {
       "id": 92000201,
       "mailType": 0,

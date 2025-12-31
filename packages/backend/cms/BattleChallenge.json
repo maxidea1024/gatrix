@@ -475,7 +475,7 @@
       "id": 79000001,
       "name": "기초 전투 학습",
       "illust": "Illustration_Loading_Battle_02_Sprite",
-      "localBitflag": 219,
+      "localBitflag": 192,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -513,7 +513,7 @@
       "id": 79000002,
       "name": "심화 전투 학습",
       "illust": "Illustration_Loading_Battle_03_Sprite",
-      "localBitflag": 219,
+      "localBitflag": 192,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -551,7 +551,7 @@
       "id": 79000003,
       "name": "알제 수금함대 토벌(백병)",
       "illust": "Illustration_Story_056_Sprite",
-      "localBitflag": 219,
+      "localBitflag": 0,
       "contentsTerms": [
         {
           "Id": 81000039,
@@ -590,7 +590,7 @@
       "id": 79000004,
       "name": "알제 수금함대 토벌(포격)",
       "illust": "Illustration_Story_056_Sprite",
-      "localBitflag": 219,
+      "localBitflag": 0,
       "contentsTerms": [
         {
           "Id": 81000039,
@@ -629,7 +629,7 @@
       "id": 79000005,
       "name": "알제 수금함대 토벌(충파)",
       "illust": "Illustration_Story_056_Sprite",
-      "localBitflag": 219,
+      "localBitflag": 0,
       "contentsTerms": [
         {
           "Id": 81000039,
@@ -668,7 +668,7 @@
       "id": 79000006,
       "name": "후퇴를 모르는 자",
       "illust": "Illustration_Loading_Port_11_Sprite",
-      "localBitflag": 219,
+      "localBitflag": 0,
       "contentsTerms": [
         {
           "Id": 81000039,
@@ -707,7 +707,7 @@
       "id": 79000007,
       "name": "영겁의 불꽃",
       "illust": "Illustration_Disaster_16100005_Sprite",
-      "localBitflag": 219,
+      "localBitflag": 0,
       "contentsTerms": [
         {
           "Id": 81000039,
@@ -746,7 +746,7 @@
       "id": 79010001,
       "name": "요새 전함의 최후",
       "illust": "Illustration_Loading_Battle_03_Sprite",
-      "localBitflag": 219,
+      "localBitflag": 0,
       "contentsTerms": [
         {
           "Id": 81000039,
@@ -785,7 +785,7 @@
       "id": 79010002,
       "name": "아홉 개의 원혼",
       "illust": "Illustration_Story_068_Sprite",
-      "localBitflag": 219,
+      "localBitflag": 0,
       "contentsTerms": [
         {
           "Id": 81000039,

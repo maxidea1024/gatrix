@@ -185,6 +185,7 @@ export class Environment extends Model implements EnvironmentData {
    * Validate environment name format
    */
   static isValidEnvironmentName(name: string): boolean {
+    if (!name || typeof name !== 'string') return false;
     return /^[a-z0-9_-]+$/.test(name) && name.length >= 1 && name.length <= 100;
   }
 

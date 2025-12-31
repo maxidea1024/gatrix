@@ -3,7 +3,7 @@ import { Tag } from './tagService';
 
 export interface StoreProduct {
   id: string;
-  environmentId: string;
+  environment: string;
   isActive: boolean;
   productId: string;
   cmsProductId: number | null;

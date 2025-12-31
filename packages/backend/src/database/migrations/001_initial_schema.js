@@ -25,6 +25,8 @@ exports.up = async function (connection) {
       lastLoginAt TIMESTAMP NULL,
       avatarUrl VARCHAR(500) NULL,
       preferredLanguage VARCHAR(10) NULL,
+      isEditor BOOLEAN NOT NULL DEFAULT FALSE,
+      forceToEditorMode BOOLEAN NOT NULL DEFAULT FALSE,
       createdBy INT NULL,
       updatedBy INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -84,10 +86,12 @@ exports.up = async function (connection) {
       entityId INT NULL,
       oldValues JSON NULL,
       newValues JSON NULL,
+      environment VARCHAR(100) NULL COMMENT 'Environment name',
       ipAddress VARCHAR(45) NULL,
       userAgent TEXT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       CONSTRAINT fk_audit_user FOREIGN KEY (userId) REFERENCES g_users(id) ON DELETE SET NULL,
+      INDEX idx_audit_environment (environment),
       INDEX idx_user_action (userId, action),
       INDEX idx_entity (entityType, entityId),
       INDEX idx_created (createdAt)
@@ -106,7 +110,17 @@ exports.up = async function (connection) {
       isMaintenance BOOLEAN NOT NULL DEFAULT FALSE,
       displayOrder INT NOT NULL DEFAULT 0,
       tags JSON NULL,
+      maintenanceStartDate DATETIME NULL,
+      maintenanceEndDate DATETIME NULL,
+      maintenanceMessage TEXT NULL,
+      maintenanceMessageTemplateId INT NULL,
+      supportsMultiLanguage BOOLEAN NOT NULL DEFAULT FALSE,
+      forceDisconnect BOOLEAN NOT NULL DEFAULT FALSE,
+      gracePeriodMinutes INT NOT NULL DEFAULT 0,
       customPayload JSON NULL COMMENT 'Custom payload for game world configuration',
+      infraSettings JSON NULL COMMENT 'Infrastructure settings (JSON)',
+      infraSettingsRaw TEXT NULL COMMENT 'Original JSON5 source for editing',
+      worldServerAddress VARCHAR(255) NOT NULL COMMENT 'Game server address',
       createdBy INT NOT NULL,
       updatedBy INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -138,10 +152,15 @@ exports.up = async function (connection) {
       externalClickLink VARCHAR(500) NULL COMMENT 'External click link',
       memo TEXT NULL COMMENT 'Memo',
       customPayload TEXT NULL COMMENT 'Custom payload (JSON)',
+      maintenanceStartDate DATETIME NULL,
+      maintenanceEndDate DATETIME NULL,
+      maintenanceMessage TEXT NULL,
+      supportsMultiLanguage BOOLEAN NOT NULL DEFAULT FALSE,
+      messageTemplateId INT NULL,
       createdAt DATETIME NOT NULL,
       updatedAt DATETIME NOT NULL,
       createdBy INT NOT NULL COMMENT 'Creator user ID',
-      updatedBy INT NOT NULL COMMENT 'Updater user ID',
+      updatedBy INT NULL COMMENT 'Updater user ID',
       CONSTRAINT fk_client_versions_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE RESTRICT,
       CONSTRAINT fk_client_versions_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE RESTRICT,
       INDEX idx_environment (environment),
@@ -388,7 +407,8 @@ exports.up = async function (connection) {
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_remote_configs (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      keyName VARCHAR(255) NOT NULL UNIQUE,
+      environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
+      keyName VARCHAR(255) NOT NULL,
       defaultValue TEXT NULL,
       valueType ENUM('string', 'number', 'boolean', 'json', 'yaml') NOT NULL DEFAULT 'string',
       description TEXT NULL,
@@ -399,6 +419,8 @@ exports.up = async function (connection) {
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       CONSTRAINT fk_remote_configs_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
       CONSTRAINT fk_remote_configs_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
+      UNIQUE KEY unique_env_key (environment, keyName),
+      INDEX idx_environment (environment),
       INDEX idx_key_name (keyName),
       INDEX idx_value_type (valueType),
       INDEX idx_active (isActive)
@@ -425,6 +447,29 @@ exports.up = async function (connection) {
       INDEX idx_config_version (configId, versionNumber),
       INDEX idx_status (status),
       INDEX idx_published (publishedAt)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
+
+  // 17.5. Remote config rules table (Segmentation)
+  await connection.execute(`
+    CREATE TABLE IF NOT EXISTS g_remote_config_rules (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      configId INT NOT NULL,
+      ruleName VARCHAR(255) NOT NULL,
+      conditions JSON NOT NULL,
+      value TEXT NULL,
+      priority INT NOT NULL DEFAULT 0,
+      isActive BOOLEAN NOT NULL DEFAULT TRUE,
+      createdBy INT NULL,
+      updatedBy INT NULL,
+      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      CONSTRAINT fk_rules_config FOREIGN KEY (configId) REFERENCES g_remote_configs(id) ON DELETE CASCADE,
+      CONSTRAINT fk_rules_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
+      CONSTRAINT fk_rules_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
+      INDEX idx_config_id (configId),
+      INDEX idx_priority (priority),
+      INDEX idx_is_active (isActive)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
@@ -526,7 +571,9 @@ exports.up = async function (connection) {
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_remote_config_segments (
       id INT AUTO_INCREMENT PRIMARY KEY,
+      environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
       segmentName VARCHAR(255) NOT NULL,
+      displayName VARCHAR(300) NOT NULL DEFAULT '',
       conditions JSON NOT NULL,
       value TEXT NULL COMMENT 'Segment description',
       priority INT NOT NULL DEFAULT 0,
@@ -538,6 +585,8 @@ exports.up = async function (connection) {
 
       CONSTRAINT fk_segments_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
       CONSTRAINT fk_segments_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
+      UNIQUE KEY unique_env_segment (environment, segmentName),
+      INDEX idx_environment (environment),
       INDEX idx_segments_active (isActive),
       INDEX idx_segments_priority (priority),
       INDEX idx_segments_name (segmentName)
@@ -637,6 +686,8 @@ exports.up = async function (connection) {
       isActive BOOLEAN NOT NULL DEFAULT TRUE COMMENT 'Active status',
       category ENUM('maintenance', 'event', 'notice', 'promotion', 'other') NOT NULL COMMENT 'Notice category',
       platforms JSON NOT NULL COMMENT 'Target platforms (pc, pc-wegame, ios, android, harmonyos)',
+      channels JSON NULL COMMENT 'Target channels',
+      subchannels JSON NULL COMMENT 'Target subchannels',
       startDate DATETIME NULL COMMENT 'Start date/time (UTC)',
       endDate DATETIME NULL COMMENT 'End date/time (UTC)',
       tabTitle VARCHAR(200) NULL COMMENT 'Optional tab title (used in list views)',
@@ -669,6 +720,9 @@ exports.up = async function (connection) {
       targetChannelsInverted BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Invert channel targeting',
       targetSubchannels JSON NULL COMMENT 'Target subchannels (array of strings)',
       targetSubchannelsInverted BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Invert subchannel targeting',
+      targetMarkets JSON NULL COMMENT 'Target markets (array)',
+      targetClientVersions JSON NULL COMMENT 'Target client versions (array)',
+      targetAccountIds JSON NULL COMMENT 'Target account IDs (array)',
       targetUserIds VARCHAR(1000) NULL COMMENT 'Target user IDs (comma-separated or JSON)',
       targetUserIdsInverted BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Invert user ID targeting',
       displayPriority INT NOT NULL DEFAULT 100 COMMENT 'Display priority (lower = higher)',
@@ -1034,10 +1088,16 @@ exports.up = async function (connection) {
     CREATE TABLE IF NOT EXISTS g_reward_templates (
       id VARCHAR(26) PRIMARY KEY COMMENT 'ULID',
       environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
-      nameKey VARCHAR(128) NULL,
-      descriptionKey VARCHAR(128) NULL,
+      name VARCHAR(255) NOT NULL,
+      description TEXT NULL,
+      rewardItems JSON NOT NULL,
+      tags JSON NULL,
+      createdBy INT NULL,
+      updatedBy INT NULL,
       createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      INDEX idx_reward_template_env (environment),
+      INDEX idx_reward_template_created (createdAt)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
@@ -1190,6 +1250,7 @@ exports.up = async function (connection) {
       height INT NOT NULL DEFAULT 512 COMMENT 'Rendering height (px)',
       metadata JSON NULL COMMENT 'Extended settings JSON',
       playbackSpeed DECIMAL(3,2) NOT NULL DEFAULT 1.00 COMMENT 'Overall banner playback speed',
+      shuffle TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Whether to shuffle sequences',
       sequences JSON NOT NULL COMMENT 'Sequence list (JSON Array)',
       version INT NOT NULL DEFAULT 1 COMMENT 'Version for cache management',
       status ENUM('draft', 'published', 'archived') NOT NULL DEFAULT 'draft' COMMENT 'Banner status',
@@ -1219,6 +1280,9 @@ exports.up = async function (connection) {
       internalAddress VARCHAR(255),
       externalAddress VARCHAR(255),
       ports JSON,
+      cloudProvider VARCHAR(63),
+      cloudRegion VARCHAR(63),
+      cloudZone VARCHAR(63),
       labels JSON,
       appVersion VARCHAR(63),
       sdkVersion VARCHAR(63),
@@ -1356,6 +1420,7 @@ exports.up = async function (connection) {
       templateType VARCHAR(50) NOT NULL,
       status VARCHAR(50) NOT NULL DEFAULT 'draft',
       templateData JSON NOT NULL,
+      metadata JSON NULL COMMENT 'Additional template metadata',
       version INT NOT NULL DEFAULT 1,
       etag VARCHAR(64) NOT NULL,
       publishedAt TIMESTAMP NULL,

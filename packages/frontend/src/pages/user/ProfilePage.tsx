@@ -47,15 +47,16 @@ import { Permission, getPermissionLabelKey, PERMISSION_CATEGORIES } from '@/type
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 
 interface Environment {
-  id: string;
+  environment: string;
   environmentName: string;
   displayName: string;
   color?: string;
+  description?: string;
 }
 
 interface UserEnvironmentAccess {
   allowAllEnvironments: boolean;
-  environmentIds: string[];
+  environments: string[]; // List of environment names
 }
 
 const ProfilePage: React.FC = () => {
@@ -122,7 +123,7 @@ const ProfilePage: React.FC = () => {
   // Get accessible environments
   const accessibleEnvironments = environmentAccess?.allowAllEnvironments
     ? environments
-    : environments.filter(env => environmentAccess?.environmentIds?.includes(env.id));
+    : environments.filter(env => (environmentAccess?.environments || (environmentAccess as any)?.environmentIds || []).includes(env.environment));
 
   const handleEditToggle = () => {
     if (isEditing) {
@@ -513,7 +514,7 @@ const ProfilePage: React.FC = () => {
               ) : accessibleEnvironments.length > 0 ? (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                   {accessibleEnvironments.map((env) => (
-                    <Tooltip key={env.id} title={env.description || ''} arrow placement="top">
+                    <Tooltip key={env.environment} title={env.description || ''} arrow placement="top">
                       <Chip
                         label={env.displayName || env.environmentName}
                         size="small"

@@ -26,7 +26,7 @@ import { Permission } from '@/types';
 import { PERMISSION_CATEGORIES, ALL_PERMISSIONS } from '@/types/permissions';
 
 export interface Environment {
-  id: string;
+  environment: string;
   name: string;
   displayName?: string;
   environmentName?: string;
@@ -354,11 +354,11 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                 pointerEvents: allowAllEnvs ? 'none' : 'auto',
               }}>
                 {environments.map((env) => {
-                  const isSelected = allowAllEnvs || selectedEnvIds.includes(env.id);
+                  const isSelected = allowAllEnvs || selectedEnvIds.includes(env.environment);
                   const displayName = env.displayName || env.environmentName || env.name;
                   return (
                     <Tooltip
-                      key={env.id}
+                      key={env.environment}
                       title={t('users.environmentAccessDesc', { name: displayName })}
                       arrow
                       placement="top"
@@ -367,10 +367,10 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                       <Box
                         onClick={() => {
                           if (allowAllEnvs) return;
-                          if (selectedEnvIds.includes(env.id)) {
-                            onEnvIdsChange?.(selectedEnvIds.filter(id => id !== env.id));
+                          if (selectedEnvIds.includes(env.environment)) {
+                            onEnvIdsChange?.(selectedEnvIds.filter(id => id !== env.environment));
                           } else {
-                            onEnvIdsChange?.([...selectedEnvIds, env.id]);
+                            onEnvIdsChange?.([...selectedEnvIds, env.environment]);
                           }
                         }}
                         sx={{

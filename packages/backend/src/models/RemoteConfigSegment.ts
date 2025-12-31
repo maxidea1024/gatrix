@@ -110,6 +110,32 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
     this.updatedAt = new Date();
   }
 
+  $formatDatabaseJson(json: any) {
+    const formatted = super.$formatDatabaseJson(json);
+    if (formatted.segmentConditions !== undefined) {
+      formatted.conditions = formatted.segmentConditions;
+      delete formatted.segmentConditions;
+    }
+    if (formatted.description !== undefined) {
+      formatted.value = formatted.description;
+      delete formatted.description;
+    }
+    return formatted;
+  }
+
+  $parseDatabaseJson(json: any) {
+    const parsed = super.$parseDatabaseJson(json);
+    if (parsed.conditions !== undefined) {
+      parsed.segmentConditions = typeof parsed.conditions === 'string' ? JSON.parse(parsed.conditions) : parsed.conditions;
+      delete parsed.conditions;
+    }
+    if (parsed.value !== undefined) {
+      parsed.description = parsed.value;
+      delete parsed.value;
+    }
+    return parsed;
+  }
+
   /**
    * Get segment by environment and name
    */

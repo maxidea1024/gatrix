@@ -194,7 +194,7 @@ export class EnvironmentController {
    */
   static updateEnvironment = asyncHandler(async (req: Request, res: Response) => {
     const { environment } = req.params;
-    const { displayName, description, requiresApproval, requiredApprovers, isDefault, isHidden } = req.body;
+    const { displayName, description, requiresApproval, requiredApprovers, isDefault, isHidden, color, displayOrder } = req.body;
     const userId = (req.user as any)?.userId;
 
     if (!userId) {
@@ -222,7 +222,9 @@ export class EnvironmentController {
         requiresApproval,
         requiredApprovers,
         isDefault,
-        isHidden
+        isHidden,
+        color,
+        displayOrder
       }, userId);
 
       logger.info(`Environment updated: ${env.environment} by user ${userId}`);

@@ -63,13 +63,13 @@ const EnvironmentsPage: React.FC = () => {
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [newEnv, setNewEnv] = useState<CreateEnvironmentData>({
-    environmentName: '',
+    environment: '',
     displayName: '',
     description: '',
     environmentType: 'development',
     color: '#2e7d32',
   });
-  const [baseEnvironmentId, setBaseEnvironmentId] = useState<string>('');
+  const [baseEnvironment, setBaseEnvironment] = useState<string>('');
   const [selectedEnvForDelete, setSelectedEnvForDelete] = useState<Environment | null>(null);
   const [relatedData, setRelatedData] = useState<EnvironmentRelatedData | null>(null);
   const [loadingRelatedData, setLoadingRelatedData] = useState(false);
@@ -117,13 +117,13 @@ const EnvironmentsPage: React.FC = () => {
 
   const handleOpenAddDialog = () => {
     setNewEnv({
-      environmentName: '',
+      environment: '',
       displayName: '',
       description: '',
       environmentType: 'development',
       color: '#2e7d32',
     });
-    setBaseEnvironmentId('');
+    setBaseEnvironment('');
     setAddDialogOpen(true);
   };
 
@@ -134,14 +134,14 @@ const EnvironmentsPage: React.FC = () => {
   };
 
   const handleCreateEnvironment = async () => {
-    if (!newEnv.environmentName || !newEnv.displayName) return;
+    if (!newEnv.environment || !newEnv.displayName) return;
 
     setCreating(true);
     try {
       // Create the environment with optional base environment for data copy
       await environmentService.createEnvironment({
         ...newEnv,
-        baseEnvironmentId: baseEnvironmentId || undefined,
+        baseEnvironment: baseEnvironment || undefined,
       });
 
       enqueueSnackbar(t('environments.createSuccess'), { variant: 'success' });
@@ -173,7 +173,7 @@ const EnvironmentsPage: React.FC = () => {
     setLoadingRelatedData(true);
 
     try {
-      const data = await environmentService.getRelatedData(env.id);
+      const data = await environmentService.getRelatedData(env.environment);
       setRelatedData(data);
     } catch (err) {
       console.error('Failed to load related data:', err);
@@ -197,7 +197,7 @@ const EnvironmentsPage: React.FC = () => {
 
     setDeleting(true);
     try {
-      await environmentService.deleteEnvironment(selectedEnvForDelete.id, forceDelete);
+      await environmentService.deleteEnvironment(selectedEnvForDelete.environment, forceDelete);
       enqueueSnackbar(t('environments.deleteSuccess'), { variant: 'success' });
       setDeleteDialogOpen(false);
       setSelectedEnvForDelete(null);
@@ -293,7 +293,7 @@ const EnvironmentsPage: React.FC = () => {
 
     setUpdating(true);
     try {
-      await environmentService.updateEnvironment(selectedEnvForEdit.id, editEnv);
+      await environmentService.updateEnvironment(selectedEnvForEdit.environment, editEnv);
       enqueueSnackbar(t('environments.updateSuccess'), { variant: 'success' });
       setEditDialogOpen(false);
       setSelectedEnvForEdit(null);
@@ -310,7 +310,7 @@ const EnvironmentsPage: React.FC = () => {
   // Handle toggle visibility
   const handleToggleVisibility = async (env: Environment) => {
     try {
-      await environmentService.updateEnvironment(env.id, { isHidden: !env.isHidden });
+      await environmentService.updateEnvironment(env.environment, { isHidden: !env.isHidden });
       enqueueSnackbar(
         env.isHidden ? t('environments.showSuccess') : t('environments.hideSuccess'),
         { variant: 'success' }
@@ -393,7 +393,7 @@ const EnvironmentsPage: React.FC = () => {
               {environments
                 .filter((env) => env.environmentName !== 'gatrix-env')
                 .map((env) => (
-                  <TableRow key={env.id}>
+                  <TableRow key={env.environment}>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
@@ -533,8 +533,8 @@ const EnvironmentsPage: React.FC = () => {
             <TextField
               inputRef={addNameFieldRef}
               label={t('environments.name')}
-              value={newEnv.environmentName}
-              onChange={(e) => setNewEnv({ ...newEnv, environmentName: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '') })}
+              value={newEnv.environment}
+              onChange={(e) => setNewEnv({ ...newEnv, environment: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '') })}
               placeholder={t('environments.namePlaceholder')}
               helperText={t('environments.nameHelperText')}
               fullWidth
@@ -582,16 +582,16 @@ const EnvironmentsPage: React.FC = () => {
             <FormControl fullWidth>
               <InputLabel>{t('environments.baseEnvironment')}</InputLabel>
               <Select
-                value={baseEnvironmentId}
+                value={baseEnvironment}
                 label={t('environments.baseEnvironment')}
-                onChange={(e) => setBaseEnvironmentId(e.target.value)}
+                onChange={(e) => setBaseEnvironment(e.target.value)}
                 disabled={creating}
               >
                 <MenuItem value="">
                   <em>{t('environments.noBase')}</em>
                 </MenuItem>
                 {environments.map((env) => (
-                  <MenuItem key={env.id} value={env.id}>
+                  <MenuItem key={env.environment} value={env.environment}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Box
                         sx={{
@@ -626,7 +626,7 @@ const EnvironmentsPage: React.FC = () => {
           <Button
             variant="contained"
             onClick={handleCreateEnvironment}
-            disabled={!newEnv.environmentName || !newEnv.displayName || creating}
+            disabled={!newEnv.environment || !newEnv.displayName || creating}
           >
             {t('environments.create')}
           </Button>

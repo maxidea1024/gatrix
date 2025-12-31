@@ -3,22 +3,22 @@ import { environmentService, Environment } from '../services/environmentService'
 import { apiService } from '../services/api';
 import { useAuth } from './AuthContext';
 
-const STORAGE_KEY = 'gatrix_selected_environment_id';
+const STORAGE_KEY = 'gatrix_selected_environment';
 const STORAGE_KEY_NAME = 'gatrix_selected_environment_name';
 
 interface UserEnvironmentAccess {
   allowAllEnvironments: boolean;
-  environmentIds: string[];
+  environments: string[]; // List of environment names user has access to
 }
 
 export interface EnvironmentContextType {
   environments: Environment[];
   allEnvironments: Environment[]; // All environments (for admin UI)
   currentEnvironment: Environment | null;
-  currentEnvironmentId: string | null;
+  currentEnvironmentId: string | null; // Keep for backward compatibility (actually environment name)
   isLoading: boolean;
   error: string | null;
-  switchEnvironment: (environmentId: string) => void;
+  switchEnvironment: (environment: string) => void;
   refresh: () => Promise<void>;
 }
 
@@ -28,18 +28,18 @@ interface EnvironmentProviderProps {
   children: ReactNode;
 }
 
-// Get stored environment ID from localStorage
-const getStoredEnvironmentId = (): string | null => {
+// Get stored environment from localStorage
+const getStoredEnvironment = (): string | null => {
   if (typeof window !== 'undefined') {
     return localStorage.getItem(STORAGE_KEY);
   }
   return null;
 };
 
-// Store environment ID and name to localStorage
-const storeEnvironment = (id: string, name: string): void => {
+// Store environment to localStorage
+const storeEnvironment = (environment: string, name: string): void => {
   if (typeof window !== 'undefined') {
-    localStorage.setItem(STORAGE_KEY, id);
+    localStorage.setItem(STORAGE_KEY, environment);
     localStorage.setItem(STORAGE_KEY_NAME, name);
   }
 };
@@ -48,12 +48,12 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
   const { isAuthenticated } = useAuth();
   const [allEnvironments, setAllEnvironments] = useState<Environment[]>([]);
   const [environments, setEnvironments] = useState<Environment[]>([]);
-  const [currentEnvironmentId, setCurrentEnvironmentId] = useState<string | null>(getStoredEnvironmentId());
+  const [currentEnvironmentId, setCurrentEnvironmentId] = useState<string | null>(getStoredEnvironment());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Find current environment from the list
-  const currentEnvironment = environments.find(env => env.id === currentEnvironmentId) || null;
+  const currentEnvironment = environments.find(env => env.environment === currentEnvironmentId) || null;
 
   // Load environments from API
   const loadEnvironments = useCallback(async () => {
@@ -81,7 +81,9 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
         if (userAccess.allowAllEnvironments) {
           accessibleEnvs = envList;
         } else {
-          accessibleEnvs = envList.filter(env => userAccess.environmentIds.includes(env.id));
+          // Use environments array (names) instead of environmentIds
+          const accessList = userAccess.environments || (userAccess as any).environmentIds || [];
+          accessibleEnvs = envList.filter(env => accessList.includes(env.environment));
         }
       } catch (accessError) {
         console.warn('[EnvironmentContext] Failed to load user access, allowing all environments:', accessError);
@@ -92,24 +94,24 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
       console.log('[EnvironmentContext] Accessible environments:', accessibleEnvs);
       setEnvironments(accessibleEnvs);
 
-      // Get the currently stored environment ID
-      const storedEnvId = getStoredEnvironmentId();
+      // Get the currently stored environment
+      const storedEnv = getStoredEnvironment();
 
       // If no environment is selected, select the first one (or default)
-      if (!storedEnvId && accessibleEnvs.length > 0) {
+      if (!storedEnv && accessibleEnvs.length > 0) {
         // Prefer the first environment or the one marked as default
-        const defaultEnv = accessibleEnvs.find(e => e.environmentName === 'Default') || accessibleEnvs[0];
+        const defaultEnv = accessibleEnvs.find(e => e.isDefault) || accessibleEnvs[0];
         if (defaultEnv) {
-          console.log('[EnvironmentContext] Auto-selecting default environment:', defaultEnv.environmentName);
-          setCurrentEnvironmentId(defaultEnv.id);
-          storeEnvironment(defaultEnv.id, defaultEnv.environmentName);
+          console.log('[EnvironmentContext] Auto-selecting default environment:', defaultEnv.environment);
+          setCurrentEnvironmentId(defaultEnv.environment);
+          storeEnvironment(defaultEnv.environment, defaultEnv.displayName);
         }
-      } else if (storedEnvId && !accessibleEnvs.find(e => e.id === storedEnvId)) {
-        // If the stored environment ID doesn't exist anymore or not accessible, reset to first
+      } else if (storedEnv && !accessibleEnvs.find(e => e.environment === storedEnv)) {
+        // If the stored environment doesn't exist anymore or not accessible, reset to first
         if (accessibleEnvs.length > 0) {
           console.log('[EnvironmentContext] Stored environment not found, resetting to first');
-          setCurrentEnvironmentId(accessibleEnvs[0].id);
-          storeEnvironment(accessibleEnvs[0].id, accessibleEnvs[0].environmentName);
+          setCurrentEnvironmentId(accessibleEnvs[0].environment);
+          storeEnvironment(accessibleEnvs[0].environment, accessibleEnvs[0].displayName);
         } else {
           // No accessible environments - clear localStorage as well
           setCurrentEnvironmentId(null);
@@ -124,7 +126,7 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
     } finally {
       setIsLoading(false);
     }
-  }, []); // Remove currentEnvironmentId from dependencies
+  }, []);
 
   // Fetch environments only when authenticated
   useEffect(() => {
@@ -141,15 +143,15 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
   }, [isAuthenticated, loadEnvironments]);
 
   // Switch to a different environment
-  const switchEnvironment = useCallback((environmentId: string) => {
-    const env = environments.find(e => e.id === environmentId);
+  const switchEnvironment = useCallback((environment: string) => {
+    const env = environments.find(e => e.environment === environment);
     if (env) {
-      setCurrentEnvironmentId(environmentId);
-      storeEnvironment(environmentId, env.environmentName);
+      setCurrentEnvironmentId(environment);
+      storeEnvironment(environment, env.displayName);
 
       // Dispatch custom event to notify other components
       window.dispatchEvent(new CustomEvent('environment-changed', {
-        detail: { environmentId, environment: env }
+        detail: { environment, env }
       }));
     }
   }, [environments]);
@@ -192,4 +194,3 @@ export const useEnvironments = () => {
 };
 
 export default EnvironmentContext;
-

@@ -3,7 +3,7 @@ import api from './api';
 export interface DeploymentHistoryItem {
   id: string;
   version: number;
-  environmentId: number;
+  environment: string;
   deployedBy: {
     name: string;
     email: string;
@@ -38,7 +38,7 @@ export interface RollbackRequest {
 
 export interface DeployRequest {
   templateId?: number;
-  environmentId?: number;
+  environment?: string;
   changeDescription?: string;
   changes?: any[];
 }
@@ -58,7 +58,7 @@ class RemoteConfigService {
       const deployments = response.data.versions.map((version: any) => ({
         id: version.id.toString(),
         version: version.version,
-        environmentId: 1, // Default environment for now
+        environment: version.environment || 'default', // Environment from version
         deployedBy: {
           name: version.createdByName || 'Unknown User',
           email: version.createdByEmail || 'unknown@example.com'

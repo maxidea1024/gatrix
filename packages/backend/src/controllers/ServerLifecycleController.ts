@@ -18,7 +18,7 @@ class ServerLifecycleController {
                 limit = 20,
                 serviceType,
                 instanceId,
-                environmentId,
+                environment,
                 eventType,
                 serviceGroup,
                 hostname,
@@ -37,11 +37,7 @@ class ServerLifecycleController {
 
             // Join with environments to get environment name
             const query = ServerLifecycleEvent.query()
-                .select(
-                    'g_server_lifecycle_events.*',
-                    'g_environments.environmentName as environmentName'
-                )
-                .leftJoin('g_environments', 'g_server_lifecycle_events.environmentId', 'g_environments.id')
+                .select('g_server_lifecycle_events.*')
                 .orderBy(`g_server_lifecycle_events.${safeSortBy}`, safeSortOrder);
 
             if (serviceType) {
@@ -50,8 +46,8 @@ class ServerLifecycleController {
             if (instanceId) {
                 query.where('g_server_lifecycle_events.instanceId', instanceId as string);
             }
-            if (environmentId) {
-                query.where('g_server_lifecycle_events.environmentId', environmentId as string);
+            if (environment) {
+                query.where('g_server_lifecycle_events.environment', environment as string);
             }
             if (eventType) {
                 query.where('g_server_lifecycle_events.eventType', eventType as string);

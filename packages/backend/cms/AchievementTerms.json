@@ -3,6 +3,7 @@
     ":type": {
       "id": "key",
       "desc": "text",
+      "targetTimeOptionDesc": "text",
       "descFormat": [
         {
           "Type": "number",
@@ -635,6 +636,7 @@
     "87000053": {
       "id": 87000053,
       "desc": "총 {0}일 동안 항해(도시 입장 시 반영)",
+      "targetTimeOptionDesc": "총 {0}분 동안 항해(도시 입장 시 반영)",
       "descFormat": [
         {
           "Type": 1
@@ -1330,6 +1332,7 @@
     "87000118": {
       "id": 87000118,
       "desc": "총 {0}일 동안 항해",
+      "targetTimeOptionDesc": "총 {0}분 동안 항해",
       "descFormat": [
         {
           "Type": 1

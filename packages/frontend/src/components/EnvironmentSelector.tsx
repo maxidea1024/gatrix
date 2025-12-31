@@ -300,11 +300,11 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
       >
         {environments.map((env) => {
           const itemColor = getEnvironmentColor(env.environmentType, env.color);
-          const isSelected = env.id === currentEnvironmentId;
+          const isSelected = env.environment === currentEnvironmentId;
           return (
             <MenuItem
-              key={env.id}
-              value={env.id}
+              key={env.environment}
+              value={env.environment}
               sx={{
                 backgroundColor: isSelected ? alpha(itemColor, 0.15) : 'transparent',
                 '&:hover': {
