@@ -668,12 +668,12 @@ exports.up = async function (connection) {
 
   // Insert predefined environments
   await connection.execute(`
-    INSERT IGNORE INTO g_environments (environment, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, createdBy)
+    INSERT IGNORE INTO g_environments (environment, displayName, description, environmentType, isSystemDefined, isHidden, isDefault, displayOrder, color, projectId, createdBy)
     VALUES 
-      ('development', 'Development', 'Development environment', 'development', TRUE, TRUE, 1, '#4CAF50', (SELECT id FROM g_projects WHERE projectName = 'default'), 1),
-      ('qa', 'QA', 'QA environment', 'staging', TRUE, FALSE, 2, '#FF9800', (SELECT id FROM g_projects WHERE projectName = 'default'), 1),
-      ('production', 'Production', 'Production environment', 'production', TRUE, FALSE, 3, '#F44336', (SELECT id FROM g_projects WHERE projectName = 'default'), 1),
-      ('gatrix-env', 'Gatrix System', 'Internal system environment', 'development', TRUE, FALSE, 999, '#9E9E9E', (SELECT id FROM g_projects WHERE projectName = 'default'), 1)
+      ('development', 'Development', 'Development environment', 'development', TRUE, FALSE, TRUE, 1, '#4CAF50', (SELECT id FROM g_projects WHERE projectName = 'default'), 1),
+      ('qa', 'QA', 'QA environment', 'staging', TRUE, FALSE, FALSE, 2, '#FF9800', (SELECT id FROM g_projects WHERE projectName = 'default'), 1),
+      ('production', 'Production', 'Production environment', 'production', TRUE, FALSE, FALSE, 3, '#F44336', (SELECT id FROM g_projects WHERE projectName = 'default'), 1),
+      ('gatrix-env', 'Gatrix System', 'Internal system environment for global configurations', 'production', TRUE, TRUE, FALSE, 999, '#9E9E9E', (SELECT id FROM g_projects WHERE projectName = 'default'), 1)
   `);
 
   console.log('✓ Projects and environments created');
@@ -1606,6 +1606,30 @@ exports.up = async function (connection) {
       UNIQUE KEY unique_client_version_lang (clientVersionId, lang)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
+
+  // Seed default tags
+  console.log('Seeding default tags...');
+  const defaultTags = [
+    { name: 'Event', color: '#FF6B6B', description: 'Event-related items' },
+    { name: 'Promotion', color: '#4ECDC4', description: 'Promotional items and campaigns' },
+    { name: 'Maintenance', color: '#FFE66D', description: 'Maintenance-related items' },
+    { name: 'Bug Fix', color: '#95E1D3', description: 'Bug fix and patch items' },
+    { name: 'Feature', color: '#A8E6CF', description: 'New feature items' },
+    { name: 'Important', color: '#FF8B94', description: 'Important items requiring attention' },
+    { name: 'Testing', color: '#C7CEEA', description: 'Testing and QA items' },
+    { name: 'Documentation', color: '#B5EAD7', description: 'Documentation and guides' },
+    { name: 'New', color: '#90EE90', description: 'Newly added features' },
+    { name: 'Deprecated', color: '#D3D3D3', description: 'Deprecated items to be removed' },
+    { name: 'Disabled', color: '#A9A9A9', description: 'Disabled or inactive items' },
+    { name: 'Enabled', color: '#32CD32', description: 'Enabled or active items' }
+  ];
+  for (const tag of defaultTags) {
+    await connection.execute(
+      'INSERT IGNORE INTO g_tags (name, color, description, createdAt, updatedAt) VALUES (?, ?, ?, NOW(), NOW())',
+      [tag.name, tag.color, tag.description]
+    );
+  }
+  console.log('✓ Default tags seeded');
 
   console.log('✓ Default data inserted');
   console.log('🎉 Initial schema creation completed successfully!');
