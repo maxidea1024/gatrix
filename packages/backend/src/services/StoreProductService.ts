@@ -775,10 +775,12 @@ class StoreProductService {
       }
 
       const dbMap = new Map<number, StoreProduct>();
+      const dbProductKeyMap = new Map<string, StoreProduct>(); // Key: productId:store
       for (const p of dbProducts) {
         if (p.cmsProductId !== null) {
           dbMap.set(p.cmsProductId, p);
         }
+        dbProductKeyMap.set(`${p.productId}:${p.store}`, p);
       }
 
       const toAdd: SyncAddItem[] = [];
@@ -787,7 +789,8 @@ class StoreProductService {
 
       // Check for products to add or update
       for (const [cmsProductId, planningProduct] of planningMap) {
-        const dbProduct = dbMap.get(cmsProductId);
+        // Find DB product by CMS ID or by productId:store combination
+        const dbProduct = dbMap.get(cmsProductId) || dbProductKeyMap.get(`${planningProduct.productCode}:sdo`);
 
         // Get multi-language values from planning data
         const nameKo = planningProduct.name?.ko || '';
@@ -878,7 +881,7 @@ class StoreProductService {
         },
       };
     } catch (error) {
-      logger.error('Failed to preview sync', { error, environment: environment });
+      logger.error('Failed to preview sync', { error, environment });
       throw new GatrixError('Failed to preview sync with planning data', 500);
     }
   }

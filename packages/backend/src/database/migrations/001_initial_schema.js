@@ -613,19 +613,19 @@ exports.up = async function (connection) {
   const { ulid } = require('ulid');
   const defaultProjectId = ulid();
   await connection.execute(`
-    INSERT INTO g_projects (id, projectName, displayName, description, isDefault, createdBy)
+    INSERT IGNORE INTO g_projects (id, projectName, displayName, description, isDefault, createdBy)
     VALUES (?, 'default', 'Default Project', 'Default project', TRUE, 1)
   `, [defaultProjectId]);
 
   // Insert predefined environments
   await connection.execute(`
-    INSERT INTO g_environments (environment, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, createdBy)
+    INSERT IGNORE INTO g_environments (environment, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, createdBy)
     VALUES 
-      ('development', 'Development', 'Development environment', 'development', TRUE, TRUE, 1, '#4CAF50', ?, 1),
-      ('qa', 'QA', 'QA environment', 'staging', TRUE, FALSE, 2, '#FF9800', ?, 1),
-      ('production', 'Production', 'Production environment', 'production', TRUE, FALSE, 3, '#F44336', ?, 1),
-      ('gatrix-env', 'Gatrix System', 'Internal system environment', 'development', TRUE, FALSE, 999, '#9E9E9E', ?, 1)
-  `, [defaultProjectId, defaultProjectId, defaultProjectId, defaultProjectId]);
+      ('development', 'Development', 'Development environment', 'development', TRUE, TRUE, 1, '#4CAF50', (SELECT id FROM g_projects WHERE projectName = 'default'), 1),
+      ('qa', 'QA', 'QA environment', 'staging', TRUE, FALSE, 2, '#FF9800', (SELECT id FROM g_projects WHERE projectName = 'default'), 1),
+      ('production', 'Production', 'Production environment', 'production', TRUE, FALSE, 3, '#F44336', (SELECT id FROM g_projects WHERE projectName = 'default'), 1),
+      ('gatrix-env', 'Gatrix System', 'Internal system environment', 'development', TRUE, FALSE, 999, '#9E9E9E', (SELECT id FROM g_projects WHERE projectName = 'default'), 1)
+  `);
 
   console.log('✓ Projects and environments created');
 
@@ -1113,13 +1113,20 @@ exports.up = async function (connection) {
       environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
       isActive TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Whether the product is available for sale',
       productId VARCHAR(255) NOT NULL COMMENT 'Store product ID',
+      cmsProductId INT NULL COMMENT 'CMS product ID for sync with planning data',
       productName VARCHAR(255) NOT NULL COMMENT 'Display name of the product',
+      nameKo VARCHAR(255) NULL COMMENT 'Korean name',
+      nameEn VARCHAR(255) NULL COMMENT 'English name',
+      nameZh VARCHAR(255) NULL COMMENT 'Chinese name',
       store VARCHAR(50) NOT NULL COMMENT 'Store type: google, apple, onestore, etc.',
       price DECIMAL(10, 2) NOT NULL COMMENT 'Product price',
       currency VARCHAR(10) NOT NULL DEFAULT 'USD' COMMENT 'Currency code',
       saleStartAt DATETIME NULL COMMENT 'Sale start date/time',
       saleEndAt DATETIME NULL COMMENT 'Sale end date/time',
       description TEXT NULL COMMENT 'Product description',
+      descriptionKo TEXT NULL COMMENT 'Korean description',
+      descriptionEn TEXT NULL COMMENT 'English description',
+      descriptionZh TEXT NULL COMMENT 'Chinese description',
       metadata JSON NULL COMMENT 'Additional metadata',
       createdBy INT NULL,
       updatedBy INT NULL,
@@ -1129,7 +1136,7 @@ exports.up = async function (connection) {
       INDEX idx_is_active (isActive),
       INDEX idx_product_id (productId),
       INDEX idx_store (store),
-      UNIQUE KEY uk_env_product_store (environment, productId, store)
+      UNIQUE KEY uk_env_cms_product_id (environment, cmsProductId)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
