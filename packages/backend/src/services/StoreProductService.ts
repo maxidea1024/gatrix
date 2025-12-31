@@ -761,7 +761,7 @@ class StoreProductService {
       const planningProducts: CmsCashShopProduct[] = planningData.items || [];
 
       // Get current DB products
-      const pool = await database.getPool();
+      const pool = database.getPool();
       const [rows] = await pool.execute(
         'SELECT * FROM g_store_products WHERE environment = ?',
         [environment]
@@ -891,7 +891,7 @@ class StoreProductService {
     userId?: number,
     selected?: SelectedSyncItems
   ): Promise<SyncApplyResult> {
-    const pool = await database.getPool();
+    const pool = database.getPool();
     const preview = await this.previewSync(environment);
 
     // Filter items based on selection if provided
