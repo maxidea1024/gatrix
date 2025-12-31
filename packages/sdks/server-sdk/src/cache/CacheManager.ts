@@ -188,7 +188,7 @@ export class CacheManager {
       // For wildcard mode, fetch environment list first
       if (this.environments === '*' && this.environmentService) {
         const environments = await this.environmentService.fetchEnvironments();
-        this.cachedEnvironmentList = environments.map(e => e.environmentName);
+        this.cachedEnvironmentList = environments.map(e => e.environment);
         this.logger.info('Multi-environment mode (*): fetched environment list from backend', {
           count: this.cachedEnvironmentList.length,
           environments: this.cachedEnvironmentList,
@@ -497,7 +497,7 @@ export class CacheManager {
 
     const oldEnvList = [...this.cachedEnvironmentList];
     const environments = await this.environmentService.fetchEnvironments();
-    this.cachedEnvironmentList = environments.map(e => e.environmentName);
+    this.cachedEnvironmentList = environments.map(e => e.environment);
 
     const added = this.cachedEnvironmentList.filter(e => !oldEnvList.includes(e));
     const removed = oldEnvList.filter(e => !this.cachedEnvironmentList.includes(e));
@@ -647,7 +647,7 @@ export class CacheManager {
       // For wildcard mode, refresh environment list first
       if (this.environments === '*' && this.environmentService) {
         const environments = await this.environmentService.fetchEnvironments();
-        this.cachedEnvironmentList = environments.map(e => e.environmentName);
+        this.cachedEnvironmentList = environments.map(e => e.environment);
       }
 
       // Get target environments for multi-environment mode
