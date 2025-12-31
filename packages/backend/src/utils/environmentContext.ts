@@ -65,7 +65,7 @@ export async function validateEnvironment(db: any, environment: string): Promise
     return false;
   }
   const result = await db('g_environments')
-    .where('name', environment)
+    .where('environment', environment)
     .first();
   return !!result;
 }
@@ -75,9 +75,9 @@ export async function validateEnvironment(db: any, environment: string): Promise
  */
 export async function getAllEnvironments(db: any): Promise<string[]> {
   const environments = await db('g_environments')
-    .select('name')
+    .select('environment')
     .orderBy('displayOrder', 'asc');
-  return environments.map((e: any) => e.name);
+  return environments.map((e: any) => e.environment);
 }
 
 /**

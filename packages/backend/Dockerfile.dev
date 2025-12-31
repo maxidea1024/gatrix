@@ -20,10 +20,15 @@ COPY packages/backend/package.json ./packages/backend/
 COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
+COPY packages/shared/package.json ./packages/shared/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Install all dependencies (including dev dependencies)
 RUN yarn install --frozen-lockfile --network-timeout 600000
+
+# Copy and build shared (required by other packages)
+COPY packages/shared ./packages/shared
+RUN yarn workspace @gatrix/shared build
 
 # Copy and build server-sdk (required dependency)
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk

@@ -19,38 +19,7 @@ async function columnExists(connection, tableName, columnName) {
   return rows[0].cnt > 0;
 }
 
-// Simple ULID generator for migration
-function generateUlid() {
-  const ENCODING = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
-  const ENCODING_LEN = ENCODING.length;
-  const TIME_LEN = 10;
-  const RANDOM_LEN = 16;
-
-  function encodeTime(now, len) {
-    let str = '';
-    for (let i = len; i > 0; i--) {
-      const mod = now % ENCODING_LEN;
-      str = ENCODING[mod] + str;
-      now = Math.floor(now / ENCODING_LEN);
-    }
-    return str;
-  }
-
-  function encodeRandom(len) {
-    let str = '';
-    for (let i = 0; i < len; i++) {
-      str += ENCODING[Math.floor(Math.random() * ENCODING_LEN)];
-    }
-    return str;
-  }
-
-  return encodeTime(Date.now(), TIME_LEN) + encodeRandom(RANDOM_LEN);
-}
-
-// Generate environment ID in format: {environmentName}.{ulid}
-function generateEnvironmentId(environmentName) {
-  return `${environmentName}.${generateUlid()}`;
-}
+// No longer need ULID generation - environment name IS the primary key
 
 exports.up = async function (connection) {
   console.log('Starting multi-environment support migration...');
@@ -91,11 +60,10 @@ exports.up = async function (connection) {
   // 2. Add new columns to g_environments (already has VARCHAR(127) id from 005)
   console.log('Ensuring g_environments table exists and adding new columns...');
 
-  // Ensure g_environments exists (it should have been created in 005, but safety first for some environments)
+  // Ensure g_environments exists - using environment name as primary key
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_environments (
-      id VARCHAR(127) NOT NULL PRIMARY KEY COMMENT 'Format: {environmentName}.{ulid}',
-      environmentName VARCHAR(100) NOT NULL UNIQUE,
+      environment VARCHAR(100) NOT NULL PRIMARY KEY COMMENT 'Environment name (lowercase, numbers, underscore, hyphen)',
       displayName VARCHAR(200) NOT NULL,
       description TEXT NULL,
       isDefault BOOLEAN NOT NULL DEFAULT FALSE,
@@ -106,7 +74,6 @@ exports.up = async function (connection) {
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-      INDEX idx_environment_name (environmentName),
       INDEX idx_is_default (isDefault)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
@@ -179,26 +146,26 @@ exports.up = async function (connection) {
   // Development environment
   await connection.execute(`
     INSERT INTO g_environments
-    (id, environmentName, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
-    VALUES (?, 'development', 'Development', 'Development environment for testing and feature development', 'development', TRUE, TRUE, 1, '#4CAF50', ?, FALSE, 1, 1)
+    (environment, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
+    VALUES ('development', 'Development', 'Development environment for testing and feature development', 'development', TRUE, TRUE, 1, '#4CAF50', ?, FALSE, 1, 1)
     ON DUPLICATE KEY UPDATE displayName = VALUES(displayName)
-  `, [generateEnvironmentId('development'), projectId]);
+  `, [projectId]);
 
   // QA environment
   await connection.execute(`
     INSERT INTO g_environments
-    (id, environmentName, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
-    VALUES (?, 'qa', 'QA', 'QA environment for quality assurance testing', 'staging', TRUE, FALSE, 2, '#FF9800', ?, TRUE, 1, 1)
+    (environment, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
+    VALUES ('qa', 'QA', 'QA environment for quality assurance testing', 'staging', TRUE, FALSE, 2, '#FF9800', ?, TRUE, 1, 1)
     ON DUPLICATE KEY UPDATE displayName = VALUES(displayName)
-  `, [generateEnvironmentId('qa'), projectId]);
+  `, [projectId]);
 
   // Production environment
   await connection.execute(`
     INSERT INTO g_environments
-    (id, environmentName, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
-    VALUES (?, 'production', 'Production', 'Production environment for live users', 'production', TRUE, FALSE, 3, '#F44336', ?, TRUE, 2, 1)
+    (environment, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
+    VALUES ('production', 'Production', 'Production environment for live users', 'production', TRUE, FALSE, 3, '#F44336', ?, TRUE, 2, 1)
     ON DUPLICATE KEY UPDATE displayName = VALUES(displayName)
-  `, [generateEnvironmentId('production'), projectId]);
+  `, [projectId]);
 
   console.log('✓ Predefined environments created');
   console.log('Multi-environment support migration completed successfully');
