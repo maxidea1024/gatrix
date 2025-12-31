@@ -21,6 +21,7 @@ export class ServerEnvironmentController {
 
       const result = environments.map(env => ({
         environment: env.environment,
+        environmentName: env.environment, // SDK compatibility - same as 'environment'
         displayName: env.displayName,
         environmentType: env.environmentType,
         color: env.color,
