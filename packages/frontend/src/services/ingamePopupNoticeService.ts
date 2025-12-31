@@ -49,7 +49,7 @@ export interface CreateIngamePopupNoticeData {
   description?: string | null;
 }
 
-export interface UpdateIngamePopupNoticeData extends Partial<CreateIngamePopupNoticeData> {}
+export interface UpdateIngamePopupNoticeData extends Partial<CreateIngamePopupNoticeData> { }
 
 export interface IngamePopupNoticeFilters {
   isActive?: boolean;
@@ -108,7 +108,7 @@ class IngamePopupNoticeService {
     }
 
     const response = await api.get('/admin/ingame-popup-notices', { params });
-    return response;
+    return response.data;
   }
 
   /**
