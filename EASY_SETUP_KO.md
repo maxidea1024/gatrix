@@ -106,25 +106,25 @@ Copy-Item .env.local.example .env.local
 
 **모든 서비스 동시 실행:**
 ```bash
-yarn local
+yarn dev
 ```
 
 **개별 서비스 실행 (별도 터미널에서):**
 ```bash
 # Backend
-yarn local:backend
+yarn dev:backend
 
 # Frontend
-yarn local:frontend
+yarn dev:frontend
 
 # Edge (선택사항)
-yarn local:edge
+yarn dev:edge
 
 # Chat Server (선택사항)
-yarn local:chat-server
+yarn dev:chat-server
 
 # Event Lens (선택사항)
-yarn local:event-lens
+yarn dev:event-lens
 ```
 
 #### 4단계: 접속
