@@ -90,44 +90,47 @@ docker compose -f docker-compose-infra.yml up -d
 
 #### 2단계: 로컬 환경변수 설정
 
-`.env.local.example`을 참고하여 `.env.local` 파일을 생성하거나, 각 패키지의 환경변수를 설정합니다.
+`.env.local.example`을 복사하여 `.env.local` 파일을 생성합니다:
 
-**주요 차이점:** Docker 네트워크 대신 localhost 포트 사용
-- `DB_HOST=localhost`, `DB_PORT=43306`
-- `REDIS_HOST=localhost`, `REDIS_PORT=46379`
-- `ETCD_HOSTS=http://localhost:42379`
+```bash
+# Linux/Mac
+cp .env.local.example .env.local
+
+# Windows PowerShell
+Copy-Item .env.local.example .env.local
+```
+
+필요시 `.env.local` 파일을 수정하여 환경에 맞게 설정합니다.
 
 #### 3단계: 서비스 로컬 실행
 
-**터미널 1 - Backend:**
+**모든 서비스 동시 실행:**
 ```bash
-yarn workspace @gatrix/backend dev
+yarn local
 ```
 
-**터미널 2 - Frontend:**
+**개별 서비스 실행 (별도 터미널에서):**
 ```bash
-yarn workspace @gatrix/frontend dev
-```
+# Backend
+yarn local:backend
 
-**터미널 3 - Edge (선택사항):**
-```bash
-yarn workspace @gatrix/edge dev
-```
+# Frontend
+yarn local:frontend
 
-**터미널 4 - Chat Server (선택사항):**
-```bash
-yarn workspace @gatrix/chat-server dev
-```
+# Edge (선택사항)
+yarn local:edge
 
-**터미널 5 - Event Lens (선택사항):**
-```bash
-yarn workspace @gatrix/event-lens dev
+# Chat Server (선택사항)
+yarn local:chat-server
+
+# Event Lens (선택사항)
+yarn local:event-lens
 ```
 
 #### 4단계: 접속
 
-- **Frontend:** http://localhost:3000
-- **Backend API:** http://localhost:5000
+- **Frontend:** http://localhost:43000
+- **Backend API:** http://localhost:45000
 - **Grafana:** http://localhost:44000
 
 
