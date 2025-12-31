@@ -7,7 +7,7 @@ dotenv.config();
 export const config = {
   // Server
   nodeEnv: process.env.NODE_ENV || 'development',
-  port: parseInt(process.env.PORT || '5100', 10),
+  port: parseInt(process.env.CHAT_PORT || process.env.PORT || '45100', 10),
   host: process.env.HOST || 'localhost',
 
   // Database
@@ -124,7 +124,7 @@ export const config = {
   // Performance Monitoring
   monitoring: {
     enabled: process.env.MONITORING_ENABLED === 'true',
-    metricsPort: parseInt(process.env.METRICS_PORT || '9090', 10),
+    metricsPort: parseInt(process.env.CHAT_METRICS_PORT || process.env.METRICS_PORT || '9402', 10),
     healthCheckPath: process.env.HEALTH_CHECK_PATH || '/health',
     readinessCheckPath: process.env.READINESS_CHECK_PATH || '/ready',
   },

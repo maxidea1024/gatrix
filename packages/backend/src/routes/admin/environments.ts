@@ -15,15 +15,15 @@ router.get('/', requireAdmin, EnvironmentController.getEnvironments);
 
 // Read-only access requires environments.view permission
 const viewPermission = requirePermission([PERMISSIONS.ENVIRONMENTS_VIEW, PERMISSIONS.ENVIRONMENTS_MANAGE]) as any;
-router.get('/:id', requireAdmin, viewPermission, EnvironmentController.getEnvironment);
-router.get('/:id/stats', requireAdmin, viewPermission, EnvironmentController.getEnvironmentStats);
-router.get('/:id/related-data', requireAdmin, viewPermission, EnvironmentController.getEnvironmentRelatedData);
+router.get('/:environment', requireAdmin, viewPermission, EnvironmentController.getEnvironment);
+router.get('/:environment/stats', requireAdmin, viewPermission, EnvironmentController.getEnvironmentStats);
+router.get('/:environment/related-data', requireAdmin, viewPermission, EnvironmentController.getEnvironmentRelatedData);
 
 // Write access requires environments.manage permission
 const managePermission = requirePermission(PERMISSIONS.ENVIRONMENTS_MANAGE) as any;
 router.post('/', requireAdmin, managePermission, EnvironmentController.createEnvironment);
-router.put('/:id', requireAdmin, managePermission, EnvironmentController.updateEnvironment);
-router.delete('/:id', requireAdmin, managePermission, EnvironmentController.deleteEnvironment);
+router.put('/:environment', requireAdmin, managePermission, EnvironmentController.updateEnvironment);
+router.delete('/:environment', requireAdmin, managePermission, EnvironmentController.deleteEnvironment);
 router.post('/validate-name', requireAdmin, managePermission, EnvironmentController.validateEnvironmentName);
 
 // Environment copy routes (requires manage permission)

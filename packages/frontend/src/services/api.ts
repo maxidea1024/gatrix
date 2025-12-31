@@ -13,20 +13,30 @@ class ApiService {
     // In production: API calls go to the same origin, so '/api/v1' is safest
     let baseURL = (import.meta as any).env?.VITE_API_URL || '/api/v1';
 
+    // Debugging: exact source of baseURL
+    console.log('[ApiService] Initial baseURL evaluation:', {
+      envValue: (import.meta as any).env?.VITE_API_URL,
+      fallback: '/api/v1',
+      evaluated: baseURL
+    });
+
     // Only use runtime config in production (when explicitly set)
     if (import.meta.env.PROD) {
       const runtimeEnv = (typeof window !== 'undefined' && (window as any)?.ENV?.VITE_API_URL) as string | undefined;
       if (runtimeEnv && runtimeEnv.trim()) {
         baseURL = runtimeEnv.trim();
+        console.log('[ApiService] PROD: Using runtime config baseURL:', baseURL);
       }
     }
 
-    // Normalize common misconfig: avoid accidentally pointing to localhost:5001
-    if (/^https?:\/\/localhost:5001\b/.test(baseURL)) {
-      baseURL = baseURL.replace('localhost:5001', 'localhost:5000');
+    // Force relative path in development if it's accidentally set to an absolute URL pointing to port 5000
+    // This often happens due to old env files or misconfigured local environments
+    if (!import.meta.env.PROD && typeof baseURL === 'string' && baseURL.includes('localhost:5000')) {
+      console.warn('[ApiService] Detected absolute URL to localhost:5000 in dev. Forcing relative path /api/v1 to use Vite proxy.');
+      baseURL = '/api/v1';
     }
 
-    console.log('[ApiService] Constructor - baseURL:', baseURL, 'PROD:', import.meta.env.PROD);
+    console.log('[ApiService] Final baseURL:', baseURL, 'PROD:', import.meta.env.PROD);
 
     this.api = axios.create({
       baseURL,
@@ -55,12 +65,14 @@ class ApiService {
           config.headers.Authorization = `Bearer ${this.accessToken}`;
         }
 
-        // Add environment ID header for multi-environment support
-        const environmentId = typeof window !== 'undefined'
-          ? localStorage.getItem('gatrix_selected_environment_id')
+        // Add environment header for multi-environment support
+        // Read the environment name from localStorage
+        const environmentName = typeof window !== 'undefined'
+          ? localStorage.getItem('gatrix_selected_environment_name')
           : null;
-        if (environmentId) {
-          config.headers['X-Environment-Id'] = environmentId;
+        if (environmentName) {
+          // The backend expects X-Environment header with environment name
+          config.headers['X-Environment'] = environmentName;
         }
 
         return config;
@@ -82,9 +94,9 @@ class ApiService {
         // Check for "user not found" error - this happens when user is deleted but token is still valid
         // Redirect to session expired page to prevent infinite loop
         if (error.response?.status === 404 &&
-            (error.response?.data?.message === 'USER_NOT_FOUND' ||
-             error.response?.data?.error?.message === 'USER_NOT_FOUND' ||
-             error.response?.data?.message?.includes('User not found'))) {
+          (error.response?.data?.message === 'USER_NOT_FOUND' ||
+            error.response?.data?.error?.message === 'USER_NOT_FOUND' ||
+            error.response?.data?.message?.includes('User not found'))) {
           // Clear all auth data
           this.clearTokens();
           if (typeof window !== 'undefined') {

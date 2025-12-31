@@ -17,11 +17,13 @@ export class EnvironmentController {
     const includeHidden = req.query.includeHidden === 'true';
     const environments = await Environment.getAll(includeHidden);
 
-    // Get stats for each environment
+    // Get stats for each environment and add id field for frontend compatibility
     const environmentsWithStats = await Promise.all(
       environments.map(async (env) => {
         const stats = await env.getStats();
         return {
+          id: env.environment, // Map environment to id for frontend compatibility
+          environmentName: env.environment, // Also provide as environmentName
           ...env,
           stats
         };

@@ -109,8 +109,17 @@ const updateMaintenanceSchema = Joi.object({
 export class GameWorldController {
   static getGameWorlds = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const environment = req.environment;
+
+    // If no environment is provided, return empty list (happens during initial frontend load)
     if (!environment) {
-      throw new GatrixError('Environment is required', 400);
+      return res.json({
+        success: true,
+        data: {
+          worlds: [],
+          total: 0
+        },
+        message: 'No environment selected',
+      });
     }
 
     const worlds = await GameWorldService.getGameWorlds({

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { gameWorldService } from '../services/gameWorldService';
 import { useAuth } from './AuthContext';
+import { useEnvironment } from './EnvironmentContext';
 import { PERMISSIONS } from '@/types/permissions';
 
 export interface GameWorldOption {
@@ -23,6 +24,7 @@ interface GameWorldProviderProps {
 
 export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }) => {
   const { isAuthenticated, hasPermission, permissionsLoading } = useAuth();
+  const { currentEnvironment, isLoading: environmentLoading } = useEnvironment();
   const [worlds, setWorlds] = useState<GameWorldOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,6 +33,13 @@ export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }
   const canViewGameWorlds = hasPermission([PERMISSIONS.GAME_WORLDS_VIEW, PERMISSIONS.GAME_WORLDS_MANAGE]);
 
   const loadGameWorlds = async () => {
+    // Don't load if no environment is selected
+    if (!currentEnvironment) {
+      setWorlds([]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError(null);
@@ -49,22 +58,22 @@ export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }
     }
   };
 
-  // Fetch only when authenticated and has permission
+  // Fetch only when authenticated, has permission, and environment is selected
   useEffect(() => {
-    // Wait for permissions to be loaded
-    if (permissionsLoading) {
+    // Wait for permissions and environment to be loaded
+    if (permissionsLoading || environmentLoading) {
       return;
     }
 
-    if (isAuthenticated && canViewGameWorlds) {
+    if (isAuthenticated && canViewGameWorlds && currentEnvironment) {
       loadGameWorlds();
     } else {
-      // Reset and stop loading when unauthenticated or no permission
+      // Reset and stop loading when unauthenticated, no permission, or no environment
       setWorlds([]);
       setError(null);
       setIsLoading(false);
     }
-  }, [isAuthenticated, canViewGameWorlds, permissionsLoading]);
+  }, [isAuthenticated, canViewGameWorlds, permissionsLoading, currentEnvironment, environmentLoading]);
 
   // Listen for game world updates from backend (only when authenticated and has permission)
   useEffect(() => {
