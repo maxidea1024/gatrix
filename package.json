@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "dev": "concurrently \"yarn dev:backend\" \"yarn dev:frontend\"",
+    "dev:all": "concurrently -n backend,frontend,edge,chat,event-lens -c blue,green,cyan,magenta,yellow \"yarn dev:backend\" \"yarn dev:frontend\" \"yarn dev:edge\" \"yarn dev:chat-server\" \"yarn dev:event-lens\"",
     "dev:backend": "dotenv -e .env.local -- yarn workspace @gatrix/backend dev",
     "dev:frontend": "dotenv -e .env.local -- yarn workspace @gatrix/frontend dev",
     "dev:edge": "dotenv -e .env.local -- yarn workspace @gatrix/edge dev",

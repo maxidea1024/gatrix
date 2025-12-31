@@ -104,7 +104,12 @@ Copy-Item .env.local.example .env.local
 
 #### 3단계: 서비스 로컬 실행
 
-**모든 서비스 동시 실행:**
+**모든 서비스 동시 실행 (Backend, Frontend, Edge, Chat, Event-Lens):**
+```bash
+yarn dev:all
+```
+
+**기본 서비스만 실행 (Backend + Frontend):**
 ```bash
 yarn dev
 ```
