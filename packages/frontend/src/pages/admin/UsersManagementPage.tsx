@@ -1588,12 +1588,12 @@ const UsersManagementPage: React.FC = () => {
         }
         return (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-            {userEnvIds.slice(0, 3).map((envId) => {
-              const env = environments.find(e => e.id === envId);
+            {userEnvIds.slice(0, 3).map((envName) => {
+              const env = environments.find(e => e.environment === envName);
               return (
                 <Chip
-                  key={envId}
-                  label={env?.displayName || env?.environmentName || envId}
+                  key={envName}
+                  label={env?.displayName || env?.environmentName || envName}
                   size="small"
                   sx={{
                     borderRadius: 1,
@@ -2519,7 +2519,7 @@ const UsersManagementPage: React.FC = () => {
                 allowAllEnvs={promoteDialog.allowAllEnvs}
                 selectedEnvironments={promoteDialog.selectedEnvironments}
                 onAllowAllEnvsChange={(allowAll) => setPromoteDialog(prev => ({ ...prev, allowAllEnvs: allowAll }))}
-                onEnvironmentsChange={(environments) => setPromoteDialog(prev => ({ ...prev, envIds }))}
+                onEnvironmentsChange={(environments) => setPromoteDialog(prev => ({ ...prev, selectedEnvironments: environments }))}
               />
             </>
           )}
@@ -2617,11 +2617,11 @@ const UsersManagementPage: React.FC = () => {
                     </Typography>
                   ) : (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {promoteDialog.selectedEnvironments.map(envId => {
-                        const env = environments.find(e => e.id === envId);
-                        const displayName = env?.displayName || env?.environmentName || envId;
+                      {promoteDialog.selectedEnvironments.map(envName => {
+                        const env = environments.find(e => e.environment === envName);
+                        const displayName = env?.displayName || env?.environmentName || envName;
                         return (
-                          <Tooltip key={envId} title={t('users.environmentAccessDesc', { name: displayName })} arrow placement="top" enterDelay={200}>
+                          <Tooltip key={envName} title={t('users.environmentAccessDesc', { name: displayName })} arrow placement="top" enterDelay={200}>
                             <Chip
                               label={displayName}
                               size="small"

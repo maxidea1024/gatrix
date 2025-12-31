@@ -88,7 +88,6 @@ class ApiTokensController {
           maskedTokenValue: maskedToken,
           allowAllEnvironments: Boolean(token.allowAllEnvironments),
           environments: envByToken[token.id] || [],
-          environmentIds: envByToken[token.id] || [], // Backward compatibility
           creator: {
             name: token.creatorName || 'Unknown',
             email: token.creatorEmail || ''
@@ -198,7 +197,6 @@ class ApiTokensController {
           tokenValue, // Only shown once!
           allowAllEnvironments,
           environments: allowAllEnvironments ? [] : environments,
-          environmentIds: allowAllEnvironments ? [] : environments, // Backward compatibility
           expiresAt,
           createdAt: new Date().toISOString()
         }
