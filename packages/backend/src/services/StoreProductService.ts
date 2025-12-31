@@ -830,6 +830,11 @@ class StoreProductService {
             changes.push({ field: 'nameZh', oldValue: dbProduct.nameZh, newValue: nameZh });
           }
 
+          // Check productCode (productId) change
+          if (dbProduct.productId !== planningProduct.productCode) {
+            changes.push({ field: 'productId', oldValue: dbProduct.productId, newValue: planningProduct.productCode });
+          }
+
           if (Number(dbProduct.price) !== planningProduct.price) {
             changes.push({ field: 'price', oldValue: dbProduct.price, newValue: planningProduct.price });
           }
@@ -956,8 +961,8 @@ class StoreProductService {
 
         for (const change of item.changes) {
           const field = change.field;
-          // Handle multi-language fields
-          if (['nameKo', 'nameEn', 'nameZh', 'descriptionKo', 'descriptionEn', 'descriptionZh', 'price'].includes(field)) {
+          // Handle multi-language fields and productId
+          if (['nameKo', 'nameEn', 'nameZh', 'descriptionKo', 'descriptionEn', 'descriptionZh', 'price', 'productId'].includes(field)) {
             updates.push(`${field} = ?`);
             values.push(change.newValue ?? null);
           }

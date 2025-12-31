@@ -698,6 +698,7 @@ export class PlanningDataService {
         'oceannpcarea-lookup-kr.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:kr`,
         'oceannpcarea-lookup-en.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:en`,
         'oceannpcarea-lookup-zh.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`,
+        'cashshop-lookup.json': this.CACHE_KEYS.CASH_SHOP,
       };
 
       const envDataPath = this.getEnvironmentDataPath(environment);
