@@ -13,7 +13,7 @@ import { pubSubService } from '../services/PubSubService';
 
 const setEnvironmentAccessSchema = Joi.object({
   allowAllEnvironments: Joi.boolean().required(),
-  environmentIds: Joi.array().items(Joi.string().min(1).max(127)).default([]),
+  environments: Joi.array().items(Joi.string().min(1).max(127)).default([]),
 });
 
 // Super admin email - this account cannot be modified by anyone except themselves (name only)
@@ -149,7 +149,7 @@ export class AdminController {
 
   static async createUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { name, email, password, role, tagIds, allowAllEnvironments, environmentIds } = req.body;
+      const { name, email, password, role, tagIds, allowAllEnvironments, environments } = req.body;
 
       if (!req.user?.userId) {
         throw new GatrixError('User not authenticated', 401);
@@ -181,11 +181,11 @@ export class AdminController {
       }
 
       // 환경 접근 권한 설정
-      if (environmentIds && environmentIds.length > 0 && !allowAllEnvironments) {
+      if (environments && environments.length > 0 && !allowAllEnvironments) {
         await UserModel.setEnvironmentAccess(
           user.id,
           false,
-          environmentIds,
+          environments,
           createdBy
         );
       }
@@ -1033,10 +1033,10 @@ export class AdminController {
         throw new GatrixError(error.details[0].message, 400);
       }
 
-      const { allowAllEnvironments, environmentIds } = value;
+      const { allowAllEnvironments, environments } = value;
       const updatedBy = req.user!.userId;
 
-      await UserModel.setEnvironmentAccess(userId, allowAllEnvironments, environmentIds, updatedBy);
+      await UserModel.setEnvironmentAccess(userId, allowAllEnvironments, environments, updatedBy);
 
       res.json({
         success: true,

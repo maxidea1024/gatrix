@@ -701,7 +701,7 @@ const DashboardPage: React.FC = () => {
         // Filter to accessible environments
         const accessibleEnvs = access?.allowAllEnvironments
           ? allEnvs
-          : allEnvs.filter((env: Environment) => access?.environmentIds?.includes(env.environment));
+          : allEnvs.filter((env: Environment) => access?.environments?.includes(env.environment));
 
         // Show all accessible environments
         const displayEnvs = accessibleEnvs;

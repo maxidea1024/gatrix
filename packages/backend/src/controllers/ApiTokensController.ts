@@ -64,13 +64,13 @@ class ApiTokensController {
       const environmentAssignments = tokenIds.length > 0
         ? await knex('g_api_access_token_environments')
           .whereIn('tokenId', tokenIds)
-          .select('tokenId', 'environmentId')
+          .select('tokenId', 'environment')
         : [];
 
-      // Group environment IDs by token
+      // Group environment names by token
       const envByToken = environmentAssignments.reduce((acc: any, env: any) => {
         if (!acc[env.tokenId]) acc[env.tokenId] = [];
-        acc[env.tokenId].push(env.environmentId);
+        acc[env.tokenId].push(env.environment);
         return acc;
       }, {});
 
@@ -87,7 +87,7 @@ class ApiTokensController {
           // Add maskedTokenValue for display
           maskedTokenValue: maskedToken,
           allowAllEnvironments: Boolean(token.allowAllEnvironments),
-          environmentIds: envByToken[token.id] || [],
+          environments: envByToken[token.id] || [],
           creator: {
             name: token.creatorName || 'Unknown',
             email: token.creatorEmail || ''
@@ -133,7 +133,7 @@ class ApiTokensController {
         });
       }
 
-      const { tokenName, description, tokenType, expiresAt, allowAllEnvironments = true, environmentIds = [] } = req.body;
+      const { tokenName, description, tokenType, expiresAt, allowAllEnvironments = true, environments = [] } = req.body;
       const userId = (req as any).user.id;
 
       // Generate secure token (store as plain text)
@@ -160,11 +160,11 @@ class ApiTokensController {
         });
 
         // If not allowing all environments, insert environment assignments
-        if (!allowAllEnvironments && environmentIds.length > 0) {
-          const envInserts = environmentIds.map((envId: string) => ({
+        if (!allowAllEnvironments && environments.length > 0) {
+          const envInserts = environments.map((envName: string) => ({
             id: ulid(), // Generate ULID for each record
             tokenId: tokenId,
-            environmentId: envId,
+            environment: envName,
           }));
           await trx('g_api_access_token_environments').insert(envInserts);
         }
@@ -196,7 +196,7 @@ class ApiTokensController {
           tokenType,
           tokenValue, // Only shown once!
           allowAllEnvironments,
-          environmentIds: allowAllEnvironments ? [] : environmentIds,
+          environments: allowAllEnvironments ? [] : environments,
           expiresAt,
           createdAt: new Date().toISOString()
         }
@@ -216,7 +216,7 @@ class ApiTokensController {
   async updateToken(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { tokenName, description, expiresAt, allowAllEnvironments, environmentIds } = req.body;
+      const { tokenName, description, expiresAt, allowAllEnvironments, environments } = req.body;
       const userId = (req as any).user.id;
 
       // Check if token exists
@@ -247,18 +247,18 @@ class ApiTokensController {
           .update(updateData);
 
         // Update environment assignments if provided
-        if (environmentIds !== undefined) {
+        if (environments !== undefined) {
           // Delete existing assignments
           await trx('g_api_access_token_environments')
             .where('tokenId', id)
             .delete();
 
           // Insert new assignments
-          if (!allowAllEnvironments && environmentIds.length > 0) {
-            const envInserts = environmentIds.map((envId: string) => ({
+          if (!allowAllEnvironments && environments.length > 0) {
+            const envInserts = environments.map((envName: string) => ({
               id: ulid(), // Generate ULID for each record
               tokenId: id,
-              environmentId: envId,
+              environment: envName,
             }));
             await trx('g_api_access_token_environments').insert(envInserts);
           }
@@ -279,14 +279,15 @@ class ApiTokensController {
       // Get environment IDs only (frontend has environment list)
       const envAssignments = await knex('g_api_access_token_environments')
         .where('tokenId', id)
-        .select('environmentId');
+        .select('environment');
 
       // Format response
+      const envNames = envAssignments.map((e: any) => e.environment);
       const formattedToken = {
         ...updatedToken,
         maskedTokenValue: updatedToken.tokenValue?.substring(0, 4) + '••••••••' + updatedToken.tokenValue?.substring(updatedToken.tokenValue.length - 4),
         allowAllEnvironments: Boolean(updatedToken.allowAllEnvironments),
-        environmentIds: envAssignments.map((e: any) => e.environmentId),
+        environments: envNames,
         creator: {
           name: updatedToken.creatorName || 'Unknown',
           email: updatedToken.creatorEmail || ''

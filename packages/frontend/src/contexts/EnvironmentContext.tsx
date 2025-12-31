@@ -82,7 +82,7 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
           accessibleEnvs = envList;
         } else {
           // Use environments array (names) instead of environmentIds
-          const accessList = userAccess.environments || (userAccess as any).environmentIds || [];
+          const accessList = userAccess.environments || (userAccess as any).environments || [];
           accessibleEnvs = envList.filter(env => accessList.includes(env.environment));
         }
       } catch (accessError) {

@@ -100,9 +100,8 @@ interface CreateTokenData {
   tokenName: string;
   description?: string;
   tokenType: TokenType;
-  environmentId?: number;
   allowAllEnvironments: boolean;
-  environmentIds: string[];
+  environments: string[];
   expiresAt?: string;
 }
 
@@ -265,9 +264,8 @@ const ApiTokensPage: React.FC = () => {
     tokenName: '',
     description: '',
     tokenType: 'client',
-    environmentId: 1,
     allowAllEnvironments: false,
-    environmentIds: [],
+    environments: [],
   });
 
   // UI states
@@ -456,8 +454,8 @@ const ApiTokensPage: React.FC = () => {
           );
         }
         // Map environment IDs to environment objects from loaded environments
-        const tokenEnvs = (token.environmentIds || [])
-          .map((envId: string) => environments.find(e => e.id === envId))
+        const tokenEnvs = (token.environments || [])
+          .map((envName: string) => environments.find(e => e.environment === envName))
           .filter(Boolean);
         return (
           <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
@@ -557,7 +555,7 @@ const ApiTokensPage: React.FC = () => {
         tokenType: formData.tokenType,
         expiresAt: formData.expiresAt,
         allowAllEnvironments: formData.allowAllEnvironments,
-        environmentIds: formData.environmentIds,
+        environments: formData.environments,
         isNew: true
       };
 
@@ -597,7 +595,7 @@ const ApiTokensPage: React.FC = () => {
         tokenName: formData.tokenName,
         description: formData.description,
         allowAllEnvironments: formData.allowAllEnvironments,
-        environmentIds: formData.allowAllEnvironments ? [] : formData.environmentIds,
+        environments: formData.allowAllEnvironments ? [] : formData.environments,
         expiresAt: formData.expiresAt,
       });
       await loadTokens();
@@ -677,9 +675,8 @@ const ApiTokensPage: React.FC = () => {
       tokenName: '',
       description: '',
       tokenType: 'client',
-      environmentId: 1,
       allowAllEnvironments: false,
-      environmentIds: [],
+      environments: [],
     });
   };
 
@@ -698,9 +695,8 @@ const ApiTokensPage: React.FC = () => {
       tokenName: token.tokenName,
       description: token.description || '',
       tokenType: token.tokenType,
-      environmentId: token.environmentId,
       allowAllEnvironments: token.allowAllEnvironments ?? false,
-      environmentIds: token.environmentIds || [],
+      environments: token.environments || [],
       expiresAt: token.expiresAt ? new Date(token.expiresAt).toISOString().slice(0, 16) : undefined,
     });
     setEditDialogOpen(true);
@@ -1239,7 +1235,7 @@ const ApiTokensPage: React.FC = () => {
                       onChange={(e) => setFormData(prev => ({
                         ...prev,
                         allowAllEnvironments: e.target.checked,
-                        environmentIds: e.target.checked ? [] : prev.environmentIds,
+                        environments: e.target.checked ? [] : prev.environments,
                       }))}
                       size="small"
                     />
@@ -1267,17 +1263,17 @@ const ApiTokensPage: React.FC = () => {
                         key={env.id}
                         control={
                           <Checkbox
-                            checked={formData.environmentIds.includes(env.id)}
+                            checked={formData.environments.includes(env.id)}
                             onChange={(e) => {
                               if (e.target.checked) {
                                 setFormData(prev => ({
                                   ...prev,
-                                  environmentIds: [...prev.environmentIds, env.id],
+                                  environments: [...prev.environments, env.id],
                                 }));
                               } else {
                                 setFormData(prev => ({
                                   ...prev,
-                                  environmentIds: prev.environmentIds.filter(id => id !== env.id),
+                                  environments: prev.environments.filter(id => id !== env.id),
                                 }));
                               }
                             }}
@@ -1308,7 +1304,7 @@ const ApiTokensPage: React.FC = () => {
                       ...prev,
                       tokenType: 'edge',
                       allowAllEnvironments: false,
-                      environmentIds: prev.environmentIds.length > 0 ? [prev.environmentIds[0]] : [],
+                      environments: prev.environments.length > 0 ? [prev.environments[0]] : [],
                     }));
                   }
                 }}
@@ -1336,11 +1332,11 @@ const ApiTokensPage: React.FC = () => {
                     {t('apiTokens.selectSingleEnvironment')}
                   </Typography>
                   <RadioGroup
-                    value={formData.environmentIds[0] || ''}
+                    value={formData.environments[0] || ''}
                     onChange={(e) => setFormData(prev => ({
                       ...prev,
                       allowAllEnvironments: false,
-                      environmentIds: [e.target.value],
+                      environments: [e.target.value],
                     }))}
                   >
                     {environments.map((env) => (
@@ -1416,7 +1412,7 @@ const ApiTokensPage: React.FC = () => {
               !isValidTokenName(formData.tokenName) ||
               !expiresAtValidation.isValid ||
               // Edge token requires exactly one environment to be selected
-              (formData.tokenType === 'edge' && formData.environmentIds.length === 0)
+              (formData.tokenType === 'edge' && formData.environments.length === 0)
             }
           >
             {t('apiTokens.createToken')}
@@ -1506,11 +1502,11 @@ const ApiTokensPage: React.FC = () => {
                     {t('apiTokens.selectSingleEnvironment')}
                   </Typography>
                   <RadioGroup
-                    value={formData.environmentIds[0] || ''}
+                    value={formData.environments[0] || ''}
                     onChange={(e) => setFormData(prev => ({
                       ...prev,
                       allowAllEnvironments: false,
-                      environmentIds: [e.target.value],
+                      environments: [e.target.value],
                     }))}
                   >
                     {environments.map((env) => (
@@ -1532,7 +1528,7 @@ const ApiTokensPage: React.FC = () => {
                         onChange={(e) => setFormData(prev => ({
                           ...prev,
                           allowAllEnvironments: e.target.checked,
-                          environmentIds: e.target.checked ? [] : prev.environmentIds,
+                          environments: e.target.checked ? [] : prev.environments,
                         }))}
                         size="small"
                       />
@@ -1560,17 +1556,17 @@ const ApiTokensPage: React.FC = () => {
                           key={env.id}
                           control={
                             <Checkbox
-                              checked={formData.environmentIds.includes(env.id)}
+                              checked={formData.environments.includes(env.id)}
                               onChange={(e) => {
                                 if (e.target.checked) {
                                   setFormData(prev => ({
                                     ...prev,
-                                    environmentIds: [...prev.environmentIds, env.id],
+                                    environments: [...prev.environments, env.id],
                                   }));
                                 } else {
                                   setFormData(prev => ({
                                     ...prev,
-                                    environmentIds: prev.environmentIds.filter(id => id !== env.id),
+                                    environments: prev.environments.filter(id => id !== env.id),
                                   }));
                                 }
                               }}
@@ -2140,12 +2136,12 @@ const ApiTokensPage: React.FC = () => {
                         size="small"
                         color="success"
                       />
-                    ) : newTokenInfo.environmentIds && newTokenInfo.environmentIds.length > 0 ? (
-                      newTokenInfo.environmentIds.map((envId: number) => {
-                        const env = environments.find(e => e.id === envId);
+                    ) : newTokenInfo.environments && newTokenInfo.environments.length > 0 ? (
+                      newTokenInfo.environments.map((envName: string) => {
+                        const env = environments.find(e => e.environment === envName);
                         return env ? (
                           <Chip
-                            key={envId}
+                            key={envName}
                             label={env.environmentName}
                             size="small"
                             variant="outlined"

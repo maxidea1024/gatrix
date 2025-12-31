@@ -96,7 +96,7 @@ export const EnvironmentChangeOverlay: React.FC = () => {
 
   useEffect(() => {
     // Listen for manual environment switch only (not page load)
-    const handleEnvironmentChange = (event: CustomEvent<{ environmentId: string; environment: typeof environments[0] }>) => {
+    const handleEnvironmentChange = (event: CustomEvent<{ environment: typeof environments[0] }>) => {
       const { environment } = event.detail;
       setDisplayedEnv(environment);
       setPhase('enter');

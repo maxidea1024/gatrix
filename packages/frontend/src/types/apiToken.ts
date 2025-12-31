@@ -8,7 +8,7 @@ export interface ApiAccessToken {
   tokenValue?: string; // Original token value for copying (only in list response)
   tokenType: TokenType;
   allowAllEnvironments: boolean;
-  environmentIds?: string[]; // Environment IDs (frontend maps to names)
+  environments?: string[]; // Environment names
   expiresAt?: string;
   lastUsedAt?: string;
   usageCount?: number;
@@ -34,7 +34,7 @@ export interface CreateTokenRequest {
   description?: string;
   tokenType: TokenType;
   allowAllEnvironments?: boolean;
-  environmentIds?: string[];
+  environments?: string[];
   expiresAt?: string;
 }
 
@@ -42,7 +42,7 @@ export interface UpdateTokenRequest {
   tokenName?: string;
   description?: string;
   allowAllEnvironments?: boolean;
-  environmentIds?: string[];
+  environments?: string[];
   expiresAt?: string;
 }
 
@@ -68,7 +68,7 @@ export interface GetTokensRequest {
   page?: number;
   limit?: number;
   tokenType?: TokenType;
-  environmentId?: number;
+  environment?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }

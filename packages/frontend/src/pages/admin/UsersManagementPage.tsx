@@ -487,7 +487,7 @@ const UsersManagementPage: React.FC = () => {
     status: 'pending' | 'active' | 'suspended' | 'deleted';
     tags: Tag[];
     allowAllEnvs: boolean;
-    envIds: string[];
+    selectedEnvironments: string[];
     permissions: Permission[];
   } | null>(null);
 
@@ -508,7 +508,7 @@ const UsersManagementPage: React.FC = () => {
     loading: boolean;
     showReview: boolean;
     allowAllEnvs: boolean;
-    envIds: string[];
+    selectedEnvironments: string[];
   }>({
     open: false,
     user: null,
@@ -516,7 +516,7 @@ const UsersManagementPage: React.FC = () => {
     loading: false,
     showReview: false,
     allowAllEnvs: false,
-    envIds: [],
+    selectedEnvironments: [],
   });
 
   // 이메일 인증 관련 상태
@@ -904,7 +904,7 @@ const UsersManagementPage: React.FC = () => {
       loading: false,
       showReview: false,
       allowAllEnvs: false,
-      envIds: [],
+      selectedEnvironments: [],
     });
   };
 
@@ -937,12 +937,12 @@ const UsersManagementPage: React.FC = () => {
       const promoteAllowAll = Boolean(promoteDialog.allowAllEnvs);
       await apiService.put(`/admin/users/${promoteDialog.user.id}/environments`, {
         allowAllEnvironments: promoteAllowAll,
-        environmentIds: promoteAllowAll ? [] : promoteDialog.envIds
+        environments: promoteAllowAll ? [] : promoteDialog.selectedEnvironments
       });
 
       enqueueSnackbar(t('common.userPromoted'), { variant: 'success' });
       mutateUsers();
-      setPromoteDialog({ open: false, user: null, permissions: [], loading: false, showReview: false, allowAllEnvs: false, envIds: [] });
+      setPromoteDialog({ open: false, user: null, permissions: [], loading: false, showReview: false, allowAllEnvs: false, selectedEnvironments: [] });
     } catch (error: any) {
       enqueueSnackbar(error.message || t('common.userPromoteFailed'), { variant: 'error' });
       setPromoteDialog(prev => ({ ...prev, loading: false }));
@@ -950,7 +950,7 @@ const UsersManagementPage: React.FC = () => {
   };
 
   const handlePromoteCancel = () => {
-    setPromoteDialog({ open: false, user: null, permissions: [], loading: false, showReview: false, allowAllEnvs: false, envIds: [] });
+    setPromoteDialog({ open: false, user: null, permissions: [], loading: false, showReview: false, allowAllEnvs: false, selectedEnvironments: [] });
   };
 
   const handleDemoteUser = (user: User) => {
@@ -1018,7 +1018,7 @@ const UsersManagementPage: React.FC = () => {
   };
 
   const handleEditUser = async (user: User) => {
-    const userWithEnv = user as User & { allowAllEnvironments?: boolean; environmentIds?: string[] };
+    const userWithEnv = user as User & { allowAllEnvironments?: boolean; environments?: string[] };
 
     setEditUserData({
       name: user.name,
@@ -1034,7 +1034,7 @@ const UsersManagementPage: React.FC = () => {
 
     // Load environment access from user data (already included in list response)
     setEditUserAllowAllEnvs(userWithEnv.allowAllEnvironments || false);
-    setEditUserEnvIds(userWithEnv.environmentIds || []);
+    setEditUserEnvIds(userWithEnv.environments || []);
 
     // Load user permissions
     let loadedPermissions: Permission[] = [];
@@ -1063,7 +1063,7 @@ const UsersManagementPage: React.FC = () => {
       status: user.status,
       tags: user.tags || [],
       allowAllEnvs: userWithEnv.allowAllEnvironments || false,
-      envIds: userWithEnv.environmentIds || [],
+      selectedEnvironments: userWithEnv.environments || [],
       permissions: loadedPermissions,
     });
 
@@ -1160,7 +1160,7 @@ const UsersManagementPage: React.FC = () => {
           to: editUserAllowAllEnvs ? t('common.all') : t('users.specificEnvironments')
         });
       } else if (!editUserAllowAllEnvs) {
-        const origEnvs = originalUserData.envIds.sort().join(',');
+        const origEnvs = originalUserData.selectedEnvironments.sort().join(',');
         const newEnvs = editUserEnvIds.sort().join(',');
         if (origEnvs !== newEnvs) {
           const getEnvNames = (ids: string[]) =>
@@ -1170,7 +1170,7 @@ const UsersManagementPage: React.FC = () => {
             }).join(', ') || '-';
           changes.push({
             field: t('users.environmentAccess'),
-            from: getEnvNames(originalUserData.envIds),
+            from: getEnvNames(originalUserData.selectedEnvironments),
             to: getEnvNames(editUserEnvIds)
           });
         }
@@ -1256,7 +1256,7 @@ const UsersManagementPage: React.FC = () => {
         const allowAll = Boolean(editUserAllowAllEnvs);
         await apiService.put(`/admin/users/${editUserDialog.user.id}/environments`, {
           allowAllEnvironments: allowAll,
-          environmentIds: allowAll ? [] : editUserEnvIds
+          environments: allowAll ? [] : editUserEnvIds
         });
 
         // Update permissions for admin users
@@ -1420,7 +1420,7 @@ const UsersManagementPage: React.FC = () => {
         ...newUserData,
         tagIds: newUserTags.map(tag => tag.id),
         allowAllEnvironments: newUserAllowAllEnvs,
-        environmentIds: newUserAllowAllEnvs ? [] : newUserEnvIds,
+        environments: newUserAllowAllEnvs ? [] : newUserEnvIds,
       };
       await apiService.post('/admin/users', userData);
       enqueueSnackbar(t('users.userCreated'), { variant: 'success' });
@@ -1566,7 +1566,7 @@ const UsersManagementPage: React.FC = () => {
           />
         );
       case 'environments': {
-        const userWithEnv = user as User & { allowAllEnvironments?: boolean; environmentIds?: string[] };
+        const userWithEnv = user as User & { allowAllEnvironments?: boolean; environments?: string[] };
         if (userWithEnv.allowAllEnvironments) {
           return (
             <Chip
@@ -1577,7 +1577,7 @@ const UsersManagementPage: React.FC = () => {
             />
           );
         }
-        const userEnvIds = userWithEnv.environmentIds || [];
+        const userEnvIds = userWithEnv.environments || [];
         if (userEnvIds.length === 0) {
           return (
             <Typography variant="body2" color="text.secondary">
@@ -1587,12 +1587,12 @@ const UsersManagementPage: React.FC = () => {
         }
         return (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-            {userEnvIds.slice(0, 3).map((envId) => {
-              const env = environments.find(e => e.id === envId);
+            {userEnvIds.slice(0, 3).map((envName) => {
+              const env = environments.find(e => e.environment === envName);
               return (
                 <Chip
-                  key={envId}
-                  label={env?.displayName || env?.environmentName || envId}
+                  key={envName}
+                  label={env?.displayName || env?.environmentName || envName}
                   size="small"
                   sx={{
                     borderRadius: 1,
@@ -2278,9 +2278,9 @@ const UsersManagementPage: React.FC = () => {
                   environmentName: env.environmentName
                 }))}
                 allowAllEnvs={newUserAllowAllEnvs}
-                selectedEnvIds={newUserEnvIds}
+                selectedEnvironments={newUserEnvIds}
                 onAllowAllEnvsChange={setNewUserAllowAllEnvs}
-                onEnvIdsChange={setNewUserEnvIds}
+                onEnvironmentsChange={setNewUserEnvIds}
               />
             </Box>
           </Box>
@@ -2516,9 +2516,9 @@ const UsersManagementPage: React.FC = () => {
                   environmentName: env.environmentName
                 }))}
                 allowAllEnvs={promoteDialog.allowAllEnvs}
-                selectedEnvIds={promoteDialog.envIds}
+                selectedEnvironments={promoteDialog.selectedEnvironments}
                 onAllowAllEnvsChange={(allowAll) => setPromoteDialog(prev => ({ ...prev, allowAllEnvs: allowAll }))}
-                onEnvIdsChange={(envIds) => setPromoteDialog(prev => ({ ...prev, envIds }))}
+                onEnvironmentsChange={(environments) => setPromoteDialog(prev => ({ ...prev, selectedEnvironments: environments }))}
               />
             </>
           )}
@@ -2610,17 +2610,17 @@ const UsersManagementPage: React.FC = () => {
                       variant="filled"
                       sx={{ fontSize: '0.75rem' }}
                     />
-                  ) : promoteDialog.envIds.length === 0 ? (
+                  ) : promoteDialog.selectedEnvironments.length === 0 ? (
                     <Typography variant="body2" color="text.secondary" fontStyle="italic">
                       {t('users.noEnvironmentsSelected')}
                     </Typography>
                   ) : (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {promoteDialog.envIds.map(envId => {
-                        const env = environments.find(e => e.id === envId);
-                        const displayName = env?.displayName || env?.environmentName || envId;
+                      {promoteDialog.selectedEnvironments.map(envName => {
+                        const env = environments.find(e => e.environment === envName);
+                        const displayName = env?.displayName || env?.environmentName || envName;
                         return (
-                          <Tooltip key={envId} title={t('users.environmentAccessDesc', { name: displayName })} arrow placement="top" enterDelay={200}>
+                          <Tooltip key={envName} title={t('users.environmentAccessDesc', { name: displayName })} arrow placement="top" enterDelay={200}>
                             <Chip
                               label={displayName}
                               size="small"
@@ -2871,9 +2871,9 @@ const UsersManagementPage: React.FC = () => {
                     environmentName: env.environmentName
                   }))}
                   allowAllEnvs={editUserAllowAllEnvs}
-                  selectedEnvIds={editUserEnvIds}
+                  selectedEnvironments={editUserEnvIds}
                   onAllowAllEnvsChange={setEditUserAllowAllEnvs}
-                  onEnvIdsChange={setEditUserEnvIds}
+                  onEnvironmentsChange={setEditUserEnvIds}
                 />
               </Box>
             )}

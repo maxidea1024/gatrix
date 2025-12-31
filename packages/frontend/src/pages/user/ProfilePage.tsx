@@ -123,7 +123,7 @@ const ProfilePage: React.FC = () => {
   // Get accessible environments
   const accessibleEnvironments = environmentAccess?.allowAllEnvironments
     ? environments
-    : environments.filter(env => (environmentAccess?.environments || (environmentAccess as any)?.environmentIds || []).includes(env.environment));
+    : environments.filter(env => (environmentAccess?.environments || (environmentAccess as any)?.environments || []).includes(env.environment));
 
   const handleEditToggle = () => {
     if (isEditing) {
