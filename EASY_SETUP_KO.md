@@ -104,15 +104,17 @@ Copy-Item .env.local.example .env.local
 
 #### 3단계: 서비스 로컬 실행
 
+**기본 서비스만 실행 (Backend + Frontend):**
+```bash
+yarn dev
+```
+
 **모든 서비스 동시 실행 (Backend, Frontend, Edge, Chat, Event-Lens):**
 ```bash
 yarn dev:all
 ```
 
-**기본 서비스만 실행 (Backend + Frontend):**
-```bash
-yarn dev
-```
+> **참고:** `yarn dev:all`은 모든 서비스를 동시에 시작합니다. Backend가 먼저 준비되어야 다른 서비스가 정상 작동하므로, 초기 시작 시 일부 재시도 오류가 발생할 수 있습니다. 개발 시에는 `yarn dev` (Backend + Frontend)를 권장합니다.
 
 **개별 서비스 실행 (별도 터미널에서):**
 ```bash
