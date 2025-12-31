@@ -43,8 +43,8 @@ class ServerLifecycleService {
         eventType?: string;
     }): Promise<EventsResponse> {
         const response = await api.get('/admin/server-lifecycle/events', { params });
-        // api.get returns response.data (the body)
-        return response as any;
+        // api.get returns { success, data: { data: [...], total, page, limit } }
+        return response.data as EventsResponse;
     }
 
     async getSummary(limit: number = 10): Promise<ServerLifecycleEvent[]> {

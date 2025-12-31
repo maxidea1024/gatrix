@@ -57,6 +57,7 @@ import JobExecutionHistory from '../../components/jobs/JobExecutionHistory';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
+import { getContrastColor } from '@/utils/colorUtils';
 
 // Default column configuration
 const defaultColumns: ColumnConfig[] = [
@@ -528,7 +529,7 @@ const JobsPage: React.FC = () => {
                           variant="outlined"
                           label={option.name}
                           size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          sx={{ bgcolor: option.color, color: getContrastColor(option.color) }}
                           {...chipProps}
                         />
                       </Tooltip>
@@ -545,7 +546,7 @@ const JobsPage: React.FC = () => {
                       <Chip
                         label={option.name}
                         size="small"
-                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                        sx={{ bgcolor: option.color, color: getContrastColor(option.color), mr: 1 }}
                       />
                       {option.description || t('common.noDescription')}
                     </Box>

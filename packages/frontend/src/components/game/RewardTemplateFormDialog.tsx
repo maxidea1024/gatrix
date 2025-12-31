@@ -28,6 +28,7 @@ import { useSnackbar } from 'notistack';
 import rewardTemplateService, { RewardTemplate, ParticipationReward } from '../../services/rewardTemplateService';
 import RewardItemSelector, { RewardSelection } from './RewardItemSelector';
 import { tagService, Tag } from '../../services/tagService';
+import { getContrastColor } from '@/utils/colorUtils';
 
 interface RewardTemplateFormDialogProps {
   open: boolean;
@@ -339,7 +340,7 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
                           variant="outlined"
                           label={option.name}
                           size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          sx={{ bgcolor: option.color, color: getContrastColor(option.color) }}
                           {...chipProps}
                         />
                       </Tooltip>

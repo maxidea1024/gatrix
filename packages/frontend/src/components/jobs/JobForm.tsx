@@ -29,6 +29,7 @@ import { Job, JobType, CreateJobData, UpdateJobData, JobSchemaField } from '../.
 import { Tag, tagService } from '../../services/tagService';
 import { jobService } from '../../services/jobService';
 import DynamicJobDataForm from './DynamicJobDataForm';
+import { getContrastColor } from '@/utils/colorUtils';
 
 interface JobFormProps {
   job?: Job | null;
@@ -455,7 +456,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
                     variant="outlined"
                     label={option.name}
                     size="small"
-                    sx={{ bgcolor: option.color, color: '#fff' }}
+                    sx={{ bgcolor: option.color, color: getContrastColor(option.color) }}
                     {...chipProps}
                   />
                 );

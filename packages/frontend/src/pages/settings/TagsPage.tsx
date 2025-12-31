@@ -9,6 +9,7 @@ import { useSnackbar } from 'notistack';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { ColorPicker } from '@/components/common/ColorPicker';
+import { getContrastColor } from '@/utils/colorUtils';
 
 const randomHexColor = () => `#${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0')}`;
 
@@ -153,7 +154,7 @@ const TagsPage: React.FC = () => {
           <CardContent>
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ md: 'center' }}>
               <Tooltip title={newDescription || t('tags.noDescription')} arrow>
-                <Chip label={newName || 'label'} sx={{ bgcolor: newColor, color: '#fff', height: 28, cursor: 'help' }} />
+                <Chip label={newName || 'label'} sx={{ bgcolor: newColor, color: getContrastColor(newColor), height: 28, cursor: 'help' }} />
               </Tooltip>
               <TextField
                 inputRef={nameInputRef}
@@ -229,10 +230,10 @@ const TagsPage: React.FC = () => {
                       <TableCell sx={{ width: 260 }}>
                         <Stack direction="row" spacing={1} alignItems="center">
                           {editingId === tag.id ? (
-                            <Chip label={editName || 'label'} size="small" sx={{ bgcolor: editColor, color: '#fff' }} />
+                            <Chip label={editName || 'label'} size="small" sx={{ bgcolor: editColor, color: getContrastColor(editColor) }} />
                           ) : (
                             <Tooltip title={tag.description || t('tags.noDescription')} arrow>
-                              <Chip label={tag.name} size="small" sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }} />
+                              <Chip label={tag.name} size="small" sx={{ bgcolor: tag.color, color: getContrastColor(tag.color), cursor: 'help' }} />
                             </Tooltip>
                           )}
                           {editingId === tag.id && (

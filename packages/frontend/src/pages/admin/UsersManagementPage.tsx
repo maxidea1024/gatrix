@@ -117,6 +117,7 @@ import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../componen
 import { usePaginatedApi, useTags } from '../../hooks/useSWR';
 import { useEnvironments } from '../../contexts/EnvironmentContext';
 import PermissionSelector from '../../components/common/PermissionSelector';
+import { getContrastColor } from '@/utils/colorUtils';
 // SSE는 MainLayout에서 전역으로 처리하므로 여기서는 제거
 
 interface UsersResponse {
@@ -1587,12 +1588,12 @@ const UsersManagementPage: React.FC = () => {
         }
         return (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-            {userEnvIds.slice(0, 3).map((envName) => {
-              const env = environments.find(e => e.environment === envName);
+            {userEnvIds.slice(0, 3).map((envId) => {
+              const env = environments.find(e => e.id === envId);
               return (
                 <Chip
-                  key={envName}
-                  label={env?.displayName || env?.environmentName || envName}
+                  key={envId}
+                  label={env?.displayName || env?.environmentName || envId}
                   size="small"
                   sx={{
                     borderRadius: 1,
@@ -2233,7 +2234,7 @@ const UsersManagementPage: React.FC = () => {
                           variant="outlined"
                           label={option.name}
                           size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          sx={{ bgcolor: option.color, color: getContrastColor(option.color) }}
                           {...chipProps}
                         />
                       </Tooltip>
@@ -2254,7 +2255,7 @@ const UsersManagementPage: React.FC = () => {
                       <Chip
                         label={option.name}
                         size="small"
-                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                        sx={{ bgcolor: option.color, color: getContrastColor(option.color), mr: 1 }}
                       />
                       {option.description || t('common.noDescription')}
                     </Box>
@@ -2518,7 +2519,7 @@ const UsersManagementPage: React.FC = () => {
                 allowAllEnvs={promoteDialog.allowAllEnvs}
                 selectedEnvironments={promoteDialog.selectedEnvironments}
                 onAllowAllEnvsChange={(allowAll) => setPromoteDialog(prev => ({ ...prev, allowAllEnvs: allowAll }))}
-                onEnvironmentsChange={(environments) => setPromoteDialog(prev => ({ ...prev, selectedEnvironments: environments }))}
+                onEnvironmentsChange={(environments) => setPromoteDialog(prev => ({ ...prev, envIds }))}
               />
             </>
           )}
@@ -2616,11 +2617,11 @@ const UsersManagementPage: React.FC = () => {
                     </Typography>
                   ) : (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {promoteDialog.selectedEnvironments.map(envName => {
-                        const env = environments.find(e => e.environment === envName);
-                        const displayName = env?.displayName || env?.environmentName || envName;
+                      {promoteDialog.selectedEnvironments.map(envId => {
+                        const env = environments.find(e => e.id === envId);
+                        const displayName = env?.displayName || env?.environmentName || envId;
                         return (
-                          <Tooltip key={envName} title={t('users.environmentAccessDesc', { name: displayName })} arrow placement="top" enterDelay={200}>
+                          <Tooltip key={envId} title={t('users.environmentAccessDesc', { name: displayName })} arrow placement="top" enterDelay={200}>
                             <Chip
                               label={displayName}
                               size="small"
@@ -2826,7 +2827,7 @@ const UsersManagementPage: React.FC = () => {
                           variant="outlined"
                           label={option.name}
                           size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          sx={{ bgcolor: option.color, color: getContrastColor(option.color) }}
                           {...chipProps}
                         />
                       </Tooltip>
@@ -2847,7 +2848,7 @@ const UsersManagementPage: React.FC = () => {
                       <Chip
                         label={option.name}
                         size="small"
-                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                        sx={{ bgcolor: option.color, color: getContrastColor(option.color), mr: 1 }}
                       />
                       {option.description || t('common.noDescription')}
                     </Box>
@@ -3192,7 +3193,7 @@ const UsersManagementPage: React.FC = () => {
                           variant="outlined"
                           label={option.name}
                           size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          sx={{ bgcolor: option.color, color: getContrastColor(option.color) }}
                           {...chipProps}
                         />
                       </Tooltip>
@@ -3213,7 +3214,7 @@ const UsersManagementPage: React.FC = () => {
                       <Chip
                         label={option.name}
                         size="small"
-                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                        sx={{ bgcolor: option.color, color: getContrastColor(option.color), mr: 1 }}
                       />
                       {option.description || t('common.noDescription')}
                     </Box>

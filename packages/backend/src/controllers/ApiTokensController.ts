@@ -88,6 +88,7 @@ class ApiTokensController {
           maskedTokenValue: maskedToken,
           allowAllEnvironments: Boolean(token.allowAllEnvironments),
           environments: envByToken[token.id] || [],
+          environmentIds: envByToken[token.id] || [], // Backward compatibility
           creator: {
             name: token.creatorName || 'Unknown',
             email: token.creatorEmail || ''
@@ -197,6 +198,7 @@ class ApiTokensController {
           tokenValue, // Only shown once!
           allowAllEnvironments,
           environments: allowAllEnvironments ? [] : environments,
+          environmentIds: allowAllEnvironments ? [] : environments, // Backward compatibility
           expiresAt,
           createdAt: new Date().toISOString()
         }
@@ -282,12 +284,11 @@ class ApiTokensController {
         .select('environment');
 
       // Format response
-      const envNames = envAssignments.map((e: any) => e.environment);
       const formattedToken = {
         ...updatedToken,
         maskedTokenValue: updatedToken.tokenValue?.substring(0, 4) + '••••••••' + updatedToken.tokenValue?.substring(updatedToken.tokenValue.length - 4),
         allowAllEnvironments: Boolean(updatedToken.allowAllEnvironments),
-        environments: envNames,
+        environments: envAssignments.map((e: any) => e.environment),
         creator: {
           name: updatedToken.creatorName || 'Unknown',
           email: updatedToken.creatorEmail || ''
