@@ -11,6 +11,8 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { useTheme } from '@mui/material/styles';
+import Editor from '@monaco-editor/react';
 import ResizableDrawer from '../common/ResizableDrawer';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 
@@ -23,33 +25,63 @@ interface PlanningDataGuideContentProps {
     variant?: 'drawer' | 'inline';
 }
 
-// Reusable command code block component
-const CodeBlock: React.FC<{ code: string; onCopy: () => void }> = ({ code, onCopy }) => (
-    <Box sx={{
-        bgcolor: 'background.paper',
-        borderRadius: 1,
-        p: 2,
-        pr: 5,
-        fontFamily: 'monospace',
-        fontSize: '0.875rem',
-        border: '1px solid',
-        borderColor: 'divider',
-        position: 'relative'
-    }}>
-        <Tooltip title="Copy">
-            <IconButton
-                size="small"
-                sx={{ position: 'absolute', top: 4, right: 4 }}
-                onClick={onCopy}
-            >
-                <CopyIcon fontSize="small" />
-            </IconButton>
-        </Tooltip>
-        <Typography component="pre" sx={{ m: 0, whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontSize: 'inherit' }}>
-            {code}
-        </Typography>
-    </Box>
-);
+// Code block component with Monaco Editor for syntax highlighting
+const CodeBlock: React.FC<{ code: string; language?: string; onCopy: () => void; height?: number }> = ({
+    code,
+    language = 'shell',
+    onCopy,
+    height = 120
+}) => {
+    const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
+
+    // Calculate height based on line count
+    const lineCount = code.split('\n').length;
+    const calculatedHeight = Math.min(Math.max(lineCount * 19 + 16, height), 300);
+
+    return (
+        <Box sx={{
+            border: `1px solid ${theme.palette.divider}`,
+            borderRadius: 1,
+            overflow: 'hidden',
+            position: 'relative'
+        }}>
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                p: 0.5,
+                backgroundColor: isDark ? '#1e1e1e' : '#f5f5f5',
+                borderBottom: `1px solid ${theme.palette.divider}`,
+            }}>
+                <Tooltip title="Copy">
+                    <IconButton size="small" onClick={onCopy} sx={{ color: 'primary.main' }}>
+                        <CopyIcon fontSize="small" />
+                    </IconButton>
+                </Tooltip>
+            </Box>
+            <Box sx={{ height: calculatedHeight }}>
+                <Editor
+                    height="100%"
+                    language={language}
+                    value={code}
+                    theme={isDark ? 'vs-dark' : 'light'}
+                    options={{
+                        readOnly: true,
+                        minimap: { enabled: false },
+                        scrollBeyondLastLine: false,
+                        wordWrap: 'on',
+                        automaticLayout: true,
+                        fontSize: 12,
+                        lineNumbers: 'off',
+                        folding: false,
+                        padding: { top: 8, bottom: 8 },
+                        scrollbar: { vertical: 'hidden', horizontal: 'hidden' },
+                    }}
+                />
+            </Box>
+        </Box>
+    );
+};
 
 // Reusable guide content component
 export const PlanningDataGuideContent: React.FC<PlanningDataGuideContentProps> = ({ variant = 'drawer' }) => {
