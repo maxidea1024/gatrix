@@ -2797,6 +2797,8 @@
     "hotTimeButtonEvent": "热时按钮活动",
     "liveEvent": "直播活动",
     "planningData": "策划数据",
+    "planningDataManagement": "策划数据管理",
+    "planningDataHistory": "策划数据历史",
     "serverManagement": "服务器管理",
     "serverList": "服务器列表",
     "openApi": "Open API",
@@ -4321,6 +4323,21 @@
       "by": "上传者",
       "hash": "哈希",
       "files": "个文件"
+    },
+    "history": {
+      "title": "策划数据历史",
+      "loadFailed": "加载上传记录失败",
+      "noRecords": "没有上传记录",
+      "uploadedAt": "上传时间",
+      "uploader": "上传者",
+      "source": "上传方式",
+      "hash": "哈希",
+      "filesCount": "文件数",
+      "size": "大小",
+      "comment": "备注",
+      "filesUploaded": "已上传文件",
+      "changedFiles": "变更文件",
+      "latest": "最新"
     }
   },
   "rewards": {

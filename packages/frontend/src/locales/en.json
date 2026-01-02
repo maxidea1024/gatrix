@@ -2746,6 +2746,8 @@
     "hotTimeButtonEvent": "Hot Time Button Event",
     "liveEvent": "Live Event",
     "planningData": "Planning Data",
+    "planningDataManagement": "Planning Data Management",
+    "planningDataHistory": "Planning Data History",
     "serverManagement": "Server Management",
     "serverList": "Server List",
     "openApi": "Open API",
@@ -4267,6 +4269,21 @@
       "by": "By",
       "hash": "Hash",
       "files": "files"
+    },
+    "history": {
+      "title": "Planning Data History",
+      "loadFailed": "Failed to load upload history",
+      "noRecords": "No upload records found",
+      "uploadedAt": "Uploaded At",
+      "uploader": "Uploader",
+      "source": "Source",
+      "hash": "Hash",
+      "filesCount": "Files",
+      "size": "Size",
+      "comment": "Comment",
+      "filesUploaded": "Files Uploaded",
+      "changedFiles": "Changed Files",
+      "latest": "Latest"
     }
   },
   "rewards": {

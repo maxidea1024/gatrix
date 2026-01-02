@@ -2745,6 +2745,8 @@
     "hotTimeButtonEvent": "핫타임버튼 이벤트",
     "liveEvent": "라이브이벤트",
     "planningData": "기획데이터",
+    "planningDataManagement": "기획데이터 관리",
+    "planningDataHistory": "기획데이터 히스토리",
     "serverManagement": "서버관리",
     "serverList": "서버목록",
     "serverLifecycle": "서버 실행 이력",
@@ -4264,6 +4266,21 @@
       "by": "업로더",
       "hash": "해시",
       "files": "파일"
+    },
+    "history": {
+      "title": "기획데이터 히스토리",
+      "loadFailed": "업로드 기록을 불러오지 못했습니다",
+      "noRecords": "업로드 기록이 없습니다",
+      "uploadedAt": "업로드 일시",
+      "uploader": "업로더",
+      "source": "업로드 방식",
+      "hash": "해시",
+      "filesCount": "파일 수",
+      "size": "크기",
+      "comment": "코멘트",
+      "filesUploaded": "업로드된 파일",
+      "changedFiles": "변경된 파일",
+      "latest": "최신"
     }
   },
   "rewards": {
