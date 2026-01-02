@@ -33,13 +33,15 @@ import {
   CheckCircle as CheckCircleIcon,
   Error as ErrorIcon,
   Description as DescriptionIcon,
+  Info as InfoIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import planningDataService from '../../services/planningDataService';
+import planningDataService, { PreviewDiffResult } from '../../services/planningDataService';
 
 interface PlanningDataUploadProps {
   onUploadSuccess?: () => void;
+  onClose?: () => void;
 }
 
 const SUPPORTED_FILES = [
@@ -78,7 +80,7 @@ const SUPPORTED_FILES = [
 
 const REQUIRED_FILES = SUPPORTED_FILES.map(f => f.name);
 
-export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUploadSuccess }) => {
+export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUploadSuccess, onClose }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -92,6 +94,12 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
   const [showSupportedFilesDialog, setShowSupportedFilesDialog] = useState(false);
   const [invalidFileName, setInvalidFileName] = useState<string | null>(null);
   const [uploadComment, setUploadComment] = useState('');
+  const [showAlreadyUpToDateDialog, setShowAlreadyUpToDateDialog] = useState(false);
+
+  // Preview diff state
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [previewResult, setPreviewResult] = useState<PreviewDiffResult | null>(null);
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -140,11 +148,40 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
     }
   };
 
+  // Called when user clicks "Upload" button - shows preview first
   const handleUpload = async () => {
     if (filesToUpload.size === 0) {
       enqueueSnackbar(t('planningData.upload.selectFilesToUpload') || 'Please select files to upload', { variant: 'warning' });
       return;
     }
+
+    try {
+      setIsPreviewLoading(true);
+
+      // Filter files to preview
+      const filesToPreviewArray = selectedFiles.filter((file) => filesToUpload.has(file.name));
+      const result = await planningDataService.previewDiff(filesToPreviewArray);
+
+      // If no changes, show already up to date dialog
+      if (result.changedFiles.length === 0) {
+        setShowAlreadyUpToDateDialog(true);
+        return;
+      }
+
+      // Show preview dialog with changes
+      setPreviewResult(result);
+      setShowPreviewDialog(true);
+    } catch (error: any) {
+      const errorMessage = error.message || t('planningData.upload.previewFailed') || 'Preview failed';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    } finally {
+      setIsPreviewLoading(false);
+    }
+  };
+
+  // Called when user confirms upload from preview dialog
+  const handleConfirmUpload = async () => {
+    setShowPreviewDialog(false);
 
     try {
       setUploading(true);
@@ -164,21 +201,23 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
 
       // Check if upload was skipped (no changes)
       if (result.stats?.skipped) {
-        enqueueSnackbar(t('planningData.upload.alreadyUpToDate') || 'Already up to date - no changes detected', { variant: 'info' });
+        setShowAlreadyUpToDateDialog(true);
       } else {
         // Localize the success message with file count
         const localizedMessage = t('planningData.upload.filesUploadedAndCached', {
           count: result.filesUploaded?.length || filesToUploadArray.length,
         });
         enqueueSnackbar(localizedMessage, { variant: 'success' });
+
+        // Only trigger refresh on actual upload
+        if (onUploadSuccess) {
+          onUploadSuccess();
+        }
       }
       setSelectedFiles([]);
       setFilesToUpload(new Set());
       setUploadComment('');
-
-      if (onUploadSuccess) {
-        onUploadSuccess();
-      }
+      setPreviewResult(null);
     } catch (error: any) {
       const errorMessage = error.message || t('planningData.upload.uploadFailed') || 'Upload failed';
       enqueueSnackbar(errorMessage, { variant: 'error' });
@@ -188,10 +227,34 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
     }
   };
 
+  const handlePreviewDiff = async () => {
+    if (filesToUpload.size === 0) {
+      enqueueSnackbar(t('planningData.upload.selectFilesToUpload') || 'Please select files to preview', { variant: 'warning' });
+      return;
+    }
+
+    try {
+      setIsPreviewLoading(true);
+
+      // Filter files to preview
+      const filesToPreviewArray = selectedFiles.filter((file) => filesToUpload.has(file.name));
+      const result = await planningDataService.previewDiff(filesToPreviewArray);
+
+      setPreviewResult(result);
+      setShowPreviewDialog(true);
+    } catch (error: any) {
+      const errorMessage = error.message || t('planningData.upload.previewFailed') || 'Preview failed';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    } finally {
+      setIsPreviewLoading(false);
+    }
+  };
+
   const handleClear = () => {
     setSelectedFiles([]);
     setFilesToUpload(new Set());
     setUploadComment('');
+    setPreviewResult(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -353,9 +416,9 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
               variant="contained"
-              startIcon={uploading ? <CircularProgress size={20} /> : <CloudUploadIcon />}
+              startIcon={(uploading || isPreviewLoading) ? <CircularProgress size={20} /> : <CloudUploadIcon />}
               onClick={handleUpload}
-              disabled={uploading || filesToUpload.size === 0}
+              disabled={uploading || isPreviewLoading || filesToUpload.size === 0}
             >
               {t('planningData.upload.upload') || 'Upload'} ({filesToUpload.size})
             </Button>
@@ -415,6 +478,290 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
           <Button onClick={() => setShowSupportedFilesDialog(false)} variant="contained">
             확인
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Already Up To Date Dialog */}
+      <Dialog
+        open={showAlreadyUpToDateDialog}
+        onClose={() => {
+          setShowAlreadyUpToDateDialog(false);
+          if (onClose) onClose();
+        }}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <InfoIcon color="info" />
+          {t('planningData.upload.alreadyUpToDateTitle') || 'Already Up To Date'}
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            {t('planningData.upload.alreadyUpToDate') || 'The data is already up to date. No changes were detected.'}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setShowAlreadyUpToDateDialog(false);
+              if (onClose) onClose();
+            }}
+          >
+            {t('common.confirm') || 'OK'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Preview Diff Dialog */}
+      <Dialog
+        open={showPreviewDialog}
+        onClose={() => setShowPreviewDialog(false)}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <InfoIcon color="info" />
+          {t('planningData.upload.previewChangesTitle') || 'Preview Changes'}
+        </DialogTitle>
+        <DialogContent sx={{ maxHeight: '70vh' }}>
+          {previewResult && (
+            <Box>
+              {/* Summary */}
+              <Box sx={{ mb: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                <Chip
+                  label={`${previewResult.changedFiles.length} ${t('planningData.upload.filesChanged') || 'files changed'}`}
+                  color={previewResult.changedFiles.length > 0 ? 'warning' : 'default'}
+                />
+                <Chip
+                  label={`+${previewResult.summary.totalAdded} ${t('planningData.history.added') || 'added'}`}
+                  color="success"
+                  variant="outlined"
+                />
+                <Chip
+                  label={`-${previewResult.summary.totalRemoved} ${t('planningData.history.removed') || 'removed'}`}
+                  color="error"
+                  variant="outlined"
+                />
+                <Chip
+                  label={`~${previewResult.summary.totalModified} ${t('planningData.history.modified') || 'modified'}`}
+                  color="warning"
+                  variant="outlined"
+                />
+              </Box>
+
+              {previewResult.changedFiles.length === 0 ? (
+                <Alert severity="info">
+                  {t('planningData.upload.noChangesDetected') || 'No changes detected. The data is already up to date.'}
+                </Alert>
+              ) : (
+                <Box>
+                  {Object.entries(previewResult.fileDiffs).map(([fileName, fileDiff]) => (
+                    <Box key={fileName} sx={{ mb: 3 }}>
+                      <Typography variant="subtitle2" color="primary" sx={{ mb: 1 }}>
+                        📄 {fileName}
+                      </Typography>
+
+                      {/* Modified items */}
+                      {fileDiff.modified?.length > 0 && (
+                        <Box sx={{ mb: 2 }}>
+                          <Typography variant="caption" color="warning.main" sx={{ fontWeight: 'bold', display: 'block', mb: 0.5 }}>
+                            ~ {t('planningData.history.modified')}: {fileDiff.modified.length}
+                          </Typography>
+                          <Box
+                            component="table"
+                            sx={{
+                              width: '100%',
+                              borderCollapse: 'collapse',
+                              fontSize: '0.75rem',
+                              fontFamily: 'monospace',
+                              border: '1px dashed',
+                              borderColor: 'divider',
+                              '& th, & td': {
+                                borderBottom: '1px dashed',
+                                borderRight: '1px dashed',
+                                borderColor: 'divider',
+                                p: 0.5,
+                                textAlign: 'left',
+                              },
+                              '& th:last-child, & td:last-child': {
+                                borderRight: 'none',
+                              },
+                              '& th': {
+                                bgcolor: 'action.hover',
+                                fontWeight: 'bold',
+                              },
+                              '& tbody tr:nth-of-type(odd)': {
+                                bgcolor: 'rgba(255, 255, 255, 0.02)',
+                              },
+                            }}
+                          >
+                            <thead>
+                              <tr>
+                                <Box component="th" sx={{ width: '35%' }}>{t('planningData.history.path')}</Box>
+                                <Box component="th" sx={{ width: '32%', color: 'error.main' }}>{t('planningData.history.before')}</Box>
+                                <Box component="th" sx={{ width: '32%', color: 'success.main' }}>{t('planningData.history.after')}</Box>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {fileDiff.modified.slice(0, 10).map((item, idx) => (
+                                <tr key={idx}>
+                                  <td>{item.path}</td>
+                                  <Box component="td" sx={{ color: 'error.main', textDecoration: 'line-through', wordBreak: 'break-all' }}>
+                                    {typeof item.before === 'string' ? item.before : JSON.stringify(item.before)}
+                                  </Box>
+                                  <Box component="td" sx={{ color: 'success.main', wordBreak: 'break-all' }}>
+                                    {typeof item.after === 'string' ? item.after : JSON.stringify(item.after)}
+                                  </Box>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </Box>
+                          {fileDiff.modified.length > 10 && (
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                              +{fileDiff.modified.length - 10} more...
+                            </Typography>
+                          )}
+                        </Box>
+                      )}
+
+                      {/* Added items */}
+                      {fileDiff.added?.length > 0 && (
+                        <Box sx={{ mb: 2 }}>
+                          <Typography variant="caption" color="success.main" sx={{ fontWeight: 'bold', display: 'block', mb: 0.5 }}>
+                            + {t('planningData.history.added')}: {fileDiff.added.length}
+                          </Typography>
+                          <Box
+                            component="table"
+                            sx={{
+                              width: '100%',
+                              borderCollapse: 'collapse',
+                              fontSize: '0.75rem',
+                              fontFamily: 'monospace',
+                              border: '1px dashed',
+                              borderColor: 'divider',
+                              '& th, & td': {
+                                borderBottom: '1px dashed',
+                                borderRight: '1px dashed',
+                                borderColor: 'divider',
+                                p: 0.5,
+                                textAlign: 'left',
+                              },
+                              '& th:last-child, & td:last-child': {
+                                borderRight: 'none',
+                              },
+                              '& th': {
+                                bgcolor: 'action.hover',
+                                fontWeight: 'bold',
+                              },
+                              '& tbody tr:nth-of-type(odd)': {
+                                bgcolor: 'rgba(255, 255, 255, 0.02)',
+                              },
+                            }}
+                          >
+                            <thead>
+                              <tr>
+                                <Box component="th" sx={{ width: '40%' }}>{t('planningData.history.path')}</Box>
+                                <Box component="th" sx={{ color: 'success.main' }}>{t('planningData.history.value')}</Box>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {fileDiff.added.slice(0, 10).map((item, idx) => (
+                                <tr key={idx}>
+                                  <td>{item.path}</td>
+                                  <Box component="td" sx={{ color: 'success.main', wordBreak: 'break-all' }}>
+                                    {typeof item.value === 'string' ? item.value : JSON.stringify(item.value)}
+                                  </Box>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </Box>
+                          {fileDiff.added.length > 10 && (
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                              +{fileDiff.added.length - 10} more...
+                            </Typography>
+                          )}
+                        </Box>
+                      )}
+
+                      {/* Removed items */}
+                      {fileDiff.removed?.length > 0 && (
+                        <Box sx={{ mb: 2 }}>
+                          <Typography variant="caption" color="error.main" sx={{ fontWeight: 'bold', display: 'block', mb: 0.5 }}>
+                            − {t('planningData.history.removed')}: {fileDiff.removed.length}
+                          </Typography>
+                          <Box
+                            component="table"
+                            sx={{
+                              width: '100%',
+                              borderCollapse: 'collapse',
+                              fontSize: '0.75rem',
+                              fontFamily: 'monospace',
+                              border: '1px dashed',
+                              borderColor: 'divider',
+                              '& th, & td': {
+                                borderBottom: '1px dashed',
+                                borderRight: '1px dashed',
+                                borderColor: 'divider',
+                                p: 0.5,
+                                textAlign: 'left',
+                              },
+                              '& th:last-child, & td:last-child': {
+                                borderRight: 'none',
+                              },
+                              '& th': {
+                                bgcolor: 'action.hover',
+                                fontWeight: 'bold',
+                              },
+                              '& tbody tr:nth-of-type(odd)': {
+                                bgcolor: 'rgba(255, 255, 255, 0.02)',
+                              },
+                            }}
+                          >
+                            <thead>
+                              <tr>
+                                <Box component="th" sx={{ width: '40%' }}>{t('planningData.history.path')}</Box>
+                                <Box component="th" sx={{ color: 'error.main' }}>{t('planningData.history.value')}</Box>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {fileDiff.removed.slice(0, 10).map((item, idx) => (
+                                <tr key={idx}>
+                                  <td>{item.path}</td>
+                                  <Box component="td" sx={{ color: 'error.main', textDecoration: 'line-through', wordBreak: 'break-all' }}>
+                                    {typeof item.value === 'string' ? item.value : JSON.stringify(item.value)}
+                                  </Box>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </Box>
+                          {fileDiff.removed.length > 10 && (
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                              +{fileDiff.removed.length - 10} more...
+                            </Typography>
+                          )}
+                        </Box>
+                      )}
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={() => setShowPreviewDialog(false)}>
+            {t('common.cancel') || 'Cancel'}
+          </Button>
+          {previewResult && previewResult.changedFiles.length > 0 && (
+            <Button
+              variant="contained"
+              startIcon={<CloudUploadIcon />}
+              onClick={handleConfirmUpload}
+            >
+              {t('common.apply') || 'Apply'}
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </Box>

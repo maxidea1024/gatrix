@@ -30,6 +30,7 @@ import {
   Tooltip,
   IconButton,
   Alert,
+  Divider,
 } from '@mui/material';
 import {
   Storage as StorageIcon,
@@ -42,6 +43,7 @@ import {
   Schedule as ScheduleIcon,
   CloudUpload as CloudUploadIcon,
   ContentCopy as CopyIcon,
+  HelpOutline as HelpOutlineIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -49,8 +51,9 @@ import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import planningDataService, { PlanningDataStats, HotTimeBuffLookup, HotTimeBuffItem, UploadRecord } from '../../services/planningDataService';
 import SimplePagination from '../../components/common/SimplePagination';
 import { useDebounce } from '../../hooks/useDebounce';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
 import PlanningDataUpload from '../../components/planning-data/PlanningDataUpload';
+import PlanningDataGuideDrawer, { PlanningDataGuideContent } from '../../components/planning-data/PlanningDataGuideDrawer';
 
 const PlanningDataPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -63,6 +66,7 @@ const PlanningDataPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [rebuilding, setRebuilding] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [showGuideDrawer, setShowGuideDrawer] = useState(false);
   const [activeTab, setActiveTab] = useState(() => {
     const saved = sessionStorage.getItem('planningDataActiveTab');
     return saved ? parseInt(saved) : 0;
@@ -681,6 +685,12 @@ const PlanningDataPage: React.FC = () => {
               {t('planningData.uploadData')}
             </Button>
           )}
+          <Divider orientation="vertical" flexItem sx={{ height: 32, alignSelf: 'center' }} />
+          <Tooltip title={t('planningData.uploadGuide.title')}>
+            <IconButton onClick={() => setShowGuideDrawer(true)}>
+              <HelpOutlineIcon />
+            </IconButton>
+          </Tooltip>
         </Box>
       </Box>
 
@@ -724,6 +734,7 @@ const PlanningDataPage: React.FC = () => {
               </Box>
               <PlanningDataUpload
                 onUploadSuccess={handleUploadSuccess}
+                onClose={() => setShowUploadDialog(false)}
               />
             </CardContent>
           </Card>
@@ -748,7 +759,7 @@ const PlanningDataPage: React.FC = () => {
                     </Typography>
                     <Chip
                       size="small"
-                      label={formatDateTimeDetailed(latestUpload.uploadedAt)}
+                      label={formatRelativeTime(latestUpload.uploadedAt)}
                       color="primary"
                       variant="outlined"
                     />
@@ -2704,108 +2715,9 @@ const PlanningDataPage: React.FC = () => {
                 {t('planningData.noDataDescription')}
               </Typography>
 
-              <Box sx={{
-                bgcolor: 'action.hover',
-                borderRadius: 2,
-                p: 3,
-                mb: 3,
-                textAlign: 'left'
-              }}>
-                <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-                  {t('planningData.uploadGuide.title')}
-                </Typography>
-
-                <Typography variant="body2" sx={{ mb: 2 }}>
-                  <strong>1. {t('planningData.uploadGuide.webUpload')}</strong>
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, pl: 2 }}>
-                  {t('planningData.uploadGuide.webUploadDesc')}
-                </Typography>
-
-                <Typography variant="body2" sx={{ mb: 2 }}>
-                  <strong>2. {t('planningData.uploadGuide.dataBuild')}</strong>
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, pl: 2 }}>
-                  {t('planningData.uploadGuide.dataBuildDesc')}
-                </Typography>
-                <Alert severity="warning" sx={{ mb: 2, textAlign: 'left' }}>
-                  {t('planningData.uploadGuide.clientDataWarning')}
-                </Alert>
-                <Box sx={{
-                  bgcolor: 'background.paper',
-                  borderRadius: 1,
-                  p: 2,
-                  pr: 5,
-                  mb: 3,
-                  fontFamily: 'monospace',
-                  fontSize: '0.875rem',
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  position: 'relative'
-                }}>
-                  <IconButton
-                    size="small"
-                    sx={{ position: 'absolute', top: 4, right: 4 }}
-                    onClick={() => copyToClipboardWithNotification(
-                      'yarn planning-data:convert --input=./cms --output=./converted-planning-data',
-                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                    )}
-                  >
-                    <CopyIcon fontSize="small" />
-                  </IconButton>
-                  <Typography component="pre" sx={{ m: 0, whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontSize: 'inherit' }}>
-                    {`yarn planning-data:convert --input=./cms --output=./converted-planning-data`}
-                  </Typography>
-                </Box>
-
-                <Typography variant="body2" sx={{ mb: 2 }}>
-                  <strong>3. {t('planningData.uploadGuide.cliUpload')}</strong>
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, pl: 2 }}>
-                  {t('planningData.uploadGuide.cliUploadDesc')}
-                </Typography>
-                <Box sx={{
-                  bgcolor: 'background.paper',
-                  borderRadius: 1,
-                  p: 2,
-                  pr: 5,
-                  mb: 2,
-                  fontFamily: 'monospace',
-                  fontSize: '0.875rem',
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  position: 'relative'
-                }}>
-                  <IconButton
-                    size="small"
-                    sx={{ position: 'absolute', top: 4, right: 4 }}
-                    onClick={() => copyToClipboardWithNotification(
-                      `yarn upload-planning-data \\
-  --api-url=https://gatrix.example.com \\
-  --env=qa \\
-  --dir=./converted-planning-data \\
-  --token=<YOUR_API_TOKEN>`,
-                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                    )}
-                  >
-                    <CopyIcon fontSize="small" />
-                  </IconButton>
-                  <Typography component="pre" sx={{ m: 0, whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontSize: 'inherit' }}>
-                    {`yarn upload-planning-data \\
-  --api-url=https://gatrix.example.com \\
-  --env=qa \\
-  --dir=./converted-planning-data \\
-  --token=<YOUR_API_TOKEN>
-
-# Options:
-#   --api-url   (Required) Backend API URL
-#   --env       (Required) Target environment (dev, qa, production)
-#   --dir       (Required) Directory containing planning data files
-#   --token     (Required) Server API token for authentication`}
-                  </Typography>
-                </Box>
+              {/* Reusable Guide Content */}
+              <Box sx={{ mb: 3 }}>
+                <PlanningDataGuideContent variant="inline" />
               </Box>
 
               {canManage && (
@@ -2822,6 +2734,12 @@ const PlanningDataPage: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Guide Drawer */}
+      <PlanningDataGuideDrawer
+        open={showGuideDrawer}
+        onClose={() => setShowGuideDrawer(false)}
+      />
     </Box>
   );
 };

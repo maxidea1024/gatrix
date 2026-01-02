@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
+import { diff as deepDiff, Diff } from 'deep-diff';
 import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { cacheService } from './CacheService';
@@ -729,45 +730,55 @@ export class PlanningDataService {
       }
 
       let changedFiles: string[] = [];
-      const fileDiffs: Record<string, { added: string[]; removed: string[]; modified: string[] }> = {};
+      const fileDiffs: Record<string, {
+        added: Array<{ path: string; value: any }>;
+        removed: Array<{ path: string; value: any }>;
+        modified: Array<{ path: string; before: any; after: any }>;
+      }> = {};
 
-      if (previousUpload) {
-        const prevHashes = typeof previousUpload.fileHashes === 'string'
-          ? JSON.parse(previousUpload.fileHashes)
-          : previousUpload.fileHashes;
+      // Compare with cached data to detect changes (works even if history was cleared)
+      for (const [fileName, _hash] of Object.entries(fileHashes)) {
+        try {
+          const currentContent = fileContents[fileName];
+          if (!currentContent) continue;
 
-        for (const [fileName, hash] of Object.entries(fileHashes)) {
-          if (prevHashes[fileName] !== hash) {
-            changedFiles.push(fileName);
+          const currentJson = JSON.parse(currentContent);
+          const baseCacheKey = this.getFileCacheKey(fileName);
 
-            // Calculate diff for JSON files
-            try {
-              const currentContent = fileContents[fileName];
-              if (currentContent) {
-                const currentJson = JSON.parse(currentContent);
+          if (baseCacheKey) {
+            const cacheKey = this.getEnvCacheKey(environment, baseCacheKey);
+            const prevContent = await cacheService.get<any>(cacheKey);
 
-                // Get the correct cache key for this file
-                const baseCacheKey = this.getFileCacheKey(fileName);
-                if (baseCacheKey) {
-                  const prevKey = this.getEnvCacheKey(environment, baseCacheKey);
-                  const prevContent = await cacheService.get<any>(prevKey);
-                  if (prevContent) {
-                    // prevContent is already parsed JSON from cache
-                    const diff = this.calculateJsonDiff(prevContent, currentJson);
-                    if (diff.added.length > 0 || diff.removed.length > 0 || diff.modified.length > 0) {
-                      fileDiffs[fileName] = diff;
-                    }
-                  }
+            if (prevContent) {
+              // Compare JSON content
+              const prevStr = JSON.stringify(prevContent, null, 0);
+              const currStr = JSON.stringify(currentJson, null, 0);
+
+              if (prevStr !== currStr) {
+                changedFiles.push(fileName);
+
+                // Calculate detailed diff
+                const diff = this.calculateJsonDiff(prevContent, currentJson);
+                if (diff.added.length > 0 || diff.removed.length > 0 || diff.modified.length > 0) {
+                  fileDiffs[fileName] = diff;
                 }
+                logger.debug(`File changed: ${fileName}`, { added: diff.added.length, removed: diff.removed.length, modified: diff.modified.length });
               }
-            } catch {
-              // Skip diff for non-JSON or parse errors
+            } else {
+              // No cache = new file
+              changedFiles.push(fileName);
+              logger.debug(`New file (no cache): ${fileName}`);
             }
+          } else {
+            // Unknown file type
+            changedFiles.push(fileName);
+            logger.debug(`Unknown file type: ${fileName}`);
           }
+        } catch (e) {
+          // Parse error - treat as changed
+          changedFiles.push(fileName);
+          logger.debug(`Error comparing ${fileName}:`, e);
         }
-      } else {
-        // First upload - all files are "new"
-        changedFiles = uploadedFiles;
       }
 
       // Calculate total size
@@ -890,6 +901,82 @@ export class PlanningDataService {
     } catch (error) {
       logger.error('Failed to get latest upload', { error, environment });
       throw new GatrixError('Failed to get latest upload', 500);
+    }
+  }
+
+  /**
+   * Reset all upload history for an environment
+   * @param environment Environment name
+   * @returns Number of deleted records
+   */
+  static async resetUploadHistory(environment: string): Promise<number> {
+    try {
+      const deletedCount = await db('planningDataUploads')
+        .where({ environment })
+        .delete();
+
+      logger.info('Upload history reset', { deletedCount, environment });
+      return deletedCount;
+    } catch (error) {
+      logger.error('Failed to reset upload history', { error, environment });
+      throw new GatrixError('Failed to reset upload history', 500);
+    }
+  }
+
+  /**
+   * Cleanup old upload records beyond retention period
+   * @param environment Environment name
+   * @param retentionDays Number of days to keep records (default from env: PLANNING_DATA_RETENTION_DAYS)
+   */
+  static async cleanupOldRecords(environment: string, retentionDays?: number): Promise<number> {
+    try {
+      const days = retentionDays || parseInt(process.env.PLANNING_DATA_RETENTION_DAYS || '14', 10);
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - days);
+
+      const deletedCount = await db('planningDataUploads')
+        .where({ environment })
+        .where('uploadedAt', '<', cutoffDate)
+        .delete();
+
+      if (deletedCount > 0) {
+        logger.info('Old upload records cleaned up', { environment, deletedCount, retentionDays: days });
+      }
+
+      return deletedCount;
+    } catch (error) {
+      logger.error('Failed to cleanup old upload records', { error, environment });
+      throw new GatrixError('Failed to cleanup old upload records', 500);
+    }
+  }
+
+  /**
+   * Cleanup old upload records for all environments
+   * Called by QueueService periodically
+   */
+  static async cleanupAllEnvironments(): Promise<{ total: number; byEnvironment: Record<string, number> }> {
+    try {
+      const environments = await db('planningDataUploads')
+        .distinct('environment')
+        .pluck('environment');
+
+      const byEnvironment: Record<string, number> = {};
+      let total = 0;
+
+      for (const environment of environments) {
+        const deleted = await this.cleanupOldRecords(environment);
+        byEnvironment[environment] = deleted;
+        total += deleted;
+      }
+
+      if (total > 0) {
+        logger.info('Planning data upload records cleanup completed', { total, byEnvironment });
+      }
+
+      return { total, byEnvironment };
+    } catch (error) {
+      logger.error('Failed to cleanup all environments', { error });
+      throw new GatrixError('Failed to cleanup old upload records', 500);
     }
   }
 
@@ -1065,51 +1152,177 @@ export class PlanningDataService {
   }
 
   /**
-   * Calculate diff between two JSON objects (arrays)
-   * Returns lists of added, removed, and modified items
+   * Preview diff between uploaded files and cached data without saving
+   * Returns diff information for each file that would change
+   */
+  static async previewDiff(
+    environment: string,
+    files: { [fieldname: string]: Express.Multer.File[] } | Express.Multer.File[] | undefined
+  ): Promise<{
+    changedFiles: string[];
+    fileDiffs: Record<string, {
+      added: Array<{ path: string; value: any }>;
+      removed: Array<{ path: string; value: any }>;
+      modified: Array<{ path: string; before: any; after: any }>;
+    }>;
+    summary: {
+      totalAdded: number;
+      totalRemoved: number;
+      totalModified: number;
+    };
+  }> {
+    if (!files) {
+      return {
+        changedFiles: [],
+        fileDiffs: {},
+        summary: { totalAdded: 0, totalRemoved: 0, totalModified: 0 },
+      };
+    }
+
+    // Normalize files array
+    const fileArray = Array.isArray(files) ? files : Object.values(files).flat();
+
+    // Read file contents
+    const fileContents: Record<string, string> = {};
+    for (const file of fileArray) {
+      const content = file.buffer.toString('utf-8');
+      fileContents[file.originalname] = content;
+    }
+
+    const changedFiles: string[] = [];
+    const fileDiffs: Record<string, {
+      added: Array<{ path: string; value: any }>;
+      removed: Array<{ path: string; value: any }>;
+      modified: Array<{ path: string; before: any; after: any }>;
+    }> = {};
+
+    let totalAdded = 0;
+    let totalRemoved = 0;
+    let totalModified = 0;
+
+    // Compare with cached data
+    for (const [fileName, content] of Object.entries(fileContents)) {
+      try {
+        const currentJson = JSON.parse(content);
+        const baseCacheKey = this.getFileCacheKey(fileName);
+
+        if (baseCacheKey) {
+          const cacheKey = this.getEnvCacheKey(environment, baseCacheKey);
+          const prevContent = await cacheService.get<any>(cacheKey);
+
+          if (prevContent) {
+            // Compare JSON content
+            const prevStr = JSON.stringify(prevContent, null, 0);
+            const currStr = JSON.stringify(currentJson, null, 0);
+
+            if (prevStr !== currStr) {
+              changedFiles.push(fileName);
+
+              // Calculate detailed diff
+              const diff = this.calculateJsonDiff(prevContent, currentJson);
+              if (diff.added.length > 0 || diff.removed.length > 0 || diff.modified.length > 0) {
+                fileDiffs[fileName] = diff;
+                totalAdded += diff.added.length;
+                totalRemoved += diff.removed.length;
+                totalModified += diff.modified.length;
+              }
+            }
+          } else {
+            // No cache = new file (all items are "added")
+            changedFiles.push(fileName);
+            // For new files, treat the entire content as added
+            const itemCount = Array.isArray(currentJson) ? currentJson.length : Object.keys(currentJson).length;
+            fileDiffs[fileName] = {
+              added: [{ path: 'root', value: `New file with ${itemCount} items` }],
+              removed: [],
+              modified: [],
+            };
+            totalAdded += 1;
+          }
+        }
+      } catch (e) {
+        // Parse error - treat as changed
+        changedFiles.push(fileName);
+        logger.debug(`Error parsing ${fileName} for preview:`, e);
+      }
+    }
+
+    return {
+      changedFiles,
+      fileDiffs,
+      summary: { totalAdded, totalRemoved, totalModified },
+    };
+  }
+
+  /**
+   * Calculate diff between two JSON objects using deep-diff library
+   * For arrays with 'id' field, converts to id-keyed objects to avoid index shift issues
+   * Returns lists of added, removed, and modified items with before/after values
    */
   private static calculateJsonDiff(
     oldJson: any,
     newJson: any
-  ): { added: string[]; removed: string[]; modified: string[] } {
-    const added: string[] = [];
-    const removed: string[] = [];
-    const modified: string[] = [];
+  ): { added: Array<{ path: string; value: any }>; removed: Array<{ path: string; value: any }>; modified: Array<{ path: string; before: any; after: any }> } {
+    const added: Array<{ path: string; value: any }> = [];
+    const removed: Array<{ path: string; value: any }> = [];
+    const modified: Array<{ path: string; before: any; after: any }> = [];
 
-    // Handle array data (most planning data is array of objects with id)
-    if (Array.isArray(oldJson) && Array.isArray(newJson)) {
-      const oldMap = new Map<string, any>();
-      const newMap = new Map<string, any>();
-
-      // Build maps by id (or first key if no id)
-      for (const item of oldJson) {
-        const key = item.id !== undefined ? String(item.id) : JSON.stringify(item);
-        oldMap.set(key, item);
-      }
-      for (const item of newJson) {
-        const key = item.id !== undefined ? String(item.id) : JSON.stringify(item);
-        newMap.set(key, item);
-      }
-
-      // Find added items
-      for (const [key] of newMap) {
-        if (!oldMap.has(key)) {
-          added.push(key);
+    // Convert arrays with id field to id-keyed objects for better comparison
+    const normalizeForDiff = (obj: any): any => {
+      if (Array.isArray(obj)) {
+        // Check if array items have 'id' field
+        if (obj.length > 0 && typeof obj[0] === 'object' && obj[0] !== null && 'id' in obj[0]) {
+          // Convert to object keyed by id
+          const result: Record<string, any> = {};
+          for (const item of obj) {
+            result[String(item.id)] = normalizeForDiff(item);
+          }
+          return result;
         }
-      }
-
-      // Find removed items
-      for (const [key] of oldMap) {
-        if (!newMap.has(key)) {
-          removed.push(key);
+        // Regular array without id - keep as is
+        return obj.map(normalizeForDiff);
+      } else if (typeof obj === 'object' && obj !== null) {
+        const result: Record<string, any> = {};
+        for (const [key, value] of Object.entries(obj)) {
+          result[key] = normalizeForDiff(value);
         }
+        return result;
       }
+      return obj;
+    };
 
-      // Find modified items
-      for (const [key, newItem] of newMap) {
-        const oldItem = oldMap.get(key);
-        if (oldItem && JSON.stringify(oldItem) !== JSON.stringify(newItem)) {
-          modified.push(key);
+    const normalizedOld = normalizeForDiff(oldJson);
+    const normalizedNew = normalizeForDiff(newJson);
+
+    const differences = deepDiff(normalizedOld, normalizedNew);
+
+    if (differences) {
+      for (const d of differences) {
+        // Build path string from diff path array
+        const pathStr = d.path ? d.path.join('.') : 'root';
+
+        switch (d.kind) {
+          case 'N': // New (added)
+            added.push({ path: pathStr, value: d.rhs });
+            break;
+          case 'D': // Deleted (removed)
+            removed.push({ path: pathStr, value: d.lhs });
+            break;
+          case 'E': // Edited (modified)
+            modified.push({ path: pathStr, before: d.lhs, after: d.rhs });
+            break;
+          case 'A': // Array change
+            // For array changes, include the index and nested path
+            const arrayPath = d.path ? d.path.join('.') : 'root';
+            const indexPath = `${arrayPath}[${d.index}]`;
+            if (d.item.kind === 'N') {
+              added.push({ path: indexPath, value: d.item.rhs });
+            } else if (d.item.kind === 'D') {
+              removed.push({ path: indexPath, value: d.item.lhs });
+            } else if (d.item.kind === 'E') {
+              modified.push({ path: indexPath, before: d.item.lhs, after: d.item.rhs });
+            }
+            break;
         }
       }
     }

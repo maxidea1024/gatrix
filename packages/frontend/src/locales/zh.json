@@ -2139,6 +2139,7 @@
     "copiedToClipboard": "已复制到剪贴板",
     "typeToConfirm": "输入 \"{{name}}\" 确认删除：",
     "copy": "复制",
+    "copyToClipboard": "复制到剪贴板",
     "paste": "粘贴",
     "copyFailed": "复制到剪贴板失败",
     "cannotCopySystemItem": "系统项目无法复制",
@@ -4285,7 +4286,13 @@
       "filesUploadedAndCached": "{{count}}个策划数据文件已上传并缓存成功",
       "comment": "上传备注",
       "commentPlaceholder": "关于此次上传的说明（可选）",
-      "alreadyUpToDate": "已是最新数据 - 没有检测到变更"
+      "alreadyUpToDate": "数据已是最新。没有检测到变更。",
+      "alreadyUpToDateTitle": "已是最新状态",
+      "previewChanges": "预览变更",
+      "previewChangesTitle": "预览变更",
+      "previewFailed": "预览变更失败",
+      "noChangesDetected": "没有检测到变更。数据已是最新。",
+      "filesChanged": "个文件变更"
     },
     "tabs": {
       "rewardTypes": "奖励类型",
@@ -4313,13 +4320,16 @@
     "noDataDescription": "请上传游戏所需的策划数据。您可以通过网页界面或CLI进行上传。",
     "uploadGuide": {
       "title": "上传指南",
+      "subtitle": "了解如何上传策划数据。",
       "webUpload": "通过网页界面上传",
       "webUploadDesc": "点击上方的「上传策划数据」按钮，选择并上传本地文件。",
       "dataBuild": "数据构建 (Excel → JSON 转换)",
       "dataBuildDesc": "将客户端CMS数据转换为JSON格式。",
       "clientDataWarning": "必须使用客户端CMS数据，不是服务器数据！",
       "cliUpload": "通过CLI远程上传",
-      "cliUploadDesc": "将转换后的数据上传到远程服务器。"
+      "cliUploadDesc": "将转换后的数据上传到远程服务器.",
+      "curlUpload": "通过curl上传",
+      "curlUploadDesc": "使用curl命令直接上传文件."
     },
     "uploadInfo": {
       "lastUpload": "最近上传",
@@ -4329,6 +4339,7 @@
     },
     "history": {
       "title": "策划数据历史",
+      "subtitle": "查看策划数据上传记录和变更历史。",
       "loadFailed": "加载上传记录失败",
       "noRecords": "没有上传记录",
       "uploadedAt": "上传时间",
@@ -4336,7 +4347,9 @@
       "source": "上传方式",
       "hash": "哈希",
       "filesCount": "文件数",
+      "changedFilesCount": "变更数",
       "size": "大小",
+      "changes": "变更",
       "comment": "备注",
       "filesUploaded": "已上传文件",
       "changedFiles": "变更文件",
@@ -4345,7 +4358,20 @@
       "removed": "删除",
       "modified": "修改",
       "noDiffAvailable": "无法查看详细变更",
-      "noChanges": "没有变更文件（首次上传）"
+      "noChanges": "没有变更文件（首次上传）",
+      "resetAll": "全部删除",
+      "resetConfirmTitle": "删除所有上传记录",
+      "resetWarning": "此操作无法撤销。所有上传记录将被永久删除。",
+      "resetConfirmMessage": "将删除{{count}}条上传记录。",
+      "resetConfirmInstruction": "请输入'全部删除'以确认删除：",
+      "resetConfirmPlaceholder": "全部删除",
+      "resetConfirmText": "全部删除",
+      "resetSuccess": "已删除{{count}}条上传记录",
+      "resetFailed": "删除上传记录失败",
+      "path": "路径",
+      "before": "修改前",
+      "after": "修改后",
+      "value": "值"
     }
   },
   "rewards": {

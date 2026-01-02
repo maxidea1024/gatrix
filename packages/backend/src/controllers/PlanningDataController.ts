@@ -276,4 +276,44 @@ export class PlanningDataController {
       message: latestUpload ? 'Latest upload retrieved successfully' : 'No uploads found',
     });
   });
+
+  /**
+   * Reset all upload history
+   * DELETE /api/v1/admin/planning-data/history
+   */
+  static resetUploadHistory = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environment = getEnvironment(req);
+
+    const deletedCount = await PlanningDataService.resetUploadHistory(environment);
+
+    res.json({
+      success: true,
+      data: { deletedCount },
+      message: 'Upload history reset successfully',
+    });
+  });
+
+  /**
+   * Preview diff before uploading
+   * POST /api/v1/admin/planning-data/preview-diff
+   */
+  static previewDiff = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environment = getEnvironment(req);
+
+    logger.info('[PlanningData] Preview diff requested', {
+      userId: req.user?.userId,
+      filesCount: req.files ? Object.keys(req.files).length : 0,
+      environment,
+    });
+
+    const result = await PlanningDataService.previewDiff(environment, req.files);
+
+    res.json({
+      success: true,
+      data: result,
+      message: result.changedFiles.length > 0
+        ? `${result.changedFiles.length} files with changes detected`
+        : 'No changes detected',
+    });
+  });
 }

@@ -2086,6 +2086,7 @@
     "copiedToClipboard": "클립보드에 복사되었습니다",
     "typeToConfirm": "삭제를 확인하려면 \"{{name}}\"을(를) 입력하세요:",
     "copy": "복사",
+    "copyToClipboard": "클립보드에 복사",
     "paste": "붙여넣기",
     "copyFailed": "클립보드 복사에 실패했습니다",
     "cannotCopySystemItem": "시스템 항목은 복사할 수 없습니다",
@@ -4228,7 +4229,13 @@
       "filesUploadedAndCached": "{{count}}개의 기획데이터 파일이 업로드되고 캐싱되었습니다",
       "comment": "업로드 코멘트",
       "commentPlaceholder": "이번 업로드에 대한 설명을 입력하세요 (선택사항)",
-      "alreadyUpToDate": "이미 최신 데이터입니다 - 변경된 내용이 없습니다"
+      "alreadyUpToDate": "이미 최신 데이터입니다. 변경된 내용이 없습니다.",
+      "alreadyUpToDateTitle": "이미 최신 상태",
+      "previewChanges": "변경사항 미리보기",
+      "previewChangesTitle": "변경사항 미리보기",
+      "previewFailed": "변경사항 확인에 실패했습니다",
+      "noChangesDetected": "변경사항이 없습니다. 이미 최신 상태입니다.",
+      "filesChanged": "개 파일 변경됨"
     },
     "tabs": {
       "rewardTypes": "보상 타입 목록",
@@ -4256,13 +4263,16 @@
     "noDataDescription": "게임에서 사용할 기획데이터를 업로드해주세요. 웹 UI 또는 CLI를 통해 업로드할 수 있습니다.",
     "uploadGuide": {
       "title": "업로드 방법 안내",
+      "subtitle": "기획데이터를 업로드하는 방법을 안내합니다.",
       "webUpload": "웹 UI를 통한 업로드",
       "webUploadDesc": "위의 '기획데이터 업로드' 버튼을 클릭하여 로컬 파일을 선택하고 업로드합니다.",
       "dataBuild": "데이터 빌드 (Excel → JSON 변환)",
       "dataBuildDesc": "클라이언트용 CMS 데이터를 JSON 형식으로 변환합니다.",
       "clientDataWarning": "반드시 클라이언트용 CMS 데이터를 사용해야 합니다. 서버용 데이터가 아닙니다!",
       "cliUpload": "CLI를 통한 원격 업로드",
-      "cliUploadDesc": "변환된 데이터를 원격 서버로 업로드합니다."
+      "cliUploadDesc": "변환된 데이터를 원격 서버로 업로드합니다.",
+      "curlUpload": "curl을 통한 업로드",
+      "curlUploadDesc": "curl 명령어를 사용하여 파일을 직접 업로드합니다."
     },
     "uploadInfo": {
       "lastUpload": "최근 업로드",
@@ -4272,6 +4282,7 @@
     },
     "history": {
       "title": "기획데이터 히스토리",
+      "subtitle": "기획데이터 업로드 내역과 변경 이력을 확인할 수 있습니다.",
       "loadFailed": "업로드 기록을 불러오지 못했습니다",
       "noRecords": "업로드 기록이 없습니다",
       "uploadedAt": "업로드 일시",
@@ -4279,7 +4290,9 @@
       "source": "업로드 방식",
       "hash": "해시",
       "filesCount": "파일 수",
+      "changedFilesCount": "변경 파일 수",
       "size": "크기",
+      "changes": "변경사항",
       "comment": "코멘트",
       "filesUploaded": "업로드된 파일",
       "changedFiles": "변경된 파일",
@@ -4288,7 +4301,20 @@
       "removed": "삭제",
       "modified": "수정",
       "noDiffAvailable": "상세 변경 내역을 확인할 수 없습니다",
-      "noChanges": "변경된 파일이 없습니다 (최초 업로드)"
+      "noChanges": "변경된 파일이 없습니다 (최초 업로드)",
+      "resetAll": "전체 삭제",
+      "resetConfirmTitle": "업로드 기록 전체 삭제",
+      "resetWarning": "이 작업은 되돌릴 수 없습니다. 모든 업로드 기록이 영구적으로 삭제됩니다.",
+      "resetConfirmMessage": "총 {{count}}개의 업로드 기록이 삭제됩니다.",
+      "resetConfirmInstruction": "삭제를 확인하려면 아래에 '전부삭제'를 입력하세요.",
+      "resetConfirmPlaceholder": "전부삭제",
+      "resetConfirmText": "전부삭제",
+      "resetSuccess": "{{count}}개의 업로드 기록이 삭제되었습니다",
+      "resetFailed": "업로드 기록 삭제에 실패했습니다",
+      "path": "경로",
+      "before": "변경 전",
+      "after": "변경 후",
+      "value": "값"
     }
   },
   "rewards": {

@@ -10,7 +10,7 @@
       },
       "description": {
         "ko": "[[BigR]]을 획득할 수 있는 상품입니다.",
-        "en": "[[BigR]]을 획득할 수 있는 상품입니다.22222",
+        "en": "[[BigR]]을 획득할 수 있는 상품입니다.3333",
         "zh": "这是一个可以获得[[BigR]]的商品。"
       },
       "productCode": "com.uwocn.30",
@@ -20,29 +20,11 @@
       "saleType": 1
     },
     {
-      "id": 10503002,
-      "name": {
-        "ko": "레드젬 1,360",
-        "en": "레드젬 1,360",
-        "zh": "红钻 1,360"
-      },
-      "description": {
-        "ko": "[[BigR]]을 획득할 수 있는 상품입니다.",
-        "en": "[[BigR]]을 획득할 수 있는 상품입니다.",
-        "zh": "这是一个可以获得[[BigR]]的商品。"
-      },
-      "productCode": "com.uwocn.68",
-      "price": 68,
-      "productCategory": 1,
-      "productType": 1,
-      "saleType": 1
-    },
-    {
       "id": 10503003,
       "name": {
-        "ko": "레드젬 3,960",
-        "en": "레드젬 3,960",
-        "zh": "红钻 3,960"
+        "ko": "레드젬 3,962111111",
+        "en": "레드젬 3,962",
+        "zh": "红钻 3,9602"
       },
       "description": {
         "ko": "[[BigR]]을 획득할 수 있는 상품입니다.",
@@ -51,24 +33,6 @@
       },
       "productCode": "com.uwocn.198",
       "price": 198,
-      "productCategory": 1,
-      "productType": 1,
-      "saleType": 1
-    },
-    {
-      "id": 10503004,
-      "name": {
-        "ko": "레드젬 6,560",
-        "en": "레드젬 6,560",
-        "zh": "红钻 6,560"
-      },
-      "description": {
-        "ko": "[[BigR]]을 획득할 수 있는 상품입니다.",
-        "en": "[[BigR]]을 획득할 수 있는 상품입니다.",
-        "zh": "这是一个可以获得[[BigR]]的商品。"
-      },
-      "productCode": "com.uwocn.328",
-      "price": 328,
       "productCategory": 1,
       "productType": 1,
       "saleType": 1
@@ -101,7 +65,7 @@
       "description": {
         "ko": "[[BigR]]을 두 배로 획득할 수 있는 상품입니다.",
         "en": "[[BigR]]을 두 배로 획득할 수 있는 상품입니다.",
-        "zh": "这是一个可以获得双倍[[BigR]]的商品。"
+        "zh": "这是一个可以获得双倍[[BigR]]的商品。222222222"
       },
       "productCode": "com.uwocn.30",
       "price": 30,

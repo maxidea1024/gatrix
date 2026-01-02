@@ -284,6 +284,31 @@ class PlanningDataService {
   }
 
   /**
+   * Preview diff before uploading
+   * Compares uploaded files with cached data without saving
+   */
+  async previewDiff(files: File[], onProgress?: (progress: number) => void): Promise<PreviewDiffResult> {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+
+    const response = await api.post('/admin/planning-data/preview-diff', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      onUploadProgress: (progressEvent) => {
+        if (onProgress && progressEvent.total) {
+          const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+          onProgress(progress);
+        }
+      },
+    });
+
+    return response.data;
+  }
+
+  /**
    * Get upload history
    */
   async getUploadHistory(limit: number = 20): Promise<UploadRecord[]> {
@@ -298,6 +323,28 @@ class PlanningDataService {
     const response = await api.get('/admin/planning-data/latest');
     return response.data;
   }
+
+  /**
+   * Reset all upload history
+   */
+  async resetUploadHistory(): Promise<{ deletedCount: number }> {
+    const response = await api.delete('/admin/planning-data/history');
+    return response.data;
+  }
+}
+
+export interface PreviewDiffResult {
+  changedFiles: string[];
+  fileDiffs: Record<string, {
+    added: Array<{ path: string; value: any }>;
+    removed: Array<{ path: string; value: any }>;
+    modified: Array<{ path: string; before: any; after: any }>;
+  }>;
+  summary: {
+    totalAdded: number;
+    totalRemoved: number;
+    totalModified: number;
+  };
 }
 
 export interface UploadRecord {
@@ -310,7 +357,11 @@ export interface UploadRecord {
   uploadSource: 'web' | 'cli';
   uploadComment: string | null;
   changedFiles: string[];
-  fileDiffs?: Record<string, { added: string[]; removed: string[]; modified: string[] }>;
+  fileDiffs?: Record<string, {
+    added: Array<{ path: string; value: any }>;
+    removed: Array<{ path: string; value: any }>;
+    modified: Array<{ path: string; before: any; after: any }>;
+  }>;
   uploadedAt: string;
 }
 
