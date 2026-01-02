@@ -368,7 +368,7 @@ const CouponUsagePage: React.FC = () => {
                 {loading ? (
                   <EmptyTableRow colSpan={visibleColumns.length} loading message={t('common.loading') as string} />
                 ) : records.length === 0 ? (
-                  <EmptyTableRow colSpan={visibleColumns.length} loading={false} message={t('common.noData') as string} />
+                  <EmptyTableRow colSpan={visibleColumns.length} loading={false} message={t('coupons.couponUsage.noRecords') as string} />
                 ) : (
                   sortedRecords.map((r) => (
                     <TableRow key={r.id} hover>

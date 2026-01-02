@@ -1058,7 +1058,7 @@ const CouponSettingsPage: React.FC = () => {
                   <EmptyTableRow
                     colSpan={colCount}
                     loading={false}
-                    message={t('common.noData') as string}
+                    message={t('coupons.couponSettings.noCoupons') as string}
                     subtitle={canManage ? t('common.addFirstItem') : undefined}
                     onAddClick={canManage ? () => { resetForm(); setOpenForm(true); } : undefined}
                     addButtonLabel={t('coupons.couponSettings.addCoupon')}

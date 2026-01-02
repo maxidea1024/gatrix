@@ -3694,6 +3694,7 @@
       "issuedCount": "Issued Codes",
       "generatingCodes": "Generating codes",
       "generatingInBackground": "Generating coupons in the background.",
+      "noCoupons": "No coupons defined.",
       "issuedCodesDrawer": {
         "title": "Issued Coupon Codes",
         "subtitle": "Coupon Setting: {name}",
@@ -3866,6 +3867,7 @@
         "characterId": "Character ID"
       },
       "allCoupons": "All Coupons",
+      "noRecords": "No coupon usage records.",
       "columns": {
         "couponName": "Coupon Name",
         "couponCode": "Coupon Code",

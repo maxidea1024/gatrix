@@ -3694,6 +3694,7 @@
       "issuedCount": "발행된 코드 수",
       "generatingCodes": "쿠폰 생성 중",
       "generatingInBackground": "쿠폰을 백그라운드에서 발급 중입니다.",
+      "noCoupons": "정의된 쿠폰이 없습니다.",
       "issuedCodesDrawer": {
         "title": "발행된 쿠폰 코드 목록",
         "subtitle": "쿠폰 설정: {name}",
@@ -3866,6 +3867,7 @@
         "characterId": "캐릭터 ID"
       },
       "allCoupons": "전체 쿠폰",
+      "noRecords": "쿠폰 사용 기록이 없습니다.",
       "columns": {
         "couponName": "쿠폰 이름",
         "couponCode": "쿠폰 코드",

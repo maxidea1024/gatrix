@@ -3747,6 +3747,7 @@
       "issuedCount": "已发行代码",
       "generatingCodes": "正在生成代码",
       "generatingInBackground": "正在后台生成优惠券。",
+      "noCoupons": "暂无定义的优惠券。",
       "sdkGuide": "SDK 集成指南",
       "issuedCodesDrawer": {
         "title": "已发行优惠券代码列表",
@@ -3920,6 +3921,7 @@
         "characterId": "角色ID"
       },
       "allCoupons": "所有优惠券",
+      "noRecords": "暂无优惠券使用记录。",
       "columns": {
         "couponName": "优惠券名称",
         "couponCode": "优惠券代码",
