@@ -110,6 +110,8 @@ import GameWorldSDKGuideDrawer from '../../components/gameWorlds/GameWorldSDKGui
 import GameWorldForm from '../../components/admin/GameWorldForm';
 import MaintenanceSettingsInput from '../../components/common/MaintenanceSettingsInput';
 import { parseJson5 } from '../../components/common/JsonEditor';
+import { TableLoadingRow } from '@/components/common/TableLoadingRow';
+import { TableSkeletonRows } from '@/components/common/TableSkeletonRows';
 
 // Column definition interface
 interface ColumnConfig {
@@ -312,7 +314,7 @@ const GameWorldsPage: React.FC = () => {
   const canManage = hasPermission([PERMISSIONS.GAME_WORLDS_MANAGE]);
 
   const [worlds, setWorlds] = useState<GameWorld[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
 
@@ -656,9 +658,12 @@ const GameWorldsPage: React.FC = () => {
     paper: { sx: { maxHeight: 280 } },
   } as const;
 
+  const isFetchingRef = useRef(false);
+
   const loadGameWorlds = async () => {
     // 이미 로딩 중이면 중복 요청 방지
-    if (loading) return;
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
 
     try {
       setLoading(true);
@@ -689,6 +694,7 @@ const GameWorldsPage: React.FC = () => {
       }
     } finally {
       setLoading(false);
+      isFetchingRef.current = false;
     }
   };
 
@@ -1506,10 +1512,16 @@ const GameWorldsPage: React.FC = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {worlds.length === 0 ? (
+                  {loading ? (
+                    <TableSkeletonRows
+                      rowCount={10}
+                      cellCount={1 + columns.filter(col => col.visible).length + 1 + (canManage ? 1 : 0)}
+                      loading={true}
+                    />
+                  ) : worlds.length === 0 ? (
                     <EmptyTableRow
                       colSpan={1 + columns.filter(col => col.visible).length + 2}
-                      loading={loading}
+                      loading={false}
                       message={t('gameWorlds.noWorldsFound')}
                       loadingMessage={t('common.loadingData')}
                       subtitle={canManage ? t('common.addFirstItem') : undefined}

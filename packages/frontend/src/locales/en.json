@@ -4249,7 +4249,19 @@
     "testComponent": {
       "title": "Test Component (Data Verification)"
     },
-    "noData": "No data available"
+    "noData": "No data available",
+    "noDataTitle": "No Planning Data Uploaded",
+    "noDataDescription": "Please upload planning data for the game. You can upload via Web UI or CLI.",
+    "uploadGuide": {
+      "title": "Upload Guide",
+      "webUpload": "Upload via Web UI",
+      "webUploadDesc": "Click the 'Upload Planning Data' button above to select and upload local files.",
+      "dataBuild": "Data Build (Excel → JSON Conversion)",
+      "dataBuildDesc": "Convert client CMS data to JSON format.",
+      "clientDataWarning": "You must use CLIENT CMS data, NOT server data!",
+      "cliUpload": "Remote Upload via CLI",
+      "cliUploadDesc": "Upload converted data to the remote server."
+    }
   },
   "rewards": {
     "rewardType": "Reward Type",

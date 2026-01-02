@@ -95,7 +95,8 @@
     "docs:deploy": "cd docs && npm run deploy",
     "chat:reset": "node scripts/reset-chat-data.js --confirm",
     "chat:reset-safe": "node scripts/reset-chat-data.js",
-    "deploy:ftp": "node scripts/deploy-ftp.js"
+    "deploy:ftp": "node scripts/deploy-ftp.js",
+    "upload-planning-data": "node scripts/upload-planning-data.js"
   },
   "keywords": [
     "gatrix",

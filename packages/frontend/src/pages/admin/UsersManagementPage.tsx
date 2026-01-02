@@ -119,6 +119,7 @@ import PermissionSelector from '../../components/common/PermissionSelector';
 import { getContrastColor } from '@/utils/colorUtils';
 
 import { TableLoadingRow } from '@/components/common/TableLoadingRow';
+import { TableSkeletonRows } from '@/components/common/TableSkeletonRows';
 // SSE는 MainLayout에서 전역으로 처리하므로 여기서는 제거
 
 interface UsersResponse {
@@ -1897,8 +1898,9 @@ const UsersManagementPage: React.FC = () => {
               </TableHead>
               <TableBody>
                 {isInitialLoad && loading ? (
-                  <TableLoadingRow
-                    colSpan={columns.filter(col => col.visible).length + 2}
+                  <TableSkeletonRows
+                    rowCount={10}
+                    cellCount={columns.filter(col => col.visible).length + 2}
                     loading={true}
                   />
                 ) : users.length === 0 ? (

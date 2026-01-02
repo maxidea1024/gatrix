@@ -4303,7 +4303,19 @@
     "testComponent": {
       "title": "测试组件（数据验证）"
     },
-    "noData": "没有可用数据"
+    "noData": "没有可用数据",
+    "noDataTitle": "未上传策划数据",
+    "noDataDescription": "请上传游戏所需的策划数据。您可以通过网页界面或CLI进行上传。",
+    "uploadGuide": {
+      "title": "上传指南",
+      "webUpload": "通过网页界面上传",
+      "webUploadDesc": "点击上方的「上传策划数据」按钮，选择并上传本地文件。",
+      "dataBuild": "数据构建 (Excel → JSON 转换)",
+      "dataBuildDesc": "将客户端CMS数据转换为JSON格式。",
+      "clientDataWarning": "必须使用客户端CMS数据，不是服务器数据！",
+      "cliUpload": "通过CLI远程上传",
+      "cliUploadDesc": "将转换后的数据上传到远程服务器。"
+    }
   },
   "rewards": {
     "rewardType": "奖励类型",

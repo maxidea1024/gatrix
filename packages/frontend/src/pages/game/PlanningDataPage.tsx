@@ -28,6 +28,8 @@ import {
   FormControlLabel,
   Checkbox,
   Tooltip,
+  IconButton,
+  Alert,
 } from '@mui/material';
 import {
   Storage as StorageIcon,
@@ -39,6 +41,7 @@ import {
   Category as CategoryIcon,
   Schedule as ScheduleIcon,
   CloudUpload as CloudUploadIcon,
+  ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -57,7 +60,7 @@ const PlanningDataPage: React.FC = () => {
 
   // State
   const [stats, setStats] = useState<PlanningDataStats | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [rebuilding, setRebuilding] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [activeTab, setActiveTab] = useState(() => {
@@ -725,7 +728,7 @@ const PlanningDataPage: React.FC = () => {
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
           <CircularProgress />
         </Box>
-      ) : stats ? (
+      ) : stats && stats.rewardTypes && stats.rewardTypes.length > 0 ? (
         <>
           {/* Tabs */}
           <Card>
@@ -2622,7 +2625,137 @@ const PlanningDataPage: React.FC = () => {
             </CardContent>
           </Card>
         </>
-      ) : null}
+      ) : (
+        // Empty state when no planning data is uploaded
+        <Card>
+          <CardContent sx={{ py: 6 }}>
+            <Box sx={{ textAlign: 'center', maxWidth: 800, mx: 'auto' }}>
+              <CloudUploadIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+              <Typography variant="h5" gutterBottom>
+                {t('planningData.noDataTitle')}
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                {t('planningData.noDataDescription')}
+              </Typography>
+
+              <Box sx={{
+                bgcolor: 'action.hover',
+                borderRadius: 2,
+                p: 3,
+                mb: 3,
+                textAlign: 'left'
+              }}>
+                <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+                  {t('planningData.uploadGuide.title')}
+                </Typography>
+
+                <Typography variant="body2" sx={{ mb: 2 }}>
+                  <strong>1. {t('planningData.uploadGuide.webUpload')}</strong>
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, pl: 2 }}>
+                  {t('planningData.uploadGuide.webUploadDesc')}
+                </Typography>
+
+                <Typography variant="body2" sx={{ mb: 2 }}>
+                  <strong>2. {t('planningData.uploadGuide.dataBuild')}</strong>
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, pl: 2 }}>
+                  {t('planningData.uploadGuide.dataBuildDesc')}
+                </Typography>
+                <Alert severity="warning" sx={{ mb: 2, textAlign: 'left' }}>
+                  {t('planningData.uploadGuide.clientDataWarning')}
+                </Alert>
+                <Box sx={{
+                  bgcolor: 'background.paper',
+                  borderRadius: 1,
+                  p: 2,
+                  pr: 5,
+                  mb: 3,
+                  fontFamily: 'monospace',
+                  fontSize: '0.875rem',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  position: 'relative'
+                }}>
+                  <IconButton
+                    size="small"
+                    sx={{ position: 'absolute', top: 4, right: 4 }}
+                    onClick={() => copyToClipboardWithNotification(
+                      'yarn planning-data:convert --input=./cms --output=./converted-planning-data',
+                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                    )}
+                  >
+                    <CopyIcon fontSize="small" />
+                  </IconButton>
+                  <Typography component="pre" sx={{ m: 0, whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontSize: 'inherit' }}>
+                    {`yarn planning-data:convert --input=./cms --output=./converted-planning-data`}
+                  </Typography>
+                </Box>
+
+                <Typography variant="body2" sx={{ mb: 2 }}>
+                  <strong>3. {t('planningData.uploadGuide.cliUpload')}</strong>
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, pl: 2 }}>
+                  {t('planningData.uploadGuide.cliUploadDesc')}
+                </Typography>
+                <Box sx={{
+                  bgcolor: 'background.paper',
+                  borderRadius: 1,
+                  p: 2,
+                  pr: 5,
+                  mb: 2,
+                  fontFamily: 'monospace',
+                  fontSize: '0.875rem',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  position: 'relative'
+                }}>
+                  <IconButton
+                    size="small"
+                    sx={{ position: 'absolute', top: 4, right: 4 }}
+                    onClick={() => copyToClipboardWithNotification(
+                      `yarn upload-planning-data \\
+  --api-url=https://gatrix.example.com \\
+  --env=qa \\
+  --dir=./converted-planning-data \\
+  --token=<YOUR_API_TOKEN>`,
+                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                    )}
+                  >
+                    <CopyIcon fontSize="small" />
+                  </IconButton>
+                  <Typography component="pre" sx={{ m: 0, whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontSize: 'inherit' }}>
+                    {`yarn upload-planning-data \\
+  --api-url=https://gatrix.example.com \\
+  --env=qa \\
+  --dir=./converted-planning-data \\
+  --token=<YOUR_API_TOKEN>
+
+# Options:
+#   --api-url   (Required) Backend API URL
+#   --env       (Required) Target environment (dev, qa, production)
+#   --dir       (Required) Directory containing planning data files
+#   --token     (Required) API token for authentication`}
+                  </Typography>
+                </Box>
+              </Box>
+
+              {canManage && (
+                <Button
+                  variant="contained"
+                  size="large"
+                  startIcon={<CloudUploadIcon />}
+                  onClick={handleRebuild}
+                >
+                  {t('planningData.uploadData')}
+                </Button>
+              )}
+            </Box>
+          </CardContent>
+        </Card>
+      )}
     </Box>
   );
 };
