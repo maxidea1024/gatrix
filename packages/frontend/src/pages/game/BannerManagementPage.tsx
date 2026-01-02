@@ -399,7 +399,7 @@ const BannerManagementPage: React.FC = () => {
 
       {/* Table */}
       <Card>
-        <CardContent sx={{ p: 0 }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           <TableContainer>
             <Table>
               <TableHead>

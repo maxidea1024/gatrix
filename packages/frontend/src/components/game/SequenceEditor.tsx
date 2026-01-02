@@ -73,6 +73,7 @@ import {
   sortableKeyboardCoordinates,
   horizontalListSortingStrategy,
   verticalListSortingStrategy,
+  rectSortingStrategy,
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -1184,7 +1185,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
             ) : viewMode === 'grid' ? (
               /* Grid View - equal size frames */
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={sequence.frames.map(f => f.frameId)} strategy={horizontalListSortingStrategy}>
+                <SortableContext items={sequence.frames.map(f => f.frameId)} strategy={rectSortingStrategy}>
                   <Box
                     sx={{
                       display: 'flex',

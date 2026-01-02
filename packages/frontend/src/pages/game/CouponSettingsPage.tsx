@@ -1018,7 +1018,7 @@ const CouponSettingsPage: React.FC = () => {
 
       {/* List */}
       <Card>
-        <CardContent sx={{ p: 0 }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           <TableContainer>
             <Table size="small">
               <TableHead>
@@ -1530,7 +1530,7 @@ const CouponSettingsPage: React.FC = () => {
                         value={form.codePattern || 'ALPHANUMERIC_8'}
                         onChange={(e) => setForm((s: any) => ({ ...s, codePattern: e.target.value }))}
                         disabled={!!editing}
-                        helperText={!!editing ? t('coupons.couponSettings.form.codePatternCannotBeChanged') : `예시: ${codePatternExample}`}
+                        helperText={!!editing ? t('coupons.couponSettings.form.codePatternCannotBeChanged') : `?�시: ${codePatternExample}`}
                       >
                         <MenuItem value="ALPHANUMERIC_8">{t('coupons.couponSettings.form.codePattern8')}</MenuItem>
                         <MenuItem value="ALPHANUMERIC_16">{t('coupons.couponSettings.form.codePattern16')}</MenuItem>

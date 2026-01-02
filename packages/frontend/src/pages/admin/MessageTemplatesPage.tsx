@@ -183,17 +183,16 @@ const MessageTemplatesPage: React.FC = () => {
 
   const [saving, setSaving] = useState(false);
 
-  // 페이지네이션
-  const [page, setPage] = useState(0); // SimplePagination은 0-based
+  // ?�이지?�이??  const [page, setPage] = useState(0); // SimplePagination?� 0-based
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  // 필터
+  // ?�터
   const [searchQuery, setSearchQuery] = useState('');
 
-  // 디바운싱된 검색어 (500ms 지연)
+  // ?�바?�싱??검?�어 (500ms 지??
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-  // 동적 필터 상태 (localStorage에서 복원)
+  // ?�적 ?�터 ?�태 (localStorage?�서 복원)
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(() => {
     try {
       const saved = localStorage.getItem('messageTemplatesPage.activeFilters');
@@ -204,7 +203,7 @@ const MessageTemplatesPage: React.FC = () => {
   });
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  // 동적 필터에서 값 추출 (useMemo로 참조 안정화)
+  // ?�적 ?�터?�서 �?추출 (useMemo�?참조 ?�정??
   const isEnabledFilter = useMemo(() => {
     const filter = activeFilters.find(f => f.key === 'isEnabled');
     return filter?.value as boolean | boolean[] | undefined;
@@ -225,15 +224,14 @@ const MessageTemplatesPage: React.FC = () => {
     return filter?.operator;
   }, [activeFilters]);
 
-  // 필터를 문자열로 변환하여 의존성 배열에 사용
+  // ?�터�?문자?�로 변?�하???�존??배열???�용
   const isEnabledFilterString = useMemo(() =>
     Array.isArray(isEnabledFilter) ? isEnabledFilter.join(',') : (isEnabledFilter !== undefined ? String(isEnabledFilter) : ''),
     [isEnabledFilter]
   );
   const tagIdsString = useMemo(() => tagIds.join(','), [tagIds]);
 
-  // 선택 관련
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  // ?�택 관??  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -242,7 +240,7 @@ const MessageTemplatesPage: React.FC = () => {
   const [deletingTemplate, setDeletingTemplate] = useState<MessageTemplate | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
-  // 태그 관련 상태
+  // ?�그 관???�태
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
   const [selectedTemplateForTags, setSelectedTemplateForTags] = useState<MessageTemplate | null>(null);
@@ -286,8 +284,7 @@ const MessageTemplatesPage: React.FC = () => {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  // 폼 필드 ref들
-  const nameFieldRef = useRef<HTMLInputElement>(null);
+  // ???�드 ref??  const nameFieldRef = useRef<HTMLInputElement>(null);
   const defaultMessageFieldRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -323,7 +320,7 @@ const MessageTemplatesPage: React.FC = () => {
     }
   }, [page, rowsPerPage, isEnabledFilterString, isEnabledOperator, tagIdsString, tagOperator, debouncedSearchQuery, enqueueSnackbar, t]);
 
-  // 태그 로딩
+  // ?�그 로딩
   const loadTags = useCallback(async () => {
     try {
       const tags = await tagService.list();
@@ -338,7 +335,7 @@ const MessageTemplatesPage: React.FC = () => {
     loadTags();
   }, [load, loadTags]);
 
-  // 동적 필터 정의
+  // ?�적 ?�터 ?�의
   const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
     {
       key: 'isEnabled',
@@ -366,8 +363,7 @@ const MessageTemplatesPage: React.FC = () => {
     },
   ], [t, allTags]);
 
-  // 동적 필터 핸들러
-  const handleFilterAdd = (filter: ActiveFilter) => {
+  // ?�적 ?�터 ?�들??  const handleFilterAdd = (filter: ActiveFilter) => {
     setActiveFilters([...activeFilters, filter]);
     setPage(0);
   };
@@ -390,20 +386,17 @@ const MessageTemplatesPage: React.FC = () => {
     ));
   };
 
-  // 페이지 변경 핸들러
-  const handlePageChange = useCallback((_: unknown, newPage: number) => {
+  // ?�이지 변�??�들??  const handlePageChange = useCallback((_: unknown, newPage: number) => {
     setPage(newPage);
   }, []);
 
-  // 페이지 크기 변경 핸들러
-  const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+  // ?�이지 ?�기 변�??�들??  const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const newRowsPerPage = parseInt(event.target.value, 10);
     setRowsPerPage(newRowsPerPage);
     setPage(0);
   }, []);
 
-  // 선택 관련 핸들러
-  const handleSelectAll = useCallback((checked: boolean) => {
+  // ?�택 관???�들??  const handleSelectAll = useCallback((checked: boolean) => {
     setSelectAll(checked);
     if (checked) {
       setSelectedIds(items.filter(item => item.id).map(item => item.id!));
@@ -418,7 +411,7 @@ const MessageTemplatesPage: React.FC = () => {
         ? [...prev, id]
         : prev.filter(selectedId => selectedId !== id);
 
-      // 전체 선택 상태 업데이트
+      // ?�체 ?�택 ?�태 ?�데?�트
       const availableIds = items.filter(item => item.id).map(item => item.id!);
       setSelectAll(newIds.length === availableIds.length && availableIds.length > 0);
 
@@ -426,7 +419,7 @@ const MessageTemplatesPage: React.FC = () => {
     });
   }, [items]);
 
-  // 일괄 삭제
+  // ?�괄 ??��
   const handleBulkDelete = useCallback(() => {
     if (selectedIds.length === 0) return;
     setBulkDeleteDialogOpen(true);
@@ -446,8 +439,7 @@ const MessageTemplatesPage: React.FC = () => {
     }
   }, [selectedIds, t, enqueueSnackbar, load]);
 
-  // 일괄 사용 가능/불가 변경
-  const handleBulkToggleAvailability = useCallback(async (isEnabled: boolean) => {
+  // ?�괄 ?�용 가??불�? 변�?  const handleBulkToggleAvailability = useCallback(async (isEnabled: boolean) => {
     if (selectedIds.length === 0) return;
 
     try {
@@ -474,7 +466,7 @@ const MessageTemplatesPage: React.FC = () => {
     }
   }, [selectedIds, items, t, enqueueSnackbar, load]);
 
-  // 개별 삭제
+  // 개별 ??��
   const openDeleteDialog = useCallback((template: MessageTemplate) => {
     setDeletingTemplate(template);
     setDeleteDialogOpen(true);
@@ -516,8 +508,7 @@ const MessageTemplatesPage: React.FC = () => {
     setDialogOpen(true);
   };
 
-  // 태그 관련 핸들러
-  const handleOpenTagDialog = useCallback(async (template: MessageTemplate) => {
+  // ?�그 관???�들??  const handleOpenTagDialog = useCallback(async (template: MessageTemplate) => {
     try {
       setSelectedTemplateForTags(template);
       const tags = await messageTemplateService.getTags(template.id!);
@@ -536,7 +527,7 @@ const MessageTemplatesPage: React.FC = () => {
       await messageTemplateService.setTags(selectedTemplateForTags.id, tagIds);
       setTagDialogOpen(false);
       enqueueSnackbar(t('common.success'), { variant: 'success' });
-      // 필요시 목록 새로고침
+      // ?�요??목록 ?�로고침
       load();
     } catch (error) {
       console.error('Error saving template tags:', error);
@@ -586,18 +577,18 @@ const MessageTemplatesPage: React.FC = () => {
         enqueueSnackbar(t('common.createSuccess'), { variant: 'success' });
       }
 
-      // 태그 설정
+      // ?�그 ?�정
       if (form.tags && form.tags.length > 0) {
         await messageTemplateService.setTags(templateId, form.tags.map(tag => tag.id));
       } else {
-        // 태그가 없으면 기존 태그 모두 제거
+        // ?�그가 ?�으�?기존 ?�그 모두 ?�거
         await messageTemplateService.setTags(templateId, []);
       }
 
       setDialogOpen(false);
       await load();
     } catch (error: any) {
-      // Handle duplicate name error - 두 가지 오류 구조 모두 처리
+      // Handle duplicate name error - ??가지 ?�류 구조 모두 처리
       const status = error?.response?.status || error?.status;
       const errorData = error?.response?.data?.error || error?.error;
 
@@ -722,12 +713,12 @@ const MessageTemplatesPage: React.FC = () => {
 
       </Box>
 
-      {/* 필터 */}
+      {/* ?�터 */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
-              {/* 검색 컨트롤을 맨 앞으로 이동하고 개선 */}
+              {/* 검??컨트롤을 �??�으�??�동?�고 개선 */}
               <TextField
                 placeholder={t('messageTemplates.searchPlaceholderDetailed')}
                 size="small"
@@ -806,7 +797,7 @@ const MessageTemplatesPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* 일괄 작업 툴바 */}
+      {/* ?�괄 ?�업 ?�바 */}
       {selectedIds.length > 0 && (
         <Card sx={{ mb: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(110, 168, 255, 0.08)' : 'rgba(25, 118, 210, 0.04)' }}>
           <CardContent sx={{ py: 1 }}>
@@ -847,7 +838,7 @@ const MessageTemplatesPage: React.FC = () => {
       )}
 
       <Card sx={{ position: 'relative' }}>
-        <CardContent sx={{ p: 0 }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           <TableContainer
             sx={{
               opacity: !isInitialLoad && loading ? 0.5 : 1,
@@ -877,7 +868,7 @@ const MessageTemplatesPage: React.FC = () => {
               </TableHead>
               <TableBody>
                 {isInitialLoad && loading ? (
-                  // 스켈레톤 로딩 (초기 로딩 시에만)
+                  // ?�켈?�톤 로딩 (초기 로딩 ?�에�?
                   Array.from({ length: 5 }).map((_, index) => (
                     <TableRow key={`skeleton-${index}`}>
                       {canManage && (
@@ -940,7 +931,7 @@ const MessageTemplatesPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* 페이지네이션 - 데이터가 있을 때만 표시 */}
+      {/* ?�이지?�이??- ?�이?��? ?�을 ?�만 ?�시 */}
       {total > 0 && (
         <SimplePagination
           count={total}
@@ -961,8 +952,7 @@ const MessageTemplatesPage: React.FC = () => {
         minWidth={500}
         zIndex={1300}
         onEntered={() => {
-          // Drawer가 열린 후 이름 필드에 포커스
-          setTimeout(() => {
+          // Drawer가 ?�린 ???�름 ?�드???�커??          setTimeout(() => {
             nameFieldRef.current?.focus();
           }, 100);
         }}
@@ -982,7 +972,7 @@ const MessageTemplatesPage: React.FC = () => {
               control={<Switch checked={form.isEnabled} onChange={(e) => setForm(prev => ({ ...prev, isEnabled: e.target.checked }))} />}
               label={t('messageTemplates.availability')}
             />
-            {/* 다국어 메시지 입력 컴포넌트 */}
+            {/* ?�국??메시지 ?�력 컴포?�트 */}
             <MultiLanguageMessageInput
               defaultMessage={form.defaultMessage || ''}
               onDefaultMessageChange={(message) => setForm(prev => ({ ...prev, defaultMessage: message }))}
@@ -999,8 +989,7 @@ const MessageTemplatesPage: React.FC = () => {
               locales={(form.locales || []).map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
               onLocalesChange={(locales) => {
                 setForm(prev => ({ ...prev, locales: locales.map(l => ({ lang: l.lang, message: l.message })) }));
-                // 번역 결과가 있으면 자동으로 다국어 지원 활성화
-                const hasNonEmptyLocales = locales.some(l => l.message && l.message.trim() !== '');
+                // 번역 결과가 ?�으�??�동?�로 ?�국??지???�성??                const hasNonEmptyLocales = locales.some(l => l.message && l.message.trim() !== '');
                 if (hasNonEmptyLocales && !form.supportsMultiLanguage) {
                   setForm(prev => ({ ...prev, supportsMultiLanguage: true }));
                 }
@@ -1012,7 +1001,7 @@ const MessageTemplatesPage: React.FC = () => {
               translateTooltip={t('maintenance.translateTooltip')}
             />
 
-            {/* 태그 선택 */}
+            {/* ?�그 ?�택 */}
             <TextField
               select
               multiple
@@ -1048,7 +1037,7 @@ const MessageTemplatesPage: React.FC = () => {
                   </Box>
                 ),
               }}
-              helperText="메시지 템플릿에 적용할 태그를 선택하세요"
+              helperText="메시지 ?�플릿에 ?�용???�그�??�택?�세??
             >
               {allTags.map((tag) => (
                 <MenuItem key={tag.id} value={tag.id}>
@@ -1057,7 +1046,7 @@ const MessageTemplatesPage: React.FC = () => {
                     size="small"
                     sx={{ bgcolor: tag.color, color: '#fff', mr: 1 }}
                   />
-                  {tag.description || '설명 없음'}
+                  {tag.description || '?�명 ?�음'}
                 </MenuItem>
               ))}
             </TextField>
@@ -1093,7 +1082,7 @@ const MessageTemplatesPage: React.FC = () => {
         </Box>
       </ResizableDrawer>
 
-      {/* 개별 삭제 확인 Drawer */}
+      {/* 개별 ??�� ?�인 Drawer */}
       <ResizableDrawer
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
@@ -1138,7 +1127,7 @@ const MessageTemplatesPage: React.FC = () => {
         </Box>
       </ResizableDrawer>
 
-      {/* 일괄 삭제 확인 Drawer */}
+      {/* ?�괄 ??�� ?�인 Drawer */}
       <ResizableDrawer
         open={bulkDeleteDialogOpen}
         onClose={() => setBulkDeleteDialogOpen(false)}
@@ -1183,7 +1172,7 @@ const MessageTemplatesPage: React.FC = () => {
         </Box>
       </ResizableDrawer>
 
-      {/* 태그 관리 다이얼로그 */}
+      {/* ?�그 관�??�이?�로�?*/}
       <Dialog open={tagDialogOpen} onClose={() => setTagDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>
           {t('common.tags')} - {selectedTemplateForTags?.name}

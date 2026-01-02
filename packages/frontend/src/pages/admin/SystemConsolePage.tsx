@@ -622,13 +622,13 @@ const SystemConsolePage: React.FC = () => {
                 const plainText = output.replace(/\u001b\[[0-9;]*m/g, '');
                 copyToClipboard(plainText).then((success) => {
                   if (success) {
-                    term.write('\u001b[32m✓ Copied to clipboard\u001b[0m\r\n');
+                    term.write('\u001b[32m??Copied to clipboard\u001b[0m\r\n');
                   } else {
-                    term.write('\u001b[33m⚠ Failed to copy to clipboard\u001b[0m\r\n');
+                    term.write('\u001b[33m??Failed to copy to clipboard\u001b[0m\r\n');
                   }
                   writePrompt(term);
                 }).catch(() => {
-                  term.write('\u001b[33m⚠ Failed to copy to clipboard\u001b[0m\r\n');
+                  term.write('\u001b[33m??Failed to copy to clipboard\u001b[0m\r\n');
                   writePrompt(term);
                 });
               }

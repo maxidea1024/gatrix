@@ -91,7 +91,7 @@ const CustomQueueMonitorPage: React.FC = () => {
   useEffect(() => {
     if (user?.role === 'admin') {
       fetchQueues();
-      const interval = setInterval(fetchQueues, 5000); // 5초마다 갱신
+      const interval = setInterval(fetchQueues, 5000); // 5초마??갱신
       return () => clearInterval(interval);
     }
   }, [user]);
@@ -201,7 +201,7 @@ const CustomQueueMonitorPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" sx={{ fontWeight: 600 }}>
-          큐 모니터 (커스텀)
+          ??모니??(커스?�)
         </Typography>
         <Button
           variant="outlined"
@@ -209,7 +209,7 @@ const CustomQueueMonitorPage: React.FC = () => {
           onClick={fetchQueues}
           disabled={loading}
         >
-          새로고침
+          ?�로고침
         </Button>
       </Box>
 
@@ -219,7 +219,7 @@ const CustomQueueMonitorPage: React.FC = () => {
         </Alert>
       )}
 
-      {/* 큐 통계 카드들 */}
+      {/* ???�계 카드??*/}
       <Grid container spacing={3} sx={{ mb: 3 }}>
         {queues.map((queue) => (
           <Grid size={{ xs: 12 , sm: 6, md: 3 }} key={queue.name}>
@@ -237,22 +237,22 @@ const CustomQueueMonitorPage: React.FC = () => {
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                   <Chip 
-                    label={`대기: ${queue.counts?.waiting || 0}`} 
+                    label={`?��? ${queue.counts?.waiting || 0}`} 
                     color="info" 
                     size="small" 
                   />
                   <Chip 
-                    label={`실행중: ${queue.counts?.active || 0}`} 
+                    label={`?�행�? ${queue.counts?.active || 0}`} 
                     color="primary" 
                     size="small" 
                   />
                   <Chip 
-                    label={`완료: ${queue.counts?.completed || 0}`} 
+                    label={`?�료: ${queue.counts?.completed || 0}`} 
                     color="success" 
                     size="small" 
                   />
                   <Chip 
-                    label={`실패: ${queue.counts?.failed || 0}`} 
+                    label={`?�패: ${queue.counts?.failed || 0}`} 
                     color="error" 
                     size="small" 
                   />
@@ -263,12 +263,12 @@ const CustomQueueMonitorPage: React.FC = () => {
         ))}
       </Grid>
 
-      {/* 선택된 큐의 상세 정보 */}
+      {/* ?�택???�의 ?�세 ?�보 */}
       {currentQueue && (
         <Card>
           <CardContent>
             <Typography variant="h5" gutterBottom>
-              {currentQueue.name} 큐 상세
+              {currentQueue.name} ???�세
             </Typography>
             
             <Tabs 
@@ -286,11 +286,11 @@ const CustomQueueMonitorPage: React.FC = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell>ID</TableCell>
-                    <TableCell>이름</TableCell>
-                    <TableCell>상태</TableCell>
-                    <TableCell>생성시간</TableCell>
-                    <TableCell>진행률</TableCell>
-                    <TableCell>액션</TableCell>
+                    <TableCell>?�름</TableCell>
+                    <TableCell>?�태</TableCell>
+                    <TableCell>?�성?�간</TableCell>
+                    <TableCell>진행�?/TableCell>
+                    <TableCell>?�션</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -301,7 +301,7 @@ const CustomQueueMonitorPage: React.FC = () => {
                       <TableCell>
                         <Chip 
                           icon={getStatusIcon('waiting')} 
-                          label="대기중" 
+                          label="?�기중" 
                           color={getStatusColor('waiting')} 
                           size="small" 
                         />
@@ -320,7 +320,7 @@ const CustomQueueMonitorPage: React.FC = () => {
                         </Box>
                       </TableCell>
                       <TableCell>
-                        <Tooltip title="상세보기">
+                        <Tooltip title="?�세보기">
                           <IconButton 
                             size="small"
                             onClick={() => {
@@ -331,7 +331,7 @@ const CustomQueueMonitorPage: React.FC = () => {
                             <ViewIcon />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="재시도">
+                        <Tooltip title="?�시??>
                           <IconButton 
                             size="small"
                             onClick={() => retryJob(job.id)}
@@ -339,7 +339,7 @@ const CustomQueueMonitorPage: React.FC = () => {
                             <RetryIcon />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="삭제">
+                        <Tooltip title="??��">
                           <IconButton 
                             size="small"
                             onClick={() => deleteJob(job.id)}
@@ -357,14 +357,14 @@ const CustomQueueMonitorPage: React.FC = () => {
         </Card>
       )}
 
-      {/* 작업 상세 다이얼로그 */}
+      {/* ?�업 ?�세 ?�이?�로�?*/}
       <Dialog 
         open={jobDialogOpen} 
         onClose={() => setJobDialogOpen(false)}
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>작업 상세 정보</DialogTitle>
+        <DialogTitle>?�업 ?�세 ?�보</DialogTitle>
         <DialogContent>
           {selectedJob && (
             <Box>
@@ -372,10 +372,10 @@ const CustomQueueMonitorPage: React.FC = () => {
                 <strong>ID:</strong> {selectedJob.id}
               </Typography>
               <Typography variant="subtitle1" gutterBottom>
-                <strong>이름:</strong> {selectedJob.name}
+                <strong>?�름:</strong> {selectedJob.name}
               </Typography>
               <Typography variant="subtitle1" gutterBottom>
-                <strong>데이터:</strong>
+                <strong>?�이??</strong>
               </Typography>
               <Paper sx={{ p: 2, bgcolor: 'grey.100' }}>
                 <pre>{JSON.stringify(selectedJob.data, null, 2)}</pre>
@@ -384,7 +384,7 @@ const CustomQueueMonitorPage: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setJobDialogOpen(false)}>닫기</Button>
+          <Button onClick={() => setJobDialogOpen(false)}>?�기</Button>
         </DialogActions>
       </Dialog>
     </Box>

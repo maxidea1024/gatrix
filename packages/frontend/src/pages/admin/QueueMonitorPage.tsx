@@ -11,8 +11,7 @@ const QueueMonitorPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // 페이지 로드 시 iframe 로딩 완료를 기다림
-    const timer = setTimeout(() => {
+    // ?�이지 로드 ??iframe 로딩 ?�료�?기다�?    const timer = setTimeout(() => {
       setLoading(false);
     }, 2000);
 

@@ -71,14 +71,14 @@ const ChatPageContent: React.FC = () => {
   const { joinChannel } = actions;
   const theme = useTheme();
 
-  // 반응형 브레이크포인트 (1200px 이상에서 사이드바이사이드, 미만에서 스택)
+  // 반응??브레?�크?�인??(1200px ?�상?�서 ?�이?�바?�사?�드, 미만?�서 ?�택)
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('xl')); // 1536px+
   const isMediumScreen = useMediaQuery(theme.breakpoints.up('lg')); // 1200px+
   const [createChannelOpen, setCreateChannelOpen] = useState(false);
   const [isCreatingChannel, setIsCreatingChannel] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     const saved = localStorage.getItem('chatSidebarOpen');
-    return saved !== null ? JSON.parse(saved) : true; // 기본값: 열린 상태
+    return saved !== null ? JSON.parse(saved) : true; // 기본�? ?�린 ?�태
   });
   const [channelFormData, setChannelFormData] = useState<CreateChannelRequest>({
     name: '',
@@ -92,8 +92,7 @@ const ChatPageContent: React.FC = () => {
   const [memberListOpen, setMemberListOpen] = useState(false);
   const [isWindowFocused, setIsWindowFocused] = useState(true);
 
-  // 새로운 다이얼로그 상태들
-  const [userSearchOpen, setUserSearchOpen] = useState(false);
+  // ?�로???�이?�로�??�태??  const [userSearchOpen, setUserSearchOpen] = useState(false);
   const [invitationManagerOpen, setInvitationManagerOpen] = useState(false);
   const [privacySettingsOpen, setPrivacySettingsOpen] = useState(false);
   const [statusPickerOpen, setStatusPickerOpen] = useState(false);
@@ -163,23 +162,23 @@ const ChatPageContent: React.FC = () => {
   };
 
 
-  // 로딩 상태 확인 - 초기 로딩 중이거나 채널이 없으면 스켈레톤 표시
-  // 스켈레톤 완전 제거 - 바로 채팅 UI 표시
+  // 로딩 ?�태 ?�인 - 초기 로딩 중이거나 채널???�으�??�켈?�톤 ?�시
+  // ?�켈?�톤 ?�전 ?�거 - 바로 채팅 UI ?�시
   const isInitialLoading = false;
 
-  // 로딩 상태 디버깅 (필요시 주석 해제)
-  // console.log('🔍 ChatPage loading state:', {
+  // 로딩 ?�태 ?�버�?(?�요??주석 ?�제)
+  // console.log('?�� ChatPage loading state:', {
   //   isLoading: state.isLoading,
   //   loadingStage: state.loadingStage,
   //   channelsLength: state.channels.length,
   //   isInitialLoading
   // });
 
-  // 스레드 관련 상태
+  // ?�레??관???�태
   const [threadMessage, setThreadMessage] = useState<Message | null>(null);
   const [isThreadOpen, setIsThreadOpen] = useState(false);
 
-  // 스레드 뷰 모드 결정 (큰 화면: 사이드바이사이드, 작은 화면: 스택)
+  // ?�레??�?모드 결정 (???�면: ?�이?�바?�사?�드, ?��? ?�면: ?�택)
   const threadViewMode = isMediumScreen ? 'sidebar' : 'stack';
   const [userStatus, setUserStatus] = useState<UserStatus>('online');
   const [statusMessage, setStatusMessage] = useState('');
@@ -243,7 +242,7 @@ const ChatPageContent: React.FC = () => {
         joinChannel &&
         !joinedChannels.has(state.currentChannelId) &&
         !joiningChannels.has(state.currentChannelId) &&
-        state.isConnected) { // WebSocket 연결된 상태에서만 join 시도
+        state.isConnected) { // WebSocket ?�결???�태?�서�?join ?�도
 
       console.log('Joining channel:', state.currentChannelId);
       setJoiningChannels(prev => new Set(prev).add(state.currentChannelId!));
@@ -267,16 +266,14 @@ const ChatPageContent: React.FC = () => {
     }
   }, [state.currentChannelId, joinChannel, joinedChannels, joiningChannels, state.isConnected]);
 
-  // 연결이 끊어졌을 때 join 상태 초기화
-  useEffect(() => {
+  // ?�결???�어졌을 ??join ?�태 초기??  useEffect(() => {
     if (!state.isConnected) {
       setJoinedChannels(new Set());
       setJoiningChannels(new Set());
     }
   }, [state.isConnected]);
 
-  // localStorage에 사이드바 상태 저장
-  useEffect(() => {
+  // localStorage???�이?�바 ?�태 ?�??  useEffect(() => {
     localStorage.setItem('chatSidebarOpen', JSON.stringify(isSidebarOpen));
   }, [isSidebarOpen]);
 
@@ -292,31 +289,31 @@ const ChatPageContent: React.FC = () => {
       }
 
       setIsCreatingChannel(true);
-      console.log('🚀 Creating channel:', channelFormData);
+      console.log('?? Creating channel:', channelFormData);
       const startTime = Date.now();
 
       const channel = await actions.createChannel(channelFormData);
 
       const duration = Date.now() - startTime;
-      console.log('✅ Channel created successfully:', { channel, duration: `${duration}ms` });
+      console.log('??Channel created successfully:', { channel, duration: `${duration}ms` });
 
-      // 생성된 채널로 자동 이동
+      // ?�성??채널�??�동 ?�동
       actions.setCurrentChannel(channel.id);
 
       setCreateChannelOpen(false);
       setChannelFormData({ name: '', description: '', type: 'public' });
       enqueueSnackbar(t('chat.channelCreated'), { variant: 'success' });
     } catch (error: any) {
-      console.error('❌ Channel creation failed:', error);
+      console.error('??Channel creation failed:', error);
       enqueueSnackbar(error.message || t('chat.createChannelFailed'), { variant: 'error' });
     } finally {
       setIsCreatingChannel(false);
     }
   };
 
-  // 채널 변경 시: 이전 채널의 열린 스레드는 닫고, 새 채널에서 마지막으로 열려있던 스레드를 복원
+  // 채널 변�??? ?�전 채널???�린 ?�레?�는 ?�고, ??채널?�서 마�?막으�??�려?�던 ?�레?��? 복원
   useEffect(() => {
-    // 닫기 (이전 채널의 스레드가 남아있는 버그 방지)
+    // ?�기 (?�전 채널???�레?��? ?�아?�는 버그 방�?)
     setIsThreadOpen(false);
     setThreadMessage(null);
     pendingThreadToOpenRef.current = null;
@@ -326,24 +323,24 @@ const ChatPageContent: React.FC = () => {
 
     const map = loadLastThreadMap();
     const lastId = map[String(chId)];
-    if (!lastId) return; // 새 채널에서 복원할 스레드가 없으면 종료
+    if (!lastId) return; // ??채널?�서 복원???�레?��? ?�으�?종료
 
     const msgs = state.messages[chId] || [];
     const found = msgs.find(m => m.id === lastId);
     if (found) {
-      // 스레드 복원 시 약간의 딜레이를 주어 메인 입력창 포커스와 충돌 방지
+      // ?�레??복원 ???�간???�레?��? 주어 메인 ?�력�??�커?��? 충돌 방�?
       setTimeout(() => {
         setThreadMessage(found);
         setIsThreadOpen(true);
         pendingThreadToOpenRef.current = null;
       }, 50);
     } else {
-      // 메시지가 아직 로드되지 않은 경우, 로딩 후 열도록 예약해둠
+      // 메시지가 ?�직 로드?��? ?��? 경우, 로딩 ???�도�??�약?�둠
       pendingThreadToOpenRef.current = lastId;
     }
   }, [state.currentChannelId]);
 
-  // 메시지 로딩 완료 후, 대기 중인 스레드가 있으면 자동으로 열기
+  // 메시지 로딩 ?�료 ?? ?��?중인 ?�레?��? ?�으�??�동?�로 ?�기
   useEffect(() => {
     const chId = state.currentChannelId;
     const pendingId = pendingThreadToOpenRef.current;
@@ -372,32 +369,29 @@ const ChatPageContent: React.FC = () => {
 
       await actions.sendMessage(state.currentChannelId, messageData);
     } catch (error: any) {
-      // 에러는 ChatContext에서 처리하므로 여기서는 별도 토스트 표시하지 않음
-      // ChatContext의 SET_ERROR 액션으로 에러가 설정되고 하단의 Snackbar에서 표시됨
-    }
+      // ?�러??ChatContext?�서 처리?��?�??�기?�는 별도 ?�스???�시?��? ?�음
+      // ChatContext??SET_ERROR ?�션?�로 ?�러가 ?�정?�고 ?�단??Snackbar?�서 ?�시??    }
   };
 
   const currentChannel = state.channels.find(c => c.id === state.currentChannelId);
 
-  // 사용자 초대 핸들러
-  const handleInviteUser = async (userId: number) => {
+  // ?�용??초�? ?�들??  const handleInviteUser = async (userId: number) => {
     if (!state.currentChannelId) {
       throw new Error('No channel selected');
     }
 
     try {
       await actions.inviteUser(state.currentChannelId, userId);
-      console.log('✅ Invitation sent successfully');
+      console.log('??Invitation sent successfully');
     } catch (error: any) {
-      console.error('❌ Failed to invite user:', error);
+      console.error('??Failed to invite user:', error);
       throw error;
     }
   };
 
-  // 사용자 상태 변경 핸들러
-  const handleStatusChange = async (status: UserStatus, message?: string) => {
+  // ?�용???�태 변�??�들??  const handleStatusChange = async (status: UserStatus, message?: string) => {
     try {
-      // WebSocket을 통해 서버에 상태 업데이트
+      // WebSocket???�해 ?�버???�태 ?�데?�트
       const wsService = getChatWebSocketService();
       if (wsService.isConnected()) {
         wsService.updateStatus(status, message);
@@ -413,8 +407,7 @@ const ChatPageContent: React.FC = () => {
     }
   };
 
-  // 스레드 관련 핸들러
-  const handleOpenThread = (message: Message) => {
+  // ?�레??관???�들??  const handleOpenThread = (message: Message) => {
     setThreadMessage(message);
     setIsThreadOpen(true);
     if (state.currentChannelId) {
@@ -426,7 +419,7 @@ const ChatPageContent: React.FC = () => {
     setIsThreadOpen(false);
     setThreadMessage(null);
     if (state.currentChannelId) {
-      // 사용자가 명시적으로 닫으면 해당 채널의 자동 복원은 비움
+      // ?�용?��? 명시?�으�??�으�??�당 채널???�동 복원?� 비�?
       saveLastThreadForChannel(state.currentChannelId, null);
     }
   };
@@ -441,7 +434,7 @@ const ChatPageContent: React.FC = () => {
     }
   };
 
-  // 스켈레톤 제거 - 항상 채팅 UI 표시
+  // ?�켈?�톤 ?�거 - ??�� 채팅 UI ?�시
   // if (isInitialLoading) {
   //   return <ChatSkeleton stage={state.loadingStage} />;
   // }
@@ -469,7 +462,7 @@ const ChatPageContent: React.FC = () => {
           <Typography variant="h4" sx={{ fontWeight: 600, flex: 1 }}>
             {t('chat.title')}
           </Typography>
-          {/* 웹소켓 연결 상태 */}
+          {/* ?�소�??�결 ?�태 */}
           <Tooltip title={state.isConnected ? t('chat.connected') : t('chat.disconnected')} placement="bottom">
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               {state.isConnected ? (
@@ -493,17 +486,16 @@ const ChatPageContent: React.FC = () => {
 
 
 
-      {/* Main Chat Interface - 깜빡임 방지를 위해 Fade 제거 */}
+      {/* Main Chat Interface - 깜빡??방�?�??�해 Fade ?�거 */}
       <Paper sx={{
         flex: 1,
         display: 'flex',
-        minHeight: 0, // 중요: flex 아이템이 축소될 수 있도록 함
-        overflow: 'hidden'
+        minHeight: 0, // 중요: flex ?�이?�이 축소?????�도�???        overflow: 'hidden'
       }}>
         {/* Channel List Sidebar */}
         <Box
           sx={{
-            width: isSidebarOpen ? 300 : 48, // 닫힌 상태에서도 버튼 공간 확보
+            width: isSidebarOpen ? 300 : 48, // ?�힌 ?�태?�서??버튼 공간 ?�보
             borderRight: 1,
             borderColor: 'divider',
             height: '100%',
@@ -513,7 +505,7 @@ const ChatPageContent: React.FC = () => {
             flexDirection: 'column',
           }}
         >
-          {/* 토글 버튼 */}
+          {/* ?��? 버튼 */}
           <Box sx={{
             p: 1,
             borderBottom: isSidebarOpen ? 1 : 0,
@@ -543,10 +535,10 @@ const ChatPageContent: React.FC = () => {
                 />
               </Box>
 
-              {/* 하단 기능 버튼들 */}
+              {/* ?�단 기능 버튼??*/}
               <Box sx={{ p: 1, borderTop: 1, borderColor: 'divider' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-                  {/* 내 상태 설정 버튼 */}
+                  {/* ???�태 ?�정 버튼 */}
                   <Tooltip title={t('chat.setStatus')} placement="top">
                     <IconButton
                       size="small"
@@ -567,7 +559,7 @@ const ChatPageContent: React.FC = () => {
                     </IconButton>
                   </Tooltip>
 
-                  {/* 초대 관리 버튼 */}
+                  {/* 초�? 관�?버튼 */}
                   <Tooltip title={t('chat.manageInvitations')} placement="top">
                     <IconButton
                       size="small"
@@ -592,7 +584,7 @@ const ChatPageContent: React.FC = () => {
                     </IconButton>
                   </Tooltip>
 
-                  {/* 프라이버시 설정 버튼 */}
+                  {/* ?�라?�버???�정 버튼 */}
                   <Tooltip title={t('chat.privacySettings')} placement="top">
                     <IconButton
                       size="small"
@@ -617,7 +609,7 @@ const ChatPageContent: React.FC = () => {
 
         {/* Chat Area */}
         <Box sx={{ flex: 1, height: '100%', display: 'flex', position: 'relative' }}>
-          {/* Main Chat - 스택 모드에서 스레드가 열리면 숨김 */}
+          {/* Main Chat - ?�택 모드?�서 ?�레?��? ?�리�??��? */}
           <Box
             sx={{
               flex: 1,
@@ -660,7 +652,7 @@ const ChatPageContent: React.FC = () => {
             )}
           </Box>
 
-          {/* Thread Panel - 사이드바 모드 (리사이즈 가능) */}
+          {/* Thread Panel - ?�이?�바 모드 (리사?�즈 가?? */}
           {threadViewMode === 'sidebar' && isThreadOpen && threadMessage && (
             <>
               {/* Resizer */}
@@ -699,7 +691,7 @@ const ChatPageContent: React.FC = () => {
             </>
           )}
 
-          {/* Thread Panel - 스택 모드 (전체 화면 오버레이) */}
+          {/* Thread Panel - ?�택 모드 (?�체 ?�면 ?�버?�이) */}
           {threadViewMode === 'stack' && isThreadOpen && threadMessage && (
             <Slide direction="left" in={isThreadOpen} mountOnEnter unmountOnExit>
               <Box
@@ -713,7 +705,7 @@ const ChatPageContent: React.FC = () => {
                   backgroundColor: 'background.paper',
                 }}
               >
-                {/* 뒤로가기 헤더 */}
+                {/* ?�로가�??�더 */}
                 <Box
                   sx={{
                     display: 'flex',
@@ -731,7 +723,7 @@ const ChatPageContent: React.FC = () => {
                   </Typography>
                 </Box>
 
-                {/* 스레드 컨텐츠 */}
+                {/* ?�레??컨텐�?*/}
                 <Box sx={{ height: 'calc(100% - 73px)' }}>
                   <ThreadView
                     originalMessage={threadMessage}
@@ -882,7 +874,7 @@ const ChatPageContent: React.FC = () => {
         isWindowFocused={isWindowFocused}
       />
 
-      {/* 새로운 다이얼로그들 */}
+      {/* ?�로???�이?�로그들 */}
       <UserSearchDialog
         open={userSearchOpen}
         onClose={() => setUserSearchOpen(false)}
@@ -899,23 +891,23 @@ const ChatPageContent: React.FC = () => {
         title={t('chat.manageInvitations')}
         subtitle={t('chat.manageInvitationsSubtitle')}
         onInvitationAccepted={async (channelId) => {
-          // 초대 수락 후 채널 목록 새로고침 후 해당 채널로 이동
-          console.log('🎉 Invitation accepted, refreshing channels and switching to channel:', channelId);
+          // 초�? ?�락 ??채널 목록 ?�로고침 ???�당 채널�??�동
+          console.log('?�� Invitation accepted, refreshing channels and switching to channel:', channelId);
 
           try {
-            // 채널 목록 새로고침
+            // 채널 목록 ?�로고침
             await actions.loadChannels();
 
-            // 채널 전환
+            // 채널 ?�환
             actions.setCurrentChannel(channelId);
 
-            // 초대 관리 창 닫기
+            // 초�? 관�?�??�기
             setInvitationManagerOpen(false);
 
-            console.log('✅ Successfully switched to accepted channel:', channelId);
+            console.log('??Successfully switched to accepted channel:', channelId);
           } catch (error) {
-            console.error('❌ Failed to refresh channels after invitation acceptance:', error);
-            // 실패해도 채널 전환은 시도
+            console.error('??Failed to refresh channels after invitation acceptance:', error);
+            // ?�패?�도 채널 ?�환?� ?�도
             actions.setCurrentChannel(channelId);
             setInvitationManagerOpen(false);
           }

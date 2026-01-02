@@ -1392,7 +1392,7 @@ const DashboardPage: React.FC = () => {
                               <Typography variant="caption" color="text.secondary">
                                 {activity.userName}
                               </Typography>
-                              <Typography variant="caption" color="text.disabled">•</Typography>
+                              <Typography variant="caption" color="text.disabled">??/Typography>
                               <Typography variant="caption" color="text.secondary">
                                 {formatRelativeTime(activity.timestamp)}
                               </Typography>

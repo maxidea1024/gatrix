@@ -80,7 +80,7 @@ const WhitelistPage: React.FC = () => {
   // Refs for form focus
   const accountIdFieldRef = useRef<HTMLInputElement>(null);
 
-  // 페이지 상태 관리 (localStorage 연동)
+  // ?�이지 ?�태 관�?(localStorage ?�동)
   const {
     pageState,
     updatePage,
@@ -126,7 +126,7 @@ const WhitelistPage: React.FC = () => {
   // Tab state
   const [currentTab, setCurrentTab] = useState(getInitialTab);
 
-  // 디바운싱된 검색어 (500ms 지연)
+  // ?�바?�싱??검?�어 (500ms 지??
   const debouncedSearch = useDebounce(pageState.filters?.search || '', 500);
 
 
@@ -191,7 +191,7 @@ const WhitelistPage: React.FC = () => {
 
       console.log('Whitelist load result:', result);
 
-      // 안전한 데이터 접근
+      // ?�전???�이???�근
       if (result && typeof result === 'object' && Array.isArray(result.whitelists)) {
         setWhitelists(result.whitelists);
         setTotal(result.total || 0);
@@ -199,7 +199,7 @@ const WhitelistPage: React.FC = () => {
         console.error('Invalid response structure:', result);
         setWhitelists([]);
         setTotal(0);
-        // 오류 메시지를 사용자에게 표시하지 않음 (서버 응답 구조 문제일 수 있음)
+        // ?�류 메시지�??�용?�에�??�시?��? ?�음 (?�버 ?�답 구조 문제?????�음)
       }
     } catch (error: any) {
       console.error('Error loading whitelists:', error);
@@ -247,7 +247,7 @@ const WhitelistPage: React.FC = () => {
 
   const handleChangePage = (_event: unknown, newPage: number) => {
     if (typeof newPage === 'number' && !isNaN(newPage)) {
-      updatePage(newPage + 1); // MUI는 0부터 시작, 우리는 1부터 시작
+      updatePage(newPage + 1); // MUI??0부???�작, ?�리??1부???�작
     } else {
       console.error('Invalid page number received:', newPage);
       updatePage(1); // Reset to first page
@@ -266,7 +266,7 @@ const WhitelistPage: React.FC = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    // selectedWhitelist는 다이얼로그가 닫힐 때까지 유지
+    // selectedWhitelist???�이?�로그�? ?�힐 ?�까지 ?��?
   };
 
   // Toggle whitelist status
@@ -312,8 +312,7 @@ const WhitelistPage: React.FC = () => {
     setFormErrors({});
     setAddDialog(true);
 
-    // 계정ID 필드에 포커스
-    setTimeout(() => {
+    // 계정ID ?�드???�커??    setTimeout(() => {
       accountIdFieldRef.current?.focus();
     }, 100);
   };
@@ -330,8 +329,7 @@ const WhitelistPage: React.FC = () => {
       setFormErrors({});
       setEditDialog(true);
 
-      // 계정ID 필드에 포커스
-      setTimeout(() => {
+      // 계정ID ?�드???�커??      setTimeout(() => {
         accountIdFieldRef.current?.focus();
       }, 100);
     }
@@ -362,13 +360,11 @@ const WhitelistPage: React.FC = () => {
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
 
-    // 계정 ID 유효성 검사
-    if (!formData.accountId || formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36) {
+    // 계정 ID ?�효??검??    if (!formData.accountId || formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36) {
       errors.accountId = t('whitelist.form.accountIdValidation');
     }
 
-    // 사용목적 필수 검사
-    if (!formData.purpose || formData.purpose.trim().length === 0) {
+    // ?�용목적 ?�수 검??    if (!formData.purpose || formData.purpose.trim().length === 0) {
       errors.purpose = t('whitelist.form.purposeRequired');
     }
 
@@ -403,7 +399,7 @@ const WhitelistPage: React.FC = () => {
         setAddDialog(false);
       }
 
-      // 안전하게 목록 다시 로드
+      // ?�전?�게 목록 ?�시 로드
       setTimeout(() => {
         loadWhitelists();
       }, 100);
@@ -522,7 +518,7 @@ const WhitelistPage: React.FC = () => {
 
             {/* Nickname Whitelist Table */}
             <Card variant="outlined">
-              <CardContent sx={{ p: 0 }}>
+              <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
                 <TableContainer>
                   <Table>
                     <TableHead>
@@ -663,7 +659,7 @@ const WhitelistPage: React.FC = () => {
                 {total > 0 && (
                   <SimplePagination
                     count={total}
-                    page={pageState.page - 1} // MUI는 0부터 시작
+                    page={pageState.page - 1} // MUI??0부???�작
                     rowsPerPage={pageState.limit}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}

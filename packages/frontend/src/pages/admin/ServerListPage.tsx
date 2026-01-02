@@ -2294,12 +2294,12 @@ const ServerListPage: React.FC = () => {
 
   const handleCleanupConfirm = async () => {
     try {
-      console.log('🗑️ Starting cleanup...');
+      console.log('?���?Starting cleanup...');
 
       // Call backend cleanup endpoint (handles all terminated/error/no-response servers)
       const result = await serviceDiscoveryService.cleanupServices();
 
-      console.log(`✅ Cleanup complete: ${result.deletedCount}/${result.totalCount} servers deleted`);
+      console.log(`??Cleanup complete: ${result.deletedCount}/${result.totalCount} servers deleted`);
 
       // Remove from frontend state immediately
       setServices((prev) => prev.filter((s) => s.status !== 'terminated' && s.status !== 'error' && s.status !== 'no-response'));
@@ -2310,7 +2310,7 @@ const ServerListPage: React.FC = () => {
         { variant: 'success' }
       );
     } catch (error) {
-      console.error('❌ Cleanup failed:', error);
+      console.error('??Cleanup failed:', error);
       enqueueSnackbar(t('serverList.cleanupFailed'), { variant: 'error' });
     } finally {
       // Always close dialog, regardless of success or failure
@@ -3875,7 +3875,7 @@ const ServerListPage: React.FC = () => {
                                         >
                                           {actionsHealthStatus.result.healthy
                                             ? `${actionsHealthStatus.result.latency}ms`
-                                            : '✕'}
+                                            : '??}
                                         </Box>
                                       ) : (
                                         // Show button (rounded style like view mode buttons)
@@ -4103,7 +4103,7 @@ const ServerListPage: React.FC = () => {
                                         animation: gridHealthStatus.fading ? 'wiggleFade 0.5s ease-out forwards' : 'none',
                                       }}
                                     >
-                                      {gridHealthStatus.result.healthy ? `${gridHealthStatus.result.latency}ms` : '✕'}
+                                      {gridHealthStatus.result.healthy ? `${gridHealthStatus.result.latency}ms` : '??}
                                     </Box>
                                   ) : (
                                     <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
@@ -4232,6 +4232,7 @@ const ServerListPage: React.FC = () => {
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
             gap: 1.5,
+            alignContent: 'flex-start',
             '@media (max-width: 1200px)': { gridTemplateColumns: 'repeat(2, 1fr)' },
             '@media (max-width: 768px)': { gridTemplateColumns: '1fr' },
           }}>
@@ -4381,7 +4382,7 @@ const ServerListPage: React.FC = () => {
                                         animation: cardHealthStatus.fading ? 'wiggleFade 0.5s ease-out forwards' : 'none',
                                       }}
                                     >
-                                      {cardHealthStatus.result.healthy ? `${cardHealthStatus.result.latency}ms` : '✕'}
+                                      {cardHealthStatus.result.healthy ? `${cardHealthStatus.result.latency}ms` : '??}
                                     </Box>
                                   ) : (
                                     <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>

@@ -515,12 +515,11 @@ const ApiTokensPage: React.FC = () => {
     setPage(0); // Reset to first page when sorting
   };
 
-  // 토큰 이름 유효성 검사
-  const isValidTokenName = (name: string): boolean => {
-    return name.trim().length >= 3; // 최소 3자 이상
+  // ?�큰 ?�름 ?�효??검??  const isValidTokenName = (name: string): boolean => {
+    return name.trim().length >= 3; // 최소 3???�상
   };
 
-  // 유효기간 검증 함수
+  // ?�효기간 검�??�수
   const validateExpiresAt = (expiresAt: string | undefined): { isValid: boolean; warning: string | null } => {
     if (!expiresAt) {
       return { isValid: true, warning: null }; // No expiration is valid
@@ -546,9 +545,9 @@ const ApiTokensPage: React.FC = () => {
   const handleCreate = async () => {
     try {
       const response = await apiTokenService.createToken(formData);
-      console.log('Create token response:', response); // 디버깅용
+      console.log('Create token response:', response); // ?�버깅용
 
-      // 토큰 정보를 먼저 설정
+      // ?�큰 ?�보�?먼�? ?�정
       const tokenInfo = {
         tokenName: formData.tokenName,
         description: formData.description,
@@ -559,25 +558,24 @@ const ApiTokensPage: React.FC = () => {
         isNew: true
       };
 
-      // 생성 다이얼로그를 먼저 닫기
+      // ?�성 ?�이?�로그�? 먼�? ?�기
       setCreateDialogOpen(false);
       resetForm();
 
-      // 백엔드 응답 구조 확인 및 토큰 값 추출
+      // 백엔???�답 구조 ?�인 �??�큰 �?추출
       const tokenValue = response?.data?.tokenValue || response?.tokenValue || '';
-      console.log('Create response structure:', response); // 디버깅용
-      console.log('Extracted token value:', tokenValue); // 디버깅용
+      console.log('Create response structure:', response); // ?�버깅용
+      console.log('Extracted token value:', tokenValue); // ?�버깅용
 
-      // 상태를 순서대로 설정하여 다이얼로그가 확실히 열리도록 함
-      setNewTokenInfo(tokenInfo);
+      // ?�태�??�서?��??�정?�여 ?�이?�로그�? ?�실???�리?�록 ??      setNewTokenInfo(tokenInfo);
       setNewTokenValue(tokenValue);
 
-      // 다음 렌더링 사이클에서 다이얼로그 열기
+      // ?�음 ?�더�??�이?�에???�이?�로�??�기
       setTimeout(() => {
         setNewTokenDialogOpen(true);
       }, 0);
 
-      // 토큰 목록은 백그라운드에서 새로고침 (await 제거)
+      // ?�큰 목록?� 백그?�운?�에???�로고침 (await ?�거)
       loadTokens().catch(console.error);
 
       enqueueSnackbar(t('apiTokens.createSuccess'), { variant: 'success' });
@@ -636,12 +634,12 @@ const ApiTokensPage: React.FC = () => {
 
     try {
       const response = await apiTokenService.regenerateToken(selectedToken.id);
-      console.log('Regenerate token response:', response); // 디버깅용
+      console.log('Regenerate token response:', response); // ?�버깅용
 
-      // 백엔드 응답 구조 확인 및 토큰 값 추출
+      // 백엔???�답 구조 ?�인 �??�큰 �?추출
       const tokenValue = response?.data?.tokenValue || response?.tokenValue || '';
-      console.log('Regenerate response structure:', response); // 디버깅용
-      console.log('Extracted token value:', tokenValue); // 디버깅용
+      console.log('Regenerate response structure:', response); // ?�버깅용
+      console.log('Extracted token value:', tokenValue); // ?�버깅용
 
       const tokenInfo = {
         tokenName: selectedToken.tokenName,
@@ -651,11 +649,10 @@ const ApiTokensPage: React.FC = () => {
         isNew: false
       };
 
-      // 상태를 순서대로 설정하여 다이얼로그가 확실히 열리도록 함
-      setNewTokenInfo(tokenInfo);
+      // ?�태�??�서?��??�정?�여 ?�이?�로그�? ?�실???�리?�록 ??      setNewTokenInfo(tokenInfo);
       setNewTokenValue(tokenValue);
 
-      // 다음 렌더링 사이클에서 다이얼로그 열기
+      // ?�음 ?�더�??�이?�에???�이?�로�??�기
       setTimeout(() => {
         setNewTokenDialogOpen(true);
       }, 0);
@@ -779,7 +776,7 @@ const ApiTokensPage: React.FC = () => {
 
   const maskToken = (token: string) => {
     if (!token || token.length < 8) return token;
-    return `${token.substring(0, 4)}${'•'.repeat(token.length - 8)}${token.substring(token.length - 4)}`;
+    return `${token.substring(0, 4)}${'??.repeat(token.length - 8)}${token.substring(token.length - 4)}`;
   };
 
   // Bulk selection handlers
@@ -1976,7 +1973,7 @@ const ApiTokensPage: React.FC = () => {
                       {token.tokenName}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {token.tokenType} • {t('apiTokens.createdBy')}: {token.creator?.name || 'Unknown'}
+                      {token.tokenType} ??{t('apiTokens.createdBy')}: {token.creator?.name || 'Unknown'}
                     </Typography>
                   </Box>
                 ))

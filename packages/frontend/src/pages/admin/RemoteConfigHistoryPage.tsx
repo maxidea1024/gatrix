@@ -223,7 +223,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
       {/* Deployments View */}
       {viewMode === 'deployments' && (
         <Card>
-          <CardContent sx={{ p: 0 }}>
+          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
             <TableContainer>
               <Table>
                 <TableHead>
@@ -364,7 +364,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
       {/* Versions View */}
       {viewMode === 'versions' && (
         <Card>
-          <CardContent sx={{ p: 0 }}>
+          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
             <TableContainer>
               <Table>
                 <TableHead>
@@ -697,12 +697,12 @@ const RemoteConfigHistoryPage: React.FC = () => {
       >
         <DialogTitle>
           <Typography variant="h6" color="warning.main">
-            롤백 확인
+            롤백 ?�인
           </Typography>
         </DialogTitle>
         <DialogContent>
           <Typography variant="body1" sx={{ mb: 2 }} color="text.primary">
-            정말로 다음 배포로 롤백하시겠습니까?
+            ?�말�??�음 배포�?롤백?�시겠습?�까?
           </Typography>
           {rollbackTarget && (
             <Box sx={{
@@ -711,28 +711,28 @@ const RemoteConfigHistoryPage: React.FC = () => {
               borderRadius: 1
             }}>
               <Typography variant="subtitle2" gutterBottom color="text.primary">
-                배포 정보:
+                배포 ?�보:
               </Typography>
               <Typography variant="body2" color="text.primary">
-                <strong>이름:</strong> {rollbackTarget.deploymentName || `배포 #${rollbackTarget.id}`}
+                <strong>?�름:</strong> {rollbackTarget.deploymentName || `배포 #${rollbackTarget.id}`}
               </Typography>
               <Typography variant="body2" color="text.primary">
-                <strong>배포일:</strong> {new Date(rollbackTarget.deployedAt).toLocaleString('ko-KR')}
+                <strong>배포??</strong> {new Date(rollbackTarget.deployedAt).toLocaleString('ko-KR')}
               </Typography>
               <Typography variant="body2" color="text.primary">
-                <strong>배포자:</strong> {rollbackTarget.deployedByName || '알 수 없음'}
+                <strong>배포??</strong> {rollbackTarget.deployedByName || '?????�음'}
               </Typography>
               {rollbackTarget.description && (
                 <Typography variant="body2" color="text.primary">
-                  <strong>설명:</strong> {rollbackTarget.description}
+                  <strong>?�명:</strong> {rollbackTarget.description}
                 </Typography>
               )}
             </Box>
           )}
           <Alert severity="warning" sx={{ mt: 2 }}>
             <Typography variant="body2">
-              <strong>주의:</strong> 롤백하면 현재 설정이 선택한 배포 시점의 설정으로 되돌아갑니다.
-              이 작업은 되돌릴 수 없습니다.
+              <strong>주의:</strong> 롤백?�면 ?�재 ?�정???�택??배포 ?�점???�정?�로 ?�돌?�갑?�다.
+              ???�업?� ?�돌�????�습?�다.
             </Typography>
           </Alert>
         </DialogContent>
@@ -750,7 +750,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
             variant="contained"
             startIcon={<RestoreIcon />}
           >
-            롤백 실행
+            롤백 ?�행
           </Button>
         </DialogActions>
       </Dialog>

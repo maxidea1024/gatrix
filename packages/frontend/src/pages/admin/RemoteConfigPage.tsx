@@ -109,7 +109,7 @@ const RemoteConfigPage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [filters, setFilters] = useState<RemoteConfigFilters>({});
 
-  // SSE connection for real-time updates (임시 비활성화)
+  // SSE connection for real-time updates (?�시 비활?�화)
   // const { isConnected } = useSSENotifications({
   //   onEvent: (event) => {
   //     if (event.type === 'remote_config_change') {
@@ -142,16 +142,16 @@ const RemoteConfigPage: React.FC = () => {
       fontSize: 'inherit' as const,
       sx: {
         mr: 0.5,
-        fontSize: '0.875rem', // 글자 크기와 비슷하게
+        fontSize: '0.875rem', // 글???�기?� 비슷?�게
         verticalAlign: 'middle'
       }
     };
 
     switch (valueType) {
       case 'string':
-        return <StringIcon {...iconProps} color="primary" title="문자열" />;
+        return <StringIcon {...iconProps} color="primary" title="문자?? />;
       case 'number':
-        return <NumberIcon {...iconProps} color="success" title="숫자" />;
+        return <NumberIcon {...iconProps} color="success" title="?�자" />;
       case 'boolean':
         return <BooleanIcon {...iconProps} color="warning" title="불린" />;
       case 'json':
@@ -159,7 +159,7 @@ const RemoteConfigPage: React.FC = () => {
       case 'yaml':
         return <YamlIcon {...iconProps} color="secondary" title="YAML" />;
       default:
-        return <StringIcon {...iconProps} color="primary" title="문자열" />;
+        return <StringIcon {...iconProps} color="primary" title="문자?? />;
     }
   };
   
@@ -257,7 +257,7 @@ const RemoteConfigPage: React.FC = () => {
     }
 
     if (!formData.description.trim()) {
-      errors.description = '설명은 필수 입력 항목입니다.';
+      errors.description = '?�명?� ?�수 ?�력 ??��?�니??';
     }
 
     setFormErrors(errors);
@@ -269,13 +269,13 @@ const RemoteConfigPage: React.FC = () => {
     try {
       setLoading(true);
 
-      // 기본 파라미터
+      // 기본 ?�라미터
       const params: Record<string, string> = {
         page: (page + 1).toString(),
         limit: rowsPerPage.toString(),
       };
 
-      // 필터 파라미터 추가 (undefined 값 제외)
+      // ?�터 ?�라미터 추�? (undefined �??�외)
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
           params[key] = String(value);
@@ -373,7 +373,7 @@ const RemoteConfigPage: React.FC = () => {
   // Stage configs
   const handleStageConfigs = async () => {
     try {
-      console.log('Starting stage configs...', { selectedConfigs, stageFormData }); // 디버깅용
+      console.log('Starting stage configs...', { selectedConfigs, stageFormData }); // ?�버깅용
 
       if (selectedConfigs.length === 0) {
         enqueueSnackbar(t('remoteConfig.selectConfigsFirst'), { variant: 'warning' });
@@ -385,10 +385,10 @@ const RemoteConfigPage: React.FC = () => {
         description: stageFormData.description
       });
 
-      console.log('Full response:', response); // 전체 응답 확인
-      console.log('Stage response:', response.data); // 디버깅용
+      console.log('Full response:', response); // ?�체 ?�답 ?�인
+      console.log('Stage response:', response.data); // ?�버깅용
 
-      // 성공 조건: success가 true이거나, stagedConfigIds가 있으면 성공으로 간주
+      // ?�공 조건: success가 true?�거?? stagedConfigIds가 ?�으�??�공?�로 간주
       if (response.data.success || response.data.stagedConfigIds) {
         enqueueSnackbar(t('remoteConfig.stageSuccess'), { variant: 'success' });
         setStageDialogOpen(false);
@@ -396,7 +396,7 @@ const RemoteConfigPage: React.FC = () => {
         setSelectedConfigs([]);
         loadConfigs();
       } else {
-        console.log('Stage failed - success is false'); // 디버깅용
+        console.log('Stage failed - success is false'); // ?�버깅용
         enqueueSnackbar(response.data.message || t('remoteConfig.stageError'), { variant: 'error' });
       }
     } catch (error: any) {
@@ -409,7 +409,7 @@ const RemoteConfigPage: React.FC = () => {
   // Publish staged configs
   const handlePublishChanges = async () => {
     try {
-      console.log('Starting publish...', { publishFormData }); // 디버깅용
+      console.log('Starting publish...', { publishFormData }); // ?�버깅용
 
       const response = await api.post('/admin/remote-config/publish', {
         deploymentName: publishFormData.deploymentName,
@@ -441,7 +441,7 @@ const RemoteConfigPage: React.FC = () => {
         await api.delete(`/admin/remote-config/${configId}/versions/draft`);
       }
 
-      enqueueSnackbar(`${configsToDiscard.length}개 설정의 변경사항이 취소되었습니다.`, { variant: 'success' });
+      enqueueSnackbar(`${configsToDiscard.length}�??�정??변경사??�� 취소?�었?�니??`, { variant: 'success' });
       setDiscardChangesDialogOpen(false);
       setSelectedDiscardConfigs([]);
 
@@ -474,7 +474,7 @@ const RemoteConfigPage: React.FC = () => {
       await loadConfigs();
     } catch (error: any) {
       console.error('Error discarding changes:', error);
-      const errorMessage = error.response?.data?.error?.message || error.message || '변경사항 취소 중 오류가 발생했습니다.';
+      const errorMessage = error.response?.data?.error?.message || error.message || '변경사??취소 �??�류가 발생?�습?�다.';
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
@@ -523,10 +523,10 @@ const RemoteConfigPage: React.FC = () => {
     // Create campaign
     const handleCreateCampaign = async () => {
       try {
-        // 항상 draft 상태로 생성
+        // ??�� draft ?�태�??�성
         const createData = {
           ...campaignFormData,
-          status: 'draft' // 강제로 draft 상태로 설정
+          status: 'draft' // 강제�?draft ?�태�??�정
         };
         const response = await api.post('/admin/remote-config/campaigns', createData);
 
@@ -619,7 +619,7 @@ const RemoteConfigPage: React.FC = () => {
                 <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.description')}</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.campaigns.startDate')}</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.campaigns.endDate')}</TableCell>
-                <TableCell sx={{ fontWeight: 600 }} align="center">트래픽 비율</TableCell>
+                <TableCell sx={{ fontWeight: 600 }} align="center">?�래??비율</TableCell>
                 <TableCell sx={{ fontWeight: 600 }} align="center">{t('remoteConfig.status')}</TableCell>
                 <TableCell sx={{ fontWeight: 600 }} align="center">{t('remoteConfig.actions')}</TableCell>
               </TableRow>
@@ -764,7 +764,7 @@ const RemoteConfigPage: React.FC = () => {
                 multiline
                 rows={3}
                 required
-                helperText="캠페인의 목적과 내용을 간단히 설명해주세요"
+                helperText="캠페?�의 목적�??�용??간단???�명?�주?�요"
               />
               <TextField
                 fullWidth
@@ -794,7 +794,7 @@ const RemoteConfigPage: React.FC = () => {
               />
               <TextField
                 fullWidth
-                label="트래픽 비율 (%)"
+                label="?�래??비율 (%)"
                 type="number"
                 value={campaignFormData.trafficPercentage}
                 onChange={(e) => {
@@ -803,7 +803,7 @@ const RemoteConfigPage: React.FC = () => {
                   setCampaignFormData({ ...campaignFormData, trafficPercentage: clampedValue });
                 }}
                 inputProps={{ min: 0, max: 100, step: 0.01 }}
-                helperText="캠페인이 적용될 사용자 비율 (0-100%)"
+                helperText="캠페?�이 ?�용???�용??비율 (0-100%)"
               />
 
               <FormControlLabel
@@ -1051,22 +1051,21 @@ const RemoteConfigPage: React.FC = () => {
     const loadTargetings = async () => {
       try {
         setTargetingLoading(true);
-        // 실제 데이터베이스의 세그먼트 로드
+        // ?�제 ?�이?�베?�스???�그먼트 로드
         const segmentsResponse = await api.getSegments();
         const segments = segmentsResponse.data.segments || [];
 
-        // 세그먼트 데이터를 타겟팅 형식으로 변환
-        const targetingSegments = segments.map((segment: any) => ({
+        // ?�그먼트 ?�이?��? ?�겟팅 ?�식?�로 변??        const targetingSegments = segments.map((segment: any) => ({
           id: segment.id,
           name: segment.ruleName,
-          description: segment.value || '세그먼트 설명 없음',
+          description: segment.value || '?�그먼트 ?�명 ?�음',
           conditions: segment.conditions?.conditions || []
         }));
 
         setTargetings(targetingSegments);
       } catch (error) {
         console.error('Error loading segments:', error);
-        // 에러 시 빈 배열로 설정
+        // ?�러 ??�?배열�??�정
         setTargetings([]);
       } finally {
         setTargetingLoading(false);
@@ -1079,7 +1078,7 @@ const RemoteConfigPage: React.FC = () => {
 
     const handleCreateTargeting = async () => {
       try {
-        // 타겟팅 생성 (향후 API 연동 예정)
+        // ?�겟팅 ?�성 (?�후 API ?�동 ?�정)
         const newTargeting = {
           id: `custom_${Date.now()}`,
           name: targetingFormData.name,
@@ -1089,13 +1088,13 @@ const RemoteConfigPage: React.FC = () => {
           createdAt: new Date().toISOString()
         };
 
-        // 임시로 로컬 상태에 추가
+        // ?�시�?로컬 ?�태??추�?
         setTargetings(prev => [...prev, newTargeting]);
 
         setCreateTargetingDialogOpen(false);
         setTargetingFormData({ id: '', name: '', description: '', conditions: [] });
 
-        // 성공 메시지 표시
+        // ?�공 메시지 ?�시
         setSnackbar({
           open: true,
           message: t('remoteConfig.targeting.createSuccess'),
@@ -1123,7 +1122,7 @@ const RemoteConfigPage: React.FC = () => {
 
     const handleUpdateTargeting = async () => {
       try {
-        // 타겟팅 업데이트 (향후 API 연동 예정)
+        // ?�겟팅 ?�데?�트 (?�후 API ?�동 ?�정)
         setTargetings(prev => prev.map(targeting =>
           targeting.id === targetingFormData.id
             ? {
@@ -1139,7 +1138,7 @@ const RemoteConfigPage: React.FC = () => {
         setEditTargetingDialogOpen(false);
         setTargetingFormData({ id: '', name: '', description: '', conditions: [] });
 
-        // 성공 메시지 표시
+        // ?�공 메시지 ?�시
         setSnackbar({
           open: true,
           message: t('remoteConfig.targeting.updateSuccess'),
@@ -1161,10 +1160,10 @@ const RemoteConfigPage: React.FC = () => {
       }
 
       try {
-        // 타겟팅 삭제 (향후 API 연동 예정)
+        // ?�겟팅 ??�� (?�후 API ?�동 ?�정)
         setTargetings(prev => prev.filter(t => t.id !== targeting.id));
 
-        // 성공 메시지 표시
+        // ?�공 메시지 ?�시
         setSnackbar({
           open: true,
           message: t('remoteConfig.targeting.deleteSuccess'),
@@ -1436,12 +1435,12 @@ const RemoteConfigPage: React.FC = () => {
           isRequired: fieldFormData.isRequired,
         };
 
-        // defaultValue 처리 (빈 문자열, false, 0도 유효한 기본값)
+        // defaultValue 처리 (�?문자?? false, 0???�효??기본�?
         if (fieldFormData.defaultValue !== undefined && fieldFormData.defaultValue !== null) {
           createData.defaultValue = fieldFormData.defaultValue;
         }
 
-        // options가 있을 때만 추가 (array 타입이고 옵션이 있는 경우)
+        // options가 ?�을 ?�만 추�? (array ?�?�이�??�션???�는 경우)
         if (fieldFormData.type === 'array' && fieldFormData.options.length > 0) {
           createData.options = fieldFormData.options.filter(opt => opt.trim());
         }
@@ -1451,10 +1450,10 @@ const RemoteConfigPage: React.FC = () => {
           setCreateFieldDialogOpen(false);
           setFieldFormData({ key: '', name: '', description: '', type: 'string', defaultValue: '', isRequired: false, options: [] });
           loadContextFields();
-          enqueueSnackbar('컨텍스트 필드가 성공적으로 생성되었습니다.', { variant: 'success' });
+          enqueueSnackbar('컨텍?�트 ?�드가 ?�공?�으�??�성?�었?�니??', { variant: 'success' });
         } else {
           console.error('Failed to create context field:', response.message);
-          enqueueSnackbar(response.message || '컨텍스트 필드 생성에 실패했습니다.', { variant: 'error' });
+          enqueueSnackbar(response.message || '컨텍?�트 ?�드 ?�성???�패?�습?�다.', { variant: 'error' });
         }
       } catch (error) {
         console.error('Error creating context field:', error);
@@ -1485,12 +1484,12 @@ const RemoteConfigPage: React.FC = () => {
           isRequired: fieldFormData.isRequired,
         };
 
-        // defaultValue 처리 (빈 문자열, false, 0도 유효한 기본값)
+        // defaultValue 처리 (�?문자?? false, 0???�효??기본�?
         if (fieldFormData.defaultValue !== undefined && fieldFormData.defaultValue !== null) {
           updateData.defaultValue = fieldFormData.defaultValue;
         }
 
-        // options가 있을 때만 추가 (array 타입이고 옵션이 있는 경우)
+        // options가 ?�을 ?�만 추�? (array ?�?�이�??�션???�는 경우)
         if (fieldFormData.type === 'array' && fieldFormData.options.length > 0) {
           updateData.options = fieldFormData.options.filter(opt => opt.trim());
         }
@@ -1501,10 +1500,10 @@ const RemoteConfigPage: React.FC = () => {
           setSelectedField(null);
           setFieldFormData({ key: '', name: '', description: '', type: 'string', defaultValue: '', isRequired: false, options: [] });
           loadContextFields();
-          enqueueSnackbar('컨텍스트 필드가 성공적으로 수정되었습니다.', { variant: 'success' });
+          enqueueSnackbar('컨텍?�트 ?�드가 ?�공?�으�??�정?�었?�니??', { variant: 'success' });
         } else {
           console.error('Failed to update context field:', response.message);
-          enqueueSnackbar(response.message || '컨텍스트 필드 수정에 실패했습니다.', { variant: 'error' });
+          enqueueSnackbar(response.message || '컨텍?�트 ?�드 ?�정???�패?�습?�다.', { variant: 'error' });
         }
       } catch (error) {
         console.error('Error updating context field:', error);
@@ -1567,8 +1566,8 @@ const RemoteConfigPage: React.FC = () => {
                   <TableCell>{t('remoteConfig.contextFields.key')}</TableCell>
                   <TableCell>{t('remoteConfig.contextFields.name')}</TableCell>
                   <TableCell>{t('remoteConfig.contextFields.type')}</TableCell>
-                  <TableCell>기본값</TableCell>
-                  <TableCell align="center">필수 여부</TableCell>
+                  <TableCell>기본�?/TableCell>
+                  <TableCell align="center">?�수 ?��?</TableCell>
                   <TableCell>{t('remoteConfig.description')}</TableCell>
                   <TableCell align="center">{t('remoteConfig.actions')}</TableCell>
                 </TableRow>
@@ -1599,7 +1598,7 @@ const RemoteConfigPage: React.FC = () => {
                     </TableCell>
                     <TableCell align="center">
                       <Chip
-                        label={field.isRequired ? '필수' : '선택'}
+                        label={field.isRequired ? '?�수' : '?�택'}
                         size="small"
                         color={field.isRequired ? 'error' : 'default'}
                         variant="outlined"
@@ -1687,29 +1686,29 @@ const RemoteConfigPage: React.FC = () => {
               {/* Default Value Field */}
               {fieldFormData.type === 'boolean' ? (
                 <FormControl fullWidth>
-                  <InputLabel>기본값</InputLabel>
+                  <InputLabel>기본�?/InputLabel>
                   <Select
                     value={fieldFormData.defaultValue}
                     onChange={(e) => setFieldFormData({ ...fieldFormData, defaultValue: e.target.value })}
-                    label="기본값"
+                    label="기본�?
                   >
                     <MenuItem value="true">True</MenuItem>
                     <MenuItem value="false">False</MenuItem>
                   </Select>
-                  <FormHelperText>컨텍스트에서 값을 받지 못했을 때 사용할 기본값</FormHelperText>
+                  <FormHelperText>컨텍?�트?�서 값을 받�? 못했?????�용??기본�?/FormHelperText>
                 </FormControl>
               ) : (
                 <TextField
                   fullWidth
-                  label="기본값"
+                  label="기본�?
                   value={fieldFormData.defaultValue}
                   onChange={(e) => setFieldFormData({ ...fieldFormData, defaultValue: e.target.value })}
                   type={fieldFormData.type === 'number' ? 'number' : 'text'}
-                  helperText="컨텍스트에서 값을 받지 못했을 때 사용할 기본값"
+                  helperText="컨텍?�트?�서 값을 받�? 못했?????�용??기본�?
                   placeholder={
-                    fieldFormData.type === 'string' ? '예: "default"' :
-                    fieldFormData.type === 'number' ? '예: 0' :
-                    fieldFormData.type === 'array' ? '예: []' : ''
+                    fieldFormData.type === 'string' ? '?? "default"' :
+                    fieldFormData.type === 'number' ? '?? 0' :
+                    fieldFormData.type === 'array' ? '?? []' : ''
                   }
                 />
               )}
@@ -1720,7 +1719,7 @@ const RemoteConfigPage: React.FC = () => {
                   onChange={(e) => setFieldFormData({ ...fieldFormData, isRequired: e.target.checked })}
                 />
                 <Typography variant="body2" color="text.primary">
-                  필수 필드 (조건 평가 시 반드시 제공되어야 함)
+                  ?�수 ?�드 (조건 ?��? ??반드???�공?�어????
                 </Typography>
               </Box>
 
@@ -1787,7 +1786,7 @@ const RemoteConfigPage: React.FC = () => {
                 label={t('remoteConfig.contextFields.key')}
                 value={fieldFormData.key}
                 disabled
-                helperText="키는 수정할 수 없습니다."
+                helperText="?�는 ?�정?????�습?�다."
               />
               <TextField
                 fullWidth
@@ -1808,29 +1807,29 @@ const RemoteConfigPage: React.FC = () => {
               {/* Default Value Field - Edit */}
               {fieldFormData.type === 'boolean' ? (
                 <FormControl fullWidth>
-                  <InputLabel>기본값</InputLabel>
+                  <InputLabel>기본�?/InputLabel>
                   <Select
                     value={fieldFormData.defaultValue}
                     onChange={(e) => setFieldFormData({ ...fieldFormData, defaultValue: e.target.value })}
-                    label="기본값"
+                    label="기본�?
                   >
                     <MenuItem value="true">True</MenuItem>
                     <MenuItem value="false">False</MenuItem>
                   </Select>
-                  <FormHelperText>컨텍스트에서 값을 받지 못했을 때 사용할 기본값</FormHelperText>
+                  <FormHelperText>컨텍?�트?�서 값을 받�? 못했?????�용??기본�?/FormHelperText>
                 </FormControl>
               ) : (
                 <TextField
                   fullWidth
-                  label="기본값"
+                  label="기본�?
                   value={fieldFormData.defaultValue}
                   onChange={(e) => setFieldFormData({ ...fieldFormData, defaultValue: e.target.value })}
                   type={fieldFormData.type === 'number' ? 'number' : 'text'}
-                  helperText="컨텍스트에서 값을 받지 못했을 때 사용할 기본값"
+                  helperText="컨텍?�트?�서 값을 받�? 못했?????�용??기본�?
                   placeholder={
-                    fieldFormData.type === 'string' ? '예: "default"' :
-                    fieldFormData.type === 'number' ? '예: 0' :
-                    fieldFormData.type === 'array' ? '예: []' : ''
+                    fieldFormData.type === 'string' ? '?? "default"' :
+                    fieldFormData.type === 'number' ? '?? 0' :
+                    fieldFormData.type === 'array' ? '?? []' : ''
                   }
                 />
               )}
@@ -1854,7 +1853,7 @@ const RemoteConfigPage: React.FC = () => {
                   onChange={(e) => setFieldFormData({ ...fieldFormData, isRequired: e.target.checked })}
                 />
                 <Typography variant="body2" color="text.primary">
-                  필수 필드 (조건 평가 시 반드시 제공되어야 함)
+                  ?�수 ?�드 (조건 ?��? ??반드???�공?�어????
                 </Typography>
               </Box>
 
@@ -2039,8 +2038,7 @@ const RemoteConfigPage: React.FC = () => {
             {/* Header */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Typography variant="subtitle1" color="text.primary">
-                {selectedConfig.keyName}의 변형
-              </Typography>
+                {selectedConfig.keyName}??변??              </Typography>
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
@@ -2435,7 +2433,7 @@ const RemoteConfigPage: React.FC = () => {
               {modifiedConfigs.length > 0 && (
                 <Chip
                   size="small"
-                  label={`${modifiedConfigs.length}개 수정됨`}
+                  label={`${modifiedConfigs.length}�??�정??}
                   color="warning"
                   variant="outlined"
                 />
@@ -2443,7 +2441,7 @@ const RemoteConfigPage: React.FC = () => {
               {stagedConfigs.length > 0 && (
                 <Chip
                   size="small"
-                  label={`${stagedConfigs.length}개 스테이징됨`}
+                  label={`${stagedConfigs.length}�??�테?�징??}
                   color="info"
                   variant="outlined"
                 />
@@ -2461,7 +2459,7 @@ const RemoteConfigPage: React.FC = () => {
                     onClick={() => setDiscardChangesDialogOpen(true)}
                     color="error"
                   >
-                    변경사항 취소
+                    변경사??취소
                   </Button>
                   <Button
                     variant="outlined"
@@ -2472,7 +2470,7 @@ const RemoteConfigPage: React.FC = () => {
                       setStageDialogOpen(true);
                     }}
                   >
-                    변경사항 스테이징
+                    변경사???�테?�징
                   </Button>
                 </>
               )}
@@ -2490,15 +2488,15 @@ const RemoteConfigPage: React.FC = () => {
                     setPublishDialogOpen(true);
                   }}
                 >
-                  설정 배포 ({stagedConfigs.length}개)
+                  ?�정 배포 ({stagedConfigs.length}�?
                 </Button>
               ) : modifiedConfigs.length === 0 && (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Typography variant="body2" color="text.secondary">
-                    💡 배포할 스테이징된 설정이 없습니다.
+                    ?�� 배포???�테?�징???�정???�습?�다.
                   </Typography>
                   <Typography variant="body2" color="primary.main" sx={{ fontWeight: 500 }}>
-                    설정을 수정한 후 "변경사항 스테이징"을 먼저 진행하세요.
+                    ?�정???�정????"변경사???�테?�징"??먼�? 진행?�세??
                   </Typography>
                 </Box>
               )}
@@ -2613,7 +2611,7 @@ const RemoteConfigPage: React.FC = () => {
               <TableCell>{t('remoteConfig.valueType')}</TableCell>
               <TableCell>{t('remoteConfig.defaultValue')}</TableCell>
               <TableCell>{t('remoteConfig.status')}</TableCell>
-              <TableCell>버전 상태</TableCell>
+              <TableCell>버전 ?�태</TableCell>
               <TableCell>{t('remoteConfig.description')}</TableCell>
               <TableCell>{t('remoteConfig.updated')}</TableCell>
               <TableCell>{t('remoteConfig.createdBy')}</TableCell>
@@ -2917,7 +2915,7 @@ const RemoteConfigPage: React.FC = () => {
                 {selectedConfig.status === 'published' && (
                   <Chip
                     size="small"
-                    label="배포됨"
+                    label="배포??
                     color="success"
                     variant="outlined"
                   />
@@ -2925,7 +2923,7 @@ const RemoteConfigPage: React.FC = () => {
                 {selectedConfig.status === 'draft' && (
                   <Chip
                     size="small"
-                    label="수정됨"
+                    label="?�정??
                     color="warning"
                     variant="outlined"
                   />
@@ -2933,7 +2931,7 @@ const RemoteConfigPage: React.FC = () => {
                 {selectedConfig.status === 'draft' && formData.defaultValue === originalPublishedValue && (
                   <Chip
                     size="small"
-                    label="원래 값과 동일"
+                    label="?�래 값과 ?�일"
                     color="info"
                     variant="outlined"
                   />
@@ -2989,10 +2987,10 @@ const RemoteConfigPage: React.FC = () => {
                     <Tooltip
                       title={
                         selectedConfig.status === 'published'
-                          ? '배포된 상태입니다'
+                          ? '배포???�태?�니??
                           : formData.defaultValue === originalPublishedValue
-                            ? '배포된 값과 동일합니다'
-                            : '배포된 값과 다릅니다'
+                            ? '배포??값과 ?�일?�니??
+                            : '배포??값과 ?�릅?�다'
                       }
                     >
                       <Box
@@ -3039,10 +3037,10 @@ const RemoteConfigPage: React.FC = () => {
                       <Tooltip
                         title={
                           selectedConfig.status === 'published'
-                            ? '배포된 상태입니다'
+                            ? '배포???�태?�니??
                             : formData.defaultValue === originalPublishedValue
-                              ? '배포된 값과 동일합니다'
-                              : '배포된 값과 다릅니다'
+                              ? '배포??값과 ?�일?�니??
+                              : '배포??값과 ?�릅?�다'
                         }
                       >
                         <Box sx={{ display: 'flex', alignItems: 'center', ml: 1 }}>
@@ -3159,14 +3157,14 @@ const RemoteConfigPage: React.FC = () => {
           <Stack spacing={3} sx={{ mt: 1 }}>
             <Alert severity="info" sx={{ mb: 2 }}>
               <Typography variant="body2">
-                다음 {selectedConfigs.length}개의 설정을 스테이징합니다. 스테이징된 설정은 배포 대기 상태가 됩니다.
+                ?�음 {selectedConfigs.length}개의 ?�정???�테?�징?�니?? ?�테?�징???�정?� 배포 ?��??�태가 ?�니??
               </Typography>
             </Alert>
 
             {/* Staging targets list */}
             <Box>
               <Typography variant="subtitle1" color="text.primary" sx={{ mb: 2, fontWeight: 600 }}>
-                📋 스테이징 대상 설정
+                ?�� ?�테?�징 ?�???�정
               </Typography>
               <Box sx={{
                 maxHeight: 300,
@@ -3195,22 +3193,22 @@ const RemoteConfigPage: React.FC = () => {
                         {config.keyName}
                       </Typography>
                       <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                        {config.description || '설명 없음'}
+                        {config.description || '?�명 ?�음'}
                       </Typography>
                       <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                        타입: {config.valueType} | 현재 값: {config.defaultValue || '(없음)'}
+                        ?�?? {config.valueType} | ?�재 �? {config.defaultValue || '(?�음)'}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
                       <Chip
                         size="small"
-                        label={config.status === 'draft' ? '수정됨' : config.status}
+                        label={config.status === 'draft' ? '?�정?? : config.status}
                         color={config.status === 'draft' ? 'warning' : 'default'}
                         variant="outlined"
                       />
                       <Chip
                         size="small"
-                        label={config.isActive ? '활성' : '비활성'}
+                        label={config.isActive ? '?�성' : '비활??}
                         color={config.isActive ? 'success' : 'default'}
                         variant="filled"
                       />
@@ -3229,7 +3227,7 @@ const RemoteConfigPage: React.FC = () => {
               rows={3}
               placeholder={t('remoteConfig.stageDescriptionPlaceholder')}
               required
-              helperText="스테이징하는 이유나 변경 내용을 간단히 설명해주세요."
+              helperText="?�테?�징?�는 ?�유??변�??�용??간단???�명?�주?�요."
               error={!stageFormData.description.trim()}
             />
           </Stack>
@@ -3272,7 +3270,7 @@ const RemoteConfigPage: React.FC = () => {
               onChange={(e) => setPublishFormData({ ...publishFormData, deploymentName: e.target.value })}
               placeholder={t('remoteConfig.deploymentNamePlaceholder')}
               required
-              helperText="배포를 식별할 수 있는 고유한 이름을 입력하세요. (예: v1.2.0_release)"
+              helperText="배포�??�별?????�는 고유???�름???�력?�세?? (?? v1.2.0_release)"
               error={!publishFormData.deploymentName.trim()}
             />
             <TextField
@@ -3284,7 +3282,7 @@ const RemoteConfigPage: React.FC = () => {
               rows={3}
               placeholder={t('remoteConfig.deploymentDescriptionPlaceholder')}
               required
-              helperText="이번 배포에 포함된 변경사항이나 목적을 설명해주세요."
+              helperText="?�번 배포???�함??변경사??��??목적???�명?�주?�요."
               error={!publishFormData.description.trim()}
             />
 
@@ -3294,10 +3292,10 @@ const RemoteConfigPage: React.FC = () => {
             {/* Deployment Review Section */}
             <Box>
               <Typography variant="subtitle1" color="text.primary" sx={{ mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-                🚀 배포 대상 설정 리뷰
+                ?? 배포 ?�???�정 리뷰
                 <Chip
                   size="small"
-                  label={`${stagedConfigs.length}개`}
+                  label={`${stagedConfigs.length}�?}
                   color="success"
                   variant="outlined"
                 />
@@ -3332,7 +3330,7 @@ const RemoteConfigPage: React.FC = () => {
                           {config.keyName}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                          {config.description || '설명 없음'}
+                          {config.description || '?�명 ?�음'}
                         </Typography>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -3342,7 +3340,7 @@ const RemoteConfigPage: React.FC = () => {
                             </Typography>
                           </Box>
                           <Typography variant="caption" color="text.secondary">
-                            현재 값: {config.defaultValue || 'null'}
+                            ?�재 �? {config.defaultValue || 'null'}
                           </Typography>
                         </Box>
                       </Box>
@@ -3359,7 +3357,7 @@ const RemoteConfigPage: React.FC = () => {
                 </Box>
               ) : (
                 <Alert severity="info">
-                  배포할 스테이징된 설정이 없습니다.
+                  배포???�테?�징???�정???�습?�다.
                 </Alert>
               )}
             </Box>
@@ -3384,7 +3382,7 @@ const RemoteConfigPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* 컨텍스트 필드 삭제 확인 다이얼로그 */}
+      {/* 컨텍?�트 ?�드 ??�� ?�인 ?�이?�로�?*/}
       <Dialog
         open={deleteConfirmDialog.open}
         onClose={() => setDeleteConfirmDialog({ open: false, field: null })}
@@ -3419,7 +3417,7 @@ const RemoteConfigPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* 변경사항 취소 다이얼로그 */}
+      {/* 변경사??취소 ?�이?�로�?*/}
       <Dialog
         open={discardChangesDialogOpen}
         onClose={() => setDiscardChangesDialogOpen(false)}
@@ -3427,11 +3425,11 @@ const RemoteConfigPage: React.FC = () => {
         fullWidth
       >
         <DialogTitle color="text.primary">
-          변경사항 취소
+          변경사??취소
         </DialogTitle>
         <DialogContent>
           <Typography color="text.primary" sx={{ mb: 2 }}>
-            다음 설정들의 변경사항을 취소하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+            ?�음 ?�정?�의 변경사??�� 취소?�시겠습?�까? ???�업?� ?�돌�????�습?�다.
           </Typography>
 
           {/* Modified configs list */}
@@ -3467,12 +3465,12 @@ const RemoteConfigPage: React.FC = () => {
                     {config.keyName}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {config.description || '설명 없음'}
+                    {config.description || '?�명 ?�음'}
                   </Typography>
                 </Box>
                 <Chip
                   size="small"
-                  label="수정됨"
+                  label="?�정??
                   color="warning"
                   variant="outlined"
                 />
@@ -3482,7 +3480,7 @@ const RemoteConfigPage: React.FC = () => {
 
           {modifiedConfigs.length === 0 && (
             <Typography color="text.secondary" align="center" sx={{ py: 2 }}>
-              취소할 변경사항이 없습니다.
+              취소??변경사??�� ?�습?�다.
             </Typography>
           )}
         </DialogContent>
@@ -3500,7 +3498,7 @@ const RemoteConfigPage: React.FC = () => {
             disabled={modifiedConfigs.length === 0}
             startIcon={<UndoIcon />}
           >
-            변경사항 취소
+            변경사??취소
           </Button>
         </DialogActions>
       </Dialog>

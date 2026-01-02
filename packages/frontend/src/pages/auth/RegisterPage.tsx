@@ -65,7 +65,7 @@ const RegisterPage: React.FC = () => {
     return /AppleWebKit|Chrome|Safari|Edg/.test(navigator.userAgent);
   }, []);
 
-  // 초대 관련 상태
+  // 초�? 관???�태
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const [invitation, setInvitation] = useState<Invitation | null>(null);
   const [invitationLoading, setInvitationLoading] = useState(false);
@@ -107,8 +107,7 @@ const RegisterPage: React.FC = () => {
     setValue,
   } = useForm<RegisterData & { confirmPassword: string }>({
     resolver,
-    mode: 'onChange', // 실시간 검증을 위해 onChange로 변경
-    defaultValues: {
+    mode: 'onChange', // ?�시�?검증을 ?�해 onChange�?변�?    defaultValues: {
       name: '',
       email: '',
       password: '',
@@ -141,7 +140,7 @@ const RegisterPage: React.FC = () => {
 
 
 
-  // 초대 토큰 확인
+  // 초�? ?�큰 ?�인
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const token = urlParams.get('invite');
@@ -160,17 +159,16 @@ const RegisterPage: React.FC = () => {
       const result = await invitationService.validateInvitation(token);
       if (result.valid && result.invitation) {
         setInvitation(result.invitation);
-        // 초대받은 경우 이메일 필드를 미리 채움 (있는 경우)
+        // 초�?받�? 경우 ?�메???�드�?미리 채�? (?�는 경우)
         if (result.invitation.email) {
           setValue('email', result.invitation.email);
         }
       } else {
-        // 초대 링크가 유효하지 않은 경우 전용 페이지로 리다이렉트
-        navigate('/invalid-invite', { replace: true });
+        // 초�? 링크가 ?�효?��? ?��? 경우 ?�용 ?�이지�?리다?�렉??        navigate('/invalid-invite', { replace: true });
       }
     } catch (error: any) {
       console.error('Failed to validate invitation:', error);
-      // 404나 기타 에러의 경우도 유효하지 않은 초대로 처리
+      // 404??기�? ?�러??경우???�효?��? ?��? 초�?�?처리
       if (error.status === 404 || error.status === 400) {
         navigate('/invalid-invite', { replace: true });
       } else {
@@ -227,38 +225,34 @@ const RegisterPage: React.FC = () => {
     try {
       setIsSubmittingForm(true);
 
-      // API 호출
+      // API ?�출
       if (inviteToken && invitation) {
-        // 초대를 통한 가입
-        await invitationService.acceptInvitation(inviteToken, {
+        // 초�?�??�한 가??        await invitationService.acceptInvitation(inviteToken, {
           username: data.name,
           password: data.password,
           email: data.email,
           fullName: data.name,
         });
       } else {
-        // 일반 가입
-        await register({
+        // ?�반 가??        await register({
           name: data.name,
           email: data.email,
           password: data.password,
         });
       }
 
-      // 성공 시 최소 2초 대기
-      const elapsed = Date.now() - startTime;
+      // ?�공 ??최소 2�??��?      const elapsed = Date.now() - startTime;
       const remainingTime = Math.max(0, 2000 - elapsed);
       if (remainingTime > 0) {
         await new Promise(resolve => setTimeout(resolve, remainingTime));
       }
 
-      // 성공 시에만 에러 메시지 지우기
+      // ?�공 ?�에�??�러 메시지 지?�기
       setRegisterError(null);
       setRegisteredEmail(data.email); // Save registered email
       setRegisterSuccess(true);
     } catch (err: any) {
-      // 에러 시에도 최소 2초 대기
-      const elapsed = Date.now() - startTime;
+      // ?�러 ?�에??최소 2�??��?      const elapsed = Date.now() - startTime;
       const remainingTime = Math.max(0, 2000 - elapsed);
       if (remainingTime > 0) {
         await new Promise(resolve => setTimeout(resolve, remainingTime));
@@ -288,17 +282,15 @@ const RegisterPage: React.FC = () => {
     setOauthLoading(provider);
     setRegisterError(null);
 
-    // 최소 2초 대기
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // 최소 2�??��?    await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // 타임아웃 설정 (30초)
+    // ?�?�아???�정 (30�?
     const timeout = setTimeout(() => {
       setOauthLoading(null);
       setRegisterError(t('auth.errors.oauthTimeout'));
     }, 30000);
 
-    // 페이지 이동 전에 타임아웃 정보를 sessionStorage에 저장
-    sessionStorage.setItem('oauthTimeout', timeout.toString());
+    // ?�이지 ?�동 ?�에 ?�?�아???�보�?sessionStorage???�??    sessionStorage.setItem('oauthTimeout', timeout.toString());
     sessionStorage.setItem('oauthProvider', provider);
 
     window.location.href = authUrl;
@@ -317,12 +309,12 @@ const RegisterPage: React.FC = () => {
   };
 
   const handleWeChatLogin = () => {
-    // 임시 비활성화
+    // ?�시 비활?�화
     console.log('WeChat login not available yet');
   };
 
   const handleBaiduLogin = () => {
-    // 임시 비활성화
+    // ?�시 비활?�화
     console.log('Baidu login not available yet');
   };
 
@@ -404,7 +396,7 @@ const RegisterPage: React.FC = () => {
                   },
                 }}
               >
-                🎉
+                ?��
               </Typography>
             </Box>
             <Typography
@@ -517,7 +509,7 @@ const RegisterPage: React.FC = () => {
           <Alert severity="info" sx={{ mb: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <CircularProgress size={16} />
-              초대 링크를 확인하고 있습니다...
+              초�? 링크�??�인?�고 ?�습?�다...
             </Box>
           </Alert>
         )}
@@ -1063,7 +1055,7 @@ const RegisterPage: React.FC = () => {
             <span>
               <IconButton
                 onClick={handleWeChatLogin}
-                disabled={true} // 임시 비활성화
+                disabled={true} // ?�시 비활?�화
                 sx={{
                   width: 56,
                   height: 56,
@@ -1087,7 +1079,7 @@ const RegisterPage: React.FC = () => {
             <span>
               <IconButton
                 onClick={handleBaiduLogin}
-                disabled={true} // 임시 비활성화
+                disabled={true} // ?�시 비활?�화
                 sx={{
                   width: 56,
                   height: 56,

@@ -64,8 +64,7 @@ const MaintenancePage: React.FC = () => {
 
   const [endsAt, setEndsAt] = useState<Dayjs | null>(null);
   const [kickExistingPlayers, setKickExistingPlayers] = useState(false);
-  const [kickDelayMinutes, setKickDelayMinutes] = useState<number>(5); // 유예시간 (분) - 기본값 5분
-
+  const [kickDelayMinutes, setKickDelayMinutes] = useState<number>(5); // ?�예?�간 (�? - 기본�?5�?
   // Input mode
   const [inputMode, setInputMode] = useState<'direct'|'template'|''>('direct');
 
@@ -175,7 +174,7 @@ const MaintenancePage: React.FC = () => {
         const status = computeMaintenanceStatus(!!isUnderMaintenance, detail);
         setMaintenanceStatus(status);
         setCurrentMaintenanceDetail(detail);
-        // 점검 중일 때만 기존 설정을 불러옴 (SSE)
+        // ?��? 중일 ?�만 기존 ?�정??불러??(SSE)
         if (detail && !!isUnderMaintenance) {
           setType(detail.type);
           setStartsAt(detail.startsAt ? dayjs.utc(detail.startsAt).tz(getStoredTimezone()) : null);
@@ -189,8 +188,7 @@ const MaintenancePage: React.FC = () => {
           if (detail.localeMessages?.zh) d.push({ lang: 'zh', message: detail.localeMessages.zh });
           setLocales(d as any);
         } else {
-          // 점검 중이 아니면 깨끗한 상태로 초기화
-          setType('regular');
+          // ?��? 중이 ?�니�?깨끗???�태�?초기??          setType('regular');
           setStartsAt(null);
           setEndsAt(null);
           setBaseMsg('');
@@ -200,30 +198,29 @@ const MaintenancePage: React.FC = () => {
     }
   });
 
-  // 시간 검증 함수
+  // ?�간 검�??�수
   const validateMaintenanceTime = () => {
     const now = dayjs();
 
-    // 종료 시간이 과거인 경우: 에러
+    // 종료 ?�간??과거??경우: ?�러
     if (endsAt && endsAt.isBefore(now)) {
       enqueueSnackbar(t('maintenance.validationEndTimeInPast'), { variant: 'error' });
       endsAtRef.current?.focus();
       return { valid: false };
     }
 
-    // 시작 시간이 설정되지 않았고 종료 시간만 설정된 경우 (즉시 시작)
+    // ?�작 ?�간???�정?��? ?�았�?종료 ?�간�??�정??경우 (즉시 ?�작)
     if (!startsAt && endsAt) {
-      // 즉시 시작이므로 현재 시간부터 종료 시간까지의 기간 계산
+      // 즉시 ?�작?��?�??�재 ?�간부??종료 ?�간까�???기간 계산
       const duration = endsAt.diff(now, 'minute');
 
-      // 최소 5분 검증
-      if (duration < 5) {
+      // 최소 5�?검�?      if (duration < 5) {
         enqueueSnackbar(t('maintenance.validationMinDuration', { duration: Math.max(0, duration) }), { variant: 'error' });
         endsAtRef.current?.focus();
         return { valid: false };
       }
 
-      // 유예시간 검증 (kickExistingPlayers가 활성화된 경우)
+      // ?�예?�간 검�?(kickExistingPlayers가 ?�성?�된 경우)
       if (kickExistingPlayers && kickDelayMinutes >= duration) {
         enqueueSnackbar(t('maintenance.validationGracePeriodExceedsDuration', {
           duration,
@@ -235,27 +232,25 @@ const MaintenancePage: React.FC = () => {
       return { valid: true };
     }
 
-    // 시작 시간이 설정된 경우
+    // ?�작 ?�간???�정??경우
     if (startsAt) {
-      // 종료 시간이 시작 시간보다 이른지 확인
+      // 종료 ?�간???�작 ?�간보다 ?�른지 ?�인
       if (endsAt && endsAt.isBefore(startsAt)) {
         enqueueSnackbar(t('maintenance.validationEndBeforeStart'), { variant: 'error' });
         endsAtRef.current?.focus();
         return { valid: false };
       }
 
-      // 종료 시간이 설정된 경우 기간 검증
-      if (endsAt) {
+      // 종료 ?�간???�정??경우 기간 검�?      if (endsAt) {
         const duration = endsAt.diff(startsAt, 'minute');
 
-        // 최소 5분 검증
-        if (duration < 5) {
+        // 최소 5�?검�?        if (duration < 5) {
           enqueueSnackbar(t('maintenance.validationMinDuration', { duration }), { variant: 'error' });
           endsAtRef.current?.focus();
           return { valid: false };
         }
 
-        // 유예시간 검증 (kickExistingPlayers가 활성화된 경우)
+        // ?�예?�간 검�?(kickExistingPlayers가 ?�성?�된 경우)
         if (kickExistingPlayers && kickDelayMinutes >= duration) {
           enqueueSnackbar(t('maintenance.validationGracePeriodExceedsDuration', {
             duration,
@@ -269,15 +264,14 @@ const MaintenancePage: React.FC = () => {
     return { valid: true };
   };
 
-  // 시작 시간이 과거인지 확인하는 헬퍼 함수
+  // ?�작 ?�간??과거?��? ?�인?�는 ?�퍼 ?�수
   const isStartTimeInPast = (): boolean => {
     if (!startsAt) return false;
     return startsAt.isBefore(dayjs());
   };
 
   const startMaintenance = async () => {
-    // 시간 검증
-    const validation = validateMaintenanceTime();
+    // ?�간 검�?    const validation = validateMaintenanceTime();
     if (!validation.valid) {
       return;
     }
@@ -316,7 +310,7 @@ const MaintenancePage: React.FC = () => {
     const { isUnderMaintenance } = response.data;
 
     if (!isUnderMaintenance) {
-      // 점검이 시작되지 않은 경우 경고
+      // ?��????�작?��? ?��? 경우 경고
       enqueueSnackbar(t('maintenance.startFailedWarning'), { variant: 'warning' });
       return;
     }
@@ -330,8 +324,7 @@ const MaintenancePage: React.FC = () => {
   };
 
   const updateMaintenance = async () => {
-    // 시간 검증
-    const validation = validateMaintenanceTime();
+    // ?�간 검�?    const validation = validateMaintenanceTime();
     if (!validation.valid) {
       return;
     }
@@ -370,7 +363,7 @@ const MaintenancePage: React.FC = () => {
     const result = await maintenanceService.setStatus(payload);
 
     if (!result.data?.isUnderMaintenance) {
-      // 점검이 업데이트되지 않은 경우 경고
+      // ?��????�데?�트?��? ?��? 경우 경고
       enqueueSnackbar(t('maintenance.updateFailedWarning'), { variant: 'warning' });
       return;
     }
@@ -417,7 +410,7 @@ const MaintenancePage: React.FC = () => {
 
       </Box>
       <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
-        {/* 좌측 설정 영역 */}
+        {/* 좌측 ?�정 ?�역 */}
         <Card sx={{
           borderColor: (theme)=> isMaintenance ? theme.palette.error.main : theme.palette.success.main,
           borderWidth: 1,
@@ -465,7 +458,7 @@ const MaintenancePage: React.FC = () => {
                           </Box>
                         </Box>
 
-                        {/* 점검 기간 */}
+                        {/* ?��? 기간 */}
                         <Box component="tr">
                           <Box component="td" sx={{
                             fontWeight: 500,
@@ -566,7 +559,7 @@ const MaintenancePage: React.FC = () => {
                           </Box>
                         )}
 
-                        {/* 강제종료 옵션 */}
+                        {/* 강제종료 ?�션 */}
                         <Box component="tr">
                           <Box component="td" sx={{
                             fontWeight: 500,
@@ -586,7 +579,7 @@ const MaintenancePage: React.FC = () => {
                           </Box>
                         </Box>
 
-                        {/* 설정자 정보 */}
+                        {/* ?�정???�보 */}
                         {currentMaintenanceDetail?.updatedBy && (
                           <Box component="tr">
                             <Box component="td" sx={{
@@ -604,7 +597,7 @@ const MaintenancePage: React.FC = () => {
                           </Box>
                         )}
 
-                        {/* 설정 시간 */}
+                        {/* ?�정 ?�간 */}
                         {currentMaintenanceDetail?.updatedAt && (
                           <Box component="tr">
                             <Box component="td" sx={{
@@ -697,7 +690,7 @@ const MaintenancePage: React.FC = () => {
                   {/* Kick existing players option */}
                   <Box sx={{ alignSelf: 'flex-start', width: '100%' }}>
                     <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3, flexWrap: 'wrap' }}>
-                      {/* 체크박스 영역 */}
+                      {/* 체크박스 ?�역 */}
                       <Box sx={{ flex: '0 0 auto' }}>
                         <FormControlLabel
                           control={
@@ -714,7 +707,7 @@ const MaintenancePage: React.FC = () => {
                         </Typography>
                       </Box>
 
-                      {/* 유예시간 설정 영역 */}
+                      {/* ?�예?�간 ?�정 ?�역 */}
                       {kickExistingPlayers && (
                         <Box sx={{ flex: '0 0 auto', minWidth: 250 }}>
                           <TextField
@@ -739,7 +732,7 @@ const MaintenancePage: React.FC = () => {
                     </Box>
                   </Box>
 
-                  {/* 구분선 */}
+                  {/* 구분??*/}
                   <Box sx={{ width: '100%', my: 5 }}>
                     <Box sx={{
                       height: '1px',
@@ -779,7 +772,7 @@ const MaintenancePage: React.FC = () => {
                             <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{tpls.find(t=>t.id===selectedTplId)?.defaultMessage || '-'}</Typography>
                             <Stack spacing={1} sx={{ mt: 2 }}>
                               {(tpls.find(t=>t.id===selectedTplId)?.locales || []).map(l => {
-                                const langLabels = { ko: '한국어', en: '영어', zh: '중국어' };
+                                const langLabels = { ko: '?�국??, en: '?�어', zh: '중국?? };
                                 return (
                                   <Box key={l.lang} sx={{ display:'flex', gap:1, alignItems:'flex-start' }}>
                                     <Chip label={langLabels[l.lang as keyof typeof langLabels] || l.lang} size="small" sx={{ width: 96, justifyContent:'flex-start' }} />
@@ -807,7 +800,7 @@ const MaintenancePage: React.FC = () => {
                       onSupportsMultiLanguageChange={(supports) => {
                         setSupportsMultiLanguage(supports);
                         if (supports) {
-                          // 모든 언어 자동 추가
+                          // 모든 ?�어 ?�동 추�?
                           const allLangs = [
                             { code: 'ko' as const, message: '' },
                             { code: 'en' as const, message: '' },
@@ -824,8 +817,7 @@ const MaintenancePage: React.FC = () => {
                       locales={locales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
                       onLocalesChange={(newLocales) => {
                         setLocales(newLocales.map(l => ({ lang: l.lang, message: l.message })));
-                        // 번역 결과가 있으면 자동으로 다국어 지원 활성화
-                        const hasNonEmptyLocales = newLocales.some(l => l.message && l.message.trim() !== '');
+                        // 번역 결과가 ?�으�??�동?�로 ?�국??지???�성??                        const hasNonEmptyLocales = newLocales.some(l => l.message && l.message.trim() !== '');
                         if (hasNonEmptyLocales && !supportsMultiLanguage) {
                           setSupportsMultiLanguage(true);
                         }
@@ -841,13 +833,13 @@ const MaintenancePage: React.FC = () => {
                 </>
               )}
 
-              {/* Actions는 우측 영역으로 이동 */}
+              {/* Actions???�측 ?�역?�로 ?�동 */}
 
             </Stack>
           </CardContent>
         </Card>
 
-        {/* 우측 액션 버튼 영역 */}
+        {/* ?�측 ?�션 버튼 ?�역 */}
         {canManage && (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 200 }}>
             {!isMaintenance ? (
@@ -857,7 +849,7 @@ const MaintenancePage: React.FC = () => {
                 size="large"
                 startIcon={<PlayArrowIcon />}
                 onClick={() => {
-                  // 시간 검증 먼저 실행
+                  // ?�간 검�?먼�? ?�행
                   const validation = validateMaintenanceTime();
                   if (!validation.valid) {
                     return;
@@ -893,7 +885,7 @@ const MaintenancePage: React.FC = () => {
                     size="large"
                     startIcon={<SaveIcon />}
                     onClick={() => {
-                      // 시간 검증 먼저 실행
+                      // ?�간 검�?먼�? ?�행
                       const validation = validateMaintenanceTime();
                       if (!validation.valid) {
                         return;
@@ -1014,7 +1006,7 @@ const MaintenancePage: React.FC = () => {
                     </Box>
                   </Box>
 
-                  {/* 점검 기간 */}
+                  {/* ?��? 기간 */}
                   <Box component="tr">
                     <Box component="td" sx={{
                       fontWeight: 500,
@@ -1088,7 +1080,7 @@ const MaintenancePage: React.FC = () => {
                     </Box>
                   )}
 
-                  {/* 강제종료 옵션 */}
+                  {/* 강제종료 ?�션 */}
                   <Box component="tr">
                     <Box component="td" sx={{
                       fontWeight: 500,
@@ -1132,7 +1124,7 @@ const MaintenancePage: React.FC = () => {
                     </Box>
                   )}
 
-                  {/* 설정자 정보 (Dialog에서는 현재 사용자) */}
+                  {/* ?�정???�보 (Dialog?�서???�재 ?�용?? */}
                   {user && (
                     <Box component="tr">
                       <Box component="td" sx={{

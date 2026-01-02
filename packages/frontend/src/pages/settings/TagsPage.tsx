@@ -198,7 +198,7 @@ const TagsPage: React.FC = () => {
 
       {/* Table list */}
       <Card>
-        <CardContent sx={{ p: 0 }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           {loading && <LinearProgress />}
           <TableContainer>
             <Table>

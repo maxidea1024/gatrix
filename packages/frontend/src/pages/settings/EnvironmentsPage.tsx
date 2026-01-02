@@ -440,10 +440,10 @@ const EnvironmentsPage: React.FC = () => {
                     </TableCell>
                     <TableCell>{env.description || '-'}</TableCell>
                     <TableCell align="center">
-                      {(env as any).isDefault ? <Chip label="✓" color="primary" size="small" /> : '-'}
+                      {(env as any).isDefault ? <Chip label="?? color="primary" size="small" /> : '-'}
                     </TableCell>
                     <TableCell align="center">
-                      {env.isSystemDefined ? <Chip label="✓" color="default" size="small" /> : '-'}
+                      {env.isSystemDefined ? <Chip label="?? color="default" size="small" /> : '-'}
                     </TableCell>
                     {canManage && (
                       <TableCell align="center">
@@ -684,7 +684,7 @@ const EnvironmentsPage: React.FC = () => {
                               color="text.secondary"
                               sx={{ py: 0.25 }}
                             >
-                              • {item.displayName}
+                              ??{item.displayName}
                             </Typography>
                           ))}
                           {category.count > category.items.length && (
