@@ -4305,13 +4305,28 @@
       "internalAddress": "내부 IP",
       "externalAddress": "공인 IP"
     },
+    "hostname": "호스트명",
+    "externalAddress": "외부 주소",
+    "internalAddress": "내부 주소",
+    "ports": "포트",
+    "cloudProvider": "클라우드 제공자",
+    "cloudRegion": "클라우드 리전",
+    "cloudZone": "클라우드 존",
+    "appVersion": "앱 버전",
+    "labels": "라벨",
     "status": {
       "initializing": "초기화 중",
+      "INITIALIZING": "초기화 중",
       "ready": "온라인",
+      "READY": "온라인",
       "shuttingDown": "종료중",
+      "SHUTTING_DOWN": "종료중",
       "error": "오류",
+      "ERROR": "오류",
       "terminated": "종료됨",
+      "TERMINATED": "종료됨",
       "noResponse": "응답 없음",
+      "NO_RESPONSE": "응답 없음",
       "busy": "처리 중"
     },
     "statusTooltip": {

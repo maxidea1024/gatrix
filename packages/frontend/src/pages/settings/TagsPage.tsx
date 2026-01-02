@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { tagService, Tag } from '@/services/tagService';
 import { useSnackbar } from 'notistack';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
+import { TableLoadingRow } from '@/components/common/TableLoadingRow';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { ColorPicker } from '@/components/common/ColorPicker';
 import { getContrastColor } from '@/utils/colorUtils';
@@ -199,7 +200,6 @@ const TagsPage: React.FC = () => {
       {/* Table list */}
       <Card>
         <CardContent sx={{ p: 0 }}>
-          {loading && <LinearProgress />}
           <TableContainer>
             <Table>
               <TableHead>
@@ -214,7 +214,9 @@ const TagsPage: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filtered.length === 0 ? (
+                {loading && filtered.length === 0 ? (
+                  <TableLoadingRow colSpan={7} loading={loading} />
+                ) : filtered.length === 0 ? (
                   <EmptyTableRow
                     colSpan={7}
                     loading={loading}

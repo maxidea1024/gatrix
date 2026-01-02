@@ -183,8 +183,7 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
 
     // Get localized event type label
     const getEventTypeLabel = (eventType: string) => {
-        const statusKey = eventType.toLowerCase().replace('_', '-');
-        return t(`serverList.status.${statusKey}`, { defaultValue: eventType });
+        return t(`serverList.status.${eventType}`, { defaultValue: eventType });
     };
 
     const renderCell = (columnId: string) => {

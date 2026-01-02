@@ -34,6 +34,7 @@ import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import KeyValueFormDrawer from '@/components/settings/KeyValueFormDrawer';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
+import { TableLoadingRow } from '@/components/common/TableLoadingRow';
 
 import { useEnvironment } from '@/contexts/EnvironmentContext';
 
@@ -247,7 +248,7 @@ const KeyValuePage: React.FC = () => {
       {/* Table */}
       <Card>
         <CardContent sx={{ p: 0 }}>
-          {loading && <LinearProgress />}
+
           <TableContainer>
             <Table>
               <TableHead>
@@ -261,7 +262,9 @@ const KeyValuePage: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {items.length === 0 ? (
+                {loading && items.length === 0 ? (
+                  <TableLoadingRow colSpan={canManage ? 6 : 5} loading={loading} />
+                ) : items.length === 0 ? (
                   <EmptyTableRow
                     colSpan={canManage ? 6 : 5}
                     message={t('settings.kv.noItems')}

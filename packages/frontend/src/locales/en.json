@@ -4308,13 +4308,28 @@
       "internalAddress": "Internal IP",
       "externalAddress": "External IP"
     },
+    "hostname": "Hostname",
+    "externalAddress": "External IP",
+    "internalAddress": "Internal IP",
+    "ports": "Ports",
+    "cloudProvider": "Cloud Provider",
+    "cloudRegion": "Cloud Region",
+    "cloudZone": "Cloud Zone",
+    "appVersion": "App Version",
+    "labels": "Labels",
     "status": {
       "initializing": "Initializing",
+      "INITIALIZING": "Initializing",
       "ready": "Online",
+      "READY": "Online",
       "shuttingDown": "Shutting Down",
+      "SHUTTING_DOWN": "Shutting Down",
       "error": "Error",
+      "ERROR": "Error",
       "terminated": "Terminated",
+      "TERMINATED": "Terminated",
       "noResponse": "No Response",
+      "NO_RESPONSE": "No Response",
       "busy": "Busy"
     },
     "statusTooltip": {

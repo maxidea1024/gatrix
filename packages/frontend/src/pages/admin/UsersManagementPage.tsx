@@ -36,7 +36,6 @@ import {
   Tooltip,
   Checkbox,
   Drawer,
-  Skeleton,
   Popover,
   List,
   ListItem,
@@ -118,6 +117,8 @@ import { usePaginatedApi, useTags } from '../../hooks/useSWR';
 import { useEnvironments } from '../../contexts/EnvironmentContext';
 import PermissionSelector from '../../components/common/PermissionSelector';
 import { getContrastColor } from '@/utils/colorUtils';
+
+import { TableLoadingRow } from '@/components/common/TableLoadingRow';
 // SSE는 MainLayout에서 전역으로 처리하므로 여기서는 제거
 
 interface UsersResponse {
@@ -1865,7 +1866,7 @@ const UsersManagementPage: React.FC = () => {
       <Card sx={{ position: 'relative' }}>
         <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           <TableContainer
-            sx={{
+            style={{
               opacity: !isInitialLoad && loading ? 0.5 : 1,
               transition: 'opacity 0.15s ease-in-out',
               pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
@@ -1896,50 +1897,10 @@ const UsersManagementPage: React.FC = () => {
               </TableHead>
               <TableBody>
                 {isInitialLoad && loading ? (
-                  // 스켈레톤 로딩 (초기 로딩 시에만)
-                  Array.from({ length: 5 }).map((_, index) => (
-                    <TableRow key={`skeleton-${index}`}>
-                      <TableCell padding="checkbox">
-                        <Skeleton variant="rectangular" width={24} height={24} />
-                      </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                          <Skeleton variant="circular" width={40} height={40} />
-                          <Box>
-                            <Skeleton variant="text" width={120} />
-                            <Skeleton variant="text" width={180} sx={{ fontSize: '0.75rem' }} />
-                          </Box>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width={100} />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="rounded" width={80} height={24} />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="rounded" width={70} height={24} />
-                      </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', gap: 0.5 }}>
-                          <Skeleton variant="rounded" width={60} height={24} />
-                          <Skeleton variant="rounded" width={60} height={24} />
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width="70%" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width="70%" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width="60%" />
-                      </TableCell>
-                      <TableCell align="center">
-                        <Skeleton variant="circular" width={32} height={32} sx={{ mx: 'auto' }} />
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  <TableLoadingRow
+                    colSpan={columns.filter(col => col.visible).length + 2}
+                    loading={true}
+                  />
                 ) : users.length === 0 ? (
                   <EmptyTableRow
                     colSpan={columns.filter(col => col.visible).length + 2} // +2 for checkbox and actions columns
@@ -3485,7 +3446,7 @@ const UsersManagementPage: React.FC = () => {
         </ClickAwayListener>
       </Popover>
 
-    </Box>
+    </Box >
   );
 };
 
