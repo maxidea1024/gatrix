@@ -27,6 +27,7 @@ import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../common/ResizableDrawer';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { getBackendUrl } from '../../utils/backendUrl';
 
 interface GameWorldSDKGuideDrawerProps {
   open: boolean;
@@ -39,22 +40,23 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
   const isDark = theme.palette.mode === 'dark';
   const { enqueueSnackbar } = useSnackbar();
   const { currentEnvironmentId } = useEnvironment();
+  const backendUrl = getBackendUrl();
 
   const [mainTabValue, setMainTabValue] = useState(0);
   const [errorTabValue, setErrorTabValue] = useState(0);
 
   // API test state
   const [apiToken, setApiToken] = useState('gatrix-unsecured-server-api-token'); // Default to unsecured server token
-  const [appName, setAppName] = useState('MyGameApp');
   const [page, setPage] = useState('1');
   const [limit, setLimit] = useState('10');
   const [lang, setLang] = useState(''); // Optional language parameter for maintenance message
   const [testResponse, setTestResponse] = useState<any>(null);
   const [testLoading, setTestLoading] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
   const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
-  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(false);
+  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(true);
   const [expandedResponseHeaders, setExpandedResponseHeaders] = useState(false);
   const [expandedRequestHeadersDetail, setExpandedRequestHeadersDetail] = useState(false);
   const [expandedResponseHeadersDetail, setExpandedResponseHeadersDetail] = useState(false);
@@ -66,9 +68,8 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
     try {
       const saved = localStorage.getItem('gameWorldSDKGuide_testInputs');
       if (saved) {
-        const { apiToken: savedToken, appName: savedAppName } = JSON.parse(saved);
+        const { apiToken: savedToken } = JSON.parse(saved);
         if (savedToken) setApiToken(savedToken);
-        if (savedAppName) setAppName(savedAppName);
       }
     } catch (error) {
       // Silently ignore localStorage errors
@@ -80,16 +81,15 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
     try {
       localStorage.setItem('gameWorldSDKGuide_testInputs', JSON.stringify({
         apiToken,
-        appName,
       }));
     } catch (error) {
       // Silently ignore localStorage errors
     }
-  }, [apiToken, appName]);
+  }, [apiToken]);
 
   // curl example code
   const curlExample = `# Get Game Worlds List API Example
-curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your-environment'}/game-worlds" \\
+curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environment'}/game-worlds" \\
   -H "Content-Type: application/json" \\
   -H "X-Application-Name: MyGameApp" \\
   -H "X-API-Token: your-api-token-here"`;
@@ -166,12 +166,19 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
   };
 
   const handleTestAPI = async () => {
+    // Validation
+    if (!apiToken.trim()) {
+      setValidationError(t('gameWorlds.sdkGuide.apiTokenRequired') || 'API Token is required');
+      return;
+    }
+
+    setValidationError(null);
     setTestLoading(true);
     setTestError(null);
     setTestResponse(null);
     setTestStatus(null);
     setTestDuration(null);
-    setExpandedRequestHeaders(false);
+    // Keep request section open
     setExpandedResponseHeaders(false);
 
     const startTime = performance.now();
@@ -186,7 +193,7 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'X-Application-Name': appName,
+            'X-Application-Name': 'gatrix-frontend-tester',
             'X-API-Token': apiToken,
           },
         }
@@ -202,7 +209,7 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
 
       setRequestHeaders({
         'Content-Type': 'application/json',
-        'X-Application-Name': appName,
+        'X-Application-Name': 'gatrix-frontend-tester',
         'X-API-Token': apiToken,
       });
 
@@ -528,7 +535,7 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                     {/* Parameters Table */}
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
-                        {t('gameWorlds.sdkGuide.authentication')}
+                        {t('common.queryParameters') || 'Query Parameters'}
                       </Typography>
                       <Box sx={{
                         border: `1px solid ${theme.palette.divider}`,
@@ -541,32 +548,6 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                             p: 1.5,
                             backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
                             borderBottom: `1px solid ${theme.palette.divider}`,
-                            display: 'flex',
-                            alignItems: 'center',
-                            fontWeight: 500,
-                            fontSize: '0.875rem'
-                          }}>
-                            {t('gameWorlds.sdkGuide.testAppName')}
-                          </Box>
-                          <Box sx={{
-                            p: 1,
-                            borderBottom: `1px solid ${theme.palette.divider}`,
-                            borderLeft: `1px solid ${theme.palette.divider}`
-                          }}>
-                            <TextField
-                              value={appName}
-                              onChange={(e) => setAppName(e.target.value)}
-                              size="small"
-                              fullWidth
-                              placeholder="e.g., MyGameApp"
-                              sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
-                            />
-                          </Box>
-
-                          {/* Language */}
-                          <Box sx={{
-                            p: 1.5,
-                            backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
                             display: 'flex',
                             alignItems: 'center',
                             fontWeight: 500,
@@ -632,6 +613,37 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                     )}
 
                     {/* Test Button */}
+                    {/* Curl Preview */}
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                        {t('common.curlPreview') || 'curl Preview'}
+                      </Typography>
+                      <Box sx={{
+                        p: 1.5,
+                        backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+                        borderRadius: 1,
+                        border: `1px solid ${theme.palette.divider}`,
+                        fontFamily: 'monospace',
+                        fontSize: '0.75rem',
+                        overflow: 'auto',
+                        maxHeight: 120,
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-all',
+                      }}>
+                        {`curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environment'}/game-worlds${lang ? `?lang=${lang}` : ''}" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Application-Name: gatrix-frontend-tester" \\
+  -H "X-API-Token: ${apiToken}"`}
+                      </Box>
+                    </Box>
+
+                    {/* Validation Error */}
+                    {validationError && (
+                      <Alert severity="error" sx={{ mb: 2 }}>
+                        {validationError}
+                      </Alert>
+                    )}
+
                     <Button
                       variant="contained"
                       startIcon={testLoading ? <CircularProgress size={16} sx={{ color: 'inherit' }} /> : <PlayArrowIcon />}
@@ -639,7 +651,7 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                       disabled={testLoading}
                       fullWidth
                     >
-                      {testLoading ? t('gameWorlds.sdkGuide.testLoading') : t('gameWorlds.sdkGuide.testButton')}
+                      {t('common.request') || 'Request'}
                     </Button>
                   </Box>
                 </Collapse>

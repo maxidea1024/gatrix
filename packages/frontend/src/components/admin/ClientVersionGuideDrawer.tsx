@@ -42,6 +42,7 @@ import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../common/ResizableDrawer';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { getBackendUrl } from '../../utils/backendUrl';
 
 interface ClientVersionGuideDrawerProps {
   open: boolean;
@@ -54,6 +55,7 @@ const ClientVersionGuideDrawer: React.FC<ClientVersionGuideDrawerProps> = ({ ope
   const isDark = theme.palette.mode === 'dark';
   const { enqueueSnackbar } = useSnackbar();
   const { currentEnvironmentId } = useEnvironment();
+  const backendUrl = getBackendUrl();
 
   // State for main tabs (Guide vs Test)
   const [mainTabValue, setMainTabValue] = useState(0);
@@ -70,12 +72,13 @@ const ClientVersionGuideDrawer: React.FC<ClientVersionGuideDrawerProps> = ({ ope
   const [testResponse, setTestResponse] = useState<any>(null);
   const [testLoading, setTestLoading] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [testStartTime, setTestStartTime] = useState<number | null>(null);
   const [testDuration, setTestDuration] = useState<number | null>(null);
   const [testStatus, setTestStatus] = useState<number | null>(null);
   const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
   const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
-  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(false);
+  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(true);
   const [expandedResponseHeaders, setExpandedResponseHeaders] = useState(false);
   const [expandedRequestHeadersDetail, setExpandedRequestHeadersDetail] = useState(false);
   const [expandedResponseHeadersDetail, setExpandedResponseHeadersDetail] = useState(false);
@@ -115,19 +118,19 @@ const ClientVersionGuideDrawer: React.FC<ClientVersionGuideDrawerProps> = ({ ope
   // curl example code
   const curlExample = `# Client Version Query API Example
 # Query specific version
-curl -X GET "http://localhost:5000/api/v1/client/${currentEnvironmentId || 'your-environment'}/client-version?platform=ios&version=1.0.0&lang=ko" \\
+curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environment'}/client-version?platform=ios&version=1.0.0&lang=ko" \\
   -H "Content-Type: application/json" \\
   -H "X-Application-Name: MyGameApp" \\
   -H "X-API-Token: your-api-token-here"
 
 # Query latest version (omit version parameter)
-curl -X GET "http://localhost:5000/api/v1/client/${currentEnvironmentId || 'your-environment'}/client-version?platform=ios&lang=ko" \\
+curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environment'}/client-version?platform=ios&lang=ko" \\
   -H "Content-Type: application/json" \\
   -H "X-Application-Name: MyGameApp" \\
   -H "X-API-Token: your-api-token-here"
 
 # Query latest ONLINE version only
-curl -X GET "http://localhost:5000/api/v1/client/${currentEnvironmentId || 'your-environment'}/client-version?platform=ios&status=ONLINE" \\
+curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environment'}/client-version?platform=ios&status=ONLINE" \\
   -H "Content-Type: application/json" \\
   -H "X-Application-Name: MyGameApp" \\
   -H "X-API-Token: your-api-token-here"`;
@@ -198,6 +201,17 @@ curl -X GET "http://localhost:5000/api/v1/client/${currentEnvironmentId || 'your
   };
 
   const handleTestAPI = async () => {
+    // Validation
+    if (!platform.trim()) {
+      setValidationError(t('clientVersions.sdkGuideDrawer.platformRequired') || 'Platform is required');
+      return;
+    }
+    if (!apiToken.trim()) {
+      setValidationError(t('clientVersions.sdkGuideDrawer.apiTokenRequired') || 'API Token is required');
+      return;
+    }
+
+    setValidationError(null);
     setTestLoading(true);
     setTestError(null);
     setTestResponse(null);
@@ -205,8 +219,7 @@ curl -X GET "http://localhost:5000/api/v1/client/${currentEnvironmentId || 'your
     setTestDuration(null);
     setRequestHeaders({});
     setResponseHeaders({});
-    // Collapse Request and prepare to expand Response
-    setExpandedRequestHeaders(false);
+    // Keep request section open, prepare to expand Response
     setExpandedResponseHeaders(false);
 
     try {
@@ -229,7 +242,7 @@ curl -X GET "http://localhost:5000/api/v1/client/${currentEnvironmentId || 'your
 
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
-        'X-Application-Name': 'AdminTestClient',
+        'X-Application-Name': 'gatrix-frontend-tester',
         'X-API-Token': apiToken,
       };
 
@@ -839,6 +852,37 @@ curl -X GET "http://localhost:5000/api/v1/client/${currentEnvironmentId || 'your
                       </Box>
                     )}
 
+                    {/* Curl Preview */}
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                        {t('common.curlPreview') || 'curl Preview'}
+                      </Typography>
+                      <Box sx={{
+                        p: 1.5,
+                        backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+                        borderRadius: 1,
+                        border: `1px solid ${theme.palette.divider}`,
+                        fontFamily: 'monospace',
+                        fontSize: '0.75rem',
+                        overflow: 'auto',
+                        maxHeight: 120,
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-all',
+                      }}>
+                        {`curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environment'}/client-version?platform=${platform}${version ? `&version=${version}` : ''}${status ? `&status=${status}` : ''}${lang ? `&lang=${lang}` : ''}" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Application-Name: gatrix-frontend-tester" \\
+  -H "X-API-Token: ${apiToken}"`}
+                      </Box>
+                    </Box>
+
+                    {/* Validation Error */}
+                    {validationError && (
+                      <Alert severity="error" sx={{ mb: 2 }}>
+                        {validationError}
+                      </Alert>
+                    )}
+
                     {/* Test Button */}
                     <Button
                       variant="contained"
@@ -847,7 +891,7 @@ curl -X GET "http://localhost:5000/api/v1/client/${currentEnvironmentId || 'your
                       disabled={testLoading}
                       fullWidth
                     >
-                      Test API
+                      {t('common.request') || 'Request'}
                     </Button>
                   </Box>
                 </Collapse>

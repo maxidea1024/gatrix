@@ -2309,7 +2309,11 @@
     },
     "relativeTime": {
       "secondsAgo": "{{seconds}} seconds ago"
-    }
+    },
+    "curlPreview": "curl Preview",
+    "request": "Request",
+    "example": "Example",
+    "queryParameters": "Query Parameters"
   },
   "createdAt": "createdAt",
   "dashboard": {

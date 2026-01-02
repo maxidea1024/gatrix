@@ -2309,7 +2309,11 @@
     },
     "relativeTime": {
       "secondsAgo": "{{seconds}}초 전"
-    }
+    },
+    "curlPreview": "curl 미리보기",
+    "request": "요청",
+    "example": "예시",
+    "queryParameters": "쿼리 파라미터"
   },
   "createdAt": "생성일",
   "dashboard": {

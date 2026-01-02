@@ -2363,7 +2363,11 @@
     "relativeTime": {
       "secondsAgo": "{{seconds}}秒前"
     },
-    "refreshed": "已刷新"
+    "refreshed": "已刷新",
+    "curlPreview": "curl 预览",
+    "request": "请求",
+    "example": "示例",
+    "queryParameters": "查询参数"
   },
   "createdAt": "createdAt",
   "dashboard": {
