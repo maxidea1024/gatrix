@@ -469,7 +469,7 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                                         {record.changedFiles.map((file) => {
                                                                             const fileDiff = record.fileDiffs?.[file];
                                                                             return (
-                                                                                <Box key={file} sx={{ p: 1.5, bgcolor: 'action.hover', borderRadius: 1 }}>
+                                                                                <Box key={file} sx={{ p: 1.5, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'background.default' : 'action.hover', borderRadius: 1 }}>
                                                                                     <Chip size="small" label={file} color="warning" sx={{ mb: 1 }} />
                                                                                     {fileDiff && (
                                                                                         <Box sx={{ mt: 1 }}>
