@@ -615,9 +615,22 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                     {/* Test Button */}
                     {/* Curl Preview */}
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                        {t('common.curlPreview') || 'curl Preview'}
-                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          {t('common.curlPreview') || 'curl Preview'}
+                        </Typography>
+                        <Tooltip title={t('common.copy') || 'Copy'}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleCopyCode(`curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environment'}/game-worlds${lang ? `?lang=${lang}` : ''}" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Application-Name: gatrix-frontend-tester" \\
+  -H "X-API-Token: ${apiToken}"`)}
+                          >
+                            <ContentCopyIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
                       <Box sx={{
                         p: 1.5,
                         backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
