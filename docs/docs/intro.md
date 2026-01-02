@@ -2,86 +2,45 @@
 sidebar_position: 1
 ---
 
-# Getting Started with Gatrix
+# Gatrix 시작하기
 
-Welcome to **Gatrix**, a comprehensive online game platform management system built specifically for **UWO (Uncharted Waters Online)** game management.
+## 기능 설명
 
-## What is Gatrix?
+Gatrix는 온라인 게임 플랫폼을 위한 관리 시스템입니다.
 
-Gatrix is a modern, full-stack platform that provides robust user management, authentication, and administrative features for online gaming platforms. Built with TypeScript, React, MUI, and Express.js, it offers a complete solution for game platform operations.
+### 제공 기능
 
-### Key Features
+**게임 운영:**
+- 공지사항 (Service Notices)
+- 인게임 팝업 (Popup Notices)
+- 쿠폰 (Coupons)
+- 배너 (Banners)
+- 설문조사 (Surveys)
+- 상점 상품 (Store Products)
+- 기획 데이터 (Planning Data)
 
-- 🎮 **Game Platform Management**: Comprehensive platform for online game management
-- 🌍 **Game World Management**: Multi-world support with individual configurations
-- 📱 **Client Version Management**: Version control and distribution management
-- 🔧 **Maintenance Mode**: System-wide maintenance control with custom messages
-- 🏷️ **Tagging System**: Flexible tagging for content organization
-- 📝 **Message Templates**: Multi-language message template management
-- 🛡️ **IP Whitelisting**: Advanced IP access control and management
-- ⚙️ **Job Scheduler**: Advanced job scheduling with cron-like syntax
-- 📊 **Queue Monitoring**: Real-time job queue monitoring with Bull Board
-- 💬 **Real-time Chat**: High-performance chat server with Socket.IO and Redis clustering
+**시스템 관리:**
+- 클라이언트 버전 (Client Versions)
+- 게임 월드 (Game Worlds)
+- 점검 관리 (Maintenance)
+- 사용자 관리 (Users)
 
-## Prerequisites
+**API:**
+- Client API
+- Server SDK API
 
-Before you begin, ensure you have the following installed:
+## 사용 방법
 
-- [Node.js](https://nodejs.org/en/download/) version 22 LTS or above
-- [MySQL](https://dev.mysql.com/downloads/) version 8.0 or above
-- [Redis](https://redis.io/download) version 6.0 or above
+[확인 필요] 설치 및 실행 방법은 별도 문서 참조
 
-## Quick Start
+## 즉시 발생하는 변화
 
-### 1. Clone the Repository
+해당 없음
 
-```bash
-git clone https://github.com/motifgames/gatrix.git
-cd gatrix
-```
+## ⚠ 주의사항
 
-### 2. Environment Setup
+해당 없음
 
-```bash
-# Copy environment variables
-cp .env.example .env
+## � 실제 사고 사례
 
-# Update the .env file with your configuration
-```
-
-### 3. Install Dependencies
-
-```bash
-npm install
-```
-
-### 4. Database Setup
-
-```bash
-# Run database migrations
-npm run migrate
-
-# Seed initial data
-npm run seed
-```
-
-### 5. Start Development Server
-
-```bash
-# Start both frontend and backend
-npm run dev
-```
-
-The application will be available at:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:5000
-- API Documentation: http://localhost:5000/api-docs
-- Queue Monitor: http://localhost:5000/admin/queues
-
-## Next Steps
-
-- 📖 [Read the API Documentation](./api/client-api.md)
-- 🔧 [Learn about the Cache System](./backend/cache-keys.md)
-- 🚀 [Explore Job Management](./features/job-management.md)
-- 🌍 [Configure Game Worlds](./features/game-worlds.md)
-- 💬 [Set up Chat Server](https://github.com/motifgames/gatrix/blob/main/packages/chat-server/README.md)
+해당 없음
