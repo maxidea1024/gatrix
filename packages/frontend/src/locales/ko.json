@@ -4258,6 +4258,12 @@
       "clientDataWarning": "반드시 클라이언트용 CMS 데이터를 사용해야 합니다. 서버용 데이터가 아닙니다!",
       "cliUpload": "CLI를 통한 원격 업로드",
       "cliUploadDesc": "변환된 데이터를 원격 서버로 업로드합니다."
+    },
+    "uploadInfo": {
+      "lastUpload": "최근 업로드",
+      "by": "업로더",
+      "hash": "해시",
+      "files": "파일"
     }
   },
   "rewards": {

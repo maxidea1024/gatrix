@@ -46,7 +46,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
-import planningDataService, { PlanningDataStats, HotTimeBuffLookup, HotTimeBuffItem } from '../../services/planningDataService';
+import planningDataService, { PlanningDataStats, HotTimeBuffLookup, HotTimeBuffItem, UploadRecord } from '../../services/planningDataService';
 import SimplePagination from '../../components/common/SimplePagination';
 import { useDebounce } from '../../hooks/useDebounce';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
@@ -115,6 +115,9 @@ const PlanningDataPage: React.FC = () => {
     const saved = sessionStorage.getItem('planningDataViewAllHotTimeBuff');
     return saved === 'true';
   });
+
+  // Upload history state
+  const [latestUpload, setLatestUpload] = useState<UploadRecord | null>(null);
 
   // EventPage state
   const [eventPageData, setEventPageData] = useState<any>(null);
@@ -213,12 +216,16 @@ const PlanningDataPage: React.FC = () => {
   const loadStats = async () => {
     try {
       setLoading(true);
-      const data = await planningDataService.getStats();
+      const [data, uploadData] = await Promise.all([
+        planningDataService.getStats(),
+        planningDataService.getLatestUpload(),
+      ]);
       console.log('Stats data received:', data);
       if (!data) {
         throw new Error('Stats data is null or undefined');
       }
       setStats(data);
+      setLatestUpload(uploadData);
     } catch (error: any) {
       // Extract user-friendly error message
       let errorMessage = t('planningData.errors.loadStatsFailed');
@@ -730,6 +737,65 @@ const PlanningDataPage: React.FC = () => {
         </Box>
       ) : stats && stats.rewardTypes && stats.rewardTypes.length > 0 ? (
         <>
+          {/* Upload Info */}
+          {latestUpload && (
+            <Card sx={{ mb: 2, bgcolor: 'background.paper' }}>
+              <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('planningData.uploadInfo.lastUpload')}:
+                    </Typography>
+                    <Chip
+                      size="small"
+                      label={formatDateTimeDetailed(latestUpload.uploadedAt)}
+                      color="primary"
+                      variant="outlined"
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      {t('planningData.uploadInfo.by')}:
+                    </Typography>
+                    <Chip
+                      size="small"
+                      label={latestUpload.uploaderName || 'Unknown'}
+                      color={latestUpload.uploadSource === 'cli' ? 'warning' : 'default'}
+                      variant="outlined"
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      {t('planningData.uploadInfo.hash')}:
+                    </Typography>
+                    <Tooltip title={t('common.copyToClipboard')}>
+                      <Chip
+                        size="small"
+                        label={latestUpload.uploadHash}
+                        onClick={() => copyToClipboardWithNotification(
+                          latestUpload.uploadHash,
+                          () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                          () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                        )}
+                        sx={{ cursor: 'pointer', fontFamily: 'monospace' }}
+                      />
+                    </Tooltip>
+                    {latestUpload.uploadComment && (
+                      <>
+                        <Typography variant="body2" color="text.secondary">|</Typography>
+                        <Typography variant="body2" color="text.primary" sx={{ fontStyle: 'italic' }}>
+                          "{latestUpload.uploadComment}"
+                        </Typography>
+                      </>
+                    )}
+                  </Box>
+                  <Chip
+                    size="small"
+                    label={`${latestUpload.filesCount} ${t('planningData.uploadInfo.files')}`}
+                    color="success"
+                    variant="outlined"
+                  />
+                </Box>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Tabs */}
           <Card>
             <Tabs value={activeTab} onChange={handleTabChange}>

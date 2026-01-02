@@ -4315,6 +4315,12 @@
       "clientDataWarning": "必须使用客户端CMS数据，不是服务器数据！",
       "cliUpload": "通过CLI远程上传",
       "cliUploadDesc": "将转换后的数据上传到远程服务器。"
+    },
+    "uploadInfo": {
+      "lastUpload": "最近上传",
+      "by": "上传者",
+      "hash": "哈希",
+      "files": "个文件"
     }
   },
   "rewards": {

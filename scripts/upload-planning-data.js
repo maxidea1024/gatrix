@@ -11,6 +11,8 @@
  *   --env       (Required) Target environment (dev, qa, production)
  *   --dir       (Required) Directory containing planning data files
  *   --token     (Required) Server API token for authentication. Can also use GATRIX_API_TOKEN env var.
+ *   --uploader  (Optional) Override uploader name (e.g., "Jenkins CI", "Build Server")
+ *   --comment   (Optional) Upload comment/description
  */
 
 const fs = require('fs');
@@ -24,8 +26,8 @@ function parseArgs() {
     const args = {};
     process.argv.slice(2).forEach(arg => {
         if (arg.startsWith('--')) {
-            const [key, value] = arg.substring(2).split('=');
-            args[key] = value || true;
+            const [key, ...valueParts] = arg.substring(2).split('=');
+            args[key] = valueParts.join('=') || true;
         }
     });
     return args;
@@ -39,14 +41,16 @@ function validateArgs(args) {
     if (missing.length > 0) {
         console.error('❌ Missing required arguments:', missing.join(', '));
         console.error('\nUsage:');
-        console.error('  yarn upload-planning-data --api-url=<URL> --env=<ENV> --dir=<DIR> --token=<TOKEN>');
+        console.error('  yarn upload-planning-data --api-url=<URL> --env=<ENV> --dir=<DIR> --token=<TOKEN> [--uploader=<NAME>] [--comment=<TEXT>]');
         console.error('\nOptions:');
         console.error('  --api-url   (Required) Backend API URL (e.g., https://gatrix.example.com)');
         console.error('  --env       (Required) Target environment (dev, qa, production)');
         console.error('  --dir       (Required) Directory containing planning data files');
         console.error('  --token     (Required) Server API token for authentication');
+        console.error('  --uploader  (Optional) Override uploader name (e.g., "Jenkins CI")');
+        console.error('  --comment   (Optional) Upload comment/description');
         console.error('\nExample:');
-        console.error('  yarn upload-planning-data --api-url=https://gatrix.motifgames.in --env=qa --dir=./planning-data --token=abc123');
+        console.error('  yarn upload-planning-data --api-url=https://gatrix.motifgames.in --env=qa --dir=./planning-data --token=abc123 --uploader="Jenkins CI" --comment="Automated build #123"');
         process.exit(1);
     }
 
@@ -74,7 +78,7 @@ function getFiles(dir) {
 }
 
 // Upload files to server
-async function uploadFiles(apiUrl, env, files, token) {
+async function uploadFiles(apiUrl, env, files, token, uploader, comment) {
     return new Promise((resolve, reject) => {
         const form = new FormData();
 
@@ -83,6 +87,11 @@ async function uploadFiles(apiUrl, env, files, token) {
             const fileName = path.basename(filePath);
             form.append('files', fs.createReadStream(filePath), fileName);
         });
+
+        // Add optional metadata
+        if (comment) {
+            form.append('comment', comment);
+        }
 
         // Parse URL - use server API route: /api/v1/server/:env/planning-data/upload
         const url = new URL(`${apiUrl}/api/v1/server/${env}/planning-data/upload`);
@@ -96,6 +105,11 @@ async function uploadFiles(apiUrl, env, files, token) {
             'X-Application-Name': 'gatrix-cli',
         };
 
+        // Add uploader override header if provided
+        if (uploader) {
+            headers['X-Uploader-Name'] = uploader;
+        }
+
         const options = {
             hostname: url.hostname,
             port: url.port || (isHttps ? 443 : 80),
@@ -107,6 +121,12 @@ async function uploadFiles(apiUrl, env, files, token) {
         console.log(`📤 Uploading ${files.length} file(s) to ${apiUrl}...`);
         console.log(`   Environment: ${env}`);
         console.log(`   API Endpoint: ${url.pathname}`);
+        if (uploader) {
+            console.log(`   Uploader: ${uploader}`);
+        }
+        if (comment) {
+            console.log(`   Comment: ${comment}`);
+        }
 
         const req = lib.request(options, (res) => {
             let data = '';
@@ -145,6 +165,8 @@ async function main() {
     const env = args.env;
     const dir = args.dir;
     const token = args.token || process.env.GATRIX_API_TOKEN;
+    const uploader = args.uploader;
+    const comment = args.comment;
 
     // Validate token
     if (!token) {
@@ -166,13 +188,18 @@ async function main() {
     console.log();
 
     try {
-        const result = await uploadFiles(apiUrl, env, files, token);
+        const result = await uploadFiles(apiUrl, env, files, token, uploader, comment);
         console.log('\n✅ Upload successful!');
         if (result.message) {
             console.log(`   ${result.message}`);
         }
-        if (result.data?.filesUploaded) {
-            console.log(`   Files uploaded: ${result.data.filesUploaded}`);
+        if (result.data?.stats) {
+            const stats = result.data.stats;
+            console.log(`   Files uploaded: ${stats.filesUploaded}`);
+            console.log(`   Upload hash: ${stats.uploadHash}`);
+            if (stats.changedFilesCount > 0) {
+                console.log(`   Changed files: ${stats.changedFilesCount}`);
+            }
         }
     } catch (error) {
         console.error(`\n❌ Upload failed: ${error.message}`);

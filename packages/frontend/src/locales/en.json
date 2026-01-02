@@ -4261,6 +4261,12 @@
       "clientDataWarning": "You must use CLIENT CMS data, NOT server data!",
       "cliUpload": "Remote Upload via CLI",
       "cliUploadDesc": "Upload converted data to the remote server."
+    },
+    "uploadInfo": {
+      "lastUpload": "Last Upload",
+      "by": "By",
+      "hash": "Hash",
+      "files": "files"
     }
   },
   "rewards": {

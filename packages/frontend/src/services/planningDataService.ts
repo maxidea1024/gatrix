@@ -261,13 +261,18 @@ class PlanningDataService {
   /**
    * Upload planning data files (drag & drop)
    */
-  async uploadPlanningData(files: File[]): Promise<{ success: boolean; message: string; filesUploaded: string[]; stats: any }> {
+  async uploadPlanningData(files: File[], comment?: string): Promise<{ success: boolean; message: string; filesUploaded: string[]; stats: any; uploadRecord?: UploadRecord }> {
     const formData = new FormData();
 
     // Add each file to FormData
     files.forEach((file) => {
       formData.append('files', file, file.name);
     });
+
+    // Add optional comment
+    if (comment) {
+      formData.append('comment', comment);
+    }
 
     const response = await api.post('/admin/planning-data/upload', formData, {
       headers: {
@@ -277,6 +282,35 @@ class PlanningDataService {
 
     return response.data;
   }
+
+  /**
+   * Get upload history
+   */
+  async getUploadHistory(limit: number = 20): Promise<UploadRecord[]> {
+    const response = await api.get('/admin/planning-data/history', { params: { limit } });
+    return response.data;
+  }
+
+  /**
+   * Get latest upload record
+   */
+  async getLatestUpload(): Promise<UploadRecord | null> {
+    const response = await api.get('/admin/planning-data/latest');
+    return response.data;
+  }
+}
+
+export interface UploadRecord {
+  id: number;
+  uploadHash: string;
+  filesUploaded: string[];
+  filesCount: number;
+  totalSize: number;
+  uploaderName: string | null;
+  uploadSource: 'web' | 'cli';
+  uploadComment: string | null;
+  changedFiles: string[];
+  uploadedAt: string;
 }
 
 export default new PlanningDataService();

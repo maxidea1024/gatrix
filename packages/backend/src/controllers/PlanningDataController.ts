@@ -208,9 +208,10 @@ export class PlanningDataController {
 
     // Determine upload source and uploader info
     const isCliUpload = req.headers['x-application-name'] === 'gatrix-cli';
+    const uploaderNameOverride = req.headers['x-uploader-name'] as string | undefined;
     const uploadInfo = {
       uploadedBy: req.user?.userId,
-      uploaderName: req.user?.name || req.user?.email || (req as any).apiToken?.tokenName || 'Unknown',
+      uploaderName: uploaderNameOverride || req.user?.name || req.user?.email || (req as any).apiToken?.tokenName || 'Unknown',
       uploadSource: (isCliUpload ? 'cli' : 'web') as 'web' | 'cli',
       uploadComment: uploadComment as string | undefined,
     };
