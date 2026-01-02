@@ -89,11 +89,10 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
 
   // curl example code
   const curlExample = `# Get Game Worlds List API Example
-curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
+curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your-environment'}/game-worlds" \\
   -H "Content-Type: application/json" \\
   -H "X-Application-Name: MyGameApp" \\
-  -H "X-API-Token: your-api-token-here" \\
-  -H "X-Environment-Id: ${currentEnvironmentId || 'your-environment-id'}"`;
+  -H "X-API-Token: your-api-token-here"`;
 
   // JSON response example
   const jsonResponse = `{
@@ -178,7 +177,8 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
     const startTime = performance.now();
 
     try {
-      const url = `/api/v1/server/game-worlds`;
+      const envPath = currentEnvironmentId || 'default';
+      const url = `/api/v1/server/${envPath}/game-worlds`;
 
       const response = await fetch(
         url,
@@ -188,7 +188,6 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
             'Content-Type': 'application/json',
             'X-Application-Name': appName,
             'X-API-Token': apiToken,
-            ...(currentEnvironmentId && { 'X-Environment-Id': currentEnvironmentId }),
           },
         }
       );
@@ -205,7 +204,6 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
         'Content-Type': 'application/json',
         'X-Application-Name': appName,
         'X-API-Token': apiToken,
-        ...(currentEnvironmentId && { 'X-Environment-Id': currentEnvironmentId }),
       });
 
       setResponseHeaders({
@@ -332,7 +330,7 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
                   <strong>{t('gameWorlds.sdkGuide.method')}:</strong> GET
                 </Typography>
                 <Typography component="div" sx={{ wordBreak: 'break-all' }}>
-                  /api/v1/server/game-worlds
+                  /api/v1/server/{'{environment}'}/game-worlds
                 </Typography>
               </Paper>
 
@@ -361,9 +359,6 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
                 </Typography>
                 <Typography variant="body2">
                   • <strong>X-Application-Name</strong>: {t('gameWorlds.sdkGuide.headerAppName')}
-                </Typography>
-                <Typography variant="body2">
-                  • <strong>X-Environment-Id</strong>: {t('common.sdkGuide.headerEnvironmentId')}
                 </Typography>
                 <Typography variant="body2">
                   • <strong>Content-Type</strong>: {t('gameWorlds.sdkGuide.headerContentType')}

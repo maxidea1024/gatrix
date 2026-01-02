@@ -116,13 +116,11 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
         'X-Application-Name': applicationName,
         'X-API-Token': apiToken,
       };
-      if (currentEnvironmentId) {
-        headers['X-Environment-Id'] = currentEnvironmentId;
-      }
 
       setRequestHeaders(headers);
 
-      const response = await fetch('/api/v1/server/ingame-popup-notices', {
+      const envPath = currentEnvironmentId || 'default';
+      const response = await fetch(`/api/v1/server/${envPath}/ingame-popup-notices`, {
         method: 'GET',
         headers,
       });
@@ -217,11 +215,10 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
   );
 
   const curlExample = `# Ingame Popup Notice Server SDK API Example
-curl -X GET "http://localhost:5000/api/v1/server/ingame-popup-notices" \\
+curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your-environment'}/ingame-popup-notices" \\
   -H "Content-Type: application/json" \\
   -H "X-Application-Name: MyGameServer" \\
-  -H "X-API-Token: your-server-api-token-here" \\
-  -H "X-Environment-Id: ${currentEnvironmentId || 'your-environment-id'}"`;
+  -H "X-API-Token: your-server-api-token-here"`;
 
   const jsonResponse = `{
   "success": true,
@@ -300,7 +297,7 @@ curl -X GET "http://localhost:5000/api/v1/server/ingame-popup-notices" \\
                   <strong>{t('ingamePopupNotices.sdkGuideDrawer.method')}:</strong> GET
                 </Typography>
                 <Typography component="div" sx={{ wordBreak: 'break-all' }}>
-                  /api/v1/server/ingame-popup-notices
+                  /api/v1/server/{'{environment}'}/ingame-popup-notices
                 </Typography>
               </Box>
 
@@ -315,9 +312,6 @@ curl -X GET "http://localhost:5000/api/v1/server/ingame-popup-notices" \\
                 </Typography>
                 <Typography variant="body2">
                   • <strong>X-Application-Name</strong>: {t('ingamePopupNotices.sdkGuideDrawer.headerAppName')}
-                </Typography>
-                <Typography variant="body2">
-                  • <strong>X-Environment-Id</strong>: {t('common.sdkGuide.headerEnvironmentId')}
                 </Typography>
                 <Typography variant="body2">
                   • <strong>Content-Type</strong>: {t('ingamePopupNotices.sdkGuideDrawer.headerContentType')}

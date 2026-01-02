@@ -117,11 +117,10 @@ const SDKGuideDrawer: React.FC<SDKGuideDrawerProps> = ({ open, onClose }) => {
 
   // curl example code
   const curlExample = `# Coupon Redeem API Example
-curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
+curl -X POST http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your-environment'}/coupons/{COUPON_CODE}/redeem \\
   -H "Content-Type: application/json" \\
   -H "X-Application-Name: MyGameApp" \\
   -H "X-API-Token: your-api-token-here" \\
-  -H "X-Environment-Id: ${currentEnvironmentId || 'your-environment-id'}" \\
   -d '{
     "userId": "user123",
     "userName": "John Doe",
@@ -276,8 +275,10 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
       // Generate requestId (ULID format)
       const requestId = generateULID();
 
+      // Build the API path with environment
+      const envPath = currentEnvironmentId || 'default';
       const response = await fetch(
-        `/api/v1/server/coupons/${couponCode}/redeem`,
+        `/api/v1/server/${envPath}/coupons/${couponCode}/redeem`,
         {
           method: 'POST',
           headers: {
@@ -285,7 +286,6 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
             'X-Application-Name': 'AdminTestClient',
             'X-API-Token': apiToken,
             'X-Request-Id': requestId,
-            ...(currentEnvironmentId && { 'X-Environment-Id': currentEnvironmentId }),
           },
           body: JSON.stringify({
             userId,
@@ -313,7 +313,6 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
         'X-Application-Name': 'AdminTestClient',
         'X-API-Token': apiToken,
         'X-Request-Id': requestId,
-        ...(currentEnvironmentId && { 'X-Environment-Id': currentEnvironmentId }),
       });
 
       // Set response headers (basic info)
@@ -419,456 +418,145 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
 
         {/* Content */}
         <Box sx={{ p: 3, overflow: 'auto', flex: 1 }}>
-        {/* Tab 1: SDK Guide */}
-        {mainTabValue === 0 && (
-          <>
-        {/* Description */}
-        <Alert severity="info" sx={{ mb: 3 }}>
-          {t('coupons.couponSettings.sdkGuideDrawer.description')}
-        </Alert>
+          {/* Tab 1: SDK Guide */}
+          {mainTabValue === 0 && (
+            <>
+              {/* Description */}
+              <Alert severity="info" sx={{ mb: 3 }}>
+                {t('coupons.couponSettings.sdkGuideDrawer.description')}
+              </Alert>
 
-        {/* Endpoint */}
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-          {t('coupons.couponSettings.sdkGuideDrawer.endpoint')}
-        </Typography>
-        <Paper
-          sx={{
-            p: 2,
-            mb: 3,
-            backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
-            fontFamily: 'monospace',
-            fontSize: '0.9rem',
-          }}
-        >
-          <Typography component="div" sx={{ mb: 1 }}>
-            <strong>{t('coupons.couponSettings.sdkGuideDrawer.method')}:</strong> POST
-          </Typography>
-          <Typography component="div" sx={{ wordBreak: 'break-all' }}>
-            /api/v1/server/coupons/{'{'}<strong>code</strong>{'}'}
-            /redeem
-          </Typography>
-        </Paper>
-
-        <Divider sx={{ my: 3 }} />
-
-        {/* Parameters */}
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-          {t('coupons.couponSettings.sdkGuideDrawer.parameters')}
-        </Typography>
-        <Stack spacing={1} sx={{ mb: 3 }}>
-          <Typography variant="body2">
-            • <strong>userId</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramUserId')}
-          </Typography>
-          <Typography variant="body2">
-            • <strong>userName</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramUserName')}
-          </Typography>
-          <Typography variant="body2">
-            • <strong>characterId</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramCharacterId')}
-          </Typography>
-          <Typography variant="body2">
-            • <strong>worldId</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramWorldId')}
-          </Typography>
-          <Typography variant="body2">
-            • <strong>platform</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramPlatform')}
-          </Typography>
-          <Typography variant="body2">
-            • <strong>channel</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramChannel')}
-          </Typography>
-          <Typography variant="body2">
-            • <strong>subChannel</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramSubChannel')}
-          </Typography>
-        </Stack>
-
-        <Divider sx={{ my: 3 }} />
-
-        {/* Required Headers */}
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-          {t('coupons.couponSettings.sdkGuideDrawer.requiredHeaders')}
-        </Typography>
-        <Stack spacing={1} sx={{ mb: 3 }}>
-          <Typography variant="body2">
-            • <strong>X-API-Token</strong>: {t('coupons.couponSettings.sdkGuideDrawer.headerApiToken')}
-          </Typography>
-          <Typography variant="body2">
-            • <strong>X-Application-Name</strong>: {t('coupons.couponSettings.sdkGuideDrawer.headerAppName')}
-          </Typography>
-          <Typography variant="body2">
-            • <strong>X-Environment-Id</strong>: {t('common.sdkGuide.headerEnvironmentId')}
-          </Typography>
-          <Typography variant="body2">
-            • <strong>Content-Type</strong>: {t('coupons.couponSettings.sdkGuideDrawer.headerContentType')}
-          </Typography>
-        </Stack>
-
-        <Divider sx={{ my: 3 }} />
-
-        {/* Request Body */}
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-          {t('coupons.couponSettings.sdkGuideDrawer.requestBody')}
-        </Typography>
-        <CodeBlock code={jsonRequest} language="json" />
-
-        {/* curl Example */}
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-          curl {t('common.example') || 'Example'}
-        </Typography>
-        <CodeBlock code={curlExample} language="bash" />
-
-        <Divider sx={{ my: 3 }} />
-
-        {/* Response Example */}
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-          {t('coupons.couponSettings.sdkGuideDrawer.responseExample')}
-        </Typography>
-        <CodeBlock code={jsonResponse} language="json" />
-
-        <Divider sx={{ my: 3 }} />
-
-        {/* Error Codes - Tabbed */}
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-          {t('coupons.couponSettings.sdkGuideDrawer.errorCodes')}
-        </Typography>
-        <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
-          {t('coupons.couponSettings.sdkGuideDrawer.errorCodesDesc') || 'Error response examples for different scenarios'}
-        </Typography>
-
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-          <Tabs value={errorTabValue} onChange={(e, newValue) => setErrorTabValue(newValue)} variant="scrollable" scrollButtons="auto">
-            <Tab label="400 - Missing Params" />
-            <Tab label="400 - Missing Headers" />
-            <Tab label="404 - Not Found" />
-            <Tab label="409 - Conflict" />
-            <Tab label="409 - Limit Reached" />
-            <Tab label="422 - Unprocessable" />
-            <Tab label="429 - Too Many Requests" />
-          </Tabs>
-        </Box>
-
-        {errorTabValue === 0 && <CodeBlock code={errorMissingParams} language="json" />}
-        {errorTabValue === 1 && <CodeBlock code={errorMissingHeaders} language="json" />}
-        {errorTabValue === 2 && <CodeBlock code={errorNotFound} language="json" />}
-        {errorTabValue === 3 && <CodeBlock code={errorConflict} language="json" />}
-        {errorTabValue === 4 && <CodeBlock code={errorLimitReached} language="json" />}
-        {errorTabValue === 5 && <CodeBlock code={errorUnprocessable} language="json" />}
-        {errorTabValue === 6 && <CodeBlock code={errorTooManyRequests} language="json" />}
-          </>
-        )}
-
-        {/* Tab 2: API Test */}
-        {mainTabValue === 1 && (
-          <>
-            {/* REQUEST SECTION */}
-            <Box sx={{ mb: 3 }}>
-              <Box
-                onClick={() => setExpandedRequestHeaders(!expandedRequestHeaders)}
+              {/* Endpoint */}
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                {t('coupons.couponSettings.sdkGuideDrawer.endpoint')}
+              </Typography>
+              <Paper
                 sx={{
-                  p: 1.5,
-                  backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
-                  borderRadius: 1,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  border: `2px solid ${theme.palette.primary.main}`,
-                  '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#bbdefb' },
+                  p: 2,
+                  mb: 3,
+                  backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                  fontFamily: 'monospace',
+                  fontSize: '0.9rem',
                 }}
               >
-                <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
-                  {t('coupons.couponSettings.sdkGuideDrawer.request')}
+                <Typography component="div" sx={{ mb: 1 }}>
+                  <strong>{t('coupons.couponSettings.sdkGuideDrawer.method')}:</strong> POST
                 </Typography>
-                <Box sx={{ transform: expandedRequestHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', color: theme.palette.primary.main }}>
-                  ▼
-                </Box>
+                <Typography component="div" sx={{ wordBreak: 'break-all' }}>
+                  /api/v1/server/coupons/{'{'}<strong>code</strong>{'}'}
+                  /redeem
+                </Typography>
+              </Paper>
+
+              <Divider sx={{ my: 3 }} />
+
+              {/* Parameters */}
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                {t('coupons.couponSettings.sdkGuideDrawer.parameters')}
+              </Typography>
+              <Stack spacing={1} sx={{ mb: 3 }}>
+                <Typography variant="body2">
+                  • <strong>userId</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramUserId')}
+                </Typography>
+                <Typography variant="body2">
+                  • <strong>userName</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramUserName')}
+                </Typography>
+                <Typography variant="body2">
+                  • <strong>characterId</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramCharacterId')}
+                </Typography>
+                <Typography variant="body2">
+                  • <strong>worldId</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramWorldId')}
+                </Typography>
+                <Typography variant="body2">
+                  • <strong>platform</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramPlatform')}
+                </Typography>
+                <Typography variant="body2">
+                  • <strong>channel</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramChannel')}
+                </Typography>
+                <Typography variant="body2">
+                  • <strong>subChannel</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramSubChannel')}
+                </Typography>
+              </Stack>
+
+              <Divider sx={{ my: 3 }} />
+
+              {/* Required Headers */}
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                {t('coupons.couponSettings.sdkGuideDrawer.requiredHeaders')}
+              </Typography>
+              <Stack spacing={1} sx={{ mb: 3 }}>
+                <Typography variant="body2">
+                  • <strong>X-API-Token</strong>: {t('coupons.couponSettings.sdkGuideDrawer.headerApiToken')}
+                </Typography>
+                <Typography variant="body2">
+                  • <strong>X-Application-Name</strong>: {t('coupons.couponSettings.sdkGuideDrawer.headerAppName')}
+                </Typography>
+                <Typography variant="body2">
+                  • <strong>Content-Type</strong>: {t('coupons.couponSettings.sdkGuideDrawer.headerContentType')}
+                </Typography>
+              </Stack>
+
+              <Divider sx={{ my: 3 }} />
+
+              {/* Request Body */}
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                {t('coupons.couponSettings.sdkGuideDrawer.requestBody')}
+              </Typography>
+              <CodeBlock code={jsonRequest} language="json" />
+
+              {/* curl Example */}
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                curl {t('common.example') || 'Example'}
+              </Typography>
+              <CodeBlock code={curlExample} language="bash" />
+
+              <Divider sx={{ my: 3 }} />
+
+              {/* Response Example */}
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                {t('coupons.couponSettings.sdkGuideDrawer.responseExample')}
+              </Typography>
+              <CodeBlock code={jsonResponse} language="json" />
+
+              <Divider sx={{ my: 3 }} />
+
+              {/* Error Codes - Tabbed */}
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                {t('coupons.couponSettings.sdkGuideDrawer.errorCodes')}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+                {t('coupons.couponSettings.sdkGuideDrawer.errorCodesDesc') || 'Error response examples for different scenarios'}
+              </Typography>
+
+              <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+                <Tabs value={errorTabValue} onChange={(e, newValue) => setErrorTabValue(newValue)} variant="scrollable" scrollButtons="auto">
+                  <Tab label="400 - Missing Params" />
+                  <Tab label="400 - Missing Headers" />
+                  <Tab label="404 - Not Found" />
+                  <Tab label="409 - Conflict" />
+                  <Tab label="409 - Limit Reached" />
+                  <Tab label="422 - Unprocessable" />
+                  <Tab label="429 - Too Many Requests" />
+                </Tabs>
               </Box>
-              <Collapse in={expandedRequestHeaders}>
-                <Box sx={{ p: 2, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
-                  {/* Parameters Table */}
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
-                      Parameters
-                    </Typography>
-                    <Box sx={{
-                      border: `1px solid ${theme.palette.divider}`,
-                      borderRadius: 1,
-                      overflow: 'hidden'
-                    }}>
-                      <Box sx={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 0 }}>
-                        {/* Coupon Code */}
-                        <Box sx={{
-                          p: 1.5,
-                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
-                          borderBottom: `1px solid ${theme.palette.divider}`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          fontWeight: 500,
-                          fontSize: '0.875rem'
-                        }}>
-                          Coupon Code *
-                        </Box>
-                        <Box sx={{
-                          p: 1,
-                          borderBottom: `1px solid ${theme.palette.divider}`,
-                          borderLeft: `1px solid ${theme.palette.divider}`
-                        }}>
-                          <TextField
-                            value={couponCode}
-                            onChange={(e) => setCouponCode(e.target.value)}
-                            size="small"
-                            fullWidth
-                            placeholder="e.g., ABC12345"
-                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
-                          />
-                        </Box>
 
-                        {/* User ID */}
-                        <Box sx={{
-                          p: 1.5,
-                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
-                          borderBottom: `1px solid ${theme.palette.divider}`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          fontWeight: 500,
-                          fontSize: '0.875rem'
-                        }}>
-                          User ID
-                        </Box>
-                        <Box sx={{
-                          p: 1,
-                          borderBottom: `1px solid ${theme.palette.divider}`,
-                          borderLeft: `1px solid ${theme.palette.divider}`
-                        }}>
-                          <TextField
-                            value={userId}
-                            onChange={(e) => setUserId(e.target.value)}
-                            size="small"
-                            fullWidth
-                            placeholder="e.g., user123"
-                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
-                          />
-                        </Box>
+              {errorTabValue === 0 && <CodeBlock code={errorMissingParams} language="json" />}
+              {errorTabValue === 1 && <CodeBlock code={errorMissingHeaders} language="json" />}
+              {errorTabValue === 2 && <CodeBlock code={errorNotFound} language="json" />}
+              {errorTabValue === 3 && <CodeBlock code={errorConflict} language="json" />}
+              {errorTabValue === 4 && <CodeBlock code={errorLimitReached} language="json" />}
+              {errorTabValue === 5 && <CodeBlock code={errorUnprocessable} language="json" />}
+              {errorTabValue === 6 && <CodeBlock code={errorTooManyRequests} language="json" />}
+            </>
+          )}
 
-                        {/* User Name */}
-                        <Box sx={{
-                          p: 1.5,
-                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
-                          borderBottom: `1px solid ${theme.palette.divider}`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          fontWeight: 500,
-                          fontSize: '0.875rem'
-                        }}>
-                          User Name
-                        </Box>
-                        <Box sx={{
-                          p: 1,
-                          borderBottom: `1px solid ${theme.palette.divider}`,
-                          borderLeft: `1px solid ${theme.palette.divider}`
-                        }}>
-                          <TextField
-                            value={userName}
-                            onChange={(e) => setUserName(e.target.value)}
-                            size="small"
-                            fullWidth
-                            placeholder="e.g., John Doe"
-                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
-                          />
-                        </Box>
-
-                        {/* Character ID */}
-                        <Box sx={{
-                          p: 1.5,
-                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
-                          borderBottom: `1px solid ${theme.palette.divider}`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          fontWeight: 500,
-                          fontSize: '0.875rem'
-                        }}>
-                          Character ID
-                        </Box>
-                        <Box sx={{
-                          p: 1,
-                          borderBottom: `1px solid ${theme.palette.divider}`,
-                          borderLeft: `1px solid ${theme.palette.divider}`
-                        }}>
-                          <TextField
-                            value={characterId}
-                            onChange={(e) => setCharacterId(e.target.value)}
-                            size="small"
-                            fullWidth
-                            placeholder="e.g., char456"
-                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
-                          />
-                        </Box>
-
-                        {/* World ID */}
-                        <Box sx={{
-                          p: 1.5,
-                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
-                          borderBottom: `1px solid ${theme.palette.divider}`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          fontWeight: 500,
-                          fontSize: '0.875rem'
-                        }}>
-                          World ID
-                        </Box>
-                        <Box sx={{
-                          p: 1,
-                          borderBottom: `1px solid ${theme.palette.divider}`,
-                          borderLeft: `1px solid ${theme.palette.divider}`
-                        }}>
-                          <TextField
-                            value={worldId}
-                            onChange={(e) => setWorldId(e.target.value)}
-                            size="small"
-                            fullWidth
-                            placeholder="e.g., world01"
-                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
-                          />
-                        </Box>
-
-                        {/* Platform */}
-                        <Box sx={{
-                          p: 1.5,
-                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
-                          borderBottom: `1px solid ${theme.palette.divider}`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          fontWeight: 500,
-                          fontSize: '0.875rem'
-                        }}>
-                          Platform
-                        </Box>
-                        <Box sx={{
-                          p: 1,
-                          borderBottom: `1px solid ${theme.palette.divider}`,
-                          borderLeft: `1px solid ${theme.palette.divider}`
-                        }}>
-                          <TextField
-                            value={platform}
-                            onChange={(e) => setPlatform(e.target.value)}
-                            size="small"
-                            fullWidth
-                            placeholder="e.g., ios, android, pc"
-                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
-                          />
-                        </Box>
-
-                        {/* Channel */}
-                        <Box sx={{
-                          p: 1.5,
-                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
-                          borderBottom: `1px solid ${theme.palette.divider}`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          fontWeight: 500,
-                          fontSize: '0.875rem'
-                        }}>
-                          Channel
-                        </Box>
-                        <Box sx={{
-                          p: 1,
-                          borderBottom: `1px solid ${theme.palette.divider}`,
-                          borderLeft: `1px solid ${theme.palette.divider}`
-                        }}>
-                          <TextField
-                            value={channel}
-                            onChange={(e) => setChannel(e.target.value)}
-                            size="small"
-                            fullWidth
-                            placeholder="e.g., app_store, google_play"
-                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
-                          />
-                        </Box>
-
-                        {/* Sub Channel */}
-                        <Box sx={{
-                          p: 1.5,
-                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
-                          display: 'flex',
-                          alignItems: 'center',
-                          fontWeight: 500,
-                          fontSize: '0.875rem'
-                        }}>
-                          Sub Channel
-                        </Box>
-                        <Box sx={{
-                          p: 1,
-                          borderLeft: `1px solid ${theme.palette.divider}`
-                        }}>
-                          <TextField
-                            value={subChannel}
-                            onChange={(e) => setSubChannel(e.target.value)}
-                            size="small"
-                            fullWidth
-                            placeholder="e.g., web, mobile"
-                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
-                          />
-                        </Box>
-                      </Box>
-                    </Box>
-                  </Box>
-
-                  {/* Request Headers */}
-                  {Object.keys(requestHeaders).length > 0 && (
-                    <Box sx={{ mb: 2 }}>
-                      <Box
-                        onClick={() => setExpandedRequestHeadersDetail(!expandedRequestHeadersDetail)}
-                        sx={{
-                          p: 1,
-                          backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f0f0f0',
-                          borderRadius: 0.5,
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#e8e8e8' },
-                        }}
-                      >
-                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                          Headers ({Object.keys(requestHeaders).length})
-                        </Typography>
-                        <Box sx={{ transform: expandedRequestHeadersDetail ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', fontSize: '0.8rem' }}>
-                          ▼
-                        </Box>
-                      </Box>
-                      <Collapse in={expandedRequestHeadersDetail}>
-                        <Stack spacing={0.5} sx={{ pl: 1, pt: 1 }}>
-                          {Object.entries(requestHeaders).map(([key, value]) => (
-                            <Box key={key} sx={{ display: 'flex', gap: 1 }}>
-                              <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 150, color: 'primary.main' }}>
-                                {key}:
-                              </Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>
-                                {String(value)}
-                              </Typography>
-                            </Box>
-                          ))}
-                        </Stack>
-                      </Collapse>
-                    </Box>
-                  )}
-
-                  {/* Test Button */}
-                  <Button
-                    variant="contained"
-                    startIcon={testLoading ? <CircularProgress size={16} sx={{ color: 'inherit' }} /> : <PlayArrowIcon />}
-                    onClick={handleTestAPI}
-                    disabled={testLoading}
-                    fullWidth
-                  >
-                    Test API
-                  </Button>
-                </Box>
-              </Collapse>
-            </Box>
-
-            {/* RESPONSE SECTION */}
-            {testResponse && (
+          {/* Tab 2: API Test */}
+          {mainTabValue === 1 && (
+            <>
+              {/* REQUEST SECTION */}
               <Box sx={{ mb: 3 }}>
                 <Box
-                  onClick={() => setExpandedResponseHeaders(!expandedResponseHeaders)}
+                  onClick={() => setExpandedRequestHeaders(!expandedRequestHeaders)}
                   sx={{
                     p: 1.5,
                     backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
@@ -881,53 +569,248 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
                     '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#bbdefb' },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
-                      {t('coupons.couponSettings.sdkGuideDrawer.response')}
-                    </Typography>
-                    {testStatus && (
-                      <Box sx={{ display: 'flex', gap: 2 }}>
-                        <Box>
-                          <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('coupons.couponSettings.sdkGuideDrawer.status')}</Typography>
-                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                            {testStatus} {testStatus === 200 ? 'OK' : testStatus === 404 ? 'Not Found' : testStatus === 400 ? 'Bad Request' : 'Error'}
-                          </Typography>
-                        </Box>
-                        {testDuration !== null && (
-                          <Box>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('coupons.couponSettings.sdkGuideDrawer.time')}</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 600 }}>{testDuration}ms</Typography>
-                          </Box>
-                        )}
-                        {Object.keys(responseHeaders).length > 0 && (
-                          <Box>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('coupons.couponSettings.sdkGuideDrawer.size')}</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                              {new Blob([JSON.stringify(testResponse)]).size} bytes
-                            </Typography>
-                          </Box>
-                        )}
-                      </Box>
-                    )}
-                  </Box>
-                  <Box sx={{ transform: expandedResponseHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', color: theme.palette.primary.main }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
+                    {t('coupons.couponSettings.sdkGuideDrawer.request')}
+                  </Typography>
+                  <Box sx={{ transform: expandedRequestHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', color: theme.palette.primary.main }}>
                     ▼
                   </Box>
                 </Box>
-                <Collapse in={expandedResponseHeaders}>
+                <Collapse in={expandedRequestHeaders}>
                   <Box sx={{ p: 2, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
-                    {/* Error Message */}
-                    {testError && (
-                      <Alert severity="error" sx={{ mb: 2 }}>
-                        {testError}
-                      </Alert>
-                    )}
+                    {/* Parameters Table */}
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+                        Parameters
+                      </Typography>
+                      <Box sx={{
+                        border: `1px solid ${theme.palette.divider}`,
+                        borderRadius: 1,
+                        overflow: 'hidden'
+                      }}>
+                        <Box sx={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 0 }}>
+                          {/* Coupon Code */}
+                          <Box sx={{
+                            p: 1.5,
+                            backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontWeight: 500,
+                            fontSize: '0.875rem'
+                          }}>
+                            Coupon Code *
+                          </Box>
+                          <Box sx={{
+                            p: 1,
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            borderLeft: `1px solid ${theme.palette.divider}`
+                          }}>
+                            <TextField
+                              value={couponCode}
+                              onChange={(e) => setCouponCode(e.target.value)}
+                              size="small"
+                              fullWidth
+                              placeholder="e.g., ABC12345"
+                              sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                            />
+                          </Box>
 
-                    {/* Response Headers */}
-                    {Object.keys(responseHeaders).length > 0 && (
+                          {/* User ID */}
+                          <Box sx={{
+                            p: 1.5,
+                            backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontWeight: 500,
+                            fontSize: '0.875rem'
+                          }}>
+                            User ID
+                          </Box>
+                          <Box sx={{
+                            p: 1,
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            borderLeft: `1px solid ${theme.palette.divider}`
+                          }}>
+                            <TextField
+                              value={userId}
+                              onChange={(e) => setUserId(e.target.value)}
+                              size="small"
+                              fullWidth
+                              placeholder="e.g., user123"
+                              sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                            />
+                          </Box>
+
+                          {/* User Name */}
+                          <Box sx={{
+                            p: 1.5,
+                            backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontWeight: 500,
+                            fontSize: '0.875rem'
+                          }}>
+                            User Name
+                          </Box>
+                          <Box sx={{
+                            p: 1,
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            borderLeft: `1px solid ${theme.palette.divider}`
+                          }}>
+                            <TextField
+                              value={userName}
+                              onChange={(e) => setUserName(e.target.value)}
+                              size="small"
+                              fullWidth
+                              placeholder="e.g., John Doe"
+                              sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                            />
+                          </Box>
+
+                          {/* Character ID */}
+                          <Box sx={{
+                            p: 1.5,
+                            backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontWeight: 500,
+                            fontSize: '0.875rem'
+                          }}>
+                            Character ID
+                          </Box>
+                          <Box sx={{
+                            p: 1,
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            borderLeft: `1px solid ${theme.palette.divider}`
+                          }}>
+                            <TextField
+                              value={characterId}
+                              onChange={(e) => setCharacterId(e.target.value)}
+                              size="small"
+                              fullWidth
+                              placeholder="e.g., char456"
+                              sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                            />
+                          </Box>
+
+                          {/* World ID */}
+                          <Box sx={{
+                            p: 1.5,
+                            backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontWeight: 500,
+                            fontSize: '0.875rem'
+                          }}>
+                            World ID
+                          </Box>
+                          <Box sx={{
+                            p: 1,
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            borderLeft: `1px solid ${theme.palette.divider}`
+                          }}>
+                            <TextField
+                              value={worldId}
+                              onChange={(e) => setWorldId(e.target.value)}
+                              size="small"
+                              fullWidth
+                              placeholder="e.g., world01"
+                              sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                            />
+                          </Box>
+
+                          {/* Platform */}
+                          <Box sx={{
+                            p: 1.5,
+                            backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontWeight: 500,
+                            fontSize: '0.875rem'
+                          }}>
+                            Platform
+                          </Box>
+                          <Box sx={{
+                            p: 1,
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            borderLeft: `1px solid ${theme.palette.divider}`
+                          }}>
+                            <TextField
+                              value={platform}
+                              onChange={(e) => setPlatform(e.target.value)}
+                              size="small"
+                              fullWidth
+                              placeholder="e.g., ios, android, pc"
+                              sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                            />
+                          </Box>
+
+                          {/* Channel */}
+                          <Box sx={{
+                            p: 1.5,
+                            backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontWeight: 500,
+                            fontSize: '0.875rem'
+                          }}>
+                            Channel
+                          </Box>
+                          <Box sx={{
+                            p: 1,
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            borderLeft: `1px solid ${theme.palette.divider}`
+                          }}>
+                            <TextField
+                              value={channel}
+                              onChange={(e) => setChannel(e.target.value)}
+                              size="small"
+                              fullWidth
+                              placeholder="e.g., app_store, google_play"
+                              sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                            />
+                          </Box>
+
+                          {/* Sub Channel */}
+                          <Box sx={{
+                            p: 1.5,
+                            backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontWeight: 500,
+                            fontSize: '0.875rem'
+                          }}>
+                            Sub Channel
+                          </Box>
+                          <Box sx={{
+                            p: 1,
+                            borderLeft: `1px solid ${theme.palette.divider}`
+                          }}>
+                            <TextField
+                              value={subChannel}
+                              onChange={(e) => setSubChannel(e.target.value)}
+                              size="small"
+                              fullWidth
+                              placeholder="e.g., web, mobile"
+                              sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                            />
+                          </Box>
+                        </Box>
+                      </Box>
+                    </Box>
+
+                    {/* Request Headers */}
+                    {Object.keys(requestHeaders).length > 0 && (
                       <Box sx={{ mb: 2 }}>
                         <Box
-                          onClick={() => setExpandedResponseHeadersDetail(!expandedResponseHeadersDetail)}
+                          onClick={() => setExpandedRequestHeadersDetail(!expandedRequestHeadersDetail)}
                           sx={{
                             p: 1,
                             backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f0f0f0',
@@ -940,15 +823,15 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
                           }}
                         >
                           <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                            Headers ({Object.keys(responseHeaders).length})
+                            Headers ({Object.keys(requestHeaders).length})
                           </Typography>
-                          <Box sx={{ transform: expandedResponseHeadersDetail ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', fontSize: '0.8rem' }}>
+                          <Box sx={{ transform: expandedRequestHeadersDetail ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', fontSize: '0.8rem' }}>
                             ▼
                           </Box>
                         </Box>
-                        <Collapse in={expandedResponseHeadersDetail}>
+                        <Collapse in={expandedRequestHeadersDetail}>
                           <Stack spacing={0.5} sx={{ pl: 1, pt: 1 }}>
-                            {Object.entries(responseHeaders).map(([key, value]) => (
+                            {Object.entries(requestHeaders).map(([key, value]) => (
                               <Box key={key} sx={{ display: 'flex', gap: 1 }}>
                                 <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 150, color: 'primary.main' }}>
                                   {key}:
@@ -963,67 +846,180 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
                       </Box>
                     )}
 
-                    {/* Response Body */}
-                    <Box>
-                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                        Body
-                      </Typography>
-                      <Box
-                        sx={{
-                          position: 'relative',
-                          border: `1px solid ${theme.palette.divider}`,
-                          borderRadius: 1,
-                          overflow: 'hidden',
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'flex-end',
-                            p: 0.5,
-                            backgroundColor: theme.palette.mode === 'dark' ? '#0e0e0e' : '#f0f0f0',
-                            borderBottom: `1px solid ${theme.palette.divider}`,
-                          }}
-                        >
-                          <Tooltip title={t('common.copy') || 'Copy'}>
-                            <IconButton
-                              size="small"
-                              onClick={() => {
-                                handleCopyCode(JSON.stringify(testResponse, null, 2));
-                              }}
-                              sx={{ color: 'primary.main' }}
-                            >
-                              <ContentCopyIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                        <Box sx={{ height: 600, overflow: 'hidden' }}>
-                          <Editor
-                            height="100%"
-                            language="json"
-                            value={JSON.stringify(testResponse, null, 2)}
-                            theme={isDark ? 'vs-dark' : 'light'}
-                            options={{
-                              readOnly: true,
-                              minimap: { enabled: false },
-                              scrollBeyondLastLine: false,
-                              wordWrap: 'on',
-                              automaticLayout: true,
-                              fontSize: 12,
-                              lineNumbers: 'on',
-                              folding: true,
-                              padding: { top: 8, bottom: 8 },
-                            }}
-                          />
-                        </Box>
-                      </Box>
-                    </Box>
+                    {/* Test Button */}
+                    <Button
+                      variant="contained"
+                      startIcon={testLoading ? <CircularProgress size={16} sx={{ color: 'inherit' }} /> : <PlayArrowIcon />}
+                      onClick={handleTestAPI}
+                      disabled={testLoading}
+                      fullWidth
+                    >
+                      Test API
+                    </Button>
                   </Box>
                 </Collapse>
               </Box>
-            )}
-          </>
-        )}
+
+              {/* RESPONSE SECTION */}
+              {testResponse && (
+                <Box sx={{ mb: 3 }}>
+                  <Box
+                    onClick={() => setExpandedResponseHeaders(!expandedResponseHeaders)}
+                    sx={{
+                      p: 1.5,
+                      backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
+                      borderRadius: 1,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      border: `2px solid ${theme.palette.primary.main}`,
+                      '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#bbdefb' },
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
+                        {t('coupons.couponSettings.sdkGuideDrawer.response')}
+                      </Typography>
+                      {testStatus && (
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                          <Box>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('coupons.couponSettings.sdkGuideDrawer.status')}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              {testStatus} {testStatus === 200 ? 'OK' : testStatus === 404 ? 'Not Found' : testStatus === 400 ? 'Bad Request' : 'Error'}
+                            </Typography>
+                          </Box>
+                          {testDuration !== null && (
+                            <Box>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('coupons.couponSettings.sdkGuideDrawer.time')}</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>{testDuration}ms</Typography>
+                            </Box>
+                          )}
+                          {Object.keys(responseHeaders).length > 0 && (
+                            <Box>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('coupons.couponSettings.sdkGuideDrawer.size')}</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                {new Blob([JSON.stringify(testResponse)]).size} bytes
+                              </Typography>
+                            </Box>
+                          )}
+                        </Box>
+                      )}
+                    </Box>
+                    <Box sx={{ transform: expandedResponseHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', color: theme.palette.primary.main }}>
+                      ▼
+                    </Box>
+                  </Box>
+                  <Collapse in={expandedResponseHeaders}>
+                    <Box sx={{ p: 2, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
+                      {/* Error Message */}
+                      {testError && (
+                        <Alert severity="error" sx={{ mb: 2 }}>
+                          {testError}
+                        </Alert>
+                      )}
+
+                      {/* Response Headers */}
+                      {Object.keys(responseHeaders).length > 0 && (
+                        <Box sx={{ mb: 2 }}>
+                          <Box
+                            onClick={() => setExpandedResponseHeadersDetail(!expandedResponseHeadersDetail)}
+                            sx={{
+                              p: 1,
+                              backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f0f0f0',
+                              borderRadius: 0.5,
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#e8e8e8' },
+                            }}
+                          >
+                            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                              Headers ({Object.keys(responseHeaders).length})
+                            </Typography>
+                            <Box sx={{ transform: expandedResponseHeadersDetail ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', fontSize: '0.8rem' }}>
+                              ▼
+                            </Box>
+                          </Box>
+                          <Collapse in={expandedResponseHeadersDetail}>
+                            <Stack spacing={0.5} sx={{ pl: 1, pt: 1 }}>
+                              {Object.entries(responseHeaders).map(([key, value]) => (
+                                <Box key={key} sx={{ display: 'flex', gap: 1 }}>
+                                  <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 150, color: 'primary.main' }}>
+                                    {key}:
+                                  </Typography>
+                                  <Typography variant="caption" sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>
+                                    {String(value)}
+                                  </Typography>
+                                </Box>
+                              ))}
+                            </Stack>
+                          </Collapse>
+                        </Box>
+                      )}
+
+                      {/* Response Body */}
+                      <Box>
+                        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                          Body
+                        </Typography>
+                        <Box
+                          sx={{
+                            position: 'relative',
+                            border: `1px solid ${theme.palette.divider}`,
+                            borderRadius: 1,
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'flex-end',
+                              p: 0.5,
+                              backgroundColor: theme.palette.mode === 'dark' ? '#0e0e0e' : '#f0f0f0',
+                              borderBottom: `1px solid ${theme.palette.divider}`,
+                            }}
+                          >
+                            <Tooltip title={t('common.copy') || 'Copy'}>
+                              <IconButton
+                                size="small"
+                                onClick={() => {
+                                  handleCopyCode(JSON.stringify(testResponse, null, 2));
+                                }}
+                                sx={{ color: 'primary.main' }}
+                              >
+                                <ContentCopyIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                          <Box sx={{ height: 600, overflow: 'hidden' }}>
+                            <Editor
+                              height="100%"
+                              language="json"
+                              value={JSON.stringify(testResponse, null, 2)}
+                              theme={isDark ? 'vs-dark' : 'light'}
+                              options={{
+                                readOnly: true,
+                                minimap: { enabled: false },
+                                scrollBeyondLastLine: false,
+                                wordWrap: 'on',
+                                automaticLayout: true,
+                                fontSize: 12,
+                                lineNumbers: 'on',
+                                folding: true,
+                                padding: { top: 8, bottom: 8 },
+                              }}
+                            />
+                          </Box>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Collapse>
+                </Box>
+              )}
+            </>
+          )}
         </Box>
       </Box>
     </ResizableDrawer>
