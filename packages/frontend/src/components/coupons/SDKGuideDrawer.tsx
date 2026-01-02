@@ -27,6 +27,7 @@ import { useSnackbar } from 'notistack';
 import ResizableDrawer from '../common/ResizableDrawer';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { getBackendUrl } from '../../utils/backendUrl';
 
 // Generate ULID format request ID
 function generateULID(): string {
@@ -46,6 +47,7 @@ const SDKGuideDrawer: React.FC<SDKGuideDrawerProps> = ({ open, onClose }) => {
   const isDark = theme.palette.mode === 'dark';
   const { enqueueSnackbar } = useSnackbar();
   const { currentEnvironmentId } = useEnvironment();
+  const backendUrl = getBackendUrl();
 
   // State for main tabs (Guide vs Test)
   const [mainTabValue, setMainTabValue] = useState(0);
@@ -66,14 +68,16 @@ const SDKGuideDrawer: React.FC<SDKGuideDrawerProps> = ({ open, onClose }) => {
   const [testResponse, setTestResponse] = useState<any>(null);
   const [testLoading, setTestLoading] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
   const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
-  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(false);
+  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(true);
   const [expandedResponseHeaders, setExpandedResponseHeaders] = useState(false);
   const [expandedRequestHeadersDetail, setExpandedRequestHeadersDetail] = useState(false);
   const [expandedResponseHeadersDetail, setExpandedResponseHeadersDetail] = useState(false);
   const [testDuration, setTestDuration] = useState<number | null>(null);
   const [testStatus, setTestStatus] = useState<number | null>(null);
+  const [responseTime, setResponseTime] = useState<Date | null>(null);
 
   // Load saved values from localStorage on mount
   useEffect(() => {
@@ -117,7 +121,7 @@ const SDKGuideDrawer: React.FC<SDKGuideDrawerProps> = ({ open, onClose }) => {
 
   // curl example code
   const curlExample = `# Coupon Redeem API Example
-curl -X POST http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your-environment'}/coupons/{COUPON_CODE}/redeem \\
+curl -X POST ${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environment'}/coupons/{COUPON_CODE}/redeem \\
   -H "Content-Type: application/json" \\
   -H "X-Application-Name: MyGameApp" \\
   -H "X-API-Token: your-api-token-here" \\
@@ -256,17 +260,21 @@ curl -X POST http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
 
   const handleTestAPI = async () => {
     if (!couponCode.trim()) {
-      setTestError('Coupon Code is required');
+      setValidationError(t('coupons.sdkGuide.couponCodeRequired') || 'Coupon Code is required');
+      return;
+    }
+    if (!apiToken.trim()) {
+      setValidationError(t('common.apiTokenRequired') || 'API Token is required');
       return;
     }
 
+    setValidationError(null);
     setTestLoading(true);
     setTestError(null);
     setTestResponse(null);
     setTestStatus(null);
     setTestDuration(null);
-    // Collapse Request and prepare to expand Response
-    setExpandedRequestHeaders(false);
+    // Keep request section open
     setExpandedResponseHeaders(false);
 
     const startTime = performance.now();
@@ -283,7 +291,7 @@ curl -X POST http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Application-Name': 'AdminTestClient',
+            'X-Application-Name': 'gatrix-frontend-tester',
             'X-API-Token': apiToken,
             'X-Request-Id': requestId,
           },
@@ -306,11 +314,12 @@ curl -X POST http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
       setTestResponse(data);
       setTestStatus(response.status);
       setTestDuration(duration);
+      setResponseTime(new Date());
 
       // Set request headers
       setRequestHeaders({
         'Content-Type': 'application/json',
-        'X-Application-Name': 'AdminTestClient',
+        'X-Application-Name': 'gatrix-frontend-tester',
         'X-API-Token': apiToken,
         'X-Request-Id': requestId,
       });
@@ -846,6 +855,52 @@ curl -X POST http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                       </Box>
                     )}
 
+                    {/* Curl Preview */}
+                    <Box sx={{ mb: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          {t('common.curlPreview') || 'curl Preview'}
+                        </Typography>
+                        <Tooltip title={t('common.copy') || 'Copy'}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleCopyCode(`curl -X POST "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environment'}/coupons/${couponCode || '{COUPON_CODE}'}/redeem" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Application-Name: gatrix-frontend-tester" \\
+  -H "X-API-Token: ${apiToken}" \\
+  -d '${JSON.stringify({ userId, userName, ...(characterId && { characterId }), worldId, platform, channel, subChannel }, null, 2)}'`)}
+                          >
+                            <ContentCopyIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                      <Box sx={{
+                        p: 1.5,
+                        backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+                        borderRadius: 1,
+                        border: `1px solid ${theme.palette.divider}`,
+                        fontFamily: 'monospace',
+                        fontSize: '0.75rem',
+                        overflow: 'auto',
+                        maxHeight: 150,
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-all',
+                      }}>
+                        {`curl -X POST "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environment'}/coupons/${couponCode || '{COUPON_CODE}'}/redeem" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Application-Name: gatrix-frontend-tester" \\
+  -H "X-API-Token: ${apiToken}" \\
+  -d '${JSON.stringify({ userId, userName, ...(characterId && { characterId }), worldId, platform, channel, subChannel }, null, 2)}'`}
+                      </Box>
+                    </Box>
+
+                    {/* Validation Error */}
+                    {validationError && (
+                      <Alert severity="error" sx={{ mb: 2 }}>
+                        {validationError}
+                      </Alert>
+                    )}
+
                     {/* Test Button */}
                     <Button
                       variant="contained"
@@ -854,7 +909,7 @@ curl -X POST http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                       disabled={testLoading}
                       fullWidth
                     >
-                      Test API
+                      {t('common.request') || 'Request'}
                     </Button>
                   </Box>
                 </Collapse>
@@ -900,6 +955,14 @@ curl -X POST http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                               <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('coupons.couponSettings.sdkGuideDrawer.size')}</Typography>
                               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                                 {new Blob([JSON.stringify(testResponse)]).size} bytes
+                              </Typography>
+                            </Box>
+                          )}
+                          {responseTime && (
+                            <Box>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('common.receivedAt') || 'Received At'}</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                {responseTime.toLocaleTimeString()}
                               </Typography>
                             </Box>
                           )}
