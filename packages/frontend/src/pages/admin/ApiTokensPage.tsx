@@ -100,6 +100,7 @@ interface CreateTokenData {
   tokenName: string;
   description?: string;
   tokenType: TokenType;
+  environmentId?: number;
   allowAllEnvironments: boolean;
   environments: string[];
   expiresAt?: string;
@@ -264,6 +265,7 @@ const ApiTokensPage: React.FC = () => {
     tokenName: '',
     description: '',
     tokenType: 'client',
+    environmentId: 1,
     allowAllEnvironments: false,
     environments: [],
   });
@@ -453,9 +455,9 @@ const ApiTokensPage: React.FC = () => {
             />
           );
         }
-        // Map environment names to environment objects from loaded environments
+        // Map environment IDs to environment objects from loaded environments
         const tokenEnvs = (token.environments || [])
-          .map((envName: string) => environments.find(e => e.environment === envName))
+          .map((envId: string) => environments.find(e => e.id === envId))
           .filter(Boolean);
         return (
           <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
@@ -672,6 +674,7 @@ const ApiTokensPage: React.FC = () => {
       tokenName: '',
       description: '',
       tokenType: 'client',
+      environmentId: 1,
       allowAllEnvironments: false,
       environments: [],
     });
@@ -692,6 +695,7 @@ const ApiTokensPage: React.FC = () => {
       tokenName: token.tokenName,
       description: token.description || '',
       tokenType: token.tokenType,
+      environmentId: token.environmentId,
       allowAllEnvironments: token.allowAllEnvironments ?? false,
       environments: token.environments || [],
       expiresAt: token.expiresAt ? new Date(token.expiresAt).toISOString().slice(0, 16) : undefined,
@@ -2134,11 +2138,11 @@ const ApiTokensPage: React.FC = () => {
                         color="success"
                       />
                     ) : newTokenInfo.environments && newTokenInfo.environments.length > 0 ? (
-                      newTokenInfo.environments.map((envName: string) => {
-                        const env = environments.find(e => e.environment === envName);
+                      newTokenInfo.environments.map((envId: number) => {
+                        const env = environments.find(e => e.id === envId);
                         return env ? (
                           <Chip
-                            key={envName}
+                            key={envId}
                             label={env.environmentName}
                             size="small"
                             variant="outlined"

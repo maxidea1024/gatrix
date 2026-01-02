@@ -33,11 +33,11 @@ export function allEnvironmentsPattern(pattern: string): string {
 
 /**
  * Create a pattern for matching all keys in a specific environment
- * @param environment - The environment name
+ * @param environmentId - The environment ULID
  * @returns Pattern that matches all keys in the environment
  */
-export function environmentPattern(environment: string): string {
-  return `${ENV_PREFIX}:${environment}:*`;
+export function environmentPattern(environmentId: string): string {
+  return `${ENV_PREFIX}:${environmentId}:*`;
 }
 
 /**
@@ -446,9 +446,9 @@ export const PATTERNS = {
 
   /**
    * 특정 환경의 모든 캐시
-   * @param environment 환경 이름
+   * @param environmentId 환경 ULID
    */
-  ENVIRONMENT: (environment: string) => `${ENV_PREFIX}:${environment}:*`,
+  ENVIRONMENT: (environmentId: string) => `${ENV_PREFIX}:${environmentId}:*`,
 
   /**
    * 모든 환경의 특정 패턴 캐시
