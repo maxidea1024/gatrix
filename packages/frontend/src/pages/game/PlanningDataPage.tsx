@@ -2737,7 +2737,7 @@ const PlanningDataPage: React.FC = () => {
 #   --api-url   (Required) Backend API URL
 #   --env       (Required) Target environment (dev, qa, production)
 #   --dir       (Required) Directory containing planning data files
-#   --token     (Required) API token for authentication`}
+#   --token     (Required) Server API token for authentication`}
                   </Typography>
                 </Box>
               </Box>

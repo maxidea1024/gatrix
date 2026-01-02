@@ -1,4 +1,5 @@
 import express from 'express';
+import multer from 'multer';
 import { authenticateServerApiToken } from '../../middleware/apiTokenAuth';
 import { resolveEnvironment } from '../../middleware/environmentResolver';
 import RemoteConfigSDKController from '../../controllers/RemoteConfigSDKController';
@@ -19,8 +20,18 @@ import ServerBannerController from '../../controllers/ServerBannerController';
 import ServerStoreProductController from '../../controllers/ServerStoreProductController';
 import ServerEnvironmentController from '../../controllers/ServerEnvironmentController';
 import InternalApiTokensController from '../../controllers/InternalApiTokensController';
+import { PlanningDataController } from '../../controllers/PlanningDataController';
 
 const router = express.Router();
+
+// Configure multer for planning data file uploads (memory storage)
+// 100MB file size limit for planning data uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 100 * 1024 * 1024, // 100MB
+  },
+});
 
 // ============================================================================
 // Internal routes (Edge bypass token only) - No environment required
@@ -128,5 +139,8 @@ router.get('/:env/banners/:bannerId', authenticateServerApiToken, resolveEnviron
 // Store product routes
 router.get('/:env/store-products', authenticateServerApiToken, resolveEnvironment, ServerStoreProductController.getStoreProducts);
 router.get('/:env/store-products/:id', authenticateServerApiToken, resolveEnvironment, ServerStoreProductController.getStoreProductById);
+
+// Planning data upload route (for external CLI uploads)
+router.post('/:env/planning-data/upload', authenticateServerApiToken as any, resolveEnvironment as any, upload.any() as any, PlanningDataController.uploadPlanningData as any);
 
 export default router;

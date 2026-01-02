@@ -9,7 +9,7 @@
     "packages/sdks/*"
   ],
   "scripts": {
-    "dev": "concurrently \"yarn dev:backend\" \"yarn dev:frontend\"",
+    "dev": "concurrently -k \"yarn dev:backend\" \"wait-on http://localhost:45000/api/v1/ready && yarn dev:frontend\"",
     "dev:all": "concurrently -k \"yarn dev:backend\" \"wait-on http://localhost:45000/api/v1/ready && yarn dev:others\"",
     "dev:backend": "dotenv -e .env.local -- yarn workspace @gatrix/backend dev",
     "dev:frontend": "dotenv -e .env.local -- yarn workspace @gatrix/frontend dev",
@@ -96,6 +96,7 @@
     "chat:reset": "node scripts/reset-chat-data.js --confirm",
     "chat:reset-safe": "node scripts/reset-chat-data.js",
     "deploy:ftp": "node scripts/deploy-ftp.js",
+    "planning-data:convert": "node scripts/convert-planning-data.js",
     "upload-planning-data": "node scripts/upload-planning-data.js"
   },
   "keywords": [

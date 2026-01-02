@@ -10,7 +10,7 @@
  *   --api-url   (Required) Backend API URL (e.g., https://gatrix.example.com)
  *   --env       (Required) Target environment (dev, qa, production)
  *   --dir       (Required) Directory containing planning data files
- *   --token     (Required) API token for authentication. Can also use GATRIX_API_TOKEN env var.
+ *   --token     (Required) Server API token for authentication. Can also use GATRIX_API_TOKEN env var.
  */
 
 const fs = require('fs');
@@ -44,7 +44,7 @@ function validateArgs(args) {
         console.error('  --api-url   (Required) Backend API URL (e.g., https://gatrix.example.com)');
         console.error('  --env       (Required) Target environment (dev, qa, production)');
         console.error('  --dir       (Required) Directory containing planning data files');
-        console.error('  --token     (Required) API token for authentication');
+        console.error('  --token     (Required) Server API token for authentication');
         console.error('\nExample:');
         console.error('  yarn upload-planning-data --api-url=https://gatrix.motifgames.in --env=qa --dir=./planning-data --token=abc123');
         process.exit(1);
@@ -84,16 +84,16 @@ async function uploadFiles(apiUrl, env, files, token) {
             form.append('files', fs.createReadStream(filePath), fileName);
         });
 
-        // Parse URL
-        const url = new URL(`${apiUrl}/api/planning-data/upload`);
+        // Parse URL - use server API route: /api/v1/server/:env/planning-data/upload
+        const url = new URL(`${apiUrl}/api/v1/server/${env}/planning-data/upload`);
         const isHttps = url.protocol === 'https:';
         const lib = isHttps ? https : http;
 
         // Set up headers
         const headers = {
             ...form.getHeaders(),
-            'X-Environment': env,
             'X-API-Token': token,
+            'X-Application-Name': 'gatrix-cli',
         };
 
         const options = {
@@ -106,6 +106,7 @@ async function uploadFiles(apiUrl, env, files, token) {
 
         console.log(`📤 Uploading ${files.length} file(s) to ${apiUrl}...`);
         console.log(`   Environment: ${env}`);
+        console.log(`   API Endpoint: ${url.pathname}`);
 
         const req = lib.request(options, (res) => {
             let data = '';
@@ -147,7 +148,7 @@ async function main() {
 
     // Validate token
     if (!token) {
-        console.error('❌ API token is required for authentication.');
+        console.error('❌ Server API token is required for authentication.');
         console.error('   Provide --token=<YOUR_TOKEN> or set GATRIX_API_TOKEN environment variable.');
         process.exit(1);
     }
@@ -170,8 +171,8 @@ async function main() {
         if (result.message) {
             console.log(`   ${result.message}`);
         }
-        if (result.uploadedFiles) {
-            console.log(`   Files uploaded: ${result.uploadedFiles}`);
+        if (result.data?.filesUploaded) {
+            console.log(`   Files uploaded: ${result.data.filesUploaded}`);
         }
     } catch (error) {
         console.error(`\n❌ Upload failed: ${error.message}`);
