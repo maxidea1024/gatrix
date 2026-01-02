@@ -76,6 +76,7 @@ const ClientVersionGuideDrawer: React.FC<ClientVersionGuideDrawerProps> = ({ ope
   const [testStartTime, setTestStartTime] = useState<number | null>(null);
   const [testDuration, setTestDuration] = useState<number | null>(null);
   const [testStatus, setTestStatus] = useState<number | null>(null);
+  const [responseTime, setResponseTime] = useState<Date | null>(null);
   const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
   const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
   const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(true);
@@ -271,6 +272,7 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
 
       const data = await response.json();
       setTestResponse(data);
+      setResponseTime(new Date());
 
       // Expand Response section when response is received
       setExpandedResponseHeaders(true);
@@ -950,6 +952,14 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                               <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('clientVersions.sdkGuideDrawer.size')}</Typography>
                               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                                 {new Blob([JSON.stringify(testResponse)]).size} bytes
+                              </Typography>
+                            </Box>
+                          )}
+                          {responseTime && (
+                            <Box>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('clientVersions.sdkGuideDrawer.receivedAt') || 'Received At'}</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                {responseTime.toLocaleTimeString()}
                               </Typography>
                             </Box>
                           )}

@@ -62,6 +62,7 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
   const [expandedResponseHeadersDetail, setExpandedResponseHeadersDetail] = useState(false);
   const [testDuration, setTestDuration] = useState<number | null>(null);
   const [testStatus, setTestStatus] = useState<number | null>(null);
+  const [responseTime, setResponseTime] = useState<Date | null>(null);
 
   // Load saved values from localStorage on mount
   useEffect(() => {
@@ -206,6 +207,7 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
       setTestResponse(data);
       setTestStatus(response.status);
       setTestDuration(duration);
+      setResponseTime(new Date());
 
       setRequestHeaders({
         'Content-Type': 'application/json',
@@ -710,6 +712,14 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                               <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('gameWorlds.sdkGuide.testSize')}</Typography>
                               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                                 {new Blob([JSON.stringify(testResponse)]).size} bytes
+                              </Typography>
+                            </Box>
+                          )}
+                          {responseTime && (
+                            <Box>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('common.receivedAt') || 'Received At'}</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                {responseTime.toLocaleTimeString()}
                               </Typography>
                             </Box>
                           )}

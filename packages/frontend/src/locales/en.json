@@ -2313,7 +2313,8 @@
     "curlPreview": "curl Preview",
     "request": "Request",
     "example": "Example",
-    "queryParameters": "Query Parameters"
+    "queryParameters": "Query Parameters",
+    "receivedAt": "Received At"
   },
   "createdAt": "createdAt",
   "dashboard": {

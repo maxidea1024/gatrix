@@ -2313,7 +2313,8 @@
     "curlPreview": "curl 미리보기",
     "request": "요청",
     "example": "예시",
-    "queryParameters": "쿼리 파라미터"
+    "queryParameters": "쿼리 파라미터",
+    "receivedAt": "수신 시각"
   },
   "createdAt": "생성일",
   "dashboard": {

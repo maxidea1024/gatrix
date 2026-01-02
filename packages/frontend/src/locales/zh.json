@@ -2367,7 +2367,8 @@
     "curlPreview": "curl 预览",
     "request": "请求",
     "example": "示例",
-    "queryParameters": "查询参数"
+    "queryParameters": "查询参数",
+    "receivedAt": "接收时间"
   },
   "createdAt": "createdAt",
   "dashboard": {
