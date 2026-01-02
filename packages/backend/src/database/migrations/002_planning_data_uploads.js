@@ -3,26 +3,35 @@
  * Tracks planning data upload history with hash, uploader info, and timestamps
  */
 
-exports.up = async function (knex) {
-    await knex.schema.createTable('planningDataUploads', (table) => {
-        table.increments('id').primary();
-        table.string('environment', 100).notNullable().index();
-        table.string('uploadHash', 64).notNullable(); // SHA-256 hash of all content
-        table.json('filesUploaded').notNullable(); // Array of file names
-        table.json('fileHashes').notNullable(); // Per-file hashes for diff tracking { fileName: hash }
-        table.integer('filesCount').notNullable();
-        table.bigInteger('totalSize').notNullable();
-        table.integer('uploadedBy').unsigned().nullable().references('id').inTable('users').onDelete('SET NULL');
-        table.string('uploaderName', 255).nullable(); // Display name or token name
-        table.string('uploadSource', 50).notNullable().defaultTo('web'); // 'web' or 'cli'
-        table.text('uploadComment').nullable(); // Optional comment from uploader
-        table.json('changedFiles').nullable(); // Files that changed compared to previous upload
-        table.timestamp('uploadedAt').notNullable().defaultTo(knex.fn.now());
+exports.up = async function (connection) {
+    console.log('Creating planningDataUploads table...');
 
-        table.index(['environment', 'uploadedAt']);
-    });
+    await connection.execute(`
+    CREATE TABLE IF NOT EXISTS planningDataUploads (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      environment VARCHAR(100) NOT NULL,
+      uploadHash VARCHAR(64) NOT NULL COMMENT 'SHA-256 hash of all content',
+      filesUploaded JSON NOT NULL COMMENT 'Array of file names',
+      fileHashes JSON NOT NULL COMMENT 'Per-file hashes for diff tracking',
+      filesCount INT NOT NULL,
+      totalSize BIGINT NOT NULL,
+      uploadedBy INT NULL,
+      uploaderName VARCHAR(255) NULL COMMENT 'Display name or token name',
+      uploadSource VARCHAR(50) NOT NULL DEFAULT 'web' COMMENT 'web or cli',
+      uploadComment TEXT NULL COMMENT 'Optional comment from uploader',
+      changedFiles JSON NULL COMMENT 'Files that changed compared to previous upload',
+      uploadedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      INDEX idx_environment (environment),
+      INDEX idx_environment_uploaded_at (environment, uploadedAt),
+      CONSTRAINT fk_planning_uploads_user FOREIGN KEY (uploadedBy) REFERENCES g_users(id) ON DELETE SET NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
+
+    console.log('✓ planningDataUploads table created');
 };
 
-exports.down = async function (knex) {
-    await knex.schema.dropTableIfExists('planningDataUploads');
+exports.down = async function (connection) {
+    console.log('Dropping planningDataUploads table...');
+    await connection.execute('DROP TABLE IF EXISTS planningDataUploads');
+    console.log('✓ planningDataUploads table dropped');
 };
