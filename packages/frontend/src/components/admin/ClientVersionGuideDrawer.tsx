@@ -957,7 +957,7 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                           )}
                           {responseTime && (
                             <Box>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('clientVersions.sdkGuideDrawer.receivedAt') || 'Received At'}</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('common.receivedAt') || 'Received At'}</Typography>
                               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                                 {responseTime.toLocaleTimeString()}
                               </Typography>
