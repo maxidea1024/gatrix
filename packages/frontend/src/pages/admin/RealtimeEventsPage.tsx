@@ -113,19 +113,19 @@ dayjs.extend(updateLocale);
 // Customize relativeTime thresholds and strings
 dayjs.updateLocale('ko', {
   relativeTime: {
-    future: '%s ??,
-    past: '%s ??,
+    future: '%s 후',
+    past: '%s 전',
     s: '방금',
-    m: '1�?,
-    mm: '%d�?,
-    h: '1?�간',
-    hh: '%d?�간',
-    d: '1??,
-    dd: '%d??,
+    m: '1분',
+    mm: '%d분',
+    h: '1시간',
+    hh: '%d시간',
+    d: '1일',
+    dd: '%d일',
     M: '1개월',
     MM: '%d개월',
-    y: '1??,
-    yy: '%d??,
+    y: '1년',
+    yy: '%d년',
   },
 });
 
@@ -149,19 +149,19 @@ dayjs.updateLocale('en', {
 
 dayjs.updateLocale('zh-cn', {
   relativeTime: {
-    future: '%s??,
-    past: '%s??,
-    s: '?�刚',
-    m: '1?�钟',
-    mm: '%d?�钟',
+    future: '%s后',
+    past: '%s前',
+    s: '刚刚',
+    m: '1分钟',
+    mm: '%d分钟',
     h: '1小时',
     hh: '%d小时',
-    d: '1�?,
-    dd: '%d�?,
+    d: '1天',
+    dd: '%d天',
     M: '1个月',
     MM: '%d个月',
-    y: '1�?,
-    yy: '%d�?,
+    y: '1年',
+    yy: '%d年',
   },
 });
 
@@ -204,10 +204,10 @@ const RealtimeEventsPage: React.FC = () => {
   const latestEventTimestampRef = useRef<Date | null>(null);
   const isInitialLoadRef = useRef<boolean>(true);
 
-  // ?�적 ?�터 ?�태
+  // 동적 필터 상태
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
-  // ?�적 ?�터?�서 �?추출
+  // 동적 필터에서 값 추출
   const eventTypeFilter = activeFilters.find(f => f.key === 'action')?.value as string | string[] || '';
   const eventTypeOperator = activeFilters.find(f => f.key === 'action')?.operator;
   const resourceTypeFilter = activeFilters.find(f => f.key === 'resource_type')?.value as string | string[] || '';
@@ -388,7 +388,7 @@ const RealtimeEventsPage: React.FC = () => {
               // Check which new events haven't been seen yet
               unseenEventIdsToProcess = Array.from(newIdsToFlash).filter(id => !seenEventIds.has(id));
 
-              console.log('?�� New events detected:', {
+              console.log('🔔 New events detected:', {
                 newEventCount: newIdsToFlash.size,
                 unseenCount: unseenEventIdsToProcess.length,
                 previousEventIds: Array.from(previousEventIdsRef.current),
@@ -425,11 +425,11 @@ const RealtimeEventsPage: React.FC = () => {
 
           // Update unseen events state
           if (unseenEventIdsToProcess.length > 0 && !isAtTopPosition) {
-            console.log('??Setting hasUnseenEvents to true');
+            console.log('✅ Setting hasUnseenEvents to true');
             setHasUnseenEvents(true);
             setUnseenEventCount(prev => prev + unseenEventIdsToProcess.length);
           } else if (isAtTopPosition && unseenEventIdsToProcess.length > 0) {
-            console.log('??Already at top - marking new events as seen');
+            console.log('❌ Already at top - marking new events as seen');
             // Mark new events as seen immediately
             setSeenEventIds(prev => {
               const newSet = new Set(prev);
@@ -437,7 +437,7 @@ const RealtimeEventsPage: React.FC = () => {
               return newSet;
             });
           } else if (unseenEventIdsToProcess.length === 0) {
-            console.log('??All new events already seen');
+            console.log('❌ All new events already seen');
           }
         }
       }
@@ -541,17 +541,17 @@ const RealtimeEventsPage: React.FC = () => {
   useEffect(() => {
     const firstEvent = firstEventRef.current;
     if (!firstEvent) {
-      console.log('?�️ First event ref not found');
+      console.log('⚠️ First event ref not found');
       return;
     }
 
-    console.log('??Setting up Intersection Observer for first event');
+    console.log('✅ Setting up Intersection Observer for first event');
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            console.log('?���?First event is visible - marking events as seen');
+            console.log('👁️ First event is visible - marking events as seen');
             // Mark all current events as seen
             const currentEventIds = new Set(events.map(e => e.id));
             setSeenEventIds(currentEventIds);
@@ -569,7 +569,7 @@ const RealtimeEventsPage: React.FC = () => {
     observer.observe(firstEvent);
 
     return () => {
-      console.log('?�� Cleaning up Intersection Observer');
+      console.log('🧹 Cleaning up Intersection Observer');
       observer.disconnect();
     };
   }, [events]);
@@ -704,7 +704,7 @@ const RealtimeEventsPage: React.FC = () => {
   const allEventTypes = Array.from(new Set(events.map(e => e.action))).sort();
   const allResourceTypes = Array.from(new Set(events.map(e => e.entityType).filter(Boolean))).sort();
 
-  // ?�적 ?�터 ?�의
+  // 동적 필터 정의
   const availableFilterDefinitions: FilterDefinition[] = [
     {
       key: 'action',
@@ -744,7 +744,8 @@ const RealtimeEventsPage: React.FC = () => {
     loadEvents();
   };
 
-  // ?�적 ?�터 ?�들??  const handleFilterAdd = (filter: ActiveFilter) => {
+  // 동적 필터 핸들러
+  const handleFilterAdd = (filter: ActiveFilter) => {
     setActiveFilters([...activeFilters, filter]);
   };
 

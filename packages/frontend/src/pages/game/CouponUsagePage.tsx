@@ -528,8 +528,8 @@ const CouponUsagePage: React.FC = () => {
           {exportSuccess
             ? t('coupons.couponUsage.exportDialog.completed')
             : exportError
-            ? t('coupons.couponUsage.exportDialog.failed')
-            : t('coupons.couponUsage.exportDialog.title')}
+              ? t('coupons.couponUsage.exportDialog.failed')
+              : t('coupons.couponUsage.exportDialog.title')}
         </DialogTitle>
         <DialogContent sx={{ py: 3 }}>
           {exporting ? (

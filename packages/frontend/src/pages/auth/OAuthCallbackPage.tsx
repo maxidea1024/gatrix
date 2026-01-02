@@ -14,14 +14,15 @@ const OAuthCallbackPage: React.FC = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    // ?�?�아???�정 (30�?
+    // 타임아웃 설정 (30초)
     const timeout = setTimeout(() => {
       navigate('/login?error=oauth_timeout', { replace: true });
     }, 30000);
 
     const handleCallback = async () => {
       try {
-        // ?�공 ???�?�아???�리??        clearTimeout(timeout);
+        // 성공 시 타임아웃 클리어
+        clearTimeout(timeout);
 
         // Get token from URL parameters
         const token = searchParams.get('token');
@@ -64,7 +65,8 @@ const OAuthCallbackPage: React.FC = () => {
 
     handleCallback();
 
-    // 컴포?�트 ?�마?�트 ???�?�아???�리??    return () => {
+    // 컴포넌트 언마운트 시 타임아웃 클리어
+    return () => {
       clearTimeout(timeout);
     };
   }, [navigate, searchParams]);

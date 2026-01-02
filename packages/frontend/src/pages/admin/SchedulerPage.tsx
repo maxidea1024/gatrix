@@ -67,7 +67,7 @@ import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import FormDialogHeader from '@/components/common/FormDialogHeader';
 
-// ?��?�??�벤???�???�의
+// 스케줄 이벤트 타입 정의
 interface ScheduleEvent {
   id: string;
   title: string;
@@ -80,7 +80,7 @@ interface ScheduleEvent {
   textColor?: string;
 }
 
-// Job �?Trigger ?�???�의 (Quartzmin ?��???
+// Job 및 Trigger 타입 정의 (Quartzmin 스타일)
 interface JobDetail {
   id: string;
   name: string;
@@ -132,7 +132,7 @@ interface CreateScheduleEventData {
   scheduleType: 'once' | 'cron' | 'interval';
   cronExpression: string;
   intervalMinutes: number;
-  repeatCount: number; // -1?� 무한 반복
+  repeatCount: number; // -1은 무한 반복
   calendar?: string;
   misfireInstruction?: string;
   priority?: number;
@@ -165,7 +165,7 @@ const SchedulerPage: React.FC = () => {
     description: '',
     allDay: false,
     scheduleType: 'interval',
-    cronExpression: '0 0 12 * * ?', // 매일 ?�오
+    cronExpression: '0 0 12 * * ?', // 매일 정오
     intervalMinutes: 1,
     repeatCount: -1,
     calendar: '--- Not Set ---',
@@ -179,35 +179,36 @@ const SchedulerPage: React.FC = () => {
     jobDataMap: {},
   });
 
-  // ?��?�??�벤??로딩 (?�제로는 API?�서 가?�옴)
+  // 스케줄 이벤트 로딩 (실제로는 API에서 가져옴)
   const loadEvents = async () => {
     setLoading(true);
     try {
-      // ?�시 ?�이??      const mockEvents: ScheduleEvent[] = [
+      // 임시 데이터
+      const mockEvents: ScheduleEvent[] = [
         {
           id: '1',
-          title: '?� 미팅',
+          title: '팀 미팅',
           start: '2024-01-15T10:00:00',
           end: '2024-01-15T11:00:00',
-          description: '주간 ?� 미팅',
+          description: '주간 팀 미팅',
           backgroundColor: '#1976d2',
           borderColor: '#1976d2',
         },
         {
           id: '2',
-          title: '?�로?�트 리뷰',
+          title: '프로젝트 리뷰',
           start: '2024-01-16T14:00:00',
           end: '2024-01-16T16:00:00',
-          description: '분기�??�로?�트 리뷰',
+          description: '분기별 프로젝트 리뷰',
           backgroundColor: '#388e3c',
           borderColor: '#388e3c',
         },
         {
           id: '3',
-          title: '?�스???��?',
+          title: '시스템 점검',
           start: '2024-01-17',
           allDay: true,
-          description: '?�기 ?�스???��?',
+          description: '정기 시스템 점검',
           backgroundColor: '#f57c00',
           borderColor: '#f57c00',
         },
@@ -225,7 +226,8 @@ const SchedulerPage: React.FC = () => {
     loadEvents();
   }, []);
 
-  // 캘린???�벤???�들??  const handleDateSelect = (selectInfo: any) => {
+  // 캘린더 이벤트 핸들러
+  const handleDateSelect = (selectInfo: any) => {
     setSelectedDate(selectInfo.start);
     setEditingEvent(null);
     setFormData({
@@ -284,7 +286,7 @@ const SchedulerPage: React.FC = () => {
       return;
     }
 
-    // 종료 ?�간???�작 ?�간보다 ?�전?��? ?�인
+    // 종료 시간이 시작 시간보다 이전인지 확인
     if (formData.end && formData.end <= formData.start) {
       enqueueSnackbar(t('scheduler.endTimeAfterStart'), { variant: 'error' });
       return;
@@ -292,7 +294,7 @@ const SchedulerPage: React.FC = () => {
 
     setSaving(true);
     try {
-      // ?�시 구현 (?�제로는 API ?�출)
+      // 임시 구현 (실제로는 API 호출)
       if (editingEvent) {
         enqueueSnackbar(t('scheduler.eventUpdated'), { variant: 'success' });
       } else {
@@ -317,7 +319,7 @@ const SchedulerPage: React.FC = () => {
     }
 
     try {
-      // ?�시 구현 (?�제로는 API ?�출)
+      // 임시 구현 (실제로는 API 호출)
       enqueueSnackbar(t('scheduler.eventDeleted'), { variant: 'success' });
       setDialogOpen(false);
       await loadEvents();
@@ -327,11 +329,11 @@ const SchedulerPage: React.FC = () => {
     }
   };
 
-  // ?�재 ?�어???�른 로�????�정
+  // 현재 언어에 따른 로케일 설정
   const currentLanguage = i18n.language;
   moment.locale(currentLanguage);
 
-  // FullCalendar 로�????�택
+  // FullCalendar 로케일 선택
   const getCalendarLocale = () => {
     switch (currentLanguage) {
       case 'en':
@@ -344,7 +346,7 @@ const SchedulerPage: React.FC = () => {
     }
   };
 
-  // FullCalendar 버튼 ?�스???�택
+  // FullCalendar 버튼 텍스트 선택
   const getButtonText = () => {
     switch (currentLanguage) {
       case 'en':
@@ -360,23 +362,23 @@ const SchedulerPage: React.FC = () => {
       case 'zh':
         return {
           today: '今天',
-          month: '??,
-          week: '??,
-          day: '??,
-          dayGridMonth: '??,
-          timeGridWeek: '??,
-          timeGridDay: '??
+          month: '月',
+          week: '周',
+          day: '日',
+          dayGridMonth: '月',
+          timeGridWeek: '周',
+          timeGridDay: '日'
         };
       case 'ko':
       default:
         return {
-          today: '?�늘',
-          month: '??,
-          week: '�?,
-          day: '??,
-          dayGridMonth: '??,
-          timeGridWeek: '�?,
-          timeGridDay: '??
+          today: '오늘',
+          month: '월',
+          week: '주',
+          day: '일',
+          dayGridMonth: '월',
+          timeGridWeek: '주',
+          timeGridDay: '일'
         };
     }
   };
@@ -446,15 +448,15 @@ const SchedulerPage: React.FC = () => {
         {/* Add/Edit Event Dialog */}
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
           <FormDialogHeader
-            title={editingEvent ? '?��?�??�벤???�집' : '?��?�??�벤??추�?'}
+            title={editingEvent ? '스케줄 이벤트 편집' : '스케줄 이벤트 추가'}
             description={editingEvent
-              ? '기존 ?��?�??�벤?�의 ?�보�??�정?�고 ?�데?�트?????�습?�다.'
-              : '?�로???��?�??�벤?��? ?�성?�고 ?�행 ?�간???�정?????�습?�다.'
+              ? '기존 스케줄 이벤트의 정보를 수정하고 업데이트할 수 있습니다.'
+              : '새로운 스케줄 이벤트를 생성하고 실행 시간을 설정할 수 있습니다.'
             }
           />
           <DialogContent>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
-              {/* 기본 ?�보 */}
+              {/* 기본 정보 */}
               <Grid container spacing={2}>
                 <Grid size={{ xs: 6 }}>
                   <DateTimePicker
@@ -596,7 +598,7 @@ const SchedulerPage: React.FC = () => {
                 </Grid>
               </Grid>
 
-              {/* ?�간 범위 ?�정 */}
+              {/* 시간 범위 설정 */}
               <Grid container spacing={2} sx={{ mt: 1 }}>
                 <Grid size={{ xs: 6 }}>
                   <TextField
@@ -620,7 +622,7 @@ const SchedulerPage: React.FC = () => {
                 </Grid>
               </Grid>
 
-              {/* ?�일 ?�택 */}
+              {/* 요일 선택 */}
               <Box sx={{ mt: 2 }}>
                 <Typography variant="body2" sx={{ mb: 1 }}>Days of Week</Typography>
                 <Grid container spacing={1}>
@@ -666,7 +668,7 @@ const SchedulerPage: React.FC = () => {
                   </Grid>
                 </Grid>
 
-                {/* 기본 Count ?�라미터 */}
+                {/* 기본 Count 파라미터 */}
                 <Grid container spacing={2} sx={{ mb: 1 }}>
                   <Grid size={{ xs: 4 }}>
                     <TextField
@@ -700,7 +702,7 @@ const SchedulerPage: React.FC = () => {
                   </Grid>
                 </Grid>
 
-                {/* 추�? ?�라미터 */}
+                {/* 추가 파라미터 */}
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 4 }}>
                     <TextField

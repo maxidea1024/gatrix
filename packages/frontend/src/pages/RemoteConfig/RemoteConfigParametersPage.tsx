@@ -3220,16 +3220,16 @@ const DeploymentHistoryManagement: React.FC = () => {
                 {t('remoteConfig.rollbackDetails')}:
               </Typography>
               <Typography variant="body2">
-                ??{t('remoteConfig.version')}: #{deploymentToRollback.version}
+                • {t('remoteConfig.version')}: #{deploymentToRollback.version}
               </Typography>
               <Typography variant="body2">
-                ??{t('remoteConfig.deployedBy')}: {deploymentToRollback.deployedBy.name} ({deploymentToRollback.deployedBy.email})
+                • {t('remoteConfig.deployedBy')}: {deploymentToRollback.deployedBy.name} ({deploymentToRollback.deployedBy.email})
               </Typography>
               <Typography variant="body2">
-                ??{t('remoteConfig.deployedAt')}: {formatDateTimeDetailed(deploymentToRollback.deployedAt)}
+                • {t('remoteConfig.deployedAt')}: {formatDateTimeDetailed(deploymentToRollback.deployedAt)}
               </Typography>
               <Typography variant="body2">
-                ??{t('remoteConfig.message')}: {deploymentToRollback.message}
+                • {t('remoteConfig.message')}: {deploymentToRollback.message}
               </Typography>
             </Box>
           </>

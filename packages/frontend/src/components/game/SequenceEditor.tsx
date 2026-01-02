@@ -71,9 +71,8 @@ import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
-  horizontalListSortingStrategy,
-  verticalListSortingStrategy,
   rectSortingStrategy,
+  verticalListSortingStrategy,
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -1118,7 +1117,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                 onDragEnd={handleDragEnd}
                 modifiers={[restrictToHorizontalAxis]}
               >
-                <SortableContext items={sequence.frames.map(f => f.frameId)} strategy={horizontalListSortingStrategy}>
+                <SortableContext items={sequence.frames.map(f => f.frameId)} strategy={rectSortingStrategy}>
                   <Box
                     sx={{
                       display: 'flex',

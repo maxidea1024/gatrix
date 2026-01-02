@@ -182,9 +182,8 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
     };
 
     // Get localized event type label
-    // Convert SNAKE_CASE to camelCase (e.g., NO_RESPONSE -> noResponse, SHUTTING_DOWN -> shuttingDown)
     const getEventTypeLabel = (eventType: string) => {
-        const statusKey = eventType.toLowerCase().replace(/_([a-z])/g, (_, char) => char.toUpperCase());
+        const statusKey = eventType.toLowerCase().replace('_', '-');
         return t(`serverList.status.${statusKey}`, { defaultValue: eventType });
     };
 

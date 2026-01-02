@@ -709,7 +709,8 @@ const PlanningDataPage: React.FC = () => {
                   onClick={() => setShowUploadDialog(false)}
                   sx={{ minWidth: 'auto' }}
                 >
-                  ??                </Button>
+                  ✕
+                </Button>
               </Box>
               <PlanningDataUpload
                 onUploadSuccess={handleUploadSuccess}
@@ -1039,7 +1040,7 @@ const PlanningDataPage: React.FC = () => {
                           borderColor: 'divider'
                         }}>
                           <Typography variant="body1" color="text.primary" sx={{ mb: 1, fontWeight: 500 }}>
-                            ?�� {t(currentRewardType.nameKey)}
+                            📊 {t(currentRewardType.nameKey)}
                           </Typography>
                           <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', maxWidth: 600 }}>
                             {t('planningData.noTableForRewardType')}
@@ -1196,7 +1197,7 @@ const PlanningDataPage: React.FC = () => {
 
                                 const label = `${item.id}: ${displayName}`;
                                 const tooltipTitle = item.hasError
-                                  ? `?�️ ?�류: ${item.errorMessage}\n${label}`
+                                  ? `⚠️ 오류: ${item.errorMessage}\n${label}`
                                   : label;
 
                                 return (
@@ -1284,7 +1285,7 @@ const PlanningDataPage: React.FC = () => {
                                             onClick={(e) => handleCellClick(e, displayName)}
                                             sx={{ cursor: 'pointer' }}
                                           >
-                                            <Tooltip title={item.hasError ? `?�️ ${item.errorMessage}` : ''} arrow>
+                                            <Tooltip title={item.hasError ? `⚠️ ${item.errorMessage}` : ''} arrow>
                                               <span>{displayName}</span>
                                             </Tooltip>
                                           </TableCell>
@@ -2177,7 +2178,7 @@ const PlanningDataPage: React.FC = () => {
                                 const itemName = item.name;
                                 const label = `${item.id}: ${itemName ?? (item.mateId ?? '')}`;
                                 const tooltipTitle = item.mateExists === false
-                                  ? `?�️ ?�류: ??��?��? MateTemplate??존재?��? ?�습?�다.\n${label}`
+                                  ? `⚠️ 오류: 항해사가 MateTemplate에 존재하지 않습니다.\n${label}`
                                   : label;
                                 return (
                                   <Tooltip key={item.id} title={tooltipTitle} arrow>
@@ -2239,12 +2240,12 @@ const PlanningDataPage: React.FC = () => {
                                             <Chip label={item.id} size="small" variant="outlined" />
                                           </TableCell>
                                           <TableCell>
-                                            <Tooltip title={item.mateExists === false ? '?�️ ??��?��? MateTemplate??존재?��? ?�습?�다' : ''} arrow>
+                                            <Tooltip title={item.mateExists === false ? '⚠️ 항해사가 MateTemplate에 존재하지 않습니다' : ''} arrow>
                                               <span>{itemName ?? item.mateId}</span>
                                             </Tooltip>
                                           </TableCell>
                                           <TableCell>
-                                            <Tooltip title={item.mateExists === false ? '?�️ ??��?��? MateTemplate??존재?��? ?�습?�다' : ''} arrow>
+                                            <Tooltip title={item.mateExists === false ? '⚠️ 항해사가 MateTemplate에 존재하지 않습니다' : ''} arrow>
                                               <Chip
                                                 label={`${item.mateId}: ${mateName ?? item.mateId}`}
                                                 size="small"

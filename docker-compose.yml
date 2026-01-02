@@ -551,7 +551,7 @@ services:
       - "${ETCD_PORT:-42379}:2379"
       - "42380:2380"
     volumes:
-      - ${DATA_ROOT:-./data}/etcd:/etcd-data
+      - gatrix_etcd_data:/etcd-data
     networks:
       - gatrix-network
     healthcheck:
@@ -570,3 +570,4 @@ networks:
 
 volumes:
   clickhouse-data:
+  gatrix_etcd_data:

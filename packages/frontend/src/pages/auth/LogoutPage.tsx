@@ -48,7 +48,7 @@ const LogoutPage: React.FC = () => {
 
       setLogoutComplete(true);
 
-      // 2�???로그???�이지�??�동
+      // 2초 후 로그인 페이지로 이동
       setTimeout(() => {
         console.log('[LogoutPage] Navigating to login page...');
         navigate('/login', { replace: true });
@@ -64,16 +64,17 @@ const LogoutPage: React.FC = () => {
   };
 
   const handleCancel = () => {
-    navigate(-1); // ?�전 ?�이지�??�아가�?  };
+    navigate(-1); // 이전 페이지로 돌아가기
+  };
 
   const handleRetry = () => {
     setLogoutError(null);
     handleLogout();
   };
 
-  // ?�이지 로드 ???�동?�로 로그?�웃 ?�작?��? ?�음 (?�용???�인 ?�요)
+  // 페이지 로드 시 자동으로 로그아웃 시작하지 않음 (사용자 확인 필요)
   useEffect(() => {
-    // URL ?�라미터�??�동 로그?�웃 ?��? ?�인
+    // URL 파라미터로 자동 로그아웃 여부 확인
     const urlParams = new URLSearchParams(window.location.search);
     const autoLogout = urlParams.get('auto') === 'true';
     

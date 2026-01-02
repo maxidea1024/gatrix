@@ -156,13 +156,13 @@ const JobsPage: React.FC = () => {
       setJobTypes(jobTypesData);
     } catch (error) {
       console.error('Failed to load data:', error);
-      enqueueSnackbar('?�업 목록??불러?�는???�패?�습?�다.', { variant: 'error' });
+      enqueueSnackbar('작업 목록을 불러오는데 실패했습니다.', { variant: 'error' });
     } finally {
       setLoading(false);
     }
   }, [selectedJobType, enabledFilter, searchTerm, tagFilter, page, rowsPerPage]);
 
-  // ?�그 로딩
+  // 태그 로딩
   const loadTags = useCallback(async () => {
     try {
       const tags = await tagService.list();
@@ -199,16 +199,19 @@ const JobsPage: React.FC = () => {
     // loadData will be called automatically by useEffect
   };
 
-  // ?�그 ?�터 변�??�들??  const handleTagFilterChange = useCallback((tags: Tag[]) => {
+  // 태그 필터 변경 핸들러
+  const handleTagFilterChange = useCallback((tags: Tag[]) => {
     setTagFilter(tags);
     setPage(0);
   }, []);
 
-  // ?�이지 변�??�들??  const handlePageChange = useCallback((_: unknown, newPage: number) => {
+  // 페이지 변경 핸들러
+  const handlePageChange = useCallback((_: unknown, newPage: number) => {
     setPage(newPage);
   }, []);
 
-  // ?�이지 ?�기 변�??�들??  const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+  // 페이지 크기 변경 핸들러
+  const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const newRowsPerPage = parseInt(event.target.value, 10);
     setRowsPerPage(newRowsPerPage);
     setPage(0);
@@ -257,7 +260,7 @@ const JobsPage: React.FC = () => {
       loadData();
     } catch (error) {
       console.error('Failed to delete job:', error);
-      enqueueSnackbar('?�업 ??��???�패?�습?�다.', { variant: 'error' });
+      enqueueSnackbar('작업 삭제에 실패했습니다.', { variant: 'error' });
     }
   };
 
@@ -275,7 +278,7 @@ const JobsPage: React.FC = () => {
     } catch (error: any) {
       console.error('Failed to save job:', error);
 
-      // 409 ?�러 (?�름 중복) 처리
+      // 409 에러 (이름 중복) 처리
       const status = error?.status || error?.response?.status;
       if (status === 409) {
         enqueueSnackbar(t('common.jobNameDuplicate'), { variant: 'error' });
@@ -297,7 +300,7 @@ const JobsPage: React.FC = () => {
     return jobType?.displayName || jobType?.name || 'Unknown';
   };
 
-  // ?�스??길이 ?�한 ?�수
+  // 텍스트 길이 제한 함수
   const truncateText = (text: string | null | undefined, maxLength: number = 50) => {
     if (!text) return '-';
     if (text.length <= maxLength) return text;
@@ -501,7 +504,7 @@ const JobsPage: React.FC = () => {
             </Grid>
 
             <Grid size={{ xs: 12, md: 5 }}>
-              {/* ?�그 ?�터 */}
+              {/* 태그 필터 */}
               <Autocomplete
                 multiple
                 sx={{ minWidth: 400 }}
@@ -648,7 +651,7 @@ const JobsPage: React.FC = () => {
           </TableBody>
         </Table>
 
-        {/* ?�이지?�이??*/}
+        {/* 페이지네이션 */}
         <SimplePagination
           count={total}
           page={page}

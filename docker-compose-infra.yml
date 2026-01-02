@@ -66,10 +66,10 @@ services:
       - --name=etcd0
       - --data-dir=/etcd-data
       - --listen-client-urls=http://0.0.0.0:2379
-      - --advertise-client-urls=http://localhost:2379
+      - --advertise-client-urls=http://etcd:2379
       - --listen-peer-urls=http://0.0.0.0:2380
-      - --initial-advertise-peer-urls=http://localhost:2380
-      - --initial-cluster=etcd0=http://localhost:2380
+      - --initial-advertise-peer-urls=http://etcd:2380
+      - --initial-cluster=etcd0=http://etcd:2380
       - --initial-cluster-token=etcd-cluster-dev
       - --initial-cluster-state=new
       - --log-level=info
@@ -77,7 +77,7 @@ services:
       - "0.0.0.0:${ETCD_CLIENT_PORT:-42379}:2379"
       - "0.0.0.0:${ETCD_PEER_PORT:-42380}:2380"
     volumes:
-      - ${DATA_ROOT:-./data}/etcd:/etcd-data
+      - gatrix_etcd_dev_data:/etcd-data
     networks:
       - gatrix-dev-network
     healthcheck:
@@ -231,4 +231,5 @@ networks:
 
 volumes:
   gatrix_mysql_dev_data:
+  gatrix_etcd_dev_data:
   clickhouse-data:

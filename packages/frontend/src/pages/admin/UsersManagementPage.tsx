@@ -118,7 +118,7 @@ import { usePaginatedApi, useTags } from '../../hooks/useSWR';
 import { useEnvironments } from '../../contexts/EnvironmentContext';
 import PermissionSelector from '../../components/common/PermissionSelector';
 import { getContrastColor } from '@/utils/colorUtils';
-// SSE??MainLayout?�서 ?�역?�로 처리?��?�??�기?�는 ?�거
+// SSE는 MainLayout에서 전역으로 처리하므로 여기서는 제거
 
 interface UsersResponse {
   users: User[];
@@ -249,7 +249,7 @@ const RoleChipWithTooltip: React.FC<RoleChipWithTooltipProps> = ({ user }) => {
         </Typography>
         {displayPermissions.map((perm) => (
           <Typography key={perm} variant="caption" sx={{ display: 'block', color: 'inherit' }}>
-            ??{t(`permissions.${perm.replace('.', '_')}`)}
+            • {t(`permissions.${perm.replace('.', '_')}`)}
           </Typography>
         ))}
         {remaining > 0 && (
@@ -308,7 +308,7 @@ const UsersManagementPage: React.FC = () => {
     return true;
   };
 
-  // ?�립보드 복사 ?�수
+  // 클립보드 복사 함수
   const copyToClipboard = async (text: string, type: 'name' | 'email') => {
     copyToClipboardWithNotification(
       text,
@@ -320,7 +320,7 @@ const UsersManagementPage: React.FC = () => {
     );
   };
 
-  // ?�이지 ?�태 관�?(URL params ?�동)
+  // 페이지 상태 관리 (URL params 연동)
   const {
     pageState,
     updatePage,
@@ -337,14 +337,14 @@ const UsersManagementPage: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
 
-  // ?�적 ?�터 ?�태
+  // 동적 필터 상태
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  // ?�바?�싱??검?�어
+  // 디바운싱된 검색어
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  // SWR�??�이??로딩
+  // SWR로 데이터 로딩
   const { data: usersData, error: usersError, isLoading: isLoadingUsers, mutate: mutateUsers } = usePaginatedApi<UsersResponse>(
     '/admin/users',
     pageState.page,
@@ -362,7 +362,7 @@ const UsersManagementPage: React.FC = () => {
   const total = useMemo(() => usersData?.total || 0, [usersData]);
   const loading = isLoadingUsers || isLoadingTags;
 
-  // 초기 로딩 ?�태 추적
+  // 초기 로딩 상태 추적
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   useEffect(() => {
     if (!loading && isInitialLoad) {
@@ -370,7 +370,7 @@ const UsersManagementPage: React.FC = () => {
     }
   }, [loading, isInitialLoad]);
 
-  // ?�적 ?�터?�서 �?추출 (useMemo�?참조 ?�정??
+  // 동적 필터에서 값 추출 (useMemo로 참조 안정화)
   const statusFilter = useMemo(() =>
     activeFilters.find(f => f.key === 'status')?.value as string[] || [],
     [activeFilters]
@@ -396,12 +396,12 @@ const UsersManagementPage: React.FC = () => {
     [activeFilters]
   );
 
-  // 배열??문자?�로 변?�하???�존??배열???�용
+  // 배열을 문자열로 변환하여 의존성 배열에 사용
   const statusFilterString = useMemo(() => statusFilter.join(','), [statusFilter]);
   const roleFilterString = useMemo(() => roleFilter.join(','), [roleFilter]);
   const tagIdsString = useMemo(() => tagIds.join(','), [tagIds]);
 
-  // ?�괄 ?�택 관???�태
+  // 일괄 선택 관련 상태
   const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
   const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
   const [bulkActionType, setBulkActionType] = useState<'status' | 'role' | 'tags' | 'emailVerified' | 'delete'>('status');
@@ -420,7 +420,7 @@ const UsersManagementPage: React.FC = () => {
   });
   const [confirmDialogLoading, setConfirmDialogLoading] = useState(false);
 
-  // 초�? 관???�태
+  // 초대 관련 상태
   const [invitationDialogOpen, setInvitationDialogOpen] = useState(false);
   const [currentInvitation, setCurrentInvitation] = useState<Invitation | null>(null);
 
@@ -520,7 +520,7 @@ const UsersManagementPage: React.FC = () => {
     selectedEnvironments: [],
   });
 
-  // ?�메???�증 관???�태
+  // 이메일 인증 관련 상태
   const [emailVerificationLoading, setEmailVerificationLoading] = useState(false);
 
   // Default column configuration
@@ -575,7 +575,7 @@ const UsersManagementPage: React.FC = () => {
     })
   );
 
-  // ?�재 초�? ?�보 로드
+  // 현재 초대 정보 로드
   const loadCurrentInvitation = async () => {
     try {
       const invitation = await invitationService.getCurrentInvitation();
@@ -587,14 +587,14 @@ const UsersManagementPage: React.FC = () => {
     }
   };
 
-  // SWR???�동?�로 ?�이?��? 로드?��?�?fetchUsers ?�수 ?�거
+  // SWR이 자동으로 데이터를 로드하므로 fetchUsers 함수 제거
 
-  // 초�?링크 ?�벤??처리 (MainLayout?�서 ?�달받음)
+  // 초대링크 이벤트 처리 (MainLayout에서 전달받음)
   useEffect(() => {
     const handleInvitationChange = (event: CustomEvent) => {
       const sseEvent = event.detail;
       if (sseEvent.type === 'invitation_created' || sseEvent.type === 'invitation_deleted') {
-        // 초�?링크 ?�태가 변경되�??�재 초�? ?�보�??�시 로드
+        // 초대링크 상태가 변경되면 현재 초대 정보를 다시 로드
         loadCurrentInvitation();
       }
     };
@@ -617,9 +617,10 @@ const UsersManagementPage: React.FC = () => {
       }
     };
     loadTags();
-    loadCurrentInvitation(); // 초�? 기능 ?�성??  }, []);
+    loadCurrentInvitation(); // 초대 기능 활성화
+  }, []);
 
-  // ?�적 ?�터 ?�의
+  // 동적 필터 정의
   const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
     {
       key: 'status',
@@ -659,7 +660,7 @@ const UsersManagementPage: React.FC = () => {
     },
   ], [t, availableTags]);
 
-  // ?�이지 로드 ??pageState.filters?�서 activeFilters 복원
+  // 페이지 로드 시 pageState.filters에서 activeFilters 복원
   useEffect(() => {
     if (filtersInitialized) return;
 
@@ -671,7 +672,7 @@ const UsersManagementPage: React.FC = () => {
     const restoredFilters: ActiveFilter[] = [];
     const filters = pageState.filters;
 
-    // status ?�터 복원
+    // status 필터 복원
     if (filters.status) {
       restoredFilters.push({
         key: 'status',
@@ -681,7 +682,7 @@ const UsersManagementPage: React.FC = () => {
       });
     }
 
-    // role ?�터 복원
+    // role 필터 복원
     if (filters.role) {
       restoredFilters.push({
         key: 'role',
@@ -691,7 +692,7 @@ const UsersManagementPage: React.FC = () => {
       });
     }
 
-    // tags ?�터 복원
+    // tags 필터 복원
     if (filters.tags) {
       restoredFilters.push({
         key: 'tags',
@@ -707,7 +708,7 @@ const UsersManagementPage: React.FC = () => {
     setFiltersInitialized(true);
   }, [filtersInitialized, pageState.filters, t]);
 
-  // activeFilters 변�???pageState.filters ?�데?�트
+  // activeFilters 변경 시 pageState.filters 업데이트
   useEffect(() => {
     if (!filtersInitialized) return;
 
@@ -734,7 +735,8 @@ const UsersManagementPage: React.FC = () => {
     }
   }, [activeFilters, filtersInitialized, pageState.filters, updateFilters]);
 
-  // ?�적 ?�터 ?�들??  const handleFilterAdd = (filter: ActiveFilter) => {
+  // 동적 필터 핸들러
+  const handleFilterAdd = (filter: ActiveFilter) => {
     setActiveFilters([...activeFilters, filter]);
   };
 
@@ -754,7 +756,8 @@ const UsersManagementPage: React.FC = () => {
     ));
   };
 
-  // 체크박스 ?�들??  const handleSelectUser = (userId: number) => {
+  // 체크박스 핸들러
+  const handleSelectUser = (userId: number) => {
     const newSelected = new Set(selectedUsers);
     if (newSelected.has(userId)) {
       newSelected.delete(userId);
@@ -772,15 +775,16 @@ const UsersManagementPage: React.FC = () => {
     }
   };
 
-  // ?�괄 처리 ?�들??  const handleBulkAction = (actionType: 'status' | 'role' | 'tags' | 'emailVerified' | 'delete') => {
-    // ?�픈 ??�?초기??(?�전???�택??�??��? 방�?)
+  // 일괄 처리 핸들러
+  const handleBulkAction = (actionType: 'status' | 'role' | 'tags' | 'emailVerified' | 'delete') => {
+    // 오픈 시 값 초기화 (이전에 선택한 값 유지 방지)
     setBulkActionType(actionType);
     setBulkActionValue('');
     setBulkActionTags([]);
     setBulkActionDialogOpen(true);
   };
 
-  // ?�괄 ?�업 ?�??버튼 ?�성??조건 ?�인
+  // 일괄 작업 저장 버튼 활성화 조건 확인
   const isBulkActionValid = () => {
     switch (bulkActionType) {
       case 'status':
@@ -788,7 +792,7 @@ const UsersManagementPage: React.FC = () => {
       case 'emailVerified':
         return bulkActionValue !== '';
       case 'tags':
-        // ?�그??�?배열???�용 (?�그 ?�거 목적)
+        // 태그는 빈 배열도 허용 (태그 제거 목적)
         return true;
       case 'delete':
         return true;
@@ -1269,7 +1273,7 @@ const UsersManagementPage: React.FC = () => {
       setReviewDialog({ open: false, saving: false });
       setEditUserDialog({ open: false, user: null });
     } catch (error: any) {
-      // API ?�류 ?�답?�서 구체?�인 메시지 추출
+      // API 오류 응답에서 구체적인 메시지 추출
       const errorMessage = error.error?.message || error.message || t('users.updateError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
       setReviewDialog(prev => ({ ...prev, saving: false }));
@@ -1298,21 +1302,21 @@ const UsersManagementPage: React.FC = () => {
         mutateUsers(); // SWR cache 갱신
         setDeleteConfirmDialog({ open: false, user: null, inputValue: '' });
       } catch (error: any) {
-        // API ?�류 ?�답?�서 구체?�인 메시지 추출
+        // API 오류 응답에서 구체적인 메시지 추출
         const errorMessage = error.error?.message || error.message || t('users.deleteError');
         enqueueSnackbar(errorMessage, { variant: 'error' });
       }
     }
   };
 
-  // ?�메??강제 ?�증 처리
+  // 이메일 강제 인증 처리
   const handleVerifyUserEmail = async (userId: number) => {
     try {
       setEmailVerificationLoading(true);
       await UserService.verifyUserEmail(userId);
       enqueueSnackbar(t('users.emailVerified'), { variant: 'success' });
       mutateUsers(); // SWR cache 갱신
-      // ?�집 ?�이 ?�려?�다�??�이???�데?�트
+      // 편집 폼이 열려있다면 데이터 업데이트
       if (editUserDialog.open && editUserDialog.user?.id === userId) {
         setEditUserDialog(prev => ({
           ...prev,
@@ -1327,7 +1331,8 @@ const UsersManagementPage: React.FC = () => {
     }
   };
 
-  // ?�메???�증 메일 ?�전??  const handleResendVerificationEmail = async (userId: number) => {
+  // 이메일 인증 메일 재전송
+  const handleResendVerificationEmail = async (userId: number) => {
     try {
       setEmailVerificationLoading(true);
       await UserService.resendVerificationEmail(userId);
@@ -1341,7 +1346,8 @@ const UsersManagementPage: React.FC = () => {
   };
 
   const handleAddUser = () => {
-    // ???�이??초기??    setNewUserData({
+    // 폼 데이터 초기화
+    setNewUserData({
       name: '',
       email: '',
       password: '',
@@ -1352,7 +1358,8 @@ const UsersManagementPage: React.FC = () => {
     setNewUserEnvIds([]);
     setAddUserDialog(true);
 
-    // 브라?��? ?�동?�성??방�??�기 ?�해 ?�간??지?????�시 초기??    setTimeout(() => {
+    // 브라우저 자동완성을 방지하기 위해 약간의 지연 후 다시 초기화
+    setTimeout(() => {
       setNewUserData({
         name: '',
         email: '',
@@ -1404,7 +1411,8 @@ const UsersManagementPage: React.FC = () => {
   };
 
   const handleCreateUser = async () => {
-    // ??검�?    if (!validateNewUserForm()) {
+    // 폼 검증
+    if (!validateNewUserForm()) {
       return;
     }
 
@@ -1420,21 +1428,22 @@ const UsersManagementPage: React.FC = () => {
       mutateUsers(); // SWR cache 갱신
       handleCloseAddUserDialog();
     } catch (error: any) {
-      // API ?�류 ?�답?�서 구체?�인 메시지 추출
+      // API 오류 응답에서 구체적인 메시지 추출
       const errorMessage = error.error?.message || error.message || t('users.createError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
 
-  // 초�? 관???�들??  const handleCreateInvitation = async (data: CreateInvitationRequest) => {
+  // 초대 관련 핸들러
+  const handleCreateInvitation = async (data: CreateInvitationRequest) => {
     try {
       const response = await invitationService.createInvitation(data);
-      setInvitationDialogOpen(false); // 초�? ???�기
-      await loadCurrentInvitation(); // ?�재 초�? ?�보 ?�로고침
-      // ?�공 ?�스?�는 SSE ?�벤?�에??처리 (중복 방�?)
+      setInvitationDialogOpen(false); // 초대 폼 닫기
+      await loadCurrentInvitation(); // 현재 초대 정보 새로고침
+      // 성공 토스트는 SSE 이벤트에서 처리 (중복 방지)
     } catch (error: any) {
       console.error('Failed to create invitation:', error);
-      enqueueSnackbar(error.message || '초�? 링크 ?�성???�패?�습?�다.', { variant: 'error' });
+      enqueueSnackbar(error.message || '초대 링크 생성에 실패했습니다.', { variant: 'error' });
     }
   };
 
@@ -1444,10 +1453,10 @@ const UsersManagementPage: React.FC = () => {
     try {
       await invitationService.deleteInvitation(currentInvitation.id);
       setCurrentInvitation(null);
-      // ?�공 ?�스?�는 SSE ?�벤?�에??처리 (중복 방�?)
+      // 성공 토스트는 SSE 이벤트에서 처리 (중복 방지)
     } catch (error: any) {
       console.error('Failed to delete invitation:', error);
-      enqueueSnackbar(error.message || '초�? 링크 ??��???�패?�습?�다.', { variant: 'error' });
+      enqueueSnackbar(error.message || '초대 링크 삭제에 실패했습니다.', { variant: 'error' });
     }
   };
 
@@ -1579,12 +1588,12 @@ const UsersManagementPage: React.FC = () => {
         }
         return (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-            {userEnvIds.slice(0, 3).map((envId) => {
-              const env = environments.find(e => e.id === envId);
+            {userEnvIds.slice(0, 3).map((envName) => {
+              const env = environments.find(e => e.environment === envName);
               return (
                 <Chip
-                  key={envId}
-                  label={env?.displayName || env?.environmentName || envId}
+                  key={envName}
+                  label={env?.displayName || env?.environmentName || envName}
                   size="small"
                   sx={{
                     borderRadius: 1,
@@ -1783,7 +1792,7 @@ const UsersManagementPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* ?�괄 ?�업 ?�바 - 목록 ?�로 ?�동 */}
+      {/* 일괄 작업 툴바 - 목록 위로 이동 */}
       {selectedUsers.size > 0 && (
         <Card sx={{ mb: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(110, 168, 255, 0.08)' : 'rgba(25, 118, 210, 0.04)' }}>
           <CardContent sx={{ py: 1 }}>
@@ -1887,7 +1896,7 @@ const UsersManagementPage: React.FC = () => {
               </TableHead>
               <TableBody>
                 {isInitialLoad && loading ? (
-                  // ?�켈?�톤 로딩 (초기 로딩 ?�에�?
+                  // 스켈레톤 로딩 (초기 로딩 시에만)
                   Array.from({ length: 5 }).map((_, index) => (
                     <TableRow key={`skeleton-${index}`}>
                       <TableCell padding="checkbox">
@@ -1991,7 +2000,7 @@ const UsersManagementPage: React.FC = () => {
             </Table>
           </TableContainer>
 
-          {/* ?�이지?�이??- ?�이?��? ?�을 ?�만 ?�시 */}
+          {/* 페이지네이션 - 데이터가 있을 때만 표시 */}
           {total > 0 && (
             <SimplePagination
               count={total}
@@ -2510,7 +2519,7 @@ const UsersManagementPage: React.FC = () => {
                 allowAllEnvs={promoteDialog.allowAllEnvs}
                 selectedEnvironments={promoteDialog.selectedEnvironments}
                 onAllowAllEnvsChange={(allowAll) => setPromoteDialog(prev => ({ ...prev, allowAllEnvs: allowAll }))}
-                onEnvironmentsChange={(environments) => setPromoteDialog(prev => ({ ...prev, envIds }))}
+                onEnvironmentsChange={(environments) => setPromoteDialog(prev => ({ ...prev, selectedEnvironments: environments }))}
               />
             </>
           )}
@@ -2608,11 +2617,11 @@ const UsersManagementPage: React.FC = () => {
                     </Typography>
                   ) : (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {promoteDialog.selectedEnvironments.map(envId => {
-                        const env = environments.find(e => e.id === envId);
-                        const displayName = env?.displayName || env?.environmentName || envId;
+                      {promoteDialog.selectedEnvironments.map(envName => {
+                        const env = environments.find(e => e.environment === envName);
+                        const displayName = env?.displayName || env?.environmentName || envName;
                         return (
-                          <Tooltip key={envId} title={t('users.environmentAccessDesc', { name: displayName })} arrow placement="top" enterDelay={200}>
+                          <Tooltip key={envName} title={t('users.environmentAccessDesc', { name: displayName })} arrow placement="top" enterDelay={200}>
                             <Chip
                               label={displayName}
                               size="small"
@@ -2720,7 +2729,7 @@ const UsersManagementPage: React.FC = () => {
               />
             </Box>
 
-            {/* ?�메???�증 ?�태 �??�션 */}
+            {/* 이메일 인증 상태 및 액션 */}
             {editUserDialog.user && !isCurrentUser(editUserDialog.user) && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1, border: 1, borderColor: 'divider' }}>
                 <EmailIcon color={editUserDialog.user.emailVerified ? 'success' : 'warning'} />
@@ -2984,7 +2993,7 @@ const UsersManagementPage: React.FC = () => {
                         >
                           {change.from}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">??/Typography>
+                        <Typography variant="body2" color="text.secondary">→</Typography>
                         <Typography
                           variant="body2"
                           sx={{
@@ -3074,7 +3083,7 @@ const UsersManagementPage: React.FC = () => {
         open={bulkActionDialogOpen}
         onClose={() => setBulkActionDialogOpen(false)}
         sx={{
-          zIndex: (theme) => theme.zIndex.drawer + 3, // AppBar(theme.zIndex.drawer+2)보다 ?�게
+          zIndex: (theme) => theme.zIndex.drawer + 3, // AppBar(theme.zIndex.drawer+2)보다 높게
           '& .MuiDrawer-paper': {
             width: { xs: '100%', sm: 500 },
             maxWidth: '100vw',
@@ -3171,7 +3180,7 @@ const UsersManagementPage: React.FC = () => {
                 slotProps={{
                   popper: {
                     style: {
-                      zIndex: 1500 // Drawer보다 ?��? zIndex
+                      zIndex: 1500 // Drawer보다 높은 zIndex
                     }
                   }
                 }}
@@ -3215,7 +3224,7 @@ const UsersManagementPage: React.FC = () => {
             </Box>
           )}
 
-          {/* 공통 ?�??미리보기 (??�� ???�션?�도 ?�시) */}
+          {/* 공통 대상 미리보기 (삭제 외 액션에도 표시) */}
           {bulkActionType !== 'delete' && selectedUsers.size > 0 && (
             <Box sx={{ mt: 3 }}>
               <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'medium' }}>
@@ -3277,7 +3286,7 @@ const UsersManagementPage: React.FC = () => {
                 {t('users.bulkDeleteConfirm', { count: selectedUsers.size })}
               </Typography>
 
-              {/* ??�� ?�???�용??목록 */}
+              {/* 삭제 대상 사용자 목록 */}
               <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'medium' }}>
                 {t('users.deleteTargetUsers')}:
               </Typography>
@@ -3365,8 +3374,8 @@ const UsersManagementPage: React.FC = () => {
           '& .MuiDrawer-paper': {
             width: { xs: '100%', sm: 400 },
             maxWidth: '100vw',
-            height: '100vh', // ?�체 ?�면 ?�이 ?�용
-            top: 0, // ?�단??붙임
+            height: '100vh', // 전체 화면 높이 사용
+            top: 0, // 상단에 붙임
             display: 'flex',
             flexDirection: 'column'
           }
@@ -3412,7 +3421,7 @@ const UsersManagementPage: React.FC = () => {
           </Box>
         </Box>
 
-        {/* Content - ?�크�?가??*/}
+        {/* Content - 스크롤 가능 */}
         <Box sx={{
           flex: 1,
           overflow: 'auto',

@@ -316,10 +316,10 @@ const GameWorldsPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
 
-  // ?�바?�싱??검?�어 (500ms 지??
+  // 디바운싱된 검색어 (500ms 지연)
   const debouncedSearch = useDebounce(search, 500);
 
-  // ?�적 ?�터 ?�태
+  // 동적 필터 상태
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -343,7 +343,7 @@ const GameWorldsPage: React.FC = () => {
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
-  // ?��? ?��? ?�이?�로�??�태
+  // 점검 토글 다이얼로그 상태
   const [maintenanceToggleDialog, setMaintenanceToggleDialog] = useState<{
     open: boolean;
     world: GameWorld | null;
@@ -376,12 +376,12 @@ const GameWorldsPage: React.FC = () => {
   const [toggleMaintenanceLocales, setToggleMaintenanceLocales] = useState<GameWorldMaintenanceLocale[]>([]);
   const [toggleSupportsMultiLanguage, setToggleSupportsMultiLanguage] = useState(false);
 
-  // 메시지 ?�플�?관??state
+  // 메시지 템플릿 관련 state
   const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>([]);
   const [toggleInputMode, setToggleInputMode] = useState<'direct' | 'template'>('direct');
   const [toggleSelectedTemplateId, setToggleSelectedTemplateId] = useState<number | ''>('');
 
-  // 게임?�드 ?�집 ?�용 state
+  // 게임월드 편집 폼용 state
   const [inputMode, setInputMode] = useState<'direct' | 'template'>('direct');
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | ''>('');
 
@@ -503,10 +503,11 @@ const GameWorldsPage: React.FC = () => {
     loadTemplates();
   }, []);
 
-  // SDK 가?�드 ?�태
+  // SDK 가이드 상태
   const [openSDKGuide, setOpenSDKGuide] = useState(false);
 
-  // ?��? 메시지 로�???관�??�수??  const addMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
+  // 점검 메시지 로케일 관리 함수들
+  const addMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
     if (!maintenanceLocales.find(l => l.lang === lang)) {
       const newLocales = [...maintenanceLocales, { lang, message: '' }];
       setMaintenanceLocales(newLocales);
@@ -522,11 +523,12 @@ const GameWorldsPage: React.FC = () => {
     setFormData(prev => ({ ...prev, maintenanceLocales: newLocales }));
   };
 
-  // ?�어�?메시지 ?�용 ?��? 변�?  const handleSupportsMultiLanguageChange = (enabled: boolean) => {
+  // 언어별 메시지 사용 여부 변경
+  const handleSupportsMultiLanguageChange = (enabled: boolean) => {
     setSupportsMultiLanguage(enabled);
     setFormData(prev => ({ ...prev, supportsMultiLanguage: enabled }));
     if (enabled) {
-      // ?�성???? 기존 값을 보존?�면???�락???�어�?추�?
+      // 활성화 시, 기존 값을 보존하면서 누락된 언어만 추가
       const merged = availableLanguages.map((lang) => {
         const existing = maintenanceLocales.find(l => l.lang === lang.code);
         return { lang: lang.code, message: existing?.message || '' };
@@ -534,12 +536,12 @@ const GameWorldsPage: React.FC = () => {
       setMaintenanceLocales(merged);
       setFormData(prev => ({ ...prev, maintenanceLocales: merged }));
     } else {
-      // 비활?�화 ?? ?�력값�? ?��??�고 UI�??��? (state/form 값�? 건드리�? ?�음)
+      // 비활성화 시, 입력값은 유지하고 UI만 숨김 (state/form 값은 건드리지 않음)
       // no-op
     }
   };
 
-  // ?�용 가?�한 ?�어 목록
+  // 사용 가능한 언어 목록
   const availableLanguages = useMemo(() => ([
     { code: 'ko' as const, label: t('gameWorlds.maintenanceConfig.korean') },
     { code: 'en' as const, label: t('gameWorlds.maintenanceConfig.english') },
@@ -549,7 +551,7 @@ const GameWorldsPage: React.FC = () => {
   const usedLanguages = new Set(maintenanceLocales.map(l => l.lang));
   const availableToAdd = availableLanguages.filter(l => !usedLanguages.has(l.code));
 
-  // ?�짜 로�????�정
+  // 날짜 로케일 설정
   const getDateLocale = () => {
     const currentLang = i18n.language || 'ko';
     switch (currentLang) {
@@ -567,7 +569,7 @@ const GameWorldsPage: React.FC = () => {
     }
   };
 
-  // ?�적 ?�터 ?�의
+  // 동적 필터 정의
   const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
     {
       key: 'tags',
@@ -583,7 +585,8 @@ const GameWorldsPage: React.FC = () => {
     },
   ], [t, allRegistryTags]);
 
-  // ?�적 ?�터 ?�들??  const handleFilterAdd = (filter: ActiveFilter) => {
+  // 동적 필터 핸들러
+  const handleFilterAdd = (filter: ActiveFilter) => {
     setActiveFilters(prev => [...prev, filter]);
   };
 
@@ -614,7 +617,7 @@ const GameWorldsPage: React.FC = () => {
       }
     };
 
-    // allRegistryTags가 로드???�에�?게임?�드�?로드
+    // allRegistryTags가 로드된 후에만 게임월드를 로드
     const tagFilter = activeFilters.find(f => f.key === 'tags');
     if (allRegistryTags.length > 0 || !tagFilter || (Array.isArray(tagFilter.value) && tagFilter.value.length === 0)) {
       loadData();
@@ -654,13 +657,13 @@ const GameWorldsPage: React.FC = () => {
   } as const;
 
   const loadGameWorlds = async () => {
-    // ?��? 로딩 중이�?중복 ?�청 방�?
+    // 이미 로딩 중이면 중복 요청 방지
     if (loading) return;
 
     try {
       setLoading(true);
 
-      // ?�그 ?�터?�서 ?�그 ID 추출
+      // 태그 필터에서 태그 ID 추출
       const tagFilter = activeFilters.find(f => f.key === 'tags');
       const tagIds = tagFilter && Array.isArray(tagFilter.value) && tagFilter.value.length > 0
         ? tagFilter.value
@@ -668,7 +671,8 @@ const GameWorldsPage: React.FC = () => {
       const tagOperator = tagFilter?.operator;
 
       const result = await gameWorldService.getGameWorlds({
-        // ?�버 컨트롤러??tagIds(?�표구분)�?기�???        search: debouncedSearch || undefined,
+        // 서버 컨트롤러는 tagIds(쉼표구분)를 기대함
+        search: debouncedSearch || undefined,
         tagIds: tagIds.length ? tagIds.join(',') : undefined,
         tags_operator: tagOperator,
       });
@@ -679,7 +683,7 @@ const GameWorldsPage: React.FC = () => {
     } catch (error: any) {
       console.error('Failed to load game worlds:', error);
 
-      // ?�트?�크 ?�류??경우?�만 toast ?�시
+      // 네트워크 오류인 경우에만 toast 표시
       if (error.message?.includes('Network Error') || error.code === 'NETWORK_ERROR') {
         enqueueSnackbar(t('gameWorlds.errors.loadFailed'), { variant: 'error' });
       }
@@ -731,7 +735,7 @@ const GameWorldsPage: React.FC = () => {
   const handleEditWorld = (world: GameWorld) => {
     setEditingWorld(world);
 
-    // ?�어�?메시지가 ?�는지 ?�인
+    // 언어별 메시지가 있는지 확인
     const hasMaintenanceLocales = world.maintenanceLocales && world.maintenanceLocales.length > 0;
     const shouldEnableMultiLanguage = (world.supportsMultiLanguage ?? false) || hasMaintenanceLocales;
 
@@ -825,19 +829,20 @@ const GameWorldsPage: React.FC = () => {
       errors.name = t('validation.fieldRequired', { field: t('gameWorlds.name') });
     }
 
-    // worldServerAddress ?�수 체크 �??�식 검�?(?�반 URL ?�는 host[:port] ?�용)
+    // worldServerAddress 필수 체크 및 형식 검증 (일반 URL 또는 host[:port] 허용)
     if (!formData.worldServerAddress || !formData.worldServerAddress.trim()) {
       errors.worldServerAddress = t('validation.fieldRequired', { field: t('gameWorlds.worldServerAddress') });
     } else if (!/^(?:[a-zA-Z][a-zA-Z0-9+.-]*:\/\/\S+|[a-zA-Z0-9.-]+(:\d+)?)$/.test(formData.worldServerAddress.trim())) {
       errors.worldServerAddress = t('gameWorlds.form.worldServerAddressInvalid');
     }
 
-    // ?��? 모드????기본 ?��? 메시지 ?�수 체크
+    // 점검 모드일 때 기본 점검 메시지 필수 체크
     if (formData.isMaintenance && (!formData.maintenanceMessage || !formData.maintenanceMessage.trim())) {
       errors.maintenanceMessage = t('gameWorlds.maintenance.messageRequired');
     }
 
-    // ?��? 모드????기간 �??�예?�간 검�?    if (formData.isMaintenance && formData.maintenanceEndDate) {
+    // 점검 모드일 때 기간 및 유예시간 검증
+    if (formData.isMaintenance && formData.maintenanceEndDate) {
       const now = dayjs();
       const startsAt = formData.maintenanceStartDate ? dayjs(formData.maintenanceStartDate) : null;
       const endsAt = dayjs(formData.maintenanceEndDate);
@@ -879,7 +884,7 @@ const GameWorldsPage: React.FC = () => {
 
     setSaving(true);
     try {
-      // Tag 객체?�서 ID 추출
+      // Tag 객체에서 ID 추출
       const tagIds = (formTags || []).map(t => t.id);
 
       // Parse custom payload JSON
@@ -1005,7 +1010,8 @@ const GameWorldsPage: React.FC = () => {
 
     const isActivating = !world.isMaintenance;
 
-    // ?��? ?�성?�시 기존 ?��? ?�정 가?�오�?    if (isActivating) {
+    // 점검 활성화시 기존 점검 설정 가져오기
+    if (isActivating) {
       setToggleMaintenanceLocales(world.maintenanceLocales || []);
       setToggleSupportsMultiLanguage(world.supportsMultiLanguage || false);
       setToggleInputMode('direct');
@@ -1061,7 +1067,7 @@ const GameWorldsPage: React.FC = () => {
           }
         }
 
-        // ?��? ?�성?? ?��? ?�용 API ?�용
+        // 점검 활성화: 점검 전용 API 사용
         const updateData: any = {
           isMaintenance: true,
           maintenanceStartDate: maintenanceStartDate || undefined,
@@ -1070,12 +1076,12 @@ const GameWorldsPage: React.FC = () => {
           gracePeriodMinutes: forceDisconnect ? gracePeriodMinutes : undefined,
         };
 
-        // 메시지 ?�스???�라 분기
+        // 메시지 소스에 따라 분기
         if (toggleInputMode === 'template') {
-          // ?�플�?모드: templateId ?�송
+          // 템플릿 모드: templateId 전송
           updateData.maintenanceMessageTemplateId = toggleSelectedTemplateId || undefined;
         } else {
-          // 직접 ?�력 모드: 메시지 직접 ?�송
+          // 직접 입력 모드: 메시지 직접 전송
           updateData.maintenanceMessage = maintenanceToggleDialog.maintenanceData.maintenanceMessage || undefined;
           updateData.supportsMultiLanguage = toggleSupportsMultiLanguage;
           updateData.maintenanceLocales = toggleMaintenanceLocales.filter(l => l.message.trim() !== '');
@@ -1084,7 +1090,7 @@ const GameWorldsPage: React.FC = () => {
         await gameWorldService.updateMaintenance(maintenanceToggleDialog.world.id, updateData);
         enqueueSnackbar(t('gameWorlds.maintenanceStarted'), { variant: 'success' });
       } else {
-        // ?��? ?�제: ?��? ?�용 API ?�용
+        // 점검 해제: 점검 전용 API 사용
         const updateData = {
           isMaintenance: false,
           maintenanceMessage: '',
@@ -1734,7 +1740,7 @@ const GameWorldsPage: React.FC = () => {
                 {t('gameWorlds.configureMaintenanceSettings')}
               </Alert>
 
-              {/* ?��? ?�정 ??*/}
+              {/* 점검 설정 폼 */}
               <MaintenanceSettingsInput
                 startDate={maintenanceToggleDialog.maintenanceData.maintenanceStartDate}
                 endDate={maintenanceToggleDialog.maintenanceData.maintenanceEndDate}
@@ -1811,7 +1817,7 @@ const GameWorldsPage: React.FC = () => {
                 sx={{ mb: 3 }}
               />
 
-              {/* ?�인 ?�력 */}
+              {/* 확인 입력 */}
               <Typography variant="body2" sx={{ mb: 2 }}>
                 {t('gameWorlds.typeWorldIdToConfirm', { worldId: maintenanceToggleDialog.world?.worldId })}
               </Typography>

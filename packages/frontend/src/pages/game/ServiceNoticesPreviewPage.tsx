@@ -28,7 +28,7 @@ const PREVIEW_HEIGHT = 928;
 const SIDEBAR_WIDTH = 320;
 const READ_NOTICES_KEY = 'serviceNotices_readStatus';
 
-// Game UI color palette (based on ?€??•´?œë? ?¨ë¼???¤ë¦¬ì§?
+// Game UI color palette (based on ëŒ€í•­í•´ì‹œëŒ€ ì˜¨ë¼ì¸ ì˜¤ë¦¬ì§„)
 const GAME_COLORS = {
   background: '#E8DDD0', // Light beige background
   sidebarBg: '#2B2420', // Darker brown sidebar (matching game UI)

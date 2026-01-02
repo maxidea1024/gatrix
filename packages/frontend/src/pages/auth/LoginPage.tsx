@@ -47,14 +47,14 @@ import { devLogger } from '@/utils/logger';
 
 // Validation schema - will be created inside component to access t function
 
-// ?�용??친화?�인 ?�류 메시지 ?�수
+// 사용자 친화적인 오류 메시지 함수
 const getErrorMessage = (error: any, t: any): string => {
   if (!error) return '';
 
   const errorCode = error.message || error.error?.message || '';
   const status = error.status;
 
-  // ?�태 코드�?메시지
+  // 상태 코드별 메시지
   if (status === 401) {
     return t('auth.errors.invalidCredentials');
   }
@@ -84,7 +84,7 @@ const getErrorMessage = (error: any, t: any): string => {
     return t('auth.errors.serverError');
   }
 
-  // ?�트?�크 ?�류
+  // 네트워크 오류
   if (error.name === 'NetworkError' || !status) {
     return t('auth.errors.networkError');
   }
@@ -154,7 +154,8 @@ const LoginPage: React.FC = () => {
       navigate(location.pathname, { replace: true });
     }
 
-    // OAuth 로딩 ?�태 초기??    setOauthLoading(null);
+    // OAuth 로딩 상태 초기화
+    setOauthLoading(null);
   }, [location.search, location.pathname, navigate, t]);
 
   // Validation schema with translations
@@ -183,14 +184,15 @@ const LoginPage: React.FC = () => {
     setValue,
   } = useForm<LoginCredentials & { rememberMe: boolean }>({
     resolver,
-    mode: 'onChange', // ?�시�?validation ?�성??    defaultValues: {
+    mode: 'onChange', // 실시간 validation 활성화
+    defaultValues: {
       email: '',
       password: '',
       rememberMe: false,
     },
   });
 
-  // ?�재 ?�메??�?감시
+  // 현재 이메일 값 감시
   const emailValue = watch('email') || '';
   const passwordValue = watch('password') || '';
 
@@ -211,7 +213,7 @@ const LoginPage: React.FC = () => {
       const rememberedEmail = AuthService.getRememberedEmail();
       const isRememberMeEnabled = AuthService.isRememberMeEnabled();
 
-      // 기억???�메?�과 ?�정??모두 ?�을 ?�만 ?�에 ?�정
+      // 기억된 이메일과 설정이 모두 있을 때만 폼에 설정
       if (rememberedEmail && isRememberMeEnabled) {
         reset({
           email: rememberedEmail,
@@ -219,7 +221,8 @@ const LoginPage: React.FC = () => {
           rememberMe: true,
         });
       } else {
-        // 기억???�정???�거??불일치하�?초기??        reset({
+        // 기억된 설정이 없거나 불일치하면 초기화
+        reset({
           email: '',
           password: '',
           rememberMe: false,
@@ -252,7 +255,8 @@ const LoginPage: React.FC = () => {
       clearError();
 
       devLogger.debug('[LoginPage] Starting login...');
-      // 최소 2�??��?      const startTime = Date.now();
+      // 최소 2초 대기
+      const startTime = Date.now();
 
       const loginPromise = login({
         email: data.email,
@@ -260,7 +264,8 @@ const LoginPage: React.FC = () => {
         rememberMe: data.rememberMe,
       });
 
-      // 최소 2초�? 지?��? ?�았?�면 추�? ?��?      const elapsed = Date.now() - startTime;
+      // 최소 2초가 지나지 않았다면 추가 대기
+      const elapsed = Date.now() - startTime;
       if (elapsed < 2000) {
         await Promise.all([
           loginPromise,
@@ -277,7 +282,7 @@ const LoginPage: React.FC = () => {
 
       // Handle network errors explicitly
       if (err.message === 'Network Error' || err.code === 'ERR_NETWORK' || !err.status) {
-        const networkError = t('auth.errors.networkError') || '?�버???�결?????�습?�다. ?�트?�크 ?�결???�인?�거???�시 ???�시 ?�도?�주?�요.';
+        const networkError = t('auth.errors.networkError') || '서버에 연결할 수 없습니다. 네트워크 연결을 확인하거나 잠시 후 다시 시도해주세요.';
         setLoginError(networkError);
         return;
       }
@@ -323,15 +328,17 @@ const LoginPage: React.FC = () => {
     setOauthLoading(provider);
     setLoginError(null);
 
-    // 최소 2�??��?    await new Promise(resolve => setTimeout(resolve, 2000));
+    // 최소 2초 대기
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // ?�?�아???�정 (30�?
+    // 타임아웃 설정 (30초)
     const timeout = setTimeout(() => {
       setOauthLoading(null);
       setLoginError(t('auth.errors.oauthTimeout'));
     }, 30000);
 
-    // ?�이지 ?�동 ?�에 ?�?�아???�보�?sessionStorage???�??    sessionStorage.setItem('oauthTimeout', timeout.toString());
+    // 페이지 이동 전에 타임아웃 정보를 sessionStorage에 저장
+    sessionStorage.setItem('oauthTimeout', timeout.toString());
     sessionStorage.setItem('oauthProvider', provider);
 
     window.location.href = authUrl;
@@ -361,25 +368,28 @@ const LoginPage: React.FC = () => {
     setShowPassword(!showPassword);
   };
 
-  // ?�메??기억?�기 체크박스 변�??�들??  const handleRememberMeChange = (checked: boolean, onChange: (value: boolean) => void) => {
+  // 이메일 기억하기 체크박스 변경 핸들러
+  const handleRememberMeChange = (checked: boolean, onChange: (value: boolean) => void) => {
     if (checked) {
-      // 체크?�려�?????보안 경고 ?�시
+      // 체크하려고 할 때 보안 경고 표시
       setPendingRememberMe(true);
       setShowRememberMeWarning(true);
     } else {
-      // 체크 ?�제???�는 즉시 ?�용?�고 ?�?�된 ?�메?�도 ??��
+      // 체크 해제할 때는 즉시 적용하고 저장된 이메일도 삭제
       onChange(false);
       AuthService.clearRememberedCredentials();
     }
   };
 
-  // 보안 경고 ?�인 ??  const handleRememberMeConfirm = () => {
+  // 보안 경고 확인 시
+  const handleRememberMeConfirm = () => {
     setValue('rememberMe', true);
     setShowRememberMeWarning(false);
     setPendingRememberMe(false);
   };
 
-  // 보안 경고 취소 ??  const handleRememberMeCancel = () => {
+  // 보안 경고 취소 시
+  const handleRememberMeCancel = () => {
     setShowRememberMeWarning(false);
     setPendingRememberMe(false);
   };
@@ -834,7 +844,7 @@ const LoginPage: React.FC = () => {
             <span>
               <IconButton
                 onClick={handleWeChatLogin}
-                disabled={true} // ?�시 비활?�화
+                disabled={true} // 임시 비활성화
                 sx={{
                   width: 56,
                   height: 56,
@@ -858,7 +868,7 @@ const LoginPage: React.FC = () => {
             <span>
               <IconButton
                 onClick={handleBaiduLogin}
-                disabled={true} // ?�시 비활?�화
+                disabled={true} // 임시 비활성화
                 sx={{
                   width: 56,
                   height: 56,
@@ -880,7 +890,7 @@ const LoginPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* 보안 경고 ?�?�상??*/}
+      {/* 보안 경고 대화상자 */}
       <Dialog
         open={showRememberMeWarning}
         onClose={handleRememberMeCancel}

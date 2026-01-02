@@ -100,7 +100,6 @@ interface CreateTokenData {
   tokenName: string;
   description?: string;
   tokenType: TokenType;
-  environmentId?: number;
   allowAllEnvironments: boolean;
   environments: string[];
   expiresAt?: string;
@@ -265,7 +264,6 @@ const ApiTokensPage: React.FC = () => {
     tokenName: '',
     description: '',
     tokenType: 'client',
-    environmentId: 1,
     allowAllEnvironments: false,
     environments: [],
   });
@@ -455,9 +453,9 @@ const ApiTokensPage: React.FC = () => {
             />
           );
         }
-        // Map environment IDs to environment objects from loaded environments
+        // Map environment names to environment objects from loaded environments
         const tokenEnvs = (token.environments || [])
-          .map((envId: string) => environments.find(e => e.id === envId))
+          .map((envName: string) => environments.find(e => e.environment === envName))
           .filter(Boolean);
         return (
           <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
@@ -517,11 +515,12 @@ const ApiTokensPage: React.FC = () => {
     setPage(0); // Reset to first page when sorting
   };
 
-  // ?�큰 ?�름 ?�효??검??  const isValidTokenName = (name: string): boolean => {
-    return name.trim().length >= 3; // 최소 3???�상
+  // 토큰 이름 유효성 검사
+  const isValidTokenName = (name: string): boolean => {
+    return name.trim().length >= 3; // 최소 3자 이상
   };
 
-  // ?�효기간 검�??�수
+  // 유효기간 검증 함수
   const validateExpiresAt = (expiresAt: string | undefined): { isValid: boolean; warning: string | null } => {
     if (!expiresAt) {
       return { isValid: true, warning: null }; // No expiration is valid
@@ -547,9 +546,9 @@ const ApiTokensPage: React.FC = () => {
   const handleCreate = async () => {
     try {
       const response = await apiTokenService.createToken(formData);
-      console.log('Create token response:', response); // ?�버깅용
+      console.log('Create token response:', response); // 디버깅용
 
-      // ?�큰 ?�보�?먼�? ?�정
+      // 토큰 정보를 먼저 설정
       const tokenInfo = {
         tokenName: formData.tokenName,
         description: formData.description,
@@ -560,24 +559,25 @@ const ApiTokensPage: React.FC = () => {
         isNew: true
       };
 
-      // ?�성 ?�이?�로그�? 먼�? ?�기
+      // 생성 다이얼로그를 먼저 닫기
       setCreateDialogOpen(false);
       resetForm();
 
-      // 백엔???�답 구조 ?�인 �??�큰 �?추출
+      // 백엔드 응답 구조 확인 및 토큰 값 추출
       const tokenValue = response?.data?.tokenValue || response?.tokenValue || '';
-      console.log('Create response structure:', response); // ?�버깅용
-      console.log('Extracted token value:', tokenValue); // ?�버깅용
+      console.log('Create response structure:', response); // 디버깅용
+      console.log('Extracted token value:', tokenValue); // 디버깅용
 
-      // ?�태�??�서?��??�정?�여 ?�이?�로그�? ?�실???�리?�록 ??      setNewTokenInfo(tokenInfo);
+      // 상태를 순서대로 설정하여 다이얼로그가 확실히 열리도록 함
+      setNewTokenInfo(tokenInfo);
       setNewTokenValue(tokenValue);
 
-      // ?�음 ?�더�??�이?�에???�이?�로�??�기
+      // 다음 렌더링 사이클에서 다이얼로그 열기
       setTimeout(() => {
         setNewTokenDialogOpen(true);
       }, 0);
 
-      // ?�큰 목록?� 백그?�운?�에???�로고침 (await ?�거)
+      // 토큰 목록은 백그라운드에서 새로고침 (await 제거)
       loadTokens().catch(console.error);
 
       enqueueSnackbar(t('apiTokens.createSuccess'), { variant: 'success' });
@@ -636,12 +636,12 @@ const ApiTokensPage: React.FC = () => {
 
     try {
       const response = await apiTokenService.regenerateToken(selectedToken.id);
-      console.log('Regenerate token response:', response); // ?�버깅용
+      console.log('Regenerate token response:', response); // 디버깅용
 
-      // 백엔???�답 구조 ?�인 �??�큰 �?추출
+      // 백엔드 응답 구조 확인 및 토큰 값 추출
       const tokenValue = response?.data?.tokenValue || response?.tokenValue || '';
-      console.log('Regenerate response structure:', response); // ?�버깅용
-      console.log('Extracted token value:', tokenValue); // ?�버깅용
+      console.log('Regenerate response structure:', response); // 디버깅용
+      console.log('Extracted token value:', tokenValue); // 디버깅용
 
       const tokenInfo = {
         tokenName: selectedToken.tokenName,
@@ -651,10 +651,11 @@ const ApiTokensPage: React.FC = () => {
         isNew: false
       };
 
-      // ?�태�??�서?��??�정?�여 ?�이?�로그�? ?�실???�리?�록 ??      setNewTokenInfo(tokenInfo);
+      // 상태를 순서대로 설정하여 다이얼로그가 확실히 열리도록 함
+      setNewTokenInfo(tokenInfo);
       setNewTokenValue(tokenValue);
 
-      // ?�음 ?�더�??�이?�에???�이?�로�??�기
+      // 다음 렌더링 사이클에서 다이얼로그 열기
       setTimeout(() => {
         setNewTokenDialogOpen(true);
       }, 0);
@@ -674,7 +675,6 @@ const ApiTokensPage: React.FC = () => {
       tokenName: '',
       description: '',
       tokenType: 'client',
-      environmentId: 1,
       allowAllEnvironments: false,
       environments: [],
     });
@@ -695,7 +695,6 @@ const ApiTokensPage: React.FC = () => {
       tokenName: token.tokenName,
       description: token.description || '',
       tokenType: token.tokenType,
-      environmentId: token.environmentId,
       allowAllEnvironments: token.allowAllEnvironments ?? false,
       environments: token.environments || [],
       expiresAt: token.expiresAt ? new Date(token.expiresAt).toISOString().slice(0, 16) : undefined,
@@ -780,7 +779,7 @@ const ApiTokensPage: React.FC = () => {
 
   const maskToken = (token: string) => {
     if (!token || token.length < 8) return token;
-    return `${token.substring(0, 4)}${'??.repeat(token.length - 8)}${token.substring(token.length - 4)}`;
+    return `${token.substring(0, 4)}${'•'.repeat(token.length - 8)}${token.substring(token.length - 4)}`;
   };
 
   // Bulk selection handlers
@@ -1977,7 +1976,7 @@ const ApiTokensPage: React.FC = () => {
                       {token.tokenName}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {token.tokenType} ??{t('apiTokens.createdBy')}: {token.creator?.name || 'Unknown'}
+                      {token.tokenType} • {t('apiTokens.createdBy')}: {token.creator?.name || 'Unknown'}
                     </Typography>
                   </Box>
                 ))
@@ -2138,11 +2137,11 @@ const ApiTokensPage: React.FC = () => {
                         color="success"
                       />
                     ) : newTokenInfo.environments && newTokenInfo.environments.length > 0 ? (
-                      newTokenInfo.environments.map((envId: number) => {
-                        const env = environments.find(e => e.id === envId);
+                      newTokenInfo.environments.map((envName: string) => {
+                        const env = environments.find(e => e.environment === envName);
                         return env ? (
                           <Chip
-                            key={envId}
+                            key={envName}
                             label={env.environmentName}
                             size="small"
                             variant="outlined"
