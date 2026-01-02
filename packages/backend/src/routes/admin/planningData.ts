@@ -44,5 +44,9 @@ router.get('/oceannpcarea', PlanningDataController.getOceanNpcAreaSpawnerLookup)
 // File upload route (drag & drop)
 router.post('/upload', upload.any(), PlanningDataController.uploadPlanningData);
 
+// Upload history routes
+router.get('/history', PlanningDataController.getUploadHistory);
+router.get('/latest', PlanningDataController.getLatestUpload);
+
 export default router;
 

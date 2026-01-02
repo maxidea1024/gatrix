@@ -1,8 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
+import crypto from 'crypto';
 import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { cacheService } from './CacheService';
+import db from '../config/knex';
 
 export interface RewardTypeInfo {
   value: number;
@@ -543,10 +545,20 @@ export class PlanningDataService {
    * Saves files to data/planning/{environment}/ and caches them in Redis
    * @param environment Environment name
    * @param files Uploaded files
+   * @param uploadInfo Optional upload metadata (uploader info, comment, source)
    */
-  static async uploadPlanningData(environment: string, files: any): Promise<{ success: boolean; message: string; filesUploaded: string[]; stats: any }> {
+  static async uploadPlanningData(
+    environment: string,
+    files: any,
+    uploadInfo?: {
+      uploadedBy?: number;
+      uploaderName?: string;
+      uploadSource?: 'web' | 'cli';
+      uploadComment?: string;
+    }
+  ): Promise<{ success: boolean; message: string; filesUploaded: string[]; stats: any; uploadRecord?: any }> {
     try {
-      logger.info('Starting planning data upload...', { environment });
+      logger.info('Starting planning data upload...', { environment, uploadInfo });
 
       // Ensure environment-specific data directory exists
       const envDataPath = this.getEnvironmentDataPath(environment);
@@ -593,7 +605,9 @@ export class PlanningDataService {
       }
 
       const uploadedFiles: string[] = [];
-      const fileStats: any = {};
+      const fileStats: Record<string, { size: number; path: string }> = {};
+      const fileHashes: Record<string, string> = {};
+      const allBuffers: Buffer[] = [];
 
       // Process each uploaded file
       const invalidFiles: string[] = [];
@@ -622,6 +636,11 @@ export class PlanningDataService {
           throw new GatrixError(`File ${fileName} is not valid JSON`, 400);
         }
 
+        // Calculate file hash
+        const fileHash = crypto.createHash('sha256').update(file.buffer).digest('hex');
+        fileHashes[fileName] = fileHash;
+        allBuffers.push(file.buffer);
+
         // Save file to disk (environment-specific path)
         const filePath = path.join(envDataPath, fileName);
         await fs.writeFile(filePath, file.buffer);
@@ -632,7 +651,7 @@ export class PlanningDataService {
           path: filePath,
         };
 
-        logger.info(`File saved: ${fileName}`, { size: file.size, environment });
+        logger.info(`File saved: ${fileName}`, { size: file.size, hash: fileHash.substring(0, 8), environment });
       }
 
       if (uploadedFiles.length === 0) {
@@ -642,10 +661,64 @@ export class PlanningDataService {
         throw new GatrixError('No valid files were uploaded', 400);
       }
 
+      // Calculate overall upload hash
+      const combinedHash = crypto.createHash('sha256');
+      allBuffers.forEach(buf => combinedHash.update(buf));
+      const uploadHash = combinedHash.digest('hex');
+
+      // Get previous upload to determine changed files
+      const previousUpload = await db('planningDataUploads')
+        .where({ environment })
+        .orderBy('uploadedAt', 'desc')
+        .first();
+
+      let changedFiles: string[] = [];
+      if (previousUpload) {
+        const prevHashes = typeof previousUpload.fileHashes === 'string'
+          ? JSON.parse(previousUpload.fileHashes)
+          : previousUpload.fileHashes;
+
+        for (const [fileName, hash] of Object.entries(fileHashes)) {
+          if (prevHashes[fileName] !== hash) {
+            changedFiles.push(fileName);
+          }
+        }
+      } else {
+        // First upload - all files are "new"
+        changedFiles = uploadedFiles;
+      }
+
+      // Calculate total size
+      const totalSize = Object.values(fileStats).reduce((sum, stat) => sum + stat.size, 0);
+
+      // Save upload record to database
+      const [uploadRecordId] = await db('planningDataUploads').insert({
+        environment,
+        uploadHash,
+        filesUploaded: JSON.stringify(uploadedFiles),
+        fileHashes: JSON.stringify(fileHashes),
+        filesCount: uploadedFiles.length,
+        totalSize,
+        uploadedBy: uploadInfo?.uploadedBy || null,
+        uploaderName: uploadInfo?.uploaderName || null,
+        uploadSource: uploadInfo?.uploadSource || 'web',
+        uploadComment: uploadInfo?.uploadComment || null,
+        changedFiles: JSON.stringify(changedFiles),
+        uploadedAt: new Date(),
+      });
+
+      // Fetch the created record
+      const uploadRecord = await db('planningDataUploads').where({ id: uploadRecordId }).first();
+
       // Cache all uploaded files in Redis (environment-scoped)
       await this.cacheUploadedFiles(environment, uploadedFiles);
 
-      logger.info('Planning data uploaded and cached successfully', { filesUploaded: uploadedFiles });
+      logger.info('Planning data uploaded and cached successfully', {
+        filesUploaded: uploadedFiles,
+        uploadHash: uploadHash.substring(0, 8),
+        changedFiles,
+        uploadRecordId,
+      });
 
       return {
         success: true,
@@ -653,14 +726,85 @@ export class PlanningDataService {
         filesUploaded: uploadedFiles,
         stats: {
           filesUploaded: uploadedFiles.length,
-          totalSize: Object.values(fileStats).reduce((sum: number, stat: any) => sum + stat.size, 0),
+          totalSize,
           timestamp: new Date().toISOString(),
+          uploadHash: uploadHash.substring(0, 16),
+          changedFilesCount: changedFiles.length,
+          changedFiles,
         },
+        uploadRecord: uploadRecord ? {
+          id: uploadRecord.id,
+          uploadHash: uploadRecord.uploadHash.substring(0, 16),
+          uploaderName: uploadRecord.uploaderName,
+          uploadSource: uploadRecord.uploadSource,
+          uploadedAt: uploadRecord.uploadedAt,
+        } : undefined,
       };
     } catch (error) {
       if (error instanceof GatrixError) throw error;
       logger.error('Failed to upload planning data', { error, environment });
       throw new GatrixError('Failed to upload planning data', 500);
+    }
+  }
+
+  /**
+   * Get planning data upload history for an environment
+   * @param environment Environment name
+   * @param limit Maximum number of records to return
+   */
+  static async getUploadHistory(environment: string, limit: number = 20): Promise<any[]> {
+    try {
+      const uploads = await db('planningDataUploads')
+        .where({ environment })
+        .orderBy('uploadedAt', 'desc')
+        .limit(limit);
+
+      return uploads.map(upload => ({
+        id: upload.id,
+        uploadHash: upload.uploadHash.substring(0, 16),
+        filesUploaded: typeof upload.filesUploaded === 'string' ? JSON.parse(upload.filesUploaded) : upload.filesUploaded,
+        filesCount: upload.filesCount,
+        totalSize: upload.totalSize,
+        uploaderName: upload.uploaderName,
+        uploadSource: upload.uploadSource,
+        uploadComment: upload.uploadComment,
+        changedFiles: typeof upload.changedFiles === 'string' ? JSON.parse(upload.changedFiles) : (upload.changedFiles || []),
+        uploadedAt: upload.uploadedAt,
+      }));
+    } catch (error) {
+      logger.error('Failed to get upload history', { error, environment });
+      throw new GatrixError('Failed to get upload history', 500);
+    }
+  }
+
+  /**
+   * Get the latest planning data upload for an environment
+   * @param environment Environment name
+   */
+  static async getLatestUpload(environment: string): Promise<any | null> {
+    try {
+      const upload = await db('planningDataUploads')
+        .where({ environment })
+        .orderBy('uploadedAt', 'desc')
+        .first();
+
+      if (!upload) return null;
+
+      return {
+        id: upload.id,
+        uploadHash: upload.uploadHash.substring(0, 16),
+        filesUploaded: typeof upload.filesUploaded === 'string' ? JSON.parse(upload.filesUploaded) : upload.filesUploaded,
+        filesCount: upload.filesCount,
+        totalSize: upload.totalSize,
+        uploaderName: upload.uploaderName,
+        uploadSource: upload.uploadSource,
+        uploadComment: upload.uploadComment,
+        changedFiles: typeof upload.changedFiles === 'string' ? JSON.parse(upload.changedFiles) : (upload.changedFiles || []),
+        uploadedAt: upload.uploadedAt,
+      };
+    } catch (error) {
+      logger.error('Failed to get latest upload', { error, environment });
+      throw new GatrixError('Failed to get latest upload', 500);
     }
   }
 

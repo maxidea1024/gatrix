@@ -1,0 +1,3837 @@
+{
+  "totalCount": 196,
+  "items": [
+    {
+      "id": 58001001,
+      "startDate": "2023-08-01T15:00:00.000Z",
+      "endDate": "2023-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ],
+      "name": "핫타임 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001002,
+      "startDate": "2023-08-01T15:00:00.000Z",
+      "endDate": "2023-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001003,
+      "startDate": "2023-08-01T15:00:00.000Z",
+      "endDate": "2023-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ],
+      "name": "탐험 특수 자원 획득 확률 증가",
+      "worldBuffNames": [
+        "탐험 특수 자원 획득 확률 증가"
+      ]
+    },
+    {
+      "id": 58001004,
+      "startDate": "2023-08-01T15:00:00.000Z",
+      "endDate": "2023-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001005,
+      "startDate": "2023-08-01T15:00:00.000Z",
+      "endDate": "2023-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001006,
+      "startDate": "2023-08-01T15:00:00.000Z",
+      "endDate": "2023-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001007,
+      "startDate": "2023-08-01T15:00:00.000Z",
+      "endDate": "2023-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가"
+      ]
+    },
+    {
+      "id": 58001008,
+      "startDate": "2023-08-01T15:00:00.000Z",
+      "endDate": "2023-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099000
+      ],
+      "name": "핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001009,
+      "startDate": "2023-08-01T15:00:00.000Z",
+      "endDate": "2023-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가"
+      ]
+    },
+    {
+      "id": 58001010,
+      "startDate": "2023-08-01T15:00:00.000Z",
+      "endDate": "2023-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099000
+      ],
+      "name": "핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001011,
+      "startDate": "2023-08-01T15:00:00.000Z",
+      "endDate": "2023-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ],
+      "name": "핫타임 선박 이해도 획득 증가",
+      "worldBuffNames": [
+        "핫타임 선박 이해도 획득 증가"
+      ]
+    },
+    {
+      "id": 58001012,
+      "startDate": "2023-08-01T15:00:00.000Z",
+      "endDate": "2023-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099009
+      ],
+      "name": "핫타임 투자 점수 획득 증가",
+      "worldBuffNames": [
+        "핫타임 투자 점수 획득 증가"
+      ]
+    },
+    {
+      "id": 58001013,
+      "startDate": "2023-08-01T15:00:00.000Z",
+      "endDate": "2023-08-14T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099013
+      ],
+      "name": "상급 어종 발견 확률 증가",
+      "worldBuffNames": [
+        "상급 어종 발견 확률 증가"
+      ]
+    },
+    {
+      "id": 58001014,
+      "startDate": "2023-08-01T15:00:00.000Z",
+      "endDate": "2023-08-14T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001015,
+      "startDate": "2023-08-14T15:00:00.000Z",
+      "endDate": "2023-08-15T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099000,
+        38099002,
+        38099003
+      ],
+      "name": "핫타임 면세 혜택, 핫타임 일일 과제 보상 증가, 핫타임 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 면세 혜택",
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001016,
+      "startDate": "2023-08-22T15:00:00.000Z",
+      "endDate": "2023-08-29T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38099006,
+        38099002,
+        38099003
+      ],
+      "name": "핫타임 건조 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 핫타임 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 건조 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001017,
+      "startDate": "2023-08-29T15:00:00.000Z",
+      "endDate": "2023-09-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ],
+      "name": "핫타임 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001018,
+      "startDate": "2023-08-29T15:00:00.000Z",
+      "endDate": "2023-09-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001019,
+      "startDate": "2023-08-29T15:00:00.000Z",
+      "endDate": "2023-09-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ],
+      "name": "탐험 특수 자원 획득 확률 증가",
+      "worldBuffNames": [
+        "탐험 특수 자원 획득 확률 증가"
+      ]
+    },
+    {
+      "id": 58001020,
+      "startDate": "2023-08-29T15:00:00.000Z",
+      "endDate": "2023-09-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001021,
+      "startDate": "2023-08-29T15:00:00.000Z",
+      "endDate": "2023-09-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001022,
+      "startDate": "2023-08-29T15:00:00.000Z",
+      "endDate": "2023-09-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001023,
+      "startDate": "2023-08-29T15:00:00.000Z",
+      "endDate": "2023-09-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가"
+      ]
+    },
+    {
+      "id": 58001024,
+      "startDate": "2023-08-29T15:00:00.000Z",
+      "endDate": "2023-09-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099000
+      ],
+      "name": "핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001025,
+      "startDate": "2023-08-29T15:00:00.000Z",
+      "endDate": "2023-09-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가"
+      ]
+    },
+    {
+      "id": 58001026,
+      "startDate": "2023-08-29T15:00:00.000Z",
+      "endDate": "2023-09-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099000
+      ],
+      "name": "핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001027,
+      "startDate": "2023-08-29T15:00:00.000Z",
+      "endDate": "2023-09-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ],
+      "name": "핫타임 선박 이해도 획득 증가",
+      "worldBuffNames": [
+        "핫타임 선박 이해도 획득 증가"
+      ]
+    },
+    {
+      "id": 58001028,
+      "startDate": "2023-08-29T15:00:00.000Z",
+      "endDate": "2023-09-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099009
+      ],
+      "name": "핫타임 투자 점수 획득 증가",
+      "worldBuffNames": [
+        "핫타임 투자 점수 획득 증가"
+      ]
+    },
+    {
+      "id": 58001029,
+      "startDate": "2023-08-29T15:00:00.000Z",
+      "endDate": "2023-09-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099013
+      ],
+      "name": "상급 어종 발견 확률 증가",
+      "worldBuffNames": [
+        "상급 어종 발견 확률 증가"
+      ]
+    },
+    {
+      "id": 58001030,
+      "startDate": "2023-08-29T15:00:00.000Z",
+      "endDate": "2023-09-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001031,
+      "startDate": "2023-09-27T15:00:00.000Z",
+      "endDate": "2023-10-03T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 119,
+      "worldBuffId": [
+        38099002,
+        38099008,
+        38099005
+      ],
+      "name": "핫타임 일일 과제 보상 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001032,
+      "startDate": "2023-10-03T15:00:00.000Z",
+      "endDate": "2023-12-19T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ],
+      "name": "핫타임 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001033,
+      "startDate": "2023-10-03T15:00:00.000Z",
+      "endDate": "2023-12-19T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001034,
+      "startDate": "2023-10-03T15:00:00.000Z",
+      "endDate": "2023-12-19T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ],
+      "name": "탐험 특수 자원 획득 확률 증가",
+      "worldBuffNames": [
+        "탐험 특수 자원 획득 확률 증가"
+      ]
+    },
+    {
+      "id": 58001035,
+      "startDate": "2023-10-03T15:00:00.000Z",
+      "endDate": "2023-12-19T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001036,
+      "startDate": "2023-10-03T15:00:00.000Z",
+      "endDate": "2023-12-19T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001037,
+      "startDate": "2023-10-03T15:00:00.000Z",
+      "endDate": "2023-12-19T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001038,
+      "startDate": "2023-10-03T15:00:00.000Z",
+      "endDate": "2023-12-19T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가"
+      ]
+    },
+    {
+      "id": 58001039,
+      "startDate": "2023-10-03T15:00:00.000Z",
+      "endDate": "2023-12-19T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099000
+      ],
+      "name": "핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001040,
+      "startDate": "2023-10-03T15:00:00.000Z",
+      "endDate": "2023-12-19T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가"
+      ]
+    },
+    {
+      "id": 58001041,
+      "startDate": "2023-10-03T15:00:00.000Z",
+      "endDate": "2023-12-19T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099000
+      ],
+      "name": "핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001042,
+      "startDate": "2023-10-03T15:00:00.000Z",
+      "endDate": "2023-12-19T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ],
+      "name": "핫타임 선박 이해도 획득 증가",
+      "worldBuffNames": [
+        "핫타임 선박 이해도 획득 증가"
+      ]
+    },
+    {
+      "id": 58001043,
+      "startDate": "2023-10-03T15:00:00.000Z",
+      "endDate": "2023-12-19T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099009
+      ],
+      "name": "핫타임 투자 점수 획득 증가",
+      "worldBuffNames": [
+        "핫타임 투자 점수 획득 증가"
+      ]
+    },
+    {
+      "id": 58001044,
+      "startDate": "2023-10-03T15:00:00.000Z",
+      "endDate": "2023-12-19T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099013
+      ],
+      "name": "상급 어종 발견 확률 증가",
+      "worldBuffNames": [
+        "상급 어종 발견 확률 증가"
+      ]
+    },
+    {
+      "id": 58001045,
+      "startDate": "2023-10-03T15:00:00.000Z",
+      "endDate": "2023-12-19T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001046,
+      "startDate": "2023-08-15T15:00:00.000Z",
+      "endDate": "2023-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099013
+      ],
+      "name": "상급 어종 발견 확률 증가",
+      "worldBuffNames": [
+        "상급 어종 발견 확률 증가"
+      ]
+    },
+    {
+      "id": 58001047,
+      "startDate": "2023-08-15T15:00:00.000Z",
+      "endDate": "2023-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001050,
+      "startDate": "2023-12-19T15:00:00.000Z",
+      "endDate": "2024-01-01T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099002,
+        38099007,
+        38099005
+      ],
+      "name": "핫타임 일일 과제 보상 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001051,
+      "startDate": "2023-12-19T15:00:00.000Z",
+      "endDate": "2024-01-01T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099003,
+        38099007,
+        38099005
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001052,
+      "startDate": "2023-12-19T15:00:00.000Z",
+      "endDate": "2024-01-01T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099002,
+        38099007,
+        38099005
+      ],
+      "name": "핫타임 일일 과제 보상 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001053,
+      "startDate": "2023-12-19T15:00:00.000Z",
+      "endDate": "2024-01-01T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099007,
+        38099005
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001054,
+      "startDate": "2023-12-19T15:00:00.000Z",
+      "endDate": "2024-01-01T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099007,
+        38099005
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001055,
+      "startDate": "2023-12-19T15:00:00.000Z",
+      "endDate": "2024-01-01T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099007,
+        38099005
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001056,
+      "startDate": "2023-12-19T15:00:00.000Z",
+      "endDate": "2024-01-01T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099003,
+        38099007,
+        38099005
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001057,
+      "startDate": "2024-01-01T15:00:00.000Z",
+      "endDate": "2024-01-16T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ],
+      "name": "핫타임 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001058,
+      "startDate": "2024-01-01T15:00:00.000Z",
+      "endDate": "2024-01-16T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001059,
+      "startDate": "2024-01-01T15:00:00.000Z",
+      "endDate": "2024-01-16T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ],
+      "name": "탐험 특수 자원 획득 확률 증가",
+      "worldBuffNames": [
+        "탐험 특수 자원 획득 확률 증가"
+      ]
+    },
+    {
+      "id": 58001060,
+      "startDate": "2024-01-01T15:00:00.000Z",
+      "endDate": "2024-01-16T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001061,
+      "startDate": "2024-01-01T15:00:00.000Z",
+      "endDate": "2024-01-16T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001062,
+      "startDate": "2024-01-01T15:00:00.000Z",
+      "endDate": "2024-01-16T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001063,
+      "startDate": "2024-01-01T15:00:00.000Z",
+      "endDate": "2024-01-16T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099007,
+        38099005
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001064,
+      "startDate": "2024-01-01T15:00:00.000Z",
+      "endDate": "2024-01-16T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099007,
+        38099005
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001065,
+      "startDate": "2024-01-01T15:00:00.000Z",
+      "endDate": "2024-01-16T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ],
+      "name": "핫타임 선박 이해도 획득 증가",
+      "worldBuffNames": [
+        "핫타임 선박 이해도 획득 증가"
+      ]
+    },
+    {
+      "id": 58001066,
+      "startDate": "2024-01-01T15:00:00.000Z",
+      "endDate": "2024-01-16T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099009
+      ],
+      "name": "핫타임 투자 점수 획득 증가",
+      "worldBuffNames": [
+        "핫타임 투자 점수 획득 증가"
+      ]
+    },
+    {
+      "id": 58001067,
+      "startDate": "2024-01-01T15:00:00.000Z",
+      "endDate": "2024-01-16T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099013
+      ],
+      "name": "상급 어종 발견 확률 증가",
+      "worldBuffNames": [
+        "상급 어종 발견 확률 증가"
+      ]
+    },
+    {
+      "id": 58001068,
+      "startDate": "2024-01-01T15:00:00.000Z",
+      "endDate": "2024-01-16T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001069,
+      "startDate": "2024-01-16T15:00:00.000Z",
+      "endDate": "2024-07-30T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ],
+      "name": "핫타임 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001070,
+      "startDate": "2024-01-16T15:00:00.000Z",
+      "endDate": "2024-07-30T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001071,
+      "startDate": "2024-01-16T15:00:00.000Z",
+      "endDate": "2024-07-30T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ],
+      "name": "탐험 특수 자원 획득 확률 증가",
+      "worldBuffNames": [
+        "탐험 특수 자원 획득 확률 증가"
+      ]
+    },
+    {
+      "id": 58001072,
+      "startDate": "2024-01-16T15:00:00.000Z",
+      "endDate": "2024-07-30T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001073,
+      "startDate": "2024-01-16T15:00:00.000Z",
+      "endDate": "2024-07-30T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001074,
+      "startDate": "2024-01-16T15:00:00.000Z",
+      "endDate": "2024-07-30T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001075,
+      "startDate": "2024-01-16T15:00:00.000Z",
+      "endDate": "2024-07-30T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가"
+      ]
+    },
+    {
+      "id": 58001076,
+      "startDate": "2024-01-16T15:00:00.000Z",
+      "endDate": "2024-07-30T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099000
+      ],
+      "name": "핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001077,
+      "startDate": "2024-01-16T15:00:00.000Z",
+      "endDate": "2024-07-30T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가"
+      ]
+    },
+    {
+      "id": 58001078,
+      "startDate": "2024-01-16T15:00:00.000Z",
+      "endDate": "2024-07-30T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099000
+      ],
+      "name": "핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001079,
+      "startDate": "2024-01-16T15:00:00.000Z",
+      "endDate": "2024-07-30T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ],
+      "name": "핫타임 선박 이해도 획득 증가",
+      "worldBuffNames": [
+        "핫타임 선박 이해도 획득 증가"
+      ]
+    },
+    {
+      "id": 58001080,
+      "startDate": "2024-01-16T15:00:00.000Z",
+      "endDate": "2024-07-30T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099009
+      ],
+      "name": "핫타임 투자 점수 획득 증가",
+      "worldBuffNames": [
+        "핫타임 투자 점수 획득 증가"
+      ]
+    },
+    {
+      "id": 58001081,
+      "startDate": "2024-01-16T15:00:00.000Z",
+      "endDate": "2024-07-30T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099013
+      ],
+      "name": "상급 어종 발견 확률 증가",
+      "worldBuffNames": [
+        "상급 어종 발견 확률 증가"
+      ]
+    },
+    {
+      "id": 58001082,
+      "startDate": "2024-01-16T15:00:00.000Z",
+      "endDate": "2024-07-30T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001083,
+      "startDate": "2024-07-30T15:00:00.000Z",
+      "endDate": "2024-08-06T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099004,
+        38099054,
+        38099055,
+        38099007
+      ],
+      "name": "핫타임 경험치 획득 증가, 물물 교환 가격 협상 성공률 증가, 물물 교환 수량 협상 성공률 증가, 핫타임 선박 이해도 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "물물 교환 가격 협상 성공률 증가",
+        "물물 교환 수량 협상 성공률 증가",
+        "핫타임 선박 이해도 획득 증가"
+      ]
+    },
+    {
+      "id": 58001084,
+      "startDate": "2024-07-30T15:00:00.000Z",
+      "endDate": "2024-08-06T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099004,
+        38099059,
+        38099012,
+        38099000
+      ],
+      "name": "핫타임 경험치 획득 증가, 교역품 재입고 시간 단축, 핫타임 교역품 구매 수량 증가, 핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "교역품 재입고 시간 단축",
+        "핫타임 교역품 구매 수량 증가",
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001085,
+      "startDate": "2024-07-30T15:00:00.000Z",
+      "endDate": "2024-08-06T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099004,
+        38099054,
+        38099055,
+        38099007
+      ],
+      "name": "핫타임 경험치 획득 증가, 물물 교환 가격 협상 성공률 증가, 물물 교환 수량 협상 성공률 증가, 핫타임 선박 이해도 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "물물 교환 가격 협상 성공률 증가",
+        "물물 교환 수량 협상 성공률 증가",
+        "핫타임 선박 이해도 획득 증가"
+      ]
+    },
+    {
+      "id": 58001086,
+      "startDate": "2024-07-30T15:00:00.000Z",
+      "endDate": "2024-08-06T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099004,
+        38099057,
+        38099058
+      ],
+      "name": "핫타임 경험치 획득 증가, 육지 탐험 쾌속 추가, 육지 탐험 모든 스탯 상승",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "육지 탐험 쾌속 추가",
+        "육지 탐험 모든 스탯 상승"
+      ]
+    },
+    {
+      "id": 58001087,
+      "startDate": "2024-07-30T15:00:00.000Z",
+      "endDate": "2024-08-06T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099004,
+        38099057,
+        38099058
+      ],
+      "name": "핫타임 경험치 획득 증가, 육지 탐험 쾌속 추가, 육지 탐험 모든 스탯 상승",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "육지 탐험 쾌속 추가",
+        "육지 탐험 모든 스탯 상승"
+      ]
+    },
+    {
+      "id": 58001088,
+      "startDate": "2024-07-30T15:00:00.000Z",
+      "endDate": "2024-08-06T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099004,
+        38099059,
+        38099012,
+        38099000
+      ],
+      "name": "핫타임 경험치 획득 증가, 교역품 재입고 시간 단축, 핫타임 교역품 구매 수량 증가, 핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "교역품 재입고 시간 단축",
+        "핫타임 교역품 구매 수량 증가",
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001089,
+      "startDate": "2024-07-30T15:00:00.000Z",
+      "endDate": "2024-08-06T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099004,
+        38099054,
+        38099055,
+        38099007
+      ],
+      "name": "핫타임 경험치 획득 증가, 물물 교환 가격 협상 성공률 증가, 물물 교환 수량 협상 성공률 증가, 핫타임 선박 이해도 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "물물 교환 가격 협상 성공률 증가",
+        "물물 교환 수량 협상 성공률 증가",
+        "핫타임 선박 이해도 획득 증가"
+      ]
+    },
+    {
+      "id": 58001090,
+      "startDate": "2024-08-06T15:00:00.000Z",
+      "endDate": "2024-08-11T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099004,
+        38099059,
+        38099012,
+        38099000
+      ],
+      "name": "핫타임 경험치 획득 증가, 교역품 재입고 시간 단축, 핫타임 교역품 구매 수량 증가, 핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "교역품 재입고 시간 단축",
+        "핫타임 교역품 구매 수량 증가",
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001091,
+      "startDate": "2024-08-06T15:00:00.000Z",
+      "endDate": "2024-08-11T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099004,
+        38099054,
+        38099055,
+        38099007
+      ],
+      "name": "핫타임 경험치 획득 증가, 물물 교환 가격 협상 성공률 증가, 물물 교환 수량 협상 성공률 증가, 핫타임 선박 이해도 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "물물 교환 가격 협상 성공률 증가",
+        "물물 교환 수량 협상 성공률 증가",
+        "핫타임 선박 이해도 획득 증가"
+      ]
+    },
+    {
+      "id": 58001092,
+      "startDate": "2024-08-06T15:00:00.000Z",
+      "endDate": "2024-08-11T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099004,
+        38099059,
+        38099012,
+        38099000
+      ],
+      "name": "핫타임 경험치 획득 증가, 교역품 재입고 시간 단축, 핫타임 교역품 구매 수량 증가, 핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "교역품 재입고 시간 단축",
+        "핫타임 교역품 구매 수량 증가",
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001093,
+      "startDate": "2024-08-06T15:00:00.000Z",
+      "endDate": "2024-08-11T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099004,
+        38099057,
+        38099058
+      ],
+      "name": "핫타임 경험치 획득 증가, 육지 탐험 쾌속 추가, 육지 탐험 모든 스탯 상승",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "육지 탐험 쾌속 추가",
+        "육지 탐험 모든 스탯 상승"
+      ]
+    },
+    {
+      "id": 58001094,
+      "startDate": "2024-08-06T15:00:00.000Z",
+      "endDate": "2024-08-11T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099004,
+        38099057,
+        38099058
+      ],
+      "name": "핫타임 경험치 획득 증가, 육지 탐험 쾌속 추가, 육지 탐험 모든 스탯 상승",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "육지 탐험 쾌속 추가",
+        "육지 탐험 모든 스탯 상승"
+      ]
+    },
+    {
+      "id": 58001095,
+      "startDate": "2024-08-11T15:00:00.000Z",
+      "endDate": "2024-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ],
+      "name": "핫타임 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001096,
+      "startDate": "2024-08-11T15:00:00.000Z",
+      "endDate": "2024-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001097,
+      "startDate": "2024-08-11T15:00:00.000Z",
+      "endDate": "2024-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ],
+      "name": "탐험 특수 자원 획득 확률 증가",
+      "worldBuffNames": [
+        "탐험 특수 자원 획득 확률 증가"
+      ]
+    },
+    {
+      "id": 58001098,
+      "startDate": "2024-08-11T15:00:00.000Z",
+      "endDate": "2024-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001099,
+      "startDate": "2024-08-11T15:00:00.000Z",
+      "endDate": "2024-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001100,
+      "startDate": "2024-08-11T15:00:00.000Z",
+      "endDate": "2024-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001101,
+      "startDate": "2024-08-11T15:00:00.000Z",
+      "endDate": "2024-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가"
+      ]
+    },
+    {
+      "id": 58001102,
+      "startDate": "2024-08-11T15:00:00.000Z",
+      "endDate": "2024-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099000
+      ],
+      "name": "핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001103,
+      "startDate": "2024-08-11T15:00:00.000Z",
+      "endDate": "2024-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가"
+      ]
+    },
+    {
+      "id": 58001104,
+      "startDate": "2024-08-11T15:00:00.000Z",
+      "endDate": "2024-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099000
+      ],
+      "name": "핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001105,
+      "startDate": "2024-08-11T15:00:00.000Z",
+      "endDate": "2024-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ],
+      "name": "핫타임 선박 이해도 획득 증가",
+      "worldBuffNames": [
+        "핫타임 선박 이해도 획득 증가"
+      ]
+    },
+    {
+      "id": 58001106,
+      "startDate": "2024-08-11T15:00:00.000Z",
+      "endDate": "2024-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099009
+      ],
+      "name": "핫타임 투자 점수 획득 증가",
+      "worldBuffNames": [
+        "핫타임 투자 점수 획득 증가"
+      ]
+    },
+    {
+      "id": 58001107,
+      "startDate": "2024-08-11T15:00:00.000Z",
+      "endDate": "2024-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099013
+      ],
+      "name": "상급 어종 발견 확률 증가",
+      "worldBuffNames": [
+        "상급 어종 발견 확률 증가"
+      ]
+    },
+    {
+      "id": 58001108,
+      "startDate": "2024-08-11T15:00:00.000Z",
+      "endDate": "2024-08-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001109,
+      "startDate": "2024-08-22T15:00:00.000Z",
+      "endDate": "2024-08-25T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099057,
+        38099058,
+        38099055
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 육지 탐험 쾌속 추가, 육지 탐험 모든 스탯 상승, 물물 교환 수량 협상 성공률 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "육지 탐험 쾌속 추가",
+        "육지 탐험 모든 스탯 상승",
+        "물물 교환 수량 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001110,
+      "startDate": "2024-08-22T15:00:00.000Z",
+      "endDate": "2024-08-25T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099058,
+        38099054
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 육지 탐험 모든 스탯 상승, 물물 교환 가격 협상 성공률 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "육지 탐험 모든 스탯 상승",
+        "물물 교환 가격 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001111,
+      "startDate": "2024-08-22T15:00:00.000Z",
+      "endDate": "2024-08-25T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099057,
+        38099055
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 육지 탐험 쾌속 추가, 물물 교환 수량 협상 성공률 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "육지 탐험 쾌속 추가",
+        "물물 교환 수량 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001112,
+      "startDate": "2024-08-25T15:00:00.000Z",
+      "endDate": "2024-09-13T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099001,
+        38099007,
+        38099005
+      ],
+      "name": "핫타임 일일 과제 보상 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001113,
+      "startDate": "2024-08-25T15:00:00.000Z",
+      "endDate": "2024-09-13T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099001,
+        38099007,
+        38099005
+      ],
+      "name": "핫타임 일일 과제 보상 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001114,
+      "startDate": "2024-08-25T15:00:00.000Z",
+      "endDate": "2024-09-13T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099001,
+        38099007,
+        38099005
+      ],
+      "name": "핫타임 일일 과제 보상 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001115,
+      "startDate": "2024-08-25T15:00:00.000Z",
+      "endDate": "2024-09-13T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099001,
+        38099007,
+        38099005
+      ],
+      "name": "핫타임 일일 과제 보상 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001116,
+      "startDate": "2024-08-25T15:00:00.000Z",
+      "endDate": "2024-09-13T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099001,
+        38099007,
+        38099005
+      ],
+      "name": "핫타임 일일 과제 보상 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001117,
+      "startDate": "2024-08-25T15:00:00.000Z",
+      "endDate": "2024-09-13T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099007,
+        38099005
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001118,
+      "startDate": "2024-08-25T15:00:00.000Z",
+      "endDate": "2024-09-13T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099008,
+        38099006
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 핫타임 선박 이해도 획득 증가, 핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 선박 이해도 획득 증가",
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001119,
+      "startDate": "2024-09-13T15:00:00.000Z",
+      "endDate": "2024-09-18T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099057,
+        38099055
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 육지 탐험 쾌속 추가, 물물 교환 수량 협상 성공률 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "육지 탐험 쾌속 추가",
+        "물물 교환 수량 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001120,
+      "startDate": "2024-09-13T15:00:00.000Z",
+      "endDate": "2024-09-18T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099058,
+        38099054
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 육지 탐험 모든 스탯 상승, 물물 교환 가격 협상 성공률 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "육지 탐험 모든 스탯 상승",
+        "물물 교환 가격 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001121,
+      "startDate": "2024-09-13T15:00:00.000Z",
+      "endDate": "2024-09-18T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099057,
+        38099055
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 육지 탐험 쾌속 추가, 물물 교환 수량 협상 성공률 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "육지 탐험 쾌속 추가",
+        "물물 교환 수량 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001122,
+      "startDate": "2024-09-13T15:00:00.000Z",
+      "endDate": "2024-09-18T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099057,
+        38099058,
+        38099054
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 육지 탐험 쾌속 추가, 육지 탐험 모든 스탯 상승, 물물 교환 가격 협상 성공률 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "육지 탐험 쾌속 추가",
+        "육지 탐험 모든 스탯 상승",
+        "물물 교환 가격 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001123,
+      "startDate": "2024-09-13T15:00:00.000Z",
+      "endDate": "2024-09-18T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099057,
+        38099055
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 육지 탐험 쾌속 추가, 물물 교환 수량 협상 성공률 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "육지 탐험 쾌속 추가",
+        "물물 교환 수량 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001124,
+      "startDate": "2024-09-18T15:00:00.000Z",
+      "endDate": "2024-10-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ],
+      "name": "핫타임 선박 이해도 획득 증가",
+      "worldBuffNames": [
+        "핫타임 선박 이해도 획득 증가"
+      ]
+    },
+    {
+      "id": 58001125,
+      "startDate": "2024-09-18T15:00:00.000Z",
+      "endDate": "2024-10-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099000
+      ],
+      "name": "핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001126,
+      "startDate": "2024-09-18T15:00:00.000Z",
+      "endDate": "2024-10-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001127,
+      "startDate": "2024-09-18T15:00:00.000Z",
+      "endDate": "2024-10-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001128,
+      "startDate": "2024-09-18T15:00:00.000Z",
+      "endDate": "2024-10-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ],
+      "name": "핫타임 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001129,
+      "startDate": "2024-09-18T15:00:00.000Z",
+      "endDate": "2024-10-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001130,
+      "startDate": "2024-09-18T15:00:00.000Z",
+      "endDate": "2024-10-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ],
+      "name": "탐험 특수 자원 획득 확률 증가",
+      "worldBuffNames": [
+        "탐험 특수 자원 획득 확률 증가"
+      ]
+    },
+    {
+      "id": 58001131,
+      "startDate": "2024-09-18T15:00:00.000Z",
+      "endDate": "2024-10-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001132,
+      "startDate": "2024-09-18T15:00:00.000Z",
+      "endDate": "2024-10-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099013
+      ],
+      "name": "상급 어종 발견 확률 증가",
+      "worldBuffNames": [
+        "상급 어종 발견 확률 증가"
+      ]
+    },
+    {
+      "id": 58001133,
+      "startDate": "2024-09-18T15:00:00.000Z",
+      "endDate": "2024-10-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099009
+      ],
+      "name": "핫타임 투자 점수 획득 증가",
+      "worldBuffNames": [
+        "핫타임 투자 점수 획득 증가"
+      ]
+    },
+    {
+      "id": 58001134,
+      "startDate": "2024-09-18T15:00:00.000Z",
+      "endDate": "2024-10-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가"
+      ]
+    },
+    {
+      "id": 58001135,
+      "startDate": "2024-09-18T15:00:00.000Z",
+      "endDate": "2024-10-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099055
+      ],
+      "name": "물물 교환 수량 협상 성공률 증가",
+      "worldBuffNames": [
+        "물물 교환 수량 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001136,
+      "startDate": "2024-09-18T15:00:00.000Z",
+      "endDate": "2024-10-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가"
+      ]
+    },
+    {
+      "id": 58001137,
+      "startDate": "2024-09-18T15:00:00.000Z",
+      "endDate": "2024-10-22T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099054
+      ],
+      "name": "물물 교환 가격 협상 성공률 증가",
+      "worldBuffNames": [
+        "물물 교환 가격 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001138,
+      "startDate": "2024-10-22T15:00:00.000Z",
+      "endDate": "2024-10-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003,
+        38099000,
+        38099012
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 면세 혜택, 핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 면세 혜택",
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001139,
+      "startDate": "2024-10-22T15:00:00.000Z",
+      "endDate": "2024-10-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001140,
+      "startDate": "2024-10-22T15:00:00.000Z",
+      "endDate": "2024-10-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014,
+        38099000,
+        38099012
+      ],
+      "name": "탐험 특수 자원 획득 확률 증가, 핫타임 면세 혜택, 핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "탐험 특수 자원 획득 확률 증가",
+        "핫타임 면세 혜택",
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001141,
+      "startDate": "2024-10-22T15:00:00.000Z",
+      "endDate": "2024-10-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001142,
+      "startDate": "2024-10-22T15:00:00.000Z",
+      "endDate": "2024-10-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099013,
+        38099000,
+        38099012
+      ],
+      "name": "상급 어종 발견 확률 증가, 핫타임 면세 혜택, 핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "상급 어종 발견 확률 증가",
+        "핫타임 면세 혜택",
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001143,
+      "startDate": "2024-10-22T15:00:00.000Z",
+      "endDate": "2024-10-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099005
+      ],
+      "name": "핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001144,
+      "startDate": "2024-10-22T15:00:00.000Z",
+      "endDate": "2024-10-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001,
+        38099000,
+        38099012
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 핫타임 면세 혜택, 핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 면세 혜택",
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001145,
+      "startDate": "2024-10-22T15:00:00.000Z",
+      "endDate": "2024-10-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099055
+      ],
+      "name": "물물 교환 수량 협상 성공률 증가",
+      "worldBuffNames": [
+        "물물 교환 수량 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001146,
+      "startDate": "2024-10-22T15:00:00.000Z",
+      "endDate": "2024-10-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001,
+        38099000,
+        38099012
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 핫타임 면세 혜택, 핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "핫타임 면세 혜택",
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001147,
+      "startDate": "2024-10-22T15:00:00.000Z",
+      "endDate": "2024-10-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099054
+      ],
+      "name": "물물 교환 가격 협상 성공률 증가",
+      "worldBuffNames": [
+        "물물 교환 가격 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001148,
+      "startDate": "2024-10-27T15:00:00.000Z",
+      "endDate": "2025-01-21T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007,
+        38090015,
+        38090016,
+        38090017
+      ],
+      "name": "핫타임 선박 이해도 획득 증가, 공예품, 공업품, 무기류 판촉, 기호품, 미술품, 주류 판촉, 귀금속, 보석, 직물 판촉",
+      "worldBuffNames": [
+        "핫타임 선박 이해도 획득 증가",
+        "공예품, 공업품, 무기류 판촉",
+        "기호품, 미술품, 주류 판촉",
+        "귀금속, 보석, 직물 판촉"
+      ]
+    },
+    {
+      "id": 58001149,
+      "startDate": "2024-10-27T15:00:00.000Z",
+      "endDate": "2025-01-21T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099000
+      ],
+      "name": "핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001150,
+      "startDate": "2024-10-27T15:00:00.000Z",
+      "endDate": "2025-01-21T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010,
+        38090015,
+        38090016,
+        38090017
+      ],
+      "name": "핫타임 거래 점수 기준 감소, 공예품, 공업품, 무기류 판촉, 기호품, 미술품, 주류 판촉, 귀금속, 보석, 직물 판촉",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소",
+        "공예품, 공업품, 무기류 판촉",
+        "기호품, 미술품, 주류 판촉",
+        "귀금속, 보석, 직물 판촉"
+      ]
+    },
+    {
+      "id": 58001151,
+      "startDate": "2024-10-27T15:00:00.000Z",
+      "endDate": "2025-01-21T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001152,
+      "startDate": "2024-10-27T15:00:00.000Z",
+      "endDate": "2025-01-21T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003,
+        38090015,
+        38090016,
+        38090017
+      ],
+      "name": "핫타임 경험치 획득 증가, 공예품, 공업품, 무기류 판촉, 기호품, 미술품, 주류 판촉, 귀금속, 보석, 직물 판촉",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "공예품, 공업품, 무기류 판촉",
+        "기호품, 미술품, 주류 판촉",
+        "귀금속, 보석, 직물 판촉"
+      ]
+    },
+    {
+      "id": 58001153,
+      "startDate": "2024-10-27T15:00:00.000Z",
+      "endDate": "2025-01-21T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001154,
+      "startDate": "2024-10-27T15:00:00.000Z",
+      "endDate": "2025-01-21T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014,
+        38090015,
+        38090016,
+        38090017
+      ],
+      "name": "탐험 특수 자원 획득 확률 증가, 공예품, 공업품, 무기류 판촉, 기호품, 미술품, 주류 판촉, 귀금속, 보석, 직물 판촉",
+      "worldBuffNames": [
+        "탐험 특수 자원 획득 확률 증가",
+        "공예품, 공업품, 무기류 판촉",
+        "기호품, 미술품, 주류 판촉",
+        "귀금속, 보석, 직물 판촉"
+      ]
+    },
+    {
+      "id": 58001155,
+      "startDate": "2024-10-27T15:00:00.000Z",
+      "endDate": "2025-01-21T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001156,
+      "startDate": "2024-10-27T15:00:00.000Z",
+      "endDate": "2025-01-21T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099013,
+        38090015,
+        38090016,
+        38090017
+      ],
+      "name": "상급 어종 발견 확률 증가, 공예품, 공업품, 무기류 판촉, 기호품, 미술품, 주류 판촉, 귀금속, 보석, 직물 판촉",
+      "worldBuffNames": [
+        "상급 어종 발견 확률 증가",
+        "공예품, 공업품, 무기류 판촉",
+        "기호품, 미술품, 주류 판촉",
+        "귀금속, 보석, 직물 판촉"
+      ]
+    },
+    {
+      "id": 58001157,
+      "startDate": "2024-10-27T15:00:00.000Z",
+      "endDate": "2025-01-21T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099005
+      ],
+      "name": "핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001158,
+      "startDate": "2024-10-27T15:00:00.000Z",
+      "endDate": "2025-01-21T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001,
+        38090015,
+        38090016,
+        38090017
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 공예품, 공업품, 무기류 판촉, 기호품, 미술품, 주류 판촉, 귀금속, 보석, 직물 판촉",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "공예품, 공업품, 무기류 판촉",
+        "기호품, 미술품, 주류 판촉",
+        "귀금속, 보석, 직물 판촉"
+      ]
+    },
+    {
+      "id": 58001159,
+      "startDate": "2024-10-27T15:00:00.000Z",
+      "endDate": "2025-01-21T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099055
+      ],
+      "name": "물물 교환 수량 협상 성공률 증가",
+      "worldBuffNames": [
+        "물물 교환 수량 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001160,
+      "startDate": "2024-10-27T15:00:00.000Z",
+      "endDate": "2025-01-21T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001,
+        38090015,
+        38090016,
+        38090017
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가, 공예품, 공업품, 무기류 판촉, 기호품, 미술품, 주류 판촉, 귀금속, 보석, 직물 판촉",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가",
+        "공예품, 공업품, 무기류 판촉",
+        "기호품, 미술품, 주류 판촉",
+        "귀금속, 보석, 직물 판촉"
+      ]
+    },
+    {
+      "id": 58001161,
+      "startDate": "2024-10-27T15:00:00.000Z",
+      "endDate": "2025-01-21T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099054
+      ],
+      "name": "물물 교환 가격 협상 성공률 증가",
+      "worldBuffNames": [
+        "물물 교환 가격 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001162,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ],
+      "name": "핫타임 선박 이해도 획득 증가",
+      "worldBuffNames": [
+        "핫타임 선박 이해도 획득 증가"
+      ]
+    },
+    {
+      "id": 58001163,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 20,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099079
+      ],
+      "name": "핫타임 관세 혜택",
+      "worldBuffNames": [
+        "핫타임 관세 혜택"
+      ]
+    },
+    {
+      "id": 58001164,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 20,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099080
+      ],
+      "name": "핫타임 관세 혜택",
+      "worldBuffNames": [
+        "핫타임 관세 혜택"
+      ]
+    },
+    {
+      "id": 58001165,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 22,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099000
+      ],
+      "name": "핫타임 면세 혜택",
+      "worldBuffNames": [
+        "핫타임 면세 혜택"
+      ]
+    },
+    {
+      "id": 58001166,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001167,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 20,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099081
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001168,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 20,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099082
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001169,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 22,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001170,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ],
+      "name": "핫타임 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001171,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 20,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099083
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001172,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 20,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099084
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001173,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 22,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099085
+      ],
+      "name": "핫타임 거래 점수 기준 감소",
+      "worldBuffNames": [
+        "핫타임 거래 점수 기준 감소"
+      ]
+    },
+    {
+      "id": 58001174,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ],
+      "name": "탐험 특수 자원 획득 확률 증가",
+      "worldBuffNames": [
+        "탐험 특수 자원 획득 확률 증가"
+      ]
+    },
+    {
+      "id": 58001175,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 20,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099081
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001176,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 20,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099082
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001177,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 22,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099012
+      ],
+      "name": "핫타임 교역품 구매 수량 증가",
+      "worldBuffNames": [
+        "핫타임 교역품 구매 수량 증가"
+      ]
+    },
+    {
+      "id": 58001178,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099013
+      ],
+      "name": "상급 어종 발견 확률 증가",
+      "worldBuffNames": [
+        "상급 어종 발견 확률 증가"
+      ]
+    },
+    {
+      "id": 58001179,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 20,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099086
+      ],
+      "name": "핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001180,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 20,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099087
+      ],
+      "name": "핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001181,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 22,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099088
+      ],
+      "name": "핫타임 건조 경험치 획득 증가",
+      "worldBuffNames": [
+        "핫타임 건조 경험치 획득 증가"
+      ]
+    },
+    {
+      "id": 58001182,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가"
+      ]
+    },
+    {
+      "id": 58001183,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 20,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099077
+      ],
+      "name": "물물 교환 수량 협상 성공률 증가",
+      "worldBuffNames": [
+        "물물 교환 수량 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001184,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 20,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099078
+      ],
+      "name": "물물 교환 수량 협상 성공률 증가",
+      "worldBuffNames": [
+        "물물 교환 수량 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001185,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 22,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099055
+      ],
+      "name": "물물 교환 수량 협상 성공률 증가",
+      "worldBuffNames": [
+        "물물 교환 수량 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001186,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ],
+      "name": "핫타임 경험치 획득 증가, 핫타임 일일 과제 보상 증가",
+      "worldBuffNames": [
+        "핫타임 경험치 획득 증가",
+        "핫타임 일일 과제 보상 증가"
+      ]
+    },
+    {
+      "id": 58001187,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 20,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099075
+      ],
+      "name": "물물 교환 가격 협상 성공률 증가",
+      "worldBuffNames": [
+        "물물 교환 가격 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001188,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 20,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099076
+      ],
+      "name": "물물 교환 가격 협상 성공률 증가",
+      "worldBuffNames": [
+        "물물 교환 가격 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001189,
+      "startDate": "2025-01-21T15:00:00.000Z",
+      "endDate": "2030-12-31T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 22,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099054
+      ],
+      "name": "물물 교환 가격 협상 성공률 증가",
+      "worldBuffNames": [
+        "물물 교환 가격 협상 성공률 증가"
+      ]
+    },
+    {
+      "id": 58001190,
+      "startDate": "2025-03-27T15:00:00.000Z",
+      "endDate": "2025-04-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38090018
+      ],
+      "name": "향신료, 보석, 총포류 판촉",
+      "worldBuffNames": [
+        "향신료, 보석, 총포류 판촉"
+      ]
+    },
+    {
+      "id": 58001191,
+      "startDate": "2025-04-22T15:00:00.000Z",
+      "endDate": "2025-04-27T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38095410
+      ],
+      "name": "운하 무료 이용",
+      "worldBuffNames": [
+        "운하 무료 이용"
+      ]
+    },
+    {
+      "id": 58001192,
+      "startDate": "2025-08-19T15:00:00.000Z",
+      "endDate": "2025-09-23T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 12,
+      "endHour": 14,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38099093
+      ],
+      "name": "핫타임 한국 3주년 효과",
+      "worldBuffNames": [
+        "핫타임 한국 3주년 효과"
+      ]
+    },
+    {
+      "id": 58001193,
+      "startDate": "2025-08-19T15:00:00.000Z",
+      "endDate": "2025-09-23T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 19,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38099093
+      ],
+      "name": "핫타임 한국 3주년 효과",
+      "worldBuffNames": [
+        "핫타임 한국 3주년 효과"
+      ]
+    },
+    {
+      "id": 58001194,
+      "startDate": "2025-08-19T15:00:00.000Z",
+      "endDate": "2025-09-23T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 1,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38099093
+      ],
+      "name": "핫타임 한국 3주년 효과",
+      "worldBuffNames": [
+        "핫타임 한국 3주년 효과"
+      ]
+    },
+    {
+      "id": 58001195,
+      "startDate": "2025-11-18T15:00:00.000Z",
+      "endDate": "2025-11-25T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 23,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38090031
+      ],
+      "name": "행운의 핫타임Ⅰ : 교역품 구매 할인",
+      "worldBuffNames": [
+        "행운의 핫타임Ⅰ : 교역품 구매 할인"
+      ]
+    },
+    {
+      "id": 58001196,
+      "startDate": "2025-11-25T15:00:00.000Z",
+      "endDate": "2025-12-02T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 23,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38090032
+      ],
+      "name": "행운의 핫타임Ⅱ : 도구점 구매 할인",
+      "worldBuffNames": [
+        "행운의 핫타임Ⅱ : 도구점 구매 할인"
+      ]
+    },
+    {
+      "id": 58001197,
+      "startDate": "2025-12-02T15:00:00.000Z",
+      "endDate": "2025-12-09T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 23,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38090033
+      ],
+      "name": "행운의 핫타임Ⅲ : 건조 비용 할인",
+      "worldBuffNames": [
+        "행운의 핫타임Ⅲ : 건조 비용 할인"
+      ]
+    },
+    {
+      "id": 58001198,
+      "startDate": "2025-12-09T15:00:00.000Z",
+      "endDate": "2025-12-14T14:59:59.000Z",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 23,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38090034
+      ],
+      "name": "행운의 핫타임Ⅳ : 물물 교환 비용 할인",
+      "worldBuffNames": [
+        "행운의 핫타임Ⅳ : 물물 교환 비용 할인"
+      ]
+    }
+  ]
+}

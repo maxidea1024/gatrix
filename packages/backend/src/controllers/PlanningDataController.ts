@@ -198,6 +198,7 @@ export class PlanningDataController {
    */
   static uploadPlanningData = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const environment = getEnvironment(req);
+    const uploadComment = req.body?.comment || req.query?.comment;
 
     logger.info('Planning data upload requested', {
       userId: req.user?.userId,
@@ -205,7 +206,16 @@ export class PlanningDataController {
       environment,
     });
 
-    const result = await PlanningDataService.uploadPlanningData(environment, req.files as any);
+    // Determine upload source and uploader info
+    const isCliUpload = req.headers['x-application-name'] === 'gatrix-cli';
+    const uploadInfo = {
+      uploadedBy: req.user?.userId,
+      uploaderName: req.user?.name || req.user?.email || (req as any).apiToken?.tokenName || 'Unknown',
+      uploadSource: (isCliUpload ? 'cli' : 'web') as 'web' | 'cli',
+      uploadComment: uploadComment as string | undefined,
+    };
+
+    const result = await PlanningDataService.uploadPlanningData(environment, req.files as any, uploadInfo);
 
     await pubSubService.invalidateByPattern('*planning_data*');
 
@@ -220,6 +230,7 @@ export class PlanningDataController {
         filesUploaded: result.filesUploaded,
         environment,
         timestamp: new Date().toISOString(),
+        uploadRecord: result.uploadRecord,
       },
       timestamp: new Date(),
       targetChannels: ['admin'],
@@ -229,6 +240,39 @@ export class PlanningDataController {
       success: true,
       data: result,
       message: 'Planning data uploaded and cache invalidated successfully',
+    });
+  });
+
+  /**
+   * Get planning data upload history
+   * GET /api/v1/admin/planning-data/history
+   */
+  static getUploadHistory = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environment = getEnvironment(req);
+    const limit = parseInt(req.query.limit as string) || 20;
+
+    const history = await PlanningDataService.getUploadHistory(environment, limit);
+
+    res.json({
+      success: true,
+      data: history,
+      message: 'Upload history retrieved successfully',
+    });
+  });
+
+  /**
+   * Get latest planning data upload
+   * GET /api/v1/admin/planning-data/latest
+   */
+  static getLatestUpload = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environment = getEnvironment(req);
+
+    const latestUpload = await PlanningDataService.getLatestUpload(environment);
+
+    res.json({
+      success: true,
+      data: latestUpload,
+      message: latestUpload ? 'Latest upload retrieved successfully' : 'No uploads found',
     });
   });
 }
