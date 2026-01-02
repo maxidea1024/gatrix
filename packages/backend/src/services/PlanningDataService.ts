@@ -85,6 +85,38 @@ export class PlanningDataService {
     return path.join(this.getEnvironmentDataPath(environment), fileName);
   }
 
+  /**
+   * Map file name to cache key
+   */
+  private static getFileCacheKey(fileName: string): string | null {
+    const fileKeyMap: Record<string, string> = {
+      'reward-lookup-kr.json': this.CACHE_KEYS.REWARD_LOOKUP_KR,
+      'reward-lookup-en.json': this.CACHE_KEYS.REWARD_LOOKUP_EN,
+      'reward-lookup-zh.json': this.CACHE_KEYS.REWARD_LOOKUP_ZH,
+      'reward-type-list.json': this.CACHE_KEYS.REWARD_TYPE_LIST,
+      'ui-list-data-kr.json': `${this.CACHE_KEYS.UI_LIST_DATA}:kr`,
+      'ui-list-data-en.json': `${this.CACHE_KEYS.UI_LIST_DATA}:en`,
+      'ui-list-data-zh.json': `${this.CACHE_KEYS.UI_LIST_DATA}:zh`,
+      'hottimebuff-lookup-kr.json': `${this.CACHE_KEYS.HOT_TIME_BUFF}:kr`,
+      'hottimebuff-lookup-en.json': `${this.CACHE_KEYS.HOT_TIME_BUFF}:en`,
+      'hottimebuff-lookup-zh.json': `${this.CACHE_KEYS.HOT_TIME_BUFF}:zh`,
+      'eventpage-lookup-kr.json': `${this.CACHE_KEYS.EVENT_PAGE}:kr`,
+      'eventpage-lookup-en.json': `${this.CACHE_KEYS.EVENT_PAGE}:en`,
+      'eventpage-lookup-zh.json': `${this.CACHE_KEYS.EVENT_PAGE}:zh`,
+      'liveevent-lookup-kr.json': `${this.CACHE_KEYS.LIVE_EVENT}:kr`,
+      'liveevent-lookup-en.json': `${this.CACHE_KEYS.LIVE_EVENT}:en`,
+      'liveevent-lookup-zh.json': `${this.CACHE_KEYS.LIVE_EVENT}:zh`,
+      'materecruiting-lookup-kr.json': `${this.CACHE_KEYS.MATE_RECRUITING}:kr`,
+      'materecruiting-lookup-en.json': `${this.CACHE_KEYS.MATE_RECRUITING}:en`,
+      'materecruiting-lookup-zh.json': `${this.CACHE_KEYS.MATE_RECRUITING}:zh`,
+      'oceannpcarea-lookup-kr.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:kr`,
+      'oceannpcarea-lookup-en.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:en`,
+      'oceannpcarea-lookup-zh.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`,
+      'cashshop-lookup.json': this.CACHE_KEYS.CASH_SHOP,
+    };
+    return fileKeyMap[fileName] || null;
+  }
+
   // Cache TTL: 24 hours (in milliseconds)
 
 
@@ -714,14 +746,17 @@ export class PlanningDataService {
               if (currentContent) {
                 const currentJson = JSON.parse(currentContent);
 
-                // Try to get previous content from Redis cache
-                const prevKey = `planning_data:${environment}:${fileName}`;
-                const prevContent = await cacheService.get<string>(prevKey);
-                if (prevContent) {
-                  const prevJson = JSON.parse(prevContent);
-                  const diff = this.calculateJsonDiff(prevJson, currentJson);
-                  if (diff.added.length > 0 || diff.removed.length > 0 || diff.modified.length > 0) {
-                    fileDiffs[fileName] = diff;
+                // Get the correct cache key for this file
+                const baseCacheKey = this.getFileCacheKey(fileName);
+                if (baseCacheKey) {
+                  const prevKey = this.getEnvCacheKey(environment, baseCacheKey);
+                  const prevContent = await cacheService.get<any>(prevKey);
+                  if (prevContent) {
+                    // prevContent is already parsed JSON from cache
+                    const diff = this.calculateJsonDiff(prevContent, currentJson);
+                    if (diff.added.length > 0 || diff.removed.length > 0 || diff.modified.length > 0) {
+                      fileDiffs[fileName] = diff;
+                    }
                   }
                 }
               }

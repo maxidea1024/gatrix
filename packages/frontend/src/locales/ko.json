@@ -4227,7 +4227,8 @@
       "selectFilesToUpload": "업로드할 파일을 선택해주세요",
       "filesUploadedAndCached": "{{count}}개의 기획데이터 파일이 업로드되고 캐싱되었습니다",
       "comment": "업로드 코멘트",
-      "commentPlaceholder": "이번 업로드에 대한 설명을 입력하세요 (선택사항)"
+      "commentPlaceholder": "이번 업로드에 대한 설명을 입력하세요 (선택사항)",
+      "alreadyUpToDate": "이미 최신 데이터입니다 - 변경된 내용이 없습니다"
     },
     "tabs": {
       "rewardTypes": "보상 타입 목록",

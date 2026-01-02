@@ -4230,7 +4230,8 @@
       "selectFilesToUpload": "Please select files to upload",
       "filesUploadedAndCached": "{{count}} planning data files uploaded and cached successfully",
       "comment": "Upload Comment",
-      "commentPlaceholder": "Optional comment about this upload"
+      "commentPlaceholder": "Optional comment about this upload",
+      "alreadyUpToDate": "Already up to date - no changes detected"
     },
     "tabs": {
       "rewardTypes": "Reward Types",

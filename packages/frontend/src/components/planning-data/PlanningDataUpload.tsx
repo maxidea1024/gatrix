@@ -162,11 +162,16 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
       clearInterval(progressInterval);
       setUploadProgress(100);
 
-      // Localize the success message with file count
-      const localizedMessage = t('planningData.upload.filesUploadedAndCached', {
-        count: result.filesUploaded?.length || filesToUploadArray.length,
-      });
-      enqueueSnackbar(localizedMessage, { variant: 'success' });
+      // Check if upload was skipped (no changes)
+      if (result.stats?.skipped) {
+        enqueueSnackbar(t('planningData.upload.alreadyUpToDate') || 'Already up to date - no changes detected', { variant: 'info' });
+      } else {
+        // Localize the success message with file count
+        const localizedMessage = t('planningData.upload.filesUploadedAndCached', {
+          count: result.filesUploaded?.length || filesToUploadArray.length,
+        });
+        enqueueSnackbar(localizedMessage, { variant: 'success' });
+      }
       setSelectedFiles([]);
       setFilesToUpload(new Set());
       setUploadComment('');

@@ -4284,7 +4284,8 @@
       "selectFilesToUpload": "请选择要上传的文件",
       "filesUploadedAndCached": "{{count}}个策划数据文件已上传并缓存成功",
       "comment": "上传备注",
-      "commentPlaceholder": "关于此次上传的说明（可选）"
+      "commentPlaceholder": "关于此次上传的说明（可选）",
+      "alreadyUpToDate": "已是最新数据 - 没有检测到变更"
     },
     "tabs": {
       "rewardTypes": "奖励类型",
