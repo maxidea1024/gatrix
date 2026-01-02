@@ -4298,6 +4298,8 @@
       "uploader": "업로더",
       "source": "업로드 방식",
       "hash": "해시",
+      "searchPlaceholder": "업로더명, 해시, 코멘트, 파일명으로 검색",
+      "totalRecords": "전체",
       "filesCount": "파일 수",
       "changedFilesCount": "변경 파일 수",
       "size": "크기",

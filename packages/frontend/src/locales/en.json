@@ -4301,6 +4301,8 @@
       "uploader": "Uploader",
       "source": "Source",
       "hash": "Hash",
+      "searchPlaceholder": "Search by uploader, hash, comment, or file",
+      "totalRecords": "Total",
       "filesCount": "Files",
       "changedFilesCount": "Changed",
       "size": "Size",

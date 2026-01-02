@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { PERMISSIONS } from '@/types/permissions';
 import {
@@ -25,6 +25,8 @@ import {
     TextField,
     Alert,
     Divider,
+    InputAdornment,
+    TableSortLabel,
 } from '@mui/material';
 import {
     History as HistoryIcon,
@@ -35,13 +37,15 @@ import {
     Computer as WebIcon,
     Terminal as CliIcon,
     Delete as DeleteIcon,
+    Search as SearchIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import planningDataService, { UploadRecord } from '../../services/planningDataService';
 import SimplePagination from '../../components/common/SimplePagination';
-import { formatRelativeTime } from '../../utils/dateFormat';
+import { formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
+import { useDebounce } from '../../hooks/useDebounce';
 
 const PlanningDataHistoryPage: React.FC = () => {
     const { t } = useTranslation();
@@ -57,6 +61,12 @@ const PlanningDataHistoryPage: React.FC = () => {
     const [expandedRow, setExpandedRow] = useState<number | null>(null);
     const [showResetDialog, setShowResetDialog] = useState(false);
     const [resetConfirmText, setResetConfirmText] = useState('');
+
+    const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+    const [orderBy, setOrderBy] = useState<string>('uploadedAt');
+    const [order, setOrder] = useState<'asc' | 'desc'>('desc');
 
     useEffect(() => {
         loadHistory();
@@ -95,8 +105,47 @@ const PlanningDataHistoryPage: React.FC = () => {
         }
     };
 
-    // Pagination
-    const paginatedHistory = history.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
+    const handleSort = (property: string) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+
+    const filteredHistory = useMemo(() => {
+        let result = [...history];
+
+        if (debouncedSearchTerm) {
+            const search = debouncedSearchTerm.toLowerCase();
+            result = result.filter(record =>
+                (record.uploaderName?.toLowerCase().includes(search)) ||
+                (record.uploadHash?.toLowerCase().includes(search)) ||
+                (record.uploadComment?.toLowerCase().includes(search)) ||
+                (record.changedFiles?.some(f => f.toLowerCase().includes(search))) ||
+                (record.uploadSource?.toLowerCase().includes(search))
+            );
+        }
+
+        result.sort((a, b) => {
+            let valA: any = a[orderBy as keyof UploadRecord];
+            let valB: any = b[orderBy as keyof UploadRecord];
+
+            if (orderBy === 'changedFilesCount') {
+                valA = a.changedFiles?.length || 0;
+                valB = b.changedFiles?.length || 0;
+            }
+
+            if (valA === undefined || valA === null) valA = '';
+            if (valB === undefined || valB === null) valB = '';
+
+            if (valA < valB) return order === 'asc' ? -1 : 1;
+            if (valA > valB) return order === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        return result;
+    }, [history, debouncedSearchTerm, orderBy, order]);
+
+    const paginatedHistory = filteredHistory.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
 
     if (!canView) {
         return (
@@ -119,26 +168,109 @@ const PlanningDataHistoryPage: React.FC = () => {
                         {t('planningData.history.subtitle')}
                     </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                    <IconButton onClick={handleRefresh} disabled={loading}>
-                        <RefreshIcon />
-                    </IconButton>
-                    {canManage && history.length > 0 && (
-                        <>
-                            <Divider orientation="vertical" flexItem sx={{ height: 32 }} />
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                size="small"
-                                startIcon={<DeleteIcon />}
-                                onClick={() => setShowResetDialog(true)}
-                            >
-                                {t('planningData.history.resetAll')}
-                            </Button>
-                        </>
-                    )}
-                </Box>
+                {canManage && history.length > 0 && (
+                    <Button
+                        variant="contained"
+                        color="error"
+                        startIcon={<DeleteIcon />}
+                        onClick={() => setShowResetDialog(true)}
+                    >
+                        {t('planningData.history.resetAll')}
+                    </Button>
+                )}
             </Box>
+
+            {/* Search Bar */}
+            <Card sx={{ mb: 3 }}>
+                <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
+                            <TextField
+                                placeholder={t('planningData.history.searchPlaceholder') || t('common.search')}
+                                value={searchTerm}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    setPage(0);
+                                }}
+                                sx={{
+                                    minWidth: 200,
+                                    flexGrow: 1,
+                                    maxWidth: 400,
+                                    '& .MuiOutlinedInput-root': {
+                                        height: '40px',
+                                        borderRadius: '20px',
+                                        bgcolor: 'background.paper',
+                                        transition: 'all 0.2s ease-in-out',
+                                        '& fieldset': {
+                                            borderColor: 'divider',
+                                        },
+                                        '&:hover': {
+                                            bgcolor: 'action.hover',
+                                            '& fieldset': {
+                                                borderColor: 'primary.light',
+                                            }
+                                        },
+                                        '&.Mui-focused': {
+                                            bgcolor: 'background.paper',
+                                            boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                                            '& fieldset': {
+                                                borderColor: 'primary.main',
+                                                borderWidth: '1px',
+                                            }
+                                        }
+                                    },
+                                    '& .MuiInputBase-input': {
+                                        fontSize: '0.875rem',
+                                    }
+                                }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                        </InputAdornment>
+                                    ),
+                                    endAdornment: null
+                                }}
+                                size="small"
+                            />
+
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 0,
+                                    borderRadius: 1,
+                                    bgcolor: 'background.paper',
+                                    border: 1,
+                                    borderColor: 'divider',
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: 1.5, py: 0.5 }}>
+                                    <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'primary.main' }} />
+                                    <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                                        {t('planningData.history.totalRecords')} <strong style={{ color: 'inherit' }}>{history.length}</strong>
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Box>
+
+                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                            <Tooltip title={t('common.refresh')}>
+                                <span>
+                                    <IconButton
+                                        size="small"
+                                        onClick={handleRefresh}
+                                        disabled={loading}
+                                    >
+                                        <RefreshIcon fontSize="small" />
+                                    </IconButton>
+                                </span>
+                            </Tooltip>
+                        </Box>
+                    </Box>
+                </CardContent>
+            </Card>
 
             {/* Content */}
             {loading ? (
@@ -161,11 +293,43 @@ const PlanningDataHistoryPage: React.FC = () => {
                                 <TableHead>
                                     <TableRow>
                                         <TableCell width={40}></TableCell>
-                                        <TableCell>{t('planningData.history.uploadedAt')}</TableCell>
-                                        <TableCell>{t('planningData.history.uploader')}</TableCell>
-                                        <TableCell>{t('planningData.history.source')}</TableCell>
+                                        <TableCell>
+                                            <TableSortLabel
+                                                active={orderBy === 'uploadedAt'}
+                                                direction={orderBy === 'uploadedAt' ? order : 'asc'}
+                                                onClick={() => handleSort('uploadedAt')}
+                                            >
+                                                {t('planningData.history.uploadedAt')}
+                                            </TableSortLabel>
+                                        </TableCell>
+                                        <TableCell>
+                                            <TableSortLabel
+                                                active={orderBy === 'uploaderName'}
+                                                direction={orderBy === 'uploaderName' ? order : 'asc'}
+                                                onClick={() => handleSort('uploaderName')}
+                                            >
+                                                {t('planningData.history.uploader')}
+                                            </TableSortLabel>
+                                        </TableCell>
+                                        <TableCell>
+                                            <TableSortLabel
+                                                active={orderBy === 'uploadSource'}
+                                                direction={orderBy === 'uploadSource' ? order : 'asc'}
+                                                onClick={() => handleSort('uploadSource')}
+                                            >
+                                                {t('planningData.history.source')}
+                                            </TableSortLabel>
+                                        </TableCell>
                                         <TableCell>{t('planningData.history.hash')}</TableCell>
-                                        <TableCell align="center">{t('planningData.history.changedFilesCount')}</TableCell>
+                                        <TableCell align="center">
+                                            <TableSortLabel
+                                                active={orderBy === 'changedFilesCount'}
+                                                direction={orderBy === 'changedFilesCount' ? order : 'asc'}
+                                                onClick={() => handleSort('changedFilesCount')}
+                                            >
+                                                {t('planningData.history.changedFilesCount')}
+                                            </TableSortLabel>
+                                        </TableCell>
                                         <TableCell align="center">{t('planningData.history.changes')}</TableCell>
                                         <TableCell>{t('planningData.history.comment')}</TableCell>
                                     </TableRow>
@@ -176,12 +340,19 @@ const PlanningDataHistoryPage: React.FC = () => {
                                             <TableRow
                                                 hover
                                                 sx={{
-                                                    bgcolor: index === 0
-                                                        ? 'action.selected'
-                                                        : index % 2 === 0
-                                                            ? 'background.default'
-                                                            : 'background.paper',
                                                     cursor: record.fileDiffs && Object.keys(record.fileDiffs).length > 0 ? 'pointer' : 'default',
+                                                    bgcolor: index % 2 === 1
+                                                        ? (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.025)'
+                                                        : 'transparent',
+                                                    '&:hover': {
+                                                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'
+                                                    },
+                                                    '&.MuiTableRow-root:nth-of-type(even)': {
+                                                        bgcolor: index % 2 === 1
+                                                            ? (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.025)'
+                                                            : 'transparent'
+                                                    },
+                                                    ...(expandedRow === record.id && { bgcolor: 'action.selected', '&:hover': { bgcolor: 'action.selected' } })
                                                 }}
                                                 onClick={() => {
                                                     // Only toggle if there are diffs to show
@@ -199,9 +370,13 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                 </TableCell>
                                                 <TableCell>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                        {formatRelativeTime(record.uploadedAt)}
+                                                        <Tooltip title={formatDateTimeDetailed(record.uploadedAt)}>
+                                                            <Typography variant="body2" sx={{ fontWeight: index === 0 ? 'bold' : 'normal' }}>
+                                                                {formatRelativeTime(record.uploadedAt)}
+                                                            </Typography>
+                                                        </Tooltip>
                                                         {index === 0 && (
-                                                            <Chip size="small" label={t('planningData.history.latest')} color="primary" />
+                                                            <Chip size="small" label={t('planningData.history.latest')} color="primary" sx={{ height: 20, fontSize: '0.625rem', fontWeight: 'bold' }} />
                                                         )}
                                                     </Box>
                                                 </TableCell>
@@ -223,7 +398,8 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                     <Tooltip title={t('common.copyToClipboard')}>
                                                         <Chip
                                                             size="small"
-                                                            label={record.uploadHash}
+                                                            variant="outlined"
+                                                            label={record.uploadHash.substring(0, 8)}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 copyToClipboardWithNotification(
@@ -232,7 +408,13 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                                     () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
                                                                 );
                                                             }}
-                                                            sx={{ cursor: 'pointer', fontFamily: 'monospace' }}
+                                                            sx={{
+                                                                cursor: 'pointer',
+                                                                fontFamily: 'monospace',
+                                                                borderRadius: 1,
+                                                                bgcolor: 'background.paper',
+                                                                '&:hover': { bgcolor: 'action.hover' }
+                                                            }}
                                                         />
                                                     </Tooltip>
                                                 </TableCell>
@@ -261,7 +443,20 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                     </Typography>
                                                 </TableCell>
                                             </TableRow>
-                                            <TableRow>
+                                            <TableRow sx={{
+                                                bgcolor: index % 2 === 1
+                                                    ? (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.025)'
+                                                    : 'transparent',
+                                                '&:hover': {
+                                                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'
+                                                },
+                                                '&.MuiTableRow-root:nth-of-type(even)': {
+                                                    bgcolor: index % 2 === 1
+                                                        ? (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.025)'
+                                                        : 'transparent'
+                                                },
+                                                ...(expandedRow === record.id && { bgcolor: 'action.selected' })
+                                            }}>
                                                 <TableCell colSpan={8} sx={{ py: 0 }}>
                                                     <Collapse in={expandedRow === record.id} timeout="auto" unmountOnExit>
                                                         <Box sx={{ py: 2, px: 4 }}>
@@ -480,21 +675,17 @@ const PlanningDataHistoryPage: React.FC = () => {
                             </Table>
                         </TableContainer>
 
-                        {/* Pagination - show only when more than 5 items */}
-                        {history.length > 5 && (
-                            <Box sx={{ p: 2 }}>
-                                <SimplePagination
-                                    count={history.length}
-                                    page={page}
-                                    rowsPerPage={rowsPerPage}
-                                    onPageChange={(_, newPage) => setPage(newPage)}
-                                    onRowsPerPageChange={(e) => {
-                                        setRowsPerPage(Number(e.target.value));
-                                        setPage(0);
-                                    }}
-                                />
-                            </Box>
-                        )}
+                        {/* Pagination */}
+                        <SimplePagination
+                            count={filteredHistory.length}
+                            page={page}
+                            rowsPerPage={rowsPerPage}
+                            onPageChange={(_, newPage) => setPage(newPage)}
+                            onRowsPerPageChange={(e) => {
+                                setRowsPerPage(Number(e.target.value));
+                                setPage(0);
+                            }}
+                        />
                     </CardContent>
                 </Card>
             )}

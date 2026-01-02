@@ -4355,6 +4355,8 @@
       "uploader": "上传者",
       "source": "上传方式",
       "hash": "哈希",
+      "searchPlaceholder": "按上传者、哈希、备注或文件名搜索",
+      "totalRecords": "总计",
       "filesCount": "文件数",
       "changedFilesCount": "变更数",
       "size": "大小",
