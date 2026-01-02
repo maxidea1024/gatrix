@@ -433,41 +433,6 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                 </Box>
                 <Collapse in={expandedRequestHeaders}>
                   <Box sx={{ p: 2, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
-                        {t('ingamePopupNotices.sdkGuideDrawer.parameters')}
-                      </Typography>
-                      <Box sx={{
-                        border: `1px solid ${theme.palette.divider}`,
-                        borderRadius: 1,
-                        overflow: 'hidden'
-                      }}>
-                        <Box sx={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 0 }}>
-                          {/* Application Name */}
-                          <Box sx={{
-                            p: 1.5,
-                            backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
-                            display: 'flex',
-                            alignItems: 'center',
-                            fontWeight: 500,
-                            fontSize: '0.875rem'
-                          }}>
-                            X-Application-Name
-                          </Box>
-                          <Box sx={{
-                            p: 1.5,
-                            borderLeft: `1px solid ${theme.palette.divider}`,
-                            display: 'flex',
-                            alignItems: 'center',
-                            fontFamily: 'monospace',
-                            fontSize: '0.875rem',
-                            color: 'text.secondary'
-                          }}>
-                            gatrix-frontend-tester
-                          </Box>
-                        </Box>
-                      </Box>
-                    </Box>
 
                     {Object.keys(requestHeaders).length > 0 && (
                       <Box sx={{ mb: 2 }}>
