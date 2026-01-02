@@ -2368,7 +2368,8 @@
     "request": "请求",
     "example": "示例",
     "queryParameters": "查询参数",
-    "receivedAt": "接收时间"
+    "receivedAt": "接收时间",
+    "apiTokenRequired": "请输入API令牌"
   },
   "createdAt": "createdAt",
   "dashboard": {
@@ -3893,7 +3894,8 @@
         "errorCodesDesc": "各种错误情况的响应示例。",
         "apiTest": "API 测试",
         "copiedToClipboard": "代码已复制到剪贴板。",
-        "allUsed": "全部已使用"
+        "allUsed": "全部已使用",
+        "couponCodeRequired": "请输入优惠券代码"
       }
     },
     "issuedCodes": {

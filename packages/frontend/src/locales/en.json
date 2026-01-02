@@ -2314,7 +2314,8 @@
     "request": "Request",
     "example": "Example",
     "queryParameters": "Query Parameters",
-    "receivedAt": "Received At"
+    "receivedAt": "Received At",
+    "apiTokenRequired": "Please enter API token"
   },
   "createdAt": "createdAt",
   "dashboard": {
@@ -3738,7 +3739,8 @@
         "error429": "Too many requests for the same user/code (spam limit)",
         "errorCodesDesc": "Response examples for various error scenarios.",
         "apiTest": "API Test",
-        "copiedToClipboard": "Code copied to clipboard."
+        "copiedToClipboard": "Code copied to clipboard.",
+        "couponCodeRequired": "Please enter coupon code"
       },
       "columns": {
         "code": "Coupon Code",

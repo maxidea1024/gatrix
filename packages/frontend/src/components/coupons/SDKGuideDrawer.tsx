@@ -260,7 +260,7 @@ curl -X POST ${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
 
   const handleTestAPI = async () => {
     if (!couponCode.trim()) {
-      setValidationError(t('coupons.sdkGuide.couponCodeRequired') || 'Coupon Code is required');
+      setValidationError(t('coupons.couponSettings.sdkGuideDrawer.couponCodeRequired') || 'Coupon Code is required');
       return;
     }
     if (!apiToken.trim()) {

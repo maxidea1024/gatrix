@@ -1,6 +1,6 @@
 /**
  * Get the backend URL from environment config
- * Priority: runtime config > VITE_API_URL > current origin
+ * Priority: runtime config > VITE_API_URL > localhost backend > current origin
  */
 export const getBackendUrl = (): string => {
     if (typeof window !== 'undefined') {
@@ -15,6 +15,15 @@ export const getBackendUrl = (): string => {
     if (envUrl && envUrl.trim() && !envUrl.startsWith('/')) {
         return envUrl.trim().replace(/\/api\/v1$/, '');
     }
-    // Fallback to current origin (same server)
-    return typeof window !== 'undefined' ? window.location.origin : 'https://your-gatrix-server.com';
+    // In local development, use backend port directly
+    if (typeof window !== 'undefined') {
+        const origin = window.location.origin;
+        // If on frontend dev port (43000), point to backend port (45000)
+        if (origin.includes('localhost:43000') || origin.includes('127.0.0.1:43000')) {
+            return 'http://localhost:45000';
+        }
+        // Otherwise use current origin (production setup with nginx proxy)
+        return origin;
+    }
+    return 'https://your-gatrix-server.com';
 };
