@@ -4282,7 +4282,9 @@
       "uploadSuccess": "策划数据已成功上传",
       "uploadFailed": "策划数据上传失败",
       "selectFilesToUpload": "请选择要上传的文件",
-      "filesUploadedAndCached": "{{count}}个策划数据文件已上传并缓存成功"
+      "filesUploadedAndCached": "{{count}}个策划数据文件已上传并缓存成功",
+      "comment": "上传备注",
+      "commentPlaceholder": "关于此次上传的说明（可选）"
     },
     "tabs": {
       "rewardTypes": "奖励类型",
@@ -4337,7 +4339,12 @@
       "comment": "备注",
       "filesUploaded": "已上传文件",
       "changedFiles": "变更文件",
-      "latest": "最新"
+      "latest": "最新",
+      "added": "新增",
+      "removed": "删除",
+      "modified": "修改",
+      "noDiffAvailable": "无法查看详细变更",
+      "noChanges": "没有变更文件（首次上传）"
     }
   },
   "rewards": {

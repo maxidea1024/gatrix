@@ -4,9 +4,9 @@
  */
 
 exports.up = async function (connection) {
-    console.log('Creating planningDataUploads table...');
+  console.log('Creating planningDataUploads table...');
 
-    await connection.execute(`
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS planningDataUploads (
       id INT AUTO_INCREMENT PRIMARY KEY,
       environment VARCHAR(100) NOT NULL,
@@ -20,6 +20,7 @@ exports.up = async function (connection) {
       uploadSource VARCHAR(50) NOT NULL DEFAULT 'web' COMMENT 'web or cli',
       uploadComment TEXT NULL COMMENT 'Optional comment from uploader',
       changedFiles JSON NULL COMMENT 'Files that changed compared to previous upload',
+      fileDiffs JSON NULL COMMENT 'Detailed diff for each changed file',
       uploadedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       INDEX idx_environment (environment),
       INDEX idx_environment_uploaded_at (environment, uploadedAt),
@@ -27,11 +28,11 @@ exports.up = async function (connection) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
-    console.log('✓ planningDataUploads table created');
+  console.log('✓ planningDataUploads table created');
 };
 
 exports.down = async function (connection) {
-    console.log('Dropping planningDataUploads table...');
-    await connection.execute('DROP TABLE IF EXISTS planningDataUploads');
-    console.log('✓ planningDataUploads table dropped');
+  console.log('Dropping planningDataUploads table...');
+  await connection.execute('DROP TABLE IF EXISTS planningDataUploads');
+  console.log('✓ planningDataUploads table dropped');
 };

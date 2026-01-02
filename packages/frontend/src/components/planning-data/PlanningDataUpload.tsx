@@ -26,6 +26,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  TextField,
 } from '@mui/material';
 import {
   CloudUpload as CloudUploadIcon,
@@ -90,6 +91,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
   const [filesToUpload, setFilesToUpload] = useState<Set<string>>(new Set());
   const [showSupportedFilesDialog, setShowSupportedFilesDialog] = useState(false);
   const [invalidFileName, setInvalidFileName] = useState<string | null>(null);
+  const [uploadComment, setUploadComment] = useState('');
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -155,7 +157,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
 
       // Filter files to upload
       const filesToUploadArray = selectedFiles.filter((file) => filesToUpload.has(file.name));
-      const result = await planningDataService.uploadPlanningData(filesToUploadArray);
+      const result = await planningDataService.uploadPlanningData(filesToUploadArray, uploadComment || undefined);
 
       clearInterval(progressInterval);
       setUploadProgress(100);
@@ -167,6 +169,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
       enqueueSnackbar(localizedMessage, { variant: 'success' });
       setSelectedFiles([]);
       setFilesToUpload(new Set());
+      setUploadComment('');
 
       if (onUploadSuccess) {
         onUploadSuccess();
@@ -183,6 +186,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
   const handleClear = () => {
     setSelectedFiles([]);
     setFilesToUpload(new Set());
+    setUploadComment('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -226,125 +230,138 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
           </Typography>
 
           {/* Drag & Drop Area */}
-        <Box
-          ref={dragOverRef}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          sx={{
-            border: '2px dashed',
-            borderColor: dragOver ? 'primary.main' : 'divider',
-            borderRadius: 2,
-            p: 3,
-            textAlign: 'center',
-            backgroundColor: dragOver ? 'action.hover' : 'background.paper',
-            transition: 'all 0.3s ease',
-            cursor: 'pointer',
-            mb: 2,
-          }}
-        >
-          <CloudUploadIcon sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-          <Typography variant="body1" gutterBottom>
-            {t('planningData.upload.dragDrop') || 'Drag and drop files here'}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            {t('planningData.upload.or') || 'or'}
-          </Typography>
-          <Button
-            variant="outlined"
-            component="label"
-            disabled={uploading}
+          <Box
+            ref={dragOverRef}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            sx={{
+              border: '2px dashed',
+              borderColor: dragOver ? 'primary.main' : 'divider',
+              borderRadius: 2,
+              p: 3,
+              textAlign: 'center',
+              backgroundColor: dragOver ? 'action.hover' : 'background.paper',
+              transition: 'all 0.3s ease',
+              cursor: 'pointer',
+              mb: 2,
+            }}
           >
-            {t('planningData.upload.selectFiles') || 'Select Files'}
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              hidden
-              onChange={handleFileInputChange}
-              accept=".json"
-            />
-          </Button>
-        </Box>
-
-        {/* Selected Files */}
-        {selectedFiles.length > 0 && (
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              {t('planningData.upload.selectedFiles') || 'Selected Files'} ({selectedFiles.length}/{REQUIRED_FILES.length})
+            <CloudUploadIcon sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
+            <Typography variant="body1" gutterBottom>
+              {t('planningData.upload.dragDrop') || 'Drag and drop files here'}
             </Typography>
-            <Box
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1,
-                maxHeight: 300,
-                overflow: 'auto',
-                mb: 2,
-              }}
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              {t('planningData.upload.or') || 'or'}
+            </Typography>
+            <Button
+              variant="outlined"
+              component="label"
+              disabled={uploading}
             >
-              <List dense sx={{ py: 0 }}>
-                {selectedFiles.map((file) => (
-                  <ListItemButton
-                    key={file.name}
-                    onClick={() => handleToggleFile(file.name)}
-                    sx={{
-                      py: 1,
-                      '&:hover': {
-                        backgroundColor: 'action.hover',
-                      },
-                    }}
-                  >
-                    <Checkbox
-                      edge="start"
-                      checked={filesToUpload.has(file.name)}
-                      tabIndex={-1}
-                      disableRipple
-                      sx={{ mr: 1 }}
-                    />
-                    <ListItemText
-                      primary={file.name}
-                      secondary={`${(file.size / 1024 / 1024).toFixed(2)} MB`}
-                    />
-                  </ListItemButton>
-                ))}
-              </List>
-            </Box>
-
-            {/* Missing Files */}
-            {missingFiles.length > 0 && (
-              <Alert severity="warning" sx={{ mt: 1 }}>
-                <Typography variant="body2">
-                  {t('planningData.upload.missingFiles') || 'Missing files'}:
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
-                  {missingFiles.map((file) => (
-                    <Chip key={file} label={file} size="small" variant="outlined" />
-                  ))}
-                </Box>
-              </Alert>
-            )}
+              {t('planningData.upload.selectFiles') || 'Select Files'}
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                hidden
+                onChange={handleFileInputChange}
+                accept=".json"
+              />
+            </Button>
           </Box>
-        )}
 
-        {/* Action Buttons */}
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="contained"
-            startIcon={uploading ? <CircularProgress size={20} /> : <CloudUploadIcon />}
-            onClick={handleUpload}
-            disabled={uploading || filesToUpload.size === 0}
-          >
-            {t('planningData.upload.upload') || 'Upload'} ({filesToUpload.size})
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={handleClear}
-            disabled={uploading || selectedFiles.length === 0}
-          >
-            {t('common.clear') || 'Clear'}
-          </Button>
-        </Box>
+          {/* Selected Files */}
+          {selectedFiles.length > 0 && (
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" gutterBottom>
+                {t('planningData.upload.selectedFiles') || 'Selected Files'} ({selectedFiles.length}/{REQUIRED_FILES.length})
+              </Typography>
+              <Box
+                sx={{
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 1,
+                  maxHeight: 300,
+                  overflow: 'auto',
+                  mb: 2,
+                }}
+              >
+                <List dense sx={{ py: 0 }}>
+                  {selectedFiles.map((file) => (
+                    <ListItemButton
+                      key={file.name}
+                      onClick={() => handleToggleFile(file.name)}
+                      sx={{
+                        py: 1,
+                        '&:hover': {
+                          backgroundColor: 'action.hover',
+                        },
+                      }}
+                    >
+                      <Checkbox
+                        edge="start"
+                        checked={filesToUpload.has(file.name)}
+                        tabIndex={-1}
+                        disableRipple
+                        sx={{ mr: 1 }}
+                      />
+                      <ListItemText
+                        primary={file.name}
+                        secondary={`${(file.size / 1024 / 1024).toFixed(2)} MB`}
+                      />
+                    </ListItemButton>
+                  ))}
+                </List>
+              </Box>
+
+              {/* Missing Files */}
+              {missingFiles.length > 0 && (
+                <Alert severity="warning" sx={{ mt: 1 }}>
+                  <Typography variant="body2">
+                    {t('planningData.upload.missingFiles') || 'Missing files'}:
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
+                    {missingFiles.map((file) => (
+                      <Chip key={file} label={file} size="small" variant="outlined" />
+                    ))}
+                  </Box>
+                </Alert>
+              )}
+
+              {/* Upload Comment */}
+              <TextField
+                fullWidth
+                multiline
+                rows={3}
+                label={t('planningData.upload.comment') || 'Upload Comment'}
+                placeholder={t('planningData.upload.commentPlaceholder') || 'Optional comment about this upload'}
+                value={uploadComment}
+                onChange={(e) => setUploadComment(e.target.value)}
+                disabled={uploading}
+                sx={{ mt: 2 }}
+              />
+            </Box>
+          )}
+
+          {/* Action Buttons */}
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="contained"
+              startIcon={uploading ? <CircularProgress size={20} /> : <CloudUploadIcon />}
+              onClick={handleUpload}
+              disabled={uploading || filesToUpload.size === 0}
+            >
+              {t('planningData.upload.upload') || 'Upload'} ({filesToUpload.size})
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={handleClear}
+              disabled={uploading || selectedFiles.length === 0}
+            >
+              {t('common.clear') || 'Clear'}
+            </Button>
+          </Box>
         </CardContent>
       </Card>
 

@@ -4228,7 +4228,9 @@
       "uploadSuccess": "Planning data has been successfully uploaded",
       "uploadFailed": "Failed to upload planning data",
       "selectFilesToUpload": "Please select files to upload",
-      "filesUploadedAndCached": "{{count}} planning data files uploaded and cached successfully"
+      "filesUploadedAndCached": "{{count}} planning data files uploaded and cached successfully",
+      "comment": "Upload Comment",
+      "commentPlaceholder": "Optional comment about this upload"
     },
     "tabs": {
       "rewardTypes": "Reward Types",
@@ -4283,7 +4285,12 @@
       "comment": "Comment",
       "filesUploaded": "Files Uploaded",
       "changedFiles": "Changed Files",
-      "latest": "Latest"
+      "latest": "Latest",
+      "added": "Added",
+      "removed": "Removed",
+      "modified": "Modified",
+      "noDiffAvailable": "Detailed diff not available",
+      "noChanges": "No changed files (initial upload)"
     }
   },
   "rewards": {

@@ -202,25 +202,80 @@ const PlanningDataHistoryPage: React.FC = () => {
                                             <TableCell colSpan={8} sx={{ py: 0 }}>
                                                 <Collapse in={expandedRow === record.id} timeout="auto" unmountOnExit>
                                                     <Box sx={{ py: 2, px: 4 }}>
-                                                        <Typography variant="subtitle2" gutterBottom>
-                                                            {t('planningData.history.filesUploaded')}:
-                                                        </Typography>
-                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
-                                                            {record.filesUploaded.map((file) => (
-                                                                <Chip key={file} size="small" label={file} variant="outlined" />
-                                                            ))}
-                                                        </Box>
-                                                        {record.changedFiles && record.changedFiles.length > 0 && (
+                                                        {record.changedFiles && record.changedFiles.length > 0 ? (
                                                             <>
                                                                 <Typography variant="subtitle2" gutterBottom>
-                                                                    {t('planningData.history.changedFiles')}:
+                                                                    {t('planningData.history.changedFiles')} ({record.changedFiles.length}):
                                                                 </Typography>
-                                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                                    {record.changedFiles.map((file) => (
-                                                                        <Chip key={file} size="small" label={file} color="warning" variant="outlined" />
-                                                                    ))}
+                                                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                                                    {record.changedFiles.map((file) => {
+                                                                        const fileDiff = record.fileDiffs?.[file];
+                                                                        return (
+                                                                            <Box key={file} sx={{ p: 1.5, bgcolor: 'action.hover', borderRadius: 1 }}>
+                                                                                <Chip size="small" label={file} color="warning" sx={{ mb: 1 }} />
+                                                                                {fileDiff && (
+                                                                                    <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 1 }}>
+                                                                                        {fileDiff.added?.length > 0 && (
+                                                                                            <Box>
+                                                                                                <Typography variant="caption" color="success.main" sx={{ fontWeight: 'bold' }}>
+                                                                                                    + {t('planningData.history.added')}: {fileDiff.added.length}
+                                                                                                </Typography>
+                                                                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+                                                                                                    {fileDiff.added.slice(0, 10).map((id: string) => (
+                                                                                                        <Chip key={id} size="small" label={`ID: ${id}`} color="success" variant="outlined" sx={{ fontSize: '0.7rem' }} />
+                                                                                                    ))}
+                                                                                                    {fileDiff.added.length > 10 && (
+                                                                                                        <Chip size="small" label={`+${fileDiff.added.length - 10} more`} variant="outlined" sx={{ fontSize: '0.7rem' }} />
+                                                                                                    )}
+                                                                                                </Box>
+                                                                                            </Box>
+                                                                                        )}
+                                                                                        {fileDiff.removed?.length > 0 && (
+                                                                                            <Box>
+                                                                                                <Typography variant="caption" color="error.main" sx={{ fontWeight: 'bold' }}>
+                                                                                                    − {t('planningData.history.removed')}: {fileDiff.removed.length}
+                                                                                                </Typography>
+                                                                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+                                                                                                    {fileDiff.removed.slice(0, 10).map((id: string) => (
+                                                                                                        <Chip key={id} size="small" label={`ID: ${id}`} color="error" variant="outlined" sx={{ fontSize: '0.7rem' }} />
+                                                                                                    ))}
+                                                                                                    {fileDiff.removed.length > 10 && (
+                                                                                                        <Chip size="small" label={`+${fileDiff.removed.length - 10} more`} variant="outlined" sx={{ fontSize: '0.7rem' }} />
+                                                                                                    )}
+                                                                                                </Box>
+                                                                                            </Box>
+                                                                                        )}
+                                                                                        {fileDiff.modified?.length > 0 && (
+                                                                                            <Box>
+                                                                                                <Typography variant="caption" color="warning.main" sx={{ fontWeight: 'bold' }}>
+                                                                                                    ~ {t('planningData.history.modified')}: {fileDiff.modified.length}
+                                                                                                </Typography>
+                                                                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+                                                                                                    {fileDiff.modified.slice(0, 10).map((id: string) => (
+                                                                                                        <Chip key={id} size="small" label={`ID: ${id}`} color="warning" variant="outlined" sx={{ fontSize: '0.7rem' }} />
+                                                                                                    ))}
+                                                                                                    {fileDiff.modified.length > 10 && (
+                                                                                                        <Chip size="small" label={`+${fileDiff.modified.length - 10} more`} variant="outlined" sx={{ fontSize: '0.7rem' }} />
+                                                                                                    )}
+                                                                                                </Box>
+                                                                                            </Box>
+                                                                                        )}
+                                                                                    </Box>
+                                                                                )}
+                                                                                {!fileDiff && (
+                                                                                    <Typography variant="caption" color="text.secondary">
+                                                                                        {t('planningData.history.noDiffAvailable')}
+                                                                                    </Typography>
+                                                                                )}
+                                                                            </Box>
+                                                                        );
+                                                                    })}
                                                                 </Box>
                                                             </>
+                                                        ) : (
+                                                            <Typography variant="body2" color="text.secondary">
+                                                                {t('planningData.history.noChanges')}
+                                                            </Typography>
                                                         )}
                                                     </Box>
                                                 </Collapse>

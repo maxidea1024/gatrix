@@ -310,6 +310,7 @@ export interface UploadRecord {
   uploadSource: 'web' | 'cli';
   uploadComment: string | null;
   changedFiles: string[];
+  fileDiffs?: Record<string, { added: string[]; removed: string[]; modified: string[] }>;
   uploadedAt: string;
 }
 

@@ -4225,7 +4225,9 @@
       "uploadSuccess": "기획데이터가 성공적으로 업로드되었습니다",
       "uploadFailed": "기획데이터 업로드에 실패했습니다",
       "selectFilesToUpload": "업로드할 파일을 선택해주세요",
-      "filesUploadedAndCached": "{{count}}개의 기획데이터 파일이 업로드되고 캐싱되었습니다"
+      "filesUploadedAndCached": "{{count}}개의 기획데이터 파일이 업로드되고 캐싱되었습니다",
+      "comment": "업로드 코멘트",
+      "commentPlaceholder": "이번 업로드에 대한 설명을 입력하세요 (선택사항)"
     },
     "tabs": {
       "rewardTypes": "보상 타입 목록",
@@ -4280,7 +4282,12 @@
       "comment": "코멘트",
       "filesUploaded": "업로드된 파일",
       "changedFiles": "변경된 파일",
-      "latest": "최신"
+      "latest": "최신",
+      "added": "추가",
+      "removed": "삭제",
+      "modified": "수정",
+      "noDiffAvailable": "상세 변경 내역을 확인할 수 없습니다",
+      "noChanges": "변경된 파일이 없습니다 (최초 업로드)"
     }
   },
   "rewards": {

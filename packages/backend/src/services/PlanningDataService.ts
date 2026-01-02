@@ -607,6 +607,7 @@ export class PlanningDataService {
       const uploadedFiles: string[] = [];
       const fileStats: Record<string, { size: number; path: string }> = {};
       const fileHashes: Record<string, string> = {};
+      const fileContents: Record<string, string> = {};
       const allBuffers: Buffer[] = [];
 
       // Process each uploaded file
@@ -639,6 +640,7 @@ export class PlanningDataService {
         // Calculate file hash
         const fileHash = crypto.createHash('sha256').update(file.buffer).digest('hex');
         fileHashes[fileName] = fileHash;
+        fileContents[fileName] = file.buffer.toString('utf-8');
         allBuffers.push(file.buffer);
 
         // Save file to disk (environment-specific path)
@@ -672,7 +674,31 @@ export class PlanningDataService {
         .orderBy('uploadedAt', 'desc')
         .first();
 
+      // Check if upload hash is the same - skip if no changes
+      if (previousUpload && previousUpload.uploadHash === uploadHash) {
+        logger.info('Planning data upload skipped - no changes detected', {
+          environment,
+          uploadHash: uploadHash.substring(0, 16),
+        });
+        return {
+          success: true,
+          message: 'No changes detected - upload skipped',
+          filesUploaded: uploadedFiles,
+          stats: {
+            filesUploaded: uploadedFiles.length,
+            totalSize: Object.values(fileStats).reduce((sum, stat) => sum + stat.size, 0),
+            timestamp: new Date().toISOString(),
+            uploadHash: uploadHash.substring(0, 16),
+            changedFilesCount: 0,
+            changedFiles: [],
+            skipped: true,
+          },
+        };
+      }
+
       let changedFiles: string[] = [];
+      const fileDiffs: Record<string, { added: string[]; removed: string[]; modified: string[] }> = {};
+
       if (previousUpload) {
         const prevHashes = typeof previousUpload.fileHashes === 'string'
           ? JSON.parse(previousUpload.fileHashes)
@@ -681,6 +707,27 @@ export class PlanningDataService {
         for (const [fileName, hash] of Object.entries(fileHashes)) {
           if (prevHashes[fileName] !== hash) {
             changedFiles.push(fileName);
+
+            // Calculate diff for JSON files
+            try {
+              const currentContent = fileContents[fileName];
+              if (currentContent) {
+                const currentJson = JSON.parse(currentContent);
+
+                // Try to get previous content from Redis cache
+                const prevKey = `planning_data:${environment}:${fileName}`;
+                const prevContent = await cacheService.get<string>(prevKey);
+                if (prevContent) {
+                  const prevJson = JSON.parse(prevContent);
+                  const diff = this.calculateJsonDiff(prevJson, currentJson);
+                  if (diff.added.length > 0 || diff.removed.length > 0 || diff.modified.length > 0) {
+                    fileDiffs[fileName] = diff;
+                  }
+                }
+              }
+            } catch {
+              // Skip diff for non-JSON or parse errors
+            }
           }
         }
       } else {
@@ -704,6 +751,7 @@ export class PlanningDataService {
         uploadSource: uploadInfo?.uploadSource || 'web',
         uploadComment: uploadInfo?.uploadComment || null,
         changedFiles: JSON.stringify(changedFiles),
+        fileDiffs: JSON.stringify(fileDiffs),
         uploadedAt: new Date(),
       });
 
@@ -769,6 +817,7 @@ export class PlanningDataService {
         uploadSource: upload.uploadSource,
         uploadComment: upload.uploadComment,
         changedFiles: typeof upload.changedFiles === 'string' ? JSON.parse(upload.changedFiles) : (upload.changedFiles || []),
+        fileDiffs: typeof upload.fileDiffs === 'string' ? JSON.parse(upload.fileDiffs) : (upload.fileDiffs || {}),
         uploadedAt: upload.uploadedAt,
       }));
     } catch (error) {
@@ -800,6 +849,7 @@ export class PlanningDataService {
         uploadSource: upload.uploadSource,
         uploadComment: upload.uploadComment,
         changedFiles: typeof upload.changedFiles === 'string' ? JSON.parse(upload.changedFiles) : (upload.changedFiles || []),
+        fileDiffs: typeof upload.fileDiffs === 'string' ? JSON.parse(upload.fileDiffs) : (upload.fileDiffs || {}),
         uploadedAt: upload.uploadedAt,
       };
     } catch (error) {
@@ -978,5 +1028,59 @@ export class PlanningDataService {
       throw new GatrixError('Failed to delete planning data', 500);
     }
   }
+
+  /**
+   * Calculate diff between two JSON objects (arrays)
+   * Returns lists of added, removed, and modified items
+   */
+  private static calculateJsonDiff(
+    oldJson: any,
+    newJson: any
+  ): { added: string[]; removed: string[]; modified: string[] } {
+    const added: string[] = [];
+    const removed: string[] = [];
+    const modified: string[] = [];
+
+    // Handle array data (most planning data is array of objects with id)
+    if (Array.isArray(oldJson) && Array.isArray(newJson)) {
+      const oldMap = new Map<string, any>();
+      const newMap = new Map<string, any>();
+
+      // Build maps by id (or first key if no id)
+      for (const item of oldJson) {
+        const key = item.id !== undefined ? String(item.id) : JSON.stringify(item);
+        oldMap.set(key, item);
+      }
+      for (const item of newJson) {
+        const key = item.id !== undefined ? String(item.id) : JSON.stringify(item);
+        newMap.set(key, item);
+      }
+
+      // Find added items
+      for (const [key] of newMap) {
+        if (!oldMap.has(key)) {
+          added.push(key);
+        }
+      }
+
+      // Find removed items
+      for (const [key] of oldMap) {
+        if (!newMap.has(key)) {
+          removed.push(key);
+        }
+      }
+
+      // Find modified items
+      for (const [key, newItem] of newMap) {
+        const oldItem = oldMap.get(key);
+        if (oldItem && JSON.stringify(oldItem) !== JSON.stringify(newItem)) {
+          modified.push(key);
+        }
+      }
+    }
+
+    return { added, removed, modified };
+  }
 }
+
 
