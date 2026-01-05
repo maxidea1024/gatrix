@@ -847,7 +847,7 @@ const MessageTemplatesPage: React.FC = () => {
       )}
 
       <Card sx={{ position: 'relative' }}>
-        <CardContent sx={{ p: 0 }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           <TableContainer
             sx={{
               opacity: !isInitialLoad && loading ? 0.5 : 1,

@@ -38,7 +38,7 @@ function getLocalizedDescription(product: StoreProduct, lang: SdkLanguage): stri
 
 /**
  * Strip internal fields from store product for SDK response
- * Removes: id, isActive, metadata, createdBy, updatedBy, createdAt, updatedAt, environmentId
+ * Removes: id, isActive, metadata, createdBy, updatedBy, createdAt, updatedAt, environment
  * Also removes multi-language fields and replaces with localized name/description
  */
 function stripInternalFields(product: StoreProduct, tags: any[], lang: SdkLanguage) {
@@ -50,7 +50,7 @@ function stripInternalFields(product: StoreProduct, tags: any[], lang: SdkLangua
     updatedBy: _updatedBy,
     createdAt: _createdAt,
     updatedAt: _updatedAt,
-    environmentId: _envId,
+    environment: _env,
     // Remove multi-language fields
     nameKo: _nameKo,
     nameEn: _nameEn,
@@ -70,7 +70,7 @@ function stripInternalFields(product: StoreProduct, tags: any[], lang: SdkLangua
   void _updatedBy;
   void _createdAt;
   void _updatedAt;
-  void _envId;
+  void _env;
   void _nameKo;
   void _nameEn;
   void _nameZh;
@@ -117,16 +117,26 @@ export class ServerStoreProductController {
    */
   static async getStoreProducts(req: EnvironmentRequest, res: Response) {
     try {
-      const environment = req.environment!;
+      const environment = req.environment;
       const lang = parseLanguage(req.query.language);
 
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'MISSING_ENVIRONMENT',
+            message: 'Environment is required',
+          },
+        });
+      }
+
       await respondWithEtagCache(res, {
-        cacheKey: `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment.id}`,
+        cacheKey: `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`,
         ttlMs: DEFAULT_CONFIG.STORE_PRODUCT_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
           const result = await StoreProductService.getStoreProducts({
-            environmentId: environment.id,
+            environment: environment,
             limit: 1000,
             page: 1,
             isActive: true,
@@ -140,7 +150,7 @@ export class ServerStoreProductController {
             }),
           );
 
-          logger.info(`Server SDK: Retrieved ${productsWithTags.length} store products for environment ${environment.environmentName} (lang: ${lang})`);
+          logger.info(`Server SDK: Retrieved ${productsWithTags.length} store products for environment ${environment} (lang: ${lang})`);
 
           return {
             success: true,
@@ -171,7 +181,18 @@ export class ServerStoreProductController {
   static async getStoreProductById(req: EnvironmentRequest, res: Response) {
     try {
       const { id } = req.params;
+      const environment = req.environment;
       const lang = parseLanguage(req.query.language);
+
+      if (!environment) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'MISSING_ENVIRONMENT',
+            message: 'Environment is required',
+          },
+        });
+      }
 
       if (!id) {
         return res.status(400).json({
@@ -211,7 +232,7 @@ export class ServerStoreProductController {
       const tags = await TagService.listTagsForEntity('store_product', product.id);
       const cleanProduct = stripInternalFields(product, tags, lang);
 
-      logger.info(`Server SDK: Retrieved store product ${id} (lang: ${lang})`);
+      logger.info(`Server SDK: Retrieved store product ${id} (lang: ${lang}) for environment ${environment}`);
 
       res.json({
         success: true,
@@ -231,6 +252,7 @@ export class ServerStoreProductController {
     }
   }
 }
+
 
 export default ServerStoreProductController;
 

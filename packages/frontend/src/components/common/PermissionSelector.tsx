@@ -26,7 +26,7 @@ import { Permission } from '@/types';
 import { PERMISSION_CATEGORIES, ALL_PERMISSIONS } from '@/types/permissions';
 
 export interface Environment {
-  id: string;
+  environment: string;
   name: string;
   displayName?: string;
   environmentName?: string;
@@ -42,9 +42,9 @@ interface PermissionSelectorProps {
   // Environment access props
   environments?: Environment[];
   allowAllEnvs?: boolean;
-  selectedEnvIds?: string[];
+  selectedEnvironments?: string[];
   onAllowAllEnvsChange?: (allowAll: boolean) => void;
-  onEnvIdsChange?: (envIds: string[]) => void;
+  onEnvironmentsChange?: (environments: string[]) => void;
   showEnvironments?: boolean;
 }
 
@@ -67,9 +67,9 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
   showPermissionCategories = true,
   environments = [],
   allowAllEnvs = false,
-  selectedEnvIds = [],
+  selectedEnvironments = [],
   onAllowAllEnvsChange,
-  onEnvIdsChange,
+  onEnvironmentsChange,
   showEnvironments = false,
 }) => {
   const { t } = useTranslation();
@@ -327,10 +327,10 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                 {t('permissions.categories.environments')}
               </Typography>
               <Chip
-                label={allowAllEnvs ? t('common.all') : `${selectedEnvIds.length}/${environments.length}`}
+                label={allowAllEnvs ? t('common.all') : `${selectedEnvironments.length}/${environments.length}`}
                 size="small"
-                color={allowAllEnvs ? 'warning' : selectedEnvIds.length > 0 ? 'success' : 'default'}
-                variant={allowAllEnvs || selectedEnvIds.length > 0 ? 'filled' : 'outlined'}
+                color={allowAllEnvs ? 'warning' : selectedEnvironments.length > 0 ? 'success' : 'default'}
+                variant={allowAllEnvs || selectedEnvironments.length > 0 ? 'filled' : 'outlined'}
                 sx={{ ml: 'auto', mr: 1, height: 24, fontSize: '0.75rem' }}
               />
             </AccordionSummary>
@@ -354,11 +354,11 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                 pointerEvents: allowAllEnvs ? 'none' : 'auto',
               }}>
                 {environments.map((env) => {
-                  const isSelected = allowAllEnvs || selectedEnvIds.includes(env.id);
+                  const isSelected = allowAllEnvs || selectedEnvironments.includes(env.environment);
                   const displayName = env.displayName || env.environmentName || env.name;
                   return (
                     <Tooltip
-                      key={env.id}
+                      key={env.environment}
                       title={t('users.environmentAccessDesc', { name: displayName })}
                       arrow
                       placement="top"
@@ -367,10 +367,10 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                       <Box
                         onClick={() => {
                           if (allowAllEnvs) return;
-                          if (selectedEnvIds.includes(env.id)) {
-                            onEnvIdsChange?.(selectedEnvIds.filter(id => id !== env.id));
+                          if (selectedEnvironments.includes(env.environment)) {
+                            onEnvironmentsChange?.(selectedEnvironments.filter(id => id !== env.environment));
                           } else {
-                            onEnvIdsChange?.([...selectedEnvIds, env.id]);
+                            onEnvironmentsChange?.([...selectedEnvironments, env.environment]);
                           }
                         }}
                         sx={{

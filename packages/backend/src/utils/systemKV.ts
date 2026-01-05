@@ -2,14 +2,12 @@
  * System KV (Key-Value) definitions
  * 
  * This file allows programmatic definition of system-level KV items.
- * System-defined KV items:
- * - Cannot be deleted
- * - Cannot have their type changed
- * - Can have their value updated
  */
 
 import VarsModel, { VarValueType } from '../models/Vars';
 import logger from '../config/logger';
+import { getAllEnvironments } from './environmentContext';
+import knex from '../config/knex';
 
 interface SystemKVDefinition {
   key: string;
@@ -21,7 +19,6 @@ interface SystemKVDefinition {
 
 /**
  * System KV definitions
- * Add new system KV items here
  */
 const SYSTEM_KV_DEFINITIONS: SystemKVDefinition[] = [
   {
@@ -69,61 +66,52 @@ const SYSTEM_KV_DEFINITIONS: SystemKVDefinition[] = [
 ];
 
 /**
- * Initialize all system-defined KV items
- * This should be called during application startup
+ * Initialize all system-defined KV items for all environments
  */
-export async function initializeSystemKV(): Promise<void> {
+export async function initializeAllSystemKV(): Promise<void> {
   try {
-    logger.info('Initializing system-defined KV items...');
+    logger.info('Initializing system-defined KV items for all environments...');
+    const environments = await getAllEnvironments(knex);
 
-    for (const def of SYSTEM_KV_DEFINITIONS) {
-      await VarsModel.defineSystemKV(
-        def.key,
-        def.value,
-        def.valueType,
-        def.description,
-        def.isCopyable
-      );
-      logger.info(`System KV initialized: ${def.key}`);
+    for (const environment of environments) {
+      await initializeSystemKV(environment);
     }
 
-    logger.info(`Successfully initialized ${SYSTEM_KV_DEFINITIONS.length} system KV items`);
+    logger.info(`Successfully initialized system KV items for ${environments.length} environments`);
   } catch (error) {
-    logger.error('Error initializing system KV items:', error);
+    logger.error('Error initializing all system KV items:', error);
     throw error;
   }
 }
 
 /**
  * Initialize system-defined KV items for a specific environment
- * This should be called when creating a new environment without a base environment
  */
-export async function initializeSystemKVForEnvironment(environmentId: string): Promise<void> {
+export async function initializeSystemKV(environment: string): Promise<void> {
   try {
-    logger.info(`Initializing system-defined KV items for environment ${environmentId}...`);
+    logger.info(`Initializing system-defined KV items for environment ${environment}...`);
 
     for (const def of SYSTEM_KV_DEFINITIONS) {
       await VarsModel.defineSystemKV(
         def.key,
         def.value,
         def.valueType,
+        environment,
         def.description,
-        def.isCopyable,
-        environmentId
+        def.isCopyable
       );
-      logger.info(`System KV initialized for env ${environmentId}: ${def.key}`);
+      logger.info(`System KV initialized for env ${environment}: ${def.key}`);
     }
 
-    logger.info(`Successfully initialized ${SYSTEM_KV_DEFINITIONS.length} system KV items for environment ${environmentId}`);
+    logger.info(`Successfully initialized ${SYSTEM_KV_DEFINITIONS.length} system KV items for environment ${environment}`);
   } catch (error) {
-    logger.error(`Error initializing system KV items for environment ${environmentId}:`, error);
+    logger.error(`Error initializing system KV items for environment ${environment}:`, error);
     throw error;
   }
 }
 
 /**
  * Get all system KV definitions
- * Useful for checking what system KVs should exist
  */
 export function getSystemKVDefinitions(): SystemKVDefinition[] {
   return [...SYSTEM_KV_DEFINITIONS];
@@ -131,19 +119,19 @@ export function getSystemKVDefinitions(): SystemKVDefinition[] {
 
 /**
  * Define a new system KV item programmatically
- * Use this function to add system KV items at runtime
  */
 export async function defineSystemKV(
   key: string,
   value: string | null,
   valueType: VarValueType,
+  environment: string,
   description: string
 ): Promise<void> {
   try {
-    await VarsModel.defineSystemKV(key, value, valueType, description);
-    logger.info(`System KV defined: ${key}`);
+    await VarsModel.defineSystemKV(key, value, valueType, environment, description);
+    logger.info(`System KV defined: ${key} in ${environment}`);
   } catch (error) {
-    logger.error(`Error defining system KV ${key}:`, error);
+    logger.error(`Error defining system KV ${key} in ${environment}:`, error);
     throw error;
   }
 }

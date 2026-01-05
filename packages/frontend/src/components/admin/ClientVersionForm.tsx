@@ -58,6 +58,7 @@ import JsonEditor from '../common/JsonEditor';
 import MaintenanceSettingsInput from '../common/MaintenanceSettingsInput';
 import { MessageTemplate, messageTemplateService } from '../../services/messageTemplateService';
 import { MessageLocale } from '../common/MultiLanguageMessageInput';
+import { getContrastColor } from '@/utils/colorUtils';
 
 interface ClientVersionFormProps {
   open: boolean;
@@ -952,7 +953,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           variant="outlined"
                           label={option.name}
                           size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          sx={{ bgcolor: option.color, color: getContrastColor(option.color) }}
                           {...chipProps}
                         />
                       </Tooltip>
@@ -967,7 +968,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     <Chip
                       label={option.name}
                       size="small"
-                      sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                      sx={{ bgcolor: option.color, color: getContrastColor(option.color), mr: 1 }}
                     />
                     {option.description || t('common.noDescription')}
                   </Box>

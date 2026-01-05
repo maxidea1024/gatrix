@@ -1,13 +1,14 @@
 import api from './api';
 
 export interface Environment {
-  id: string;
-  environmentName: string;
+  environment: string; // Primary identifier (environment name)
+  environmentName: string; // Alias for backward compatibility
   displayName: string;
   environmentType: 'development' | 'staging' | 'production';
   description?: string;
   isSystemDefined: boolean;
   isHidden: boolean;
+  isDefault: boolean;
   displayOrder: number;
   color?: string;
   createdAt: string;
@@ -15,13 +16,13 @@ export interface Environment {
 }
 
 export interface CreateEnvironmentData {
-  environmentName: string;
+  environment: string; // Environment name (primary key)
   displayName: string;
   description?: string;
   environmentType: 'development' | 'staging' | 'production';
   color?: string;
   displayOrder?: number;
-  baseEnvironmentId?: string; // If provided, copy data from this environment
+  baseEnvironment?: string; // If provided, copy data from this environment
 }
 
 export interface UpdateEnvironmentData {
@@ -96,14 +97,12 @@ export interface CopyPreviewSummary {
 
 export interface CopyPreview {
   source: {
-    id: string;
+    environment: string;
     name: string;
-    environmentName: string;
   };
   target: {
-    id: string;
+    environment: string;
     name: string;
-    environmentName: string;
   };
   summary: {
     templates: CopyPreviewSummary;
@@ -159,13 +158,13 @@ export interface RelatedDataDetails {
   jobs: RelatedDataCategory;
   clientVersions: RelatedDataCategory;
   apiTokens: RelatedDataCategory;
+  storeProducts: RelatedDataCategory;
   total: number;
 }
 
 export interface EnvironmentRelatedData {
   environment: {
-    id: string;
-    environmentName: string;
+    environment: string;
     displayName: string;
     isSystemDefined: boolean;
     isDefault: boolean;
@@ -192,11 +191,12 @@ class EnvironmentService {
   }
 
   /**
-   * Get environment by ID
+   * Get environment by name
+   * @param environment Environment name (primary key)
    */
-  async getEnvironment(id: string): Promise<Environment> {
+  async getEnvironment(environment: string): Promise<Environment> {
     try {
-      const response = await api.get(`/admin/environments/${id}`);
+      const response = await api.get(`/admin/environments/${environment}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching environment:', error);
@@ -219,10 +219,11 @@ class EnvironmentService {
 
   /**
    * Update an existing environment
+   * @param environment Environment name (primary key)
    */
-  async updateEnvironment(id: string, data: UpdateEnvironmentData): Promise<Environment> {
+  async updateEnvironment(environment: string, data: UpdateEnvironmentData): Promise<Environment> {
     try {
-      const response = await api.put(`/admin/environments/${id}`, data);
+      const response = await api.put(`/admin/environments/${environment}`, data);
       return response.data;
     } catch (error) {
       console.error('Error updating environment:', error);
@@ -232,10 +233,12 @@ class EnvironmentService {
 
   /**
    * Get copy preview between two environments
+   * @param sourceEnvironment Source environment name
+   * @param targetEnvironment Target environment name
    */
-  async getCopyPreview(sourceId: string, targetId: string): Promise<CopyPreview> {
+  async getCopyPreview(sourceEnvironment: string, targetEnvironment: string): Promise<CopyPreview> {
     try {
-      const response = await api.get(`/admin/environments/${sourceId}/copy/${targetId}/preview`);
+      const response = await api.get(`/admin/environments/${sourceEnvironment}/copy/${targetEnvironment}/preview`);
       return response.data;
     } catch (error) {
       console.error('Error fetching copy preview:', error);
@@ -245,10 +248,12 @@ class EnvironmentService {
 
   /**
    * Copy data from one environment to another
+   * @param sourceEnvironment Source environment name
+   * @param targetEnvironment Target environment name
    */
-  async copyEnvironmentData(sourceId: string, targetId: string, options: CopyOptions): Promise<CopyResult> {
+  async copyEnvironmentData(sourceEnvironment: string, targetEnvironment: string, options: CopyOptions): Promise<CopyResult> {
     try {
-      const response = await api.post(`/admin/environments/${sourceId}/copy/${targetId}`, options);
+      const response = await api.post(`/admin/environments/${sourceEnvironment}/copy/${targetEnvironment}`, options);
       return response.data;
     } catch (error) {
       console.error('Error copying environment data:', error);
@@ -258,10 +263,11 @@ class EnvironmentService {
 
   /**
    * Get related data counts for an environment (for delete confirmation)
+   * @param environment Environment name (primary key)
    */
-  async getRelatedData(id: string): Promise<EnvironmentRelatedData> {
+  async getRelatedData(environment: string): Promise<EnvironmentRelatedData> {
     try {
-      const response = await api.get(`/admin/environments/${id}/related-data`);
+      const response = await api.get(`/admin/environments/${environment}/related-data`);
       return response.data;
     } catch (error) {
       console.error('Error fetching related data:', error);
@@ -271,12 +277,12 @@ class EnvironmentService {
 
   /**
    * Delete an environment
-   * @param id Environment ID
+   * @param environment Environment name (primary key)
    * @param force If true, delete all related data as well
    */
-  async deleteEnvironment(id: string, force: boolean = false): Promise<void> {
+  async deleteEnvironment(environment: string, force: boolean = false): Promise<void> {
     try {
-      await api.delete(`/admin/environments/${id}`, { data: { force } });
+      await api.delete(`/admin/environments/${environment}`, { data: { force } });
     } catch (error) {
       console.error('Error deleting environment:', error);
       throw error;
@@ -286,4 +292,3 @@ class EnvironmentService {
 
 export const environmentService = new EnvironmentService();
 export default environmentService;
-

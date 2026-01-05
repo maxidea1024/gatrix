@@ -8,7 +8,11 @@
 
 import { Request, Response } from 'express';
 import serviceDiscoveryService from '../services/serviceDiscoveryService';
-import logger from '../config/logger';
+import {
+  sendInternalError,
+  sendSuccessResponse,
+  ErrorCodes,
+} from '../utils/apiResponse';
 
 class ServiceDiscoveryController {
   /**
@@ -20,16 +24,9 @@ class ServiceDiscoveryController {
       const { type, group } = req.query;
       const services = await serviceDiscoveryService.getServices(type as string, group as string);
 
-      res.json({
-        success: true,
-        data: services,
-      });
-    } catch (error: any) {
-      logger.error('Failed to get services:', error);
-      res.status(500).json({
-        success: false,
-        error: error.message || 'Failed to get services',
-      });
+      return sendSuccessResponse(res, services);
+    } catch (error) {
+      return sendInternalError(res, 'Failed to get services', error, ErrorCodes.SERVICE_DISCOVERY_ERROR);
     }
   }
 
@@ -41,16 +38,9 @@ class ServiceDiscoveryController {
     try {
       const stats = await serviceDiscoveryService.getServiceStats();
 
-      res.json({
-        success: true,
-        data: stats,
-      });
-    } catch (error: any) {
-      logger.error('Failed to get service stats:', error);
-      res.status(500).json({
-        success: false,
-        error: error.message || 'Failed to get service stats',
-      });
+      return sendSuccessResponse(res, stats);
+    } catch (error) {
+      return sendInternalError(res, 'Failed to get service stats', error, ErrorCodes.SERVICE_DISCOVERY_ERROR);
     }
   }
 
@@ -62,19 +52,11 @@ class ServiceDiscoveryController {
     try {
       const types = await serviceDiscoveryService.getServiceTypes();
 
-      res.json({
-        success: true,
-        data: types,
-      });
-    } catch (error: any) {
-      logger.error('Failed to get service types:', error);
-      res.status(500).json({
-        success: false,
-        error: error.message || 'Failed to get service types',
-      });
+      return sendSuccessResponse(res, types);
+    } catch (error) {
+      return sendInternalError(res, 'Failed to get service types', error, ErrorCodes.SERVICE_DISCOVERY_ERROR);
     }
   }
 }
 
 export default new ServiceDiscoveryController();
-

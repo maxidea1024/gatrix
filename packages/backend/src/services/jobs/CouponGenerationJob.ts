@@ -67,16 +67,16 @@ export class CouponGenerationJob {
         ['IN_PROGRESS', jobIdForDb, settingId]
       );
 
-      // Get codePattern and environmentId from settings
+      // Get codePattern and environment from settings
       const [settings] = await pool.execute<RowDataPacket[]>(
-        'SELECT codePattern, environmentId FROM g_coupon_settings WHERE id = ?',
+        'SELECT codePattern, environment FROM g_coupon_settings WHERE id = ?',
         [settingId]
       );
       const codePattern = (settings[0]?.codePattern || 'ALPHANUMERIC_8') as CodePattern;
-      const environmentId = settings[0]?.environmentId;
+      const environment = settings[0]?.environment;
 
-      if (!environmentId) {
-        throw new Error('Setting not found or missing environmentId');
+      if (!environment) {
+        throw new Error('Setting not found or missing environment');
       }
 
       // Generate and insert codes in streaming batches
@@ -84,7 +84,7 @@ export class CouponGenerationJob {
       let totalGenerated = 0;
       let lastProgressUpdate = 0;
 
-      logger.info('Starting streaming batch generation', { settingId, quantity, codePattern, environmentId });
+      logger.info('Starting streaming batch generation', { settingId, quantity, codePattern, environment });
 
       for (let i = 0; i < quantity; i += this.BATCH_SIZE) {
         const batchCodes: Array<[string, string, string, string]> = [];
@@ -122,14 +122,14 @@ export class CouponGenerationJob {
           }
 
           localSet.add(code!);
-          batchCodes.push([ulid(), settingId, code!, environmentId]);
+          batchCodes.push([ulid(), settingId, code!, environment]);
         }
 
         // Insert batch immediately (streaming approach)
         if (batchCodes.length > 0) {
           const placeholders = batchCodes.map(() => '(?, ?, ?, ?)').join(',');
           await pool.execute(
-            `INSERT INTO g_coupons (id, settingId, code, environmentId) VALUES ${placeholders}`,
+            `INSERT INTO g_coupons (id, settingId, code, environment) VALUES ${placeholders}`,
             batchCodes.flat()
           );
 

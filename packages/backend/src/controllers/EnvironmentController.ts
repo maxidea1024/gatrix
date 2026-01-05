@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import { Environment } from '../models/Environment';
 import { RemoteConfigSegment } from '../models/RemoteConfigSegment';
-import { asyncHandler } from '../utils/asyncHandler';
+import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import logger from '../config/logger';
 import { EnvironmentCopyService, CopyOptions } from '../services/EnvironmentCopyService';
-import { initializeSystemKVForEnvironment } from '../utils/systemKV';
+import { initializeSystemKV } from '../utils/systemKV';
 import { pubSubService } from '../services/PubSubService';
+import { ErrorCodes } from '../utils/apiResponse';
 
 export class EnvironmentController {
   /**
@@ -16,11 +17,13 @@ export class EnvironmentController {
     const includeHidden = req.query.includeHidden === 'true';
     const environments = await Environment.getAll(includeHidden);
 
-    // Get stats for each environment
+    // Get stats for each environment and add id field for frontend compatibility
     const environmentsWithStats = await Promise.all(
       environments.map(async (env) => {
         const stats = await env.getStats();
         return {
+          id: env.environment, // Map environment to id for frontend compatibility
+          environmentName: env.environment, // Also provide as environmentName
           ...env,
           stats
         };
@@ -34,31 +37,28 @@ export class EnvironmentController {
   });
 
   /**
-   * Get environment by ID
+   * Get environment by name
    */
   static getEnvironment = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const { environment } = req.params;
 
-    const environment = await Environment.query()
-      .findById(id)
+    const env = await Environment.query()
+      .findById(environment)
       .withGraphFetched('[creator(basicInfo), updater(basicInfo)]')
       .modifiers({
         basicInfo: (builder) => builder.select('id', 'username', 'email')
       });
 
-    if (!environment) {
-      return res.status(404).json({
-        success: false,
-        message: 'Environment not found'
-      });
+    if (!env) {
+      throw new GatrixError('Environment not found', 404, true, ErrorCodes.ENV_NOT_FOUND);
     }
 
-    const stats = await environment.getStats();
+    const stats = await env.getStats();
 
     res.json({
       success: true,
       data: {
-        ...environment,
+        ...env,
         stats
       }
     });
@@ -69,7 +69,7 @@ export class EnvironmentController {
    */
   static createEnvironment = asyncHandler(async (req: Request, res: Response) => {
     const {
-      environmentName,
+      environment,
       displayName,
       description,
       environmentType,
@@ -78,31 +78,25 @@ export class EnvironmentController {
       projectId,
       requiresApproval,
       requiredApprovers,
-      baseEnvironmentId
+      baseEnvironment
     } = req.body;
     const userId = (req.user as any)?.userId;
 
     if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message: 'User not authenticated'
-      });
+      throw new GatrixError('User not authenticated', 401, true, ErrorCodes.UNAUTHORIZED);
     }
 
     // Validate base environment if provided
-    if (baseEnvironmentId) {
-      const baseEnv = await Environment.query().findById(baseEnvironmentId);
+    if (baseEnvironment) {
+      const baseEnv = await Environment.query().findById(baseEnvironment);
       if (!baseEnv) {
-        return res.status(400).json({
-          success: false,
-          message: 'Base environment not found'
-        });
+        throw new GatrixError('Base environment not found', 400, true, ErrorCodes.ENV_NOT_FOUND);
       }
     }
 
     try {
-      const environment = await Environment.createEnvironment({
-        environmentName,
+      const newEnv = await Environment.createEnvironment({
+        environment,
         displayName,
         description,
         environmentType: environmentType || 'development',
@@ -118,17 +112,17 @@ export class EnvironmentController {
       });
 
       // Create predefined segments and system KV for the new environment (only if no base environment)
-      if (!baseEnvironmentId) {
-        await RemoteConfigSegment.createPredefinedSegments(environment.id, userId);
+      if (!baseEnvironment) {
+        await RemoteConfigSegment.createPredefinedSegments(newEnv.environment, userId);
         // Initialize system-defined KV items ($channels, $platforms, $clientVersionPassiveData)
-        await initializeSystemKVForEnvironment(environment.id);
-        logger.info(`System KV items initialized for new environment: ${environmentName}`);
+        await initializeSystemKV(newEnv.environment);
+        logger.info(`System KV items initialized for new environment: ${environment}`);
       }
 
       // Copy data from base environment if provided
       let copyResult = null;
-      if (baseEnvironmentId) {
-        logger.info(`Copying data from base environment ${baseEnvironmentId} to new environment ${environment.id}`);
+      if (baseEnvironment) {
+        logger.info(`Copying data from base environment ${baseEnvironment} to new environment ${newEnv.environment}`);
 
         const copyOptions: CopyOptions = {
           copyTemplates: true,
@@ -154,24 +148,23 @@ export class EnvironmentController {
         };
 
         copyResult = await EnvironmentCopyService.copyEnvironmentData(
-          baseEnvironmentId,
-          environment.id,
+          baseEnvironment,
+          newEnv.environment,
           copyOptions,
           userId
         );
 
-        logger.info(`Data copied from base environment to ${environmentName}`, { copyResult });
+        logger.info(`Data copied from base environment to ${environment}`, { copyResult });
       }
 
-      logger.info(`Environment created: ${environmentName} by user ${userId}`);
+      logger.info(`Environment created: ${environment} by user ${userId}`);
 
       // Publish SDK event for dynamic environment detection
       try {
         await pubSubService.publishSDKEvent({
           type: 'environment.created',
           data: {
-            id: environment.id,
-            environment: environment.environmentName,
+            environment: newEnv.environment,
             timestamp: Date.now()
           }
         });
@@ -181,9 +174,9 @@ export class EnvironmentController {
 
       res.status(201).json({
         success: true,
-        data: environment,
+        data: newEnv,
         copyResult,
-        message: baseEnvironmentId
+        message: baseEnvironment
           ? 'Environment created and data copied from base environment successfully'
           : 'Environment created successfully'
       });
@@ -200,27 +193,21 @@ export class EnvironmentController {
    * Update environment
    */
   static updateEnvironment = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { displayName, description, requiresApproval, requiredApprovers, isDefault, isHidden } = req.body;
+    const { environment } = req.params;
+    const { displayName, description, requiresApproval, requiredApprovers, isDefault, isHidden, color, displayOrder } = req.body;
     const userId = (req.user as any)?.userId;
 
     if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message: 'User not authenticated'
-      });
+      throw new GatrixError('User not authenticated', 401, true, ErrorCodes.UNAUTHORIZED);
     }
 
-    const environment = await Environment.query().findById(id);
-    if (!environment) {
-      return res.status(404).json({
-        success: false,
-        message: 'Environment not found'
-      });
+    const env = await Environment.query().findById(environment);
+    if (!env) {
+      throw new GatrixError('Environment not found', 404, true, ErrorCodes.ENV_NOT_FOUND);
     }
 
     // Prevent modifying hidden status for system environments like gatrix-env
-    if (isHidden !== undefined && environment.environmentName === 'gatrix-env') {
+    if (isHidden !== undefined && env.environment === 'gatrix-env') {
       return res.status(400).json({
         success: false,
         code: 'CANNOT_MODIFY_SYSTEM_ENVIRONMENT',
@@ -229,16 +216,18 @@ export class EnvironmentController {
     }
 
     try {
-      const updatedEnvironment = await environment.updateEnvironment({
+      const updatedEnvironment = await env.updateEnvironment({
         displayName,
         description,
         requiresApproval,
         requiredApprovers,
         isDefault,
-        isHidden
+        isHidden,
+        color,
+        displayOrder
       }, userId);
 
-      logger.info(`Environment updated: ${environment.environmentName} by user ${userId}`);
+      logger.info(`Environment updated: ${env.environment} by user ${userId}`);
 
       res.json({
         success: true,
@@ -258,30 +247,29 @@ export class EnvironmentController {
    * Get related data details for an environment (for delete confirmation)
    */
   static getEnvironmentRelatedData = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const { environment: envParam } = req.params;
 
-    const environment = await Environment.query().findById(id);
-    if (!environment) {
+    const env = await Environment.query().findById(envParam);
+    if (!env) {
       return res.status(404).json({
         success: false,
         message: 'Environment not found'
       });
     }
 
-    const relatedData = await environment.getRelatedDataDetails();
+    const relatedData = await env.getRelatedDataDetails();
 
     res.json({
       success: true,
       data: {
         environment: {
-          id: environment.id,
-          environmentName: environment.environmentName,
-          displayName: environment.displayName,
-          isSystemDefined: environment.isSystemDefined,
-          isDefault: environment.isDefault,
+          environment: env.environment,
+          displayName: env.displayName,
+          isSystemDefined: env.isSystemDefined,
+          isDefault: env.isDefault,
         },
         relatedData,
-        canDelete: !environment.isSystemDefined && !environment.isDefault,
+        canDelete: !env.isSystemDefined && !env.isDefault,
         hasData: relatedData.total > 0,
       }
     });
@@ -291,7 +279,7 @@ export class EnvironmentController {
    * Delete environment
    */
   static deleteEnvironment = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const { environment: envParam } = req.params;
     const { force } = req.body || {};
     const userId = (req.user as any)?.userId;
 
@@ -302,8 +290,8 @@ export class EnvironmentController {
       });
     }
 
-    const environment = await Environment.query().findById(id);
-    if (!environment) {
+    const env = await Environment.query().findById(envParam);
+    if (!env) {
       return res.status(404).json({
         success: false,
         message: 'Environment not found'
@@ -311,12 +299,12 @@ export class EnvironmentController {
     }
 
     try {
-      const environmentName = environment.environmentName;
-      await environment.deleteEnvironment(force === true);
+      const environmentName = env.environment;
+      await env.deleteEnvironment(force === true);
 
       logger.info(`Environment deleted: ${environmentName} by user ${userId}`, {
         force,
-        environmentId: id
+        environment: envParam
       });
 
       // Publish SDK event for dynamic environment detection
@@ -324,7 +312,6 @@ export class EnvironmentController {
         await pubSubService.publishSDKEvent({
           type: 'environment.deleted',
           data: {
-            id,
             environment: environmentName,
             timestamp: Date.now()
           }
@@ -377,17 +364,17 @@ export class EnvironmentController {
    * Get environment segments
    */
   static getEnvironmentSegments = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const { environment } = req.params;
 
-    const environment = await Environment.query().findById(id);
-    if (!environment) {
+    const env = await Environment.query().findById(environment);
+    if (!env) {
       return res.status(404).json({
         success: false,
         message: 'Environment not found'
       });
     }
 
-    const segments = await RemoteConfigSegment.getAllByEnvironment(environment.id);
+    const segments = await RemoteConfigSegment.getAllByEnvironment(env.environment);
 
     res.json({
       success: true,
@@ -399,7 +386,7 @@ export class EnvironmentController {
    * Create predefined segments for environment
    */
   static createPredefinedSegments = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const { environment } = req.params;
     const userId = (req.user as any)?.userId;
 
     if (!userId) {
@@ -409,8 +396,8 @@ export class EnvironmentController {
       });
     }
 
-    const environment = await Environment.query().findById(id);
-    if (!environment) {
+    const env = await Environment.query().findById(environment);
+    if (!env) {
       return res.status(404).json({
         success: false,
         message: 'Environment not found'
@@ -418,9 +405,9 @@ export class EnvironmentController {
     }
 
     try {
-      const segments = await RemoteConfigSegment.createPredefinedSegments(environment.id, userId);
+      const segments = await RemoteConfigSegment.createPredefinedSegments(env.environment, userId);
 
-      logger.info(`Predefined segments created for environment: ${environment.environmentName} by user ${userId}`);
+      logger.info(`Predefined segments created for environment: ${env.environment} by user ${userId}`);
 
       res.json({
         success: true,
@@ -440,17 +427,17 @@ export class EnvironmentController {
    * Get environment statistics
    */
   static getEnvironmentStats = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const { environment } = req.params;
 
-    const environment = await Environment.query().findById(id);
-    if (!environment) {
+    const env = await Environment.query().findById(environment);
+    if (!env) {
       return res.status(404).json({
         success: false,
         message: 'Environment not found'
       });
     }
 
-    const stats = await environment.getStats();
+    const stats = await env.getStats();
 
     res.json({
       success: true,
@@ -462,16 +449,16 @@ export class EnvironmentController {
    * Validate environment name
    */
   static validateEnvironmentName = asyncHandler(async (req: Request, res: Response) => {
-    const { environmentName } = req.body;
+    const { environment } = req.body;
 
-    if (!environmentName) {
+    if (!environment) {
       return res.status(400).json({
         success: false,
         message: 'Environment name is required'
       });
     }
 
-    const isValid = Environment.isValidEnvironmentName(environmentName);
+    const isValid = Environment.isValidEnvironmentName(environment);
     if (!isValid) {
       return res.status(400).json({
         success: false,
@@ -479,7 +466,7 @@ export class EnvironmentController {
       });
     }
 
-    const existing = await Environment.getByName(environmentName);
+    const existing = await Environment.getByName(environment);
     if (existing) {
       return res.status(409).json({
         success: false,
@@ -497,7 +484,7 @@ export class EnvironmentController {
    * Copy data from one environment to another
    */
   static copyEnvironmentData = asyncHandler(async (req: Request, res: Response) => {
-    const { sourceEnvironmentId, targetEnvironmentId } = req.params;
+    const { sourceEnvironment, targetEnvironment } = req.params;
     const options = req.body as CopyOptions;
     const userId = (req.user as any)?.userId;
 
@@ -509,7 +496,7 @@ export class EnvironmentController {
     }
 
     // Validate source environment
-    const sourceEnv = await Environment.query().findById(sourceEnvironmentId);
+    const sourceEnv = await Environment.query().findById(sourceEnvironment);
     if (!sourceEnv) {
       return res.status(404).json({
         success: false,
@@ -518,7 +505,7 @@ export class EnvironmentController {
     }
 
     // Validate target environment
-    const targetEnv = await Environment.query().findById(targetEnvironmentId);
+    const targetEnv = await Environment.query().findById(targetEnvironment);
     if (!targetEnv) {
       return res.status(404).json({
         success: false,
@@ -526,7 +513,7 @@ export class EnvironmentController {
       });
     }
 
-    if (sourceEnvironmentId === targetEnvironmentId) {
+    if (sourceEnvironment === targetEnvironment) {
       return res.status(400).json({
         success: false,
         message: 'Source and target environments cannot be the same'
@@ -535,13 +522,13 @@ export class EnvironmentController {
 
     try {
       const result = await EnvironmentCopyService.copyEnvironmentData(
-        sourceEnvironmentId,
-        targetEnvironmentId,
+        sourceEnvironment,
+        targetEnvironment,
         options,
         userId
       );
 
-      logger.info(`Environment data copied from ${sourceEnv.environmentName} to ${targetEnv.environmentName} by user ${userId}`, {
+      logger.info(`Environment data copied from ${sourceEnv.environment} to ${targetEnv.environment} by user ${userId}`, {
         result
       });
 
@@ -563,10 +550,10 @@ export class EnvironmentController {
    * Get preview of data to be copied
    */
   static getCopyPreview = asyncHandler(async (req: Request, res: Response) => {
-    const { sourceEnvironmentId, targetEnvironmentId } = req.params;
+    const { sourceEnvironment, targetEnvironment } = req.params;
 
     // Validate source environment
-    const sourceEnv = await Environment.query().findById(sourceEnvironmentId);
+    const sourceEnv = await Environment.query().findById(sourceEnvironment);
     if (!sourceEnv) {
       return res.status(404).json({
         success: false,
@@ -575,7 +562,7 @@ export class EnvironmentController {
     }
 
     // Validate target environment
-    const targetEnv = await Environment.query().findById(targetEnvironmentId);
+    const targetEnv = await Environment.query().findById(targetEnvironment);
     if (!targetEnv) {
       return res.status(404).json({
         success: false,
@@ -585,20 +572,18 @@ export class EnvironmentController {
 
     try {
       const preview = await EnvironmentCopyService.getCopyPreview(
-        sourceEnvironmentId,
-        targetEnvironmentId
+        sourceEnvironment,
+        targetEnvironment
       );
 
       // Fill in environment info
       preview.source = {
-        id: sourceEnv.id,
-        name: sourceEnv.displayName,
-        environmentName: sourceEnv.environmentName
+        environment: sourceEnv.environment,
+        name: sourceEnv.displayName
       };
       preview.target = {
-        id: targetEnv.id,
-        name: targetEnv.displayName,
-        environmentName: targetEnv.environmentName
+        environment: targetEnv.environment,
+        name: targetEnv.displayName
       };
 
       res.json({

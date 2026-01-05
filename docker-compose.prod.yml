@@ -493,7 +493,7 @@ services:
       - "${ETCD_PORT:-52379}:2379"
       - "52380:2380"
     volumes:
-      - ${DATA_ROOT:-./data}/etcd:/etcd-data
+      - gatrix_etcd_data:/etcd-data
     networks:
       - gatrix-network
     healthcheck:
@@ -509,3 +509,6 @@ networks:
     ipam:
       config:
         - subnet: 172.22.0.0/16
+
+volumes:
+  gatrix_etcd_data:

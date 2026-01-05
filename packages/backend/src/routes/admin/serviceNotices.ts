@@ -11,10 +11,10 @@ import {
 const router = express.Router();
 
 // Get all service notices with pagination and filters
-router.get('/', ServiceNoticeController.getServiceNotices);
+router.get('/', ServiceNoticeController.getServiceNotices as any);
 
 // Get service notice by ID
-router.get('/:id', ServiceNoticeController.getServiceNoticeById);
+router.get('/:id', ServiceNoticeController.getServiceNoticeById as any);
 
 // Create service notice
 router.post('/', auditServiceNoticeCreate as any, ServiceNoticeController.createServiceNotice as any);

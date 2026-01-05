@@ -2086,6 +2086,7 @@
     "copiedToClipboard": "Copied to clipboard",
     "typeToConfirm": "Type \"{{name}}\" to confirm deletion:",
     "copy": "Copy",
+    "copyToClipboard": "Copy to clipboard",
     "paste": "Paste",
     "copyFailed": "Failed to copy to clipboard",
     "cannotCopySystemItem": "System items cannot be copied",
@@ -2308,7 +2309,13 @@
     },
     "relativeTime": {
       "secondsAgo": "{{seconds}} seconds ago"
-    }
+    },
+    "curlPreview": "curl Preview",
+    "request": "Request",
+    "example": "Example",
+    "queryParameters": "Query Parameters",
+    "receivedAt": "Received At",
+    "apiTokenRequired": "Please enter API token"
   },
   "createdAt": "createdAt",
   "dashboard": {
@@ -2427,7 +2434,30 @@
     "sessionExpired": "Session expired",
     "tryAgain": "Try again",
     "unauthorized": "Unauthorized",
-    "validationError": "Validation error"
+    "validationError": "Validation error",
+    "INTERNAL_SERVER_ERROR": "An internal server error occurred. Please try again later.",
+    "BAD_REQUEST": "Invalid request. Please check your input.",
+    "NOT_FOUND": "The requested resource was not found.",
+    "UNAUTHORIZED": "Authentication required. Please log in again.",
+    "FORBIDDEN": "Access denied.",
+    "VALIDATION_ERROR": "Invalid input values.",
+    "RESOURCE_NOT_FOUND": "The requested data was not found.",
+    "RESOURCE_ALREADY_EXISTS": "This data already exists.",
+    "RESOURCE_CREATE_FAILED": "Failed to create data.",
+    "RESOURCE_UPDATE_FAILED": "Failed to update data.",
+    "RESOURCE_DELETE_FAILED": "Failed to delete data.",
+    "RESOURCE_FETCH_FAILED": "Failed to fetch data.",
+    "AUTH_TOKEN_INVALID": "Invalid authentication token. Please log in again.",
+    "AUTH_TOKEN_EXPIRED": "Authentication token expired. Please log in again.",
+    "AUTH_PERMISSION_DENIED": "You don't have permission for this action.",
+    "USER_NOT_FOUND": "User not found.",
+    "ENV_NOT_FOUND": "Environment not found.",
+    "ENV_ACCESS_DENIED": "You don't have access to this environment.",
+    "RATE_LIMIT_EXCEEDED": "Too many requests. Please try again later.",
+    "TOO_MANY_REQUESTS": "Too many requests. Please try again later.",
+    "CONFLICT": "A conflict occurred. Please check your data.",
+    "SERVICE_UNAVAILABLE": "Service is temporarily unavailable.",
+    "TIMEOUT": "Request timed out."
   },
   "jobs": {
     "title": "Job Management",
@@ -2723,6 +2753,8 @@
     "hotTimeButtonEvent": "Hot Time Button Event",
     "liveEvent": "Live Event",
     "planningData": "Planning Data",
+    "planningDataManagement": "Planning Data Management",
+    "planningDataHistory": "Planning Data History",
     "serverManagement": "Server Management",
     "serverList": "Server List",
     "openApi": "Open API",
@@ -3542,6 +3574,7 @@
     "editNoticeSubtitle": "Edit popup notice information",
     "searchPlaceholder": "Search by content or description",
     "noNotices": "No popup notices registered",
+    "noNoticesFound": "No popup notices found.",
     "isActive": "Active",
     "isActiveHelp": "Set the activation status of the popup notice",
     "content": "Content",
@@ -3661,6 +3694,7 @@
       "issuedCount": "Issued Codes",
       "generatingCodes": "Generating codes",
       "generatingInBackground": "Generating coupons in the background.",
+      "noCoupons": "No coupons defined.",
       "issuedCodesDrawer": {
         "title": "Issued Coupon Codes",
         "subtitle": "Coupon Setting: {name}",
@@ -3706,7 +3740,8 @@
         "error429": "Too many requests for the same user/code (spam limit)",
         "errorCodesDesc": "Response examples for various error scenarios.",
         "apiTest": "API Test",
-        "copiedToClipboard": "Code copied to clipboard."
+        "copiedToClipboard": "Code copied to clipboard.",
+        "couponCodeRequired": "Please enter coupon code"
       },
       "columns": {
         "code": "Coupon Code",
@@ -3832,6 +3867,7 @@
         "characterId": "Character ID"
       },
       "allCoupons": "All Coupons",
+      "noRecords": "No coupon usage records.",
       "columns": {
         "couponName": "Coupon Name",
         "couponCode": "Coupon Code",
@@ -4202,7 +4238,16 @@
       "uploadSuccess": "Planning data has been successfully uploaded",
       "uploadFailed": "Failed to upload planning data",
       "selectFilesToUpload": "Please select files to upload",
-      "filesUploadedAndCached": "{{count}} planning data files uploaded and cached successfully"
+      "filesUploadedAndCached": "{{count}} planning data files uploaded and cached successfully",
+      "comment": "Upload Comment",
+      "commentPlaceholder": "Optional comment about this upload",
+      "alreadyUpToDate": "The data is already up to date. No changes were detected.",
+      "alreadyUpToDateTitle": "Already Up To Date",
+      "previewChanges": "Preview Changes",
+      "previewChangesTitle": "Preview Changes",
+      "previewFailed": "Failed to preview changes",
+      "noChangesDetected": "No changes detected. The data is already up to date.",
+      "filesChanged": "files changed"
     },
     "tabs": {
       "rewardTypes": "Reward Types",
@@ -4225,7 +4270,66 @@
     "testComponent": {
       "title": "Test Component (Data Verification)"
     },
-    "noData": "No data available"
+    "noData": "No data available",
+    "noDataTitle": "No Planning Data Uploaded",
+    "noDataDescription": "Please upload planning data for the game. You can upload via Web UI or CLI.",
+    "uploadGuide": {
+      "title": "Upload Guide",
+      "subtitle": "Learn how to upload planning data.",
+      "webUpload": "Upload via Web UI",
+      "webUploadDesc": "Click the 'Upload Planning Data' button above to select and upload local files.",
+      "dataBuild": "Data Build (Excel → JSON Conversion)",
+      "dataBuildDesc": "Convert client CMS data to JSON format.",
+      "clientDataWarning": "You must use CLIENT CMS data, NOT server data!",
+      "cliUpload": "Remote Upload via CLI",
+      "cliUploadDesc": "Upload converted data to the remote server.",
+      "curlUpload": "Upload via curl",
+      "curlUploadDesc": "Upload files directly using the curl command."
+    },
+    "uploadInfo": {
+      "lastUpload": "Last Upload",
+      "by": "By",
+      "hash": "Hash",
+      "files": "files"
+    },
+    "history": {
+      "title": "Planning Data History",
+      "subtitle": "View upload history and change logs for planning data.",
+      "loadFailed": "Failed to load upload history",
+      "noRecords": "No upload records found",
+      "uploadedAt": "Uploaded At",
+      "uploader": "Uploader",
+      "source": "Source",
+      "hash": "Hash",
+      "searchPlaceholder": "Search by uploader, hash, comment, or file",
+      "totalRecords": "Total",
+      "filesCount": "Files",
+      "changedFilesCount": "Changed",
+      "size": "Size",
+      "changes": "Changes",
+      "comment": "Comment",
+      "filesUploaded": "Files Uploaded",
+      "changedFiles": "Changed Files",
+      "latest": "Latest",
+      "added": "Added",
+      "removed": "Removed",
+      "modified": "Modified",
+      "noDiffAvailable": "Detailed diff not available",
+      "noChanges": "No changed files (initial upload)",
+      "resetAll": "Reset All",
+      "resetConfirmTitle": "Reset All Upload History",
+      "resetWarning": "This action cannot be undone. All upload records will be permanently deleted.",
+      "resetConfirmMessage": "{{count}} upload records will be deleted.",
+      "resetConfirmInstruction": "To confirm deletion, type 'DELETE ALL' below:",
+      "resetConfirmPlaceholder": "DELETE ALL",
+      "resetConfirmText": "DELETE ALL",
+      "resetSuccess": "{{count}} upload records deleted successfully",
+      "resetFailed": "Failed to reset upload history",
+      "path": "Path",
+      "before": "Before",
+      "after": "After",
+      "value": "Value"
+    }
   },
   "rewards": {
     "rewardType": "Reward Type",
@@ -4284,13 +4388,28 @@
       "internalAddress": "Internal IP",
       "externalAddress": "External IP"
     },
+    "hostname": "Hostname",
+    "externalAddress": "External IP",
+    "internalAddress": "Internal IP",
+    "ports": "Ports",
+    "cloudProvider": "Cloud Provider",
+    "cloudRegion": "Cloud Region",
+    "cloudZone": "Cloud Zone",
+    "appVersion": "App Version",
+    "labels": "Labels",
     "status": {
       "initializing": "Initializing",
+      "INITIALIZING": "Initializing",
       "ready": "Online",
+      "READY": "Online",
       "shuttingDown": "Shutting Down",
+      "SHUTTING_DOWN": "Shutting Down",
       "error": "Error",
+      "ERROR": "Error",
       "terminated": "Terminated",
+      "TERMINATED": "Terminated",
       "noResponse": "No Response",
+      "NO_RESPONSE": "No Response",
       "busy": "Busy"
     },
     "statusTooltip": {

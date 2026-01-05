@@ -346,7 +346,7 @@ const CouponUsagePage: React.FC = () => {
 
       {/* List */}
       <Card>
-        <CardContent sx={{ p: 0 }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           <TableContainer>
             <Table size="small">
               <TableHead>
@@ -368,7 +368,7 @@ const CouponUsagePage: React.FC = () => {
                 {loading ? (
                   <EmptyTableRow colSpan={visibleColumns.length} loading message={t('common.loading') as string} />
                 ) : records.length === 0 ? (
-                  <EmptyTableRow colSpan={visibleColumns.length} loading={false} message={t('common.noData') as string} />
+                  <EmptyTableRow colSpan={visibleColumns.length} loading={false} message={t('coupons.couponUsage.noRecords') as string} />
                 ) : (
                   sortedRecords.map((r) => (
                     <TableRow key={r.id} hover>
@@ -528,8 +528,8 @@ const CouponUsagePage: React.FC = () => {
           {exportSuccess
             ? t('coupons.couponUsage.exportDialog.completed')
             : exportError
-            ? t('coupons.couponUsage.exportDialog.failed')
-            : t('coupons.couponUsage.exportDialog.title')}
+              ? t('coupons.couponUsage.exportDialog.failed')
+              : t('coupons.couponUsage.exportDialog.title')}
         </DialogTitle>
         <DialogContent sx={{ py: 3 }}>
           {exporting ? (

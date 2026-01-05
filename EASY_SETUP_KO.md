@@ -72,6 +72,75 @@ docker-compose --version
 - 성능 및 보안 최적화
 - 프로덕션 배포에 적합
 
+### 로컬 개발 워크플로우 (권장)
+
+Docker로 모든 서비스를 실행하면 빌드 시간이 오래 걸립니다. **더 빠른 개발을 위해 인프라(MySQL, Redis, etcd 등)만 Docker로 실행하고, 개발 서비스(backend, frontend 등)는 로컬에서 `yarn dev`로 실행**하는 것을 권장합니다.
+
+#### 장점:
+- ⚡ **빠른 코드 반영** - Hot reload로 변경사항 즉시 확인
+- 🚀 **빌드 시간 절약** - Docker 이미지 빌드 없이 바로 테스트
+- 🔍 **디버깅 용이** - 로컬에서 직접 디버깅 가능
+
+#### 1단계: 인프라 서비스 시작
+
+```bash
+# 인프라만 Docker로 시작 (MySQL, Redis, etcd, ClickHouse, Grafana, Prometheus 등)
+docker compose -f docker-compose-infra.yml up -d
+```
+
+#### 2단계: 로컬 환경변수 설정
+
+`.env.local.example`을 복사하여 `.env.local` 파일을 생성합니다:
+
+```bash
+# Linux/Mac
+cp .env.local.example .env.local
+
+# Windows PowerShell
+Copy-Item .env.local.example .env.local
+```
+
+필요시 `.env.local` 파일을 수정하여 환경에 맞게 설정합니다.
+
+#### 3단계: 서비스 로컬 실행
+
+**기본 서비스만 실행 (Backend + Frontend):**
+```bash
+yarn dev
+```
+
+**모든 서비스 동시 실행 (Backend, Frontend, Edge, Chat, Event-Lens):**
+```bash
+yarn dev:all
+```
+
+> **참고:** `yarn dev:all`은 모든 서비스를 동시에 시작합니다. Backend가 먼저 준비되어야 다른 서비스가 정상 작동하므로, 초기 시작 시 일부 재시도 오류가 발생할 수 있습니다. 개발 시에는 `yarn dev` (Backend + Frontend)를 권장합니다.
+
+**개별 서비스 실행 (별도 터미널에서):**
+```bash
+# Backend
+yarn dev:backend
+
+# Frontend
+yarn dev:frontend
+
+# Edge (선택사항)
+yarn dev:edge
+
+# Chat Server (선택사항)
+yarn dev:chat-server
+
+# Event Lens (선택사항)
+yarn dev:event-lens
+```
+
+#### 4단계: 접속
+
+- **Frontend:** http://localhost:43000
+- **Backend API:** http://localhost:45000
+- **Grafana:** http://localhost:44000
+
+
 ### 1단계: 설정 파일 생성
 
 설정 스크립트를 실행하여 보안 암호화 키가 포함된 `.env` 파일을 자동으로 생성합니다.

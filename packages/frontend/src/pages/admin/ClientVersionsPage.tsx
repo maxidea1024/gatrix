@@ -126,6 +126,7 @@ import EmptyTableRow from '../../components/common/EmptyTableRow';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import ClientVersionGuideDrawer from '../../components/admin/ClientVersionGuideDrawer';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
+import { getContrastColor } from '@/utils/colorUtils';
 
 // HSV를 RGB로 변환하는 함수
 const hsvToRgb = (h: number, s: number, v: number): [number, number, number] => {
@@ -2177,7 +2178,7 @@ const ClientVersionsPage: React.FC = () => {
                     variant="outlined"
                     label={option.name}
                     size="small"
-                    sx={{ bgcolor: option.color, color: '#fff', cursor: 'help' }}
+                    sx={{ bgcolor: option.color, color: getContrastColor(option.color), cursor: 'help' }}
                     {...getTagProps({ index })}
                   />
                 </Tooltip>
@@ -2197,7 +2198,7 @@ const ClientVersionsPage: React.FC = () => {
                   <Chip
                     label={option.name}
                     size="small"
-                    sx={{ bgcolor: option.color, color: '#fff', cursor: 'help' }}
+                    sx={{ bgcolor: option.color, color: getContrastColor(option.color), cursor: 'help' }}
                   />
                   <Typography variant="body2" color="text.secondary">
                     {option.description || t('tags.noDescription')}

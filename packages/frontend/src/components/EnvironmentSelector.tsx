@@ -93,12 +93,9 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
     navigate('/settings/environments');
   };
 
-  console.log('[EnvironmentSelector] isLoading:', isLoading, 'environments.length:', environments.length, 'currentEnvironmentId:', currentEnvironmentId);
-
   // Show nothing only if there are truly no environments (not just loading)
   // Keep the component mounted during loading to prevent flickering
   if (!isLoading && environments.length === 0) {
-    console.log('[EnvironmentSelector] Returning null - no environments');
     return null;
   }
 
@@ -215,33 +212,33 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
     : '#757575';
 
   return (
-      <Box
-        sx={{
-          position: 'relative',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0.5,
-          px: 1.5,
-          py: 0.5,
-          borderRadius: 1,
-          backgroundColor: envColor,
-          boxShadow: `0 0 8px ${alpha(envColor, 0.5)}, inset 0 1px 0 ${alpha('#fff', 0.2)}`,
-          border: `1px solid ${alpha('#fff', 0.3)}`,
-          transition: 'all 0.2s ease-in-out',
-          overflow: 'hidden',
-          '&:hover': {
-            boxShadow: `0 0 12px ${alpha(envColor, 0.7)}, inset 0 1px 0 ${alpha('#fff', 0.3)}`,
-            transform: 'scale(1.02)',
-          },
-          // Shine effect overlay
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: '-100%',
-            width: '60%',
-            height: '100%',
-            background: `linear-gradient(
+    <Box
+      sx={{
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 0.5,
+        px: 1.5,
+        py: 0.5,
+        borderRadius: 1,
+        backgroundColor: envColor,
+        boxShadow: `0 0 8px ${alpha(envColor, 0.5)}, inset 0 1px 0 ${alpha('#fff', 0.2)}`,
+        border: `1px solid ${alpha('#fff', 0.3)}`,
+        transition: 'all 0.2s ease-in-out',
+        overflow: 'hidden',
+        '&:hover': {
+          boxShadow: `0 0 12px ${alpha(envColor, 0.7)}, inset 0 1px 0 ${alpha('#fff', 0.3)}`,
+          transform: 'scale(1.02)',
+        },
+        // Shine effect overlay
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: '-100%',
+          width: '60%',
+          height: '100%',
+          background: `linear-gradient(
               90deg,
               transparent,
               ${alpha('#fff', 0.15)},
@@ -249,109 +246,109 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
               ${alpha('#fff', 0.15)},
               transparent
             )`,
-            animation: `${shineAnimation} 4s ease-in-out infinite`,
-            pointerEvents: 'none',
+          animation: `${shineAnimation} 4s ease-in-out infinite`,
+          pointerEvents: 'none',
+        },
+      }}
+    >
+      <EnvironmentIcon sx={{ fontSize: 18, color: '#fff', opacity: 0.9, zIndex: 1 }} />
+      <Select
+        value={currentEnvironmentId || ''}
+        onChange={handleChange}
+        open={isSelectOpen}
+        onOpen={handleSelectOpen}
+        onClose={handleSelectClose}
+        size={size}
+        displayEmpty
+        variant="standard"
+        sx={{
+          minWidth: 100,
+          color: '#fff',
+          fontWeight: 600,
+          fontSize: '0.875rem',
+          letterSpacing: '0.02em',
+          zIndex: 1,
+          '.MuiSelect-select': {
+            py: 0.25,
+            pr: '20px !important',
+            display: 'flex',
+            alignItems: 'center',
+          },
+          '&:before, &:after': {
+            display: 'none',
+          },
+          '.MuiSvgIcon-root': {
+            color: '#fff',
+            right: 0,
+          },
+          '.MuiInput-input:focus': {
+            backgroundColor: 'transparent',
           },
         }}
-      >
-        <EnvironmentIcon sx={{ fontSize: 18, color: '#fff', opacity: 0.9, zIndex: 1 }} />
-        <Select
-          value={currentEnvironmentId || ''}
-          onChange={handleChange}
-          open={isSelectOpen}
-          onOpen={handleSelectOpen}
-          onClose={handleSelectClose}
-          size={size}
-          displayEmpty
-          variant="standard"
-          sx={{
-            minWidth: 100,
-            color: '#fff',
-            fontWeight: 600,
-            fontSize: '0.875rem',
-            letterSpacing: '0.02em',
-            zIndex: 1,
-            '.MuiSelect-select': {
-              py: 0.25,
-              pr: '20px !important',
-              display: 'flex',
-              alignItems: 'center',
-            },
-            '&:before, &:after': {
-              display: 'none',
-            },
-            '.MuiSvgIcon-root': {
+        renderValue={() => (
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 600,
               color: '#fff',
-              right: 0,
-            },
-            '.MuiInput-input:focus': {
-              backgroundColor: 'transparent',
-            },
-          }}
-          renderValue={() => (
-            <Typography
-              variant="body2"
+              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+            }}
+          >
+            {currentEnvironment?.displayName || currentEnvironment?.environmentName || ''}
+          </Typography>
+        )}
+      >
+        {environments.map((env) => {
+          const itemColor = getEnvironmentColor(env.environmentType, env.color);
+          const isSelected = env.environment === currentEnvironmentId;
+          return (
+            <MenuItem
+              key={env.environment}
+              value={env.environment}
               sx={{
-                fontWeight: 600,
-                color: '#fff',
-                textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                backgroundColor: isSelected ? alpha(itemColor, 0.15) : 'transparent',
+                '&:hover': {
+                  backgroundColor: alpha(itemColor, 0.1),
+                },
               }}
             >
-              {currentEnvironment?.displayName || currentEnvironment?.environmentName || ''}
-            </Typography>
-          )}
-        >
-          {environments.map((env) => {
-            const itemColor = getEnvironmentColor(env.environmentType, env.color);
-            const isSelected = env.id === currentEnvironmentId;
-            return (
-              <MenuItem
-                key={env.id}
-                value={env.id}
-                sx={{
-                  backgroundColor: isSelected ? alpha(itemColor, 0.15) : 'transparent',
-                  '&:hover': {
-                    backgroundColor: alpha(itemColor, 0.1),
-                  },
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <Box
-                    sx={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: 0.5,
-                      backgroundColor: itemColor,
-                      boxShadow: `0 0 4px ${alpha(itemColor, 0.5)}`,
-                    }}
-                  />
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: isSelected ? 600 : 400,
-                    }}
-                  >
-                    {env.displayName || env.environmentName}
-                  </Typography>
-                </Box>
-              </MenuItem>
-            );
-          })}
-          {canManageEnvironments && (
-            <>
-              <Divider sx={{ my: 0.5 }} />
-              <MenuItem value="__manage__" onClick={handleManageClick}>
-                <ListItemIcon sx={{ minWidth: 28 }}>
-                  <SettingsIcon fontSize="small" />
-                </ListItemIcon>
-                <Typography variant="body2">
-                  {t('environments.manage')}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Box
+                  sx={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: 0.5,
+                    backgroundColor: itemColor,
+                    boxShadow: `0 0 4px ${alpha(itemColor, 0.5)}`,
+                  }}
+                />
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: isSelected ? 600 : 400,
+                  }}
+                >
+                  {env.displayName || env.environmentName}
                 </Typography>
-              </MenuItem>
-            </>
-          )}
-        </Select>
-      </Box>
+              </Box>
+            </MenuItem>
+          );
+        })}
+        {canManageEnvironments && (
+          <>
+            <Divider sx={{ my: 0.5 }} />
+            <MenuItem value="__manage__" onClick={handleManageClick}>
+              <ListItemIcon sx={{ minWidth: 28 }}>
+                <SettingsIcon fontSize="small" />
+              </ListItemIcon>
+              <Typography variant="body2">
+                {t('environments.manage')}
+              </Typography>
+            </MenuItem>
+          </>
+        )}
+      </Select>
+    </Box>
   );
 };
 

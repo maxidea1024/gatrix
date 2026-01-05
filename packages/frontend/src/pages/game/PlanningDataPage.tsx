@@ -28,6 +28,9 @@ import {
   FormControlLabel,
   Checkbox,
   Tooltip,
+  IconButton,
+  Alert,
+  Divider,
 } from '@mui/material';
 import {
   Storage as StorageIcon,
@@ -39,15 +42,18 @@ import {
   Category as CategoryIcon,
   Schedule as ScheduleIcon,
   CloudUpload as CloudUploadIcon,
+  ContentCopy as CopyIcon,
+  HelpOutline as HelpOutlineIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
-import planningDataService, { PlanningDataStats, HotTimeBuffLookup, HotTimeBuffItem } from '../../services/planningDataService';
+import planningDataService, { PlanningDataStats, HotTimeBuffLookup, HotTimeBuffItem, UploadRecord } from '../../services/planningDataService';
 import SimplePagination from '../../components/common/SimplePagination';
 import { useDebounce } from '../../hooks/useDebounce';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
 import PlanningDataUpload from '../../components/planning-data/PlanningDataUpload';
+import PlanningDataGuideDrawer, { PlanningDataGuideContent } from '../../components/planning-data/PlanningDataGuideDrawer';
 
 const PlanningDataPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -57,9 +63,10 @@ const PlanningDataPage: React.FC = () => {
 
   // State
   const [stats, setStats] = useState<PlanningDataStats | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [rebuilding, setRebuilding] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [showGuideDrawer, setShowGuideDrawer] = useState(false);
   const [activeTab, setActiveTab] = useState(() => {
     const saved = sessionStorage.getItem('planningDataActiveTab');
     return saved ? parseInt(saved) : 0;
@@ -112,6 +119,9 @@ const PlanningDataPage: React.FC = () => {
     const saved = sessionStorage.getItem('planningDataViewAllHotTimeBuff');
     return saved === 'true';
   });
+
+  // Upload history state
+  const [latestUpload, setLatestUpload] = useState<UploadRecord | null>(null);
 
   // EventPage state
   const [eventPageData, setEventPageData] = useState<any>(null);
@@ -210,12 +220,16 @@ const PlanningDataPage: React.FC = () => {
   const loadStats = async () => {
     try {
       setLoading(true);
-      const data = await planningDataService.getStats();
+      const [data, uploadData] = await Promise.all([
+        planningDataService.getStats(),
+        planningDataService.getLatestUpload(),
+      ]);
       console.log('Stats data received:', data);
       if (!data) {
         throw new Error('Stats data is null or undefined');
       }
       setStats(data);
+      setLatestUpload(uploadData);
     } catch (error: any) {
       // Extract user-friendly error message
       let errorMessage = t('planningData.errors.loadStatsFailed');
@@ -671,6 +685,12 @@ const PlanningDataPage: React.FC = () => {
               {t('planningData.uploadData')}
             </Button>
           )}
+          <Divider orientation="vertical" flexItem sx={{ height: 32, alignSelf: 'center' }} />
+          <Tooltip title={t('planningData.uploadGuide.title')}>
+            <IconButton onClick={() => setShowGuideDrawer(true)}>
+              <HelpOutlineIcon />
+            </IconButton>
+          </Tooltip>
         </Box>
       </Box>
 
@@ -714,6 +734,7 @@ const PlanningDataPage: React.FC = () => {
               </Box>
               <PlanningDataUpload
                 onUploadSuccess={handleUploadSuccess}
+                onClose={() => setShowUploadDialog(false)}
               />
             </CardContent>
           </Card>
@@ -725,8 +746,67 @@ const PlanningDataPage: React.FC = () => {
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
           <CircularProgress />
         </Box>
-      ) : stats ? (
+      ) : stats && stats.rewardTypes && stats.rewardTypes.length > 0 ? (
         <>
+          {/* Upload Info */}
+          {latestUpload && (
+            <Card sx={{ mb: 2, bgcolor: 'background.paper' }}>
+              <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('planningData.uploadInfo.lastUpload')}:
+                    </Typography>
+                    <Chip
+                      size="small"
+                      label={formatRelativeTime(latestUpload.uploadedAt)}
+                      color="primary"
+                      variant="outlined"
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      {t('planningData.uploadInfo.by')}:
+                    </Typography>
+                    <Chip
+                      size="small"
+                      label={latestUpload.uploaderName || 'Unknown'}
+                      color={latestUpload.uploadSource === 'cli' ? 'warning' : 'default'}
+                      variant="outlined"
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      {t('planningData.uploadInfo.hash')}:
+                    </Typography>
+                    <Tooltip title={t('common.copyToClipboard')}>
+                      <Chip
+                        size="small"
+                        label={latestUpload.uploadHash}
+                        onClick={() => copyToClipboardWithNotification(
+                          latestUpload.uploadHash,
+                          () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                          () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                        )}
+                        sx={{ cursor: 'pointer', fontFamily: 'monospace' }}
+                      />
+                    </Tooltip>
+                    {latestUpload.uploadComment && (
+                      <>
+                        <Typography variant="body2" color="text.secondary">|</Typography>
+                        <Typography variant="body2" color="text.primary" sx={{ fontStyle: 'italic' }}>
+                          "{latestUpload.uploadComment}"
+                        </Typography>
+                      </>
+                    )}
+                  </Box>
+                  <Chip
+                    size="small"
+                    label={`${latestUpload.filesCount} ${t('planningData.uploadInfo.files')}`}
+                    color="success"
+                    variant="outlined"
+                  />
+                </Box>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Tabs */}
           <Card>
             <Tabs value={activeTab} onChange={handleTabChange}>
@@ -2622,7 +2702,44 @@ const PlanningDataPage: React.FC = () => {
             </CardContent>
           </Card>
         </>
-      ) : null}
+      ) : (
+        // Empty state when no planning data is uploaded
+        <Card>
+          <CardContent sx={{ py: 6 }}>
+            <Box sx={{ textAlign: 'center', maxWidth: 800, mx: 'auto' }}>
+              <CloudUploadIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+              <Typography variant="h5" gutterBottom>
+                {t('planningData.noDataTitle')}
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                {t('planningData.noDataDescription')}
+              </Typography>
+
+              {/* Reusable Guide Content */}
+              <Box sx={{ mb: 3 }}>
+                <PlanningDataGuideContent variant="inline" />
+              </Box>
+
+              {canManage && (
+                <Button
+                  variant="contained"
+                  size="large"
+                  startIcon={<CloudUploadIcon />}
+                  onClick={handleRebuild}
+                >
+                  {t('planningData.uploadData')}
+                </Button>
+              )}
+            </Box>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Guide Drawer */}
+      <PlanningDataGuideDrawer
+        open={showGuideDrawer}
+        onClose={() => setShowGuideDrawer(false)}
+      />
     </Box>
   );
 };

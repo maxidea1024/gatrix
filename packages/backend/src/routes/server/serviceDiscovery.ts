@@ -29,14 +29,14 @@ export const getWhitelistsHandler = async (req: EnvironmentRequest, res: any) =>
   const environment = req.environment!;
   try {
     await respondWithEtagCache(res, {
-      cacheKey: `${SERVER_SDK_ETAG.WHITELISTS}:${environment.id}`,
+      cacheKey: `${SERVER_SDK_ETAG.WHITELISTS}:${environment}`,
       ttlMs: DEFAULT_CONFIG.WHITELIST_TTL,
       requestEtag: req.headers?.['if-none-match'],
       buildPayload: async () => {
         // Get all enabled IP whitelists for this environment
         const ipWhitelistsResult = await IpWhitelistModel.findAll(1, 10000, {
           isEnabled: true,
-          environmentId: environment.id
+          environment: environment
         });
         const now = new Date();
 
@@ -50,7 +50,7 @@ export const getWhitelistsHandler = async (req: EnvironmentRequest, res: any) =>
         // Get all enabled account whitelists for this environment
         const accountWhitelistsResult = await WhitelistModel.findAll(1, 10000, {
           isEnabled: true,
-          environmentId: environment.id
+          environment: environment
         });
 
         // Filter by date range

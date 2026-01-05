@@ -3,6 +3,13 @@ import { mailService } from '../services/MailService';
 import { authenticate, AuthenticatedRequest } from '../middleware/auth';
 import { MailType, MailPriority } from '../models/Mail';
 import { pubSubService } from '../services/PubSubService';
+import {
+  sendBadRequest,
+  sendNotFound,
+  sendInternalError,
+  sendSuccessResponse,
+  ErrorCodes,
+} from '../utils/apiResponse';
 
 const router = express.Router();
 
@@ -48,17 +55,12 @@ router.get('/', (async (req: AuthenticatedRequest, res: Response) => {
 
     const result = await mailService.getMailsForUser(userId, filters);
 
-    res.json({
-      success: true,
+    return sendSuccessResponse(res, {
       data: result.data,
       pagination: result.pagination,
     });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to get mails',
-      error: error.message,
-    });
+  } catch (error) {
+    return sendInternalError(res, 'Failed to get mails', error, ErrorCodes.MAIL_NOT_FOUND);
   }
 }) as any);
 
@@ -84,8 +86,7 @@ router.get('/sent', (async (req: AuthenticatedRequest, res: Response) => {
 
     const result = await mailService.getSentMailsForUser(userId, options);
 
-    res.json({
-      success: true,
+    return sendSuccessResponse(res, {
       data: result.data,
       pagination: {
         page: options.page,
@@ -94,12 +95,8 @@ router.get('/sent', (async (req: AuthenticatedRequest, res: Response) => {
         totalPages: Math.ceil(result.total / options.limit),
       },
     });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to get sent mails',
-      error: error.message,
-    });
+  } catch (error) {
+    return sendInternalError(res, 'Failed to get sent mails', error, ErrorCodes.MAIL_NOT_FOUND);
   }
 }) as any);
 
@@ -112,16 +109,9 @@ router.get('/unread-count', (async (req: AuthenticatedRequest, res: Response) =>
     const userId = req.user!.userId;
     const count = await mailService.getUnreadCount(userId);
 
-    res.json({
-      success: true,
-      count,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to get unread count',
-      error: error.message,
-    });
+    return sendSuccessResponse(res, { count });
+  } catch (error) {
+    return sendInternalError(res, 'Failed to get unread count', error, ErrorCodes.RESOURCE_FETCH_FAILED);
   }
 }) as any);
 
@@ -134,16 +124,9 @@ router.get('/stats', (async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user!.userId;
     const stats = await mailService.getMailStats(userId);
 
-    res.json({
-      success: true,
-      data: stats,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to get mail stats',
-      error: error.message,
-    });
+    return sendSuccessResponse(res, stats);
+  } catch (error) {
+    return sendInternalError(res, 'Failed to get mail stats', error, ErrorCodes.RESOURCE_FETCH_FAILED);
   }
 }) as any);
 
@@ -159,22 +142,12 @@ router.get('/:id', (async (req: AuthenticatedRequest, res: Response) => {
     const mail = await mailService.getMailById(mailId, userId);
 
     if (!mail) {
-      return res.status(404).json({
-        success: false,
-        message: 'Mail not found',
-      });
+      return sendNotFound(res, 'Mail not found', ErrorCodes.MAIL_NOT_FOUND);
     }
 
-    res.json({
-      success: true,
-      data: mail,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to get mail',
-      error: error.message,
-    });
+    return sendSuccessResponse(res, mail);
+  } catch (error) {
+    return sendInternalError(res, 'Failed to get mail', error, ErrorCodes.MAIL_NOT_FOUND);
   }
 }) as any);
 
@@ -197,9 +170,8 @@ router.post('/', (async (req: AuthenticatedRequest, res: Response) => {
 
     // Validation
     if (!recipientId || !subject || !content) {
-      return res.status(400).json({
-        success: false,
-        message: 'recipientId, subject, and content are required',
+      return sendBadRequest(res, 'recipientId, subject, and content are required', {
+        fields: ['recipientId', 'subject', 'content']
       });
     }
 
@@ -232,17 +204,9 @@ router.post('/', (async (req: AuthenticatedRequest, res: Response) => {
       targetUsers: [recipientId],
     });
 
-    res.status(201).json({
-      success: true,
-      data: mail,
-      message: 'Mail sent successfully',
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to send mail',
-      error: error.message,
-    });
+    return sendSuccessResponse(res, mail, 'Mail sent successfully', 201);
+  } catch (error) {
+    return sendInternalError(res, 'Failed to send mail', error, ErrorCodes.MAIL_SEND_FAILED);
   }
 }) as any);
 
@@ -258,22 +222,12 @@ router.patch('/:id/read', (async (req: AuthenticatedRequest, res: Response) => {
     const result = await mailService.markAsRead(mailId, userId);
 
     if (!result) {
-      return res.status(404).json({
-        success: false,
-        message: 'Mail not found',
-      });
+      return sendNotFound(res, 'Mail not found', ErrorCodes.MAIL_NOT_FOUND);
     }
 
-    res.json({
-      success: true,
-      message: 'Mail marked as read',
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to mark mail as read',
-      error: error.message,
-    });
+    return sendSuccessResponse(res, undefined, 'Mail marked as read');
+  } catch (error) {
+    return sendInternalError(res, 'Failed to mark mail as read', error, ErrorCodes.RESOURCE_UPDATE_FAILED);
   }
 }) as any);
 
@@ -287,25 +241,14 @@ router.patch('/read-multiple', (async (req: AuthenticatedRequest, res: Response)
     const { mailIds } = req.body;
 
     if (!Array.isArray(mailIds) || mailIds.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'mailIds array is required',
-      });
+      return sendBadRequest(res, 'mailIds array is required', { field: 'mailIds' });
     }
 
     const count = await mailService.markMultipleAsRead(mailIds, userId);
 
-    res.json({
-      success: true,
-      count,
-      message: `${count} mails marked as read`,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to mark mails as read',
-      error: error.message,
-    });
+    return sendSuccessResponse(res, { count }, `${count} mails marked as read`);
+  } catch (error) {
+    return sendInternalError(res, 'Failed to mark mails as read', error, ErrorCodes.RESOURCE_UPDATE_FAILED);
   }
 }) as any);
 
@@ -328,17 +271,9 @@ router.patch('/read-all', (async (req: AuthenticatedRequest, res: Response) => {
 
     const count = await mailService.markAllAsRead(userId, filters);
 
-    res.json({
-      success: true,
-      count,
-      message: `${count} mails marked as read`,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to mark all mails as read',
-      error: error.message,
-    });
+    return sendSuccessResponse(res, { count }, `${count} mails marked as read`);
+  } catch (error) {
+    return sendInternalError(res, 'Failed to mark all mails as read', error, ErrorCodes.RESOURCE_UPDATE_FAILED);
   }
 }) as any);
 
@@ -353,17 +288,9 @@ router.patch('/:id/star', (async (req: AuthenticatedRequest, res: Response) => {
 
     const isStarred = await mailService.toggleStarred(mailId, userId);
 
-    res.json({
-      success: true,
-      isStarred,
-      message: isStarred ? 'Mail starred' : 'Mail unstarred',
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to toggle starred status',
-      error: error.message,
-    });
+    return sendSuccessResponse(res, { isStarred }, isStarred ? 'Mail starred' : 'Mail unstarred');
+  } catch (error) {
+    return sendInternalError(res, 'Failed to toggle starred status', error, ErrorCodes.RESOURCE_UPDATE_FAILED);
   }
 }) as any);
 
@@ -387,17 +314,9 @@ router.delete('/delete-all', (async (req: AuthenticatedRequest, res: Response) =
 
     const count = await mailService.deleteAllMails(userId, filters);
 
-    res.json({
-      success: true,
-      count,
-      message: `${count} mails deleted successfully`,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to delete all mails',
-      error: error.message,
-    });
+    return sendSuccessResponse(res, { count }, `${count} mails deleted successfully`);
+  } catch (error) {
+    return sendInternalError(res, 'Failed to delete all mails', error, ErrorCodes.RESOURCE_DELETE_FAILED);
   }
 }) as any);
 
@@ -413,22 +332,12 @@ router.delete('/:id', (async (req: AuthenticatedRequest, res: Response) => {
     const result = await mailService.deleteMail(mailId, userId);
 
     if (!result) {
-      return res.status(404).json({
-        success: false,
-        message: 'Mail not found',
-      });
+      return sendNotFound(res, 'Mail not found', ErrorCodes.MAIL_NOT_FOUND);
     }
 
-    res.json({
-      success: true,
-      message: 'Mail deleted successfully',
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to delete mail',
-      error: error.message,
-    });
+    return sendSuccessResponse(res, undefined, 'Mail deleted successfully');
+  } catch (error) {
+    return sendInternalError(res, 'Failed to delete mail', error, ErrorCodes.RESOURCE_DELETE_FAILED);
   }
 }) as any);
 
@@ -442,27 +351,15 @@ router.delete('/', (async (req: AuthenticatedRequest, res: Response) => {
     const { mailIds } = req.body;
 
     if (!Array.isArray(mailIds) || mailIds.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'mailIds array is required',
-      });
+      return sendBadRequest(res, 'mailIds array is required', { field: 'mailIds' });
     }
 
     const count = await mailService.deleteMultiple(mailIds, userId);
 
-    res.json({
-      success: true,
-      count,
-      message: `${count} mails deleted successfully`,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to delete mails',
-      error: error.message,
-    });
+    return sendSuccessResponse(res, { count }, `${count} mails deleted successfully`);
+  } catch (error) {
+    return sendInternalError(res, 'Failed to delete mails', error, ErrorCodes.RESOURCE_DELETE_FAILED);
   }
 }) as any);
 
 export default router;
-

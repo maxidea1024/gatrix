@@ -3,48 +3,12 @@
  */
 
 /**
- * Copy text to clipboard with fallback for non-HTTPS environments
- * @param text - Text to copy
- * @returns Promise that resolves when copy is successful
+ * Try execCommand fallback for clipboard copy
+ * This works in some HTTP environments where navigator.clipboard is not available
  */
-export const copyToClipboard = async (text: string): Promise<boolean> => {
-  if (!text) return false;
-
-  console.log('[Clipboard] Starting copy, text length:', text.length);
-  console.log('[Clipboard] isSecureContext:', window.isSecureContext);
-  console.log('[Clipboard] protocol:', window.location.protocol);
-
-  // Try modern Clipboard API first (HTTPS/localhost only)
-  if (navigator.clipboard && window.isSecureContext) {
-    try {
-      console.log('[Clipboard] Trying modern Clipboard API...');
-      await navigator.clipboard.writeText(text);
-      console.log('[Clipboard] ✓ Modern Clipboard API success');
-      return true;
-    } catch (error) {
-      console.warn('[Clipboard] Modern Clipboard API failed, trying fallback:', error);
-    }
-  }
-
-  // For HTTP environments, execCommand often returns true but doesn't actually copy
-  // In this case, we need to use a manual prompt fallback
-  const isInsecureContext = !window.isSecureContext || window.location.protocol === 'http:';
-
-  if (isInsecureContext) {
-    console.log('[Clipboard] HTTP environment detected, using prompt fallback');
-    // Show prompt dialog where user can copy with Ctrl+C
-    const result = window.prompt(
-      'HTTP 환경에서는 자동 복사가 지원되지 않습니다.\n아래 URL을 선택 후 Ctrl+C로 복사해주세요:\n\n(Automatic copy is not supported in HTTP environment.\nPlease select and copy with Ctrl+C)',
-      text
-    );
-    // If user clicked OK or Cancel, we consider it "handled"
-    // We return true because the user had the opportunity to copy
-    return result !== null;
-  }
-
-  // Fallback method for other cases
+const tryExecCommandCopy = (text: string): boolean => {
   try {
-    console.log('[Clipboard] Using fallback method (execCommand)...');
+    console.log('[Clipboard] Trying execCommand fallback...');
     const textArea = document.createElement('textarea');
     textArea.value = text;
 
@@ -75,16 +39,67 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
     document.body.removeChild(textArea);
 
     if (successful) {
-      console.log('[Clipboard] ✓ Fallback method success');
+      console.log('[Clipboard] ✓ execCommand fallback success');
       return true;
     } else {
-      console.error('[Clipboard] execCommand copy failed');
+      console.log('[Clipboard] execCommand returned false');
       return false;
     }
   } catch (error) {
-    console.error('[Clipboard] Fallback clipboard copy failed:', error);
+    console.error('[Clipboard] execCommand fallback failed:', error);
     return false;
   }
+};
+
+/**
+ * Copy text to clipboard with fallback for non-HTTPS environments
+ * @param text - Text to copy
+ * @returns Promise that resolves when copy is successful
+ */
+export const copyToClipboard = async (text: string): Promise<boolean> => {
+  if (!text) return false;
+
+  console.log('[Clipboard] Starting copy, text length:', text.length);
+  console.log('[Clipboard] isSecureContext:', window.isSecureContext);
+  console.log('[Clipboard] protocol:', window.location.protocol);
+
+  // Try modern Clipboard API first (HTTPS/localhost only)
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      console.log('[Clipboard] Trying modern Clipboard API...');
+      await navigator.clipboard.writeText(text);
+      console.log('[Clipboard] ✓ Modern Clipboard API success');
+      return true;
+    } catch (error) {
+      console.warn('[Clipboard] Modern Clipboard API failed, trying fallback:', error);
+    }
+  }
+
+  // For HTTP environments, try execCommand first (it works in many cases)
+  // Only fall back to prompt if execCommand fails
+  const isInsecureContext = !window.isSecureContext || window.location.protocol === 'http:';
+
+  if (isInsecureContext) {
+    console.log('[Clipboard] HTTP environment detected, trying execCommand first...');
+
+    // Try execCommand - it actually works in many HTTP environments
+    if (tryExecCommandCopy(text)) {
+      return true;
+    }
+
+    // If execCommand failed, use prompt fallback as last resort
+    console.log('[Clipboard] execCommand failed, using prompt fallback');
+    const result = window.prompt(
+      'Automatic copy failed. Please select the text below and press Ctrl+C to copy:',
+      text
+    );
+    // If user clicked OK or Cancel, we consider it "handled"
+    // Return false to indicate actual copy didn't happen automatically
+    return result !== null ? false : false;
+  }
+
+  // For secure context where modern API failed, try execCommand
+  return tryExecCommandCopy(text);
 };
 
 /**

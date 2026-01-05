@@ -4,7 +4,7 @@ import { Environment } from '../models/Environment';
 import { RemoteConfigChangeRequest } from '../models/RemoteConfigChangeRequest';
 import { RemoteConfigTemplateVersion } from '../models/RemoteConfigTemplateVersion';
 import { asyncHandler } from '../utils/asyncHandler';
-import { AuthenticatedRequest } from '../middleware/auth';
+import { AuthenticatedRequest } from '../types/auth';
 import { pubSubService } from '../services/PubSubService';
 import logger from '../config/logger';
 
@@ -13,25 +13,25 @@ export class RemoteConfigTemplateController {
    * Get templates for environment
    */
   static getTemplates = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { environmentId } = req.params;
+    const { environment } = req.params;
     const { status, type } = req.query;
 
     let templates;
-    
+
     if (status) {
       templates = await RemoteConfigTemplate.getByStatus(
-        parseInt(environmentId), 
+        environment,
         status as TemplateStatus
       );
     } else {
       templates = await RemoteConfigTemplate.query()
-        .where('environmentId', environmentId)
+        .where('environment', environment)
         .modify((builder) => {
           if (type) {
             builder.where('templateType', type as TemplateType);
           }
         })
-        .withGraphFetched('[environment, creator(basicInfo), updater(basicInfo)]')
+        .withGraphFetched('[environmentModel, creator(basicInfo), updater(basicInfo)]')
         .modifiers({
           basicInfo: (builder) => builder.select('id', 'username', 'email')
         })
@@ -49,10 +49,10 @@ export class RemoteConfigTemplateController {
    */
   static getTemplate = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    
+
     const template = await RemoteConfigTemplate.query()
       .findById(id)
-      .withGraphFetched('[environment, creator(basicInfo), updater(basicInfo)]')
+      .withGraphFetched('[environmentModel, creator(basicInfo), updater(basicInfo)]')
       .modifiers({
         basicInfo: (builder) => builder.select('id', 'username', 'email')
       });
@@ -74,8 +74,8 @@ export class RemoteConfigTemplateController {
    * Create new template
    */
   static createTemplate = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { environmentId, templateName, displayName, description, templateType, templateData } = req.body;
-    const userId = (req.user as any)?.userId;
+    const { environment, templateName, displayName, description, templateType, templateData } = req.body;
+    const userId = req.user?.userId;
 
     if (!userId) {
       return res.status(401).json({
@@ -86,8 +86,8 @@ export class RemoteConfigTemplateController {
 
     try {
       // Check if environment requires approval
-      const environment = await Environment.query().findById(environmentId);
-      if (!environment) {
+      const env = await Environment.query().findById(environment);
+      if (!env) {
         return res.status(404).json({
           success: false,
           message: 'Environment not found'
@@ -95,7 +95,7 @@ export class RemoteConfigTemplateController {
       }
 
       const template = await RemoteConfigTemplate.createTemplate({
-        environmentId,
+        environment,
         templateName,
         displayName,
         description,
@@ -106,10 +106,10 @@ export class RemoteConfigTemplateController {
       });
 
       // If environment requires approval, create change request
-      if (environment.requiresApproval) {
+      if (env.requiresApproval) {
         await RemoteConfigChangeRequest.createChangeRequest({
           templateId: template.id,
-          environmentId,
+          environment,
           requestType: 'create',
           proposedChanges: templateData,
           description: `Create new template: ${displayName}`,
@@ -122,7 +122,7 @@ export class RemoteConfigTemplateController {
           data: {
             templateId: template.id,
             templateName: template.templateName,
-            environmentName: environment.environmentName,
+            environment: env.environment,
             requestType: 'create',
             requestedBy: userId
           },
@@ -133,7 +133,7 @@ export class RemoteConfigTemplateController {
         await template.publish(userId);
       }
 
-      logger.info(`Template created: ${templateName} in ${environment.environmentName} by user ${userId}`);
+      logger.info(`Template created: ${templateName} in ${env.environment} by user ${userId}`);
 
       res.status(201).json({
         success: true,
@@ -155,7 +155,7 @@ export class RemoteConfigTemplateController {
   static updateTemplate = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
     const { templateData, changeDescription } = req.body;
-    const userId = (req.user as any)?.userId;
+    const userId = req.user?.userId;
 
     if (!userId) {
       return res.status(401).json({
@@ -166,7 +166,7 @@ export class RemoteConfigTemplateController {
 
     const template = await RemoteConfigTemplate.query()
       .findById(id)
-      .withGraphFetched('environment');
+      .withGraphFetched('environmentModel');
 
     if (!template) {
       return res.status(404).json({
@@ -184,10 +184,10 @@ export class RemoteConfigTemplateController {
 
     try {
       // If environment requires approval, create change request
-      if (template.environment?.requiresApproval) {
+      if (template.environmentModel?.requiresApproval) {
         await RemoteConfigChangeRequest.createChangeRequest({
           templateId: template.id,
-          environmentId: template.environmentId,
+          environment: template.environment,
           requestType: 'update',
           proposedChanges: templateData,
           currentData: template.templateData,
@@ -201,7 +201,7 @@ export class RemoteConfigTemplateController {
           data: {
             templateId: template.id,
             templateName: template.templateName,
-            environmentName: template.environment?.environmentName,
+            environment: template.environmentModel?.environment,
             requestType: 'update',
             requestedBy: userId
           },
@@ -238,7 +238,7 @@ export class RemoteConfigTemplateController {
    */
   static publishTemplate = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    const userId = (req.user as any)?.userId;
+    const userId = req.user?.userId;
 
     if (!userId) {
       return res.status(401).json({
@@ -297,7 +297,7 @@ export class RemoteConfigTemplateController {
    */
   static archiveTemplate = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    const userId = (req.user as any)?.userId;
+    const userId = req.user?.userId;
 
     if (!userId) {
       return res.status(401).json({
@@ -402,7 +402,7 @@ export class RemoteConfigTemplateController {
    * Validate template name
    */
   static validateTemplateName = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { environmentId, templateName } = req.body;
+    const { environment, templateName } = req.body;
 
     if (!templateName) {
       return res.status(400).json({
@@ -419,7 +419,7 @@ export class RemoteConfigTemplateController {
       });
     }
 
-    const existing = await RemoteConfigTemplate.getByEnvironmentAndName(environmentId, templateName);
+    const existing = await RemoteConfigTemplate.getByEnvironmentAndName(environment, templateName);
     if (existing) {
       return res.status(409).json({
         success: false,

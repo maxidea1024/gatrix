@@ -33,6 +33,7 @@ import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../common/ResizableDrawer';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { getBackendUrl } from '../../utils/backendUrl';
 
 interface IngamePopupNoticeGuideDrawerProps {
   open: boolean;
@@ -45,19 +46,21 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
   const isDark = theme.palette.mode === 'dark';
   const { enqueueSnackbar } = useSnackbar();
   const { currentEnvironmentId } = useEnvironment();
+  const backendUrl = getBackendUrl();
 
   const [mainTabValue, setMainTabValue] = useState(0);
   const [errorTabValue, setErrorTabValue] = useState(0);
   const [apiToken, setApiToken] = useState('gatrix-unsecured-server-api-token'); // Default to unsecured server token
-  const [applicationName, setApplicationName] = useState('MyGameServer');
   const [testResponse, setTestResponse] = useState<any>(null);
   const [testLoading, setTestLoading] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [testDuration, setTestDuration] = useState<number | null>(null);
   const [testStatus, setTestStatus] = useState<number | null>(null);
+  const [responseTime, setResponseTime] = useState<Date | null>(null);
   const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
   const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
-  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(false);
+  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(true);
   const [expandedResponseHeaders, setExpandedResponseHeaders] = useState(false);
   const [expandedRequestHeadersDetail, setExpandedRequestHeadersDetail] = useState(false);
   const [expandedResponseHeadersDetail, setExpandedResponseHeadersDetail] = useState(false);
@@ -66,9 +69,8 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
     try {
       const saved = localStorage.getItem('ingamePopupNoticeGuideDrawer_testInputs');
       if (saved) {
-        const { apiToken: savedToken, applicationName: savedAppName } = JSON.parse(saved);
+        const { apiToken: savedToken } = JSON.parse(saved);
         if (savedToken) setApiToken(savedToken);
-        if (savedAppName) setApplicationName(savedAppName);
       }
     } catch (error) {
       // Silently ignore localStorage errors
@@ -77,11 +79,11 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
 
   useEffect(() => {
     try {
-      localStorage.setItem('ingamePopupNoticeGuideDrawer_testInputs', JSON.stringify({ apiToken, applicationName }));
+      localStorage.setItem('ingamePopupNoticeGuideDrawer_testInputs', JSON.stringify({ apiToken }));
     } catch (error) {
       // Silently ignore localStorage errors
     }
-  }, [apiToken, applicationName]);
+  }, [apiToken]);
 
   const handleCopyCode = (code: string) => {
     copyToClipboardWithNotification(
@@ -92,12 +94,12 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
   };
 
   const handleTestAPI = async () => {
-    if (!applicationName.trim()) {
-      setTestError(t('ingamePopupNotices.sdkGuideDrawer.headerAppName') + ' ' + (t('common.isRequired') || 'is required'));
-      setExpandedResponseHeaders(true);
+    if (!apiToken.trim()) {
+      setValidationError(t('common.apiTokenRequired') || 'API Token is required');
       return;
     }
 
+    setValidationError(null);
     setTestLoading(true);
     setTestError(null);
     setTestResponse(null);
@@ -105,7 +107,7 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
     setTestDuration(null);
     setRequestHeaders({});
     setResponseHeaders({});
-    setExpandedRequestHeaders(false);
+    // Keep request section open
     setExpandedResponseHeaders(false);
 
     try {
@@ -113,16 +115,14 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
 
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
-        'X-Application-Name': applicationName,
+        'X-Application-Name': 'gatrix-frontend-tester',
         'X-API-Token': apiToken,
       };
-      if (currentEnvironmentId) {
-        headers['X-Environment-Id'] = currentEnvironmentId;
-      }
 
       setRequestHeaders(headers);
 
-      const response = await fetch('/api/v1/server/ingame-popup-notices', {
+      const envPath = currentEnvironmentId || 'default';
+      const response = await fetch(`/api/v1/server/${envPath}/ingame-popup-notices`, {
         method: 'GET',
         headers,
       });
@@ -140,6 +140,7 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
 
       const data = await response.json();
       setTestResponse(data);
+      setResponseTime(new Date());
       setExpandedResponseHeaders(true);
 
       if (!response.ok) {
@@ -217,11 +218,10 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
   );
 
   const curlExample = `# Ingame Popup Notice Server SDK API Example
-curl -X GET "http://localhost:5000/api/v1/server/ingame-popup-notices" \\
+curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your-environment'}/ingame-popup-notices" \\
   -H "Content-Type: application/json" \\
   -H "X-Application-Name: MyGameServer" \\
-  -H "X-API-Token: your-server-api-token-here" \\
-  -H "X-Environment-Id: ${currentEnvironmentId || 'your-environment-id'}"`;
+  -H "X-API-Token: your-server-api-token-here"`;
 
   const jsonResponse = `{
   "success": true,
@@ -300,7 +300,7 @@ curl -X GET "http://localhost:5000/api/v1/server/ingame-popup-notices" \\
                   <strong>{t('ingamePopupNotices.sdkGuideDrawer.method')}:</strong> GET
                 </Typography>
                 <Typography component="div" sx={{ wordBreak: 'break-all' }}>
-                  /api/v1/server/ingame-popup-notices
+                  /api/v1/server/{'{environment}'}/ingame-popup-notices
                 </Typography>
               </Box>
 
@@ -315,9 +315,6 @@ curl -X GET "http://localhost:5000/api/v1/server/ingame-popup-notices" \\
                 </Typography>
                 <Typography variant="body2">
                   • <strong>X-Application-Name</strong>: {t('ingamePopupNotices.sdkGuideDrawer.headerAppName')}
-                </Typography>
-                <Typography variant="body2">
-                  • <strong>X-Environment-Id</strong>: {t('common.sdkGuide.headerEnvironmentId')}
                 </Typography>
                 <Typography variant="body2">
                   • <strong>Content-Type</strong>: {t('ingamePopupNotices.sdkGuideDrawer.headerContentType')}
@@ -436,43 +433,6 @@ curl -X GET "http://localhost:5000/api/v1/server/ingame-popup-notices" \\
                 </Box>
                 <Collapse in={expandedRequestHeaders}>
                   <Box sx={{ p: 2, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
-                        {t('ingamePopupNotices.sdkGuideDrawer.parameters')}
-                      </Typography>
-                      <Box sx={{
-                        border: `1px solid ${theme.palette.divider}`,
-                        borderRadius: 1,
-                        overflow: 'hidden'
-                      }}>
-                        <Box sx={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 0 }}>
-                          {/* Application Name */}
-                          <Box sx={{
-                            p: 1.5,
-                            backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
-                            display: 'flex',
-                            alignItems: 'center',
-                            fontWeight: 500,
-                            fontSize: '0.875rem'
-                          }}>
-                            X-Application-Name *
-                          </Box>
-                          <Box sx={{
-                            p: 1,
-                            borderLeft: `1px solid ${theme.palette.divider}`
-                          }}>
-                            <TextField
-                              value={applicationName}
-                              onChange={(e) => setApplicationName(e.target.value)}
-                              size="small"
-                              fullWidth
-                              placeholder="e.g., MyGameServer"
-                              sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
-                            />
-                          </Box>
-                        </Box>
-                      </Box>
-                    </Box>
 
                     {Object.keys(requestHeaders).length > 0 && (
                       <Box sx={{ mb: 2 }}>
@@ -513,6 +473,50 @@ curl -X GET "http://localhost:5000/api/v1/server/ingame-popup-notices" \\
                       </Box>
                     )}
 
+                    {/* Curl Preview */}
+                    <Box sx={{ mb: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          {t('common.curlPreview') || 'curl Preview'}
+                        </Typography>
+                        <Tooltip title={t('common.copy') || 'Copy'}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleCopyCode(`curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environment'}/ingame-popup-notices" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Application-Name: gatrix-frontend-tester" \\
+  -H "X-API-Token: ${apiToken}"`)}
+                          >
+                            <ContentCopyIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                      <Box sx={{
+                        p: 1.5,
+                        backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+                        borderRadius: 1,
+                        border: `1px solid ${theme.palette.divider}`,
+                        fontFamily: 'monospace',
+                        fontSize: '0.75rem',
+                        overflow: 'auto',
+                        maxHeight: 120,
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-all',
+                      }}>
+                        {`curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environment'}/ingame-popup-notices" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Application-Name: gatrix-frontend-tester" \\
+  -H "X-API-Token: ${apiToken}"`}
+                      </Box>
+                    </Box>
+
+                    {/* Validation Error */}
+                    {validationError && (
+                      <Alert severity="error" sx={{ mb: 2 }}>
+                        {validationError}
+                      </Alert>
+                    )}
+
                     <Button
                       variant="contained"
                       startIcon={testLoading ? <CircularProgress size={16} sx={{ color: 'inherit' }} /> : <PlayArrowIcon />}
@@ -520,7 +524,7 @@ curl -X GET "http://localhost:5000/api/v1/server/ingame-popup-notices" \\
                       disabled={testLoading}
                       fullWidth
                     >
-                      {t('ingamePopupNotices.sdkGuideDrawer.apiTest')}
+                      {t('common.request') || 'Request'}
                     </Button>
                   </Box>
                 </Collapse>
@@ -566,6 +570,14 @@ curl -X GET "http://localhost:5000/api/v1/server/ingame-popup-notices" \\
                               <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('ingamePopupNotices.sdkGuideDrawer.size')}</Typography>
                               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                                 {new Blob([JSON.stringify(testResponse)]).size} bytes
+                              </Typography>
+                            </Box>
+                          )}
+                          {responseTime && (
+                            <Box>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('common.receivedAt') || 'Received At'}</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                {responseTime.toLocaleTimeString()}
                               </Typography>
                             </Box>
                           )}

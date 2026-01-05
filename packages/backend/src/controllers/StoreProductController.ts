@@ -11,6 +11,11 @@ export class StoreProductController {
    */
   static getStoreProducts = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { page, limit, search, sortBy, sortOrder, store, isActive } = req.query;
+    const environment = req.environment;
+
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
+    }
 
     const result = await StoreProductService.getStoreProducts({
       page: page ? parseInt(page as string) : undefined,
@@ -20,6 +25,7 @@ export class StoreProductController {
       sortOrder: (sortOrder as string)?.toLowerCase() as 'asc' | 'desc',
       store: store as string,
       isActive: isActive !== undefined ? isActive === 'true' : undefined,
+      environment,
     });
 
     res.json({
@@ -34,8 +40,11 @@ export class StoreProductController {
    * GET /api/v1/admin/store-products/stats
    */
   static getStats = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = req.environmentId;
-    const stats = await StoreProductService.getStats(environmentId);
+    const environment = req.environment;
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
+    }
+    const stats = await StoreProductService.getStats(environment);
 
     res.json({
       success: true,
@@ -50,12 +59,16 @@ export class StoreProductController {
    */
   static getStoreProductById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
+    const environment = req.environment;
 
     if (!id) {
       throw new GatrixError('Store product ID is required', 400);
     }
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
+    }
 
-    const product = await StoreProductService.getStoreProductById(id);
+    const product = await StoreProductService.getStoreProductById(id, environment);
 
     res.json({
       success: true,
@@ -70,9 +83,13 @@ export class StoreProductController {
    */
   static createStoreProduct = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
+    const environment = req.environment;
 
     if (!userId) {
       throw new GatrixError('User authentication required', 401);
+    }
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
     }
 
     const { productId, productName, store, price, currency, isActive, saleStartAt, saleEndAt, description, metadata, tagIds } = req.body;
@@ -103,6 +120,7 @@ export class StoreProductController {
       description: description?.trim() || null,
       metadata: metadata || null,
       createdBy: userId,
+      environment,
     });
 
     // Set tags for the product
@@ -127,12 +145,16 @@ export class StoreProductController {
   static updateStoreProduct = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
     const userId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
+    const environment = req.environment;
 
     if (!id) {
       throw new GatrixError('Store product ID is required', 400);
     }
     if (!userId) {
       throw new GatrixError('User authentication required', 401);
+    }
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
     }
 
     const { productId, productName, store, price, currency, isActive, saleStartAt, saleEndAt, description, metadata, tagIds } = req.body;
@@ -149,7 +171,7 @@ export class StoreProductController {
       description: description !== undefined ? (description?.trim() || null) : undefined,
       metadata,
       updatedBy: userId,
-    });
+    }, environment);
 
     // Set tags for the product
     if (Array.isArray(tagIds)) {
@@ -172,12 +194,16 @@ export class StoreProductController {
    */
   static deleteStoreProduct = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
+    const environment = req.environment;
 
     if (!id) {
       throw new GatrixError('Store product ID is required', 400);
     }
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
+    }
 
-    await StoreProductService.deleteStoreProduct(id);
+    await StoreProductService.deleteStoreProduct(id, environment);
 
     res.json({
       success: true,
@@ -191,12 +217,16 @@ export class StoreProductController {
    */
   static deleteStoreProducts = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { ids } = req.body;
+    const environment = req.environment;
 
     if (!Array.isArray(ids) || ids.length === 0) {
       throw new GatrixError('Product IDs array is required', 400);
     }
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
+    }
 
-    const deletedCount = await StoreProductService.deleteStoreProducts(ids);
+    const deletedCount = await StoreProductService.deleteStoreProducts(ids, environment);
 
     res.json({
       success: true,
@@ -213,6 +243,7 @@ export class StoreProductController {
     const { id } = req.params;
     const { isActive } = req.body;
     const userId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
+    const environment = req.environment;
 
     if (!id) {
       throw new GatrixError('Store product ID is required', 400);
@@ -220,8 +251,11 @@ export class StoreProductController {
     if (isActive === undefined) {
       throw new GatrixError('isActive value is required', 400);
     }
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
+    }
 
-    const product = await StoreProductService.toggleActive(id, isActive, userId);
+    const product = await StoreProductService.toggleActive(id, isActive, userId, environment);
 
     res.json({
       success: true,
@@ -237,6 +271,7 @@ export class StoreProductController {
   static bulkUpdateActiveStatus = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { ids, isActive } = req.body;
     const userId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
+    const environment = req.environment;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {
       throw new GatrixError('Product IDs array is required', 400);
@@ -244,8 +279,11 @@ export class StoreProductController {
     if (isActive === undefined) {
       throw new GatrixError('isActive value is required', 400);
     }
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
+    }
 
-    const affectedCount = await StoreProductService.bulkUpdateActiveStatus(ids, isActive, userId);
+    const affectedCount = await StoreProductService.bulkUpdateActiveStatus(ids, isActive, userId, environment);
 
     res.json({
       success: true,
@@ -261,9 +299,13 @@ export class StoreProductController {
   static bulkUpdateActiveStatusByFilter = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { search, currentIsActive, targetIsActive } = req.body;
     const userId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
+    const environment = req.environment;
 
     if (targetIsActive === undefined) {
       throw new GatrixError('targetIsActive value is required', 400);
+    }
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
     }
 
     const result = await StoreProductService.bulkUpdateActiveStatusByFilter(
@@ -271,6 +313,7 @@ export class StoreProductController {
         search: search as string,
         currentIsActive: currentIsActive !== undefined ? Boolean(currentIsActive) : undefined,
         targetIsActive: Boolean(targetIsActive),
+        environment,
       },
       userId
     );
@@ -288,10 +331,16 @@ export class StoreProductController {
    */
   static getCountByFilter = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { search, isActive } = req.query;
+    const environment = req.environment;
+
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
+    }
 
     const count = await StoreProductService.getCountByFilter({
       search: search as string,
       isActive: isActive !== undefined ? isActive === 'true' : undefined,
+      environment,
     });
 
     res.json({
@@ -305,9 +354,12 @@ export class StoreProductController {
    * GET /api/v1/admin/store-products/sync/preview
    */
   static previewSync = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = req.environmentId;
+    const environment = req.environment;
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
+    }
 
-    const result = await StoreProductService.previewSync(environmentId);
+    const result = await StoreProductService.previewSync(environment);
 
     res.json({
       success: true,
@@ -321,11 +373,15 @@ export class StoreProductController {
    * POST /api/v1/admin/store-products/sync/apply
    */
   static applySync = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = req.environmentId;
+    const environment = req.environment;
     const userId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
     const selected = req.body; // { toAdd: number[], toUpdate: number[], toDelete: string[] }
 
-    const result = await StoreProductService.applySync(environmentId, userId, selected);
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
+    }
+
+    const result = await StoreProductService.applySync(environment, userId, selected);
 
     res.json({
       success: true,

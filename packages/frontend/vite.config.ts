@@ -17,7 +17,8 @@ process.env.ESBUILD_BINARY_PATH = process.env.ESBUILD_BINARY_PATH || '';
 // Note: Vite only exposes VITE_* env vars to the client, but in vite.config.ts we can access all env vars
 const isDocker = process.env.VITE_DOCKER_ENV === 'true' || process.env.DOCKER_ENV === 'true';
 const backendHost = isDocker ? 'backend-dev' : 'localhost';
-const backendPort = isDocker ? '5000' : (process.env.BACKEND_PORT || '5000');
+const backendPort = isDocker ? '5000' : (process.env.BACKEND_PORT || '45000');
+const frontendPort = parseInt(process.env.FRONTEND_PORT || '43000', 10);
 const backendUrl = `http://${backendHost}:${backendPort}`;
 
 // Create HTTP agents with DNS caching disabled
@@ -64,7 +65,7 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0', // Allow external connections (required for Docker)
-    port: 3000,
+    port: frontendPort,
     watch: {
       usePolling: true, // Required for Docker on Windows/WSL
       interval: 1000, // Increased from 100ms to 1000ms to reduce unnecessary reloads

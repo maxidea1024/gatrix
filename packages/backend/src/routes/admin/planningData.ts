@@ -44,5 +44,13 @@ router.get('/oceannpcarea', PlanningDataController.getOceanNpcAreaSpawnerLookup)
 // File upload route (drag & drop)
 router.post('/upload', upload.any(), PlanningDataController.uploadPlanningData);
 
+// Preview diff route (preview changes before upload)
+router.post('/preview-diff', upload.any(), PlanningDataController.previewDiff);
+
+// Upload history routes
+router.get('/history', PlanningDataController.getUploadHistory);
+router.get('/latest', PlanningDataController.getLatestUpload);
+router.delete('/history', PlanningDataController.resetUploadHistory);
+
 export default router;
 

@@ -324,13 +324,16 @@ function loadJson5File(filePath) {
 
 /**
  * String format function (from mutil.ts)
+ * Replaces all occurrences of {0}, {1}, etc. with corresponding args
  */
 function stringFormat(formatted, args) {
   if (!formatted || !args) {
     return formatted;
   }
   for (let i = 0; i < args.length; i++) {
-    formatted = formatted.replace('{' + i + '}', args[i]);
+    // Use regex with global flag to replace ALL occurrences of {i}
+    const regex = new RegExp('\\{' + i + '\\}', 'g');
+    formatted = formatted.replace(regex, args[i]);
   }
   return formatted;
 }
@@ -2407,13 +2410,13 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir, loc
     const baseEntry = {};
     for (const [key, value] of Object.entries(item)) {
       if (key !== 'name' && key !== 'nameKr' && key !== 'nameEn' && key !== 'nameCn' &&
-          key !== 'desc' && key !== 'descKr' && key !== 'descEn' && key !== 'descCn' &&
-          key !== 'description' && key !== 'descriptionKr' && key !== 'descriptionEn' && key !== 'descriptionCn' &&
-          key !== 'mateName' && key !== 'mateNameKr' && key !== 'mateNameEn' && key !== 'mateNameCn' &&
-          key !== 'npcName' && key !== 'npcNameKr' && key !== 'npcNameEn' && key !== 'npcNameCn' &&
-          key !== 'townNames' && key !== 'townNamesKr' && key !== 'townNamesEn' && key !== 'townNamesCn' &&
-          key !== 'worldBuffNames' &&
-          key !== 'towns') { // exclude nested towns and worldBuffNames to localize per-language below
+        key !== 'desc' && key !== 'descKr' && key !== 'descEn' && key !== 'descCn' &&
+        key !== 'description' && key !== 'descriptionKr' && key !== 'descriptionEn' && key !== 'descriptionCn' &&
+        key !== 'mateName' && key !== 'mateNameKr' && key !== 'mateNameEn' && key !== 'mateNameCn' &&
+        key !== 'npcName' && key !== 'npcNameKr' && key !== 'npcNameEn' && key !== 'npcNameCn' &&
+        key !== 'townNames' && key !== 'townNamesKr' && key !== 'townNamesEn' && key !== 'townNamesCn' &&
+        key !== 'worldBuffNames' &&
+        key !== 'towns') { // exclude nested towns and worldBuffNames to localize per-language below
         baseEntry[key] = value;
       }
     }
@@ -3351,10 +3354,11 @@ function buildCashShopLookup(cmsDir, outputDir, loctab = {}) {
       return null;
     }
 
-    // Format product name: replace {0} with formatText
+    // Format product name: replace ALL {0} occurrences with formatText
     const formatProductName = (productName, formatText, loctab) => {
       const localizedTemplate = loctab[productName] || productName;
-      return localizedTemplate.replace('{0}', formatText || '');
+      // Use regex with global flag to replace ALL occurrences
+      return localizedTemplate.replace(/\{0\}/g, formatText || '');
     };
 
     // Extract valid products with unified multi-language structure
@@ -3375,9 +3379,24 @@ function buildCashShopLookup(cmsDir, outputDir, loctab = {}) {
           item.productNameFormatText || '',
           loctab
         );
-        // Translate productDesc
-        const descKo = item.productDesc || '';
-        const descZh = loctab[descKo] || descKo;
+
+        // Format product description: also replace ALL {0} occurrences
+        const formatProductDesc = (desc, formatText, loctab) => {
+          const localizedTemplate = loctab[desc] || desc;
+          return localizedTemplate.replace(/\{0\}/g, formatText || '');
+        };
+
+        // Translate productDesc with placeholder replacement
+        const descKo = formatProductDesc(
+          item.productDesc || '',
+          item.productDescFormatText || item.productNameFormatText || '',
+          {} // Korean: no translation
+        );
+        const descZh = formatProductDesc(
+          item.productDesc || '',
+          item.productDescFormatText || item.productNameFormatText || '',
+          loctab
+        );
 
         // Unified structure with language keys (ko, en, zh)
         return {

@@ -1,49 +1,52 @@
 import { config } from '../config';
 import ServerLifecycleEvent from '../models/ServerLifecycleEvent';
 import logger from '../config/logger';
-
-let cleanupInterval: ReturnType<typeof setInterval> | null = null;
+import { queueService } from './QueueService';
 
 /**
- * Start the lifecycle event cleanup scheduler
- * Runs once per day to delete old lifecycle events
+ * Initialize lifecycle cleanup job
+ * Registers a daily repeatable job in BullMQ scheduler queue
+ * This ensures only one instance runs the cleanup across all backend instances
  */
-export function startLifecycleCleanupScheduler(): void {
+export async function initializeLifecycleCleanupJob(): Promise<void> {
     const retentionDays = config.serviceDiscovery?.lifecycleEventRetentionDays ?? 14;
 
-    logger.info(`Starting lifecycle event cleanup scheduler (retention: ${retentionDays} days)`);
+    logger.info(`Initializing lifecycle event cleanup job (retention: ${retentionDays} days)`);
 
-    // Run cleanup immediately on startup
-    runCleanup(retentionDays);
+    try {
+        // Check if job already exists
+        const repeatables = await queueService.listRepeatable('scheduler');
+        const exists = repeatables.some((r) => r.name === 'lifecycle:cleanup');
 
-    // Schedule cleanup to run once per day (24 hours)
-    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-    cleanupInterval = setInterval(() => {
-        runCleanup(retentionDays);
-    }, ONE_DAY_MS);
-}
-
-/**
- * Stop the lifecycle event cleanup scheduler
- */
-export function stopLifecycleCleanupScheduler(): void {
-    if (cleanupInterval) {
-        clearInterval(cleanupInterval);
-        cleanupInterval = null;
-        logger.info('Stopped lifecycle event cleanup scheduler');
+        if (!exists) {
+            // Register daily cleanup job at 3:00 AM
+            await queueService.addJob('scheduler', 'lifecycle:cleanup', { retentionDays }, {
+                repeat: { pattern: '0 3 * * *' } // Every day at 3:00 AM
+            });
+            logger.info('Registered repeatable job: lifecycle:cleanup (daily at 3:00 AM)');
+        } else {
+            logger.info('Repeatable job already exists: lifecycle:cleanup');
+        }
+    } catch (error) {
+        logger.error('Failed to register lifecycle cleanup job:', error);
     }
 }
 
 /**
- * Run the cleanup operation
+ * Process lifecycle cleanup job
+ * Called by QueueService when the scheduled job runs
  */
-async function runCleanup(retentionDays: number): Promise<void> {
+export async function processLifecycleCleanupJob(retentionDays: number): Promise<number> {
     try {
         const deletedCount = await ServerLifecycleEvent.deleteOldEvents(retentionDays);
         if (deletedCount > 0) {
             logger.info(`Deleted ${deletedCount} lifecycle events older than ${retentionDays} days`);
+        } else {
+            logger.debug('No old lifecycle events to delete');
         }
+        return deletedCount;
     } catch (error) {
-        logger.error('Failed to cleanup old lifecycle events:', error);
+        logger.error('Failed to run lifecycle cleanup:', error);
+        throw error;
     }
 }

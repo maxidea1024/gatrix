@@ -16,6 +16,7 @@ COPY packages/backend/package.json ./packages/backend/
 COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
+COPY packages/shared/package.json ./packages/shared/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Skip Cypress binary download - not needed in production Docker image
@@ -33,6 +34,9 @@ COPY --from=deps /app/node_modules ./node_modules
 
 # Copy all source files
 COPY . .
+
+# Build shared (required by other packages)
+RUN cd packages/shared && yarn build
 
 # Build server-sdk (required because main points to dist/index.js)
 RUN cd packages/sdks/server-sdk && yarn install --ignore-optional && yarn build
@@ -59,7 +63,11 @@ COPY packages/backend/package.json ./packages/backend/
 COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
+COPY packages/shared/package.json ./packages/shared/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
+
+# Copy shared source (needed for file: dependency)
+COPY packages/shared ./packages/shared
 
 # Copy server-sdk source (needed for file: dependency)
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
@@ -67,6 +75,10 @@ COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 # Install production dependencies only (with increased network timeout for slow connections)
 RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 --ignore-optional && \
   yarn cache clean
+
+# Copy built shared from builder
+COPY --from=builder /app/packages/shared/dist ./packages/chat-server/node_modules/@gatrix/shared/dist
+COPY --from=builder /app/packages/shared/package.json ./packages/chat-server/node_modules/@gatrix/shared/package.json
 
 # Copy built server-sdk from builder to node_modules location
 COPY --from=builder /app/packages/sdks/server-sdk/dist ./packages/chat-server/node_modules/@gatrix/server-sdk/dist

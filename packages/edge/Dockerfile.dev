@@ -12,6 +12,7 @@ RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
 # Copy package files
 COPY package.json yarn.lock* ./
 COPY packages/edge/package.json ./packages/edge/
+COPY packages/shared/package.json ./packages/shared/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Skip Cypress binary download - not needed in production Docker image
@@ -25,8 +26,12 @@ RUN yarn add -W --dev @swc/core-linux-x64-musl --ignore-scripts
 
 # Copy source code
 COPY packages/edge ./packages/edge
+COPY packages/shared ./packages/shared
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 COPY tsconfig.json ./
+
+# Build shared
+RUN cd packages/shared && yarn build
 
 # Build server-sdk
 RUN cd packages/sdks/server-sdk && yarn build

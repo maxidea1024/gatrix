@@ -7484,6 +7484,14 @@
     "FleetSpeedCorrection": {
       "name": "FleetSpeedCorrection",
       "value": 0
+    },
+    "IndicatorOpenQuestId": {
+      "name": "IndicatorOpenQuestId",
+      "value": 0
+    },
+    "IndicatorOpenQuestNodeIndex": {
+      "name": "IndicatorOpenQuestNodeIndex",
+      "value": 0
     }
   }
 }

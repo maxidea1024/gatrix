@@ -226,9 +226,9 @@ export class UserModel {
         }
 
         if (filters.search) {
-          query.where(function(this: any) {
+          query.where(function (this: any) {
             this.where('g_users.name', 'like', `%${filters.search}%`)
-                .orWhere('g_users.email', 'like', `%${filters.search}%`);
+              .orWhere('g_users.email', 'like', `%${filters.search}%`);
           });
         }
 
@@ -238,22 +238,22 @@ export class UserModel {
           if (tagsOperator === 'include_all') {
             // AND 조건: 모든 태그를 가진 사용자만 반환
             filters.tags.forEach((tagId: string) => {
-              query.whereExists(function(this: any) {
+              query.whereExists(function (this: any) {
                 this.select('*')
-                    .from('g_tag_assignments')
-                    .whereRaw('g_tag_assignments.entityId = g_users.id')
-                    .where('g_tag_assignments.entityType', 'user')
-                    .where('g_tag_assignments.tagId', tagId);
+                  .from('g_tag_assignments')
+                  .whereRaw('g_tag_assignments.entityId = g_users.id')
+                  .where('g_tag_assignments.entityType', 'user')
+                  .where('g_tag_assignments.tagId', tagId);
               });
             });
           } else {
             // OR 조건: 태그 중 하나라도 가진 사용자 반환
-            query.whereExists(function(this: any) {
+            query.whereExists(function (this: any) {
               this.select('*')
-                  .from('g_tag_assignments')
-                  .whereRaw('g_tag_assignments.entityId = g_users.id')
-                  .where('g_tag_assignments.entityType', 'user')
-                  .whereIn('g_tag_assignments.tagId', filters.tags!);
+                .from('g_tag_assignments')
+                .whereRaw('g_tag_assignments.entityId = g_users.id')
+                .where('g_tag_assignments.entityType', 'user')
+                .whereIn('g_tag_assignments.tagId', filters.tags!);
             });
           }
         }
@@ -308,14 +308,14 @@ export class UserModel {
       // Batch load environment assignments
       const envAssignments = userIds.length > 0
         ? await db('g_user_environments')
-            .whereIn('userId', userIds)
-            .select('userId', 'environmentId')
+          .whereIn('userId', userIds)
+          .select('userId', 'environment')
         : [];
 
-      // Group environment IDs by user
+      // Group environment names by user
       const envByUser = envAssignments.reduce((acc: any, env: any) => {
         if (!acc[env.userId]) acc[env.userId] = [];
-        acc[env.userId].push(env.environmentId);
+        acc[env.userId].push(env.environment);
         return acc;
       }, {});
 
@@ -326,7 +326,7 @@ export class UserModel {
           return {
             ...user,
             tags,
-            environmentIds: envByUser[user.id] || []
+            environments: envByUser[user.id] || []
           };
         })
       );
@@ -493,9 +493,9 @@ export class UserModel {
       const users = await db('g_users')
         .select('id', 'name', 'email', 'role', 'status', 'avatarUrl', 'createdAt', 'updatedAt')
         .where('status', 'active') // 활성 사용자만 검색
-        .andWhere(function() {
+        .andWhere(function () {
           this.where('name', 'like', `%${query}%`)
-              .orWhere('email', 'like', `%${query}%`);
+            .orWhere('email', 'like', `%${query}%`);
         })
         .orderBy('name', 'asc')
         .limit(limit);
@@ -525,9 +525,9 @@ export class UserModel {
           'updatedAt'
         ])
         .where('status', 'active') // 활성 사용자만 동기화
-        .andWhere(function() {
+        .andWhere(function () {
           this.where('updatedAt', '>=', since)
-              .orWhere('createdAt', '>=', since);
+            .orWhere('createdAt', '>=', since);
         })
         .orderBy('updatedAt', 'desc');
 
@@ -545,7 +545,7 @@ export class UserModel {
    */
   static async getEnvironmentAccess(userId: number): Promise<{
     allowAllEnvironments: boolean;
-    environmentIds: string[];
+    environments: string[];
   }> {
     try {
       // Get allowAllEnvironments flag
@@ -560,12 +560,12 @@ export class UserModel {
 
       // Get specific environment assignments
       const environments = await db('g_user_environments')
-        .select('environmentId')
+        .select('environment')
         .where('userId', userId);
 
       return {
         allowAllEnvironments: !!user.allowAllEnvironments,
-        environmentIds: environments.map((e: any) => e.environmentId)
+        environments: environments.map((e: any) => e.environment)
       };
     } catch (error) {
       logger.error('Error getting user environment access:', error);
@@ -579,7 +579,7 @@ export class UserModel {
   static async setEnvironmentAccess(
     userId: number,
     allowAllEnvironments: boolean,
-    environmentIds: string[],
+    environments: string[],
     updatedBy: number
   ): Promise<void> {
     try {
@@ -599,10 +599,10 @@ export class UserModel {
           .del();
 
         // Add new environment assignments (only if not allowAllEnvironments)
-        if (!allowAllEnvironments && environmentIds.length > 0) {
-          const assignments = environmentIds.map(environmentId => ({
+        if (!allowAllEnvironments && environments.length > 0) {
+          const assignments = environments.map(environment => ({
             userId,
-            environmentId,
+            environment,
             createdBy: updatedBy,
             createdAt: new Date()
           }));
@@ -619,7 +619,7 @@ export class UserModel {
   /**
    * Check if user has access to a specific environment
    */
-  static async hasEnvironmentAccess(userId: number, environmentId: string): Promise<boolean> {
+  static async hasEnvironmentAccess(userId: number, environment: string): Promise<boolean> {
     try {
       const user = await db('g_users')
         .select('allowAllEnvironments')
@@ -638,7 +638,7 @@ export class UserModel {
       // Check specific environment assignment
       const assignment = await db('g_user_environments')
         .where('userId', userId)
-        .where('environmentId', environmentId)
+        .where('environment', environment)
         .first();
 
       return !!assignment;
@@ -649,9 +649,9 @@ export class UserModel {
   }
 
   /**
-   * Get accessible environment IDs for a user
+   * Get accessible environment names for a user
    */
-  static async getAccessibleEnvironmentIds(userId: number): Promise<string[] | 'all'> {
+  static async getAccessibleEnvironments(userId: number): Promise<string[] | 'all'> {
     try {
       const user = await db('g_users')
         .select('allowAllEnvironments')
@@ -667,12 +667,12 @@ export class UserModel {
       }
 
       const environments = await db('g_user_environments')
-        .select('environmentId')
+        .select('environment')
         .where('userId', userId);
 
-      return environments.map((e: any) => e.environmentId);
+      return environments.map((e: any) => e.environment);
     } catch (error) {
-      logger.error('Error getting accessible environment IDs:', error);
+      logger.error('Error getting accessible environment names:', error);
       return [];
     }
   }
@@ -704,7 +704,7 @@ export class UserModel {
       // Check for wildcard permission or exact match
       const result = await db('g_user_permissions')
         .where('userId', userId)
-        .where(function() {
+        .where(function () {
           this.where('permission', permission).orWhere('permission', '*');
         })
         .first();
@@ -725,7 +725,7 @@ export class UserModel {
       // Check for wildcard permission or any of the specified permissions
       const result = await db('g_user_permissions')
         .where('userId', userId)
-        .where(function() {
+        .where(function () {
           this.whereIn('permission', permissions).orWhere('permission', '*');
         })
         .first();

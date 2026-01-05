@@ -2086,6 +2086,7 @@
     "copiedToClipboard": "클립보드에 복사되었습니다",
     "typeToConfirm": "삭제를 확인하려면 \"{{name}}\"을(를) 입력하세요:",
     "copy": "복사",
+    "copyToClipboard": "클립보드에 복사",
     "paste": "붙여넣기",
     "copyFailed": "클립보드 복사에 실패했습니다",
     "cannotCopySystemItem": "시스템 항목은 복사할 수 없습니다",
@@ -2308,7 +2309,13 @@
     },
     "relativeTime": {
       "secondsAgo": "{{seconds}}초 전"
-    }
+    },
+    "curlPreview": "curl 미리보기",
+    "request": "요청",
+    "example": "예시",
+    "queryParameters": "쿼리 파라미터",
+    "receivedAt": "수신 시각",
+    "apiTokenRequired": "API 토큰을 입력해주세요"
   },
   "createdAt": "생성일",
   "dashboard": {
@@ -2427,7 +2434,30 @@
     "sessionExpired": "세션이 만료되었습니다",
     "tryAgain": "다시 시도하세요",
     "unauthorized": "인증되지 않음",
-    "validationError": "유효성 검사 오류"
+    "validationError": "유효성 검사 오류",
+    "INTERNAL_SERVER_ERROR": "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+    "BAD_REQUEST": "잘못된 요청입니다. 입력 값을 확인해주세요.",
+    "NOT_FOUND": "요청하신 리소스를 찾을 수 없습니다.",
+    "UNAUTHORIZED": "인증이 필요합니다. 다시 로그인해주세요.",
+    "FORBIDDEN": "접근 권한이 없습니다.",
+    "VALIDATION_ERROR": "입력 값이 올바르지 않습니다.",
+    "RESOURCE_NOT_FOUND": "요청하신 데이터를 찾을 수 없습니다.",
+    "RESOURCE_ALREADY_EXISTS": "이미 존재하는 데이터입니다.",
+    "RESOURCE_CREATE_FAILED": "데이터 생성에 실패했습니다.",
+    "RESOURCE_UPDATE_FAILED": "데이터 수정에 실패했습니다.",
+    "RESOURCE_DELETE_FAILED": "데이터 삭제에 실패했습니다.",
+    "RESOURCE_FETCH_FAILED": "데이터를 불러오는데 실패했습니다.",
+    "AUTH_TOKEN_INVALID": "인증 토큰이 유효하지 않습니다. 다시 로그인해주세요.",
+    "AUTH_TOKEN_EXPIRED": "인증 토큰이 만료되었습니다. 다시 로그인해주세요.",
+    "AUTH_PERMISSION_DENIED": "해당 작업에 대한 권한이 없습니다.",
+    "USER_NOT_FOUND": "사용자를 찾을 수 없습니다.",
+    "ENV_NOT_FOUND": "환경을 찾을 수 없습니다.",
+    "ENV_ACCESS_DENIED": "해당 환경에 대한 접근 권한이 없습니다.",
+    "RATE_LIMIT_EXCEEDED": "요청이 너무 많습니다. 잠시 후 다시 시도해주세요.",
+    "TOO_MANY_REQUESTS": "요청이 너무 많습니다. 잠시 후 다시 시도해주세요.",
+    "CONFLICT": "충돌이 발생했습니다. 데이터를 확인해주세요.",
+    "SERVICE_UNAVAILABLE": "서비스를 일시적으로 사용할 수 없습니다.",
+    "TIMEOUT": "요청 시간이 초과되었습니다."
   },
   "jobs": {
     "title": "Job 관리",
@@ -2722,6 +2752,8 @@
     "hotTimeButtonEvent": "핫타임버튼 이벤트",
     "liveEvent": "라이브이벤트",
     "planningData": "기획데이터",
+    "planningDataManagement": "기획데이터 관리",
+    "planningDataHistory": "기획데이터 히스토리",
     "serverManagement": "서버관리",
     "serverList": "서버목록",
     "serverLifecycle": "서버 실행 이력",
@@ -3662,6 +3694,7 @@
       "issuedCount": "발행된 코드 수",
       "generatingCodes": "쿠폰 생성 중",
       "generatingInBackground": "쿠폰을 백그라운드에서 발급 중입니다.",
+      "noCoupons": "정의된 쿠폰이 없습니다.",
       "issuedCodesDrawer": {
         "title": "발행된 쿠폰 코드 목록",
         "subtitle": "쿠폰 설정: {name}",
@@ -3707,7 +3740,8 @@
         "error429": "동일 사용자/코드에 대한 과도한 요청 (스팸 제한)",
         "errorCodesDesc": "다양한 오류 상황에 대한 응답 예제입니다.",
         "apiTest": "API 테스트",
-        "copiedToClipboard": "코드가 클립보드에 복사되었습니다."
+        "copiedToClipboard": "코드가 클립보드에 복사되었습니다.",
+        "couponCodeRequired": "쿠폰 코드를 입력해주세요"
       },
       "columns": {
         "code": "쿠폰 코드",
@@ -3833,6 +3867,7 @@
         "characterId": "캐릭터 ID"
       },
       "allCoupons": "전체 쿠폰",
+      "noRecords": "쿠폰 사용 기록이 없습니다.",
       "columns": {
         "couponName": "쿠폰 이름",
         "couponCode": "쿠폰 코드",
@@ -4200,7 +4235,16 @@
       "uploadSuccess": "기획데이터가 성공적으로 업로드되었습니다",
       "uploadFailed": "기획데이터 업로드에 실패했습니다",
       "selectFilesToUpload": "업로드할 파일을 선택해주세요",
-      "filesUploadedAndCached": "{{count}}개의 기획데이터 파일이 업로드되고 캐싱되었습니다"
+      "filesUploadedAndCached": "{{count}}개의 기획데이터 파일이 업로드되고 캐싱되었습니다",
+      "comment": "업로드 코멘트",
+      "commentPlaceholder": "이번 업로드에 대한 설명을 입력하세요 (선택사항)",
+      "alreadyUpToDate": "이미 최신 데이터입니다. 변경된 내용이 없습니다.",
+      "alreadyUpToDateTitle": "이미 최신 상태",
+      "previewChanges": "변경사항 미리보기",
+      "previewChangesTitle": "변경사항 미리보기",
+      "previewFailed": "변경사항 확인에 실패했습니다",
+      "noChangesDetected": "변경사항이 없습니다. 이미 최신 상태입니다.",
+      "filesChanged": "개 파일 변경됨"
     },
     "tabs": {
       "rewardTypes": "보상 타입 목록",
@@ -4223,7 +4267,66 @@
     "testComponent": {
       "title": "테스트 컴포넌트 (데이터 확인용)"
     },
-    "noData": "데이터가 없습니다"
+    "noData": "데이터가 없습니다",
+    "noDataTitle": "기획데이터가 업로드되지 않았습니다",
+    "noDataDescription": "게임에서 사용할 기획데이터를 업로드해주세요. 웹 UI 또는 CLI를 통해 업로드할 수 있습니다.",
+    "uploadGuide": {
+      "title": "업로드 방법 안내",
+      "subtitle": "기획데이터를 업로드하는 방법을 안내합니다.",
+      "webUpload": "웹 UI를 통한 업로드",
+      "webUploadDesc": "위의 '기획데이터 업로드' 버튼을 클릭하여 로컬 파일을 선택하고 업로드합니다.",
+      "dataBuild": "데이터 빌드 (Excel → JSON 변환)",
+      "dataBuildDesc": "클라이언트용 CMS 데이터를 JSON 형식으로 변환합니다.",
+      "clientDataWarning": "반드시 클라이언트용 CMS 데이터를 사용해야 합니다. 서버용 데이터가 아닙니다!",
+      "cliUpload": "CLI를 통한 원격 업로드",
+      "cliUploadDesc": "변환된 데이터를 원격 서버로 업로드합니다.",
+      "curlUpload": "curl을 통한 업로드",
+      "curlUploadDesc": "curl 명령어를 사용하여 파일을 직접 업로드합니다."
+    },
+    "uploadInfo": {
+      "lastUpload": "최근 업로드",
+      "by": "업로더",
+      "hash": "해시",
+      "files": "파일"
+    },
+    "history": {
+      "title": "기획데이터 히스토리",
+      "subtitle": "기획데이터 업로드 내역과 변경 이력을 확인할 수 있습니다.",
+      "loadFailed": "업로드 기록을 불러오지 못했습니다",
+      "noRecords": "업로드 기록이 없습니다",
+      "uploadedAt": "업로드 일시",
+      "uploader": "업로더",
+      "source": "업로드 방식",
+      "hash": "해시",
+      "searchPlaceholder": "업로더명, 해시, 코멘트, 파일명으로 검색",
+      "totalRecords": "전체",
+      "filesCount": "파일 수",
+      "changedFilesCount": "변경 파일 수",
+      "size": "크기",
+      "changes": "변경사항",
+      "comment": "코멘트",
+      "filesUploaded": "업로드된 파일",
+      "changedFiles": "변경된 파일",
+      "latest": "최신",
+      "added": "추가",
+      "removed": "삭제",
+      "modified": "수정",
+      "noDiffAvailable": "상세 변경 내역을 확인할 수 없습니다",
+      "noChanges": "변경된 파일이 없습니다 (최초 업로드)",
+      "resetAll": "전체 삭제",
+      "resetConfirmTitle": "업로드 기록 전체 삭제",
+      "resetWarning": "이 작업은 되돌릴 수 없습니다. 모든 업로드 기록이 영구적으로 삭제됩니다.",
+      "resetConfirmMessage": "총 {{count}}개의 업로드 기록이 삭제됩니다.",
+      "resetConfirmInstruction": "삭제를 확인하려면 아래에 '전부삭제'를 입력하세요.",
+      "resetConfirmPlaceholder": "전부삭제",
+      "resetConfirmText": "전부삭제",
+      "resetSuccess": "{{count}}개의 업로드 기록이 삭제되었습니다",
+      "resetFailed": "업로드 기록 삭제에 실패했습니다",
+      "path": "경로",
+      "before": "변경 전",
+      "after": "변경 후",
+      "value": "값"
+    }
   },
   "rewards": {
     "rewardType": "보상 타입",
@@ -4282,13 +4385,28 @@
       "internalAddress": "내부 IP",
       "externalAddress": "공인 IP"
     },
+    "hostname": "호스트명",
+    "externalAddress": "외부 주소",
+    "internalAddress": "내부 주소",
+    "ports": "포트",
+    "cloudProvider": "클라우드 제공자",
+    "cloudRegion": "클라우드 리전",
+    "cloudZone": "클라우드 존",
+    "appVersion": "앱 버전",
+    "labels": "라벨",
     "status": {
       "initializing": "초기화 중",
+      "INITIALIZING": "초기화 중",
       "ready": "온라인",
+      "READY": "온라인",
       "shuttingDown": "종료중",
+      "SHUTTING_DOWN": "종료중",
       "error": "오류",
+      "ERROR": "오류",
       "terminated": "종료됨",
+      "TERMINATED": "종료됨",
       "noResponse": "응답 없음",
+      "NO_RESPONSE": "응답 없음",
       "busy": "처리 중"
     },
     "statusTooltip": {

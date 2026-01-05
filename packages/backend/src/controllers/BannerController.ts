@@ -11,7 +11,9 @@ export class BannerController {
   static getBanners = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { page, limit, search, status, sortBy, sortOrder } = req.query;
 
+    const environment = req.environment || 'development';
     const result = await BannerService.getBanners({
+      environment,
       page: page ? parseInt(page as string) : undefined,
       limit: limit ? parseInt(limit as string) : undefined,
       search: search as string,
@@ -33,8 +35,9 @@ export class BannerController {
    */
   static getBannerById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
+    const environment = req.environment || 'development';
 
-    const banner = await BannerService.getBannerById(bannerId);
+    const banner = await BannerService.getBannerById(bannerId, environment);
 
     res.json({
       success: true,
@@ -49,8 +52,10 @@ export class BannerController {
    */
   static createBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { name, description, width, height, metadata, playbackSpeed, sequences } = req.body;
+    const environment = req.environment || 'development';
 
     const banner = await BannerService.createBanner({
+      environment,
       name,
       description,
       width,
@@ -75,8 +80,9 @@ export class BannerController {
   static updateBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
     const { name, description, width, height, metadata, playbackSpeed, sequences } = req.body;
+    const environment = req.environment || 'development';
 
-    const banner = await BannerService.updateBanner(bannerId, {
+    const banner = await BannerService.updateBanner(bannerId, environment, {
       name,
       description,
       width,
@@ -100,8 +106,9 @@ export class BannerController {
    */
   static deleteBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
+    const environment = req.environment || 'development';
 
-    await BannerService.deleteBanner(bannerId);
+    await BannerService.deleteBanner(bannerId, environment);
 
     res.json({
       success: true,
@@ -115,8 +122,9 @@ export class BannerController {
    */
   static publishBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
+    const environment = req.environment || 'development';
 
-    const banner = await BannerService.publishBanner(bannerId, req.user?.userId);
+    const banner = await BannerService.publishBanner(bannerId, environment, req.user?.userId);
 
     res.json({
       success: true,
@@ -131,8 +139,9 @@ export class BannerController {
    */
   static archiveBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
+    const environment = req.environment || 'development';
 
-    const banner = await BannerService.archiveBanner(bannerId, req.user?.userId);
+    const banner = await BannerService.archiveBanner(bannerId, environment, req.user?.userId);
 
     res.json({
       success: true,
@@ -147,8 +156,9 @@ export class BannerController {
    */
   static duplicateBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
+    const environment = req.environment || 'development';
 
-    const banner = await BannerService.duplicateBanner(bannerId, req.user?.userId);
+    const banner = await BannerService.duplicateBanner(bannerId, environment, req.user?.userId);
 
     res.json({
       success: true,

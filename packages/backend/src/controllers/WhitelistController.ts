@@ -78,6 +78,11 @@ const getWhitelistsQuerySchema = Joi.object({
 
 export class WhitelistController {
   static getWhitelists = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environment = req.environment;
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
+    }
+
     // Validate query parameters
     const { error, value } = getWhitelistsQuerySchema.validate(req.query);
     if (error) {
@@ -99,7 +104,7 @@ export class WhitelistController {
     const filters = { accountId, ipAddress, createdBy, search, tags: tagsArray };
     const pagination = { page, limit };
 
-    const result = await WhitelistService.getAllWhitelists(filters, pagination);
+    const result = await WhitelistService.getAllWhitelists(environment, filters, pagination);
 
     res.json({
       success: true,
@@ -109,12 +114,16 @@ export class WhitelistController {
 
   static getWhitelistById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = parseInt(req.params.id);
+    const environment = req.environment;
 
     if (isNaN(id)) {
       throw new GatrixError('Invalid whitelist ID', 400);
     }
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
+    }
 
-    const whitelist = await WhitelistService.getWhitelistById(id);
+    const whitelist = await WhitelistService.getWhitelistById(id, environment);
 
     res.json({
       success: true,
@@ -123,8 +132,12 @@ export class WhitelistController {
   });
 
   static createWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environment = req.environment;
     if (!req.user) {
       throw new GatrixError('User not authenticated', 401);
+    }
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
     }
 
     // Validate request body
@@ -138,7 +151,7 @@ export class WhitelistController {
       createdBy: req.user.userId,
     };
 
-    const whitelist = await WhitelistService.createWhitelist(whitelistData);
+    const whitelist = await WhitelistService.createWhitelist(environment, whitelistData);
 
     res.status(201).json({
       success: true,
@@ -149,9 +162,13 @@ export class WhitelistController {
 
   static updateWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = parseInt(req.params.id);
+    const environment = req.environment;
 
     if (isNaN(id)) {
       throw new GatrixError('Invalid whitelist ID', 400);
+    }
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
     }
 
     // Validate request body
@@ -160,7 +177,7 @@ export class WhitelistController {
       throw new GatrixError(error.details[0].message, 400);
     }
 
-    const whitelist = await WhitelistService.updateWhitelist(id, value);
+    const whitelist = await WhitelistService.updateWhitelist(id, environment, value);
 
     res.json({
       success: true,
@@ -171,12 +188,16 @@ export class WhitelistController {
 
   static deleteWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = parseInt(req.params.id);
+    const environment = req.environment;
 
     if (isNaN(id)) {
       throw new GatrixError('Invalid whitelist ID', 400);
     }
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
+    }
 
-    await WhitelistService.deleteWhitelist(id);
+    await WhitelistService.deleteWhitelist(id, environment);
 
     res.json({
       success: true,
@@ -185,8 +206,12 @@ export class WhitelistController {
   });
 
   static bulkCreateWhitelists = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environment = req.environment;
     if (!req.user) {
       throw new GatrixError('User not authenticated', 401);
+    }
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
     }
 
     // Validate request body
@@ -195,7 +220,7 @@ export class WhitelistController {
       throw new GatrixError(error.details[0].message, 400);
     }
 
-    const createdCount = await WhitelistService.bulkCreateWhitelists(value.entries, req.user.userId);
+    const createdCount = await WhitelistService.bulkCreateWhitelists(environment, value.entries, req.user.userId!);
 
     res.status(201).json({
       success: true,
@@ -216,7 +241,7 @@ export class WhitelistController {
       throw new GatrixError('tagIds must be an array', 400);
     }
 
-    await WhitelistModel.setTags(parseInt(id), tagIds);
+    await WhitelistModel.setTags(parseInt(id), tagIds, req.user?.userId);
 
     res.json({
       success: true,
@@ -237,12 +262,16 @@ export class WhitelistController {
 
   static toggleWhitelistStatus = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = parseInt(req.params.id);
+    const environment = req.environment;
 
     if (isNaN(id)) {
       throw new GatrixError('Invalid whitelist ID', 400);
     }
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
+    }
 
-    const updated = await WhitelistService.toggleWhitelistStatus(id, (req.user as any).userId);
+    const updated = await WhitelistService.toggleWhitelistStatus(id, environment, req.user?.userId!);
 
     res.json({
       success: true,
@@ -252,13 +281,18 @@ export class WhitelistController {
 
   // 화이트리스트 테스트
   static testWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environment = req.environment;
+    if (!environment) {
+      throw new GatrixError('Environment not specified', 400);
+    }
+
     const { error, value } = testWhitelistSchema.validate(req.body);
     if (error) {
       throw new GatrixError(error.details[0].message, 400);
     }
 
     const { accountId, ipAddress } = value;
-    const result = await WhitelistService.testWhitelist(accountId, ipAddress);
+    const result = await WhitelistService.testWhitelist(environment, accountId, ipAddress);
 
     res.json({
       success: true,

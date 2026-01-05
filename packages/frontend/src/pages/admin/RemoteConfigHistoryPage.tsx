@@ -86,7 +86,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [total, setTotal] = useState(0);
   const [viewMode, setViewMode] = useState<'deployments' | 'versions'>('deployments');
-  
+
   // Dialog states
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Deployment | ConfigVersion | null>(null);
@@ -223,7 +223,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
       {/* Deployments View */}
       {viewMode === 'deployments' && (
         <Card>
-          <CardContent sx={{ p: 0 }}>
+          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
             <TableContainer>
               <Table>
                 <TableHead>
@@ -364,7 +364,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
       {/* Versions View */}
       {viewMode === 'versions' && (
         <Card>
-          <CardContent sx={{ p: 0 }}>
+          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
             <TableContainer>
               <Table>
                 <TableHead>

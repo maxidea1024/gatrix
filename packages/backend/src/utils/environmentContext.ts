@@ -3,198 +3,103 @@
  *
  * Provides utilities for managing environment context in multi-environment setup.
  * This module helps with:
- * - Getting current environment from request context
  * - Filtering queries by environment
  * - Validating environment access
- *
- * Note: Environment IDs are ULID strings (26 characters)
  */
-
-import { AsyncLocalStorage } from 'async_hooks';
-
-// Default environment ID will be fetched from database on first request
-// This is a placeholder that should be replaced with actual development environment ID
-let cachedDefaultEnvironmentId: string | null = null;
-
-// Environment context storage using AsyncLocalStorage for request-scoped context
-const environmentStorage = new AsyncLocalStorage<{ environmentId: string }>();
-
-/**
- * Set the default environment ID (called during application initialization)
- */
-export function setDefaultEnvironmentId(envId: string): void {
-  cachedDefaultEnvironmentId = envId;
-}
-
-/**
- * Get the default environment ID
- * Throws if not initialized
- */
-export function getDefaultEnvironmentId(): string {
-  if (!cachedDefaultEnvironmentId) {
-    throw new Error('Default environment ID not initialized. Call initializeDefaultEnvironment() first.');
-  }
-  return cachedDefaultEnvironmentId;
-}
-
-/**
- * Check if default environment is initialized
- */
-export function isDefaultEnvironmentInitialized(): boolean {
-  return cachedDefaultEnvironmentId !== null;
-}
-
-/**
- * Get the current environment ID from context
- * Falls back to default environment if not set
- */
-export function getCurrentEnvironmentId(): string {
-  const store = environmentStorage.getStore();
-  if (store?.environmentId) {
-    return store.environmentId;
-  }
-  return getDefaultEnvironmentId();
-}
-
-/**
- * Run a function with a specific environment context
- */
-export function runWithEnvironment<T>(environmentId: string, fn: () => T): T {
-  return environmentStorage.run({ environmentId }, fn);
-}
-
-/**
- * Run an async function with a specific environment context
- */
-export async function runWithEnvironmentAsync<T>(environmentId: string, fn: () => Promise<T>): Promise<T> {
-  return environmentStorage.run({ environmentId }, fn);
-}
-
-/**
- * Set environment context for the current async context
- * This is typically called by middleware
- */
-export function setEnvironmentContext(environmentId: string): void {
-  const store = environmentStorage.getStore();
-  if (store) {
-    store.environmentId = environmentId;
-  }
-}
 
 /**
  * Environment filter helper for Knex queries
- * Adds environmentId filter to a query builder
+ * Adds environment filter to a query builder
  */
-export function withEnvironmentFilter<T>(query: T, environmentId?: string): T {
-  const envId = environmentId ?? getCurrentEnvironmentId();
-  return (query as any).where('environmentId', envId);
+export function withEnvironmentFilter<T>(query: T, environment: string): T {
+  if (!environment) {
+    throw new Error('Environment must be explicitly specified for filtering.');
+  }
+  return (query as any).where('environment', environment);
 }
 
 /**
- * Validate environment ID format: {environmentName}.{ulid}
- * - environmentName: lowercase letters, numbers, underscore, hyphen (1-100 chars)
- * - ulid: 26 characters Crockford Base32
+ * Validate environment format
+ * - environment: lowercase letters, numbers, underscore, hyphen (1-100 chars)
  */
-export function isValidEnvironmentId(id: string): boolean {
-  if (!id || typeof id !== 'string') return false;
+export function isValidEnvironment(environment: string): boolean {
+  if (!environment || typeof environment !== 'string') return false;
 
-  // Format: {environmentName}.{ulid}
-  const parts = id.split('.');
-  if (parts.length !== 2) return false;
-
-  const [envName, ulid] = parts;
-
-  // Validate environmentName: lowercase, numbers, underscore, hyphen
-  if (!envName || envName.length < 1 || envName.length > 100) return false;
-  const envNameRegex = /^[a-z0-9_-]+$/;
-  if (!envNameRegex.test(envName)) return false;
-
-  // Validate ULID: 26 characters Crockford Base32
-  if (!ulid || ulid.length !== 26) return false;
-  const ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/i;
-  return ulidRegex.test(ulid);
+  // Validate environment: lowercase, numbers, underscore, hyphen
+  if (environment.length < 1 || environment.length > 100) return false;
+  const envRegex = /^[a-z0-9_-]+$/;
+  return envRegex.test(environment);
 }
 
-// Alias for backward compatibility
-export const isValidUlid = isValidEnvironmentId;
-
 /**
- * Get environment ID from request headers or query params
- * Priority: X-Environment-Id header > environmentId query param > body > default
+ * Get environment from request headers or query params
+ * Priority: X-Environment header > environment query param > body
  */
-export function getEnvironmentIdFromRequest(req: any): string {
+export function getEnvironmentFromRequest(req: any): string {
   // Check header first
-  const headerEnvId = req.headers?.['x-environment-id'];
-  if (headerEnvId && isValidUlid(headerEnvId)) {
-    return headerEnvId;
+  const headerEnv = req.headers?.['x-environment'];
+  if (headerEnv && isValidEnvironment(headerEnv)) {
+    return headerEnv;
   }
 
   // Check query param
-  const queryEnvId = req.query?.environmentId;
-  if (queryEnvId && isValidUlid(queryEnvId)) {
-    return queryEnvId;
+  const queryEnv = req.query?.environment;
+  if (queryEnv && isValidEnvironment(queryEnv)) {
+    return queryEnv;
   }
 
   // Check body (for POST/PUT requests)
-  const bodyEnvId = req.body?.environmentId;
-  if (bodyEnvId && isValidUlid(bodyEnvId)) {
-    return bodyEnvId;
+  const bodyEnv = req.body?.environment;
+  if (bodyEnv && isValidEnvironment(bodyEnv)) {
+    return bodyEnv;
   }
 
-  return getDefaultEnvironmentId();
+  throw new Error('Environment not found in request. Environment must be explicitly specified.');
 }
 
 /**
- * Validate that an environment ID exists
+ * Validate that an environment exists
  */
-export async function validateEnvironmentId(db: any, environmentId: string): Promise<boolean> {
-  if (!isValidUlid(environmentId)) {
+export async function validateEnvironment(db: any, environment: string): Promise<boolean> {
+  if (!isValidEnvironment(environment)) {
     return false;
   }
   const result = await db('g_environments')
-    .where('id', environmentId)
+    .where('environment', environment)
     .first();
   return !!result;
 }
 
 /**
- * Get all available environment IDs
+ * Get all available environments
  */
-export async function getAllEnvironmentIds(db: any): Promise<string[]> {
+export async function getAllEnvironments(db: any): Promise<string[]> {
   const environments = await db('g_environments')
-    .select('id')
+    .select('environment')
     .orderBy('displayOrder', 'asc');
-  return environments.map((e: any) => e.id);
-}
-
-/**
- * Initialize the default environment ID from database
- * Should be called once during application startup
- */
-export async function initializeDefaultEnvironment(db: any): Promise<string> {
-  const defaultEnv = await db('g_environments')
-    .where('isDefault', true)
-    .first();
-
-  if (!defaultEnv) {
-    throw new Error('No default environment found in database');
-  }
-
-  setDefaultEnvironmentId(defaultEnv.id);
-  return defaultEnv.id;
+  return environments.map((e: any) => e.environment);
 }
 
 /**
  * Check if user has access to a specific environment
- * This will be expanded when access token environment restrictions are implemented
  */
 export async function hasEnvironmentAccess(
   _db: any,
   _userId: number,
-  _environmentId: string
+  _environment: string
 ): Promise<boolean> {
   // TODO: Implement environment access control based on user roles and token permissions
-  // For now, all authenticated users have access to all environments
   return true;
 }
+
+// Deprecated/Removed functions (to be removed after fixing call sites)
+export const getCurrentEnvironment = () => { throw new Error('getCurrentEnvironment is removed. Pass environment explicitly.'); };
+export const getCurrentEnvironmentId = getCurrentEnvironment;
+export const getDefaultEnvironment = () => { throw new Error('getDefaultEnvironment is removed.'); };
+export const getDefaultEnvironmentId = getDefaultEnvironment;
+export const setDefaultEnvironment = () => { throw new Error('setDefaultEnvironment is removed.'); };
+export const setDefaultEnvironmentId = setDefaultEnvironment;
+export const getEnvironmentIdFromRequest = getEnvironmentFromRequest;
+export const isValidEnvironmentId = isValidEnvironment;
+export const isValidUlid = isValidEnvironment;
 

@@ -1,0 +1,235 @@
+# Infrastructure-only Docker Compose for local development
+# Use this with `yarn dev` for faster development workflow
+#
+# Usage:
+#   docker compose -f docker-compose-infra.yml up -d
+#   Then run services locally:
+#     yarn workspace @gatrix/backend dev
+#     yarn workspace @gatrix/frontend dev
+#     yarn workspace @gatrix/edge dev
+#     yarn workspace @gatrix/chat-server dev
+#     yarn workspace @gatrix/event-lens dev
+
+services:
+  # MySQL Database for development
+  mysql:
+    image: mysql:8.0
+    container_name: gatrix-mysql-dev
+    restart: unless-stopped
+    command: --innodb-use-native-aio=0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-gatrix_rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-gatrix}
+      MYSQL_USER: ${DB_USER:-gatrix_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
+    ports:
+      - "0.0.0.0:${MYSQL_HOST_PORT:-43306}:3306"
+    volumes:
+      - gatrix_mysql_dev_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+      - ./docker/mysql/conf.d:/etc/mysql/conf.d
+    networks:
+      - gatrix-dev-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-gatrix_rootpassword}" ]
+      timeout: 20s
+      retries: 10
+      interval: 30s
+      start_period: 30s
+
+  # Redis Cache for development
+  redis:
+    image: redis:7-alpine
+    container_name: gatrix-redis-dev
+    restart: unless-stopped
+    command: redis-server --appendonly yes --notify-keyspace-events Ex
+    ports:
+      - "0.0.0.0:${REDIS_HOST_PORT:-46379}:6379"
+    volumes:
+      - ${DATA_ROOT:-./data}/redis:/data
+    networks:
+      - gatrix-dev-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      timeout: 10s
+      retries: 5
+      interval: 30s
+      start_period: 10s
+
+  # etcd for service discovery
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.12
+    container_name: gatrix-etcd-dev
+    restart: unless-stopped
+    command:
+      - /usr/local/bin/etcd
+      - --name=etcd0
+      - --data-dir=/etcd-data
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd:2379
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-advertise-peer-urls=http://etcd:2380
+      - --initial-cluster=etcd0=http://etcd:2380
+      - --initial-cluster-token=etcd-cluster-dev
+      - --initial-cluster-state=new
+      - --log-level=info
+    ports:
+      - "0.0.0.0:${ETCD_CLIENT_PORT:-42379}:2379"
+      - "0.0.0.0:${ETCD_PEER_PORT:-42380}:2380"
+    volumes:
+      - gatrix_etcd_dev_data:/etcd-data
+    networks:
+      - gatrix-dev-network
+    healthcheck:
+      test: [ "CMD", "etcdctl", "endpoint", "health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # ClickHouse for analytics
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.12.2.29-alpine
+    container_name: gatrix-clickhouse-dev
+    restart: unless-stopped
+    ports:
+      - "0.0.0.0:${CLICKHOUSE_HTTP_PORT:-48123}:8123"
+      - "0.0.0.0:${CLICKHOUSE_NATIVE_PORT:-49000}:9000"
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+    networks:
+      - gatrix-dev-network
+    environment:
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --spider -q http://127.0.0.1:8123/ping || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Loki - Log aggregation
+  loki:
+    image: grafana/loki:latest
+    container_name: gatrix-loki-dev
+    restart: unless-stopped
+    user: "0"
+    ports:
+      - "0.0.0.0:${LOKI_PORT:-43100}:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./docker/loki/local-config.yaml:/etc/loki/local-config.yaml:ro
+      - ${DATA_ROOT:-./data}/loki:/loki
+    networks:
+      - gatrix-dev-network
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --spider -q http://127.0.0.1:3100/ready || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Prometheus - Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: gatrix-prometheus-dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PROM_SCRAPE_INTERVAL: ${PROM_SCRAPE_INTERVAL:-15s}
+      PROM_RETENTION_TIME: ${PROM_RETENTION_TIME:-14d}
+    ports:
+      - "0.0.0.0:${PROMETHEUS_PORT:-49090}:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.base.yml:/etc/prometheus/prometheus.base.yml:ro
+      - ./docker/prometheus/entrypoint.sh:/docker/prometheus/entrypoint.sh:ro
+      - ${DATA_ROOT:-./data}/prometheus:/prometheus
+    entrypoint: [ "/bin/sh", "/docker/prometheus/entrypoint.sh" ]
+    networks:
+      - gatrix-dev-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Grafana - Dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: gatrix-grafana-dev
+    restart: unless-stopped
+    user: "0"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:${FRONTEND_PORT:-43000}/grafana/}
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SERVER_DOMAIN: localhost
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_SECURITY_CSRF_ALWAYS_CHECK: "false"
+      GF_SECURITY_CSRF_TRUSTED_ORIGINS: "http://localhost:43000,http://localhost:44000,http://127.0.0.1:43000,http://127.0.0.1:44000,http://localhost:3000"
+      GF_SECURITY_COOKIE_SAMESITE: "disabled"
+      GF_LIVE_ALLOWED_ORIGINS: "*"
+    ports:
+      - "0.0.0.0:${GRAFANA_PORT:-44000}:3000"
+    volumes:
+      - ${DATA_ROOT:-./data}/grafana:/var/lib/grafana
+      - ./docker/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./docker/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      prometheus:
+        condition: service_started
+    networks:
+      - gatrix-dev-network
+
+  # MySQL Exporter for Prometheus metrics
+  mysql-exporter:
+    image: prom/mysqld-exporter:latest
+    container_name: gatrix-mysql-exporter-dev
+    restart: unless-stopped
+    environment:
+      MYSQLD_EXPORTER_PASSWORD: exporter_password
+    command:
+      - "--mysqld.username=mysqld_exporter"
+      - "--mysqld.address=mysql:3306"
+    ports:
+      - "0.0.0.0:49104:9104"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - gatrix-dev-network
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://127.0.0.1:9104/metrics" ]
+      timeout: 10s
+      retries: 3
+      interval: 30s
+      start_period: 10s
+
+  # Redis Exporter for Prometheus metrics
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: gatrix-redis-exporter-dev
+    restart: unless-stopped
+    environment:
+      REDIS_ADDR: "redis:6379"
+    ports:
+      - "0.0.0.0:49121:9121"
+    networks:
+      - gatrix-dev-network
+
+networks:
+  gatrix-dev-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.23.0.0/16
+
+volumes:
+  gatrix_mysql_dev_data:
+  gatrix_etcd_dev_data:
+  clickhouse-data:

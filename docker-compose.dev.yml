@@ -213,7 +213,7 @@ services:
     #   - "127.0.0.1:${ETCD_CLIENT_PORT:-42379}:2379"
     #   - "127.0.0.1:${ETCD_PEER_PORT:-42380}:2380"
     volumes:
-      - ${DATA_ROOT:-./data}/etcd:/etcd-data
+      - gatrix_etcd_dev_data:/etcd-data
     networks:
       - gatrix-dev-network
     healthcheck:
@@ -620,4 +620,5 @@ networks:
 
 volumes:
   gatrix_mysql_dev_data:
+  gatrix_etcd_dev_data:
   clickhouse-data:

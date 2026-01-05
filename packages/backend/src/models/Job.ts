@@ -1,9 +1,8 @@
 import db from '../config/knex';
 import logger from '../config/logger';
-import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export interface JobFilters {
-  environmentId?: string;
+  environment: string;
   jobTypeId?: number;
   isEnabled?: boolean;
   search?: string;
@@ -25,6 +24,7 @@ export interface CreateJobData {
   tagIds?: number[];
   createdBy: number;
   updatedBy: number;
+  environment: string;
 }
 
 export interface UpdateJobData {
@@ -83,19 +83,19 @@ const safeJsonStringify = (data: any): string => {
 };
 
 export class JobModel {
-  static async findAllWithPagination(filters?: JobFilters): Promise<JobListResult> {
+  static async findAllWithPagination(filters: JobFilters): Promise<JobListResult> {
     try {
       // 기본값 설정
       const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 20;
       const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
-      const envId = filters?.environmentId ?? getCurrentEnvironmentId();
+      const environment = filters.environment;
 
       // 기본 쿼리 빌더 with environment filter
       const baseQuery = () => db('g_jobs as j')
         .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
         .leftJoin('g_users as cu', 'j.createdBy', 'cu.id')
         .leftJoin('g_users as uu', 'j.updatedBy', 'uu.id')
-        .where('j.environmentId', envId);
+        .where('j.environment', environment);
 
       // 필터 적용 함수
       const applyFilters = (query: any) => {
@@ -108,10 +108,10 @@ export class JobModel {
         }
 
         if (filters?.search) {
-          query.where(function(this: any) {
+          query.where(function (this: any) {
             this.where('j.name', 'like', `%${filters.search}%`)
-                .orWhere('j.description', 'like', `%${filters.search}%`)
-                .orWhere('j.memo', 'like', `%${filters.search}%`);
+              .orWhere('j.description', 'like', `%${filters.search}%`)
+              .orWhere('j.memo', 'like', `%${filters.search}%`);
           });
         }
 
@@ -208,9 +208,8 @@ export class JobModel {
     }
   }
 
-  static async findById(id: number, environmentId?: string): Promise<any | null> {
+  static async findById(id: number, environment: string): Promise<any | null> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
       const job = await db('g_jobs as j')
         .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
         .leftJoin('g_users as cu', 'j.createdBy', 'cu.id')
@@ -225,7 +224,7 @@ export class JobModel {
           'uu.email as updatedByEmail'
         ])
         .where('j.id', id)
-        .where('j.environmentId', envId)
+        .where('j.environment', environment)
         .first();
 
       if (!job) return null;
@@ -263,14 +262,14 @@ export class JobModel {
   static async create(jobData: CreateJobData): Promise<any> {
     const trx = await db.transaction();
     try {
-      const envId = getCurrentEnvironmentId();
+      const environment = jobData.environment;
       const [insertId] = await trx('g_jobs').insert({
         name: jobData.name,
         memo: jobData.memo,
         jobTypeId: jobData.jobTypeId,
         isEnabled: jobData.isEnabled,
         jobDataMap: safeJsonStringify(jobData.jobDataMap || {}),
-        environmentId: envId,
+        environment: environment,
         createdBy: jobData.createdBy,
         updatedBy: jobData.updatedBy,
         createdAt: new Date(),
@@ -290,7 +289,7 @@ export class JobModel {
       }
 
       await trx.commit();
-      return await this.findById(insertId);
+      return await this.findById(insertId, environment);
     } catch (error) {
       await trx.rollback();
       logger.error('Error creating job:', error);
@@ -298,10 +297,9 @@ export class JobModel {
     }
   }
 
-  static async update(id: number, jobData: UpdateJobData, environmentId?: string): Promise<any> {
+  static async update(id: number, jobData: UpdateJobData, environment: string): Promise<any> {
     const trx = await db.transaction();
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
       const updateData: any = {};
 
       if (jobData.name !== undefined) updateData.name = jobData.name;
@@ -315,7 +313,7 @@ export class JobModel {
 
       await trx('g_jobs')
         .where('id', id)
-        .where('environmentId', envId)
+        .where('environment', environment)
         .update(updateData);
 
       // 태그 업데이트
@@ -339,7 +337,7 @@ export class JobModel {
       }
 
       await trx.commit();
-      return await this.findById(id, envId);
+      return await this.findById(id, environment);
     } catch (error) {
       await trx.rollback();
       logger.error('Error updating job:', error);
@@ -347,10 +345,9 @@ export class JobModel {
     }
   }
 
-  static async delete(id: number, environmentId?: string): Promise<void> {
+  static async delete(id: number, environment: string): Promise<void> {
     const trx = await db.transaction();
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
       // 태그 할당 삭제
       await trx('g_tag_assignments')
         .where('entityType', 'job')
@@ -358,7 +355,7 @@ export class JobModel {
         .del();
 
       // Job 삭제
-      await trx('g_jobs').where('id', id).where('environmentId', envId).del();
+      await trx('g_jobs').where('id', id).where('environment', environment).del();
 
       await trx.commit();
     } catch (error) {
@@ -410,12 +407,11 @@ export class JobModel {
     }
   }
 
-  static async findByName(name: string, environmentId?: string): Promise<any | null> {
+  static async findByName(name: string, environment: string): Promise<any | null> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
       const job = await db('g_jobs')
         .where('name', name)
-        .where('environmentId', envId)
+        .where('environment', environment)
         .first();
 
       return job || null;

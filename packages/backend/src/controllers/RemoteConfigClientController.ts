@@ -1,4 +1,5 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { SDKRequest } from '../middleware/apiTokenAuth';
 import { RemoteConfigModel } from '../models/RemoteConfig';
 import logger from '../config/logger';
 import { GatrixError } from '../middleware/errorHandler';
@@ -15,26 +16,28 @@ export class RemoteConfigClientController {
    * Evaluate remote configs for client
    * Server-side evaluation to prevent tampering
    */
-  static async evaluate(req: Request, res: Response): Promise<void> {
+  static async evaluate(req: SDKRequest, res: Response): Promise<void> {
     try {
       const context: EvaluationContext = req.body.context || {};
       const requestedKeys: string[] = req.body.keys || [];
 
+      const environment = req.environment || (req.query.environment as string) || 'production';
+
       // Get all active configs or specific requested keys
       let configs: RemoteConfig[];
-      
+
       if (requestedKeys.length > 0) {
         // Get specific configs by keys
         configs = [];
         for (const key of requestedKeys) {
-          const config = await RemoteConfigModel.findByKey(key);
+          const config = await RemoteConfigModel.findByKey(key, environment);
           if (config && config.isActive) {
             configs.push(config);
           }
         }
       } else {
         // Get all active configs
-        const result = await RemoteConfigModel.list(1, 1000, { isActive: true });
+        const result = await RemoteConfigModel.list(1, 1000, { isActive: true, environment });
         configs = result.configs;
       }
 
@@ -63,13 +66,14 @@ export class RemoteConfigClientController {
   /**
    * Get single config value by key
    */
-  static async getConfigByKey(req: Request, res: Response): Promise<void> {
+  static async getConfigByKey(req: SDKRequest, res: Response): Promise<void> {
     try {
       const keyName = req.params.key;
       const context: EvaluationContext = req.body.context || {};
+      const environment = req.environment || (req.query.environment as string) || 'production';
 
-      const config = await RemoteConfigModel.findByKey(keyName);
-      
+      const config = await RemoteConfigModel.findByKey(keyName, environment);
+
       if (!config || !config.isActive) {
         throw new GatrixError('Config not found or inactive', 404);
       }
@@ -140,7 +144,7 @@ export class RemoteConfigClientController {
       };
     } catch (error) {
       logger.error(`Error evaluating config ${config.keyName}:`, error);
-      
+
       // Return default value on error
       return {
         value: this.parseValue(config.defaultValue, config.valueType),
@@ -164,7 +168,7 @@ export class RemoteConfigClientController {
         .where('cc.configId', configId)
         .where('c.status', 'active')
         .where('c.startTime', '<=', new Date())
-        .where(function() {
+        .where(function () {
           this.whereNull('c.endTime').orWhere('c.endTime', '>', new Date());
         })
         .orderBy('c.priority', 'desc')
@@ -394,15 +398,15 @@ export class RemoteConfigClientController {
    */
   private static sanitizeContext(context: EvaluationContext): Partial<EvaluationContext> {
     const { customFields, ...safeContext } = context;
-    
+
     // Only include non-sensitive custom fields
     const safeCustomFields: Record<string, any> = {};
     if (customFields) {
       Object.entries(customFields).forEach(([key, value]) => {
         // Exclude potentially sensitive fields
-        if (!key.toLowerCase().includes('password') && 
-            !key.toLowerCase().includes('token') && 
-            !key.toLowerCase().includes('secret')) {
+        if (!key.toLowerCase().includes('password') &&
+          !key.toLowerCase().includes('token') &&
+          !key.toLowerCase().includes('secret')) {
           safeCustomFields[key] = value;
         }
       });

@@ -2,6 +2,7 @@ import { Request } from 'express';
 
 export interface AppUser {
   id: number;
+  userId: number; // backward compatibility
   email: string;
   name: string;
   role: 'admin' | 'user';
@@ -10,8 +11,10 @@ export interface AppUser {
   updatedAt: string;
 }
 
+
 export interface AuthenticatedRequest extends Request {
   user?: AppUser;
+  environment?: string;
 }
 
 export interface JWTPayload {

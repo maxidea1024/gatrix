@@ -34,6 +34,7 @@ import { useGameWorld } from '../../contexts/GameWorldContext';
 import surveyService, { Survey, TriggerCondition, ParticipationReward, ChannelSubchannelData } from '../../services/surveyService';
 import RewardSelector from './RewardSelector';
 import TargetSettingsGroup from './TargetSettingsGroup';
+import { ErrorCodes } from '@gatrix/shared';
 
 interface SurveyFormDialogProps {
   open: boolean;
@@ -312,21 +313,31 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       onSuccess();
       onClose();
     } catch (error: any) {
-      // Map backend error messages to localized messages
+      // Map backend error codes to localized messages
       let errorMessage = t('surveys.saveFailed');
 
-      // Extract error message from various possible error structures
+      // Extract error code from standardized error response
+      const errorCode = error?.error?.code || error?.code || '';
       const backendMessage = error?.error?.message || error?.message || '';
 
-      if (backendMessage) {
-        if (backendMessage.includes('Platform survey ID already exists') ||
-          backendMessage.includes('already exists')) {
+      // Use error code for specific handling
+      switch (errorCode) {
+        case ErrorCodes.RESOURCE_ALREADY_EXISTS:
+        case ErrorCodes.SURVEY_ALREADY_EXISTS:
           errorMessage = t('surveys.platformSurveyIdExists');
-        } else if (backendMessage.includes('At least one trigger condition is required')) {
-          errorMessage = t('surveys.triggerConditionRequired');
-        } else {
-          errorMessage = backendMessage;
-        }
+          break;
+        case ErrorCodes.VALIDATION_ERROR:
+          if (backendMessage.includes('trigger')) {
+            errorMessage = t('surveys.triggerConditionRequired');
+          } else {
+            errorMessage = backendMessage || t('surveys.saveFailed');
+          }
+          break;
+        default:
+          // Fallback to backend message if available
+          if (backendMessage) {
+            errorMessage = backendMessage;
+          }
       }
 
       enqueueSnackbar(errorMessage, { variant: 'error' });

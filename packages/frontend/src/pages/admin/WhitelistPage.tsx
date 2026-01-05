@@ -522,7 +522,7 @@ const WhitelistPage: React.FC = () => {
 
             {/* Nickname Whitelist Table */}
             <Card variant="outlined">
-              <CardContent sx={{ p: 0 }}>
+              <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
                 <TableContainer>
                   <Table>
                     <TableHead>

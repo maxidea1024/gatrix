@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import logger from '../config/logger';
+import { ErrorCodes } from '../utils/apiResponse';
 
 export interface AppError extends Error {
   statusCode?: number;
@@ -22,8 +23,8 @@ export class GatrixError extends Error implements AppError {
   }
 }
 
-export const createError = (message: string, statusCode: number = 500): GatrixError => {
-  return new GatrixError(message, statusCode);
+export const createError = (message: string, statusCode: number = 500, code?: string): GatrixError => {
+  return new GatrixError(message, statusCode, true, code);
 };
 
 export const errorHandler = (
@@ -33,6 +34,7 @@ export const errorHandler = (
   _next: NextFunction
 ): void => {
   let { statusCode = 500, message } = error;
+  let errorCode = (error as any).code || ErrorCodes.INTERNAL_SERVER_ERROR;
 
   // Check if this is a client abort error (common and expected)
   const isClientAbort = error.message?.includes('request aborted') ||
@@ -57,6 +59,7 @@ export const errorHandler = (
     // Log actual errors at error level
     logger.error('Error occurred:', {
       error: message,
+      errorCode,
       stack: error.stack,
       url: req.url,
       method: req.method,
@@ -65,21 +68,26 @@ export const errorHandler = (
     });
   }
 
-  // Handle specific error types
+  // Handle specific error types and set appropriate error codes
   if (error.name === 'ValidationError') {
     statusCode = 400;
+    errorCode = ErrorCodes.VALIDATION_ERROR;
     message = 'Validation Error';
   } else if (error.name === 'UnauthorizedError') {
     statusCode = 401;
+    errorCode = ErrorCodes.UNAUTHORIZED;
     message = 'Unauthorized';
   } else if (error.name === 'JsonWebTokenError') {
     statusCode = 401;
+    errorCode = ErrorCodes.AUTH_TOKEN_INVALID;
     message = 'Invalid token';
   } else if (error.name === 'TokenExpiredError') {
     statusCode = 401;
+    errorCode = ErrorCodes.AUTH_TOKEN_EXPIRED;
     message = 'Token expired';
   } else if (error.name === 'CastError') {
     statusCode = 400;
+    errorCode = ErrorCodes.BAD_REQUEST;
     message = 'Invalid ID format';
   }
 
@@ -96,9 +104,9 @@ export const errorHandler = (
   res.status(statusCode).json({
     success: false,
     error: {
-      code: (error as any).code || `ERROR_${statusCode}`,
+      code: errorCode,
       message,
-      ...((error as any).validationErrors && { validationErrors: (error as any).validationErrors }),
+      ...((error as any).validationErrors && { details: { validationErrors: (error as any).validationErrors } }),
     },
   });
 };
@@ -122,6 +130,7 @@ export const notFoundHandler = (req: Request, res: Response): void => {
   res.status(404).json({
     success: false,
     error: {
+      code: ErrorCodes.NOT_FOUND,
       message,
     },
   });

@@ -6,11 +6,11 @@ WORKDIR /app
 
 # Install system dependencies
 RUN apk add --no-cache \
-    git \
-    python3 \
-    make \
-    g++ \
-    libc6-compat
+  git \
+  python3 \
+  make \
+  g++ \
+  libc6-compat
 
 # Use Tencent npm mirror for faster downloads in China
 RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
@@ -21,6 +21,7 @@ COPY packages/backend/package.json ./packages/backend/
 COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
+COPY packages/shared/package.json ./packages/shared/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Install all dependencies (including dev dependencies)
@@ -28,7 +29,11 @@ RUN yarn install --frozen-lockfile --network-timeout 600000
 
 # Copy source code
 COPY packages/chat-server ./packages/chat-server
+COPY packages/shared ./packages/shared
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
+
+# Build shared (required by other packages)
+RUN cd packages/shared && yarn build
 
 # Build server-sdk (required because main points to dist/index.js)
 RUN cd packages/sdks/server-sdk && yarn install --network-timeout 600000 && yarn build

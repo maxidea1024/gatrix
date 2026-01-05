@@ -74,6 +74,8 @@ const updateSchema = Joi.object({
 export class CouponSettingsController {
   static list = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { page, limit, search, type, status } = req.query;
+    const environment = req.environment;
+    if (!environment) throw new GatrixError('Environment is required', 400);
 
     const result = await CouponSettingsService.listSettings({
       page: page ? parseInt(page as string) : undefined,
@@ -81,6 +83,7 @@ export class CouponSettingsController {
       search: search as string,
       type: type as any,
       status: status as any,
+      environment
     });
 
     res.json({ success: true, data: result });
@@ -88,53 +91,59 @@ export class CouponSettingsController {
 
   static getById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
+    const environment = req.environment;
     if (!id) throw new GatrixError('id is required', 400);
-    const setting = await CouponSettingsService.getSettingById(id);
+    if (!environment) throw new GatrixError('Environment is required', 400);
+
+    const setting = await CouponSettingsService.getSettingById(id, environment);
     res.json({ success: true, data: { setting } });
   });
 
   static create = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environment = req.environment;
+    if (!environment) throw new GatrixError('Environment is required', 400);
+
     const { error, value } = createSchema.validate(req.body);
     if (error) {
-      // Debug: log Joi validation error details
-      console.warn('CouponSettingsController.create validation error', {
-        message: error.message,
-        details: error.details,
-        payload: req.body,
-      });
       throw new GatrixError(error.message, 400);
     }
 
-    const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
-    const setting = await CouponSettingsService.createSetting({ ...value, createdBy: authenticatedUserId ?? null });
+    const authenticatedUserId = req.user?.userId;
+    const setting = await CouponSettingsService.createSetting({ ...value, createdBy: authenticatedUserId ?? null }, environment);
     res.status(201).json({ success: true, data: { setting } });
   });
 
   static update = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
+    const environment = req.environment;
     if (!id) throw new GatrixError('id is required', 400);
+    if (!environment) throw new GatrixError('Environment is required', 400);
 
     const { error, value } = updateSchema.validate(req.body);
     if (error) throw new GatrixError(error.message, 400);
 
-    const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
-    const setting = await CouponSettingsService.updateSetting(id, { ...value, updatedBy: authenticatedUserId ?? null });
+    const authenticatedUserId = req.user?.userId;
+    const setting = await CouponSettingsService.updateSetting(id, { ...value, updatedBy: authenticatedUserId ?? null }, environment);
     res.json({ success: true, data: { setting } });
   });
 
   static remove = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
+    const environment = req.environment;
     if (!id) throw new GatrixError('id is required', 400);
-    await CouponSettingsService.deleteSetting(id);
+    if (!environment) throw new GatrixError('Environment is required', 400);
+
+    await CouponSettingsService.deleteSetting(id, environment);
     res.json({ success: true });
   });
 
   static usage = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
+    const environment = req.environment;
+    if (!environment) throw new GatrixError('Environment is required', 400);
+
     const { page, limit, search, platform, channel, subChannel, gameWorldId, characterId, from, to } = req.query;
 
-    // If id is provided, get usage for specific coupon setting
-    // If id is not provided, get usage for all coupon settings
     const data = await CouponSettingsService.getUsageBySetting(id || undefined, {
       page: page ? parseInt(page as string) : undefined,
       limit: limit ? parseInt(limit as string) : undefined,
@@ -146,7 +155,7 @@ export class CouponSettingsController {
       characterId: characterId as string,
       from: from as string,
       to: to as string,
-    });
+    }, environment);
     res.json({ success: true, data });
   });
 
@@ -268,4 +277,3 @@ export class CouponSettingsController {
     });
   });
 }
-

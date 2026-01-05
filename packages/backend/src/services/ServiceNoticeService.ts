@@ -1,7 +1,6 @@
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import database from '../config/database';
 import { convertDateFieldsFromMySQL, convertToMySQLDateTime } from '../utils/dateUtils';
-import { getCurrentEnvironmentId } from '../utils/environmentContext';
 import { pubSubService } from './PubSubService';
 import { Environment } from '../models/Environment';
 import logger from '../config/logger';
@@ -9,7 +8,7 @@ import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 
 export interface ServiceNotice {
   id: number;
-  environmentId: string;
+  environment: string;
   isActive: boolean;
   category: 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
   platforms: string[];
@@ -52,7 +51,7 @@ export interface ServiceNoticeFilters {
   subchannel?: string | string[];
   subchannelOperator?: 'any_of' | 'include_all';
   search?: string;
-  environmentId?: string;
+  environment: string;
 }
 
 class ServiceNoticeService {
@@ -62,7 +61,7 @@ class ServiceNoticeService {
   async getServiceNotices(
     page: number = 1,
     limit: number = 10,
-    filters: ServiceNoticeFilters = {}
+    filters: ServiceNoticeFilters
   ): Promise<{ notices: ServiceNotice[]; total: number }> {
     const pool = database.getPool();
     const offset = (page - 1) * limit;
@@ -70,9 +69,9 @@ class ServiceNoticeService {
     const queryParams: any[] = [];
 
     // Environment filter (always applied)
-    const envId = filters.environmentId ?? getCurrentEnvironmentId();
-    whereClauses.push('environmentId = ?');
-    queryParams.push(envId);
+    const environment = filters.environment;
+    whereClauses.push('environment = ?');
+    queryParams.push(environment);
 
     // Apply filters
     if (filters.isActive !== undefined) {
@@ -179,7 +178,7 @@ class ServiceNoticeService {
     const notices = rows.map(row => {
       const notice = {
         id: row.id,
-        environmentId: row.environmentId,
+        environment: row.environment,
         isActive: Boolean(row.isActive),
         category: row.category,
         platforms: typeof row.platforms === 'string' ? JSON.parse(row.platforms) : row.platforms,
@@ -204,12 +203,11 @@ class ServiceNoticeService {
   /**
    * Get service notice by ID
    */
-  async getServiceNoticeById(id: number, environmentId?: string): Promise<ServiceNotice | null> {
+  async getServiceNoticeById(id: number, environment: string): Promise<ServiceNotice | null> {
     const pool = database.getPool();
-    const envId = environmentId ?? getCurrentEnvironmentId();
     const [rows] = await pool.execute<RowDataPacket[]>(
-      'SELECT * FROM g_service_notices WHERE id = ? AND environmentId = ?',
-      [id, envId]
+      'SELECT * FROM g_service_notices WHERE id = ? AND environment = ?',
+      [id, environment]
     );
 
     if (rows.length === 0) {
@@ -219,7 +217,7 @@ class ServiceNoticeService {
     const row = rows[0];
     const notice = {
       id: row.id,
-      environmentId: row.environmentId,
+      environment: row.environment,
       isActive: Boolean(row.isActive),
       category: row.category,
       platforms: typeof row.platforms === 'string' ? JSON.parse(row.platforms) : row.platforms,
@@ -239,9 +237,8 @@ class ServiceNoticeService {
   /**
    * Create service notice
    */
-  async createServiceNotice(data: CreateServiceNoticeData, environmentId?: string): Promise<ServiceNotice> {
+  async createServiceNotice(data: CreateServiceNoticeData, environment: string): Promise<ServiceNotice> {
     const pool = database.getPool();
-    const envId = environmentId ?? getCurrentEnvironmentId();
 
     // Debug logging
     console.log('Creating service notice with data:', {
@@ -253,10 +250,10 @@ class ServiceNoticeService {
 
     const [result] = await pool.execute<ResultSetHeader>(
       `INSERT INTO g_service_notices
-      (environmentId, isActive, category, platforms, channels, subchannels, startDate, endDate, tabTitle, title, content, description)
+      (environment, isActive, category, platforms, channels, subchannels, startDate, endDate, tabTitle, title, content, description)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        envId,
+        environment,
         data.isActive,
         data.category,
         JSON.stringify(data.platforms),
@@ -271,23 +268,21 @@ class ServiceNoticeService {
       ]
     );
 
-    const notice = await this.getServiceNoticeById(result.insertId, envId);
+    const notice = await this.getServiceNoticeById(result.insertId, environment);
     if (!notice) {
       throw new Error('Failed to retrieve created service notice');
     }
 
     // Invalidate ETag cache and publish SDK Event with full data for cache update
     try {
-      const env = await Environment.query().findById(envId);
-
       // Invalidate ETag cache so SDK fetches fresh data
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${envId}`);
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environment}`);
 
       await pubSubService.publishSDKEvent({
         type: 'service_notice.created',
         data: {
           id: notice.id,
-          environment: env?.environmentName,
+          environment: environment,
           timestamp: Date.now(),
           serviceNotice: notice
         }
@@ -302,9 +297,8 @@ class ServiceNoticeService {
   /**
    * Update service notice
    */
-  async updateServiceNotice(id: number, data: UpdateServiceNoticeData, environmentId?: string): Promise<ServiceNotice> {
+  async updateServiceNotice(id: number, data: UpdateServiceNoticeData, environment: string): Promise<ServiceNotice> {
     const pool = database.getPool();
-    const envId = environmentId ?? getCurrentEnvironmentId();
     const updates: string[] = [];
     const values: any[] = [];
 
@@ -364,30 +358,28 @@ class ServiceNoticeService {
     }
 
     updates.push('updatedAt = NOW()');
-    values.push(id, envId);
+    values.push(id, environment);
 
     await pool.execute(
-      `UPDATE g_service_notices SET ${updates.join(', ')} WHERE id = ? AND environmentId = ?`,
+      `UPDATE g_service_notices SET ${updates.join(', ')} WHERE id = ? AND environment = ?`,
       values
     );
 
-    const notice = await this.getServiceNoticeById(id, envId);
+    const notice = await this.getServiceNoticeById(id, environment);
     if (!notice) {
       throw new Error('Service notice not found');
     }
 
     // Invalidate ETag cache and publish SDK Event with full data for cache update
     try {
-      const env = await Environment.query().findById(envId);
-
       // Invalidate ETag cache so SDK fetches fresh data
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${envId}`);
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environment}`);
 
       await pubSubService.publishSDKEvent({
         type: 'service_notice.updated',
         data: {
           id: notice.id,
-          environment: env?.environmentName,
+          environment: environment,
           timestamp: Date.now(),
           serviceNotice: notice
         }
@@ -402,23 +394,20 @@ class ServiceNoticeService {
   /**
    * Delete service notice
    */
-  async deleteServiceNotice(id: number, environmentId?: string): Promise<void> {
+  async deleteServiceNotice(id: number, environment: string): Promise<void> {
     const pool = database.getPool();
-    const envId = environmentId ?? getCurrentEnvironmentId();
-    await pool.execute('DELETE FROM g_service_notices WHERE id = ? AND environmentId = ?', [id, envId]);
+    await pool.execute('DELETE FROM g_service_notices WHERE id = ? AND environment = ?', [id, environment]);
 
     // Invalidate ETag cache and publish SDK Event (Deletion)
     try {
-      const env = await Environment.query().findById(envId);
-
       // Invalidate ETag cache so SDK fetches fresh data
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${envId}`);
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environment}`);
 
       await pubSubService.publishSDKEvent({
         type: 'service_notice.deleted',
         data: {
           id: id,
-          environment: env?.environmentName,
+          environment: environment,
           timestamp: Date.now()
         }
       });
@@ -430,24 +419,22 @@ class ServiceNoticeService {
   /**
    * Delete multiple service notices
    */
-  async deleteMultipleServiceNotices(ids: number[], environmentId?: string): Promise<void> {
+  async deleteMultipleServiceNotices(ids: number[], environment: string): Promise<void> {
     if (ids.length === 0) return;
 
     const pool = database.getPool();
-    const envId = environmentId ?? getCurrentEnvironmentId();
     const placeholders = ids.map(() => '?').join(',');
     await pool.execute(
-      `DELETE FROM g_service_notices WHERE id IN (${placeholders}) AND environmentId = ?`,
-      [...ids, envId]
+      `DELETE FROM g_service_notices WHERE id IN (${placeholders}) AND environment = ?`,
+      [...ids, environment]
     );
 
     // Publish SDK Event (Deletion)
     try {
-      const env = await Environment.query().findById(envId);
       await pubSubService.publishSDKEvent({
         type: 'service_notice.deleted',
         data: {
-          environment: env?.environmentName,
+          environment: environment,
           timestamp: Date.now()
         }
       });
@@ -459,31 +446,28 @@ class ServiceNoticeService {
   /**
    * Toggle active status
    */
-  async toggleActive(id: number, environmentId?: string): Promise<ServiceNotice> {
+  async toggleActive(id: number, environment: string): Promise<ServiceNotice> {
     const pool = database.getPool();
-    const envId = environmentId ?? getCurrentEnvironmentId();
     await pool.execute(
-      'UPDATE g_service_notices SET isActive = NOT isActive, updatedAt = NOW() WHERE id = ? AND environmentId = ?',
-      [id, envId]
+      'UPDATE g_service_notices SET isActive = NOT isActive, updatedAt = NOW() WHERE id = ? AND environment = ?',
+      [id, environment]
     );
 
-    const notice = await this.getServiceNoticeById(id, envId);
+    const notice = await this.getServiceNoticeById(id, environment);
     if (!notice) {
       throw new Error('Service notice not found');
     }
 
     // Invalidate ETag cache and publish SDK Event
     try {
-      const env = await Environment.query().findById(envId);
-
       // Invalidate ETag cache so SDK fetches fresh data
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${envId}`);
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environment}`);
 
       await pubSubService.publishSDKEvent({
         type: 'service_notice.updated',
         data: {
           id: notice.id,
-          environment: env?.environmentName,
+          environment: environment,
           timestamp: Date.now()
         }
       });
@@ -496,4 +480,3 @@ class ServiceNoticeService {
 }
 
 export default new ServiceNoticeService();
-

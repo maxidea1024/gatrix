@@ -2139,6 +2139,7 @@
     "copiedToClipboard": "已复制到剪贴板",
     "typeToConfirm": "输入 \"{{name}}\" 确认删除：",
     "copy": "复制",
+    "copyToClipboard": "复制到剪贴板",
     "paste": "粘贴",
     "copyFailed": "复制到剪贴板失败",
     "cannotCopySystemItem": "系统项目无法复制",
@@ -2362,7 +2363,13 @@
     "relativeTime": {
       "secondsAgo": "{{seconds}}秒前"
     },
-    "refreshed": "已刷新"
+    "refreshed": "已刷新",
+    "curlPreview": "curl 预览",
+    "request": "请求",
+    "example": "示例",
+    "queryParameters": "查询参数",
+    "receivedAt": "接收时间",
+    "apiTokenRequired": "请输入API令牌"
   },
   "createdAt": "createdAt",
   "dashboard": {
@@ -2480,7 +2487,30 @@
     "sessionExpired": "会话已过期",
     "tryAgain": "请重试",
     "unauthorized": "未授权",
-    "validationError": "验证错误"
+    "validationError": "验证错误",
+    "INTERNAL_SERVER_ERROR": "服务器内部错误，请稍后重试。",
+    "BAD_REQUEST": "请求无效，请检查输入。",
+    "NOT_FOUND": "未找到请求的资源。",
+    "UNAUTHORIZED": "需要认证，请重新登录。",
+    "FORBIDDEN": "拒绝访问。",
+    "VALIDATION_ERROR": "输入值无效。",
+    "RESOURCE_NOT_FOUND": "未找到请求的数据。",
+    "RESOURCE_ALREADY_EXISTS": "数据已存在。",
+    "RESOURCE_CREATE_FAILED": "数据创建失败。",
+    "RESOURCE_UPDATE_FAILED": "数据更新失败。",
+    "RESOURCE_DELETE_FAILED": "数据删除失败。",
+    "RESOURCE_FETCH_FAILED": "数据获取失败。",
+    "AUTH_TOKEN_INVALID": "认证令牌无效，请重新登录。",
+    "AUTH_TOKEN_EXPIRED": "认证令牌已过期，请重新登录。",
+    "AUTH_PERMISSION_DENIED": "您没有执行此操作的权限。",
+    "USER_NOT_FOUND": "用户未找到。",
+    "ENV_NOT_FOUND": "环境未找到。",
+    "ENV_ACCESS_DENIED": "您没有访问此环境的权限。",
+    "RATE_LIMIT_EXCEEDED": "请求过于频繁，请稍后重试。",
+    "TOO_MANY_REQUESTS": "请求过于频繁，请稍后重试。",
+    "CONFLICT": "发生冲突，请检查数据。",
+    "SERVICE_UNAVAILABLE": "服务暂时不可用。",
+    "TIMEOUT": "请求超时。"
   },
   "jobs": {
     "title": "Job Management",
@@ -2774,6 +2804,8 @@
     "hotTimeButtonEvent": "热时按钮活动",
     "liveEvent": "直播活动",
     "planningData": "策划数据",
+    "planningDataManagement": "策划数据管理",
+    "planningDataHistory": "策划数据历史",
     "serverManagement": "服务器管理",
     "serverList": "服务器列表",
     "openApi": "Open API",
@@ -3594,6 +3626,7 @@
     "editNoticeSubtitle": "编辑弹窗公告信息",
     "searchPlaceholder": "按内容或描述搜索",
     "noNotices": "没有注册的弹窗公告",
+    "noNoticesFound": "未找到弹窗公告。",
     "isActive": "启用状态",
     "isActiveHelp": "设置弹窗公告的激活状态",
     "content": "内容",
@@ -3714,6 +3747,7 @@
       "issuedCount": "已发行代码",
       "generatingCodes": "正在生成代码",
       "generatingInBackground": "正在后台生成优惠券。",
+      "noCoupons": "暂无定义的优惠券。",
       "sdkGuide": "SDK 集成指南",
       "issuedCodesDrawer": {
         "title": "已发行优惠券代码列表",
@@ -3861,7 +3895,8 @@
         "errorCodesDesc": "各种错误情况的响应示例。",
         "apiTest": "API 测试",
         "copiedToClipboard": "代码已复制到剪贴板。",
-        "allUsed": "全部已使用"
+        "allUsed": "全部已使用",
+        "couponCodeRequired": "请输入优惠券代码"
       }
     },
     "issuedCodes": {
@@ -3886,6 +3921,7 @@
         "characterId": "角色ID"
       },
       "allCoupons": "所有优惠券",
+      "noRecords": "暂无优惠券使用记录。",
       "columns": {
         "couponName": "优惠券名称",
         "couponCode": "优惠券代码",
@@ -4256,7 +4292,16 @@
       "uploadSuccess": "策划数据已成功上传",
       "uploadFailed": "策划数据上传失败",
       "selectFilesToUpload": "请选择要上传的文件",
-      "filesUploadedAndCached": "{{count}}个策划数据文件已上传并缓存成功"
+      "filesUploadedAndCached": "{{count}}个策划数据文件已上传并缓存成功",
+      "comment": "上传备注",
+      "commentPlaceholder": "关于此次上传的说明（可选）",
+      "alreadyUpToDate": "数据已是最新。没有检测到变更。",
+      "alreadyUpToDateTitle": "已是最新状态",
+      "previewChanges": "预览变更",
+      "previewChangesTitle": "预览变更",
+      "previewFailed": "预览变更失败",
+      "noChangesDetected": "没有检测到变更。数据已是最新。",
+      "filesChanged": "个文件变更"
     },
     "tabs": {
       "rewardTypes": "奖励类型",
@@ -4279,7 +4324,66 @@
     "testComponent": {
       "title": "测试组件（数据验证）"
     },
-    "noData": "没有可用数据"
+    "noData": "没有可用数据",
+    "noDataTitle": "未上传策划数据",
+    "noDataDescription": "请上传游戏所需的策划数据。您可以通过网页界面或CLI进行上传。",
+    "uploadGuide": {
+      "title": "上传指南",
+      "subtitle": "了解如何上传策划数据。",
+      "webUpload": "通过网页界面上传",
+      "webUploadDesc": "点击上方的「上传策划数据」按钮，选择并上传本地文件。",
+      "dataBuild": "数据构建 (Excel → JSON 转换)",
+      "dataBuildDesc": "将客户端CMS数据转换为JSON格式。",
+      "clientDataWarning": "必须使用客户端CMS数据，不是服务器数据！",
+      "cliUpload": "通过CLI远程上传",
+      "cliUploadDesc": "将转换后的数据上传到远程服务器.",
+      "curlUpload": "通过curl上传",
+      "curlUploadDesc": "使用curl命令直接上传文件."
+    },
+    "uploadInfo": {
+      "lastUpload": "最近上传",
+      "by": "上传者",
+      "hash": "哈希",
+      "files": "个文件"
+    },
+    "history": {
+      "title": "策划数据历史",
+      "subtitle": "查看策划数据上传记录和变更历史。",
+      "loadFailed": "加载上传记录失败",
+      "noRecords": "没有上传记录",
+      "uploadedAt": "上传时间",
+      "uploader": "上传者",
+      "source": "上传方式",
+      "hash": "哈希",
+      "searchPlaceholder": "按上传者、哈希、备注或文件名搜索",
+      "totalRecords": "总计",
+      "filesCount": "文件数",
+      "changedFilesCount": "变更数",
+      "size": "大小",
+      "changes": "变更",
+      "comment": "备注",
+      "filesUploaded": "已上传文件",
+      "changedFiles": "变更文件",
+      "latest": "最新",
+      "added": "新增",
+      "removed": "删除",
+      "modified": "修改",
+      "noDiffAvailable": "无法查看详细变更",
+      "noChanges": "没有变更文件（首次上传）",
+      "resetAll": "全部删除",
+      "resetConfirmTitle": "删除所有上传记录",
+      "resetWarning": "此操作无法撤销。所有上传记录将被永久删除。",
+      "resetConfirmMessage": "将删除{{count}}条上传记录。",
+      "resetConfirmInstruction": "请输入'全部删除'以确认删除：",
+      "resetConfirmPlaceholder": "全部删除",
+      "resetConfirmText": "全部删除",
+      "resetSuccess": "已删除{{count}}条上传记录",
+      "resetFailed": "删除上传记录失败",
+      "path": "路径",
+      "before": "修改前",
+      "after": "修改后",
+      "value": "值"
+    }
   },
   "rewards": {
     "rewardType": "奖励类型",
@@ -4335,16 +4439,32 @@
       "env": "环境",
       "role": "角色",
       "hostname": "主机名",
+      "hostname": "主机名",
       "internalAddress": "内部IP",
       "externalAddress": "外部IP"
     },
+    "hostname": "主机名",
+    "externalAddress": "外部地址",
+    "internalAddress": "内部地址",
+    "ports": "端口",
+    "cloudProvider": "云服务商",
+    "cloudRegion": "云区域",
+    "cloudZone": "云可用区",
+    "appVersion": "应用版本",
+    "labels": "标签",
     "status": {
       "initializing": "初始化中",
+      "INITIALIZING": "初始化中",
       "ready": "在线",
+      "READY": "在线",
       "shuttingDown": "关闭中",
+      "SHUTTING_DOWN": "关闭中",
       "error": "错误",
+      "ERROR": "错误",
       "terminated": "已终止",
+      "TERMINATED": "已终止",
       "noResponse": "无响应",
+      "NO_RESPONSE": "无响应",
       "busy": "繁忙"
     },
     "statusTooltip": {

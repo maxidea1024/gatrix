@@ -29,6 +29,7 @@ import JsonEditor, { parseJson5 } from '@/components/common/JsonEditor';
 import Json5Editor from '@/components/common/Json5Editor';
 import { MessageTemplate } from '@/services/messageTemplateService';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
+import { getContrastColor } from '@/utils/colorUtils';
 
 export interface GameWorldFormProps {
   editingWorld: GameWorld | null;
@@ -270,7 +271,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                     variant="outlined"
                     label={option.name}
                     size="small"
-                    sx={{ bgcolor: option.color, color: '#fff' }}
+                    sx={{ bgcolor: option.color, color: getContrastColor(option.color) }}
                     {...chipProps}
                   />
                 </Tooltip>
@@ -287,7 +288,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                 <Chip
                   label={option.name}
                   size="small"
-                  sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                  sx={{ bgcolor: option.color, color: getContrastColor(option.color), mr: 1 }}
                 />
                 {option.description || t('common.noDescription')}
               </Box>

@@ -36,16 +36,16 @@ export interface CmsCashShopProduct {
 export class CmsCashShopService {
   /**
    * Get all valid CMS CashShop products for an environment
-   * @param environmentId Environment ULID
+   * @param environment Environment name
    */
-  static async getProducts(environmentId: string): Promise<CmsCashShopProduct[]> {
+  static async getProducts(environment: string): Promise<CmsCashShopProduct[]> {
     try {
-      const data = await PlanningDataService.getCashShopLookup(environmentId);
+      const data = await PlanningDataService.getCashShopLookup(environment);
       const products: CmsCashShopProduct[] = data.items || [];
-      logger.info(`Loaded ${products.length} CMS CashShop products for environment ${environmentId}`);
+      logger.info(`Loaded ${products.length} CMS CashShop products for environment ${environment}`);
       return products;
     } catch (error) {
-      logger.error('Failed to load CMS CashShop products', { error, environmentId });
+      logger.error('Failed to load CMS CashShop products', { error, environment });
       throw error;
     }
   }

@@ -5,9 +5,9 @@ import { CacheService } from '../services/CacheService';
 import logger from '../config/logger';
 import { HEADERS, HEADER_VALUES } from '../constants/headers';
 import {
-  getDefaultEnvironmentId,
-  isDefaultEnvironmentInitialized
+  isValidEnvironment
 } from '../utils/environmentContext';
+import { ErrorCodes } from '../utils/apiResponse';
 
 // Unsecured tokens for testing purposes
 const UNSECURED_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
@@ -22,8 +22,8 @@ export const EDGE_BYPASS_TOKEN = process.env.EDGE_BYPASS_TOKEN || 'gatrix-edge-i
 export interface SDKRequest extends Request {
   apiToken?: ApiAccessToken;
   environments?: Environment[];
-  environment?: Environment;
-  environmentId?: string;
+  environment?: string; // Environment name string
+  environmentModel?: Environment; // Optional model if needed
   isUnsecuredToken?: boolean; // Flag to indicate unsecured token usage
   isEdgeBypassToken?: boolean; // Flag to indicate Edge bypass token usage
 }
@@ -48,7 +48,10 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: 'API token is required'
+        error: {
+          code: ErrorCodes.AUTH_TOKEN_MISSING,
+          message: 'API token is required'
+        }
       });
     }
 
@@ -56,13 +59,12 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     if (token === UNSECURED_CLIENT_TOKEN) {
       req.isUnsecuredToken = true;
       req.apiToken = {
-        id: 0,
+        id: 'unsecured-client',
         tokenType: 'client',
         tokenValue: UNSECURED_CLIENT_TOKEN,
-        name: 'Unsecured Client Token (Testing)',
+        tokenName: 'Unsecured Client Token (Testing)',
         isActive: true,
         expiresAt: null,
-        environmentId: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       } as any;
@@ -75,10 +77,10 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
       req.isUnsecuredToken = true;
       req.isEdgeBypassToken = true;
       req.apiToken = {
-        id: 0,
+        id: 'edge-bypass',
         tokenType: 'client', // Treat as client for client SDK endpoints
         tokenValue: EDGE_BYPASS_TOKEN,
-        name: 'Edge Bypass Token (Internal)',
+        tokenName: 'Edge Bypass Token (Internal)',
         allowAllEnvironments: true,
         isActive: true,
         expiresAt: null,
@@ -99,14 +101,17 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
       if (!apiToken) {
         return res.status(401).json({
           success: false,
-          message: 'Invalid or expired API token'
+          error: {
+            code: ErrorCodes.AUTH_TOKEN_INVALID,
+            message: 'Invalid or expired API token'
+          }
         });
       }
 
       // Cache the token for 5 minutes
       await CacheService.set(cacheKey, apiToken, 300);
     } else {
-      // 캐시?�서 ?�큰??찾았?�도 ?�용??기록
+      // 캐시에서 토큰을 찾았어도 사용량 기록
       if (apiToken.id) {
         const { default: apiTokenUsageService } = await import('../services/ApiTokenUsageService');
         apiTokenUsageService.recordTokenUsage(apiToken.id).catch(error => {
@@ -120,12 +125,12 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     if (isExpired) {
       return res.status(401).json({
         success: false,
-        message: 'API token is inactive or expired'
+        error: {
+          code: ErrorCodes.AUTH_TOKEN_EXPIRED,
+          message: 'API token is inactive or expired'
+        }
       });
     }
-
-    // Environment access check is deferred to setSDKEnvironment middleware
-    // where the target environment is definitively resolved.
 
     // Get environments if token has specific environment access
     let environments: Environment[] = [];
@@ -135,13 +140,13 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     } else if (!apiToken.allowAllEnvironments) {
       // Fetch environments from database if not loaded
       const { default: knex } = await import('../config/knex');
-      const envIds = await knex('g_api_access_token_environments')
+      const envNames = await knex('g_api_access_token_environments')
         .where('tokenId', apiToken.id)
-        .select('environmentId');
+        .select('environment');
 
-      if (envIds.length > 0) {
+      if (envNames.length > 0) {
         environments = await Environment.query()
-          .whereIn('id', envIds.map(e => e.environmentId));
+          .whereIn('environment', envNames.map(e => e.environment));
       }
     }
 
@@ -149,7 +154,10 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     if (!apiToken.allowAllEnvironments && environments.length === 0) {
       return res.status(403).json({
         success: false,
-        message: 'API token has no environment access configured'
+        error: {
+          code: ErrorCodes.ENV_ACCESS_DENIED,
+          message: 'API token has no environment access configured'
+        }
       });
     }
 
@@ -162,7 +170,10 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     logger.error('Error authenticating API token:', error);
     res.status(500).json({
       success: false,
-      message: 'Authentication error'
+      error: {
+        code: ErrorCodes.INTERNAL_SERVER_ERROR,
+        message: 'Authentication error'
+      }
     });
   }
 };
@@ -178,7 +189,10 @@ export const requireTokenType = (tokenType: 'client' | 'server' | 'admin') => {
     if (!apiToken) {
       return res.status(401).json({
         success: false,
-        message: 'API token not found'
+        error: {
+          code: ErrorCodes.AUTH_TOKEN_MISSING,
+          message: 'API token not found'
+        }
       });
     }
 
@@ -190,7 +204,10 @@ export const requireTokenType = (tokenType: 'client' | 'server' | 'admin') => {
     if (apiToken.tokenType !== tokenType) {
       return res.status(403).json({
         success: false,
-        message: `Invalid token type. Required: ${tokenType}, got: ${apiToken.tokenType}`
+        error: {
+          code: ErrorCodes.AUTH_PERMISSION_DENIED,
+          message: `Invalid token type. Required: ${tokenType}, got: ${apiToken.tokenType}`
+        }
       });
     }
 
@@ -207,7 +224,10 @@ export const validateApplicationName = (req: SDKRequest, res: Response, next: Ne
   if (!appName) {
     return res.status(400).json({
       success: false,
-      message: 'X-Application-Name header is required'
+      error: {
+        code: ErrorCodes.BAD_REQUEST,
+        message: 'X-Application-Name header is required'
+      }
     });
   }
 
@@ -215,7 +235,10 @@ export const validateApplicationName = (req: SDKRequest, res: Response, next: Ne
   if (!/^[a-zA-Z0-9_-]+$/.test(appName) || appName.length > 100) {
     return res.status(400).json({
       success: false,
-      message: 'Invalid application name format'
+      error: {
+        code: ErrorCodes.VALIDATION_ERROR,
+        message: 'Invalid application name format'
+      }
     });
   }
 
@@ -235,28 +258,25 @@ export const sdkRateLimit = (req: SDKRequest, res: Response, next: NextFunction)
 };
 
 /**
- * SDK ?�경 ?�정 미들?�어
- * X-Environment-Id ?�더 ?�는 기본 ?�경???�용?�여 req.environment�??�정?�니??
- * ?�큰???�경 ?�근 권한??검증합?�다.
+ * SDK 환경 설정 미들웨어
+ * X-Environment 헤더 또는 URL 파라미터를 사용하여 req.environment를 설정합니다.
+ * 토큰의 환경 접근 권한을 검증합니다.
  */
 export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: NextFunction) => {
   try {
     const apiToken = req.apiToken;
-    const requestedEnvId = req.headers[HEADERS.X_ENVIRONMENT_ID] as string;
 
-    // Get environment ID from header or use default
-    // SDK sends 'X-Environment', but backend defines 'x-environment-id'
-    let environmentId = (req.headers['x-environment'] as string) ||
-      (req.headers[HEADERS.X_ENVIRONMENT_ID] as string) ||
-      requestedEnvId;
+    // Get environment from header or use default
+    // SDK sends 'X-Environment'
+    let environmentName = req.headers['x-environment'] as string;
 
     // Use pre-resolved environment if available (e.g. from URL params)
-    if (!environmentId && req.environment?.id) {
-      environmentId = req.environment.id;
+    if (!environmentName && req.environment) {
+      environmentName = req.environment;
     }
 
     // Attempt to resolve from URL (specifically for server routes like /api/v1/server/:env/...)
-    if (!environmentId) {
+    if (!environmentName) {
       let envParam = req.params?.env;
 
       // Fallback: Manually parse URL if req.params is not populated (middleware order issue)
@@ -270,88 +290,60 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
       }
 
       if (envParam) {
-        // Try to find environment by ID first
-        let resolvedEnv = await Environment.query().findById(envParam);
-
-        // If not found by ID, try by name
-        if (!resolvedEnv) {
-          resolvedEnv = await Environment.getByName(envParam);
-        }
-
-        if (resolvedEnv) {
-          environmentId = resolvedEnv.id;
-        }
+        environmentName = envParam;
       }
     }
 
-    if (!environmentId) {
-      // Use default environment if not specified
-      if (!isDefaultEnvironmentInitialized()) {
-        return res.status(503).json({
-          success: false,
-          message: 'Environment not initialized. Please try again later.'
-        });
-      }
-      environmentId = getDefaultEnvironmentId();
-    }
-
-    if (!environmentId) {
+    if (!environmentName) {
       return res.status(400).json({
         success: false,
-        message: 'Environment ID is required (via X-Environment-Id header)'
+        error: {
+          code: ErrorCodes.ENV_INVALID,
+          message: 'Environment is required (via X-Environment header)'
+        }
       });
     }
 
-    // Fetch environment from database FIRST to resolve ID vs Name ambiguity
-    // This handles cases where client sends environment name (e.g. 'development') instead of ID
-    const cacheKey = `sdk_env:${environmentId}`;
+    // Fetch environment from database to validate
+    const cacheKey = `sdk_env:${environmentName}`;
     let environment: Environment | null = await CacheService.get<Environment>(cacheKey);
 
     if (!environment) {
-      // Try to find by ID
-      let foundEnv = await Environment.query().findById(environmentId);
-
-      // If not found by ID, try by name
-      if (!foundEnv) {
-        foundEnv = await Environment.getByName(environmentId);
-      }
+      const foundEnv = await Environment.getByName(environmentName);
 
       if (!foundEnv) {
         return res.status(404).json({
           success: false,
-          message: `Environment not found: ${environmentId}`
+          error: {
+            code: ErrorCodes.ENV_NOT_FOUND,
+            message: `Environment not found: ${environmentName}`
+          }
         });
       }
 
       environment = foundEnv;
 
       // Cache environment for 5 minutes
-      // Cache using the key we looked up with
       await CacheService.set(cacheKey, environment, 300);
-
-      // Also cache by canonical ID if we looked up by name
-      if (environment.id !== environmentId) {
-        await CacheService.set(`sdk_env:${environment.id}`, environment, 300);
-      }
     }
 
-    // Update environmentId to the canonical ID from the database
-    // This ensures subsequent checks use the correct ID even if name was passed
-    environmentId = environment.id;
-    req.environment = environment;
+    // Update to canonical name
+    environmentName = environment.environment;
+    req.environment = environmentName;
+    req.environmentModel = environment;
 
     // Validate token has access to this environment (skip for unsecured tokens)
     if (!req.isUnsecuredToken && apiToken && !apiToken.allowAllEnvironments) {
       let hasAccess = false;
 
       if (typeof apiToken.hasEnvironmentAccess === 'function') {
-        hasAccess = await apiToken.hasEnvironmentAccess(environmentId);
+        hasAccess = await apiToken.hasEnvironmentAccess(environmentName);
       } else {
         // For cached plain objects, query the database
         const { default: knex } = await import('../config/knex');
         const envAccess = await knex('g_api_access_token_environments')
           .where('tokenId', apiToken.id)
-          .where('environmentId', environmentId)
+          .where('environment', environmentName)
           .first();
         hasAccess = !!envAccess;
       }
@@ -361,7 +353,7 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
         logger.error('API token environment access denied:', {
           tokenId: apiToken.id,
           tokenName: apiToken.tokenName,
-          environmentId: environmentId,
+          environment: environmentName,
           isUnsecuredToken: req.isUnsecuredToken,
           allowAllEnvironments: apiToken.allowAllEnvironments,
           path: req.originalUrl
@@ -369,24 +361,28 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
 
         return res.status(403).json({
           success: false,
-          message: 'API token does not have access to this environment',
-          debug: {
-            tokenId: apiToken.id,
-            tokenName: apiToken.tokenName,
-            environmentId: environmentId,
-            environmentName: environment.environmentName,
+          error: {
+            code: ErrorCodes.ENV_ACCESS_DENIED,
+            message: 'API token does not have access to this environment',
+            details: {
+              tokenId: apiToken.id,
+              tokenName: apiToken.tokenName,
+              environment: environmentName,
+            }
           }
         });
       }
     }
 
-    // Proceed without AsyncLocalStorage context wrapper
     next();
   } catch (error) {
     logger.error('Error setting SDK environment:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to set environment'
+      error: {
+        code: ErrorCodes.INTERNAL_SERVER_ERROR,
+        message: 'Failed to set environment'
+      }
     });
   }
 };
@@ -403,8 +399,8 @@ export const clientSDKAuth = [
 ];
 
 /**
- * Server API ?�큰 ?�증 미들?�어
- * X-API-Token ?�더�??�용?�여 ?�버 �??�신???�증?�니??
+ * Server API 토큰 인증 미들웨어
+ * X-API-Token 헤더를 사용하여 서버 간 통신을 인증합니다.
  */
 export const authenticateServerApiToken = async (req: SDKRequest, res: Response, next: NextFunction) => {
   try {
@@ -414,14 +410,20 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
     if (!apiToken) {
       return res.status(401).json({
         success: false,
-        message: 'API token is required'
+        error: {
+          code: ErrorCodes.AUTH_TOKEN_MISSING,
+          message: 'API token is required'
+        }
       });
     }
 
     if (!appName) {
       return res.status(401).json({
         success: false,
-        message: 'Application name is required'
+        error: {
+          code: ErrorCodes.BAD_REQUEST,
+          message: 'Application name is required'
+        }
       });
     }
 
@@ -429,13 +431,12 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
     if (apiToken === UNSECURED_SERVER_TOKEN) {
       req.isUnsecuredToken = true;
       req.apiToken = {
-        id: 0,
+        id: 'unsecured-server',
         tokenType: 'server',
         tokenValue: UNSECURED_SERVER_TOKEN,
-        name: 'Unsecured Server Token (Testing)',
+        tokenName: 'Unsecured Server Token (Testing)',
         isActive: true,
         expiresAt: null,
-        environmentId: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       } as any;
@@ -471,7 +472,10 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
       if (!validatedToken) {
         return res.status(401).json({
           success: false,
-          message: 'Invalid or expired API token'
+          error: {
+            code: ErrorCodes.AUTH_TOKEN_INVALID,
+            message: 'Invalid or expired API token'
+          }
         });
       }
 
@@ -479,7 +483,10 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
       if (validatedToken.tokenType !== 'server' && validatedToken.tokenType !== 'all') {
         return res.status(403).json({
           success: false,
-          message: 'Server API token required'
+          error: {
+            code: ErrorCodes.AUTH_PERMISSION_DENIED,
+            message: 'Server API token required'
+          }
         });
       }
 
@@ -487,7 +494,7 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
       await CacheService.set(cacheKey, validatedToken, 5 * 60 * 1000);
     }
 
-    // ?�청 객체???�큰 ?�보 추�?
+    // 요청 객체에 토큰 정보 추가
     req.apiToken = validatedToken;
 
     next();
@@ -495,7 +502,10 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
     logger.error('Server API token authentication error:', error);
     return res.status(500).json({
       success: false,
-      message: 'Authentication failed'
+      error: {
+        code: ErrorCodes.INTERNAL_SERVER_ERROR,
+        message: 'Authentication failed'
+      }
     });
   }
 };

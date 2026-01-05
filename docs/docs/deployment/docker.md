@@ -239,7 +239,7 @@ vim .env
 - **Secret Management**: Secure credential storage
 - **Health Monitoring**: Automatic health checks
 
-For detailed Swarm documentation, see [deploy/README.md](/deploy/README.md).
+For detailed Swarm documentation, see the `deploy/README.md` file in the repository root.
 
 ## Data Persistence
 
@@ -370,5 +370,5 @@ Do not use restart on Docker; prefer down -> up for restarts.
 
 ## Monitoring
 
-For Prometheus + Grafana setup details and environment variables, see: /docs/features/monitoring
+For Prometheus + Grafana setup details and environment variables, see: [Monitoring](../features/monitoring)
 

@@ -25,8 +25,7 @@ export interface ApiResponse<T = any> {
 // ============================================================================
 
 export interface EnvironmentInfo {
-  id: string;
-  environmentName: string;
+  environment: string;
   displayName: string;
   environmentType: string;
   color?: string;

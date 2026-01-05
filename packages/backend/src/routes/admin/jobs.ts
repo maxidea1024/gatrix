@@ -29,12 +29,12 @@ router.use(authenticate as any);
 router.use(requireAdmin as any);
 
 // Job Types 라우트
-router.get('/job-types', getJobTypes);
-router.get('/job-types/:id', getJobType);
+router.get('/job-types', getJobTypes as any);
+router.get('/job-types/:id', getJobType as any);
 
 // Jobs 라우트
-router.get('/', getJobs);
-router.get('/:id', getJob);
+router.get('/', getJobs as any);
+router.get('/:id', getJob as any);
 router.post('/',
   auditLog({
     action: 'job_create',
@@ -43,7 +43,7 @@ router.post('/',
     getNewValues: (req) => req.body,
     getResourceIdFromResponse: (res: any) => res?.data?.id,
   }) as any,
-  createJob
+  createJob as any
 );
 router.put('/:id',
   auditLog({
@@ -52,7 +52,7 @@ router.put('/:id',
     getResourceId: (req: any) => req.params?.id,
     getNewValues: (req) => req.body,
   }) as any,
-  updateJob
+  updateJob as any
 );
 router.delete('/:id',
   auditLog({
@@ -63,7 +63,7 @@ router.delete('/:id',
       id: req.params?.id,
     }),
   }) as any,
-  deleteJob
+  deleteJob as any
 );
 router.post('/:id/execute',
   auditLog({
@@ -75,13 +75,13 @@ router.post('/:id/execute',
       executionType: 'manual',
     }),
   }) as any,
-  executeJob
+  executeJob as any
 );
-router.get('/:id/executions', getJobExecutions);
+router.get('/:id/executions', getJobExecutions as any);
 
 // 서버별 라우트는 제거됨
 // Job 태그 관리 라우트
-router.get('/:id/tags', getJobTags);
+router.get('/:id/tags', getJobTags as any);
 router.put('/:id/tags',
   auditLog({
     action: 'job_set_tags',
@@ -89,12 +89,12 @@ router.put('/:id/tags',
     getResourceId: (req: any) => req.params?.id,
     getNewValues: (req) => req.body,
   }) as any,
-  setJobTags
+  setJobTags as any
 );
 
 // Job Executions 라우트 (구체적인 라우트를 먼저 정의)
-router.get('/job-executions/statistics', getJobExecutionStatistics);
-router.get('/job-executions', getAllJobExecutions);
-router.get('/job-executions/:id', getJobExecution);
+router.get('/job-executions/statistics', getJobExecutionStatistics as any);
+router.get('/job-executions', getAllJobExecutions as any);
+router.get('/job-executions/:id', getJobExecution as any);
 
 export default router;

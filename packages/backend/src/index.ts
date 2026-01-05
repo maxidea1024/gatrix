@@ -212,17 +212,6 @@ const startServer = async () => {
       throw error;
     }
 
-    // Initialize default environment for multi-environment support
-    try {
-      const { initializeDefaultEnvironment } = await import('./utils/environmentContext');
-      const db = (await import('./config/knex')).default;
-      const defaultEnvId = await initializeDefaultEnvironment(db);
-      logger.info('Default environment initialized successfully', { defaultEnvId });
-    } catch (error) {
-      logger.error('Failed to initialize default environment:', error);
-      throw error;
-    }
-
     // Check and configure database timezone
     try {
       await setDatabaseTimezoneToUTC();
@@ -277,7 +266,7 @@ const startServer = async () => {
       logger.warn('Queue service initialization failed, continuing without queues:', error);
     }
 
-    // Initialize ApiTokenUsageService (QueueService 珥덇린???꾩뿉 ?ㅽ뻾)
+    // Initialize ApiTokenUsageService (QueueService 초기화 뒤에 실행)
     try {
       await apiTokenUsageService.initialize();
       logger.info('ApiTokenUsageService initialized successfully');
@@ -285,11 +274,11 @@ const startServer = async () => {
       logger.warn('ApiTokenUsageService initialization failed, continuing without token usage tracking:', error);
     }
 
-    // Initialize system-defined KV items
+    // Initialize system-defined KV items for all environments
     try {
-      const { initializeSystemKV } = await import('./utils/systemKV');
-      await initializeSystemKV();
-      logger.info('System KV items initialized successfully');
+      const { initializeAllSystemKV } = await import('./utils/systemKV');
+      await initializeAllSystemKV();
+      logger.info('System KV items initialized for all environments');
     } catch (error) {
       logger.warn('System KV initialization failed, continuing:', error);
     }
@@ -332,13 +321,13 @@ const startServer = async () => {
       logger.warn('Service Discovery initialization failed, continuing:', error);
     }
 
-    // Start lifecycle event cleanup scheduler
+    // Register lifecycle event cleanup job (BullMQ-based)
     try {
       lifecycleCleanupScheduler = await import('./services/lifecycleCleanupScheduler');
-      lifecycleCleanupScheduler.startLifecycleCleanupScheduler();
-      logger.info('Lifecycle event cleanup scheduler started');
+      await lifecycleCleanupScheduler.initializeLifecycleCleanupJob();
+      logger.info('Lifecycle event cleanup job registered');
     } catch (error) {
-      logger.warn('Lifecycle cleanup scheduler failed to start, continuing:', error);
+      logger.warn('Lifecycle cleanup job registration failed, continuing:', error);
     }
 
     // Start HTTP server (WebSocket? 梨꾪똿?쒕쾭?먯꽌 吏곸젒 泥섎━)

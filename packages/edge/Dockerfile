@@ -12,6 +12,7 @@ RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
 # Copy package files
 COPY package.json yarn.lock* ./
 COPY packages/edge/package.json ./packages/edge/
+COPY packages/shared/package.json ./packages/shared/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
 
@@ -26,6 +27,7 @@ RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
 # Copy all package files first
 COPY package.json yarn.lock* ./
 COPY packages/edge/package.json ./packages/edge/
+COPY packages/shared/package.json ./packages/shared/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Skip Cypress binary download - not needed in production Docker image
@@ -39,10 +41,14 @@ RUN yarn add -W --dev @swc/core-linux-x64-musl --ignore-scripts
 
 # Copy source code
 COPY packages/edge ./packages/edge
+COPY packages/shared ./packages/shared
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 COPY tsconfig.json ./
 
-# Build server-sdk first (required because main points to dist/index.js)
+# Build shared first (required by other packages)
+RUN cd packages/shared && yarn build
+
+# Build server-sdk (required because main points to dist/index.js)
 RUN cd packages/sdks/server-sdk && yarn build
 
 # Build the edge server
@@ -71,7 +77,11 @@ COPY --from=builder /app/packages/edge/public ./public
 # Copy production dependencies
 COPY package.json yarn.lock* ./
 COPY packages/edge/package.json ./packages/edge/
+COPY packages/shared/package.json ./packages/shared/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
+
+# Copy shared source (needed for file: dependency)
+COPY packages/shared ./packages/shared
 
 # Copy server-sdk source (needed for file: dependency)
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
@@ -81,6 +91,9 @@ RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 --
 
 # Copy built server-sdk dist (overwrite source with built version)
 COPY --from=builder /app/packages/sdks/server-sdk/dist ./node_modules/@gatrix/server-sdk/dist
+
+# Copy built shared dist
+COPY --from=builder /app/packages/shared/dist ./node_modules/@gatrix/shared/dist
 
 # Create logs directory
 RUN mkdir -p logs && chown nodejs:nodejs logs

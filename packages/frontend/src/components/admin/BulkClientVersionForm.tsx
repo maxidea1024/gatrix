@@ -45,6 +45,7 @@ import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import MaintenanceSettingsInput from '../common/MaintenanceSettingsInput';
 import { MessageTemplate, messageTemplateService } from '../../services/messageTemplateService';
 import ResizableDrawer from '../common/ResizableDrawer';
+import { getContrastColor } from '@/utils/colorUtils';
 
 // 클라이언트 상태 라벨 매핑
 const ClientStatusLabels = {
@@ -611,7 +612,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                           variant="outlined"
                           label={option.name}
                           size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          sx={{ bgcolor: option.color, color: getContrastColor(option.color) }}
                           {...chipProps}
                         />
                       </Tooltip>
@@ -628,7 +629,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                       <Chip
                         label={option.name}
                         size="small"
-                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                        sx={{ bgcolor: option.color, color: getContrastColor(option.color), mr: 1 }}
                       />
                       {option.description || t('common.noDescription')}
                     </Box>

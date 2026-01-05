@@ -5,14 +5,11 @@ import {
   UpdateGameWorldData,
   GameWorldListParams
 } from '../models/GameWorld';
-import { Environment } from '../models/Environment';
 import { GatrixError } from '../middleware/errorHandler';
 import {
   ENV_SCOPED,
-  withCurrentEnvironment,
   allEnvironmentsPattern
 } from '../constants/cacheKeys';
-import { getCurrentEnvironmentId } from '../utils/environmentContext';
 import { createLogger } from '../config/logger';
 import { pubSubService } from './PubSubService';
 
@@ -51,9 +48,9 @@ export class GameWorldService {
     }
   }
 
-  static async getGameWorldById(id: number): Promise<GameWorld> {
+  static async getGameWorldById(id: number, environment: string): Promise<GameWorld> {
     try {
-      const world = await GameWorldModel.findById(id);
+      const world = await GameWorldModel.findById(id, environment);
       if (!world) {
         throw new GatrixError('Game world not found', 404);
       }
@@ -69,9 +66,9 @@ export class GameWorldService {
     }
   }
 
-  static async getGameWorldByWorldId(worldId: string): Promise<GameWorld> {
+  static async getGameWorldByWorldId(worldId: string, environment: string): Promise<GameWorld> {
     try {
-      const world = await GameWorldModel.findByWorldId(worldId);
+      const world = await GameWorldModel.findByWorldId(worldId, environment);
       if (!world) {
         throw new GatrixError('Game world not found', 404);
       }
@@ -85,46 +82,23 @@ export class GameWorldService {
     }
   }
 
-  /**
-   * Helper to resolve environment name from ID (which might be ULID or composite string)
-   */
-  private static async resolveEnvironmentName(envId: string): Promise<string> {
-    if (!envId) return '';
-
-    try {
-      // Try to get from Environment model first
-      const env = await Environment.query().findById(envId);
-      if (env) {
-        return env.environmentName;
-      }
-      // Fallback: assume format {name}.{ulid} or just use as is if split fails
-      return envId.split('.')[0];
-    } catch (error) {
-      // Fallback on error
-      return envId.split('.')[0];
-    }
-  }
-
-  static async createGameWorld(worldData: CreateGameWorldData): Promise<GameWorld> {
+  static async createGameWorld(worldData: CreateGameWorldData, environment: string): Promise<GameWorld> {
     try {
       const normalized: CreateGameWorldData = {
         ...worldData,
       };
 
       // Check if worldId already exists
-      const existingWorld = await GameWorldModel.findByWorldId(worldData.worldId);
+      const existingWorld = await GameWorldModel.findByWorldId(worldData.worldId, environment);
       if (existingWorld) {
         throw new GatrixError('Game world with this world ID already exists', 409);
       }
 
-      const result = await GameWorldModel.create(normalized);
+      const result = await GameWorldModel.create(normalized, environment);
 
       // Invalidate game worlds cache (environment-scoped)
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
-
-      // Resolve environment name before publishing
-      const envName = await this.resolveEnvironmentName(result.environmentId);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.GAME_WORLDS.PUBLIC}:${environment}`);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environment}`);
 
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
@@ -133,7 +107,7 @@ export class GameWorldService {
           id: result.id,
           timestamp: Date.now(),
           isVisible: result.isVisible,
-          environment: envName
+          environment: environment
         },
       });
 
@@ -147,33 +121,30 @@ export class GameWorldService {
     }
   }
 
-  static async updateGameWorld(id: number, worldData: UpdateGameWorldData): Promise<GameWorld> {
+  static async updateGameWorld(id: number, worldData: UpdateGameWorldData, environment: string): Promise<GameWorld> {
     try {
       // Check if game world exists
-      const existingWorld = await GameWorldModel.findById(id);
+      const existingWorld = await GameWorldModel.findById(id, environment);
       if (!existingWorld) {
         throw new GatrixError('Game world not found', 404);
       }
 
       // Check if worldId is being updated and if it conflicts with existing ones
       if (worldData.worldId && worldData.worldId !== existingWorld.worldId) {
-        const worldIdExists = await GameWorldModel.exists(worldData.worldId, id);
+        const worldIdExists = await GameWorldModel.exists(worldData.worldId, id, environment);
         if (worldIdExists) {
           throw new GatrixError('Game world with this world ID already exists', 409);
         }
       }
 
-      const updatedWorld = await GameWorldModel.update(id, worldData);
+      const updatedWorld = await GameWorldModel.update(id, worldData, environment);
       if (!updatedWorld) {
         throw new GatrixError('Failed to update game world', 500);
       }
 
       // Invalidate game worlds cache (environment-scoped)
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
-
-      // Resolve environment name before publishing
-      const envName = await this.resolveEnvironmentName(updatedWorld.environmentId);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.GAME_WORLDS.PUBLIC}:${environment}`);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environment}`);
 
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
@@ -182,7 +153,7 @@ export class GameWorldService {
           id: updatedWorld.id,
           timestamp: Date.now(),
           isVisible: updatedWorld.isVisible,
-          environment: envName
+          environment: environment
         },
       });
 
@@ -196,25 +167,22 @@ export class GameWorldService {
     }
   }
 
-  static async deleteGameWorld(id: number): Promise<void> {
+  static async deleteGameWorld(id: number, environment: string): Promise<void> {
     try {
       // Check if game world exists
-      const existingWorld = await GameWorldModel.findById(id);
+      const existingWorld = await GameWorldModel.findById(id, environment);
       if (!existingWorld) {
         throw new GatrixError('Game world not found', 404);
       }
 
-      const deleted = await GameWorldModel.delete(id);
+      const deleted = await GameWorldModel.delete(id, environment);
       if (!deleted) {
         throw new GatrixError('Failed to delete game world', 500);
       }
 
       // Invalidate game worlds cache (environment-scoped)
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
-
-      // Resolve environment name before publishing
-      const envName = await this.resolveEnvironmentName(existingWorld.environmentId);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.GAME_WORLDS.PUBLIC}:${environment}`);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environment}`);
 
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
@@ -222,7 +190,7 @@ export class GameWorldService {
         data: {
           id,
           timestamp: Date.now(),
-          environment: envName
+          environment: environment
         },
       });
     } catch (error) {
@@ -234,10 +202,10 @@ export class GameWorldService {
     }
   }
 
-  static async toggleVisibility(id: number): Promise<GameWorld> {
+  static async toggleVisibility(id: number, environment: string): Promise<GameWorld> {
     logger.info(`toggleVisibility called for id: ${id}`);
     try {
-      const world = await GameWorldModel.findById(id);
+      const world = await GameWorldModel.findById(id, environment);
       if (!world) {
         throw new GatrixError('Game world not found', 404);
       }
@@ -246,7 +214,7 @@ export class GameWorldService {
 
       const updatedWorld = await GameWorldModel.update(id, {
         isVisible: !world.isVisible
-      });
+      }, environment);
 
       if (!updatedWorld) {
         throw new GatrixError('Failed to toggle visibility', 500);
@@ -255,14 +223,11 @@ export class GameWorldService {
       logger.info(`Visibility toggled for ${world.worldId}: ${world.isVisible} -> ${!world.isVisible}`);
 
       // Invalidate game worlds cache (environment-scoped)
-      const cacheKey = withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC);
+      const cacheKey = `${ENV_SCOPED.GAME_WORLDS.PUBLIC}:${environment}`;
       logger.info(`Calling cache invalidation for ${cacheKey}`);
       await pubSubService.invalidateKey(cacheKey);
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
+      await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environment}`);
       logger.info('Cache invalidation completed');
-
-      // Resolve environment name before publishing
-      const envName = await this.resolveEnvironmentName(updatedWorld.environmentId);
 
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
@@ -271,7 +236,7 @@ export class GameWorldService {
           id: updatedWorld.id,
           timestamp: Date.now(),
           isVisible: updatedWorld.isVisible,
-          environment: envName
+          environment: environment
         },
       });
 
@@ -285,27 +250,24 @@ export class GameWorldService {
     }
   }
 
-  static async toggleMaintenance(id: number): Promise<GameWorld> {
+  static async toggleMaintenance(id: number, environment: string): Promise<GameWorld> {
     try {
-      const world = await GameWorldModel.findById(id);
+      const world = await GameWorldModel.findById(id, environment);
       if (!world) {
         throw new GatrixError('Game world not found', 404);
       }
 
       const updatedWorld = await GameWorldModel.update(id, {
         isMaintenance: !world.isMaintenance
-      });
+      }, environment);
 
       if (!updatedWorld) {
         throw new GatrixError('Failed to toggle maintenance status', 500);
       }
 
       // Invalidate game worlds cache (environment-scoped)
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
-
-      // Resolve environment name before publishing
-      const envName = await this.resolveEnvironmentName(updatedWorld.environmentId);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.GAME_WORLDS.PUBLIC}:${environment}`);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environment}`);
 
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
@@ -313,7 +275,7 @@ export class GameWorldService {
         data: {
           id: updatedWorld.id,
           timestamp: Date.now(),
-          environment: envName
+          environment: environment
         },
       });
 
@@ -327,18 +289,14 @@ export class GameWorldService {
     }
   }
 
-  static async updateDisplayOrders(orderUpdates: { id: number; displayOrder: number }[]): Promise<void> {
+  static async updateDisplayOrders(orderUpdates: { id: number; displayOrder: number }[], environment: string): Promise<void> {
     try {
-      await GameWorldModel.updateDisplayOrders(orderUpdates);
+      await GameWorldModel.updateDisplayOrders(orderUpdates, environment);
 
-      const currentEnvId = getCurrentEnvironmentId();
       // Invalidate all game worlds cache (both public and admin, environment-scoped)
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.ADMIN));
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
-
-      // Resolve environment name before publishing
-      const envName = await this.resolveEnvironmentName(currentEnvId);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.GAME_WORLDS.PUBLIC}:${environment}`);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.GAME_WORLDS.ADMIN}:${environment}`);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environment}`);
 
       // Publish event for SDK to clear entire game worlds cache
       await pubSubService.publishSDKEvent({
@@ -346,7 +304,7 @@ export class GameWorldService {
         data: {
           id: 0, // Dummy id for order_changed event
           timestamp: Date.now(),
-          environment: envName
+          environment: environment
         },
       });
     } catch (error) {
@@ -355,13 +313,13 @@ export class GameWorldService {
     }
   }
 
-  static async moveUp(id: number): Promise<boolean> {
+  static async moveUp(id: number, environment: string): Promise<boolean> {
     try {
-      const result = await GameWorldModel.moveUp(id);
+      const result = await GameWorldModel.moveUp(id, environment);
 
       // Invalidate game worlds cache (environment-scoped)
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
+      await pubSubService.invalidateKey(`${ENV_SCOPED.GAME_WORLDS.PUBLIC}:${environment}`);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environment}`);
 
       return result;
     } catch (error) {
@@ -370,13 +328,13 @@ export class GameWorldService {
     }
   }
 
-  static async moveDown(id: number): Promise<boolean> {
+  static async moveDown(id: number, environment: string): Promise<boolean> {
     try {
-      const result = await GameWorldModel.moveDown(id);
+      const result = await GameWorldModel.moveDown(id, environment);
 
       // Invalidate game worlds cache (environment-scoped)
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
+      await pubSubService.invalidateKey(`${ENV_SCOPED.GAME_WORLDS.PUBLIC}:${environment}`);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environment}`);
 
       return result;
     } catch (error) {
@@ -385,11 +343,11 @@ export class GameWorldService {
     }
   }
 
-  static async invalidateCache(): Promise<void> {
+  static async invalidateCache(environment: string): Promise<void> {
     try {
       // Invalidate game worlds cache (environment-scoped)
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
-      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
+      await pubSubService.invalidateKey(`${ENV_SCOPED.GAME_WORLDS.PUBLIC}:${environment}`);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environment}`);
     } catch (error) {
       logger.error('Error in invalidateCache service:', error);
       throw new GatrixError('Failed to invalidate cache', 500);
@@ -414,12 +372,13 @@ export class GameWorldService {
   /**
    * Get maintenance message for a game world in specified language
    * @param worldId - Game world ID
+   * @param environment - Environment name
    * @param lang - Language code (ko, en, zh)
    * @returns Maintenance message or null if not found
    */
-  static async getMaintenanceMessage(worldId: number, lang: string = 'en'): Promise<string | null> {
+  static async getMaintenanceMessage(worldId: number, environment: string, lang: string = 'en'): Promise<string | null> {
     try {
-      const world = await GameWorldModel.findById(worldId);
+      const world = await GameWorldModel.findById(worldId, environment);
       if (!world) {
         return null;
       }

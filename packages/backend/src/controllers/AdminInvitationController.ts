@@ -16,6 +16,7 @@ export class AdminInvitationController {
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
+        code: 'INVALID_INPUT',
         error: 'Validation failed',
         details: errors.array()
       });
@@ -27,6 +28,7 @@ export class AdminInvitationController {
     if (!userId) {
       return res.status(401).json({
         success: false,
+        code: 'UNAUTHORIZED',
         error: 'User not authenticated'
       });
     }
@@ -37,6 +39,7 @@ export class AdminInvitationController {
       if (existingUser) {
         return res.status(409).json({
           success: false,
+          code: 'USER_ALREADY_EXISTS',
           error: 'A user with this email already exists'
         });
       }
@@ -53,6 +56,7 @@ export class AdminInvitationController {
       if (existingInvitation) {
         return res.status(409).json({
           success: false,
+          code: 'ACTIVE_INVITATION_EXISTS',
           error: 'An active invitation already exists for this email'
         });
       }
@@ -145,6 +149,7 @@ export class AdminInvitationController {
       logger.error('Error fetching current invitations:', error);
       res.status(500).json({
         success: false,
+        code: 'INTERNAL_SERVER_ERROR',
         error: 'Failed to fetch current invitations'
       });
     }
@@ -175,6 +180,7 @@ export class AdminInvitationController {
       logger.error('Error fetching invitations:', error);
       res.status(500).json({
         success: false,
+        code: 'INTERNAL_SERVER_ERROR',
         error: 'Failed to fetch invitations'
       });
     }
@@ -192,6 +198,7 @@ export class AdminInvitationController {
       if (!invitation) {
         return res.status(404).json({
           success: false,
+          code: 'INVITATION_NOT_FOUND',
           error: 'Invitation not found'
         });
       }
@@ -219,12 +226,14 @@ export class AdminInvitationController {
 
       res.json({
         success: true,
+        code: 'INVITATION_DELETED',
         message: 'Invitation deleted successfully'
       });
     } catch (error) {
       logger.error('Error deleting invitation:', error);
       res.status(500).json({
         success: false,
+        code: 'INTERNAL_SERVER_ERROR',
         error: 'Failed to delete invitation'
       });
     }
@@ -247,4 +256,3 @@ export const createInvitationValidation = [
     .isInt({ min: 1, max: 8760 }) // 최소 1시간, 최대 1년(365*24)
     .withMessage('Expiration hours must be between 1 and 8760 (1 year)')
 ];
-

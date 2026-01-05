@@ -36,7 +36,6 @@ import {
   Tooltip,
   Checkbox,
   Drawer,
-  Skeleton,
   Popover,
   List,
   ListItem,
@@ -117,6 +116,10 @@ import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../componen
 import { usePaginatedApi, useTags } from '../../hooks/useSWR';
 import { useEnvironments } from '../../contexts/EnvironmentContext';
 import PermissionSelector from '../../components/common/PermissionSelector';
+import { getContrastColor } from '@/utils/colorUtils';
+
+import { TableLoadingRow } from '@/components/common/TableLoadingRow';
+import { TableSkeletonRows } from '@/components/common/TableSkeletonRows';
 // SSE는 MainLayout에서 전역으로 처리하므로 여기서는 제거
 
 interface UsersResponse {
@@ -487,7 +490,7 @@ const UsersManagementPage: React.FC = () => {
     status: 'pending' | 'active' | 'suspended' | 'deleted';
     tags: Tag[];
     allowAllEnvs: boolean;
-    envIds: string[];
+    selectedEnvironments: string[];
     permissions: Permission[];
   } | null>(null);
 
@@ -508,7 +511,7 @@ const UsersManagementPage: React.FC = () => {
     loading: boolean;
     showReview: boolean;
     allowAllEnvs: boolean;
-    envIds: string[];
+    selectedEnvironments: string[];
   }>({
     open: false,
     user: null,
@@ -516,7 +519,7 @@ const UsersManagementPage: React.FC = () => {
     loading: false,
     showReview: false,
     allowAllEnvs: false,
-    envIds: [],
+    selectedEnvironments: [],
   });
 
   // 이메일 인증 관련 상태
@@ -904,7 +907,7 @@ const UsersManagementPage: React.FC = () => {
       loading: false,
       showReview: false,
       allowAllEnvs: false,
-      envIds: [],
+      selectedEnvironments: [],
     });
   };
 
@@ -937,12 +940,12 @@ const UsersManagementPage: React.FC = () => {
       const promoteAllowAll = Boolean(promoteDialog.allowAllEnvs);
       await apiService.put(`/admin/users/${promoteDialog.user.id}/environments`, {
         allowAllEnvironments: promoteAllowAll,
-        environmentIds: promoteAllowAll ? [] : promoteDialog.envIds
+        environments: promoteAllowAll ? [] : promoteDialog.selectedEnvironments
       });
 
       enqueueSnackbar(t('common.userPromoted'), { variant: 'success' });
       mutateUsers();
-      setPromoteDialog({ open: false, user: null, permissions: [], loading: false, showReview: false, allowAllEnvs: false, envIds: [] });
+      setPromoteDialog({ open: false, user: null, permissions: [], loading: false, showReview: false, allowAllEnvs: false, selectedEnvironments: [] });
     } catch (error: any) {
       enqueueSnackbar(error.message || t('common.userPromoteFailed'), { variant: 'error' });
       setPromoteDialog(prev => ({ ...prev, loading: false }));
@@ -950,7 +953,7 @@ const UsersManagementPage: React.FC = () => {
   };
 
   const handlePromoteCancel = () => {
-    setPromoteDialog({ open: false, user: null, permissions: [], loading: false, showReview: false, allowAllEnvs: false, envIds: [] });
+    setPromoteDialog({ open: false, user: null, permissions: [], loading: false, showReview: false, allowAllEnvs: false, selectedEnvironments: [] });
   };
 
   const handleDemoteUser = (user: User) => {
@@ -1018,7 +1021,7 @@ const UsersManagementPage: React.FC = () => {
   };
 
   const handleEditUser = async (user: User) => {
-    const userWithEnv = user as User & { allowAllEnvironments?: boolean; environmentIds?: string[] };
+    const userWithEnv = user as User & { allowAllEnvironments?: boolean; environments?: string[] };
 
     setEditUserData({
       name: user.name,
@@ -1034,7 +1037,7 @@ const UsersManagementPage: React.FC = () => {
 
     // Load environment access from user data (already included in list response)
     setEditUserAllowAllEnvs(userWithEnv.allowAllEnvironments || false);
-    setEditUserEnvIds(userWithEnv.environmentIds || []);
+    setEditUserEnvIds(userWithEnv.environments || []);
 
     // Load user permissions
     let loadedPermissions: Permission[] = [];
@@ -1063,7 +1066,7 @@ const UsersManagementPage: React.FC = () => {
       status: user.status,
       tags: user.tags || [],
       allowAllEnvs: userWithEnv.allowAllEnvironments || false,
-      envIds: userWithEnv.environmentIds || [],
+      selectedEnvironments: userWithEnv.environments || [],
       permissions: loadedPermissions,
     });
 
@@ -1160,7 +1163,7 @@ const UsersManagementPage: React.FC = () => {
           to: editUserAllowAllEnvs ? t('common.all') : t('users.specificEnvironments')
         });
       } else if (!editUserAllowAllEnvs) {
-        const origEnvs = originalUserData.envIds.sort().join(',');
+        const origEnvs = originalUserData.selectedEnvironments.sort().join(',');
         const newEnvs = editUserEnvIds.sort().join(',');
         if (origEnvs !== newEnvs) {
           const getEnvNames = (ids: string[]) =>
@@ -1170,7 +1173,7 @@ const UsersManagementPage: React.FC = () => {
             }).join(', ') || '-';
           changes.push({
             field: t('users.environmentAccess'),
-            from: getEnvNames(originalUserData.envIds),
+            from: getEnvNames(originalUserData.selectedEnvironments),
             to: getEnvNames(editUserEnvIds)
           });
         }
@@ -1256,7 +1259,7 @@ const UsersManagementPage: React.FC = () => {
         const allowAll = Boolean(editUserAllowAllEnvs);
         await apiService.put(`/admin/users/${editUserDialog.user.id}/environments`, {
           allowAllEnvironments: allowAll,
-          environmentIds: allowAll ? [] : editUserEnvIds
+          environments: allowAll ? [] : editUserEnvIds
         });
 
         // Update permissions for admin users
@@ -1420,7 +1423,7 @@ const UsersManagementPage: React.FC = () => {
         ...newUserData,
         tagIds: newUserTags.map(tag => tag.id),
         allowAllEnvironments: newUserAllowAllEnvs,
-        environmentIds: newUserAllowAllEnvs ? [] : newUserEnvIds,
+        environments: newUserAllowAllEnvs ? [] : newUserEnvIds,
       };
       await apiService.post('/admin/users', userData);
       enqueueSnackbar(t('users.userCreated'), { variant: 'success' });
@@ -1566,7 +1569,7 @@ const UsersManagementPage: React.FC = () => {
           />
         );
       case 'environments': {
-        const userWithEnv = user as User & { allowAllEnvironments?: boolean; environmentIds?: string[] };
+        const userWithEnv = user as User & { allowAllEnvironments?: boolean; environments?: string[] };
         if (userWithEnv.allowAllEnvironments) {
           return (
             <Chip
@@ -1577,7 +1580,7 @@ const UsersManagementPage: React.FC = () => {
             />
           );
         }
-        const userEnvIds = userWithEnv.environmentIds || [];
+        const userEnvIds = userWithEnv.environments || [];
         if (userEnvIds.length === 0) {
           return (
             <Typography variant="body2" color="text.secondary">
@@ -1587,12 +1590,12 @@ const UsersManagementPage: React.FC = () => {
         }
         return (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-            {userEnvIds.slice(0, 3).map((envId) => {
-              const env = environments.find(e => e.id === envId);
+            {userEnvIds.slice(0, 3).map((envName) => {
+              const env = environments.find(e => e.environment === envName);
               return (
                 <Chip
-                  key={envId}
-                  label={env?.displayName || env?.environmentName || envId}
+                  key={envName}
+                  label={env?.displayName || env?.environmentName || envName}
                   size="small"
                   sx={{
                     borderRadius: 1,
@@ -1862,9 +1865,9 @@ const UsersManagementPage: React.FC = () => {
 
       {/* Users Table */}
       <Card sx={{ position: 'relative' }}>
-        <CardContent sx={{ p: 0 }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           <TableContainer
-            sx={{
+            style={{
               opacity: !isInitialLoad && loading ? 0.5 : 1,
               transition: 'opacity 0.15s ease-in-out',
               pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
@@ -1895,50 +1898,11 @@ const UsersManagementPage: React.FC = () => {
               </TableHead>
               <TableBody>
                 {isInitialLoad && loading ? (
-                  // 스켈레톤 로딩 (초기 로딩 시에만)
-                  Array.from({ length: 5 }).map((_, index) => (
-                    <TableRow key={`skeleton-${index}`}>
-                      <TableCell padding="checkbox">
-                        <Skeleton variant="rectangular" width={24} height={24} />
-                      </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                          <Skeleton variant="circular" width={40} height={40} />
-                          <Box>
-                            <Skeleton variant="text" width={120} />
-                            <Skeleton variant="text" width={180} sx={{ fontSize: '0.75rem' }} />
-                          </Box>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width={100} />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="rounded" width={80} height={24} />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="rounded" width={70} height={24} />
-                      </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', gap: 0.5 }}>
-                          <Skeleton variant="rounded" width={60} height={24} />
-                          <Skeleton variant="rounded" width={60} height={24} />
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width="70%" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width="70%" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width="60%" />
-                      </TableCell>
-                      <TableCell align="center">
-                        <Skeleton variant="circular" width={32} height={32} sx={{ mx: 'auto' }} />
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  <TableSkeletonRows
+                    rowCount={10}
+                    cellCount={columns.filter(col => col.visible).length + 2}
+                    loading={true}
+                  />
                 ) : users.length === 0 ? (
                   <EmptyTableRow
                     colSpan={columns.filter(col => col.visible).length + 2} // +2 for checkbox and actions columns
@@ -2233,7 +2197,7 @@ const UsersManagementPage: React.FC = () => {
                           variant="outlined"
                           label={option.name}
                           size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          sx={{ bgcolor: option.color, color: getContrastColor(option.color) }}
                           {...chipProps}
                         />
                       </Tooltip>
@@ -2254,7 +2218,7 @@ const UsersManagementPage: React.FC = () => {
                       <Chip
                         label={option.name}
                         size="small"
-                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                        sx={{ bgcolor: option.color, color: getContrastColor(option.color), mr: 1 }}
                       />
                       {option.description || t('common.noDescription')}
                     </Box>
@@ -2278,9 +2242,9 @@ const UsersManagementPage: React.FC = () => {
                   environmentName: env.environmentName
                 }))}
                 allowAllEnvs={newUserAllowAllEnvs}
-                selectedEnvIds={newUserEnvIds}
+                selectedEnvironments={newUserEnvIds}
                 onAllowAllEnvsChange={setNewUserAllowAllEnvs}
-                onEnvIdsChange={setNewUserEnvIds}
+                onEnvironmentsChange={setNewUserEnvIds}
               />
             </Box>
           </Box>
@@ -2516,9 +2480,9 @@ const UsersManagementPage: React.FC = () => {
                   environmentName: env.environmentName
                 }))}
                 allowAllEnvs={promoteDialog.allowAllEnvs}
-                selectedEnvIds={promoteDialog.envIds}
+                selectedEnvironments={promoteDialog.selectedEnvironments}
                 onAllowAllEnvsChange={(allowAll) => setPromoteDialog(prev => ({ ...prev, allowAllEnvs: allowAll }))}
-                onEnvIdsChange={(envIds) => setPromoteDialog(prev => ({ ...prev, envIds }))}
+                onEnvironmentsChange={(environments) => setPromoteDialog(prev => ({ ...prev, selectedEnvironments: environments }))}
               />
             </>
           )}
@@ -2610,17 +2574,17 @@ const UsersManagementPage: React.FC = () => {
                       variant="filled"
                       sx={{ fontSize: '0.75rem' }}
                     />
-                  ) : promoteDialog.envIds.length === 0 ? (
+                  ) : promoteDialog.selectedEnvironments.length === 0 ? (
                     <Typography variant="body2" color="text.secondary" fontStyle="italic">
                       {t('users.noEnvironmentsSelected')}
                     </Typography>
                   ) : (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {promoteDialog.envIds.map(envId => {
-                        const env = environments.find(e => e.id === envId);
-                        const displayName = env?.displayName || env?.environmentName || envId;
+                      {promoteDialog.selectedEnvironments.map(envName => {
+                        const env = environments.find(e => e.environment === envName);
+                        const displayName = env?.displayName || env?.environmentName || envName;
                         return (
-                          <Tooltip key={envId} title={t('users.environmentAccessDesc', { name: displayName })} arrow placement="top" enterDelay={200}>
+                          <Tooltip key={envName} title={t('users.environmentAccessDesc', { name: displayName })} arrow placement="top" enterDelay={200}>
                             <Chip
                               label={displayName}
                               size="small"
@@ -2826,7 +2790,7 @@ const UsersManagementPage: React.FC = () => {
                           variant="outlined"
                           label={option.name}
                           size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          sx={{ bgcolor: option.color, color: getContrastColor(option.color) }}
                           {...chipProps}
                         />
                       </Tooltip>
@@ -2847,7 +2811,7 @@ const UsersManagementPage: React.FC = () => {
                       <Chip
                         label={option.name}
                         size="small"
-                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                        sx={{ bgcolor: option.color, color: getContrastColor(option.color), mr: 1 }}
                       />
                       {option.description || t('common.noDescription')}
                     </Box>
@@ -2871,9 +2835,9 @@ const UsersManagementPage: React.FC = () => {
                     environmentName: env.environmentName
                   }))}
                   allowAllEnvs={editUserAllowAllEnvs}
-                  selectedEnvIds={editUserEnvIds}
+                  selectedEnvironments={editUserEnvIds}
                   onAllowAllEnvsChange={setEditUserAllowAllEnvs}
-                  onEnvIdsChange={setEditUserEnvIds}
+                  onEnvironmentsChange={setEditUserEnvIds}
                 />
               </Box>
             )}
@@ -3192,7 +3156,7 @@ const UsersManagementPage: React.FC = () => {
                           variant="outlined"
                           label={option.name}
                           size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          sx={{ bgcolor: option.color, color: getContrastColor(option.color) }}
                           {...chipProps}
                         />
                       </Tooltip>
@@ -3213,7 +3177,7 @@ const UsersManagementPage: React.FC = () => {
                       <Chip
                         label={option.name}
                         size="small"
-                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                        sx={{ bgcolor: option.color, color: getContrastColor(option.color), mr: 1 }}
                       />
                       {option.description || t('common.noDescription')}
                     </Box>
@@ -3484,7 +3448,7 @@ const UsersManagementPage: React.FC = () => {
         </ClickAwayListener>
       </Popover>
 
-    </Box>
+    </Box >
   );
 };
 

@@ -77,15 +77,6 @@ class ServiceDiscoveryService {
     const labels = instance.labels;
     const envName = labels.environment || labels.env || 'development';
 
-    // Resolve environment ID
-    const env = await Environment.getByName(envName);
-    const environmentId = env ? env.id : (await Environment.getDefault())?.id;
-
-    if (!environmentId) {
-      logger.warn(`Could not resolve environment for event: ${envName}`, { labels });
-      return;
-    }
-
     // Update last seen status if we're going to record
     this.lastSeenStatus.set(instanceId, currentStatus);
 
@@ -114,7 +105,7 @@ class ServiceDiscoveryService {
     }
 
     await ServerLifecycleEvent.recordEvent({
-      environmentId,
+      environment: envName,
       instanceId: instance.instanceId,
       serviceType: labels.service,
       serviceGroup: labels.group,

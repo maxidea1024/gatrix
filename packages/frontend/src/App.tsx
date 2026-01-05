@@ -114,6 +114,7 @@ import BannerManagementPage from './pages/game/BannerManagementPage';
 import HotTimeButtonEventPage from './pages/game/HotTimeButtonEventPage';
 import LiveEventPage from './pages/game/LiveEventPage';
 import PlanningDataPage from './pages/game/PlanningDataPage';
+import PlanningDataHistoryPage from './pages/game/PlanningDataHistoryPage';
 
 // Conditional Landing Page Component
 const ConditionalLandingPage: React.FC = () => {
@@ -476,6 +477,7 @@ const AppContent: React.FC = () => {
                                   <Route path="coupon-usage" element={<CouponUsagePage />} />
                                   <Route path="live-event" element={<LiveEventPage />} />
                                   <Route path="planning-data" element={<PlanningDataPage />} />
+                                  <Route path="planning-data-history" element={<PlanningDataHistoryPage />} />
                                 </Routes>
                               </EnvironmentAwareLayout>
                             </PlanningDataProvider>

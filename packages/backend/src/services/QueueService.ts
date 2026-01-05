@@ -53,6 +53,15 @@ export class QueueService {
         } else {
           logger.info('Repeatable job already exists: coupon:expire');
         }
+
+        // Register planning data cleanup job (daily at 3 AM)
+        const planningCleanupExists = repeatables.some((r) => r.name === 'planning:cleanup');
+        if (!planningCleanupExists) {
+          await this.addJob('scheduler', 'planning:cleanup', {}, { repeat: { pattern: '0 3 * * *' } });
+          logger.info('Registered repeatable job: planning:cleanup (daily at 3 AM)');
+        } else {
+          logger.info('Repeatable job already exists: planning:cleanup');
+        }
       } catch (e) {
         logger.error('Failed to register repeatable scheduler jobs:', e);
       }
@@ -430,6 +439,21 @@ export class QueueService {
           const { CampaignScheduler } = await import('./campaignScheduler');
           await CampaignScheduler.getInstance().checkAndUpdateCampaigns();
           logger.info('campaign-check completed', { jobId: job.id });
+          break;
+        }
+        case 'lifecycle:cleanup': {
+          // Dynamic import to avoid circular dependency
+          const { processLifecycleCleanupJob } = await import('./lifecycleCleanupScheduler');
+          const retentionDays = job.data?.payload?.retentionDays ?? 14;
+          const deleted = await processLifecycleCleanupJob(retentionDays);
+          logger.info('lifecycle:cleanup completed', { jobId: job.id, deleted });
+          break;
+        }
+        case 'planning:cleanup': {
+          // Dynamic import to avoid circular dependency
+          const { PlanningDataService } = await import('./PlanningDataService');
+          const result = await PlanningDataService.cleanupAllEnvironments();
+          logger.info('planning:cleanup completed', { jobId: job.id, ...result });
           break;
         }
         default: {

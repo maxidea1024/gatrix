@@ -5,41 +5,21 @@
  * 모든 캐시 키는 이 파일에서 관리하여 일관성과 유지보수성을 향상시킵니다.
  */
 
-import {
-  getCurrentEnvironmentId,
-  isDefaultEnvironmentInitialized
-} from '../utils/environmentContext';
-
 /**
  * Environment-scoped cache key prefix
  * Used for data that varies by environment (game worlds, client versions, etc.)
- * Format: env:{environmentId}:{originalKey}
+ * Format: env:{environment}:{originalKey}
  */
 export const ENV_PREFIX = 'env';
 
 /**
  * Create an environment-scoped cache key
- * @param environmentId - The environment ULID
+ * @param environment - The environment name (e.g., 'development', 'production')
  * @param key - The original cache key
  * @returns Environment-prefixed cache key
  */
-export function withEnvironment(environmentId: string, key: string): string {
-  return `${ENV_PREFIX}:${environmentId}:${key}`;
-}
-
-/**
- * Create an environment-scoped cache key using current context
- * Falls back to the original key if environment context is not initialized
- * @param key - The original cache key
- * @returns Environment-prefixed cache key if context available, otherwise original key
- */
-export function withCurrentEnvironment(key: string): string {
-  if (!isDefaultEnvironmentInitialized()) {
-    // During initialization, return the key without environment prefix
-    return key;
-  }
-  const envId = getCurrentEnvironmentId();
-  return `${ENV_PREFIX}:${envId}:${key}`;
+export function withEnvironment(environment: string, key: string): string {
+  return `${ENV_PREFIX}:${environment}:${key}`;
 }
 
 /**

@@ -37,11 +37,11 @@ export class EnvironmentService {
     }
 
     const environments = response.data.environments;
-    
+
     // Detect changes
-    const oldNames = this.cachedEnvironments.map(e => e.environmentName);
-    const newNames = environments.map(e => e.environmentName);
-    
+    const oldNames = this.cachedEnvironments.map(e => e.environment);
+    const newNames = environments.map(e => e.environment);
+
     const added = newNames.filter(n => !oldNames.includes(n));
     const removed = oldNames.filter(n => !newNames.includes(n));
 
@@ -73,14 +73,14 @@ export class EnvironmentService {
    * Get cached environment names
    */
   getEnvironmentNames(): string[] {
-    return this.cachedEnvironments.map(e => e.environmentName);
+    return this.cachedEnvironments.map(e => e.environment);
   }
 
   /**
    * Check if an environment exists
    */
   hasEnvironment(environmentName: string): boolean {
-    return this.cachedEnvironments.some(e => e.environmentName === environmentName);
+    return this.cachedEnvironments.some(e => e.environment === environmentName);
   }
 
   /**

@@ -3,83 +3,47 @@
  *
  * Middleware for handling environment context in multi-environment setup.
  * This middleware:
- * - Extracts environment ID from request (header, query, or body)
+ * - Extracts environment from request (header: x-environment)
  * - Validates the environment exists
  * - Sets the environment context for the request
- * - Optionally validates user access to the environment
  */
 
-import { Request, Response, NextFunction } from 'express';
-import db from '../config/knex';
+import { Response, NextFunction } from 'express';
 import logger from '../config/logger';
-import {
-  getEnvironmentIdFromRequest,
-  runWithEnvironmentAsync,
-  getDefaultEnvironmentId,
-  validateEnvironmentId,
-  isDefaultEnvironmentInitialized
-} from '../utils/environmentContext';
-
-// Extend Express Request to include environment info
-declare global {
-  namespace Express {
-    interface Request {
-      environmentId?: string; // ULID
-      environmentName?: string;
-    }
-  }
-}
+import { AuthenticatedRequest } from '../types/auth';
+import { Environment } from '../models/Environment';
 
 /**
  * Middleware to extract and set environment context
  * This should be applied to all routes that need environment filtering
  */
 export const environmentContextMiddleware = async (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Check if default environment is initialized
-    if (!isDefaultEnvironmentInitialized()) {
-      logger.warn('Default environment not initialized, skipping environment context');
-      next();
-      return;
-    }
+    // Extract environment from header ONLY
+    const environmentName = req.headers['x-environment'] as string;
 
-    const environmentId = getEnvironmentIdFromRequest(req);
-    const defaultEnvId = getDefaultEnvironmentId();
+    if (!environmentName) {
+      // If no environment is specified, we don't set req.environment
+      // Controllers should handle missing environment if they need it
+      return next();
+    }
 
     // Validate environment exists
-    const isValid = await validateEnvironmentId(db, environmentId);
-    if (!isValid) {
-      logger.warn(`Invalid environment ID requested: ${environmentId}`);
-      // Fall back to default environment instead of failing
-      req.environmentId = defaultEnvId;
-    } else {
-      req.environmentId = environmentId;
+    const environment = await Environment.getByName(environmentName);
+    if (!environment) {
+      logger.warn(`Invalid environment requested: ${environmentName}`);
+      return next();
     }
 
-    // Get environment name for logging
-    const environment = await db('g_environments')
-      .where('id', req.environmentId)
-      .select('environmentName')
-      .first();
+    req.environment = environment.environment;
 
-    if (environment) {
-      req.environmentName = environment.environmentName;
-    }
-
-    // Run the rest of the request with environment context
-    await runWithEnvironmentAsync(req.environmentId, async () => {
-      next();
-    });
+    next();
   } catch (error) {
     logger.error('Error in environment middleware:', error);
-    // Don't fail the request, just use default environment
-    if (isDefaultEnvironmentInitialized()) {
-      req.environmentId = getDefaultEnvironmentId();
-    }
     next();
   }
 };
@@ -89,14 +53,19 @@ export const environmentContextMiddleware = async (
  * Use this to restrict certain routes to specific environment types
  */
 export const requireEnvironmentType = (allowedTypes: string[]) => {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const environmentId = req.environmentId ?? getDefaultEnvironmentId();
+      const environmentName = req.environment;
 
-      const environment = await db('g_environments')
-        .where('id', environmentId)
-        .select('environmentType')
-        .first();
+      if (!environmentName) {
+        res.status(400).json({
+          success: false,
+          message: 'Environment context is required for this operation'
+        });
+        return;
+      }
+
+      const environment = await Environment.getByName(environmentName);
 
       if (!environment || !allowedTypes.includes(environment.environmentType)) {
         res.status(403).json({
@@ -122,17 +91,18 @@ export const requireEnvironmentType = (allowedTypes: string[]) => {
  * Useful for protecting critical data
  */
 export const preventProductionModification = async (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const environmentId = req.environmentId ?? getDefaultEnvironmentId();
+    const environmentName = req.environment;
 
-    const environment = await db('g_environments')
-      .where('id', environmentId)
-      .select('environmentType', 'requiresApproval')
-      .first();
+    if (!environmentName) {
+      return next();
+    }
+
+    const environment = await Environment.getByName(environmentName);
 
     if (environment?.environmentType === 'production') {
       // For production, check if approval is required
@@ -149,4 +119,3 @@ export const preventProductionModification = async (
     next();
   }
 };
-

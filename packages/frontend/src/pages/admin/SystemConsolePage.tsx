@@ -443,7 +443,7 @@ const SystemConsolePage: React.FC = () => {
       if (ctrlOrMeta && key === 'x') {
         const sel = term.getSelection();
         if (sel) {
-          navigator.clipboard?.writeText(sel).catch(() => { });
+          copyToClipboard(sel).catch(() => { });
           // Not removing selection from buffer/output to avoid corrupting history
           return false;
         }

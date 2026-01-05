@@ -27,6 +27,7 @@ import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../common/ResizableDrawer';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { getBackendUrl } from '../../utils/backendUrl';
 
 interface GameWorldSDKGuideDrawerProps {
   open: boolean;
@@ -39,36 +40,37 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
   const isDark = theme.palette.mode === 'dark';
   const { enqueueSnackbar } = useSnackbar();
   const { currentEnvironmentId } = useEnvironment();
+  const backendUrl = getBackendUrl();
 
   const [mainTabValue, setMainTabValue] = useState(0);
   const [errorTabValue, setErrorTabValue] = useState(0);
 
   // API test state
   const [apiToken, setApiToken] = useState('gatrix-unsecured-server-api-token'); // Default to unsecured server token
-  const [appName, setAppName] = useState('MyGameApp');
   const [page, setPage] = useState('1');
   const [limit, setLimit] = useState('10');
   const [lang, setLang] = useState(''); // Optional language parameter for maintenance message
   const [testResponse, setTestResponse] = useState<any>(null);
   const [testLoading, setTestLoading] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
   const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
-  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(false);
+  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(true);
   const [expandedResponseHeaders, setExpandedResponseHeaders] = useState(false);
   const [expandedRequestHeadersDetail, setExpandedRequestHeadersDetail] = useState(false);
   const [expandedResponseHeadersDetail, setExpandedResponseHeadersDetail] = useState(false);
   const [testDuration, setTestDuration] = useState<number | null>(null);
   const [testStatus, setTestStatus] = useState<number | null>(null);
+  const [responseTime, setResponseTime] = useState<Date | null>(null);
 
   // Load saved values from localStorage on mount
   useEffect(() => {
     try {
       const saved = localStorage.getItem('gameWorldSDKGuide_testInputs');
       if (saved) {
-        const { apiToken: savedToken, appName: savedAppName } = JSON.parse(saved);
+        const { apiToken: savedToken } = JSON.parse(saved);
         if (savedToken) setApiToken(savedToken);
-        if (savedAppName) setAppName(savedAppName);
       }
     } catch (error) {
       // Silently ignore localStorage errors
@@ -80,20 +82,18 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
     try {
       localStorage.setItem('gameWorldSDKGuide_testInputs', JSON.stringify({
         apiToken,
-        appName,
       }));
     } catch (error) {
       // Silently ignore localStorage errors
     }
-  }, [apiToken, appName]);
+  }, [apiToken]);
 
   // curl example code
   const curlExample = `# Get Game Worlds List API Example
-curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
+curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environment'}/game-worlds" \\
   -H "Content-Type: application/json" \\
   -H "X-Application-Name: MyGameApp" \\
-  -H "X-API-Token: your-api-token-here" \\
-  -H "X-Environment-Id: ${currentEnvironmentId || 'your-environment-id'}"`;
+  -H "X-API-Token: your-api-token-here"`;
 
   // JSON response example
   const jsonResponse = `{
@@ -167,18 +167,26 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
   };
 
   const handleTestAPI = async () => {
+    // Validation
+    if (!apiToken.trim()) {
+      setValidationError(t('gameWorlds.sdkGuide.apiTokenRequired') || 'API Token is required');
+      return;
+    }
+
+    setValidationError(null);
     setTestLoading(true);
     setTestError(null);
     setTestResponse(null);
     setTestStatus(null);
     setTestDuration(null);
-    setExpandedRequestHeaders(false);
+    // Keep request section open
     setExpandedResponseHeaders(false);
 
     const startTime = performance.now();
 
     try {
-      const url = `/api/v1/server/game-worlds`;
+      const envPath = currentEnvironmentId || 'default';
+      const url = `/api/v1/server/${envPath}/game-worlds`;
 
       const response = await fetch(
         url,
@@ -186,9 +194,8 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'X-Application-Name': appName,
+            'X-Application-Name': 'gatrix-frontend-tester',
             'X-API-Token': apiToken,
-            ...(currentEnvironmentId && { 'X-Environment-Id': currentEnvironmentId }),
           },
         }
       );
@@ -200,12 +207,12 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
       setTestResponse(data);
       setTestStatus(response.status);
       setTestDuration(duration);
+      setResponseTime(new Date());
 
       setRequestHeaders({
         'Content-Type': 'application/json',
-        'X-Application-Name': appName,
+        'X-Application-Name': 'gatrix-frontend-tester',
         'X-API-Token': apiToken,
-        ...(currentEnvironmentId && { 'X-Environment-Id': currentEnvironmentId }),
       });
 
       setResponseHeaders({
@@ -332,7 +339,7 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
                   <strong>{t('gameWorlds.sdkGuide.method')}:</strong> GET
                 </Typography>
                 <Typography component="div" sx={{ wordBreak: 'break-all' }}>
-                  /api/v1/server/game-worlds
+                  /api/v1/server/{'{environment}'}/game-worlds
                 </Typography>
               </Paper>
 
@@ -361,9 +368,6 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
                 </Typography>
                 <Typography variant="body2">
                   • <strong>X-Application-Name</strong>: {t('gameWorlds.sdkGuide.headerAppName')}
-                </Typography>
-                <Typography variant="body2">
-                  • <strong>X-Environment-Id</strong>: {t('common.sdkGuide.headerEnvironmentId')}
                 </Typography>
                 <Typography variant="body2">
                   • <strong>Content-Type</strong>: {t('gameWorlds.sdkGuide.headerContentType')}
@@ -533,7 +537,7 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
                     {/* Parameters Table */}
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
-                        {t('gameWorlds.sdkGuide.authentication')}
+                        {t('common.queryParameters') || 'Query Parameters'}
                       </Typography>
                       <Box sx={{
                         border: `1px solid ${theme.palette.divider}`,
@@ -546,32 +550,6 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
                             p: 1.5,
                             backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
                             borderBottom: `1px solid ${theme.palette.divider}`,
-                            display: 'flex',
-                            alignItems: 'center',
-                            fontWeight: 500,
-                            fontSize: '0.875rem'
-                          }}>
-                            {t('gameWorlds.sdkGuide.testAppName')}
-                          </Box>
-                          <Box sx={{
-                            p: 1,
-                            borderBottom: `1px solid ${theme.palette.divider}`,
-                            borderLeft: `1px solid ${theme.palette.divider}`
-                          }}>
-                            <TextField
-                              value={appName}
-                              onChange={(e) => setAppName(e.target.value)}
-                              size="small"
-                              fullWidth
-                              placeholder="e.g., MyGameApp"
-                              sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
-                            />
-                          </Box>
-
-                          {/* Language */}
-                          <Box sx={{
-                            p: 1.5,
-                            backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
                             display: 'flex',
                             alignItems: 'center',
                             fontWeight: 500,
@@ -637,6 +615,50 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
                     )}
 
                     {/* Test Button */}
+                    {/* Curl Preview */}
+                    <Box sx={{ mb: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          {t('common.curlPreview') || 'curl Preview'}
+                        </Typography>
+                        <Tooltip title={t('common.copy') || 'Copy'}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleCopyCode(`curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environment'}/game-worlds${lang ? `?lang=${lang}` : ''}" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Application-Name: gatrix-frontend-tester" \\
+  -H "X-API-Token: ${apiToken}"`)}
+                          >
+                            <ContentCopyIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                      <Box sx={{
+                        p: 1.5,
+                        backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+                        borderRadius: 1,
+                        border: `1px solid ${theme.palette.divider}`,
+                        fontFamily: 'monospace',
+                        fontSize: '0.75rem',
+                        overflow: 'auto',
+                        maxHeight: 120,
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-all',
+                      }}>
+                        {`curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environment'}/game-worlds${lang ? `?lang=${lang}` : ''}" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Application-Name: gatrix-frontend-tester" \\
+  -H "X-API-Token: ${apiToken}"`}
+                      </Box>
+                    </Box>
+
+                    {/* Validation Error */}
+                    {validationError && (
+                      <Alert severity="error" sx={{ mb: 2 }}>
+                        {validationError}
+                      </Alert>
+                    )}
+
                     <Button
                       variant="contained"
                       startIcon={testLoading ? <CircularProgress size={16} sx={{ color: 'inherit' }} /> : <PlayArrowIcon />}
@@ -644,7 +666,7 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
                       disabled={testLoading}
                       fullWidth
                     >
-                      {testLoading ? t('gameWorlds.sdkGuide.testLoading') : t('gameWorlds.sdkGuide.testButton')}
+                      {t('common.request') || 'Request'}
                     </Button>
                   </Box>
                 </Collapse>
@@ -690,6 +712,14 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
                               <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('gameWorlds.sdkGuide.testSize')}</Typography>
                               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                                 {new Blob([JSON.stringify(testResponse)]).size} bytes
+                              </Typography>
+                            </Box>
+                          )}
+                          {responseTime && (
+                            <Box>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('common.receivedAt') || 'Received At'}</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                {responseTime.toLocaleTimeString()}
                               </Typography>
                             </Box>
                           )}

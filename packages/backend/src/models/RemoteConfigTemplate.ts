@@ -22,7 +22,7 @@ export interface TemplateData {
 
 export interface RemoteConfigTemplateData {
   id?: number;
-  environmentId: string; // ULID
+  environment: string;
   templateName: string;
   displayName: string;
   description?: string;
@@ -44,7 +44,7 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
   static tableName = 'g_remote_config_templates';
 
   id!: number;
-  environmentId!: string; // ULID
+  environment!: string;
   templateName!: string;
   displayName!: string;
   description?: string;
@@ -62,17 +62,17 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
   updatedAt?: Date;
 
   // Relations
-  environment?: Environment;
+  environmentModel?: Environment;
   creator?: User;
   updater?: User;
 
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['environmentId', 'templateName', 'displayName', 'templateType', 'templateData', 'createdBy'],
+      required: ['environment', 'templateName', 'displayName', 'templateType', 'templateData', 'createdBy'],
       properties: {
         id: { type: 'integer' },
-        environmentId: { type: 'string' },
+        environment: { type: 'string' },
         templateName: {
           type: 'string',
           minLength: 1,
@@ -99,12 +99,12 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
 
   static get relationMappings() {
     return {
-      environment: {
+      environmentModel: {
         relation: Model.BelongsToOneRelation,
         modelClass: Environment,
         join: {
-          from: 'g_remote_config_templates.environmentId',
-          to: 'g_environments.id'
+          from: 'g_remote_config_templates.environment',
+          to: 'g_environments.environment'
         }
       },
       creator: {
@@ -170,9 +170,9 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
   /**
    * Get template by environment and name
    */
-  static async getByEnvironmentAndName(environmentId: string, templateName: string): Promise<RemoteConfigTemplate | undefined> {
+  static async getByEnvironmentAndName(environment: string, templateName: string): Promise<RemoteConfigTemplate | undefined> {
     return await this.query()
-      .where('environmentId', environmentId)
+      .where('environment', environment)
       .where('templateName', templateName)
       .first();
   }
@@ -180,9 +180,9 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
   /**
    * Get published templates for environment
    */
-  static async getPublishedByEnvironment(environmentId: string, templateType?: TemplateType): Promise<RemoteConfigTemplate[]> {
+  static async getPublishedByEnvironment(environment: string, templateType?: TemplateType): Promise<RemoteConfigTemplate[]> {
     let query = this.query()
-      .where('environmentId', environmentId)
+      .where('environment', environment)
       .where('status', 'published');
 
     if (templateType) {
@@ -195,9 +195,9 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
   /**
    * Get templates by status
    */
-  static async getByStatus(environmentId: number, status: TemplateStatus): Promise<RemoteConfigTemplate[]> {
+  static async getByStatus(environment: string, status: TemplateStatus): Promise<RemoteConfigTemplate[]> {
     return await this.query()
-      .where('environmentId', environmentId)
+      .where('environment', environment)
       .where('status', status)
       .orderBy('updatedAt', 'desc');
   }
@@ -212,7 +212,7 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
     }
 
     // Check if template already exists
-    const existing = await this.getByEnvironmentAndName(data.environmentId, data.templateName);
+    const existing = await this.getByEnvironmentAndName(data.environment, data.templateName);
     if (existing) {
       throw new Error(`Template '${data.templateName}' already exists in this environment`);
     }

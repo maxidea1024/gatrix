@@ -3,6 +3,13 @@ import { SDKRequest } from '../middleware/apiTokenAuth';
 import knex from '../config/knex';
 import logger from '../config/logger';
 import apiTokenUsageService from '../services/ApiTokenUsageService';
+import {
+  sendForbidden,
+  sendBadRequest,
+  sendInternalError,
+  sendSuccessResponse,
+  ErrorCodes,
+} from '../utils/apiResponse';
 
 /**
  * Internal API controller for Edge server to fetch API tokens
@@ -19,10 +26,7 @@ class InternalApiTokensController {
     try {
       // Only allow Edge bypass token to access this endpoint
       if (!req.isEdgeBypassToken) {
-        return res.status(403).json({
-          success: false,
-          message: 'This endpoint is only accessible with Edge bypass token'
-        });
+        return sendForbidden(res, 'This endpoint is only accessible with Edge bypass token', ErrorCodes.AUTH_PERMISSION_DENIED);
       }
 
       // Get all valid tokens (not expired)
@@ -45,28 +49,14 @@ class InternalApiTokensController {
       const tokenIds = tokens.map((t: any) => t.id);
       const environmentAssignments = tokenIds.length > 0
         ? await knex('g_api_access_token_environments')
-            .whereIn('tokenId', tokenIds)
-            .select('tokenId', 'environmentId')
+          .whereIn('tokenId', tokenIds)
+          .select('tokenId', 'environment')
         : [];
-
-      // Get environment details
-      const envIds = [...new Set(environmentAssignments.map((e: any) => e.environmentId))];
-      const environments = envIds.length > 0
-        ? await knex('g_environments')
-            .whereIn('id', envIds)
-            .select('id', 'environmentName')
-        : [];
-
-      const envMap = environments.reduce((acc: any, env: any) => {
-        acc[env.id] = env.environmentName;
-        return acc;
-      }, {});
 
       // Group environment names by token
       const envByToken = environmentAssignments.reduce((acc: any, env: any) => {
         if (!acc[env.tokenId]) acc[env.tokenId] = [];
-        const envName = envMap[env.environmentId];
-        if (envName) acc[env.tokenId].push(envName);
+        acc[env.tokenId].push(env.environment);
         return acc;
       }, {});
 
@@ -85,19 +75,12 @@ class InternalApiTokensController {
 
       logger.info(`[InternalApiTokens] Edge fetched ${formattedTokens.length} tokens`);
 
-      res.json({
-        success: true,
-        data: {
-          tokens: formattedTokens,
-          fetchedAt: new Date().toISOString()
-        }
+      return sendSuccessResponse(res, {
+        tokens: formattedTokens,
+        fetchedAt: new Date().toISOString()
       });
     } catch (error) {
-      logger.error('Error fetching tokens for Edge:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to fetch tokens'
-      });
+      return sendInternalError(res, 'Failed to fetch tokens', error, ErrorCodes.API_TOKEN_NOT_FOUND);
     }
   }
 
@@ -111,18 +94,14 @@ class InternalApiTokensController {
     try {
       // Only allow Edge bypass token to access this endpoint
       if (!req.isEdgeBypassToken) {
-        return res.status(403).json({
-          success: false,
-          message: 'This endpoint is only accessible with Edge bypass token'
-        });
+        return sendForbidden(res, 'This endpoint is only accessible with Edge bypass token', ErrorCodes.AUTH_PERMISSION_DENIED);
       }
 
       const { edgeInstanceId, usageData, reportedAt } = req.body;
 
       if (!edgeInstanceId || !Array.isArray(usageData)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid request body: edgeInstanceId and usageData are required'
+        return sendBadRequest(res, 'Invalid request body: edgeInstanceId and usageData are required', {
+          fields: ['edgeInstanceId', 'usageData']
         });
       }
 
@@ -159,22 +138,14 @@ class InternalApiTokensController {
         totalTokens: usageData.length
       });
 
-      res.json({
-        success: true,
-        data: {
-          processedCount,
-          receivedAt: new Date().toISOString()
-        }
+      return sendSuccessResponse(res, {
+        processedCount,
+        receivedAt: new Date().toISOString()
       });
     } catch (error) {
-      logger.error('Error receiving usage report from Edge:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to process usage report'
-      });
+      return sendInternalError(res, 'Failed to process usage report', error, ErrorCodes.INTERNAL_SERVER_ERROR);
     }
   }
 }
 
 export default new InternalApiTokensController();
-

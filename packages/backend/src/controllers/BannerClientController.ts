@@ -1,14 +1,16 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { asyncHandler } from '../middleware/errorHandler';
 import BannerService from '../services/BannerService';
+import { SDKRequest } from '../middleware/apiTokenAuth';
 
 export class BannerClientController {
   /**
    * Get all published banners for client
    * GET /api/v1/client/banners
    */
-  static getBanners = asyncHandler(async (req: Request, res: Response) => {
-    const banners = await BannerService.getPublishedBanners();
+  static getBanners = asyncHandler(async (req: SDKRequest, res: Response) => {
+    const environment = req.environment || 'development';
+    const banners = await BannerService.getPublishedBanners(environment);
 
     // Transform for client (remove internal fields)
     const clientBanners = banners.map(banner => ({
@@ -35,10 +37,11 @@ export class BannerClientController {
    * Get published banner by ID for client
    * GET /api/v1/client/banners/:bannerId
    */
-  static getBannerById = asyncHandler(async (req: Request, res: Response) => {
+  static getBannerById = asyncHandler(async (req: SDKRequest, res: Response) => {
     const { bannerId } = req.params;
+    const environment = req.environment || 'development';
 
-    const banner = await BannerService.getPublishedBannerById(bannerId);
+    const banner = await BannerService.getPublishedBannerById(bannerId, environment);
 
     // Transform for client (remove internal fields)
     const clientBanner = {

@@ -1,0 +1,46 @@
+﻿yarn run v1.22.22
+$ tsc --noEmit
+src/constants/cacheKeys.ts(9,3): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/constants/cacheKeys.ts(10,3): error TS2305: Module '"../utils/environmentContext"' has no exported member 'isDefaultEnvironmentInitialized'.
+src/controllers/PlanningDataController.ts(7,10): error TS2724: '"../utils/environmentContext"' has no exported member named 'getDefaultEnvironmentId'. Did you mean 'getDefaultEnvironment'?
+src/controllers/VarsController.ts(47,120): error TS2339: Property 'getCurrentEnvironmentId' does not exist on type 'typeof import("C:/work/uwo/gatrix/packages/backend/src/utils/environmentContext")'.
+src/controllers/VarsController.ts(184,120): error TS2339: Property 'getCurrentEnvironmentId' does not exist on type 'typeof import("C:/work/uwo/gatrix/packages/backend/src/utils/environmentContext")'.
+src/middleware/apiTokenAuth.ts(8,3): error TS2724: '"../utils/environmentContext"' has no exported member named 'getDefaultEnvironmentId'. Did you mean 'getDefaultEnvironment'?
+src/middleware/apiTokenAuth.ts(9,3): error TS2305: Module '"../utils/environmentContext"' has no exported member 'isDefaultEnvironmentInitialized'.
+src/middleware/environmentMiddleware.ts(16,3): error TS2724: '"../utils/environmentContext"' has no exported member named 'getEnvironmentIdFromRequest'. Did you mean 'getEnvironmentFromRequest'?
+src/middleware/environmentMiddleware.ts(17,3): error TS2305: Module '"../utils/environmentContext"' has no exported member 'runWithEnvironmentAsync'.
+src/middleware/environmentMiddleware.ts(18,3): error TS2724: '"../utils/environmentContext"' has no exported member named 'getDefaultEnvironmentId'. Did you mean 'getDefaultEnvironment'?
+src/middleware/environmentMiddleware.ts(19,3): error TS2724: '"../utils/environmentContext"' has no exported member named 'validateEnvironmentId'. Did you mean 'validateEnvironment'?
+src/middleware/environmentMiddleware.ts(20,3): error TS2305: Module '"../utils/environmentContext"' has no exported member 'isDefaultEnvironmentInitialized'.
+src/models/AccountWhitelist.ts(4,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/models/Banner.ts(3,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/models/ClientVersion.ts(3,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/models/GameWorld.ts(4,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/models/IpWhitelist.ts(3,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/models/Job.ts(3,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/models/JobType.ts(3,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/models/MessageTemplate.ts(3,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/models/RemoteConfig.ts(15,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/models/Vars.ts(2,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/services/CouponSettingsService.ts(8,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/services/GameWorldService.ts(15,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/services/IngamePopupNoticeService.ts(4,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/services/IpWhitelistService.ts(12,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/services/RewardTemplateService.ts(6,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/services/ServiceNoticeService.ts(4,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/services/StoreProductService.ts(6,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/services/SurveyService.ts(4,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+src/services/WhitelistService.ts(4,10): error TS2305: Module '"../utils/environmentContext"' has no exported member 'getCurrentEnvironmentId'.
+node.exe : error Command failed with exit code 2.
+위치 C:\Users\jhseo\AppData\Roaming\npm\yarn.ps1:24 문자
+:5
++     & "node$exe"  "$basedir/node_modules/yarn/bin/
+yarn.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error  
+   Command failed with exit code 2.:String) [], Re  
+  moteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

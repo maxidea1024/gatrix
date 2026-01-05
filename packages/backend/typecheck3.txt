@@ -1,0 +1,40 @@
+﻿yarn run v1.22.22
+$ tsc --noEmit
+src/controllers/jobTypeController.ts(12,37): error TS2554: Expected 1 arguments, but got 0.
+src/controllers/jobTypeController.ts(14,37): error TS2554: Expected 1 arguments, but got 0.
+src/controllers/jobTypeController.ts(169,40): error TS2554: Expected 2 arguments, but got 1.
+src/controllers/MessageTemplateController.ts(64,47): error TS2554: Expected 2 arguments, but got 1.
+src/controllers/MessageTemplateController.ts(75,51): error TS2554: Expected 2-3 arguments, but got 1.
+src/controllers/MessageTemplateController.ts(88,50): error TS2554: Expected 2 arguments, but got 1.
+src/controllers/MessageTemplateController.ts(99,73): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
+src/controllers/MessageTemplateController.ts(112,50): error TS2554: Expected 3 arguments, but got 2.
+src/controllers/MessageTemplateController.ts(120,34): error TS2554: Expected 2 arguments, but got 1.
+src/controllers/MessageTemplateController.ts(137,60): error TS2554: Expected 2 arguments, but got 1.
+src/controllers/RemoteConfigClientController.ts(30,50): error TS2554: Expected 2 arguments, but got 1.
+src/controllers/RemoteConfigClientController.ts(71,46): error TS2554: Expected 2 arguments, but got 1.
+src/controllers/ServerServiceNoticeController.ts(94,49): error TS2554: Expected 2 arguments, but got 1.
+src/controllers/ServiceDiscoveryConfigController.ts(15,19): error TS2554: Expected 2 arguments, but got 1.
+src/controllers/ServiceDiscoveryConfigController.ts(16,19): error TS2554: Expected 2 arguments, but got 1.
+src/controllers/ServiceDiscoveryConfigController.ts(17,19): error TS2554: Expected 2 arguments, but got 1.
+src/controllers/ServiceDiscoveryConfigController.ts(18,19): error TS2554: Expected 2 arguments, but got 1.
+src/controllers/ServiceDiscoveryConfigController.ts(75,32): error TS2554: Expected 4 arguments, but got 3.
+src/controllers/ServiceDiscoveryConfigController.ts(79,32): error TS2554: Expected 4 arguments, but got 3.
+src/controllers/ServiceDiscoveryConfigController.ts(83,32): error TS2554: Expected 4 arguments, but got 3.
+src/controllers/ServiceDiscoveryConfigController.ts(87,32): error TS2554: Expected 4 arguments, but got 3.
+src/controllers/StoreProductController.ts(331,46): error TS2339: Property 'applySync' does not exist on type 'typeof StoreProductService'.
+src/routes/public/serviceNotices.ts(75,47): error TS2554: Expected 2 arguments, but got 1.
+src/services/PlatformDefaultsService.ts(21,36): error TS2554: Expected 2 arguments, but got 1.
+src/services/PlatformDefaultsService.ts(52,23): error TS2554: Expected 4 arguments, but got 3.
+src/services/PlatformDefaultsService.ts(65,23): error TS2554: Expected 4 arguments, but got 3.
+src/services/PlatformDefaultsService.ts(80,23): error TS2554: Expected 4 arguments, but got 3.
+src/utils/systemKV.ts(80,23): error TS2554: Expected 6 arguments, but got 5.
+src/utils/systemKV.ts(143,21): error TS2554: Expected 6 arguments, but got 4.
+node.exe : error Command failed with exit code 2.
+위치 C:\Users\jhseo\AppData\Roaming\npm\yarn.ps1:24 문자:5
++     & "node$exe"  "$basedir/node_modules/yarn/bin/yarn.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error Command failed with e 
+   xit code 2.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

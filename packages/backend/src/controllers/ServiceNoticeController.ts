@@ -1,14 +1,28 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import ServiceNoticeService from '../services/ServiceNoticeService';
+import { AuthenticatedRequest } from '../types/auth';
+import {
+  sendBadRequest,
+  sendNotFound,
+  sendInternalError,
+  sendSuccessResponse,
+  ErrorCodes,
+} from '../utils/apiResponse';
+import logger from '../config/logger';
 
 class ServiceNoticeController {
   /**
    * Get service notices with pagination and filters
    */
-  async getServiceNotices(req: Request, res: Response) {
+  getServiceNotices = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
+      const environment = req.environment;
+
+      if (!environment) {
+        return sendBadRequest(res, 'Environment is required', { field: 'environment' });
+      }
 
       // Parse platform - can be string or array
       let platform: string | string[] | undefined;
@@ -45,200 +59,166 @@ class ServiceNoticeController {
         subchannel,
         subchannelOperator: req.query.subchannelOperator as 'any_of' | 'include_all' | undefined,
         search: req.query.search as string,
+        environment,
       };
 
       const result = await ServiceNoticeService.getServiceNotices(page, limit, filters);
 
-      res.json({
-        success: true,
-        data: result,
-        message: 'Service notices retrieved successfully',
-      });
-    } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to get service notices',
-      });
+      return sendSuccessResponse(res, result, 'Service notices retrieved successfully');
+    } catch (error) {
+      return sendInternalError(res, 'Failed to get service notices', error, ErrorCodes.RESOURCE_FETCH_FAILED);
     }
   }
 
   /**
    * Get service notice by ID
    */
-  async getServiceNoticeById(req: Request, res: Response) {
+  getServiceNoticeById = async (req: AuthenticatedRequest, res: Response, _next: any) => {
     try {
       const id = parseInt(req.params.id);
-      const notice = await ServiceNoticeService.getServiceNoticeById(id);
+      const environment = req.environment;
 
-      if (!notice) {
-        return res.status(404).json({
-          success: false,
-          message: 'Service notice not found',
-        });
+      if (!environment) {
+        return sendBadRequest(res, 'Environment is required', { field: 'environment' });
       }
 
-      res.json({
-        success: true,
-        data: { notice },
-        message: 'Service notice retrieved successfully',
-      });
-    } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to get service notice',
-      });
+      const notice = await ServiceNoticeService.getServiceNoticeById(id, environment);
+
+      if (!notice) {
+        return sendNotFound(res, 'Service notice not found', ErrorCodes.RESOURCE_NOT_FOUND);
+      }
+
+      return sendSuccessResponse(res, { notice }, 'Service notice retrieved successfully');
+    } catch (error) {
+      return sendInternalError(res, 'Failed to get service notice', error, ErrorCodes.RESOURCE_FETCH_FAILED);
     }
   }
 
   /**
    * Create service notice
    */
-  async createServiceNotice(req: Request, res: Response) {
+  createServiceNotice = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const data = req.body;
+      const environment = req.environment;
+
+      if (!environment) {
+        return sendBadRequest(res, 'Environment is required', { field: 'environment' });
+      }
 
       // Debug logging
-      console.log('Received service notice data:', JSON.stringify(data, null, 2));
+      logger.debug('Received service notice data:', { data });
 
       // Validation
       if (!data.category) {
-        return res.status(400).json({
-          success: false,
-          message: 'Category is required',
-        });
+        return sendBadRequest(res, 'Category is required', { field: 'category' });
       }
 
       // Platforms is optional - empty array means "all platforms"
       if (!Array.isArray(data.platforms)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Platforms must be an array',
-        });
+        return sendBadRequest(res, 'Platforms must be an array', { field: 'platforms' });
       }
 
-      // endDate is now optional - null means no end date (permanent notice)
-
       if (!data.title) {
-        return res.status(400).json({
-          success: false,
-          message: 'Title is required',
-        });
+        return sendBadRequest(res, 'Title is required', { field: 'title' });
       }
 
       if (!data.content) {
-        return res.status(400).json({
-          success: false,
-          message: 'Content is required',
-        });
+        return sendBadRequest(res, 'Content is required', { field: 'content' });
       }
 
-      const notice = await ServiceNoticeService.createServiceNotice(data);
+      const notice = await ServiceNoticeService.createServiceNotice(data, environment);
 
-      res.status(201).json({
-        success: true,
-        data: { notice },
-        message: 'Service notice created successfully',
-      });
-    } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to create service notice',
-      });
+      return sendSuccessResponse(res, { notice }, 'Service notice created successfully', 201);
+    } catch (error) {
+      return sendInternalError(res, 'Failed to create service notice', error, ErrorCodes.RESOURCE_CREATE_FAILED);
     }
   }
 
   /**
    * Update service notice
    */
-  async updateServiceNotice(req: Request, res: Response) {
+  updateServiceNotice = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       const data = req.body;
+      const environment = req.environment;
 
-      const notice = await ServiceNoticeService.updateServiceNotice(id, data);
+      if (!environment) {
+        return sendBadRequest(res, 'Environment is required', { field: 'environment' });
+      }
 
-      res.json({
-        success: true,
-        data: { notice },
-        message: 'Service notice updated successfully',
-      });
-    } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to update service notice',
-      });
+      const notice = await ServiceNoticeService.updateServiceNotice(id, data, environment);
+
+      return sendSuccessResponse(res, { notice }, 'Service notice updated successfully');
+    } catch (error) {
+      return sendInternalError(res, 'Failed to update service notice', error, ErrorCodes.RESOURCE_UPDATE_FAILED);
     }
   }
 
   /**
    * Delete service notice
    */
-  async deleteServiceNotice(req: Request, res: Response) {
+  deleteServiceNotice = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      await ServiceNoticeService.deleteServiceNotice(id);
+      const environment = req.environment;
 
-      res.json({
-        success: true,
-        message: 'Service notice deleted successfully',
-      });
-    } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to delete service notice',
-      });
+      if (!environment) {
+        return sendBadRequest(res, 'Environment is required', { field: 'environment' });
+      }
+
+      await ServiceNoticeService.deleteServiceNotice(id, environment);
+
+      return sendSuccessResponse(res, undefined, 'Service notice deleted successfully');
+    } catch (error) {
+      return sendInternalError(res, 'Failed to delete service notice', error, ErrorCodes.RESOURCE_DELETE_FAILED);
     }
   }
 
   /**
    * Delete multiple service notices
    */
-  async deleteMultipleServiceNotices(req: Request, res: Response) {
+  deleteMultipleServiceNotices = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { ids } = req.body;
+      const environment = req.environment;
 
-      if (!Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({
-          success: false,
-          message: 'IDs array is required',
-        });
+      if (!environment) {
+        return sendBadRequest(res, 'Environment is required', { field: 'environment' });
       }
 
-      await ServiceNoticeService.deleteMultipleServiceNotices(ids);
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return sendBadRequest(res, 'IDs array is required', { field: 'ids' });
+      }
 
-      res.json({
-        success: true,
-        message: `${ids.length} service notice(s) deleted successfully`,
-      });
-    } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to delete service notices',
-      });
+      await ServiceNoticeService.deleteMultipleServiceNotices(ids, environment);
+
+      return sendSuccessResponse(res, undefined, `${ids.length} service notice(s) deleted successfully`);
+    } catch (error) {
+      return sendInternalError(res, 'Failed to delete service notices', error, ErrorCodes.RESOURCE_DELETE_FAILED);
     }
   }
 
   /**
    * Toggle active status
    */
-  async toggleActive(req: Request, res: Response) {
+  toggleActive = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      const notice = await ServiceNoticeService.toggleActive(id);
+      const environment = req.environment;
 
-      res.json({
-        success: true,
-        data: { notice },
-        message: 'Service notice status toggled successfully',
-      });
-    } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to toggle service notice status',
-      });
+      if (!environment) {
+        return sendBadRequest(res, 'Environment is required', { field: 'environment' });
+      }
+
+      const notice = await ServiceNoticeService.toggleActive(id, environment);
+
+      return sendSuccessResponse(res, { notice }, 'Service notice status toggled successfully');
+    } catch (error) {
+      return sendInternalError(res, 'Failed to toggle service notice status', error, ErrorCodes.RESOURCE_UPDATE_FAILED);
     }
   }
 }
 
 export default new ServiceNoticeController();
-

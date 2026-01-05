@@ -1,6 +1,5 @@
 import db from '../config/knex';
 import logger from '../config/logger';
-import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 // Frame action types
 export type FrameActionType = 'openUrl' | 'command' | 'deepLink' | 'none';
@@ -92,7 +91,7 @@ export interface Sequence {
 
 export interface BannerAttributes {
   bannerId: string;
-  environmentId?: string;
+  environment: string;
   name: string;
   description?: string;
   width: number;
@@ -110,7 +109,7 @@ export interface BannerAttributes {
 }
 
 export interface BannerFilters {
-  environmentId?: string;
+  environment: string;
   search?: string;
   status?: BannerStatus | BannerStatus[];
   limit?: number;
@@ -125,18 +124,18 @@ export interface BannerListResult {
 }
 
 export class BannerModel {
-  static async findAll(filters?: BannerFilters): Promise<BannerListResult> {
+  static async findAll(filters: BannerFilters): Promise<BannerListResult> {
     try {
       const limit = filters?.limit ?? 10;
       const offset = filters?.offset ?? 0;
       const sortBy = filters?.sortBy || 'createdAt';
       const sortOrder = filters?.sortOrder || 'DESC';
-      const envId = filters?.environmentId ?? getCurrentEnvironmentId();
+      const environment = filters.environment;
 
       const baseQuery = () => db('g_banners as b')
         .leftJoin('g_users as creator', 'b.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'b.updatedBy', 'updater.id')
-        .where('b.environmentId', envId);
+        .where('b.environment', environment);
 
       const applyFilters = (query: any) => {
         if (filters?.search) {
@@ -192,9 +191,8 @@ export class BannerModel {
     }
   }
 
-  static async findById(bannerId: string, environmentId?: string): Promise<BannerAttributes | null> {
+  static async findById(bannerId: string, environment: string): Promise<BannerAttributes | null> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
       const banner = await db('g_banners as b')
         .leftJoin('g_users as creator', 'b.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'b.updatedBy', 'updater.id')
@@ -206,7 +204,7 @@ export class BannerModel {
           'updater.email as updatedByEmail'
         ])
         .where('b.bannerId', bannerId)
-        .where('b.environmentId', envId)
+        .where('b.environment', environment)
         .first();
 
       if (!banner) {
@@ -230,10 +228,9 @@ export class BannerModel {
    * @param name Banner name to search
    * @param excludeBannerId Optional bannerId to exclude (for update check)
    */
-  static async findByName(name: string, excludeBannerId?: string, environmentId?: string): Promise<BannerAttributes | null> {
+  static async findByName(name: string, environment: string, excludeBannerId?: string): Promise<BannerAttributes | null> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
-      let query = db('g_banners').where('name', name).where('environmentId', envId);
+      let query = db('g_banners').where('name', name).where('environment', environment);
       if (excludeBannerId) {
         query = query.whereNot('bannerId', excludeBannerId);
       }
@@ -255,10 +252,10 @@ export class BannerModel {
 
   static async create(data: Omit<BannerAttributes, 'createdAt' | 'updatedAt'>): Promise<BannerAttributes> {
     try {
-      const envId = getCurrentEnvironmentId();
+      const environment = data.environment;
       await db('g_banners').insert({
         bannerId: data.bannerId,
-        environmentId: envId,
+        environment: environment,
         name: data.name,
         description: data.description || null,
         width: data.width,
@@ -275,7 +272,7 @@ export class BannerModel {
         updatedAt: new Date()
       });
 
-      const banner = await this.findById(data.bannerId, envId);
+      const banner = await this.findById(data.bannerId, environment);
       if (!banner) {
         throw new Error('Failed to create banner');
       }
@@ -286,9 +283,8 @@ export class BannerModel {
     }
   }
 
-  static async update(bannerId: string, data: Partial<BannerAttributes>, environmentId?: string): Promise<BannerAttributes> {
+  static async update(bannerId: string, data: Partial<BannerAttributes>, environment: string): Promise<BannerAttributes> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
       const updateData: any = {
         updatedAt: new Date()
       };
@@ -307,13 +303,13 @@ export class BannerModel {
       // Increment version on update
       await db('g_banners')
         .where('bannerId', bannerId)
-        .where('environmentId', envId)
+        .where('environment', environment)
         .update({
           ...updateData,
           version: db.raw('version + 1')
         });
 
-      const banner = await this.findById(bannerId, envId);
+      const banner = await this.findById(bannerId, environment);
       if (!banner) {
         throw new Error('Banner not found after update');
       }
@@ -324,22 +320,20 @@ export class BannerModel {
     }
   }
 
-  static async delete(bannerId: string, environmentId?: string): Promise<void> {
+  static async delete(bannerId: string, environment: string): Promise<void> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
-      await db('g_banners').where('bannerId', bannerId).where('environmentId', envId).del();
+      await db('g_banners').where('bannerId', bannerId).where('environment', environment).del();
     } catch (error) {
       logger.error('Error deleting banner:', error);
       throw error;
     }
   }
 
-  static async updateStatus(bannerId: string, status: BannerStatus, updatedBy?: number, environmentId?: string): Promise<BannerAttributes> {
+  static async updateStatus(bannerId: string, status: BannerStatus, environment: string, updatedBy?: number): Promise<BannerAttributes> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
       await db('g_banners')
         .where('bannerId', bannerId)
-        .where('environmentId', envId)
+        .where('environment', environment)
         .update({
           status,
           updatedBy: updatedBy || null,
@@ -347,7 +341,7 @@ export class BannerModel {
           version: db.raw('version + 1')
         });
 
-      const banner = await this.findById(bannerId, envId);
+      const banner = await this.findById(bannerId, environment);
       if (!banner) {
         throw new Error('Banner not found after status update');
       }
@@ -358,16 +352,16 @@ export class BannerModel {
     }
   }
 
-  static async duplicate(bannerId: string, newBannerId: string, createdBy?: number, environmentId?: string): Promise<BannerAttributes> {
+  static async duplicate(bannerId: string, newBannerId: string, environment: string, createdBy?: number): Promise<BannerAttributes> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
-      const original = await this.findById(bannerId, envId);
+      const original = await this.findById(bannerId, environment);
       if (!original) {
         throw new Error('Original banner not found');
       }
 
       return await this.create({
         bannerId: newBannerId,
+        environment,
         name: `${original.name} (Copy)`,
         description: original.description,
         width: original.width,
@@ -388,13 +382,12 @@ export class BannerModel {
   }
 
   // Get only published banners for client API
-  static async findPublished(environmentId?: string): Promise<BannerAttributes[]> {
+  static async findPublished(environment: string): Promise<BannerAttributes[]> {
     try {
-      const envId = environmentId ?? getCurrentEnvironmentId();
       const banners = await db('g_banners')
         .select('*')
         .where('status', 'published')
-        .where('environmentId', envId)
+        .where('environment', environment)
         .orderBy('createdAt', 'DESC');
 
       return banners.map((b: any) => ({
