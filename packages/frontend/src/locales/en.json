@@ -5080,6 +5080,11 @@
     "changeRequestSettings": "Change Request Settings",
     "changeRequestSettingsDescription": "Configure approval requirements for applying changes in this environment.",
     "requiredApproversHelperText": "Minimum number of approvers required to approve a change request.",
-    "messages.created": "Change request has been created."
+    "messages.created": "Change request has been created.",
+    "conflictDialog.recreateDescription": "The conflicting request has been automatically rejected. You can create a new change request based on the latest data, or discard this request.",
+    "conflictDialog.viewCurrentData": "View Current Data",
+    "actions.recreate": "Recreate Request",
+    "conflictDialog.crData": "Change Request Data",
+    "conflictDialog.liveData": "Current Live Data"
   }
 }

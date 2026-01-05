@@ -303,11 +303,19 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       };
 
       if (survey) {
-        await surveyService.updateSurvey(survey.id, data);
-        enqueueSnackbar(t('surveys.updateSuccess'), { variant: 'success' });
+        const result = await surveyService.updateSurvey(survey.id, data);
+        if (result.isChangeRequest) {
+          enqueueSnackbar(t('changeRequest.messages.created'), { variant: 'info' });
+        } else {
+          enqueueSnackbar(t('surveys.updateSuccess'), { variant: 'success' });
+        }
       } else {
-        await surveyService.createSurvey(data);
-        enqueueSnackbar(t('surveys.createSuccess'), { variant: 'success' });
+        const result = await surveyService.createSurvey(data);
+        if (result.isChangeRequest) {
+          enqueueSnackbar(t('changeRequest.messages.created'), { variant: 'info' });
+        } else {
+          enqueueSnackbar(t('surveys.createSuccess'), { variant: 'success' });
+        }
       }
 
       onSuccess();

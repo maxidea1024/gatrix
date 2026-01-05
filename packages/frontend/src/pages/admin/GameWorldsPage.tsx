@@ -108,6 +108,7 @@ import translationService from '../../services/translationService';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import { messageTemplateService, MessageTemplate } from '@/services/messageTemplateService';
 import GameWorldSDKGuideDrawer from '../../components/gameWorlds/GameWorldSDKGuideDrawer';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 import GameWorldForm from '../../components/admin/GameWorldForm';
 import MaintenanceSettingsInput from '../../components/common/MaintenanceSettingsInput';
 import { parseJson5 } from '../../components/common/JsonEditor';
@@ -1058,7 +1059,7 @@ const GameWorldsPage: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to toggle visibility:', error);
-      enqueueSnackbar(t('gameWorlds.errors.toggleVisibilityFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'gameWorlds.errors.toggleVisibilityFailed'), { variant: 'error' });
     }
   };
 

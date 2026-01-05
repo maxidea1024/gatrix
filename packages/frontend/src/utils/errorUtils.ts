@@ -1,4 +1,4 @@
-import i18n from '@/i18n';
+import i18n from 'i18next';
 
 /**
  * Parse API error and return a user-friendly message
@@ -40,18 +40,19 @@ export function parseApiErrorMessage(error: any, fallbackKey = 'common.saveFaile
 
     // Handle specific CR-related errors by error code
     if (errorCode === 'ResourceLockedException' && payload?.changeRequestTitle) {
-        return i18n.t('errors.ResourceLockedException', { title: payload.changeRequestTitle });
+        return String(i18n.t('errors.ResourceLockedException', { title: payload.changeRequestTitle }));
     }
 
     if (errorCode === 'CR_DATA_CONFLICT') {
-        return i18n.t('errors.CR_DATA_CONFLICT');
+        return String(i18n.t('errors.CR_DATA_CONFLICT'));
     }
 
     // Check for localized error message by error code
     if (errorCode && i18n.exists(`errors.${errorCode}`)) {
-        return i18n.t(`errors.${errorCode}`, payload || {});
+        return String(i18n.t(`errors.${errorCode}`, payload || {}));
     }
 
     // Fallback to translation key
-    return i18n.t(fallbackKey);
+    return String(i18n.t(fallbackKey));
 }
+

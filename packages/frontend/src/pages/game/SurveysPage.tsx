@@ -292,9 +292,13 @@ const SurveysPage: React.FC = () => {
 
   const handleToggleActive = async (survey: Survey) => {
     try {
-      await surveyService.toggleActive(survey.id);
-      enqueueSnackbar(t('surveys.toggleSuccess'), { variant: 'success' });
-      loadSurveys();
+      const result = await surveyService.toggleActive(survey.id);
+      if (result.isChangeRequest) {
+        enqueueSnackbar(t('changeRequest.messages.created'), { variant: 'info' });
+      } else {
+        enqueueSnackbar(t('surveys.toggleSuccess'), { variant: 'success' });
+        loadSurveys();
+      }
     } catch (error: any) {
       enqueueSnackbar(error.message || t('surveys.toggleFailed'), { variant: 'error' });
     }

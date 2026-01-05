@@ -5121,6 +5121,11 @@
     "noReviewersYet": "暂无审核人",
     "deleteDialog.title": "删除变更请求",
     "deleteDialog.message": "您确定要删除此变更请求吗？此操作无法撤销。",
-    "messages.created": "变更请求已创建。"
+    "messages.created": "变更请求已创建。",
+    "conflictDialog.recreateDescription": "冲突的请求已被自动拒绝。您可以基于最新数据创建新的变更请求，或者放弃此请求。",
+    "conflictDialog.viewCurrentData": "查看当前数据",
+    "actions.recreate": "重新请求",
+    "conflictDialog.crData": "变更请求的数据",
+    "conflictDialog.liveData": "当前实时数据"
   }
 }

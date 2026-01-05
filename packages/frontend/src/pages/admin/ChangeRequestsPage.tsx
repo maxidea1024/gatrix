@@ -684,24 +684,39 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
                     <DialogContentText sx={{ mb: 2 }}>
                         {t('changeRequest.conflictDialog.description') || 'The data on the live server has changed since this request was created. The request has been automatically rejected to prevent data corruption.'}
                     </DialogContentText>
+                    <DialogContentText sx={{ mb: 2, color: 'text.secondary' }}>
+                        {t('changeRequest.conflictDialog.recreateDescription')}
+                    </DialogContentText>
 
                     {conflictData && (
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            <Paper variant="outlined" sx={{ p: 2, bgcolor: '#fff3f3' }}>
-                                <Typography variant="subtitle2" color="error" gutterBottom>
-                                    {t('changeRequest.field')}: {t('changeRequest.oldValue')} (Draft) vs {t('changeRequest.newValue')} (Live)
+                            <Paper variant="outlined" sx={{ p: 2, bgcolor: 'error.dark', color: 'common.white' }}>
+                                <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+                                    {t('changeRequest.conflictDialog.crData') || 'Change Request Data'}
                                 </Typography>
-                                <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
-                                    <pre style={{ margin: 0, fontSize: '0.8rem' }}>
-                                        {JSON.stringify(conflictData, null, 2)}
+                                <Box sx={{ maxHeight: 200, overflow: 'auto', bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 1, p: 1 }}>
+                                    <pre style={{ margin: 0, fontSize: '0.75rem', whiteSpace: 'pre-wrap' }}>
+                                        {JSON.stringify(conflictData.crValue || conflictData.oldValue || conflictData, null, 2)}
                                     </pre>
                                 </Box>
                             </Paper>
+                            {conflictData.liveValue && (
+                                <Paper variant="outlined" sx={{ p: 2, bgcolor: 'success.dark', color: 'common.white' }}>
+                                    <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+                                        {t('changeRequest.conflictDialog.liveData') || 'Current Live Data'}
+                                    </Typography>
+                                    <Box sx={{ maxHeight: 200, overflow: 'auto', bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 1, p: 1 }}>
+                                        <pre style={{ margin: 0, fontSize: '0.75rem', whiteSpace: 'pre-wrap' }}>
+                                            {JSON.stringify(conflictData.liveValue, null, 2)}
+                                        </pre>
+                                    </Box>
+                                </Paper>
+                            )}
                         </Box>
                     )}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setConflictDialogOpen(false)} color="primary" variant="contained">
+                    <Button onClick={() => setConflictDialogOpen(false)} color="inherit">
                         {t('common.close')}
                     </Button>
                 </DialogActions>

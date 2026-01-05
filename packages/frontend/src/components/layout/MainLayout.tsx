@@ -1775,8 +1775,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </Toolbar>
         </AppBar>
 
-        {/* Pending CR Review Banner */}
-        {pendingCRCount > 0 && !location.pathname.startsWith('/admin/change-requests') && (
+        {/* Pending CR Review Banner - only show when CR is enabled for current environment */}
+        {currentEnvironment?.requiresApproval && pendingCRCount > 0 && !location.pathname.startsWith('/admin/change-requests') && (
           <Box
             onClick={() => navigate('/admin/change-requests?status=open')}
             sx={{

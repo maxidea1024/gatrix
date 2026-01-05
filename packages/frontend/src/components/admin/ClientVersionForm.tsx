@@ -59,6 +59,7 @@ import MaintenanceSettingsInput from '../common/MaintenanceSettingsInput';
 import { MessageTemplate, messageTemplateService } from '../../services/messageTemplateService';
 import { MessageLocale } from '../common/MultiLanguageMessageInput';
 import { getContrastColor } from '@/utils/colorUtils';
+import { parseApiErrorMessage } from '@/utils/errorUtils';
 
 interface ClientVersionFormProps {
   open: boolean;
@@ -578,39 +579,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       onClose();
     } catch (error: any) {
       console.error('Error saving client version:', error);
-
-      // Handle version validation error
-      let rawMessage = error.message;
-
-      // apiService가 throw한 에러 객체 처리 ({ error: { message: ... } } 또는 { message: ... })
-      if (!rawMessage && error.error?.message) {
-        rawMessage = error.error.message;
-      } else if (!rawMessage && error.response?.data?.error?.message) {
-        rawMessage = error.response.data.error.message;
-      } else if (!rawMessage && error.response?.data?.message) {
-        rawMessage = error.response.data.message;
-      } else if (!rawMessage && typeof error === 'string') {
-        rawMessage = error;
-      }
-
-      let errorMessage = rawMessage || t('clientVersions.saveError');
-
-      if (rawMessage?.startsWith('VERSION_TOO_OLD:')) {
-        const latestVersion = rawMessage.split(':')[1];
-        errorMessage = t('clientVersions.versionTooOld', {
-          newVersion: data.clientVersion,
-          latestVersion
-        });
-      } else if (rawMessage?.startsWith('DUPLICATE_CLIENT_VERSIONS:')) {
-        const duplicates = rawMessage.split(':')[1];
-        errorMessage = t('clientVersions.duplicateClientVersions', {
-          duplicates
-        });
-      } else if (rawMessage?.includes('unique_env_platform_version') || rawMessage?.includes('Duplicate entry')) {
-        // Handle MySQL unique constraint violation with user-friendly message
-        errorMessage = t('clientVersions.form.duplicateVersion');
-      }
-
+      const errorMessage = parseApiErrorMessage(error, 'clientVersions.saveError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setLoading(false);

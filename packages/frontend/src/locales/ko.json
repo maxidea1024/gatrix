@@ -5064,6 +5064,11 @@
     "noReviewersYet": "아직 리뷰어가 없습니다",
     "deleteDialog.title": "변경 요청 삭제",
     "deleteDialog.message": "이 변경 요청을 삭제하시겠습니까? 삭제된 요청은 복구할 수 없습니다.",
-    "messages.created": "변경 요청이 생성되었습니다."
+    "messages.created": "변경 요청이 생성되었습니다.",
+    "conflictDialog.recreateDescription": "충돌이 발생한 요청은 자동으로 거절되었습니다. 최신 데이터를 기반으로 새로운 변경 요청을 생성하시거나, 이 요청을 폐기하실 수 있습니다.",
+    "conflictDialog.viewCurrentData": "현재 데이터 확인",
+    "actions.recreate": "다시 요청",
+    "conflictDialog.crData": "변경 요청의 데이터",
+    "conflictDialog.liveData": "현재 라이브 데이터"
   }
 }

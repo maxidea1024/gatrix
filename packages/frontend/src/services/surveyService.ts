@@ -1,4 +1,5 @@
 import api from './api';
+import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
 
 export interface TriggerCondition {
   type: 'userLevel' | 'joinDays';
@@ -133,32 +134,33 @@ class SurveyService {
   /**
    * Create a new survey
    */
-  async createSurvey(input: CreateSurveyInput): Promise<Survey> {
+  async createSurvey(input: CreateSurveyInput): Promise<MutationResult<Survey>> {
     const response = await api.post('/admin/surveys', input);
-    return response.data.survey;
+    return parseChangeRequestResponse<Survey>(response, (r) => r?.survey);
   }
 
   /**
    * Update a survey
    */
-  async updateSurvey(id: string, input: UpdateSurveyInput): Promise<Survey> {
+  async updateSurvey(id: string, input: UpdateSurveyInput): Promise<MutationResult<Survey>> {
     const response = await api.put(`/admin/surveys/${id}`, input);
-    return response.data.survey;
+    return parseChangeRequestResponse<Survey>(response, (r) => r?.survey);
   }
 
   /**
    * Delete a survey
    */
-  async deleteSurvey(id: string): Promise<void> {
-    await api.delete(`/admin/surveys/${id}`);
+  async deleteSurvey(id: string): Promise<MutationResult<void>> {
+    const response = await api.delete(`/admin/surveys/${id}`);
+    return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
   /**
    * Toggle survey active status
    */
-  async toggleActive(id: string): Promise<Survey> {
+  async toggleActive(id: string): Promise<MutationResult<Survey>> {
     const response = await api.patch(`/admin/surveys/${id}/toggle-active`);
-    return response.data.survey;
+    return parseChangeRequestResponse<Survey>(response, (r) => r?.survey);
   }
 
   /**
@@ -179,4 +181,3 @@ class SurveyService {
 }
 
 export default new SurveyService();
-
