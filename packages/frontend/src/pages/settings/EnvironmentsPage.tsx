@@ -619,13 +619,50 @@ const EnvironmentsPage: React.FC = () => {
               </Select>
               <FormHelperText>{t('environments.baseEnvironmentDescription')}</FormHelperText>
             </FormControl>
+
+            {/* Change Request Settings for New Environment */}
+            <Box sx={{ mt: 1, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+                {t('environments.changeRequestSettings')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('environments.changeRequestSettingsDescription')}
+              </Typography>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={newEnv.requiresApproval || false}
+                    onChange={(e) => setNewEnv({ ...newEnv, requiresApproval: e.target.checked })}
+                    color="primary"
+                    disabled={creating}
+                  />
+                }
+                label={t('environments.requiresApproval')}
+              />
+              {newEnv.requiresApproval && (
+                <FormControl fullWidth margin="normal" size="small">
+                  <InputLabel>{t('environments.requiredApprovers')}</InputLabel>
+                  <Select
+                    value={newEnv.requiredApprovers || 1}
+                    label={t('environments.requiredApprovers')}
+                    onChange={(e) => setNewEnv({ ...newEnv, requiredApprovers: Number(e.target.value) })}
+                    disabled={creating}
+                  >
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <MenuItem key={n} value={n}>{n}</MenuItem>
+                    ))}
+                  </Select>
+                  <FormHelperText>{t('environments.requiredApproversHelperText')}</FormHelperText>
+                </FormControl>
+              )}
+            </Box>
           </Box>
 
           {creating && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
               <CircularProgress size={20} />
               <Typography variant="body2" color="text.secondary">
-                {baseEnvironmentId ? t('environments.creatingWithCopy') : t('common.creating')}
+                {baseEnvironment ? t('environments.creatingWithCopy') : t('common.creating')}
               </Typography>
             </Box>
           )}

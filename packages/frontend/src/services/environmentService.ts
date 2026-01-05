@@ -25,6 +25,8 @@ export interface CreateEnvironmentData {
   color?: string;
   displayOrder?: number;
   baseEnvironment?: string; // If provided, copy data from this environment
+  requiresApproval?: boolean; // Change Request approval required
+  requiredApprovers?: number; // Minimum number of approvers for CR
 }
 
 export interface UpdateEnvironmentData {
