@@ -370,15 +370,23 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       };
 
       if (notice) {
-        await import('../../services/serviceNoticeService').then(m =>
+        const result = await import('../../services/serviceNoticeService').then(m =>
           m.default.updateServiceNotice(notice.id, data)
         );
-        enqueueSnackbar(t('serviceNotices.updateSuccess'), { variant: 'success' });
+        if (result.isChangeRequest) {
+          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+        } else {
+          enqueueSnackbar(t('serviceNotices.updateSuccess'), { variant: 'success' });
+        }
       } else {
-        await import('../../services/serviceNoticeService').then(m =>
+        const result = await import('../../services/serviceNoticeService').then(m =>
           m.default.createServiceNotice(data as CreateServiceNoticeData)
         );
-        enqueueSnackbar(t('serviceNotices.createSuccess'), { variant: 'success' });
+        if (result.isChangeRequest) {
+          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+        } else {
+          enqueueSnackbar(t('serviceNotices.createSuccess'), { variant: 'success' });
+        }
       }
 
       onSuccess();

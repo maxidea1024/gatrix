@@ -215,13 +215,21 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
 
       if (product && product.id) {
         // Update existing product
-        await storeProductService.updateStoreProduct(product.id, payload);
-        enqueueSnackbar(t('storeProducts.updateSuccess'), { variant: 'success' });
+        const result = await storeProductService.updateStoreProduct(product.id, payload);
+        if (result.isChangeRequest) {
+          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+        } else {
+          enqueueSnackbar(t('storeProducts.updateSuccess'), { variant: 'success' });
+        }
       } else {
         // Create new product
-        await storeProductService.createStoreProduct(payload);
-        const message = isCopy ? t('storeProducts.copySuccess') : t('storeProducts.createSuccess');
-        enqueueSnackbar(message, { variant: 'success' });
+        const result = await storeProductService.createStoreProduct(payload);
+        if (result.isChangeRequest) {
+          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+        } else {
+          const message = isCopy ? t('storeProducts.copySuccess') : t('storeProducts.createSuccess');
+          enqueueSnackbar(message, { variant: 'success' });
+        }
       }
       onSave();
     } catch (error: any) {
@@ -239,8 +247,8 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
         isCopy
           ? t('storeProducts.copyProduct')
           : product
-          ? t('storeProducts.editProduct')
-          : t('storeProducts.createProduct')
+            ? t('storeProducts.editProduct')
+            : t('storeProducts.createProduct')
       }
       subtitle={t('storeProducts.formSubtitle')}
       storageKey="storeProductFormDrawerWidth"

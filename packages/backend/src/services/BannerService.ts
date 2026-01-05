@@ -1,5 +1,4 @@
 import { ulid } from 'ulid';
-import { Environment } from '../models/Environment';
 import { BannerModel, BannerAttributes, BannerFilters, BannerStatus, Sequence } from '../models/Banner';
 import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';

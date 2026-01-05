@@ -1,4 +1,5 @@
 import api from './api';
+import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
 
 export interface ServiceNotice {
   id: number;
@@ -46,6 +47,8 @@ export interface ServiceNoticesResponse {
   notices: ServiceNotice[];
   total: number;
 }
+
+export type ServiceNoticeMutationResult = MutationResult<ServiceNotice>;
 
 class ServiceNoticeService {
   /**
@@ -95,39 +98,41 @@ class ServiceNoticeService {
   /**
    * Create service notice
    */
-  async createServiceNotice(data: CreateServiceNoticeData): Promise<ServiceNotice> {
+  async createServiceNotice(data: CreateServiceNoticeData): Promise<ServiceNoticeMutationResult> {
     const response = await api.post('/admin/service-notices', data);
-    return response.data.notice;
+    return parseChangeRequestResponse<ServiceNotice>(response, (r) => r?.notice);
   }
 
   /**
    * Update service notice
    */
-  async updateServiceNotice(id: number, data: UpdateServiceNoticeData): Promise<ServiceNotice> {
+  async updateServiceNotice(id: number, data: UpdateServiceNoticeData): Promise<ServiceNoticeMutationResult> {
     const response = await api.put(`/admin/service-notices/${id}`, data);
-    return response.data.notice;
+    return parseChangeRequestResponse<ServiceNotice>(response, (r) => r?.notice);
   }
 
   /**
    * Delete service notice
    */
-  async deleteServiceNotice(id: number): Promise<void> {
-    await api.delete(`/admin/service-notices/${id}`);
+  async deleteServiceNotice(id: number): Promise<MutationResult<void>> {
+    const response = await api.delete(`/admin/service-notices/${id}`);
+    return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
   /**
    * Delete multiple service notices
    */
-  async deleteMultipleServiceNotices(ids: number[]): Promise<void> {
-    await api.post('/admin/service-notices/bulk-delete', { ids });
+  async deleteMultipleServiceNotices(ids: number[]): Promise<MutationResult<void>> {
+    const response = await api.post('/admin/service-notices/bulk-delete', { ids });
+    return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
   /**
    * Toggle active status
    */
-  async toggleActive(id: number): Promise<ServiceNotice> {
+  async toggleActive(id: number): Promise<ServiceNoticeMutationResult> {
     const response = await api.patch(`/admin/service-notices/${id}/toggle-active`);
-    return response.data.notice;
+    return parseChangeRequestResponse<ServiceNotice>(response, (r) => r?.notice);
   }
 }
 

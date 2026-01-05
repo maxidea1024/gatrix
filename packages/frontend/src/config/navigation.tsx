@@ -51,14 +51,17 @@ export interface MenuItem {
   requiredPermission?: Permission | Permission[]; // Required permission(s) to view this menu item
   children?: MenuItem[];
   divider?: boolean; // Show divider before this item
+  badge?: string | number; // Optional badge to show next to the item
 }
 
 export interface MenuCategory {
   id: string;
   text: string;
   icon: React.ReactElement;
+  path?: string; // Optional path to navigate directly
   adminOnly?: boolean;
   children: MenuItem[];
+  badge?: string | number; // Optional badge to show on the category
 }
 
 // 기본 메뉴 (모든 사용자)
@@ -140,6 +143,11 @@ export const gameMenuItems: MenuItem[] = [
   },
 ];
 
+// 변경 요청 메뉴
+export const changeRequestMenuItems: MenuItem[] = [
+  { text: 'sidebar.changeRequests', icon: <CampaignIcon />, path: '/admin/change-requests', adminOnly: true, requiredPermission: [PERMISSIONS.CHANGE_REQUESTS_VIEW, PERMISSIONS.CHANGE_REQUESTS_MANAGE] },
+];
+
 // 이벤트 렌즈 메뉴
 export const eventLensMenuItems: MenuItem[] = [
   { text: 'sidebar.projects', icon: <FolderIcon />, path: '/admin/event-lens/projects', adminOnly: true, requiredPermission: [PERMISSIONS.EVENT_LENS_VIEW, PERMISSIONS.EVENT_LENS_MANAGE] },
@@ -154,48 +162,92 @@ export const settingsMenuItems: MenuItem[] = [
 ];
 
 // 메뉴 카테고리 구성
-export const getMenuCategories = (isAdmin: boolean): MenuCategory[] => {
+export const getMenuCategories = (
+  isAdmin: boolean,
+  badges?: Record<string, string | number>,
+  options?: { requiresApproval?: boolean }
+): MenuCategory[] => {
+  // Helper to apply badges to menu items recursively
+  const applyBadges = (items: MenuItem[]): MenuItem[] => {
+    if (!badges) return items;
+    return items.map(item => ({
+      ...item,
+      badge: badges[item.text] || item.badge,
+      children: item.children ? applyBadges(item.children) : undefined
+    }));
+  };
+
+  // Helper to sum up numeric badges for a category
+  const sumBadges = (items: MenuItem[]): number => {
+    return items.reduce((sum, item) => {
+      const itemBadge = typeof item.badge === 'number' ? item.badge : 0;
+      const childrenSum = item.children ? sumBadges(item.children) : 0;
+      return sum + itemBadge + childrenSum;
+    }, 0);
+  };
+
   const categories: MenuCategory[] = [
     {
       id: 'navigation',
       text: 'sidebar.navigation',
       icon: <DashboardIcon />,
-      children: baseMenuItems,
+      children: applyBadges(baseMenuItems),
     },
   ];
 
   if (isAdmin) {
     categories.push(
       {
+        id: 'event-lens',
+        text: 'sidebar.eventLens',
+        icon: <InsightsIcon />,
+        adminOnly: true,
+        children: applyBadges(eventLensMenuItems),
+      },
+      {
         id: 'admin-panel',
         text: 'sidebar.adminPanel',
         icon: <AdminPanelSettings />,
         adminOnly: true,
-        children: adminPanelMenuItems,
+        children: applyBadges(adminPanelMenuItems),
       },
       {
         id: 'game-management',
         text: 'sidebar.gameManagement',
         icon: <SportsEsportsIcon />,
         adminOnly: true,
-        children: gameMenuItems,
-      },
-      {
-        id: 'event-lens',
-        text: 'sidebar.eventLens',
-        icon: <InsightsIcon />,
-        adminOnly: true,
-        children: eventLensMenuItems,
-      },
-      {
-        id: 'settings',
-        text: 'sidebar.settings',
-        icon: <SettingsIcon />,
-        adminOnly: true,
-        children: settingsMenuItems,
+        children: applyBadges(gameMenuItems),
       }
     );
+
+    // Only add Change Requests category if environment requires approval
+    if (options?.requiresApproval !== false) {
+      categories.push({
+        id: 'change-requests',
+        text: 'sidebar.changeRequests',
+        icon: <CampaignIcon />,
+        path: '/admin/change-requests',
+        adminOnly: true,
+        children: applyBadges(changeRequestMenuItems),
+      });
+    }
+
+    categories.push({
+      id: 'settings',
+      text: 'sidebar.settings',
+      icon: <SettingsIcon />,
+      adminOnly: true,
+      children: applyBadges(settingsMenuItems),
+    });
   }
+
+  // Calculate badges for each category
+  categories.forEach(category => {
+    const total = sumBadges(category.children);
+    if (total > 0) {
+      category.badge = total;
+    }
+  });
 
   return categories;
 };
@@ -203,7 +255,13 @@ export const getMenuCategories = (isAdmin: boolean): MenuCategory[] => {
 // 기존 호환성을 위한 함수
 export const getAllMenuItems = (isAdmin: boolean): MenuItem[] => {
   if (isAdmin) {
-    return [...baseMenuItems, ...adminPanelMenuItems];
+    return [
+      ...baseMenuItems,
+      ...adminPanelMenuItems,
+      ...gameMenuItems,
+      ...eventLensMenuItems,
+      ...settingsMenuItems
+    ];
   }
   return baseMenuItems;
 };

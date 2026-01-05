@@ -92,11 +92,11 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
       // Deep copy rewardItems to avoid reference sharing
       const rewardItemsCopy = template.rewardItems && Array.isArray(template.rewardItems)
         ? template.rewardItems.map(item => {
-            if (typeof item === 'object' && item !== null) {
-              return { ...item };
-            }
-            return item;
-          })
+          if (typeof item === 'object' && item !== null) {
+            return { ...item };
+          }
+          return item;
+        })
         : [];
       setRewardItems(rewardItemsCopy);
 
@@ -231,21 +231,29 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
         console.log('[RewardTemplateFormDialog] Template updated successfully:', {
           templateId: template.id,
           tagIds,
-          resultTags: result.tags?.map((t: any) => ({ id: t.id, name: t.name })) || [],
+          resultTags: result.data?.tags?.map((t: any) => ({ id: t.id, name: t.name })) || [],
         });
-        enqueueSnackbar(t('rewardTemplates.updateSuccess'), { variant: 'success' });
+        if (result.isChangeRequest) {
+          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+        } else {
+          enqueueSnackbar(t('rewardTemplates.updateSuccess'), { variant: 'success' });
+        }
       } else {
         // Create new template (including copied templates)
-        await rewardTemplateService.createRewardTemplate({
+        const result = await rewardTemplateService.createRewardTemplate({
           name: name.trim(),
           description: description.trim() || undefined,
           rewardItems,
           tagIds,
         });
-        // Check if this is a copy operation (name contains " (Copy)" or localized equivalent)
-        const isCopy = name.includes(`(${t('common.copy')})`);
-        const message = isCopy ? t('rewardTemplates.copySuccess') : t('rewardTemplates.createSuccess');
-        enqueueSnackbar(message, { variant: 'success' });
+        if (result.isChangeRequest) {
+          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+        } else {
+          // Check if this is a copy operation (name contains " (Copy)" or localized equivalent)
+          const isCopy = name.includes(`(${t('common.copy')})`);
+          const message = isCopy ? t('rewardTemplates.copySuccess') : t('rewardTemplates.createSuccess');
+          enqueueSnackbar(message, { variant: 'success' });
+        }
       }
       onSave();
     } catch (error: any) {
@@ -263,8 +271,8 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
         isCopy
           ? t('rewardTemplates.copyTemplate')
           : template
-          ? t('rewardTemplates.editTemplate')
-          : t('rewardTemplates.createTemplate')
+            ? t('rewardTemplates.editTemplate')
+            : t('rewardTemplates.createTemplate')
       }
       subtitle={
         isCopy

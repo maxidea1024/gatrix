@@ -62,6 +62,15 @@ export class QueueService {
         } else {
           logger.info('Repeatable job already exists: planning:cleanup');
         }
+
+        // Register change request cleanup job (daily at 4 AM)
+        const crCleanupExists = repeatables.some((r) => r.name === 'change-request:cleanup');
+        if (!crCleanupExists) {
+          await this.addJob('scheduler', 'change-request:cleanup', {}, { repeat: { pattern: '0 4 * * *' } });
+          logger.info('Registered repeatable job: change-request:cleanup (daily at 4 AM)');
+        } else {
+          logger.info('Repeatable job already exists: change-request:cleanup');
+        }
       } catch (e) {
         logger.error('Failed to register repeatable scheduler jobs:', e);
       }
@@ -398,7 +407,7 @@ export class QueueService {
    * Process audit log job
    */
   private async processAuditLogJob(job: Job<QueueJobData>): Promise<void> {
-    const { payload: _payload } = job.data;
+    // const { payload } = job.data;
     logger.info('Processing audit log job:', { jobId: job.id });
 
     // TODO: Implement audit log processing
@@ -454,6 +463,14 @@ export class QueueService {
           const { PlanningDataService } = await import('./PlanningDataService');
           const result = await PlanningDataService.cleanupAllEnvironments();
           logger.info('planning:cleanup completed', { jobId: job.id, ...result });
+          break;
+        }
+        case 'change-request:cleanup': {
+          // Dynamic import to avoid circular dependency
+          const { ChangeRequestService } = await import('./ChangeRequestService');
+          const retentionDays = parseInt(process.env.CHANGE_REQUEST_REJECTION_RETENTION_DAYS || '14', 10);
+          const deleted = await ChangeRequestService.cleanupRejected(retentionDays);
+          logger.info('change-request:cleanup completed', { jobId: job.id, deleted, retentionDays });
           break;
         }
         default: {

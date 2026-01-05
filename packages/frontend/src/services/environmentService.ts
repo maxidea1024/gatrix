@@ -11,6 +11,8 @@ export interface Environment {
   isDefault: boolean;
   displayOrder: number;
   color?: string;
+  requiresApproval: boolean; // Change Request approval required
+  requiredApprovers: number; // Minimum number of approvers for CR
   createdAt: string;
   updatedAt: string;
 }
@@ -32,6 +34,8 @@ export interface UpdateEnvironmentData {
   color?: string;
   displayOrder?: number;
   isHidden?: boolean;
+  requiresApproval?: boolean; // Change Request approval required
+  requiredApprovers?: number; // Minimum number of approvers for CR
 }
 
 export interface CopyOptions {

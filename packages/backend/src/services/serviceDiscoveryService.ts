@@ -16,7 +16,6 @@ import {
   WatchEvent,
 } from '../types/serviceDiscovery';
 import config from '../config';
-import Environment from '../models/Environment';
 import ServerLifecycleEvent from '../models/ServerLifecycleEvent';
 
 class ServiceDiscoveryService {

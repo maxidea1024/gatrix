@@ -119,10 +119,13 @@ const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
 
   const content = (
     <Typography
+      component="span"
       variant={variant}
       color={color}
       sx={{
+        display: 'inline-flex',
         whiteSpace: 'nowrap',
+        verticalAlign: 'middle',
         ...sx
       }}
     >

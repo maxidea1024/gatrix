@@ -11,20 +11,22 @@ export class GatrixError extends Error implements AppError {
   public statusCode: number;
   public isOperational: boolean;
   public code?: string;
+  public payload?: Record<string, any>;
 
-  constructor(message: string, statusCode: number = 500, isOperational: boolean = true, code?: string) {
+  constructor(message: string, statusCode: number = 500, isOperational: boolean = true, code?: string, payload?: Record<string, any>) {
     super(message);
     this.statusCode = statusCode;
     this.isOperational = isOperational;
     this.code = code;
+    this.payload = payload;
 
     //TODO 개발 환경에서만 callstack을 추적하는게?
     Error.captureStackTrace(this, this.constructor);
   }
 }
 
-export const createError = (message: string, statusCode: number = 500, code?: string): GatrixError => {
-  return new GatrixError(message, statusCode, true, code);
+export const createError = (message: string, statusCode: number = 500, code?: string, payload?: Record<string, any>): GatrixError => {
+  return new GatrixError(message, statusCode, true, code, payload);
 };
 
 export const errorHandler = (
@@ -101,13 +103,19 @@ export const errorHandler = (
     message = 'Internal Server Error';
   }
 
+  const errorResponse: any = {
+    code: errorCode,
+    message,
+    ...((error as any).validationErrors && { details: { validationErrors: (error as any).validationErrors } }),
+  };
+
+  if ((error as any).payload) {
+    errorResponse.details = { ...errorResponse.details, payload: (error as any).payload };
+  }
+
   res.status(statusCode).json({
     success: false,
-    error: {
-      code: errorCode,
-      message,
-      ...((error as any).validationErrors && { details: { validationErrors: (error as any).validationErrors } }),
-    },
+    error: errorResponse,
   });
 };
 

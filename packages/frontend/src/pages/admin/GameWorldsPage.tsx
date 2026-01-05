@@ -88,6 +88,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import dayjs from 'dayjs';
@@ -309,6 +310,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
 const GameWorldsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
   const { currentEnvironmentId } = useEnvironment();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.GAME_WORLDS_MANAGE]);
@@ -941,13 +943,46 @@ const GameWorldsPage: React.FC = () => {
         gracePeriodMinutes: formData.forceDisconnect ? (formData.gracePeriodMinutes ?? 5) : undefined,
       };
 
+
       let savedWorld: any;
       if (editingWorld) {
         savedWorld = await gameWorldService.updateGameWorld(editingWorld.id, dataToSend);
-        enqueueSnackbar(t('gameWorlds.worldUpdated'), { variant: 'success' });
+        if (savedWorld.isChangeRequest) {
+          enqueueSnackbar(t('changeRequests.createdForReview'), {
+            variant: 'info',
+            autoHideDuration: 5000,
+            action: (key) => (
+              <Button
+                color="inherit"
+                size="small"
+                onClick={() => navigate(`/admin/change-requests/${savedWorld.changeRequestId}`)}
+              >
+                {t('common.view')}
+              </Button>
+            )
+          });
+        } else {
+          enqueueSnackbar(t('gameWorlds.worldUpdated'), { variant: 'success' });
+        }
       } else {
         savedWorld = await gameWorldService.createGameWorld(dataToSend);
-        enqueueSnackbar(t('gameWorlds.worldCreated'), { variant: 'success' });
+        if (savedWorld.isChangeRequest) {
+          enqueueSnackbar(t('changeRequests.createdForReview'), {
+            variant: 'info',
+            autoHideDuration: 5000,
+            action: (key) => (
+              <Button
+                color="inherit"
+                size="small"
+                onClick={() => navigate(`/admin/change-requests/${savedWorld.changeRequestId}`)}
+              >
+                {t('common.view')}
+              </Button>
+            )
+          });
+        } else {
+          enqueueSnackbar(t('gameWorlds.worldCreated'), { variant: 'success' });
+        }
       }
 
       setDialogOpen(false);

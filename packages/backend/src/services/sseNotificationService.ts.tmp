@@ -1,0 +1,79 @@
+  /**
+   * Notify about change request approval
+   */
+  static async notifyApproved(changeRequest: {
+    id: string;
+    title: string;
+    environment: string;
+    requesterId: number;
+  }, approverName?: string, actorId?: number): Promise<void> {
+    const event: NotificationEvent = {
+      type: 'change_request_approved',
+      data: {
+        id: changeRequest.id,
+        title: changeRequest.title,
+        environment: changeRequest.environment,
+        approverName,
+      },
+      timestamp: new Date(),
+      targetUsers: [changeRequest.requesterId], // Notify the requester
+      excludeUsers: actorId ? [actorId] : undefined,
+    };
+
+    await pubSubService.publishNotification(event);
+    logger.info(`Change request approved notification published via PubSub`);
+  }
+
+  /**
+   * Notify about change request execution
+   */
+  static async notifyExecuted(changeRequest: {
+    id: string;
+    title: string;
+    environment: string;
+    requesterId: number;
+  }, actorId?: number): Promise<void> {
+    const event: NotificationEvent = {
+      type: 'change_request_executed',
+      data: {
+        id: changeRequest.id,
+        title: changeRequest.title,
+        environment: changeRequest.environment,
+      },
+      timestamp: new Date(),
+      excludeUsers: actorId ? [actorId] : undefined,
+    };
+
+    await pubSubService.publishNotification(event);
+    logger.info(`Change request executed notification published via PubSub`);
+  }
+
+  /**
+   * Notify about change request rejection
+   */
+  static async notifyRejected(changeRequest: {
+    id: string;
+    title: string;
+    environment: string;
+    requesterId: number;
+  }, rejectorName?: string, comment?: string, actorId?: number): Promise<void> {
+    const event: NotificationEvent = {
+      type: 'change_request_rejected',
+      data: {
+        id: changeRequest.id,
+        title: changeRequest.title,
+        environment: changeRequest.environment,
+        rejectorName,
+        comment,
+      },
+      timestamp: new Date(),
+      targetUsers: [changeRequest.requesterId], // Notify the requester
+      excludeUsers: actorId ? [actorId] : undefined,
+    };
+
+    await pubSubService.publishNotification(event);
+    logger.info(`Change request rejected notification published via PubSub`);
+  }
+}
+
+export default SSENotificationService;

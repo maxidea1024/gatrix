@@ -1,0 +1,868 @@
+import React, { useState, useCallback, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import {
+    Box,
+    Typography,
+    Card,
+    CardContent,
+    TableContainer,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody,
+    Chip,
+    IconButton,
+    Paper,
+    Collapse,
+    LinearProgress,
+    Button,
+    Tabs,
+    Tab,
+    Tooltip,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
+    TextField,
+} from '@mui/material';
+import {
+    Refresh as RefreshIcon,
+    ExpandMore as ExpandMoreIcon,
+    ExpandLess as ExpandLessIcon,
+    Check as CheckIcon,
+    Close as CloseIcon,
+    Undo as UndoIcon,
+    PlayArrow as PlayArrowIcon,
+    Delete as DeleteIcon,
+    Info as InfoIcon,
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import useSWR from 'swr';
+
+import { RelativeTime } from '@/components/common/RelativeTime';
+import changeRequestService, {
+    ChangeRequest,
+    ChangeRequestStatus,
+} from '@/services/changeRequestService';
+import SimplePagination from '@/components/common/SimplePagination';
+import EmptyTableRow from '@/components/common/EmptyTableRow';
+
+// JSON Diff wrapper component
+interface FieldChange {
+    field: string;
+    oldValue: any;
+    newValue: any;
+}
+
+const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({ before, after }) => {
+    const { t } = useTranslation();
+
+    // Determine operation type
+    const isCreate = !before && after;
+    const isDelete = before && !after;
+
+    // Compute field-level changes for MODIFY
+    const changes = useMemo(() => {
+        if (!before || !after) return [];
+        const result: FieldChange[] = [];
+        const allKeys = new Set([...Object.keys(before), ...Object.keys(after)]);
+
+        allKeys.forEach((key) => {
+            const oldVal = before[key];
+            const newVal = after[key];
+            if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+                result.push({ field: key, oldValue: oldVal, newValue: newVal });
+            }
+        });
+        return result;
+    }, [before, after]);
+
+    const formatValue = (value: any): string => {
+        if (value === null) return 'null';
+        if (value === undefined) return '-';
+        if (typeof value === 'object') return JSON.stringify(value);
+        return String(value);
+    };
+
+    // For CREATE: simply show the new data
+    if (isCreate) {
+        return (
+            <Box>
+                <Chip
+                    label={t('changeRequest.operationCreate')}
+                    color="success"
+                    size="small"
+                    sx={{ mb: 1 }}
+                />
+                <Box
+                    component="pre"
+                    sx={{
+                        bgcolor: 'success.main',
+                        color: 'common.white',
+                        p: 1.5,
+                        borderRadius: 1,
+                        fontSize: '0.75rem',
+                        fontFamily: 'monospace',
+                        overflow: 'auto',
+                        maxHeight: 300,
+                        m: 0,
+                    }}
+                >
+                    {JSON.stringify(after, null, 2)}
+                </Box>
+            </Box>
+        );
+    }
+
+    // For DELETE: show the deleted data
+    if (isDelete) {
+        return (
+            <Box>
+                <Chip
+                    label={t('changeRequest.operationDelete')}
+                    color="error"
+                    size="small"
+                    sx={{ mb: 1 }}
+                />
+                <Box
+                    component="pre"
+                    sx={{
+                        bgcolor: 'error.main',
+                        color: 'common.white',
+                        p: 1.5,
+                        borderRadius: 1,
+                        fontSize: '0.75rem',
+                        fontFamily: 'monospace',
+                        overflow: 'auto',
+                        maxHeight: 300,
+                        m: 0,
+                    }}
+                >
+                    {JSON.stringify(before, null, 2)}
+                </Box>
+            </Box>
+        );
+    }
+
+    // For MODIFY: show field-level changes in table format
+    if (changes.length === 0) {
+        return (
+            <Typography variant="body2" color="textSecondary" sx={{ fontStyle: 'italic' }}>
+                {t('changeRequest.noChanges')}
+            </Typography>
+        );
+    }
+
+    return (
+        <Box>
+            <Chip
+                label={t('changeRequest.operationModify')}
+                color="warning"
+                size="small"
+                sx={{ mb: 1 }}
+            />
+            <TableContainer component={Paper} variant="outlined">
+                <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell sx={{ fontWeight: 'bold', width: '25%' }}>{t('changeRequest.field')}</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', width: '37.5%' }}>{t('changeRequest.oldValue')}</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', width: '37.5%' }}>{t('changeRequest.newValue')}</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {changes.map((change) => (
+                            <TableRow key={change.field}>
+                                <TableCell sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
+                                    {change.field}
+                                </TableCell>
+                                <TableCell sx={{ fontFamily: 'monospace', bgcolor: 'error.dark', color: 'common.white' }}>
+                                    {formatValue(change.oldValue)}
+                                </TableCell>
+                                <TableCell sx={{ fontFamily: 'monospace', bgcolor: 'success.dark', color: 'common.white' }}>
+                                    {formatValue(change.newValue)}
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
+    );
+};
+
+
+
+
+// Status configuration
+const STATUS_CONFIG: Record<ChangeRequestStatus, { color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'; labelKey: string }> = {
+    draft: { color: 'default', labelKey: 'changeRequest.status.draft' },
+    open: { color: 'info', labelKey: 'changeRequest.status.open' },
+    approved: { color: 'success', labelKey: 'changeRequest.status.approved' },
+    applied: { color: 'primary', labelKey: 'changeRequest.status.applied' },
+    rejected: { color: 'error', labelKey: 'changeRequest.status.rejected' },
+};
+
+// Priority configuration
+const PRIORITY_CONFIG: Record<string, { color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'; labelKey: string }> = {
+    low: { color: 'default', labelKey: 'changeRequest.priority.low' },
+    medium: { color: 'info', labelKey: 'changeRequest.priority.medium' },
+    high: { color: 'warning', labelKey: 'changeRequest.priority.high' },
+    critical: { color: 'error', labelKey: 'changeRequest.priority.critical' },
+};
+
+// Row component
+interface ChangeRequestRowProps {
+    cr: ChangeRequest;
+    index: number;
+    onRefresh: () => void;
+}
+
+const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefresh }) => {
+    const { t, i18n } = useTranslation();
+    const { enqueueSnackbar } = useSnackbar();
+    const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
+    const [actionLoading, setActionLoading] = useState(false);
+    const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+    const [rejectComment, setRejectComment] = useState('');
+    const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
+    const [submitTitle, setSubmitTitle] = useState('');
+    const [submitReason, setSubmitReason] = useState('');
+    const [reopenDialogOpen, setReopenDialogOpen] = useState(false);
+    const [rollbackDialogOpen, setRollbackDialogOpen] = useState(false);
+    const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
+    const [conflictData, setConflictData] = useState<any>(null);
+
+    const getErrorMessage = (err: any) => {
+        if (err.code && i18n.exists(`errors.${err.code}`)) {
+            return t(`errors.${err.code}`);
+        }
+        if (err.code && i18n.exists(`changeRequest.errors.${err.code}`)) {
+            return t(`changeRequest.errors.${err.code}`);
+        }
+        return err.message || t('common.error');
+    };
+
+    const handleApprove = async () => {
+        setActionLoading(true);
+        try {
+            await changeRequestService.approve(cr.id);
+            enqueueSnackbar(t('changeRequest.messages.approved'), { variant: 'success' });
+            onRefresh();
+        } catch (err: any) {
+            enqueueSnackbar(getErrorMessage(err), { variant: 'error' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleReject = async () => {
+        if (!rejectComment.trim()) {
+            enqueueSnackbar(t('changeRequest.errors.rejectCommentRequired'), { variant: 'warning' });
+            return;
+        }
+        setActionLoading(true);
+        try {
+            await changeRequestService.reject(cr.id, rejectComment);
+            enqueueSnackbar(t('changeRequest.messages.rejected'), { variant: 'success' });
+            setRejectDialogOpen(false);
+            setRejectComment('');
+            onRefresh();
+        } catch (err: any) {
+            enqueueSnackbar(getErrorMessage(err), { variant: 'error' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleReopen = () => {
+        setReopenDialogOpen(true);
+    };
+
+    const confirmReopen = async () => {
+        setActionLoading(true);
+        try {
+            await changeRequestService.reopen(cr.id);
+            enqueueSnackbar(t('changeRequest.messages.reopened'), { variant: 'success' });
+            setReopenDialogOpen(false);
+            onRefresh();
+        } catch (err: any) {
+            enqueueSnackbar(getErrorMessage(err), { variant: 'error' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleExecute = async () => {
+        setActionLoading(true);
+        try {
+            await changeRequestService.execute(cr.id);
+            enqueueSnackbar(t('changeRequest.messages.executed'), { variant: 'success' });
+            onRefresh();
+        } catch (err: any) {
+            if (err.code === 'CR_DATA_CONFLICT') {
+                setConflictData(err.details?.payload);
+                setConflictDialogOpen(true);
+                onRefresh(); // Refresh to show the new "Rejected" status
+            } else {
+                enqueueSnackbar(getErrorMessage(err), { variant: 'error' });
+            }
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!window.confirm(t('changeRequest.confirmDelete'))) return;
+        setActionLoading(true);
+        try {
+            await changeRequestService.delete(cr.id);
+            enqueueSnackbar(t('changeRequest.messages.deleted'), { variant: 'success' });
+            onRefresh();
+        } catch (err: any) {
+            enqueueSnackbar(getErrorMessage(err), { variant: 'error' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleRollback = () => {
+        setRollbackDialogOpen(true);
+    };
+
+    const confirmRollback = async () => {
+        setActionLoading(true);
+        try {
+            const newCr = await changeRequestService.rollback(cr.id);
+            enqueueSnackbar(t('changeRequest.messages.rollbackCreated'), {
+                variant: 'success',
+                autoHideDuration: 5000,
+                action: (key) => (
+                    <Button
+                        color="inherit"
+                        size="small"
+                        onClick={() => navigate(`/admin/change-requests/${newCr.id}`)}
+                    >
+                        {t('common.view')}
+                    </Button>
+                )
+            });
+            setRollbackDialogOpen(false);
+            onRefresh();
+        } catch (err: any) {
+            enqueueSnackbar(getErrorMessage(err), { variant: 'error' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    // ... (rest of existing handlers like handleDelete)
+
+    const handleSubmit = async () => {
+        if (!submitTitle.trim() || !submitReason.trim()) {
+            enqueueSnackbar(t('changeRequest.errors.submitFieldsRequired'), { variant: 'warning' });
+            return;
+        }
+        setActionLoading(true);
+        try {
+            await changeRequestService.submit(cr.id, { title: submitTitle.trim(), reason: submitReason.trim() });
+            enqueueSnackbar(t('changeRequest.messages.submitted'), { variant: 'success' });
+            setSubmitDialogOpen(false);
+            setSubmitTitle('');
+            setSubmitReason('');
+            onRefresh();
+        } catch (err: any) {
+            enqueueSnackbar(err.message || t('common.error'), { variant: 'error' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const statusConfig = STATUS_CONFIG[cr.status];
+    const priorityConfig = PRIORITY_CONFIG[cr.priority] || PRIORITY_CONFIG.medium;
+
+    return (
+        <>
+            <TableRow
+                hover
+                sx={{
+                    '& > *': { borderBottom: 'unset' },
+                    cursor: 'pointer',
+                    bgcolor: index % 2 === 1
+                        ? (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.025)'
+                        : 'transparent',
+                }}
+                onClick={() => navigate(`/admin/change-requests/${cr.id}`)}
+            >
+                <TableCell width={50}>
+                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); setOpen(!open); }}>
+                        {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    </IconButton>
+                </TableCell>
+                <TableCell>
+                    <Chip
+                        label={t(statusConfig.labelKey)}
+                        color={statusConfig.color}
+                        size="small"
+                        sx={{ fontWeight: 'bold', minWidth: 80 }}
+                    />
+                </TableCell>
+                <TableCell>
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        {cr.title}
+                    </Typography>
+                </TableCell>
+                <TableCell>
+                    <Typography variant="body2">
+                        {cr.requester?.name || cr.requester?.email || '-'}
+                    </Typography>
+                </TableCell>
+                <TableCell>
+                    <Chip
+                        label={t(priorityConfig.labelKey)}
+                        color={priorityConfig.color}
+                        size="small"
+                        variant="outlined"
+                    />
+                </TableCell>
+                <TableCell align="center">
+                    <Typography variant="body2">
+                        {cr.changeItems?.length || 0}
+                    </Typography>
+                </TableCell>
+                <TableCell align="center">
+                    <Typography variant="body2">
+                        {cr.approvals?.length || 0} / {cr.environmentModel?.requiredApprovers || 1}
+                    </Typography>
+                </TableCell>
+                <TableCell align="center">
+                    <RelativeTime date={cr.updatedAt} />
+                </TableCell>
+                <TableCell align="center">
+                    {cr.status === 'applied' && (
+                        <Chip
+                            label={t('changeRequest.actions.rollback')}
+                            color="warning"
+                            size="small"
+                            variant="outlined"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleRollback();
+                            }}
+                            icon={<UndoIcon />}
+                            disabled={actionLoading}
+                        />
+                    )}
+                </TableCell>
+            </TableRow>
+
+            {/* Expanded Details */}
+            <TableRow sx={{
+                bgcolor: index % 2 === 1
+                    ? (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.025)'
+                    : 'transparent',
+            }}>
+                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={10}>
+                    <Collapse in={open} timeout="auto" unmountOnExit>
+                        <Box sx={{ margin: 2 }}>
+                            <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <InfoIcon fontSize="small" /> {t('changeRequest.details')}
+                            </Typography>
+                            <Paper variant="outlined" sx={{ p: 2, bgcolor: 'action.hover' }}>
+                                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
+                                    {cr.description && (
+                                        <Box>
+                                            <Typography variant="caption" color="textSecondary">{t('changeRequest.description')}</Typography>
+                                            <Typography variant="body2">{cr.description}</Typography>
+                                        </Box>
+                                    )}
+                                    {cr.reason && (
+                                        <Box>
+                                            <Typography variant="caption" color="textSecondary">{t('changeRequest.reason')}</Typography>
+                                            <Typography variant="body2">{cr.reason}</Typography>
+                                        </Box>
+                                    )}
+                                    {cr.impactAnalysis && (
+                                        <Box sx={{ gridColumn: 'span 2' }}>
+                                            <Typography variant="caption" color="textSecondary">{t('changeRequest.impactAnalysis')}</Typography>
+                                            <Typography variant="body2">{cr.impactAnalysis}</Typography>
+                                        </Box>
+                                    )}
+                                </Box>
+
+                                {/* Change Items */}
+                                {cr.changeItems && cr.changeItems.length > 0 && (
+                                    <Box sx={{ mt: 2 }}>
+                                        <Typography variant="subtitle2" gutterBottom>{t('changeRequest.changeItems')}</Typography>
+                                        {cr.changeItems.map((item) => (
+                                            <Paper key={item.id} variant="outlined" sx={{ mb: 1, p: 2 }}>
+                                                <Box sx={{ display: 'flex', gap: 2, mb: 1 }}>
+                                                    <Chip label={item.targetTable} size="small" color="primary" variant="outlined" />
+                                                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                                                        ID: {item.targetId}
+                                                    </Typography>
+                                                </Box>
+                                                <JsonDiffView before={item.beforeData} after={item.afterData} />
+                                            </Paper>
+                                        ))}
+                                    </Box>
+                                )}
+
+
+
+                                {/* Rejection Info */}
+                                {cr.status === 'rejected' && cr.rejectionReason && (
+                                    <Box sx={{ mt: 2 }}>
+                                        <Typography variant="subtitle2" gutterBottom sx={{ color: 'error.main' }}>
+                                            {t('changeRequest.rejectionInfo')}
+                                        </Typography>
+                                        <Paper variant="outlined" sx={{ p: 2, bgcolor: 'error.main', color: 'error.contrastText', opacity: 0.9 }}>
+                                            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, mb: 1 }}>
+                                                <Box>
+                                                    <Typography variant="caption" sx={{ opacity: 0.8 }}>{t('changeRequest.rejectedBy')}</Typography>
+                                                    <Typography variant="body2" fontWeight={500}>
+                                                        {cr.rejector?.name || cr.rejector?.email || t('common.unknown')}
+                                                    </Typography>
+                                                </Box>
+                                                <Box>
+                                                    <Typography variant="caption" sx={{ opacity: 0.8 }}>{t('changeRequest.rejectedAt')}</Typography>
+                                                    <Typography variant="body2" fontWeight={500}>
+                                                        {cr.rejectedAt ? new Date(cr.rejectedAt).toLocaleString() : '-'}
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+                                            <Box>
+                                                <Typography variant="caption" sx={{ opacity: 0.8 }}>{t('changeRequest.rejectionReason')}</Typography>
+                                                <Typography variant="body2" sx={{ mt: 0.5, whiteSpace: 'pre-wrap' }}>
+                                                    {cr.rejectionReason}
+                                                </Typography>
+                                            </Box>
+                                        </Paper>
+                                    </Box>
+                                )}
+
+                                {/* Approvals */}
+                                {cr.approvals && cr.approvals.length > 0 && (
+                                    <Box sx={{ mt: 2 }}>
+                                        <Typography variant="subtitle2" gutterBottom>{t('changeRequest.approvals')}</Typography>
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                            {cr.approvals.map((approval) => (
+                                                <Chip
+                                                    key={approval.id}
+                                                    icon={<CheckIcon />}
+                                                    label={`${approval.approver?.name || approval.approver?.email || 'Unknown'}`}
+                                                    color="success"
+                                                    variant="outlined"
+                                                    size="small"
+                                                />
+                                            ))}
+                                        </Box>
+                                    </Box>
+                                )}
+                            </Paper>
+                        </Box>
+                    </Collapse>
+                </TableCell>
+            </TableRow>
+
+            {/* Submit Dialog */}
+            <Dialog open={submitDialogOpen} onClose={() => setSubmitDialogOpen(false)} maxWidth="sm" fullWidth>
+                <DialogTitle>{t('changeRequest.submitDialog.title')}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText sx={{ mb: 2 }}>
+                        {t('changeRequest.submitDialog.description')}
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        fullWidth
+                        label={t('changeRequest.submitDialog.titleField')}
+                        value={submitTitle}
+                        onChange={(e) => setSubmitTitle(e.target.value)}
+                        required
+                        sx={{ mb: 2 }}
+                    />
+                    <TextField
+                        fullWidth
+                        multiline
+                        rows={3}
+                        label={t('changeRequest.submitDialog.reason')}
+                        value={submitReason}
+                        onChange={(e) => setSubmitReason(e.target.value)}
+                        required
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setSubmitDialogOpen(false)}>{t('common.cancel')}</Button>
+                    <Button onClick={handleSubmit} variant="contained" disabled={actionLoading}>
+                        {t('changeRequest.actions.submit')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Reject Dialog */}
+            <Dialog open={rejectDialogOpen} onClose={() => setRejectDialogOpen(false)} maxWidth="sm" fullWidth>
+                <DialogTitle>{t('changeRequest.rejectDialog.title')}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText sx={{ mb: 2 }}>
+                        {t('changeRequest.rejectDialog.description')}
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        fullWidth
+                        multiline
+                        rows={3}
+                        label={t('changeRequest.rejectDialog.comment')}
+                        value={rejectComment}
+                        onChange={(e) => setRejectComment(e.target.value)}
+                        required
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setRejectDialogOpen(false)}>{t('common.cancel')}</Button>
+                    <Button onClick={handleReject} color="error" disabled={actionLoading}>
+                        {t('changeRequest.actions.reject')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Reopen Confirmation Dialog */}
+            <Dialog open={reopenDialogOpen} onClose={() => setReopenDialogOpen(false)} maxWidth="sm" fullWidth>
+                <DialogTitle>{t('changeRequest.reopenDialog.title')}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        {t('changeRequest.reopenDialog.description')}
+                    </DialogContentText>
+                    {cr.rejectionReason && (
+                        <Paper variant="outlined" sx={{ mt: 2, p: 2, bgcolor: 'action.hover' }}>
+                            <Typography variant="caption" color="textSecondary">{t('changeRequest.rejectionReason')}</Typography>
+                            <Typography variant="body2" sx={{ mt: 0.5, whiteSpace: 'pre-wrap' }}>
+                                {cr.rejectionReason}
+                            </Typography>
+                        </Paper>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setReopenDialogOpen(false)}>{t('common.cancel')}</Button>
+                    <Button onClick={confirmReopen} color="warning" variant="contained" disabled={actionLoading}>
+                        {t('changeRequest.actions.reopen')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Rollback Confirmation Dialog */}
+            <Dialog open={rollbackDialogOpen} onClose={() => setRollbackDialogOpen(false)} maxWidth="sm" fullWidth>
+                <DialogTitle>{t('changeRequest.rollbackDialog.title')}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        {t('changeRequest.rollbackDialog.description')}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setRollbackDialogOpen(false)}>{t('common.cancel')}</Button>
+                    <Button onClick={confirmRollback} color="warning" variant="contained" disabled={actionLoading}>
+                        {t('changeRequest.actions.rollback')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Conflict Error Dialog */}
+            <Dialog
+                open={conflictDialogOpen}
+                onClose={() => setConflictDialogOpen(false)}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogTitle sx={{ color: 'error.main', display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <InfoIcon color="error" />
+                    {t('errors.CR_DATA_CONFLICT') || 'Data Conflict Detected'}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText sx={{ mb: 2 }}>
+                        {t('changeRequest.conflictDialog.description') || 'The data on the live server has changed since this request was created. The request has been automatically rejected to prevent data corruption.'}
+                    </DialogContentText>
+
+                    {conflictData && (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            <Paper variant="outlined" sx={{ p: 2, bgcolor: '#fff3f3' }}>
+                                <Typography variant="subtitle2" color="error" gutterBottom>
+                                    {t('changeRequest.field')}: {t('changeRequest.oldValue')} (Draft) vs {t('changeRequest.newValue')} (Live)
+                                </Typography>
+                                <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+                                    <pre style={{ margin: 0, fontSize: '0.8rem' }}>
+                                        {JSON.stringify(conflictData, null, 2)}
+                                    </pre>
+                                </Box>
+                            </Paper>
+                        </Box>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setConflictDialogOpen(false)} color="primary" variant="contained">
+                        {t('common.close')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>
+    );
+};
+
+// Main Page Component
+const ChangeRequestsPage: React.FC = () => {
+    const { t } = useTranslation();
+    const { enqueueSnackbar } = useSnackbar();
+
+    // Tab state with persistence and URL param support
+    const [searchParams, setSearchParams] = useSearchParams();
+    const statusFilters: (ChangeRequestStatus | undefined)[] = [undefined, 'draft', 'open', 'approved', 'applied', 'rejected'];
+
+    const [tabValue, setTabValue] = useState(() => {
+        // 1. Check URL param first
+        const statusParam = searchParams.get('status');
+        if (statusParam) {
+            const index = statusFilters.indexOf(statusParam as ChangeRequestStatus);
+            if (index !== -1) return index;
+        }
+
+        // 2. Fallback to session storage
+        const saved = sessionStorage.getItem('changeRequestsTab');
+        return saved ? parseInt(saved, 10) : 0;
+    });
+
+    // Update URL when tab changes, or clear it
+    const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+        setTabValue(newValue);
+        sessionStorage.setItem('changeRequestsTab', String(newValue));
+        setPage(0);
+
+        // Optional: synchronize URL with tab state if desired, or just clear the param to avoid "stuck" state
+        // For now, we just clear the specific status param if we navigate away from the executed tab, 
+        // or we could set it. Let's just remove the query param to keep URL clean after initial deep link.
+        if (searchParams.get('status')) {
+            setSearchParams({}, { replace: true });
+        }
+    };
+
+    // Pagination
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(20);
+
+    const statusFilter = statusFilters[tabValue];
+
+    // SWR fetcher
+    const fetcher = useCallback(async () => {
+        const params: any = { page: page + 1, limit: rowsPerPage };
+        if (statusFilter) {
+            params.status = statusFilter;
+        }
+        return await changeRequestService.list(params);
+    }, [page, rowsPerPage, statusFilter]);
+
+    const { data, isLoading, mutate } = useSWR(
+        `change-requests-${page}-${rowsPerPage}-${statusFilter || 'all'}`,
+        fetcher,
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+        }
+    );
+
+    const handleRefresh = useCallback(() => {
+        mutate();
+    }, [mutate]);
+
+    const handlePageChange = useCallback((_: unknown, newPage: number) => {
+        setPage(newPage);
+    }, []);
+
+    const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        const newRowsPerPage = parseInt(event.target.value, 10);
+        setRowsPerPage(newRowsPerPage);
+        setPage(0);
+    }, []);
+
+    return (
+        <Box sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+                <Box>
+                    <Typography variant="h4" component="h1" gutterBottom>
+                        {t('changeRequest.title')}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        {t('changeRequest.subtitle')}
+                    </Typography>
+                </Box>
+                <Button
+                    variant="outlined"
+                    startIcon={<RefreshIcon />}
+                    onClick={handleRefresh}
+                >
+                    {t('common.refresh')}
+                </Button>
+            </Box>
+
+            <Card>
+                <CardContent sx={{ p: 0 }}>
+                    {/* Status Tabs */}
+                    <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
+                        <Tabs value={tabValue} onChange={handleTabChange}>
+                            <Tab label={t('changeRequest.tabs.all')} />
+                            <Tab label={t('changeRequest.tabs.draft')} />
+                            <Tab label={t('changeRequest.tabs.open')} />
+                            <Tab label={t('changeRequest.tabs.approved')} />
+                            <Tab label={t('changeRequest.tabs.applied')} />
+                            <Tab label={t('changeRequest.tabs.rejected')} />
+                        </Tabs>
+                    </Box>
+
+                    {isLoading && <LinearProgress />}
+
+                    <TableContainer>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell width={50} />
+                                    <TableCell>{t('changeRequest.status')}</TableCell>
+                                    <TableCell>{t('changeRequest.titleField')}</TableCell>
+                                    <TableCell>{t('changeRequest.requester')}</TableCell>
+                                    <TableCell>{t('changeRequest.priorityField')}</TableCell>
+                                    <TableCell align="center">{t('changeRequest.items')}</TableCell>
+                                    <TableCell align="center">{t('changeRequest.approvalProgress')}</TableCell>
+                                    <TableCell align="center">{t('changeRequest.lastUpdated')}</TableCell>
+                                    <TableCell align="center">{t('changeRequest.actions.label')}</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {data?.items && data.items.length > 0 ? (
+                                    data.items.map((cr, idx) => (
+                                        <ChangeRequestRow key={cr.id} cr={cr} index={idx} onRefresh={handleRefresh} />
+                                    ))
+                                ) : (
+                                    <EmptyTableRow colSpan={9} message={t('changeRequest.noRequests')} />
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+
+                    {/* Pagination */}
+                    {data && data.pagination && (
+                        <Box sx={{ p: 2 }}>
+                            <SimplePagination
+                                count={data.pagination.total}
+                                page={page}
+                                rowsPerPage={rowsPerPage}
+                                onPageChange={handlePageChange}
+                                onRowsPerPageChange={handleRowsPerPageChange}
+                            />
+                        </Box>
+                    )}
+                </CardContent>
+            </Card>
+        </Box >
+    );
+};
+
+export default ChangeRequestsPage;

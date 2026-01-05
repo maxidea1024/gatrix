@@ -1,4 +1,5 @@
 import api from './api';
+import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
 
 // Frame action types
 export type FrameActionType = 'openUrl' | 'command' | 'deepLink' | 'none';
@@ -149,6 +150,8 @@ export interface GetBannersResponse {
   limit: number;
 }
 
+export type BannerMutationResult = MutationResult<Banner>;
+
 class BannerService {
   /**
    * Get all banners with pagination
@@ -169,40 +172,41 @@ class BannerService {
   /**
    * Create a new banner
    */
-  async createBanner(input: CreateBannerInput): Promise<Banner> {
+  async createBanner(input: CreateBannerInput): Promise<BannerMutationResult> {
     const response = await api.post('/admin/banners', input);
-    return response.data.banner;
+    return parseChangeRequestResponse<Banner>(response, (r) => r?.banner);
   }
 
   /**
    * Update a banner
    */
-  async updateBanner(bannerId: string, input: UpdateBannerInput): Promise<Banner> {
+  async updateBanner(bannerId: string, input: UpdateBannerInput): Promise<BannerMutationResult> {
     const response = await api.put(`/admin/banners/${bannerId}`, input);
-    return response.data.banner;
+    return parseChangeRequestResponse<Banner>(response, (r) => r?.banner);
   }
 
   /**
    * Delete a banner
    */
-  async deleteBanner(bannerId: string): Promise<void> {
-    await api.delete(`/admin/banners/${bannerId}`);
+  async deleteBanner(bannerId: string): Promise<MutationResult<void>> {
+    const response = await api.delete(`/admin/banners/${bannerId}`);
+    return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
   /**
    * Publish a banner
    */
-  async publishBanner(bannerId: string): Promise<Banner> {
+  async publishBanner(bannerId: string): Promise<BannerMutationResult> {
     const response = await api.post(`/admin/banners/${bannerId}/publish`);
-    return response.data.banner;
+    return parseChangeRequestResponse<Banner>(response, (r) => r?.banner);
   }
 
   /**
    * Archive a banner
    */
-  async archiveBanner(bannerId: string): Promise<Banner> {
+  async archiveBanner(bannerId: string): Promise<BannerMutationResult> {
     const response = await api.post(`/admin/banners/${bannerId}/archive`);
-    return response.data.banner;
+    return parseChangeRequestResponse<Banner>(response, (r) => r?.banner);
   }
 
   /**

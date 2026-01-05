@@ -7,6 +7,7 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   extends: [
     'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
   root: true,
   env: {
@@ -20,6 +21,12 @@ module.exports = {
     'prefer-const': 'error',
     'no-var': 'error',
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      },
+    ],
   },
 };

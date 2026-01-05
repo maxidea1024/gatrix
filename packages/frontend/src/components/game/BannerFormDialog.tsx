@@ -259,7 +259,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
     setSaving(true);
     try {
       if (banner) {
-        await bannerService.updateBanner(banner.bannerId, {
+        const result = await bannerService.updateBanner(banner.bannerId, {
           name,
           description,
           width,
@@ -268,9 +268,13 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           shuffle,
           sequences,
         });
-        enqueueSnackbar(t('banners.updateSuccess'), { variant: 'success' });
+        if (result.isChangeRequest) {
+          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+        } else {
+          enqueueSnackbar(t('banners.updateSuccess'), { variant: 'success' });
+        }
       } else {
-        await bannerService.createBanner({
+        const result = await bannerService.createBanner({
           name,
           description,
           width,
@@ -279,7 +283,11 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           shuffle,
           sequences,
         });
-        enqueueSnackbar(t('banners.createSuccess'), { variant: 'success' });
+        if (result.isChangeRequest) {
+          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+        } else {
+          enqueueSnackbar(t('banners.createSuccess'), { variant: 'success' });
+        }
       }
       onSave();
     } catch (error: any) {

@@ -1,6 +1,6 @@
 import db from '../config/knex';
 import logger from '../config/logger';
-import { Campaign, CampaignConfig } from '../types/remoteConfig';
+import { Campaign } from '../types/remoteConfig';
 
 export interface UserContext {
   userId?: string;

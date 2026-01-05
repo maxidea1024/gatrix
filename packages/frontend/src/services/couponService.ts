@@ -1,4 +1,5 @@
 import { api } from './api';
+import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
 
 export type CouponType = 'SPECIAL' | 'NORMAL';
 export type CouponStatus = 'ACTIVE' | 'DISABLED' | 'DELETED';
@@ -50,7 +51,7 @@ export interface ListSettingsResponse {
   limit: number;
 }
 
-export interface CreateCouponSettingInput extends Omit<CouponSetting, 'id'|'status'|'startsAt'|'expiresAt'> {
+export interface CreateCouponSettingInput extends Omit<CouponSetting, 'id' | 'status' | 'startsAt' | 'expiresAt'> {
   startsAt: string; // ISO
   expiresAt: string; // ISO
   status?: CouponStatus;
@@ -66,7 +67,7 @@ export interface CreateCouponSettingInput extends Omit<CouponSetting, 'id'|'stat
   targetUserIdsInverted?: boolean;
 }
 
-export interface UpdateCouponSettingInput extends Partial<CreateCouponSettingInput> {}
+export interface UpdateCouponSettingInput extends Partial<CreateCouponSettingInput> { }
 
 export interface UsageRecord {
   id: string;
@@ -133,16 +134,17 @@ export const couponService = {
     const res = await api.get(`/admin/coupon-settings/${id}`);
     return res.data;
   },
-  async createSetting(data: CreateCouponSettingInput): Promise<{ setting: any }> {
+  async createSetting(data: CreateCouponSettingInput): Promise<MutationResult<any>> {
     const res = await api.post('/admin/coupon-settings', data);
-    return res.data;
+    return parseChangeRequestResponse<any>(res, (r) => r?.setting);
   },
-  async updateSetting(id: string, data: UpdateCouponSettingInput): Promise<{ setting: any }> {
+  async updateSetting(id: string, data: UpdateCouponSettingInput): Promise<MutationResult<any>> {
     const res = await api.patch(`/admin/coupon-settings/${id}`, data);
-    return res.data;
+    return parseChangeRequestResponse<any>(res, (r) => r?.setting);
   },
-  async deleteSetting(id: string): Promise<void> {
-    await api.delete(`/admin/coupon-settings/${id}`);
+  async deleteSetting(id: string): Promise<MutationResult<void>> {
+    const res = await api.delete(`/admin/coupon-settings/${id}`);
+    return parseChangeRequestResponse<void>(res, () => undefined);
   },
   async getUsage(settingId?: string, params?: { page?: number; limit?: number; search?: string; platform?: string; channel?: string; subChannel?: string; gameWorldId?: string; characterId?: string; from?: string; to?: string; }): Promise<UsageListResponse> {
     const url = settingId ? `/admin/coupon-settings/${settingId}/usage` : '/admin/coupon-settings/usage';

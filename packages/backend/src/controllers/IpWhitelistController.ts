@@ -4,6 +4,7 @@ import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import Joi from 'joi';
 import { isValidIPOrCIDR } from '../utils/ipValidation';
+import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
 
 // Custom IP/CIDR validation for Joi
 const ipOrCidrValidator = (value: string, helpers: any) => {
@@ -100,16 +101,6 @@ export class IpWhitelistController {
 
     const { page, limit, ipAddress, purpose, isEnabled, createdBy, search, tags } = value;
 
-    // Handle tags parameter (can be string or array)
-    let tagsArray: string[] | undefined;
-    if (tags) {
-      if (typeof tags === 'string') {
-        tagsArray = [tags];
-      } else if (Array.isArray(tags)) {
-        tagsArray = tags;
-      }
-    }
-
     const filters = { ipAddress, purpose, isEnabled, createdBy, search };
     const pagination = { page, limit };
 
@@ -168,12 +159,32 @@ export class IpWhitelistController {
       createData.endDate = value.endDate;
     }
 
-    const created = await IpWhitelistService.createIpWhitelist(environment, createData);
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.requestCreation(
+      req.user?.userId || 0,
+      environment,
+      'g_ip_whitelist',
+      { ...createData, environment },
+      async () => {
+        return await IpWhitelistService.createIpWhitelist(environment, createData);
+      }
+    );
 
-    res.status(201).json({
-      success: true,
-      data: created,
-    });
+    if (gatewayResult.mode === 'DIRECT') {
+      res.status(201).json({
+        success: true,
+        data: gatewayResult.data,
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. The IP whitelist entry will be created after approval.',
+      });
+    }
   });
 
   static updateIpWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -198,12 +209,39 @@ export class IpWhitelistController {
       updatedBy: req.user?.userId,
     };
 
-    const updated = await IpWhitelistService.updateIpWhitelist(id, environment, updateData);
+    // Resolve authenticated user id
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new GatrixError('User authentication required', 401);
+    }
 
-    res.json({
-      success: true,
-      data: updated,
-    });
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.processChange(
+      userId,
+      environment,
+      'g_ip_whitelist',
+      String(id),
+      updateData,
+      async (processedData) => {
+        return await IpWhitelistService.updateIpWhitelist(id, environment, processedData as any);
+      }
+    );
+
+    if (gatewayResult.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        data: gatewayResult.data,
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. The update will be applied after approval.',
+      });
+    }
   });
 
   static deleteIpWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -217,12 +255,38 @@ export class IpWhitelistController {
       throw new GatrixError('Environment not specified', 400);
     }
 
-    await IpWhitelistService.deleteIpWhitelist(id, environment);
+    // Resolve authenticated user id
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new GatrixError('User authentication required', 401);
+    }
 
-    res.json({
-      success: true,
-      message: 'IP whitelist entry deleted successfully',
-    });
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.requestDeletion(
+      userId,
+      environment,
+      'g_ip_whitelist',
+      String(id),
+      async () => {
+        await IpWhitelistService.deleteIpWhitelist(id, environment);
+      }
+    );
+
+    if (gatewayResult.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        message: 'IP whitelist entry deleted successfully',
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. The deletion will be applied after approval.',
+      });
+    }
   });
 
   static toggleIpWhitelistStatus = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -236,12 +300,44 @@ export class IpWhitelistController {
       throw new GatrixError('Environment not specified', 400);
     }
 
-    const updated = await IpWhitelistService.toggleIpWhitelistStatus(id, environment, req.user?.userId!);
+    // Resolve authenticated user id
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new GatrixError('User authentication required', 401);
+    }
 
-    res.json({
-      success: true,
-      data: updated,
-    });
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.processChange(
+      userId,
+      environment,
+      'g_ip_whitelist',
+      String(id),
+      async (currentData: any) => {
+        return { isEnabled: !currentData.isEnabled };
+      },
+      async (processedData: any) => {
+        return await IpWhitelistService.updateIpWhitelist(id, environment, {
+          ...processedData as any,
+          updatedBy: userId
+        });
+      }
+    );
+
+    if (gatewayResult.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        data: gatewayResult.data,
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. Toggle will be applied after approval.',
+      });
+    }
   });
 
   static bulkCreateIpWhitelists = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -250,26 +346,64 @@ export class IpWhitelistController {
       throw new GatrixError('Environment not specified', 400);
     }
 
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new GatrixError('User authentication required', 401);
+    }
+
     // Validate request body
     const { error, value } = bulkCreateSchema.validate(req.body);
     if (error) {
       throw new GatrixError(error.details[0].message, 400);
     }
 
-    const createdCount = await IpWhitelistService.bulkCreateIpWhitelists(
-      environment,
-      value.entries,
-      req.user?.userId!
-    );
+    // Use UnifiedChangeGateway for CR support
+    // Since requestCreation and bulkCreate are different patterns, we check approval requirement first
+    const requiresApproval = await UnifiedChangeGateway.requiresApproval(environment);
 
-    res.status(201).json({
-      success: true,
-      data: {
-        requestedCount: value.entries.length,
-        createdCount,
-      },
-      message: `Successfully created ${createdCount} out of ${value.entries.length} IP whitelist entries`,
-    });
+    if (requiresApproval) {
+      // For bulk creation in CR, we wrap the whole operation or individual items?
+      // Conventionally, bulk creations are handled as a single CR with multiple items if possible,
+      // but UnifiedChangeGateway.requestCreation is designed for single table/item.
+      // However, we can pass the whole array as createData.
+      const gatewayResult = await UnifiedChangeGateway.requestCreation(
+        userId,
+        environment,
+        'g_ip_whitelist',
+        { entries: value.entries, bulk: true },
+        async () => {
+          return await IpWhitelistService.bulkCreateIpWhitelists(
+            environment,
+            value.entries,
+            userId
+          );
+        }
+      );
+
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. IP whitelists will be created after approval.',
+      });
+    } else {
+      const createdCount = await IpWhitelistService.bulkCreateIpWhitelists(
+        environment,
+        value.entries,
+        userId
+      );
+
+      res.status(201).json({
+        success: true,
+        data: {
+          requestedCount: value.entries.length,
+          createdCount,
+        },
+        message: `Successfully created ${createdCount} out of ${value.entries.length} IP whitelist entries`,
+      });
+    }
   });
 
   static checkIpWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {

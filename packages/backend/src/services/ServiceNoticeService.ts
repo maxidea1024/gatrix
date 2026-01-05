@@ -240,8 +240,7 @@ class ServiceNoticeService {
   async createServiceNotice(data: CreateServiceNoticeData, environment: string): Promise<ServiceNotice> {
     const pool = database.getPool();
 
-    // Debug logging
-    console.log('Creating service notice with data:', {
+    logger.debug('Creating service notice with data:', {
       startDate: data.startDate,
       endDate: data.endDate,
       convertedStartDate: convertToMySQLDateTime(data.startDate),

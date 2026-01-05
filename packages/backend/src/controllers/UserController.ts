@@ -6,6 +6,7 @@ import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { UserModel } from '../models/User';
 import Joi from 'joi';
+import logger from '../config/logger';
 
 const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
@@ -97,9 +98,9 @@ export class UserController {
 
     // 태그 설정
     if (tagIds && tagIds.length > 0) {
-      console.log('Setting user tags for new user:', { userId: user.id, tagIds, createdBy });
+      logger.debug('Setting user tags for new user:', { userId: user.id, tagIds, createdBy });
       await UserTagService.setUserTags(user.id, tagIds, createdBy!);
-      console.log('User tags set successfully for new user');
+      logger.debug('User tags set successfully for new user');
 
       // 태그 설정 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
       user = await UserService.getUserById(user.id);
@@ -135,18 +136,18 @@ export class UserController {
     }
 
     // Validate request body
-    console.log('Raw request body:', req.body);
+    logger.debug('Raw request body:', req.body);
     const { error, value } = updateUserSchema.validate(req.body);
     if (error) {
-      console.log('Validation error:', error.details);
+      logger.debug('Validation error:', error.details);
       throw new GatrixError(error.details[0].message, 400);
     }
 
-    console.log('Validated value:', value);
+    logger.debug('Validated value:', value);
     const { tagIds, ...userData } = value;
     const updatedBy = req.user?.userId;
 
-    console.log('Update user request:', { userId, tagIds, userData, updatedBy });
+    logger.debug('Update user request:', { userId, tagIds, userData, updatedBy });
 
     // Prevent users from modifying their own role or status (except admins)
     if (req.user?.userId === userId && req.user?.role !== 'admin') {
@@ -159,14 +160,14 @@ export class UserController {
 
     // 태그 설정 (tagIds가 제공된 경우에만)
     if (tagIds !== undefined) {
-      console.log('Setting user tags:', { userId, tagIds, updatedBy });
+      logger.debug('Setting user tags:', { userId, tagIds, updatedBy });
       await UserTagService.setUserTags(userId, tagIds, updatedBy!);
-      console.log('User tags set successfully');
+      logger.debug('User tags set successfully');
 
       // 태그 업데이트 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
       user = await UserService.getUserById(userId);
     } else {
-      console.log('No tagIds provided, skipping tag update');
+      logger.debug('No tagIds provided, skipping tag update');
     }
 
     res.json({
@@ -392,7 +393,7 @@ export class UserController {
       });
     } catch (error) {
       // Chat Server 동기화 실패는 로그만 남기고 사용자에게는 성공 응답
-      console.error('Failed to sync user to Chat Server:', error);
+      logger.error('Failed to sync user to Chat Server:', error);
     }
 
     res.json({

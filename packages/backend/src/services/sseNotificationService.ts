@@ -166,8 +166,11 @@ export class SSENotificationService extends EventEmitter {
    * Send event to specific user
    */
   public sendToUser(userId: number, event: NotificationEvent): number {
-    let sentCount = 0;
+    if (event.excludeUsers?.includes(userId)) {
+      return 0;
+    }
 
+    let sentCount = 0;
     this.clients.forEach((client) => {
       if (client.userId === userId) {
         if (this.sendToClient(client.id, event)) {
@@ -186,6 +189,10 @@ export class SSENotificationService extends EventEmitter {
     let sentCount = 0;
 
     this.clients.forEach((client) => {
+      if (client.userId && event.excludeUsers?.includes(client.userId)) {
+        return;
+      }
+
       const hasSubscription = channels.some(channel => client.subscriptions.has(channel));
       if (hasSubscription) {
         if (this.sendToClient(client.id, event)) {
@@ -204,6 +211,10 @@ export class SSENotificationService extends EventEmitter {
     let sentCount = 0;
 
     this.clients.forEach((client) => {
+      if (client.userId && event.excludeUsers?.includes(client.userId)) {
+        return;
+      }
+
       if (this.sendToClient(client.id, event)) {
         sentCount++;
       }
@@ -393,6 +404,118 @@ export class RemoteConfigNotifications {
 
     const sentCount = this.sseService.sendNotification(event);
     logger.info(`Campaign status change notification sent to ${sentCount} clients`);
+  }
+}
+
+/**
+ * Change Request specific notification helpers
+ */
+export class ChangeRequestNotifications {
+  private static sseService = SSENotificationService.getInstance();
+
+  /**
+   * Notify all users that a change request has been submitted for review
+   */
+  static async notifySubmitted(changeRequest: {
+    id: string;
+    title: string;
+    environment: string;
+    requesterId: number;
+    requesterName?: string;
+  }): Promise<void> {
+    const event: NotificationEvent = {
+      type: 'change_request_submitted',
+      data: {
+        id: changeRequest.id,
+        title: changeRequest.title,
+        environment: changeRequest.environment,
+        requesterId: changeRequest.requesterId,
+        requesterName: changeRequest.requesterName,
+      },
+      timestamp: new Date(),
+      excludeUsers: [changeRequest.requesterId], // Don't notify the requester themselves
+    };
+
+    await pubSubService.publishNotification(event);
+    logger.info(`Change request submitted notification published via PubSub`);
+  }
+
+  /**
+   * Notify about change request approval
+   */
+  static async notifyApproved(changeRequest: {
+    id: string;
+    title: string;
+    environment: string;
+    requesterId: number;
+  }, approverName?: string, actorId?: number): Promise<void> {
+    const event: NotificationEvent = {
+      type: 'change_request_approved',
+      data: {
+        id: changeRequest.id,
+        title: changeRequest.title,
+        environment: changeRequest.environment,
+        approverName,
+      },
+      timestamp: new Date(),
+      targetUsers: [changeRequest.requesterId], // Notify the requester
+      excludeUsers: actorId ? [actorId] : undefined,
+    };
+
+    await pubSubService.publishNotification(event);
+    logger.info(`Change request approved notification published via PubSub`);
+  }
+
+  /**
+   * Notify about change request execution
+   */
+  static async notifyExecuted(changeRequest: {
+    id: string;
+    title: string;
+    environment: string;
+    requesterId: number;
+  }, executorName?: string, actorId?: number): Promise<void> {
+    const event: NotificationEvent = {
+      type: 'change_request_executed',
+      data: {
+        id: changeRequest.id,
+        title: changeRequest.title,
+        environment: changeRequest.environment,
+        executorName,
+      },
+      timestamp: new Date(),
+      excludeUsers: actorId ? [actorId] : undefined,
+    };
+
+    await pubSubService.publishNotification(event);
+    logger.info(`Change request executed notification published via PubSub`);
+  }
+
+  /**
+   * Notify about change request rejection
+   */
+  static async notifyRejected(changeRequest: {
+    id: string;
+    title: string;
+    environment: string;
+    requesterId: number;
+  }, rejectorName?: string, comment?: string, actorId?: number): Promise<void> {
+    const event: NotificationEvent = {
+      type: 'change_request_rejected',
+      data: {
+        id: changeRequest.id,
+        title: changeRequest.title,
+        environment: changeRequest.environment,
+        rejectorName,
+        comment,
+      },
+      timestamp: new Date(),
+      targetUsers: [changeRequest.requesterId], // Notify the requester
+      excludeUsers: actorId ? [actorId] : undefined,
+    };
+
+    await pubSubService.publishNotification(event);
+    logger.info(`Change request rejected notification published via PubSub`);
   }
 }
 

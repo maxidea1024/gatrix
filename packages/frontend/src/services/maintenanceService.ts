@@ -1,4 +1,5 @@
 import { apiService } from './api';
+import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
 
 export type MaintenanceType = 'regular' | 'emergency';
 
@@ -28,8 +29,9 @@ export const maintenanceService = {
     );
     return res.data as any;
   },
-  async setStatus(payload: { isMaintenance: boolean; type?: MaintenanceType; startsAt?: string | null; endsAt?: string | null; kickExistingPlayers?: boolean; kickDelayMinutes?: number; message?: string; messages?: MaintenanceDetail['messages'] }) {
-    return apiService.post(`/admin/maintenance`, payload);
+  async setStatus(payload: { isMaintenance: boolean; type?: MaintenanceType; startsAt?: string | null; endsAt?: string | null; kickExistingPlayers?: boolean; kickDelayMinutes?: number; message?: string; messages?: MaintenanceDetail['messages'] }): Promise<MutationResult<void>> {
+    const response = await apiService.post(`/admin/maintenance`, payload);
+    return parseChangeRequestResponse<void>(response, () => undefined);
   },
   async getTemplates(): Promise<{ templates: Array<{ message?: string; messages?: MaintenanceDetail['messages'] }> }> {
     const res = await apiService.get<{ templates: Array<{ message?: string; messages?: MaintenanceDetail['messages'] }> }>(`/admin/maintenance/templates`);

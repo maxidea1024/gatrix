@@ -1,11 +1,19 @@
 import { api } from './api';
-import { 
-  GameWorld, 
-  CreateGameWorldData, 
-  UpdateGameWorldData, 
+import axios from 'axios';
+import {
+  GameWorld,
+  CreateGameWorldData,
+  UpdateGameWorldData,
   GameWorldListParams,
-  GameWorldListResult 
+  GameWorldListResult
 } from '../types/gameWorld';
+
+// Extended response type to indicate if change request was created
+export interface GameWorldMutationResult {
+  world?: GameWorld;
+  isChangeRequest: boolean;
+  changeRequestId?: string;
+}
 
 export const gameWorldService = {
   // Get list of game worlds
@@ -49,7 +57,7 @@ export const gameWorldService = {
   },
 
   // Create new game world
-  async createGameWorld(data: CreateGameWorldData): Promise<GameWorld> {
+  async createGameWorld(data: CreateGameWorldData): Promise<GameWorldMutationResult> {
     // Ensure boolean fields are actually boolean, not numbers
     const sanitizedData = {
       ...data,
@@ -57,12 +65,27 @@ export const gameWorldService = {
       ...(data.isMaintenance !== undefined && { isMaintenance: Boolean(data.isMaintenance) }),
       ...(data.supportsMultiLanguage !== undefined && { supportsMultiLanguage: Boolean(data.supportsMultiLanguage) }),
     };
-    const response = await api.post('/admin/game-worlds', sanitizedData);
-    return response.data?.data?.world || response.data?.world;
+    const response: any = await api.post('/admin/game-worlds', sanitizedData);
+
+    // Check if this is a change request response
+    // api.post returns response.data, so we check for changeRequestId in data property
+    const responseData = response.data || response;
+    if (responseData?.changeRequestId) {
+      return {
+        world: undefined,
+        isChangeRequest: true,
+        changeRequestId: responseData.changeRequestId,
+      };
+    }
+
+    return {
+      world: responseData?.world || responseData?.data?.world,
+      isChangeRequest: false,
+    };
   },
 
   // Update game world
-  async updateGameWorld(id: number, data: UpdateGameWorldData): Promise<GameWorld> {
+  async updateGameWorld(id: number, data: UpdateGameWorldData): Promise<GameWorldMutationResult> {
     // Ensure boolean fields are actually boolean, not numbers
     const sanitizedData = {
       ...data,
@@ -70,8 +93,23 @@ export const gameWorldService = {
       ...(data.isMaintenance !== undefined && { isMaintenance: Boolean(data.isMaintenance) }),
       ...(data.supportsMultiLanguage !== undefined && { supportsMultiLanguage: Boolean(data.supportsMultiLanguage) }),
     };
-    const response = await api.put(`/admin/game-worlds/${id}`, sanitizedData);
-    return response.data?.data?.world || response.data?.world;
+    const response: any = await api.put(`/admin/game-worlds/${id}`, sanitizedData);
+
+    // Check if this is a change request response
+    // api.put returns response.data, so we check for changeRequestId in data property
+    const responseData = response.data || response;
+    if (responseData?.changeRequestId) {
+      return {
+        world: undefined,
+        isChangeRequest: true,
+        changeRequestId: responseData.changeRequestId,
+      };
+    }
+
+    return {
+      world: responseData?.world || responseData?.data?.world,
+      isChangeRequest: false,
+    };
   },
 
   // Delete game world

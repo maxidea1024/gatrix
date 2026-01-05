@@ -242,11 +242,19 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
       };
 
       if (notice) {
-        await ingamePopupNoticeService.updateIngamePopupNotice(notice.id, data);
-        enqueueSnackbar(t('ingamePopupNotices.updateSuccess'), { variant: 'success' });
+        const result = await ingamePopupNoticeService.updateIngamePopupNotice(notice.id, data);
+        if (result.isChangeRequest) {
+          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+        } else {
+          enqueueSnackbar(t('ingamePopupNotices.updateSuccess'), { variant: 'success' });
+        }
       } else {
-        await ingamePopupNoticeService.createIngamePopupNotice(data as CreateIngamePopupNoticeData);
-        enqueueSnackbar(t('ingamePopupNotices.createSuccess'), { variant: 'success' });
+        const result = await ingamePopupNoticeService.createIngamePopupNotice(data as CreateIngamePopupNoticeData);
+        if (result.isChangeRequest) {
+          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+        } else {
+          enqueueSnackbar(t('ingamePopupNotices.createSuccess'), { variant: 'success' });
+        }
       }
 
       onSuccess();

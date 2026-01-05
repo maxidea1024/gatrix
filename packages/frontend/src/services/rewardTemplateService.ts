@@ -1,5 +1,6 @@
 import api from './api';
 import { Tag } from './tagService';
+import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
 
 export interface ParticipationReward {
   rewardType: string;
@@ -70,26 +71,25 @@ class RewardTemplateService {
   /**
    * Create a new reward template
    */
-  async createRewardTemplate(input: CreateRewardTemplateInput): Promise<RewardTemplate> {
+  async createRewardTemplate(input: CreateRewardTemplateInput): Promise<MutationResult<RewardTemplate>> {
     const response = await api.post('/admin/reward-templates', input);
-    // API service already unwraps response.data, so response = { success: true, data: { template }, message: "..." }
-    return response.data.template;
+    return parseChangeRequestResponse<RewardTemplate>(response, (r) => r?.template);
   }
 
   /**
    * Update a reward template
    */
-  async updateRewardTemplate(id: string, input: UpdateRewardTemplateInput): Promise<RewardTemplate> {
+  async updateRewardTemplate(id: string, input: UpdateRewardTemplateInput): Promise<MutationResult<RewardTemplate>> {
     const response = await api.put(`/admin/reward-templates/${id}`, input);
-    // API service already unwraps response.data, so response = { success: true, data: { template }, message: "..." }
-    return response.data.template;
+    return parseChangeRequestResponse<RewardTemplate>(response, (r) => r?.template);
   }
 
   /**
    * Delete a reward template
    */
-  async deleteRewardTemplate(id: string): Promise<void> {
-    await api.delete(`/admin/reward-templates/${id}`);
+  async deleteRewardTemplate(id: string): Promise<MutationResult<void>> {
+    const response = await api.delete(`/admin/reward-templates/${id}`);
+    return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
   /**

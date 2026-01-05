@@ -3,6 +3,8 @@ import Joi from 'joi';
 import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../types/auth';
 import { CouponSettingsService } from '../services/CouponSettingsService';
+import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
+import logger from '../config/logger';
 
 // Validation schemas
 const createSchema = Joi.object({
@@ -109,8 +111,25 @@ export class CouponSettingsController {
     }
 
     const authenticatedUserId = req.user?.userId;
-    const setting = await CouponSettingsService.createSetting({ ...value, createdBy: authenticatedUserId ?? null }, environment);
-    res.status(201).json({ success: true, data: { setting } });
+    if (!authenticatedUserId) throw new GatrixError('User authentication required', 401);
+
+    const result = await UnifiedChangeGateway.requestCreation(
+      authenticatedUserId,
+      environment,
+      'g_coupon_settings',
+      { ...value },
+      async () => {
+        return CouponSettingsService.createSetting({ ...value, createdBy: authenticatedUserId }, environment);
+      }
+    );
+
+    res.status(result.mode === 'CHANGE_REQUEST' ? 202 : 201).json({
+      success: true,
+      data: result.mode === 'CHANGE_REQUEST' ? { changeRequestId: result.changeRequestId } : { setting: result.data },
+      message: result.mode === 'CHANGE_REQUEST'
+        ? 'Coupon creation requested'
+        : 'Coupon created successfully',
+    });
   });
 
   static update = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -123,8 +142,29 @@ export class CouponSettingsController {
     if (error) throw new GatrixError(error.message, 400);
 
     const authenticatedUserId = req.user?.userId;
-    const setting = await CouponSettingsService.updateSetting(id, { ...value, updatedBy: authenticatedUserId ?? null }, environment);
-    res.json({ success: true, data: { setting } });
+    if (!authenticatedUserId) throw new GatrixError('User authentication required', 401);
+
+    const result = await UnifiedChangeGateway.processChange(
+      authenticatedUserId,
+      environment,
+      'g_coupon_settings',
+      id,
+      { ...value },
+      async (processedData: any) => {
+        const setting = await CouponSettingsService.updateSetting(id, { ...processedData, updatedBy: authenticatedUserId }, environment);
+        return { setting };
+      }
+    );
+
+    if (result.mode === 'DIRECT') {
+      res.json({ success: true, data: result.data, message: 'Coupon updated successfully' });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: { changeRequestId: result.changeRequestId },
+        message: 'Coupon update requested',
+      });
+    }
   });
 
   static remove = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -133,8 +173,26 @@ export class CouponSettingsController {
     if (!id) throw new GatrixError('id is required', 400);
     if (!environment) throw new GatrixError('Environment is required', 400);
 
-    await CouponSettingsService.deleteSetting(id, environment);
-    res.json({ success: true });
+    const authenticatedUserId = req.user?.userId;
+    if (!authenticatedUserId) throw new GatrixError('User authentication required', 401);
+
+    const result = await UnifiedChangeGateway.requestDeletion(
+      authenticatedUserId,
+      environment,
+      'g_coupon_settings',
+      id,
+      async () => {
+        await CouponSettingsService.deleteSetting(id, environment);
+      }
+    );
+
+    res.status(result.mode === 'CHANGE_REQUEST' ? 202 : 200).json({
+      success: true,
+      data: result.mode === 'CHANGE_REQUEST' ? { changeRequestId: result.changeRequestId } : null,
+      message: result.mode === 'CHANGE_REQUEST'
+        ? 'Coupon deletion requested'
+        : 'Coupon deleted successfully',
+    });
   });
 
   static usage = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {

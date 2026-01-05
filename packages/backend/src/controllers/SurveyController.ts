@@ -8,6 +8,8 @@ import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
 import RewardTemplateService from '../services/RewardTemplateService';
 import { EnvironmentRequest } from '../middleware/environmentResolver';
+import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
+import logger from '../config/logger';
 
 interface ServerReward {
   type: number;
@@ -139,21 +141,32 @@ export class SurveyController {
       environment,
     };
 
-    const survey = await SurveyService.createSurvey(surveyData);
+    const result = await UnifiedChangeGateway.requestCreation(
+      authenticatedUserId,
+      environment,
+      'g_surveys',
+      { ...req.body },
+      async () => {
+        const survey = await SurveyService.createSurvey(surveyData);
 
-    // Publish event for SDK real-time updates
-    await pubSubService.publishNotification({
-      type: 'survey.created',
-      data: { survey },
-      targetChannels: ['survey', 'admin'],
-    });
+        // Publish event for SDK real-time updates
+        await pubSubService.publishNotification({
+          type: 'survey.created',
+          data: { survey },
+          targetChannels: ['survey', 'admin'],
+        });
 
-    await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environment}`);
+        return survey;
+      }
+    );
 
-    res.status(201).json({
+    res.status(result.mode === 'CHANGE_REQUEST' ? 202 : 201).json({
       success: true,
-      data: { survey },
-      message: 'Survey created successfully',
+      data: result.mode === 'CHANGE_REQUEST' ? { changeRequestId: result.changeRequestId } : { survey: result.data },
+      message: result.mode === 'CHANGE_REQUEST'
+        ? 'Survey creation requested'
+        : 'Survey created successfully',
     });
   });
 
@@ -178,22 +191,41 @@ export class SurveyController {
       updatedBy: authenticatedUserId,
     };
 
-    const survey = await SurveyService.updateSurvey(id, updateData, environment);
+    const result = await UnifiedChangeGateway.processChange(
+      authenticatedUserId,
+      environment,
+      'g_surveys',
+      id,
+      { ...req.body },
+      async (processedData: any) => {
+        const survey = await SurveyService.updateSurvey(id, { ...processedData, updatedBy: authenticatedUserId }, environment);
 
-    // Publish event for SDK real-time updates
-    await pubSubService.publishNotification({
-      type: 'survey.updated',
-      data: { survey },
-      targetChannels: ['survey', 'admin'],
-    });
+        // Publish event for SDK real-time updates
+        await pubSubService.publishNotification({
+          type: 'survey.updated',
+          data: { survey },
+          targetChannels: ['survey', 'admin'],
+        });
 
-    await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environment}`);
 
-    res.json({
-      success: true,
-      data: { survey },
-      message: 'Survey updated successfully',
-    });
+        return { survey };
+      }
+    );
+
+    if (result.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        data: result.data,
+        message: 'Survey updated successfully',
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: { changeRequestId: result.changeRequestId },
+        message: 'Survey update requested',
+      });
+    }
   });
 
   /**
@@ -203,28 +235,37 @@ export class SurveyController {
   static deleteSurvey = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
     const environment = req.environment;
+    const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
+    if (!authenticatedUserId) throw new GatrixError('User authentication required', 401);
 
-    if (!id) {
-      throw new GatrixError('Survey ID is required', 400);
-    }
-    if (!environment) {
-      throw new GatrixError('Environment not specified', 400);
-    }
+    if (!id) throw new GatrixError('Survey ID is required', 400);
+    if (!environment) throw new GatrixError('Environment is required', 400);
 
-    await SurveyService.deleteSurvey(id, environment);
+    const result = await UnifiedChangeGateway.requestDeletion(
+      authenticatedUserId,
+      environment,
+      'g_surveys',
+      id,
+      async () => {
+        await SurveyService.deleteSurvey(id, environment);
 
-    // Publish event for SDK real-time updates
-    await pubSubService.publishNotification({
-      type: 'survey.deleted',
-      data: { surveyId: id },
-      targetChannels: ['survey', 'admin'],
-    });
+        // Publish event for SDK real-time updates
+        await pubSubService.publishNotification({
+          type: 'survey.deleted',
+          data: { surveyId: id },
+          targetChannels: ['survey', 'admin'],
+        });
 
-    await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environment}`);
+      }
+    );
 
-    res.json({
+    res.status(result.mode === 'CHANGE_REQUEST' ? 202 : 200).json({
       success: true,
-      message: 'Survey deleted successfully',
+      data: result.mode === 'CHANGE_REQUEST' ? { changeRequestId: result.changeRequestId } : null,
+      message: result.mode === 'CHANGE_REQUEST'
+        ? 'Survey deletion requested'
+        : 'Survey deleted successfully',
     });
   });
 
@@ -244,19 +285,38 @@ export class SurveyController {
       throw new GatrixError('Environment not specified', 400);
     }
 
-    const currentSurvey = await SurveyService.getSurveyById(id, environment);
-    const survey = await SurveyService.updateSurvey(id, {
-      isActive: !currentSurvey.isActive,
-      updatedBy: authenticatedUserId,
-    }, environment);
+    const result = await UnifiedChangeGateway.processChange(
+      authenticatedUserId,
+      environment,
+      'g_surveys',
+      id,
+      async (currentSurvey: any) => {
+        return { isActive: !currentSurvey.isActive };
+      },
+      async (processedData: any) => {
+        const survey = await SurveyService.updateSurvey(id, {
+          isActive: (processedData as any).isActive,
+          updatedBy: authenticatedUserId,
+        }, environment);
 
-    await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environment}`);
+        return { survey };
+      }
+    );
 
-    res.json({
-      success: true,
-      data: { survey },
-      message: `Survey ${survey.isActive ? 'activated' : 'deactivated'} successfully`,
-    });
+    if (result.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        data: result.data,
+        message: `Survey status toggled successfully`,
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: { changeRequestId: result.changeRequestId },
+        message: 'Survey status change requested',
+      });
+    }
   });
 
   /**

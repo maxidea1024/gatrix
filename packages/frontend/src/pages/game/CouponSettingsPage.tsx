@@ -768,23 +768,31 @@ const CouponSettingsPage: React.FC = () => {
 
     try {
       if (editing) {
-        await couponService.updateSetting(editing.id, payload);
+        const result = await couponService.updateSetting(editing.id, payload);
         setOpenForm(false);
         resetForm();
-        enqueueSnackbar(t('common.saveSuccess') as string, { variant: 'success' });
+        if (result.isChangeRequest) {
+          enqueueSnackbar(t('changeRequests.createdForReview') as string, { variant: 'info' });
+        } else {
+          enqueueSnackbar(t('common.saveSuccess') as string, { variant: 'success' });
+        }
         await load();
       } else {
         // For create: close form immediately and load in background
-        await couponService.createSetting(payload);
+        const result = await couponService.createSetting(payload);
         setOpenForm(false);
         resetForm();
 
-        // Show success message
-        const isLargeQuantity = payload.type === 'NORMAL' && (payload.quantity || 1) >= 10000;
-        if (isLargeQuantity) {
-          enqueueSnackbar(t('coupons.couponSettings.generatingInBackground') as string, { variant: 'info' });
+        if (result.isChangeRequest) {
+          enqueueSnackbar(t('changeRequests.createdForReview') as string, { variant: 'info' });
         } else {
-          enqueueSnackbar(t('common.saveSuccess') as string, { variant: 'success' });
+          // Show success message
+          const isLargeQuantity = payload.type === 'NORMAL' && (payload.quantity || 1) >= 10000;
+          if (isLargeQuantity) {
+            enqueueSnackbar(t('coupons.couponSettings.generatingInBackground') as string, { variant: 'info' });
+          } else {
+            enqueueSnackbar(t('common.saveSuccess') as string, { variant: 'success' });
+          }
         }
 
         // Load list in background (don't await)

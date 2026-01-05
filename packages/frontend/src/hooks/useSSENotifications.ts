@@ -49,7 +49,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
   const onDisconnectRef = useRef<typeof onDisconnect>();
   const onErrorRef = useRef<typeof onError>();
   const onEventRef = useRef<typeof onEvent>();
-  const connectRef = useRef<() => void>(() => {});
+  const connectRef = useRef<() => void>(() => { });
   const isConnectingRef = useRef(false);
 
   useEffect(() => {
@@ -274,6 +274,26 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
       case 'user_suspended':
         // Dispatch custom event for immediate redirect to suspended page
         window.dispatchEvent(new CustomEvent('user-suspended', { detail: event.data }));
+        break;
+
+      case 'change_request_submitted':
+        // Dispatch custom event for CR notification
+        window.dispatchEvent(new CustomEvent('change-request-notification', { detail: { ...event.data, action: 'submitted' } }));
+        break;
+
+      case 'change_request_approved':
+        // Dispatch custom event for CR notification
+        window.dispatchEvent(new CustomEvent('change-request-notification', { detail: { ...event.data, action: 'approved' } }));
+        break;
+
+      case 'change_request_rejected':
+        // Dispatch custom event for CR notification
+        window.dispatchEvent(new CustomEvent('change-request-notification', { detail: { ...event.data, action: 'rejected' } }));
+        break;
+
+      case 'change_request_executed':
+        // Dispatch custom event for CR notification
+        window.dispatchEvent(new CustomEvent('change-request-notification', { detail: { ...event.data, action: 'executed' } }));
         break;
 
       default:

@@ -1,6 +1,5 @@
 import { ClientVersionModel, ClientVersionAttributes, ClientVersionCreationAttributes, ClientStatus } from '../models/ClientVersion';
 import { pubSubService } from './PubSubService';
-import { Environment } from '../models/Environment';
 import logger from '../config/logger';
 import { applyMaintenanceStatusCalculationToArray, applyMaintenanceStatusCalculation } from '../utils/maintenanceUtils';
 import { SERVER_SDK_ETAG } from '../constants/cacheKeys';

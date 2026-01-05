@@ -3,6 +3,8 @@ import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import StoreProductService from '../services/StoreProductService';
 import { TagService } from '../services/TagService';
+import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
+import logger from '../config/logger';
 
 export class StoreProductController {
   /**
@@ -108,33 +110,53 @@ export class StoreProductController {
       throw new GatrixError('Valid price is required', 400);
     }
 
-    const product = await StoreProductService.createStoreProduct({
-      productId: productId.trim(),
-      productName: productName.trim(),
-      store: store.trim(),
-      price,
-      currency: currency?.trim() || 'USD',
-      isActive: isActive !== undefined ? isActive : true,
-      saleStartAt: saleStartAt ? new Date(saleStartAt) : null,
-      saleEndAt: saleEndAt ? new Date(saleEndAt) : null,
-      description: description?.trim() || null,
-      metadata: metadata || null,
-      createdBy: userId,
+    const result = await UnifiedChangeGateway.requestCreation(
+      userId,
       environment,
-    });
+      'g_store_products',
+      {
+        productId: productId.trim(),
+        productName: productName.trim(),
+        store: store.trim(),
+        price,
+        currency: currency?.trim() || 'USD',
+        isActive: isActive !== undefined ? isActive : true,
+        saleStartAt: saleStartAt ? new Date(saleStartAt) : null,
+        saleEndAt: saleEndAt ? new Date(saleEndAt) : null,
+        description: description?.trim() || null,
+        metadata: metadata || null,
+      },
+      async () => {
+        const product = await StoreProductService.createStoreProduct({
+          productId: productId.trim(),
+          productName: productName.trim(),
+          store: store.trim(),
+          price,
+          currency: currency?.trim() || 'USD',
+          isActive: isActive !== undefined ? isActive : true,
+          saleStartAt: saleStartAt ? new Date(saleStartAt) : null,
+          saleEndAt: saleEndAt ? new Date(saleEndAt) : null,
+          description: description?.trim() || null,
+          metadata: metadata || null,
+          createdBy: userId,
+          environment,
+        });
 
-    // Set tags for the product
-    if (Array.isArray(tagIds) && tagIds.length > 0) {
-      await TagService.setTagsForEntity('store_product', product.id, tagIds.map(Number), userId);
-    }
+        // Set tags for the product
+        if (Array.isArray(tagIds) && tagIds.length > 0) {
+          await TagService.setTagsForEntity('store_product', product.id, tagIds.map(Number), userId);
+        }
 
-    // Load tags for response
-    const tags = await TagService.listTagsForEntity('store_product', product.id);
+        return product;
+      }
+    );
 
-    res.status(201).json({
+    res.status(result.mode === 'CHANGE_REQUEST' ? 202 : 201).json({
       success: true,
-      data: { product: { ...product, tags } },
-      message: 'Store product created successfully',
+      data: result.data ? { product: result.data } : { changeRequestId: result.changeRequestId },
+      message: result.mode === 'CHANGE_REQUEST'
+        ? 'Store product creation requested'
+        : 'Store product created successfully',
     });
   });
 
@@ -159,33 +181,51 @@ export class StoreProductController {
 
     const { productId, productName, store, price, currency, isActive, saleStartAt, saleEndAt, description, metadata, tagIds } = req.body;
 
-    const product = await StoreProductService.updateStoreProduct(id, {
-      productId: productId?.trim(),
-      productName: productName?.trim(),
-      store: store?.trim(),
-      price,
-      currency: currency?.trim(),
-      isActive,
-      saleStartAt: saleStartAt !== undefined ? (saleStartAt ? new Date(saleStartAt) : null) : undefined,
-      saleEndAt: saleEndAt !== undefined ? (saleEndAt ? new Date(saleEndAt) : null) : undefined,
-      description: description !== undefined ? (description?.trim() || null) : undefined,
-      metadata,
-      updatedBy: userId,
-    }, environment);
+    const result = await UnifiedChangeGateway.processChange(
+      userId,
+      environment,
+      'g_store_products',
+      id,
+      {
+        productId: productId?.trim(),
+        productName: productName?.trim(),
+        store: store?.trim(),
+        price,
+        currency: currency?.trim(),
+        isActive,
+        saleStartAt: saleStartAt !== undefined ? (saleStartAt ? new Date(saleStartAt) : null) : undefined,
+        saleEndAt: saleEndAt !== undefined ? (saleEndAt ? new Date(saleEndAt) : null) : undefined,
+        description: description !== undefined ? (description?.trim() || null) : undefined,
+        metadata,
+      },
+      async (processedData: any) => {
+        const product = await StoreProductService.updateStoreProduct(id, {
+          ...processedData,
+          updatedBy: userId,
+        }, environment);
 
-    // Set tags for the product
-    if (Array.isArray(tagIds)) {
-      await TagService.setTagsForEntity('store_product', product.id, tagIds.map(Number), userId);
+        // Set tags for the product
+        if (Array.isArray(tagIds)) {
+          await TagService.setTagsForEntity('store_product', product.id, tagIds.map(Number), userId);
+        }
+
+        return { product };
+      }
+    );
+
+    if (result.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        data: result.data,
+        message: 'Store product updated successfully',
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: { changeRequestId: result.changeRequestId },
+        message: 'Store product update requested',
+      });
     }
-
-    // Load tags for response
-    const tags = await TagService.listTagsForEntity('store_product', product.id);
-
-    res.json({
-      success: true,
-      data: { product: { ...product, tags } },
-      message: 'Store product updated successfully',
-    });
   });
 
   /**
@@ -194,20 +234,35 @@ export class StoreProductController {
    */
   static deleteStoreProduct = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
+    const userId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
     const environment = req.environment;
 
     if (!id) {
       throw new GatrixError('Store product ID is required', 400);
     }
+    if (!userId) {
+      throw new GatrixError('User authentication required', 401);
+    }
     if (!environment) {
       throw new GatrixError('Environment not specified', 400);
     }
 
-    await StoreProductService.deleteStoreProduct(id, environment);
+    const result = await UnifiedChangeGateway.requestDeletion(
+      userId,
+      environment,
+      'g_store_products',
+      id,
+      async () => {
+        await StoreProductService.deleteStoreProduct(id, environment);
+      }
+    );
 
-    res.json({
+    res.status(result.mode === 'CHANGE_REQUEST' ? 202 : 200).json({
       success: true,
-      message: 'Store product deleted successfully',
+      data: result.mode === 'CHANGE_REQUEST' ? { changeRequestId: result.changeRequestId } : null,
+      message: result.mode === 'CHANGE_REQUEST'
+        ? 'Store product deletion requested'
+        : 'Store product deleted successfully',
     });
   });
 
@@ -255,13 +310,31 @@ export class StoreProductController {
       throw new GatrixError('Environment not specified', 400);
     }
 
-    const product = await StoreProductService.toggleActive(id, isActive, userId, environment);
+    const result = await UnifiedChangeGateway.processChange(
+      userId,
+      environment,
+      'g_store_products',
+      id,
+      { isActive },
+      async (processedData: any) => {
+        const product = await StoreProductService.toggleActive(id, (processedData as any).isActive, userId, environment);
+        return { product };
+      }
+    );
 
-    res.json({
-      success: true,
-      data: { product },
-      message: `Store product ${isActive ? 'activated' : 'deactivated'} successfully`,
-    });
+    if (result.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        data: result.data,
+        message: `Store product ${isActive ? 'activated' : 'deactivated'} successfully`,
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: { changeRequestId: result.changeRequestId },
+        message: 'Store product status change requested',
+      });
+    }
   });
 
   /**
@@ -279,16 +352,44 @@ export class StoreProductController {
     if (isActive === undefined) {
       throw new GatrixError('isActive value is required', 400);
     }
+    if (!userId) {
+      throw new GatrixError('User authentication required', 401);
+    }
     if (!environment) {
       throw new GatrixError('Environment not specified', 400);
     }
 
-    const affectedCount = await StoreProductService.bulkUpdateActiveStatus(ids, isActive, userId, environment);
+    const results = [];
+    for (const id of ids) {
+      const gatewayResult = await UnifiedChangeGateway.processChange(
+        userId,
+        environment,
+        'g_store_products',
+        String(id),
+        { isActive },
+        async (processedData: any) => {
+          const product = await StoreProductService.toggleActive(id, (processedData as any).isActive, userId, environment);
+          return product;
+        }
+      );
 
-    res.json({
+      results.push({
+        id,
+        mode: gatewayResult.mode,
+        changeRequestId: gatewayResult.changeRequestId,
+        data: gatewayResult.data
+      });
+    }
+
+    const hasCR = results.some(r => r.mode === 'CHANGE_REQUEST');
+    const lastCRId = results.find(r => r.changeRequestId)?.changeRequestId;
+
+    res.status(hasCR ? 202 : 200).json({
       success: true,
-      data: { affectedCount },
-      message: `${affectedCount} products ${isActive ? 'activated' : 'deactivated'} successfully`,
+      data: hasCR ? { changeRequestId: lastCRId } : { results },
+      message: hasCR
+        ? `Bulk update requested. ${results.filter(r => r.mode === 'CHANGE_REQUEST').length} items require approval.`
+        : 'All store products updated successfully',
     });
   });
 

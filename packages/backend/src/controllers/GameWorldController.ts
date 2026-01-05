@@ -7,6 +7,7 @@ import { asyncHandler } from '../utils/asyncHandler';
 import logger from '../config/logger';
 import Joi from 'joi';
 import { pubSubService } from '../services/PubSubService';
+import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
 
 // Allow full URLs (scheme://host[:port][...]) or host[:port] without scheme
 // Examples: https://world.example.com, world.example.com:8080, world.example.com, 192.168.1.100:8080, 192.168.1.100
@@ -258,24 +259,49 @@ export class GameWorldController {
       createdBy: authenticatedUserId,
     };
 
-    const world = await GameWorldService.createGameWorld(worldData, environment);
-    if (Array.isArray(tagIds)) {
-      await TagService.setTagsForEntity('game_world', world.id, tagIds, authenticatedUserId);
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.requestCreation(
+      authenticatedUserId,
+      environment,
+      'g_game_worlds',
+      { ...worldData, environment, tagIds },
+      async () => {
+        // Direct creation function - executed when CR is not required
+        const world = await GameWorldService.createGameWorld(worldData, environment);
+        if (Array.isArray(tagIds)) {
+          await TagService.setTagsForEntity('game_world', world.id, tagIds, authenticatedUserId);
+        }
+        const tags = await TagService.listTagsForEntity('game_world', world.id);
+
+        // Publish event for SDK real-time updates
+        await pubSubService.publishNotification({
+          type: 'gameworld.created',
+          data: { world: { ...world, tags } },
+          targetChannels: ['gameworld', 'admin'],
+        });
+
+        return { ...world, tags };
+      }
+    );
+
+    // Handle response based on gateway result
+    if (gatewayResult.mode === 'DIRECT') {
+      res.status(201).json({
+        success: true,
+        data: { world: gatewayResult.data },
+        message: 'Game world created successfully',
+      });
+    } else {
+      // Change Request created
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. The game world will be created after approval.',
+      });
     }
-    const tags = await TagService.listTagsForEntity('game_world', world.id);
-
-    // Publish event for SDK real-time updates
-    await pubSubService.publishNotification({
-      type: 'gameworld.created',
-      data: { world: { ...world, tags } },
-      targetChannels: ['gameworld', 'admin'],
-    });
-
-    res.status(201).json({
-      success: true,
-      data: { world: { ...world, tags } },
-      message: 'Game world created successfully',
-    });
   });
 
   static updateGameWorld = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -319,29 +345,59 @@ export class GameWorldController {
 
     // Add updatedBy from authenticated user session
     const authenticatedUserId = req.user?.userId;
+    if (!authenticatedUserId) {
+      throw new GatrixError('User authentication required', 401);
+    }
+
     const updateData = {
       ...updateValue,
       updatedBy: authenticatedUserId
     };
 
-    const world = await GameWorldService.updateGameWorld(id, updateData, environment);
-    if (Array.isArray(tagIds)) {
-      await TagService.setTagsForEntity('game_world', id, tagIds, authenticatedUserId);
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.processChange(
+      authenticatedUserId,
+      environment,
+      'g_game_worlds',
+      String(id),
+      { ...updateData, tagIds },
+      async (processedData) => {
+        const { tagIds: processedTagIds, ...processedWorldData } = processedData as any;
+        const world = await GameWorldService.updateGameWorld(id, processedWorldData, environment);
+        if (Array.isArray(processedTagIds)) {
+          await TagService.setTagsForEntity('game_world', id, processedTagIds, authenticatedUserId);
+        }
+        const tags = await TagService.listTagsForEntity('game_world', id);
+
+        // Publish event for SDK real-time updates
+        await pubSubService.publishNotification({
+          type: 'gameworld.updated',
+          data: { world: { ...world, tags } },
+          targetChannels: ['gameworld', 'admin'],
+        });
+
+        return { world: { ...world, tags } };
+      }
+    );
+
+    // Handle response based on gateway result
+    if (gatewayResult.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        data: gatewayResult.data,
+        message: 'Game world updated successfully',
+      });
+    } else {
+      // Change Request created
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. The update will be applied after approval.',
+      });
     }
-    const tags = await TagService.listTagsForEntity('game_world', id);
-
-    // Publish event for SDK real-time updates
-    await pubSubService.publishNotification({
-      type: 'gameworld.updated',
-      data: { world: { ...world, tags } },
-      targetChannels: ['gameworld', 'admin'],
-    });
-
-    res.json({
-      success: true,
-      data: { world: { ...world, tags } },
-      message: 'Game world updated successfully',
-    });
   });
 
   static deleteGameWorld = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -356,19 +412,46 @@ export class GameWorldController {
       throw new GatrixError('Environment is required', 400);
     }
 
-    await GameWorldService.deleteGameWorld(id, environment);
+    const authenticatedUserId = req.user?.userId;
+    if (!authenticatedUserId) {
+      throw new GatrixError('User authentication required', 401);
+    }
 
-    // Publish event for SDK real-time updates
-    await pubSubService.publishNotification({
-      type: 'gameworld.deleted',
-      data: { worldId: id },
-      targetChannels: ['gameworld', 'admin'],
-    });
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.requestDeletion(
+      authenticatedUserId,
+      environment,
+      'g_game_worlds',
+      String(id),
+      async () => {
+        await GameWorldService.deleteGameWorld(id, environment);
 
-    res.json({
-      success: true,
-      message: 'Game world deleted successfully',
-    });
+        // Publish event for SDK real-time updates
+        await pubSubService.publishNotification({
+          type: 'gameworld.deleted',
+          data: { worldId: id },
+          targetChannels: ['gameworld', 'admin'],
+        });
+      }
+    );
+
+    // Handle response based on gateway result
+    if (gatewayResult.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        message: 'Game world deleted successfully',
+      });
+    } else {
+      // Change Request created
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. The deletion will be applied after approval.',
+      });
+    }
   });
 
   static toggleVisibility = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -384,13 +467,51 @@ export class GameWorldController {
       throw new GatrixError('Environment is required', 400);
     }
 
-    const world = await GameWorldService.toggleVisibility(id, environment);
+    const authenticatedUserId = req.user?.userId;
+    if (!authenticatedUserId) {
+      throw new GatrixError('User authentication required', 401);
+    }
 
-    res.json({
-      success: true,
-      data: { world },
-      message: 'Game world visibility toggled successfully',
-    });
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.processChange(
+      authenticatedUserId,
+      environment,
+      'g_game_worlds',
+      String(id),
+      async (currentData: any) => {
+        return { isVisible: !currentData.isVisible };
+      },
+      async (processedData: any) => {
+        const world = await GameWorldService.updateGameWorld(id, processedData as any, environment);
+        const tags = await TagService.listTagsForEntity('game_world', id);
+
+        // Publish event for SDK real-time updates
+        await pubSubService.publishNotification({
+          type: 'gameworld.updated',
+          data: { world: { ...world, tags } },
+          targetChannels: ['gameworld', 'admin'],
+        });
+
+        return { world: { ...world, tags } };
+      }
+    );
+
+    if (gatewayResult.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        data: gatewayResult.data,
+        message: 'Game world visibility toggled successfully',
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. Visibility change will be applied after approval.',
+      });
+    }
   });
 
   static toggleMaintenance = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -405,13 +526,51 @@ export class GameWorldController {
       throw new GatrixError('Environment is required', 400);
     }
 
-    const world = await GameWorldService.toggleMaintenance(id, environment);
+    const authenticatedUserId = req.user?.userId;
+    if (!authenticatedUserId) {
+      throw new GatrixError('User authentication required', 401);
+    }
 
-    res.json({
-      success: true,
-      data: { world },
-      message: 'Game world maintenance status toggled successfully',
-    });
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.processChange(
+      authenticatedUserId,
+      environment,
+      'g_game_worlds',
+      String(id),
+      async (currentData: any) => {
+        return { isMaintenance: !currentData.isMaintenance };
+      },
+      async (processedData: any) => {
+        const world = await GameWorldService.updateGameWorld(id, processedData as any, environment);
+        const tags = await TagService.listTagsForEntity('game_world', id);
+
+        // Publish event for SDK real-time updates
+        await pubSubService.publishNotification({
+          type: 'gameworld.updated',
+          data: { world: { ...world, tags } },
+          targetChannels: ['gameworld', 'admin'],
+        });
+
+        return { world: { ...world, tags } };
+      }
+    );
+
+    if (gatewayResult.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        data: gatewayResult.data,
+        message: 'Game world maintenance status toggled successfully',
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. Maintenance status change will be applied after approval.',
+      });
+    }
   });
 
   static updateMaintenance = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -476,18 +635,52 @@ export class GameWorldController {
 
     // Add updatedBy from authenticated user session
     const authenticatedUserId = req.user?.userId;
+    if (!authenticatedUserId) {
+      throw new GatrixError('User authentication required', 401);
+    }
+
     const updateData = {
       ...value,
       updatedBy: authenticatedUserId
     };
 
-    const world = await GameWorldService.updateGameWorld(id, updateData, environment);
+    const gatewayResult = await UnifiedChangeGateway.processChange(
+      authenticatedUserId,
+      environment,
+      'g_game_worlds',
+      String(id),
+      updateData,
+      async (processedData: any) => {
+        const world = await GameWorldService.updateGameWorld(id, processedData as any, environment);
+        const tags = await TagService.listTagsForEntity('game_world', id);
 
-    res.json({
-      success: true,
-      data: { world },
-      message: 'Game world maintenance status updated successfully',
-    });
+        // Publish event for SDK real-time updates
+        await pubSubService.publishNotification({
+          type: 'gameworld.updated',
+          data: { world: { ...world, tags } },
+          targetChannels: ['gameworld', 'admin'],
+        });
+
+        return { world: { ...world, tags } };
+      }
+    );
+
+    if (gatewayResult.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        data: gatewayResult.data,
+        message: 'Game world maintenance status updated successfully',
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. Maintenance status update will be applied after approval.',
+      });
+    }
   });
 
   static updateDisplayOrders = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
