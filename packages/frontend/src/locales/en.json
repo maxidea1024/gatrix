@@ -2469,7 +2469,8 @@
     "CR_ALREADY_APPROVED": "You have already approved this request.",
     "CR_SELF_APPROVAL_NOT_ALLOWED": "You cannot approve your own Change Request.",
     "CR_INSUFFICIENT_PERMISSIONS": "Insufficient permissions to approve.",
-    "CR_DATA_CONFLICT": "Data has changed since this request was created."
+    "CR_DATA_CONFLICT": "Data has changed since this request was created.",
+    "ResourceLockedException": "This item is locked by Change Request \"{{title}}\". It cannot be modified until the request is processed."
   },
   "jobs": {
     "title": "Job Management",
@@ -5078,6 +5079,7 @@
     "deleteDialogDescription": "Are you sure you want to delete environment '{{name}}'? This action cannot be undone and all settings will be lost.",
     "changeRequestSettings": "Change Request Settings",
     "changeRequestSettingsDescription": "Configure approval requirements for applying changes in this environment.",
-    "requiredApproversHelperText": "Minimum number of approvers required to approve a change request."
+    "requiredApproversHelperText": "Minimum number of approvers required to approve a change request.",
+    "messages.created": "Change request has been created."
   }
 }

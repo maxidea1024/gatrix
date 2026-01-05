@@ -523,8 +523,16 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         }
 
         console.log('About to call updateClientVersion API...');
-        await ClientVersionService.updateClientVersion(clientVersion.id, cleanedData);
+        const updateResult = await ClientVersionService.updateClientVersion(clientVersion.id, cleanedData);
         console.log('updateClientVersion API call completed');
+
+        if (updateResult.isChangeRequest) {
+          enqueueSnackbar(t('changeRequest.messages.created'), { variant: 'info' });
+          onSuccess();
+          onClose();
+          return;
+        }
+
         clientVersionId = clientVersion.id;
         enqueueSnackbar(t('clientVersions.updateSuccess'), { variant: 'success' });
       } else {
@@ -534,9 +542,17 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           hasClientVersion: !!clientVersion
         });
         console.log('About to call createClientVersion API...');
-        const created = await ClientVersionService.createClientVersion(cleanedData);
+        const createResult = await ClientVersionService.createClientVersion(cleanedData);
         console.log('createClientVersion API call completed');
-        clientVersionId = created?.id;
+
+        if (createResult.isChangeRequest) {
+          enqueueSnackbar(t('changeRequest.messages.created'), { variant: 'info' });
+          onSuccess();
+          onClose();
+          return;
+        }
+
+        clientVersionId = createResult.clientVersion?.id;
         if (!clientVersionId) {
           throw new Error(t('common.cannotGetClientVersionId'));
         }
@@ -590,6 +606,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         errorMessage = t('clientVersions.duplicateClientVersions', {
           duplicates
         });
+      } else if (rawMessage?.includes('unique_env_platform_version') || rawMessage?.includes('Duplicate entry')) {
+        // Handle MySQL unique constraint violation with user-friendly message
+        errorMessage = t('clientVersions.form.duplicateVersion');
       }
 
       enqueueSnackbar(errorMessage, { variant: 'error' });

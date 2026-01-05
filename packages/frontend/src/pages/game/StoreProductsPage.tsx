@@ -51,6 +51,7 @@ import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import StoreProductFormDrawer from '../../components/game/StoreProductFormDrawer';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 
 // Store display names
 const STORE_DISPLAY_NAMES: Record<string, string> = {
@@ -575,41 +576,53 @@ const StoreProductsPage: React.FC = () => {
   const handleBulkActivate = async () => {
     if (selectedIds.length === 0) return;
     try {
-      await storeProductService.bulkUpdateActiveStatus(selectedIds, true);
-      enqueueSnackbar(t('storeProducts.bulkActivateSuccess'), { variant: 'success' });
-      setSelectedIds([]);
-      loadProducts();
-      loadStats();
+      const result = await storeProductService.bulkUpdateActiveStatus(selectedIds, true);
+      if (result.isChangeRequest) {
+        enqueueSnackbar(t('changeRequest.messages.created'), { variant: 'info' });
+      } else {
+        enqueueSnackbar(t('storeProducts.bulkActivateSuccess'), { variant: 'success' });
+        setSelectedIds([]);
+        loadProducts();
+        loadStats();
+      }
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('storeProducts.bulkActivateFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'storeProducts.bulkActivateFailed'), { variant: 'error' });
     }
   };
 
   const handleBulkDeactivate = async () => {
     if (selectedIds.length === 0) return;
     try {
-      await storeProductService.bulkUpdateActiveStatus(selectedIds, false);
-      enqueueSnackbar(t('storeProducts.bulkDeactivateSuccess'), { variant: 'success' });
-      setSelectedIds([]);
-      loadProducts();
-      loadStats();
+      const result = await storeProductService.bulkUpdateActiveStatus(selectedIds, false);
+      if (result.isChangeRequest) {
+        enqueueSnackbar(t('changeRequest.messages.created'), { variant: 'info' });
+      } else {
+        enqueueSnackbar(t('storeProducts.bulkDeactivateSuccess'), { variant: 'success' });
+        setSelectedIds([]);
+        loadProducts();
+        loadStats();
+      }
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('storeProducts.bulkDeactivateFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'storeProducts.bulkDeactivateFailed'), { variant: 'error' });
     }
   };
 
   // Toggle active status
   const handleToggleActive = async (product: StoreProduct) => {
     try {
-      await storeProductService.toggleActive(product.id, !product.isActive);
-      enqueueSnackbar(
-        product.isActive ? t('storeProducts.deactivated') : t('storeProducts.activated'),
-        { variant: 'success' }
-      );
-      loadProducts();
-      loadStats();
+      const result = await storeProductService.toggleActive(product.id, !product.isActive);
+      if (result.isChangeRequest) {
+        enqueueSnackbar(t('changeRequest.messages.created'), { variant: 'info' });
+      } else {
+        enqueueSnackbar(
+          product.isActive ? t('storeProducts.deactivated') : t('storeProducts.activated'),
+          { variant: 'success' }
+        );
+        loadProducts();
+        loadStats();
+      }
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('common.saveFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), { variant: 'error' });
     }
   };
 

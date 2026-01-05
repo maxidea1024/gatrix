@@ -2529,7 +2529,8 @@
     "CR_ALREADY_APPROVED": "您已经批准了此请求。",
     "CR_SELF_APPROVAL_NOT_ALLOWED": "您不能批准自己的变更请求。",
     "CR_INSUFFICIENT_PERMISSIONS": "审批权限不足。",
-    "CR_DATA_CONFLICT": "自创建此请求以来数据已发生变更。"
+    "CR_DATA_CONFLICT": "自创建此请求以来数据已发生变更。",
+    "ResourceLockedException": "此项目已被变更请求\"{{title}}\"锁定。在请求处理完成之前无法修改。"
   },
   "jobs": {
     "title": "Job Management",
@@ -5119,6 +5120,7 @@
     "reviewers": "审核人",
     "noReviewersYet": "暂无审核人",
     "deleteDialog.title": "删除变更请求",
-    "deleteDialog.message": "您确定要删除此变更请求吗？此操作无法撤销。"
+    "deleteDialog.message": "您确定要删除此变更请求吗？此操作无法撤销。",
+    "messages.created": "变更请求已创建。"
   }
 }

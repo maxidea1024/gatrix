@@ -2469,7 +2469,8 @@
     "CR_ALREADY_APPROVED": "이미 승인한 요청입니다.",
     "CR_SELF_APPROVAL_NOT_ALLOWED": "본인이 요청한 항목은 승인할 수 없습니다.",
     "CR_INSUFFICIENT_PERMISSIONS": "승인 권한이 부족합니다.",
-    "CR_DATA_CONFLICT": "요청 생성 이후 데이터가 변경되어 충돌이 발생했습니다."
+    "CR_DATA_CONFLICT": "요청 생성 이후 데이터가 변경되어 충돌이 발생했습니다.",
+    "ResourceLockedException": "이 항목은 변경 요청 \"{{title}}\"에 의해 잠겨 있습니다. 해당 요청이 처리될 때까지 수정할 수 없습니다."
   },
   "jobs": {
     "title": "Job 관리",
@@ -5062,6 +5063,7 @@
     "reviewers": "리뷰어",
     "noReviewersYet": "아직 리뷰어가 없습니다",
     "deleteDialog.title": "변경 요청 삭제",
-    "deleteDialog.message": "이 변경 요청을 삭제하시겠습니까? 삭제된 요청은 복구할 수 없습니다."
+    "deleteDialog.message": "이 변경 요청을 삭제하시겠습니까? 삭제된 요청은 복구할 수 없습니다.",
+    "messages.created": "변경 요청이 생성되었습니다."
   }
 }

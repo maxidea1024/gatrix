@@ -78,4 +78,11 @@ router.post('/:id/reopen', ChangeRequestController.reopen);
  */
 router.post('/:id/execute', ChangeRequestController.execute);
 
+/**
+ * @route POST /api/v1/admin/change-requests/:id/rollback
+ * @desc Rollback applied change request
+ * @access Admin
+ */
+router.post('/:id/rollback', ChangeRequestController.rollback);
+
 export default router;

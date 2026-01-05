@@ -118,15 +118,43 @@ export const gameWorldService = {
   },
 
   // Toggle visibility
-  async toggleVisibility(id: number): Promise<GameWorld> {
-    const response = await api.patch(`/admin/game-worlds/${id}/toggle-visibility`);
-    return response.data?.data?.world || response.data?.world;
+  async toggleVisibility(id: number): Promise<GameWorldMutationResult> {
+    const response: any = await api.patch(`/admin/game-worlds/${id}/toggle-visibility`);
+    const responseData = response.data || response;
+
+    // Check if this is a change request response
+    if (responseData?.changeRequestId) {
+      return {
+        world: undefined,
+        isChangeRequest: true,
+        changeRequestId: responseData.changeRequestId,
+      };
+    }
+
+    return {
+      world: responseData?.world || responseData?.data?.world,
+      isChangeRequest: false,
+    };
   },
 
   // Toggle maintenance status
-  async toggleMaintenance(id: number): Promise<GameWorld> {
-    const response = await api.patch(`/admin/game-worlds/${id}/toggle-maintenance`);
-    return response.data?.data?.world || response.data?.world;
+  async toggleMaintenance(id: number): Promise<GameWorldMutationResult> {
+    const response: any = await api.patch(`/admin/game-worlds/${id}/toggle-maintenance`);
+    const responseData = response.data || response;
+
+    // Check if this is a change request response
+    if (responseData?.changeRequestId) {
+      return {
+        world: undefined,
+        isChangeRequest: true,
+        changeRequestId: responseData.changeRequestId,
+      };
+    }
+
+    return {
+      world: responseData?.world || responseData?.data?.world,
+      isChangeRequest: false,
+    };
   },
 
   // Update maintenance status with details
@@ -140,7 +168,7 @@ export const gameWorldService = {
     maintenanceLocales?: Array<{ lang: 'ko' | 'en' | 'zh'; message: string }>;
     forceDisconnect?: boolean;
     gracePeriodMinutes?: number;
-  }): Promise<GameWorld> {
+  }): Promise<GameWorldMutationResult> {
     // Ensure boolean fields are actually boolean
     const sanitizedData = {
       ...data,
@@ -148,8 +176,22 @@ export const gameWorldService = {
       ...(data.supportsMultiLanguage !== undefined && { supportsMultiLanguage: Boolean(data.supportsMultiLanguage) }),
       ...(data.forceDisconnect !== undefined && { forceDisconnect: Boolean(data.forceDisconnect) }),
     };
-    const response = await api.patch(`/admin/game-worlds/${id}/maintenance`, sanitizedData);
-    return response.data?.data?.world || response.data?.world;
+    const response: any = await api.patch(`/admin/game-worlds/${id}/maintenance`, sanitizedData);
+    const responseData = response.data || response;
+
+    // Check if this is a change request response
+    if (responseData?.changeRequestId) {
+      return {
+        world: undefined,
+        isChangeRequest: true,
+        changeRequestId: responseData.changeRequestId,
+      };
+    }
+
+    return {
+      world: responseData?.world || responseData?.data?.world,
+      isChangeRequest: false,
+    };
   },
 
   // Update display orders

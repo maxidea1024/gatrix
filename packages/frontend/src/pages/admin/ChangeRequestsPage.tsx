@@ -715,35 +715,30 @@ const ChangeRequestsPage: React.FC = () => {
     const { t } = useTranslation();
     const { enqueueSnackbar } = useSnackbar();
 
-    // Tab state with persistence and URL param support
+
+    // Tab state controlled by URL param
     const [searchParams, setSearchParams] = useSearchParams();
     const statusFilters: (ChangeRequestStatus | undefined)[] = [undefined, 'draft', 'open', 'approved', 'applied', 'rejected'];
 
-    const [tabValue, setTabValue] = useState(() => {
-        // 1. Check URL param first
+    // Initialize/Get tab value from URL
+    const tabValue = useMemo(() => {
         const statusParam = searchParams.get('status');
         if (statusParam) {
             const index = statusFilters.indexOf(statusParam as ChangeRequestStatus);
             if (index !== -1) return index;
         }
+        return 0;
+    }, [searchParams]);
 
-        // 2. Fallback to session storage
-        const saved = sessionStorage.getItem('changeRequestsTab');
-        return saved ? parseInt(saved, 10) : 0;
-    });
-
-    // Update URL when tab changes, or clear it
+    // Update URL when tab changes
     const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
-        setTabValue(newValue);
-        sessionStorage.setItem('changeRequestsTab', String(newValue));
-        setPage(0);
-
-        // Optional: synchronize URL with tab state if desired, or just clear the param to avoid "stuck" state
-        // For now, we just clear the specific status param if we navigate away from the executed tab, 
-        // or we could set it. Let's just remove the query param to keep URL clean after initial deep link.
-        if (searchParams.get('status')) {
-            setSearchParams({}, { replace: true });
+        const status = statusFilters[newValue];
+        if (status) {
+            setSearchParams({ status });
+        } else {
+            setSearchParams({});
         }
+        setPage(0);
     };
 
     // Pagination

@@ -1778,7 +1778,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         {/* Pending CR Review Banner */}
         {pendingCRCount > 0 && !location.pathname.startsWith('/admin/change-requests') && (
           <Box
-            onClick={() => navigate('/admin/change-requests')}
+            onClick={() => navigate('/admin/change-requests?status=open')}
             sx={{
               display: 'flex',
               alignItems: 'center',

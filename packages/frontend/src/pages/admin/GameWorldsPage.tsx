@@ -1036,9 +1036,26 @@ const GameWorldsPage: React.FC = () => {
     if (!world) return;
 
     try {
-      await gameWorldService.toggleVisibility(world.id);
-      enqueueSnackbar(t('gameWorlds.visibilityToggled'), { variant: 'success' });
-      loadGameWorlds();
+      const result = await gameWorldService.toggleVisibility(world.id);
+      if (result.isChangeRequest) {
+        enqueueSnackbar(t('changeRequest.messages.created'), {
+          variant: 'info',
+          action: (key) => (
+            <Button
+              size="small"
+              color="inherit"
+              onClick={() => {
+                navigate(`/admin/change-requests/${result.changeRequestId}`);
+              }}
+            >
+              {t('common.view')}
+            </Button>
+          ),
+        });
+      } else {
+        enqueueSnackbar(t('gameWorlds.visibilityToggled'), { variant: 'success' });
+        loadGameWorlds();
+      }
     } catch (error) {
       console.error('Failed to toggle visibility:', error);
       enqueueSnackbar(t('gameWorlds.errors.toggleVisibilityFailed'), { variant: 'error' });

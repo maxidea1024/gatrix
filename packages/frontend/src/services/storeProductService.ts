@@ -179,17 +179,17 @@ class StoreProductService {
   /**
    * Toggle store product active status
    */
-  async toggleActive(id: string, isActive: boolean): Promise<StoreProduct> {
+  async toggleActive(id: string, isActive: boolean): Promise<MutationResult<StoreProduct>> {
     const response = await api.patch(`/admin/store-products/${id}/toggle-active`, { isActive });
-    return response.data.product;
+    return parseChangeRequestResponse<StoreProduct>(response, (r) => r?.product);
   }
 
   /**
    * Bulk update active status for multiple products
    */
-  async bulkUpdateActiveStatus(ids: string[], isActive: boolean): Promise<number> {
+  async bulkUpdateActiveStatus(ids: string[], isActive: boolean): Promise<MutationResult<number>> {
     const response = await api.patch('/admin/store-products/bulk-active', { ids, isActive });
-    return response.data.affectedCount;
+    return parseChangeRequestResponse<number>(response, (r) => r?.affectedCount);
   }
 
   /**

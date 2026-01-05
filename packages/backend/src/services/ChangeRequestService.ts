@@ -438,6 +438,17 @@ export class ChangeRequestService {
 
                         // Still update directly in transaction for atomicity
                         if (isCreate) {
+                            // Ensure environment is set for new records
+                            if (!dbData.environment) {
+                                dbData.environment = cr.environment;
+                            }
+                            // Ensure timestamps are set for new records
+                            if (!dbData.createdAt) {
+                                dbData.createdAt = new Date();
+                            }
+                            if (!dbData.updatedAt) {
+                                dbData.updatedAt = new Date();
+                            }
                             const [insertId] = await trx(item.targetTable).insert(dbData);
                             realId = insertId;
                         } else {
@@ -454,6 +465,17 @@ export class ChangeRequestService {
                     } else {
                         // No service handler - direct update only, no events
                         if (isCreate) {
+                            // Ensure environment is set for new records
+                            if (!dbData.environment) {
+                                dbData.environment = cr.environment;
+                            }
+                            // Ensure timestamps are set for new records
+                            if (!dbData.createdAt) {
+                                dbData.createdAt = new Date();
+                            }
+                            if (!dbData.updatedAt) {
+                                dbData.updatedAt = new Date();
+                            }
                             await trx(item.targetTable).insert(dbData);
                         } else {
                             await trx(item.targetTable).where('id', item.targetId).update(dbData);
