@@ -24,7 +24,7 @@ export class ChangeRequestService {
         environmentName: string,
         targetTable: string,
         targetId: string,
-        beforeData: Record<string, any>,
+        beforeData: Record<string, any> | null,
         afterData: Record<string, any>, // This is the proposed change
         changeRequestId?: string
     ): Promise<{ changeRequestId: string; status: ChangeRequestStatus }> {
