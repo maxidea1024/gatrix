@@ -70,7 +70,7 @@ export class UnifiedChangeGateway {
                 environmentName,
                 targetTable,
                 `NEW_${Date.now()}`, // Temporary ID for new items
-                {}, // beforeData is empty for creation
+                null, // beforeData is null for creation (record doesn't exist yet)
                 createData,
                 existingDraft?.id
             );
