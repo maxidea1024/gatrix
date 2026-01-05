@@ -4935,7 +4935,10 @@
     "show": "보이기",
     "hideSuccess": "환경이 숨겨졌습니다",
     "showSuccess": "환경이 표시됩니다",
-    "toggleVisibilityFailed": "환경 표시 상태 변경에 실패했습니다"
+    "toggleVisibilityFailed": "환경 표시 상태 변경에 실패했습니다",
+    "changeRequestSettings": "변경 요청 설정",
+    "changeRequestSettingsDescription": "이 환경에서 변경사항 적용 시 승인 절차 필요 여부를 설정합니다.",
+    "requiredApproversHelperText": "변경 요청을 승인하기 위해 필요한 최소 승인자 수입니다."
   },
   "projects": {
     "title": "프로젝트",

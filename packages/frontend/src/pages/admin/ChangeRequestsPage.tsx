@@ -848,7 +848,7 @@ const ChangeRequestsPage: React.FC = () => {
                     </TableContainer>
 
                     {/* Pagination */}
-                    {data && data.pagination && (
+                    {data && data.pagination && data.pagination.total > 0 && (
                         <Box sx={{ p: 2 }}>
                             <SimplePagination
                                 count={data.pagination.total}
