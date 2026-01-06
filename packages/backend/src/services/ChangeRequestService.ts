@@ -159,9 +159,9 @@ export class ChangeRequestService {
         if (!cr) throw new Error('Change Request not found');
         if (cr.status !== 'draft') throw new Error('Only DRAFT requests can be submitted');
 
-        // Validation
-        if (!cr.title || !cr.reason) {
-            throw new Error('Title and Reason (Justification) are required for submission.');
+        // Validation - only title is required
+        if (!cr.title) {
+            throw new Error('Title is required for submission.');
         }
 
         const updated = await cr.$query().patchAndFetch({ status: 'open' });
@@ -293,20 +293,23 @@ export class ChangeRequestService {
         return null;
     }
 
-    static async rejectChangeRequest(changeRequestId: string, rejectedBy: number, comment: string): Promise<ChangeRequest> {
+    static async rejectChangeRequest(changeRequestId: string, rejectedBy: number | null, comment: string): Promise<ChangeRequest> {
         if (!comment) throw new Error('Rejection comment is mandatory.');
 
         const cr = await ChangeRequest.query().findById(changeRequestId);
         if (!cr) throw new Error('Change Request not found');
-        if (cr.status !== 'open') throw new Error('Only OPEN requests can be rejected');
+        if (cr.status !== 'open' && cr.status !== 'approved') {
+            throw new Error('Only OPEN or APPROVED requests can be rejected');
+        }
 
-        // Get rejector info for notification
-        const rejector = await User.query().findById(rejectedBy);
+        // Get rejector info for notification (null means system rejection)
+        const rejector = rejectedBy ? await User.query().findById(rejectedBy) : null;
+        const rejectorName = rejector?.name || rejector?.email || 'System';
 
         // Update Status with rejection info
         await cr.$query().patch({
             status: 'rejected',
-            rejectedBy: rejectedBy,
+            rejectedBy: rejectedBy,  // Will be null for system rejections
             rejectedAt: knex.fn.now(),
             rejectionReason: comment
         });
@@ -314,7 +317,7 @@ export class ChangeRequestService {
         // Create Audit Log with comment
         await knex('g_audit_logs').insert({
             action: 'CHANGE_REQUEST_REJECTED',
-            userId: rejectedBy,
+            userId: rejectedBy || 0,  // 0 for system
             changeRequestId: cr.id,
             entityType: 'ChangeRequest',
             entityId: 0,
@@ -327,7 +330,7 @@ export class ChangeRequestService {
             title: cr.title,
             environment: cr.environment,
             requesterId: cr.requesterId,
-        }, rejector?.name || rejector?.email, comment, rejectedBy);
+        }, rejectorName, comment, rejectedBy || 0);
 
         const updated = await cr.$query().findById(cr.id);
         if (!updated) throw new Error('Failed to retrieve updated change request');
@@ -340,9 +343,12 @@ export class ChangeRequestService {
             if (!cr) throw new Error('Change Request not found');
             if (cr.status !== 'rejected') throw new Error('Only REJECTED requests can be reopened');
 
-            // Validate ownership: Only the original requester can reopen
-            if (cr.requesterId !== requesterId) {
-                throw new Error('Only the original requester can reopen this request.');
+            const user = await User.query(trx).findById(requesterId);
+            const isAdmin = user?.role === 'admin' || user?.role === 0;
+
+            // Validate ownership: Only the original requester or an admin can reopen
+            if (cr.requesterId !== requesterId && !isAdmin) {
+                throw new Error('Only the original requester or an admin can reopen this request.');
             }
 
             // Reset to Draft

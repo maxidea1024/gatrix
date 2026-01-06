@@ -2325,7 +2325,9 @@
     "request": "Request",
     "queryParameters": "Query Parameters",
     "receivedAt": "Received At",
-    "apiTokenRequired": "Please enter API token"
+    "apiTokenRequired": "Please enter API token",
+    "details": "Details",
+    "visible": "Visible"
   },
   "createdAt": "createdAt",
   "dashboard": {
@@ -2475,7 +2477,10 @@
     "CR_INSUFFICIENT_PERMISSIONS": "Insufficient permissions to approve.",
     "CR_DATA_CONFLICT": "Data has changed since the request was created, resulting in a conflict.",
     "ResourceLockedException": "This item is locked by Change Request \"{{title}}\". It cannot be modified until the request is processed.",
-    "RESOURCE_LOCKED": "This item is locked by Change Request \"{{changeRequestTitle}}\". It cannot be modified until the request is processed."
+    "RESOURCE_LOCKED": "This item is locked by Change Request \"{{changeRequestTitle}}\". It cannot be modified until the request is processed.",
+    "RESOURCE_LOCKED_TITLE": "Resource Locked",
+    "DUPLICATE_ENTRY": "Duplicate data already exists.",
+    "DUPLICATE_ENTRY_TITLE": "Duplicate Entry Found"
   },
   "jobs": {
     "title": "Job Management",
@@ -5029,8 +5034,19 @@
       "description": "Are you sure you want to create a rollback change request for this item? The rollback request will need to be approved before it is applied."
     },
     "conflictDialog.description": "The data on the live server has changed since this request was created. The request has been automatically rejected to prevent data corruption. Please review changes and try again.",
+    "conflictDialog.liveData": "Current Live Data",
+    "conflictDialog.originalData": "Data When Request Created",
+    "duplicateDialog.description": "A record with the same unique identifier already exists. This usually happens when the data you are trying to merge has already been added to the live server.",
+    "duplicateDialog.guide": "The request has been automatically 'Rejected' due to a conflict. Please delete this request or review the live data and try again.",
     "errors.rejectCommentRequired": "Please enter rejection reason.",
+    "errors.titleRequired": "Please enter a title.",
     "errors.submitFieldsRequired": "Please enter both title and reason.",
+    "errors.executeFailed": "Failed to apply change request.",
+    "errors.approveFailed": "Failed to approve change request.",
+    "errors.rejectFailed": "Failed to reject change request.",
+    "errors.reopenFailed": "Failed to reopen change request.",
+    "errors.deleteFailed": "Failed to delete change request.",
+    "errors.submitFailed": "Failed to submit change request.",
     "rejectDialog.title": "Reject Change Request",
     "rejectDialog.description": "Enter rejection reason. Requester can revise and resubmit.",
     "rejectDialog.comment": "Rejection Reason",
@@ -5087,25 +5103,17 @@
     "changeRequestSettings": "Change Request Settings",
     "changeRequestSettingsDescription": "Configure approval requirements for applying changes in this environment.",
     "requiredApproversHelperText": "Minimum number of approvers required to approve a change request.",
-    "messages.created": "Change request has been created.",
     "conflictDialog.recreateDescription": "The conflicting request has been automatically rejected. You can create a new change request based on the latest data, or discard this request.",
     "conflictDialog.viewCurrentData": "View Current Data",
     "actions.recreate": "Recreate Request",
     "conflictDialog.crData": "Change Request Data",
-    "conflictDialog.liveData": "Current Live Data",
-    "actions": {
-      "label": "Actions",
-      "submit": "Submit",
-      "approve": "Approve",
-      "reject": "Reject",
-      "merge": "Merge",
-      "reopen": "Reopen",
-      "rollback": "Rollback",
-      "readyForReview": "Ready for Review",
-      "submitCreate": "Request Create",
-      "submitUpdate": "Request Update",
-      "submitDelete": "Request Delete",
-      "submitSave": "Request Save"
-    }
+    "actions.delete": "Delete",
+    "actions.label": "Actions",
+    "actions.merge": "Merge",
+    "actions.readyForReview": "Ready for Review",
+    "actions.submitCreate": "Request Create",
+    "actions.submitUpdate": "Request Update",
+    "actions.submitDelete": "Request Delete",
+    "actions.submitSave": "Request Save"
   }
 }

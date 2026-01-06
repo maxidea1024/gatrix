@@ -271,13 +271,30 @@ export class ChangeRequestController {
                 message: 'Change request applied successfully',
             });
         } catch (error: any) {
-            // Check if it's a conflict error
-            if (error instanceof GatrixError && error.code === 'CR_DATA_CONFLICT') {
+            // Check if it's a conflict error (GatrixError) or duplicate error (raw MySQL or GatrixError)
+            const isGatrixConflict = error instanceof GatrixError && (error.code === 'CR_DATA_CONFLICT' || error.code === 'DUPLICATE_ENTRY');
+            const isMySQLDuplicate = error.errno === 1062 || error.code === 'ER_DUP_ENTRY';
+
+            if (isGatrixConflict || isMySQLDuplicate) {
                 // Mark CR as rejected automatically since execution failed significantly
                 try {
-                    await ChangeRequestService.rejectChangeRequest(id, userId, 'System: Data conflict detected during execution (Live data changed)');
+                    let reason: string;
+                    if (error instanceof GatrixError && error.code === 'CR_DATA_CONFLICT') {
+                        reason = 'System: Data conflict detected during execution (Live data changed)';
+                    } else {
+                        // Extract duplicate info from MySQL error if possible
+                        const match = error.message?.match(/Duplicate entry \'(.+)\' for key \'(.+)\'/);
+                        if (match) {
+                            reason = `System: Duplicate entry '${match[1]}' for key '${match[2]}'`;
+                        } else {
+                            reason = `System: Duplicate entry detected during execution`;
+                        }
+                    }
+
+                    await ChangeRequestService.rejectChangeRequest(id, null, reason);
+                    logger.info('[ChangeRequest] Auto-rejected due to conflict/duplicate', { changeRequestId: id, reason });
                 } catch (rejectError) {
-                    logger.error('[ChangeRequest] Failed to auto-reject conflicted CR', rejectError);
+                    logger.error('[ChangeRequest] Failed to auto-reject conflicted/duplicate CR', rejectError);
                 }
                 throw error; // Re-throw to be handled by global error handler
             }

@@ -41,6 +41,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import useSWR from 'swr';
+import { useHandleApiError } from '@/hooks/useHandleApiError';
 
 import { RelativeTime } from '@/components/common/RelativeTime';
 import changeRequestService, {
@@ -234,18 +235,9 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
     const [submitReason, setSubmitReason] = useState('');
     const [reopenDialogOpen, setReopenDialogOpen] = useState(false);
     const [rollbackDialogOpen, setRollbackDialogOpen] = useState(false);
-    const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
-    const [conflictData, setConflictData] = useState<any>(null);
+    const { handleApiError, ErrorDialog } = useHandleApiError();
 
-    const getErrorMessage = (err: any) => {
-        if (err.code && i18n.exists(`errors.${err.code}`)) {
-            return t(`errors.${err.code}`);
-        }
-        if (err.code && i18n.exists(`changeRequest.errors.${err.code}`)) {
-            return t(`changeRequest.errors.${err.code}`);
-        }
-        return err.message || t('common.error');
-    };
+
 
     const handleApprove = async () => {
         setActionLoading(true);
@@ -254,7 +246,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
             enqueueSnackbar(t('changeRequest.messages.approved'), { variant: 'success' });
             onRefresh();
         } catch (err: any) {
-            enqueueSnackbar(getErrorMessage(err), { variant: 'error' });
+            handleApiError(err, 'changeRequest.errors.approveFailed');
         } finally {
             setActionLoading(false);
         }
@@ -273,7 +265,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
             setRejectComment('');
             onRefresh();
         } catch (err: any) {
-            enqueueSnackbar(getErrorMessage(err), { variant: 'error' });
+            handleApiError(err, 'changeRequest.errors.rejectFailed');
         } finally {
             setActionLoading(false);
         }
@@ -291,7 +283,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
             setReopenDialogOpen(false);
             onRefresh();
         } catch (err: any) {
-            enqueueSnackbar(getErrorMessage(err), { variant: 'error' });
+            handleApiError(err, 'changeRequest.errors.reopenFailed');
         } finally {
             setActionLoading(false);
         }
@@ -304,12 +296,8 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
             enqueueSnackbar(t('changeRequest.messages.executed'), { variant: 'success' });
             onRefresh();
         } catch (err: any) {
-            if (err.code === 'CR_DATA_CONFLICT') {
-                setConflictData(err.details?.payload);
-                setConflictDialogOpen(true);
-                onRefresh(); // Refresh to show the new "Rejected" status
-            } else {
-                enqueueSnackbar(getErrorMessage(err), { variant: 'error' });
+            if (handleApiError(err, 'changeRequest.errors.executeFailed')) {
+                onRefresh(); // Refresh if it was a conflict (to show rejected status if handled by dialog)
             }
         } finally {
             setActionLoading(false);
@@ -324,7 +312,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
             enqueueSnackbar(t('changeRequest.messages.deleted'), { variant: 'success' });
             onRefresh();
         } catch (err: any) {
-            enqueueSnackbar(getErrorMessage(err), { variant: 'error' });
+            handleApiError(err, 'changeRequest.errors.deleteFailed');
         } finally {
             setActionLoading(false);
         }
@@ -354,7 +342,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
             setRollbackDialogOpen(false);
             onRefresh();
         } catch (err: any) {
-            enqueueSnackbar(getErrorMessage(err), { variant: 'error' });
+            handleApiError(err, 'changeRequest.errors.rollbackFailed');
         } finally {
             setActionLoading(false);
         }
@@ -376,7 +364,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
             setSubmitReason('');
             onRefresh();
         } catch (err: any) {
-            enqueueSnackbar(err.message || t('common.error'), { variant: 'error' });
+            handleApiError(err, 'changeRequest.errors.submitFailed');
         } finally {
             setActionLoading(false);
         }
@@ -669,58 +657,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
                 </DialogActions>
             </Dialog>
 
-            {/* Conflict Error Dialog */}
-            <Dialog
-                open={conflictDialogOpen}
-                onClose={() => setConflictDialogOpen(false)}
-                maxWidth="md"
-                fullWidth
-            >
-                <DialogTitle sx={{ color: 'error.main', display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <InfoIcon color="error" />
-                    {t('errors.CR_DATA_CONFLICT') || 'Data Conflict Detected'}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText sx={{ mb: 2 }}>
-                        {t('changeRequest.conflictDialog.description') || 'The data on the live server has changed since this request was created. The request has been automatically rejected to prevent data corruption.'}
-                    </DialogContentText>
-                    <DialogContentText sx={{ mb: 2, color: 'text.secondary' }}>
-                        {t('changeRequest.conflictDialog.recreateDescription')}
-                    </DialogContentText>
-
-                    {conflictData && (
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            <Paper variant="outlined" sx={{ p: 2, bgcolor: 'error.dark', color: 'common.white' }}>
-                                <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
-                                    {t('changeRequest.conflictDialog.crData') || 'Change Request Data'}
-                                </Typography>
-                                <Box sx={{ maxHeight: 200, overflow: 'auto', bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 1, p: 1 }}>
-                                    <pre style={{ margin: 0, fontSize: '0.75rem', whiteSpace: 'pre-wrap' }}>
-                                        {JSON.stringify(conflictData.crValue || conflictData.oldValue || conflictData, null, 2)}
-                                    </pre>
-                                </Box>
-                            </Paper>
-                            {conflictData.liveValue && (
-                                <Paper variant="outlined" sx={{ p: 2, bgcolor: 'success.dark', color: 'common.white' }}>
-                                    <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
-                                        {t('changeRequest.conflictDialog.liveData') || 'Current Live Data'}
-                                    </Typography>
-                                    <Box sx={{ maxHeight: 200, overflow: 'auto', bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 1, p: 1 }}>
-                                        <pre style={{ margin: 0, fontSize: '0.75rem', whiteSpace: 'pre-wrap' }}>
-                                            {JSON.stringify(conflictData.liveValue, null, 2)}
-                                        </pre>
-                                    </Box>
-                                </Paper>
-                            )}
-                        </Box>
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setConflictDialogOpen(false)} color="inherit">
-                        {t('common.close')}
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <ErrorDialog />
         </>
     );
 };

@@ -2326,7 +2326,9 @@
     "request": "요청",
     "queryParameters": "쿼리 파라미터",
     "receivedAt": "수신 시각",
-    "apiTokenRequired": "API 토큰을 입력해주세요"
+    "apiTokenRequired": "API 토큰을 입력해주세요",
+    "details": "상세 내용",
+    "visible": "표시"
   },
   "createdAt": "생성일",
   "dashboard": {
@@ -2477,7 +2479,10 @@
     "CR_INSUFFICIENT_PERMISSIONS": "승인 권한이 부족합니다.",
     "CR_DATA_CONFLICT": "요청 생성 이후 데이터가 변경되어 충돌이 발생했습니다.",
     "ResourceLockedException": "이 항목은 변경 요청 \"{{title}}\"에 의해 잠겨 있습니다. 해당 요청이 처리될 때까지 수정할 수 없습니다.",
-    "RESOURCE_LOCKED": "이 항목은 변경 요청 \"{{changeRequestTitle}}\"에 의해 잠겨 있습니다. 해당 요청이 처리될 때까지 수정할 수 없습니다."
+    "RESOURCE_LOCKED": "이 항목은 변경 요청 \"{{changeRequestTitle}}\"에 의해 잠겨 있습니다. 해당 요청이 처리될 때까지 수정할 수 없습니다.",
+    "RESOURCE_LOCKED_TITLE": "리소스 점검 중",
+    "DUPLICATE_ENTRY": "중복된 데이터가 이미 존재합니다.",
+    "DUPLICATE_ENTRY_TITLE": "중복 데이터 발생"
   },
   "jobs": {
     "title": "Job 관리",
@@ -5026,7 +5031,12 @@
     "rollbackDialog.title": "롤백 변경 요청 생성",
     "rollbackDialog.description": "이 항목에 대해 롤백 변경 요청을 생성하시겠습니까? 롤백 요청은 적용되기 전에 승인이 필요합니다.",
     "conflictDialog.description": "요청 생성 이후 라이브 서버의 데이터가 변경되었습니다. 데이터 무결성을 위해 요청이 자동으로 거절되었습니다. 변경 내용을 확인하고 다시 시도하세요.",
+    "conflictDialog.liveData": "현재 라이브 데이터",
+    "conflictDialog.originalData": "요청 생성 당시 데이터",
+    "duplicateDialog.description": "동일한 고유 식별자를 가진 데이터가 이미 존재합니다. 병합하려는 데이터가 이미 라이브 서버에 추가되어 있을 때 주로 발생합니다.",
+    "duplicateDialog.guide": "해당 요청은 충돌로 인해 자동으로 '거절' 처리되었습니다. 이 요청을 삭제하거나, 라이브 데이터를 확인 후 다시 진행해 주세요.",
     "errors.rejectCommentRequired": "거절 사유를 입력해주세요.",
+    "errors.titleRequired": "제목을 입력해주세요.",
     "errors.CR_DATA_CONFLICT": "요청 생성 이후 데이터가 변경되어 충돌이 발생했습니다.",
     "rejectDialog.title": "변경 요청 거절",
     "rejectDialog.description": "거절 사유를 입력해주세요. 요청자가 수정 후 다시 제출할 수 있습니다.",
@@ -5045,6 +5055,12 @@
     "submitDialog.titleField": "제목",
     "submitDialog.reason": "변경 사유",
     "errors.submitFieldsRequired": "제목과 변경 사유를 모두 입력해주세요.",
+    "errors.executeFailed": "변경 요청 적용에 실패했습니다.",
+    "errors.approveFailed": "승인 처리에 실패했습니다.",
+    "errors.rejectFailed": "거절 처리에 실패했습니다.",
+    "errors.reopenFailed": "재오픈 처리에 실패했습니다.",
+    "errors.deleteFailed": "삭제 처리에 실패했습니다.",
+    "errors.submitFailed": "제출 처리에 실패했습니다.",
     "createdForReview": "변경 요청이 생성되었습니다. 승인 후 적용됩니다.",
     "pendingReviewBanner": "승인 대기 중인 변경 요청이 {{count}}건 있습니다. 클릭하여 검토하세요.",
     "rejectionInfo": "거부 정보",
@@ -5080,25 +5096,17 @@
     "noReviewersYet": "아직 리뷰어가 없습니다",
     "deleteDialog.title": "변경 요청 삭제",
     "deleteDialog.message": "이 변경 요청을 삭제하시겠습니까? 삭제된 요청은 복구할 수 없습니다.",
-    "messages.created": "변경 요청이 생성되었습니다.",
     "conflictDialog.recreateDescription": "충돌이 발생한 요청은 자동으로 거절되었습니다. 최신 데이터를 기반으로 새로운 변경 요청을 생성하시거나, 이 요청을 폐기하실 수 있습니다.",
     "conflictDialog.viewCurrentData": "현재 데이터 확인",
     "actions.recreate": "다시 요청",
     "conflictDialog.crData": "변경 요청의 데이터",
-    "conflictDialog.liveData": "현재 라이브 데이터",
-    "actions": {
-      "label": "작업",
-      "submit": "제출",
-      "approve": "승인",
-      "reject": "거부",
-      "merge": "병합",
-      "reopen": "다시 열기",
-      "rollback": "롤백",
-      "readyForReview": "리뷰 준비",
-      "submitCreate": "생성 요청",
-      "submitUpdate": "수정 요청",
-      "submitDelete": "삭제 요청",
-      "submitSave": "저장 요청"
-    }
+    "actions.delete": "삭제",
+    "actions.label": "작업",
+    "actions.merge": "병합",
+    "actions.readyForReview": "리뷰 준비",
+    "actions.submitCreate": "생성 요청",
+    "actions.submitUpdate": "수정 요청",
+    "actions.submitDelete": "삭제 요청",
+    "actions.submitSave": "저장 요청"
   }
 }

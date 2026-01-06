@@ -2386,7 +2386,9 @@
     "request": "请求",
     "queryParameters": "查询参数",
     "receivedAt": "接收时间",
-    "apiTokenRequired": "请输入API令牌"
+    "apiTokenRequired": "请输入API令牌",
+    "details": "详细内容",
+    "visible": "显示"
   },
   "createdAt": "createdAt",
   "dashboard": {
@@ -2535,7 +2537,10 @@
     "CR_INSUFFICIENT_PERMISSIONS": "审批权限不足。",
     "CR_DATA_CONFLICT": "自创建此请求以来数据已发生变更。",
     "ResourceLockedException": "此项目已被变更请求\"{{title}}\"锁定。在请求处理完成之前无法修改。",
-    "RESOURCE_LOCKED": "此项目已被变更请求\"{{changeRequestTitle}}\"锁定。在请求处理完成之前无法修改。"
+    "RESOURCE_LOCKED": "此项目已被变更请求\"{{changeRequestTitle}}\"锁定。在请求处理完成之前无法修改。",
+    "RESOURCE_LOCKED_TITLE": "资源已锁定",
+    "DUPLICATE_ENTRY": "重复的数据已存在。",
+    "DUPLICATE_ENTRY_TITLE": "发现重复数据"
   },
   "jobs": {
     "title": "Job Management",
@@ -4580,7 +4585,7 @@
   "REWARD_TYPE_TRADE_FAME": "贸易声望",
   "REWARD_TYPE_DESC_TRADE_FAME": "贸易声望 (增加指定数值的贸易声望)",
   "REWARD_TYPE_ADVENTURE_FAME": "冒险声望",
-  "REWARD_TYPE_DESC_ADVENTURE_FAME": "冒险声望 (增加指定数值的冒险声望)",
+  "REWARD_TYPE_DESC_ADVENTURE_FAME": "冒险声望 (增加指定数值的冒险经验值)",
   "REWARD_TYPE_SAILOR": "船员",
   "REWARD_TYPE_DESC_SAILOR": "船员数 (增加指定数值的船员)",
   "REWARD_TYPE_MATE_INTIMACY_OR_LOYALTY": "航海士亲密度/忠诚度",
@@ -5073,9 +5078,20 @@
       "title": "创建回滚请求",
       "description": "您确定要为此项目创建回滚变更请求吗？回滚请求需要在应用前获得批准。"
     },
-    "conflictDialog.description": "自创建此请求以来，实时服务器上的数据已发生变更。为防止数据损坏，该请求已被自动拒绝。请检查变更并重试。",
+    "conflictDialog.description": "自此请求创建以来，实时服务器上的数据已更改。请求已被自动拒绝，以防止数据损坏。请确认更改后再试。",
+    "conflictDialog.liveData": "当前实时数据",
+    "conflictDialog.originalData": "请求创建时的数据",
+    "duplicateDialog.description": "具有相同唯一标识符的记录已存在。这通常发生在您尝试合并的数据已经添加到实时服务器时。",
+    "duplicateDialog.guide": "该请求因冲突已被自动 '拒绝'。请删除此请求，或确认实时数据后重试。",
     "errors.rejectCommentRequired": "请输入拒绝原因。",
-    "errors.submitFieldsRequired": "请输入标题和原因。",
+    "errors.titleRequired": "请输入标题。",
+    "errors.submitFieldsRequired": "请输入标题和变更原因。",
+    "errors.executeFailed": "应用变更请求失败。",
+    "errors.approveFailed": "批准变更请求失败。",
+    "errors.rejectFailed": "拒绝变更请求失败。",
+    "errors.reopenFailed": "重新打开变更请求失败。",
+    "errors.deleteFailed": "删除变更请求失败。",
+    "errors.submitFailed": "提交变更请求失败。",
     "rejectDialog.title": "拒绝变更请求",
     "rejectDialog.description": "输入拒绝原因。请求者可以修改后重新提交。",
     "rejectDialog.comment": "拒绝原因",
@@ -5127,25 +5143,17 @@
     "noReviewersYet": "暂无审核人",
     "deleteDialog.title": "删除变更请求",
     "deleteDialog.message": "您确定要删除此变更请求吗？此操作无法撤销。",
-    "messages.created": "变更请求已创建。",
     "conflictDialog.recreateDescription": "冲突的请求已被自动拒绝。您可以基于最新数据创建新的变更请求，或者放弃此请求。",
     "conflictDialog.viewCurrentData": "查看当前数据",
     "actions.recreate": "重新请求",
     "conflictDialog.crData": "变更请求的数据",
-    "conflictDialog.liveData": "当前实时数据",
-    "actions": {
-      "label": "操作",
-      "submit": "提交",
-      "approve": "批准",
-      "reject": "拒绝",
-      "merge": "合并",
-      "reopen": "重新打开",
-      "rollback": "回滚",
-      "readyForReview": "准备审核",
-      "submitCreate": "请求创建",
-      "submitUpdate": "请求更新",
-      "submitDelete": "请求删除",
-      "submitSave": "请求保存"
-    }
+    "actions.delete": "删除",
+    "actions.label": "操作",
+    "actions.merge": "合并",
+    "actions.readyForReview": "准备审核",
+    "actions.submitCreate": "请求创建",
+    "actions.submitUpdate": "请求更新",
+    "actions.submitDelete": "请求删除",
+    "actions.submitSave": "请求保存"
   }
 }

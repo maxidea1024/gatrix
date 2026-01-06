@@ -14,8 +14,8 @@ import {
     Alert,
     Tabs,
     Tab,
-    alpha,
 } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import {
     ArrowBack as ArrowBackIcon,
     Check as CheckIcon,
@@ -32,7 +32,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import { handleApiError } from '../../utils/errorHandler';
+import { useHandleApiError } from '@/hooks/useHandleApiError';
 import useSWR from 'swr';
 import { useAuth } from '@/contexts/AuthContext';
 import { RelativeTime } from '@/components/common/RelativeTime';
@@ -81,6 +81,21 @@ const ChangeRequestDetailPage: React.FC = () => {
     const [submitReason, setSubmitReason] = useState('');
     const [activeTab, setActiveTab] = useState(0);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+    // Delete handler for error dialog
+    const handleDeleteFromError = async () => {
+        try {
+            await changeRequestService.delete(id!);
+            enqueueSnackbar(t('changeRequest.messages.deleted'), { variant: 'success' });
+            navigate('/admin/change-requests');
+        } catch (err: any) {
+            enqueueSnackbar(t('changeRequest.errors.deleteFailed'), { variant: 'error' });
+        }
+    };
+
+    const { handleApiError, ErrorDialog } = useHandleApiError({
+        onDelete: handleDeleteFromError
+    });
 
     // Fetch change request
     const { data: cr, error, isLoading, mutate } = useSWR(
@@ -165,7 +180,7 @@ const ChangeRequestDetailPage: React.FC = () => {
             setComment('');
             mutate();
         } catch (err: any) {
-            handleApiError(err, enqueueSnackbar);
+            handleApiError(err, 'changeRequest.errors.approveFailed');
         } finally {
             setActionLoading(false);
         }
@@ -183,7 +198,7 @@ const ChangeRequestDetailPage: React.FC = () => {
             setComment('');
             mutate();
         } catch (err: any) {
-            handleApiError(err, enqueueSnackbar);
+            handleApiError(err, 'changeRequest.errors.rejectFailed');
         } finally {
             setActionLoading(false);
         }
@@ -196,7 +211,7 @@ const ChangeRequestDetailPage: React.FC = () => {
             enqueueSnackbar(t('changeRequest.messages.reopened'), { variant: 'success' });
             mutate();
         } catch (err: any) {
-            handleApiError(err, enqueueSnackbar);
+            handleApiError(err, 'changeRequest.errors.reopenFailed');
         } finally {
             setActionLoading(false);
         }
@@ -209,7 +224,9 @@ const ChangeRequestDetailPage: React.FC = () => {
             enqueueSnackbar(t('changeRequest.messages.executed'), { variant: 'success' });
             mutate();
         } catch (err: any) {
-            handleApiError(err, enqueueSnackbar);
+            if (handleApiError(err, 'changeRequest.errors.executeFailed')) {
+                mutate(); // Refresh if it was a conflict
+            }
         } finally {
             setActionLoading(false);
         }
@@ -226,7 +243,7 @@ const ChangeRequestDetailPage: React.FC = () => {
             enqueueSnackbar(t('changeRequest.messages.deleted'), { variant: 'success' });
             navigate('/admin/change-requests');
         } catch (err: any) {
-            handleApiError(err, enqueueSnackbar);
+            handleApiError(err, 'changeRequest.errors.deleteFailed');
             setIsDeleteDialogOpen(false);
         } finally {
             setActionLoading(false);
@@ -234,18 +251,21 @@ const ChangeRequestDetailPage: React.FC = () => {
     };
 
     const handleSubmit = async () => {
-        if (!submitTitle.trim() || !submitReason.trim()) {
-            enqueueSnackbar(t('changeRequest.errors.submitFieldsRequired'), { variant: 'warning' });
+        if (!submitTitle.trim()) {
+            enqueueSnackbar(t('changeRequest.errors.titleRequired'), { variant: 'warning' });
             return;
         }
         setActionLoading(true);
         try {
-            await changeRequestService.submit(id!, { title: submitTitle.trim(), reason: submitReason.trim() });
+            await changeRequestService.submit(id!, {
+                title: submitTitle.trim(),
+                reason: submitReason.trim() || undefined
+            });
             enqueueSnackbar(t('changeRequest.messages.submitted'), { variant: 'success' });
             setShowSubmitForm(false);
             mutate();
         } catch (err: any) {
-            handleApiError(err, enqueueSnackbar);
+            handleApiError(err, 'changeRequest.errors.submitFailed');
         } finally {
             setActionLoading(false);
         }
@@ -505,14 +525,21 @@ const ChangeRequestDetailPage: React.FC = () => {
                             )}
 
                             {/* Status Banners */}
-                            {cr.status === 'rejected' && cr.requesterId === user?.id && (
-                                <Paper sx={{ p: 2, bgcolor: (theme) => alpha(theme.palette.warning.main, 0.1), border: 1, borderColor: 'warning.main' }}>
+                            {cr.status === 'rejected' && (cr.requesterId === user?.id || user?.role === 'admin' || user?.role === 0) && (
+                                <Paper sx={{ p: 2, bgcolor: (theme) => alpha(theme.palette.error.main, 0.1), border: 1, borderColor: 'error.main' }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <Typography variant="body2" fontWeight={500}>
-                                            {t('changeRequest.changesRequested')}
-                                        </Typography>
-                                        <Button variant="outlined" color="warning" startIcon={<UndoIcon />} onClick={handleReopen} disabled={actionLoading}>
-                                            {t('changeRequest.actions.reopen')}
+                                        <Box>
+                                            <Typography variant="body2" fontWeight={500} color="error.main">
+                                                {t('changeRequest.status.rejected')}
+                                            </Typography>
+                                            {cr.rejectionReason && (
+                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                                                    {cr.rejectionReason}
+                                                </Typography>
+                                            )}
+                                        </Box>
+                                        <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={handleDelete} disabled={actionLoading}>
+                                            {t('common.delete')}
                                         </Button>
                                     </Box>
                                 </Paper>
@@ -806,6 +833,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                 message={t('changeRequest.deleteDialog.message')}
                 loading={actionLoading}
             />
+            <ErrorDialog />
         </Box>
     );
 };

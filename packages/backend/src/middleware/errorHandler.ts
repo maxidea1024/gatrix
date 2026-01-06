@@ -91,6 +91,16 @@ export const errorHandler = (
     statusCode = 400;
     errorCode = ErrorCodes.BAD_REQUEST;
     message = 'Invalid ID format';
+  } else if ((error as any).errno === 1062 || (error as any).code === 'ER_DUP_ENTRY') {
+    statusCode = 409;
+    errorCode = ErrorCodes.DUPLICATE_ENTRY;
+    // Extract duplicate value from MySQL error message if possible: "Duplicate entry '...' for key '...'"
+    const match = error.message.match(/Duplicate entry '(.+)' for key '(.+)'/);
+    if (match) {
+      message = `Duplicate entry: '${match[1]}' for index '${match[2]}'`;
+    } else {
+      message = 'A record with the same unique identifier already exists.';
+    }
   }
 
   // For client aborts, don't send response (connection is already closed)

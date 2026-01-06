@@ -1,43 +1,66 @@
 import React, { useState, useCallback } from 'react';
 import { useSnackbar } from 'notistack';
-import { useTranslation } from 'react-i18next';
 import { parseApiErrorMessage, extractConflictInfo } from '../utils/errorUtils';
-import ResourceLockedDialog from '../components/common/ResourceLockedDialog';
+import ApiErrorDialog from '../components/common/ApiErrorDialog';
 
-export function useHandleApiError() {
+interface UseHandleApiErrorOptions {
+    onDelete?: () => void;  // Optional delete callback for conflict/duplicate errors
+}
+
+export function useHandleApiError(options: UseHandleApiErrorOptions = {}) {
     const { enqueueSnackbar } = useSnackbar();
-    const { t } = useTranslation();
-    const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
-    const [conflictInfo, setConflictInfo] = useState<{
-        lockedBy?: number | string;
-        changeRequestId?: string;
-        changeRequestTitle?: string;
-    }>({});
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [errorType, setErrorType] = useState<'LOCKED' | 'CONFLICT' | 'DUPLICATE' | 'GENERIC'>('GENERIC');
+    const [errorInfo, setErrorInfo] = useState<any>({});
 
     const handleApiError = useCallback((error: any, fallbackKey: string = 'common.generic') => {
-        const lockInfo = extractConflictInfo(error);
+        const conflictInfo = extractConflictInfo(error);
 
-        if (lockInfo.isLocked) {
-            setConflictInfo({
-                lockedBy: lockInfo.lockedBy,
-                changeRequestId: lockInfo.changeRequestId,
-                changeRequestTitle: lockInfo.changeRequestTitle,
+        if (conflictInfo.isLocked) {
+            setErrorType('LOCKED');
+            setErrorInfo({
+                lockedInfo: {
+                    lockedBy: conflictInfo.lockedBy,
+                    changeRequestId: conflictInfo.changeRequestId,
+                    changeRequestTitle: conflictInfo.changeRequestTitle,
+                }
             });
-            setConflictDialogOpen(true);
-            return true; // Error was handled by dialog
+            setDialogOpen(true);
+            return true;
         }
 
+        if (conflictInfo.isDataConflict) {
+            setErrorType('CONFLICT');
+            setErrorInfo({
+                conflictData: conflictInfo.conflictData
+            });
+            setDialogOpen(true);
+            return true;
+        }
+
+        if (conflictInfo.isDuplicate) {
+            setErrorType('DUPLICATE');
+            setErrorInfo({
+                message: conflictInfo.message
+            });
+            setDialogOpen(true);
+            return true;
+        }
+
+        // Generic error handling
         enqueueSnackbar(parseApiErrorMessage(error, fallbackKey), { variant: 'error' });
-        return false; // Error was handled by toast
+        return false;
     }, [enqueueSnackbar]);
 
     const ErrorDialog = useCallback(() => (
-        <ResourceLockedDialog
-            open={conflictDialogOpen}
-            onClose={() => setConflictDialogOpen(false)}
-            {...conflictInfo}
+        <ApiErrorDialog
+            open={dialogOpen}
+            onClose={() => setDialogOpen(false)}
+            type={errorType}
+            onDelete={options.onDelete}
+            {...errorInfo}
         />
-    ), [conflictDialogOpen, conflictInfo]);
+    ), [dialogOpen, errorType, errorInfo, options.onDelete]);
 
     return {
         handleApiError,

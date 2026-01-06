@@ -22,6 +22,9 @@ export function parseApiErrorMessage(error: any, fallbackKey = 'common.saveFaile
         } else {
             errorData = errObj;
         }
+    } else if (error?.status && error?.error) {
+        // If the error object itself is already parsed (from ApiService)
+        errorData = error.error;
     } else if (error?.message) {
         try {
             // Sometimes the error message itself is a JSON string
@@ -72,11 +75,18 @@ export function extractConflictInfo(error: any): {
     changeRequestId?: string;
     changeRequestTitle?: string;
     isLocked: boolean;
+    isDataConflict: boolean;
+    isDuplicate: boolean;
+    conflictData?: any;
+    message?: string;
 } {
     let errorData: any = null;
 
     if (error?.response?.data?.error) {
         errorData = error.response.data.error;
+    } else if (error?.status && error?.error) {
+        // If the error object itself is already parsed (from ApiService)
+        errorData = error.error;
     } else if (error?.message) {
         try {
             errorData = JSON.parse(error.message);
@@ -89,16 +99,36 @@ export function extractConflictInfo(error: any): {
     const isLocked = errorCode === 'ResourceLockedException' || errorCode === 'RESOURCE_LOCKED';
 
     if (isLocked) {
-        // Backend GatrixError wraps the payload inside details.payload 
         const payload = errorData?.payload || errorData?.details?.payload || errorData?.details || {};
         return {
             lockedBy: payload.lockedBy,
             changeRequestId: payload.changeRequestId,
             changeRequestTitle: payload.changeRequestTitle || payload.title,
             isLocked: true,
+            isDataConflict: false,
+            isDuplicate: false,
         };
     }
 
-    return { isLocked: false };
-}
+    const isDataConflict = errorCode === 'CR_DATA_CONFLICT';
+    if (isDataConflict) {
+        return {
+            isLocked: false,
+            isDataConflict: true,
+            isDuplicate: false,
+            conflictData: errorData?.payload || errorData?.details?.payload || errorData?.details || {},
+        };
+    }
 
+    const isDuplicate = errorCode === 'DUPLICATE_ENTRY';
+    if (isDuplicate) {
+        return {
+            isLocked: false,
+            isDataConflict: false,
+            isDuplicate: true,
+            message: errorData?.message || error.message,
+        };
+    }
+
+    return { isLocked: false, isDataConflict: false, isDuplicate: false };
+}
