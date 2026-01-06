@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import {
     Box,
     Typography,
@@ -50,6 +50,7 @@ import changeRequestService, {
 } from '@/services/changeRequestService';
 import SimplePagination from '@/components/common/SimplePagination';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
+import ChangeRequestDetailDrawer from '@/components/admin/ChangeRequestDetailDrawer';
 
 // JSON Diff wrapper component
 interface FieldChange {
@@ -220,12 +221,12 @@ interface ChangeRequestRowProps {
     cr: ChangeRequest;
     index: number;
     onRefresh: () => void;
+    onOpenDrawer: (id: string) => void;
 }
 
-const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefresh }) => {
+const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefresh, onOpenDrawer }) => {
     const { t, i18n } = useTranslation();
     const { enqueueSnackbar } = useSnackbar();
-    const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
     const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
@@ -384,7 +385,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
                         ? (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.025)'
                         : 'transparent',
                 }}
-                onClick={() => navigate(`/admin/change-requests/${cr.id}`)}
+                onClick={() => onOpenDrawer(cr.id)}
             >
                 <TableCell width={50}>
                     <IconButton size="small" onClick={(e) => { e.stopPropagation(); setOpen(!open); }}>
@@ -697,6 +698,20 @@ const ChangeRequestsPage: React.FC = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(20);
 
+    // Drawer state
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [selectedChangeRequestId, setSelectedChangeRequestId] = useState<string | null>(null);
+
+    const handleOpenDrawer = useCallback((id: string) => {
+        setSelectedChangeRequestId(id);
+        setDrawerOpen(true);
+    }, []);
+
+    const handleCloseDrawer = useCallback(() => {
+        setDrawerOpen(false);
+        setSelectedChangeRequestId(null);
+    }, []);
+
     const statusFilter = statusFilters[tabValue];
 
     // SWR fetcher
@@ -785,7 +800,7 @@ const ChangeRequestsPage: React.FC = () => {
                             <TableBody>
                                 {data?.items && data.items.length > 0 ? (
                                     data.items.map((cr, idx) => (
-                                        <ChangeRequestRow key={cr.id} cr={cr} index={idx} onRefresh={handleRefresh} />
+                                        <ChangeRequestRow key={cr.id} cr={cr} index={idx} onRefresh={handleRefresh} onOpenDrawer={handleOpenDrawer} />
                                     ))
                                 ) : (
                                     <EmptyTableRow colSpan={9} message={t('changeRequest.noRequests')} />
@@ -808,6 +823,14 @@ const ChangeRequestsPage: React.FC = () => {
                     )}
                 </CardContent>
             </Card>
+
+            {/* Change Request Detail Drawer */}
+            <ChangeRequestDetailDrawer
+                open={drawerOpen}
+                onClose={handleCloseDrawer}
+                changeRequestId={selectedChangeRequestId}
+                onRefresh={handleRefresh}
+            />
         </Box >
     );
 };

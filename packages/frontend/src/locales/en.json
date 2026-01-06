@@ -845,7 +845,11 @@
     "system-settings_manage": "Manage System Settings",
     "system-settings_manage_desc": "Modify and save system settings. Manage network URLs, webhooks, service discovery settings, and more.",
     "chat_access": "Chat Access",
-    "chat_access_desc": "Access team chat functionality."
+    "chat_access_desc": "Access team chat functionality.",
+    "change-requests_view": "View Change Requests",
+    "change-requests_view_desc": "View change request list and check their status.",
+    "change-requests_manage": "Manage Change Requests",
+    "change-requests_manage_desc": "Approve, reject, and execute change requests."
   },
   "gameWorlds": {
     "worldId": "World ID",
@@ -5063,6 +5067,7 @@
     "submitDialog.description": "Enter title and reason to submit.",
     "submitDialog.titleField": "Title",
     "submitDialog.reason": "Reason",
+    "submitDialog.reasonOptional": "Reason is optional.",
     "createdForReview": "Change request created. Will be applied after approval.",
     "pendingReviewBanner": "{{count}} change request(s) pending. Click to review.",
     "rejectionInfo": "Rejection Info",
@@ -5114,6 +5119,7 @@
     "actions.submitCreate": "Request Create",
     "actions.submitUpdate": "Request Update",
     "actions.submitDelete": "Request Delete",
-    "actions.submitSave": "Request Save"
+    "actions.submitSave": "Request Save",
+    "collapse": "Collapse"
   }
 }

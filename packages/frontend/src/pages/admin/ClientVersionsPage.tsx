@@ -749,7 +749,7 @@ const ClientVersionsPage: React.FC = () => {
             supportsMultiLanguage: supportsMultiLanguage,
             maintenanceLocales: maintenanceLocales.filter(l => l.message.trim() !== ''),
           } : {
-            messageTemplateId: selectedTemplateId,
+            messageTemplateId: selectedTemplateId === '' ? undefined : Number(selectedTemplateId),
           }),
         }),
       };

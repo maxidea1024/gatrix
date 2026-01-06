@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -258,6 +258,7 @@ const ApiTokensPage: React.FC = () => {
 
   // Environment state
   const [environments, setEnvironments] = useState<Environment[]>([]);
+  const [fullEditingData, setFullEditingData] = useState<any>(null);
 
   // Form states
   const [formData, setFormData] = useState<CreateTokenData>({
@@ -267,6 +268,28 @@ const ApiTokensPage: React.FC = () => {
     allowAllEnvironments: false,
     environments: [],
   });
+
+  const isDirty = useMemo(() => {
+    if (!selectedToken || !fullEditingData) return true;
+
+    const currentData = {
+      tokenName: formData.tokenName.trim(),
+      description: formData.description?.trim() || '',
+      allowAllEnvironments: !!formData.allowAllEnvironments,
+      environments: [...(formData.environments || [])].sort(),
+      expiresAt: formData.expiresAt ? new Date(formData.expiresAt).toISOString() : undefined,
+    };
+
+    const originalData = {
+      tokenName: fullEditingData.tokenName.trim(),
+      description: fullEditingData.description?.trim() || '',
+      allowAllEnvironments: !!fullEditingData.allowAllEnvironments,
+      environments: [...(fullEditingData.environments || [])].sort(),
+      expiresAt: fullEditingData.expiresAt ? new Date(fullEditingData.expiresAt).toISOString() : undefined,
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [selectedToken, fullEditingData, formData]);
 
   // UI states
   const [newTokenValue, setNewTokenValue] = useState<string>('');
@@ -369,7 +392,7 @@ const ApiTokensPage: React.FC = () => {
       const filterParams: any = {};
       activeFilters.forEach(filter => {
         if (filter.value !== undefined && filter.value !== null && filter.value !== '') {
-          filterParams[filter.id] = filter.value;
+          filterParams[filter.key] = filter.value;
         }
       });
 
@@ -462,7 +485,7 @@ const ApiTokensPage: React.FC = () => {
             {tokenEnvs.length > 0 ? (
               tokenEnvs.map((env) => (
                 <Chip
-                  key={env!.id}
+                  key={env!.environment}
                   label={env!.displayName || env!.environmentName}
                   size="small"
                   variant="outlined"
@@ -601,6 +624,7 @@ const ApiTokensPage: React.FC = () => {
       await loadTokens();
       setEditDialogOpen(false);
       setSelectedToken(null);
+      setFullEditingData(null);
       resetForm();
       enqueueSnackbar(t('apiTokens.updateSuccess'), { variant: 'success' });
     } catch (error: any) {
@@ -699,6 +723,7 @@ const ApiTokensPage: React.FC = () => {
       environments: token.environments || [],
       expiresAt: token.expiresAt ? new Date(token.expiresAt).toISOString().slice(0, 16) : undefined,
     });
+    setFullEditingData(JSON.parse(JSON.stringify(token)));
     setEditDialogOpen(true);
     // Focus on token name field after dialog opens
     setTimeout(() => {
@@ -1260,20 +1285,20 @@ const ApiTokensPage: React.FC = () => {
                   <Box sx={{ mt: 1, pl: 4 }}>
                     {environments.map((env) => (
                       <FormControlLabel
-                        key={env.id}
+                        key={env.environment}
                         control={
                           <Checkbox
-                            checked={formData.environments.includes(env.id)}
+                            checked={formData.environments.includes(env.environment)}
                             onChange={(e) => {
                               if (e.target.checked) {
                                 setFormData(prev => ({
                                   ...prev,
-                                  environments: [...prev.environments, env.id],
+                                  environments: [...prev.environments, env.environment],
                                 }));
                               } else {
                                 setFormData(prev => ({
                                   ...prev,
-                                  environments: prev.environments.filter(id => id !== env.id),
+                                  environments: prev.environments.filter(id => id !== env.environment),
                                 }));
                               }
                             }}
@@ -1341,8 +1366,8 @@ const ApiTokensPage: React.FC = () => {
                   >
                     {environments.map((env) => (
                       <FormControlLabel
-                        key={env.id}
-                        value={env.id}
+                        key={env.environment}
+                        value={env.environment}
                         control={<Radio size="small" />}
                         label={env.displayName || env.environmentName}
                       />
@@ -1511,8 +1536,8 @@ const ApiTokensPage: React.FC = () => {
                   >
                     {environments.map((env) => (
                       <FormControlLabel
-                        key={env.id}
-                        value={env.id}
+                        key={env.environment}
+                        value={env.environment}
                         control={<Radio size="small" />}
                         label={env.displayName || env.environmentName}
                       />
@@ -1553,20 +1578,20 @@ const ApiTokensPage: React.FC = () => {
                     <Box sx={{ mt: 1, pl: 4 }}>
                       {environments.map((env) => (
                         <FormControlLabel
-                          key={env.id}
+                          key={env.environment}
                           control={
                             <Checkbox
-                              checked={formData.environments.includes(env.id)}
+                              checked={formData.environments.includes(env.environment)}
                               onChange={(e) => {
                                 if (e.target.checked) {
                                   setFormData(prev => ({
                                     ...prev,
-                                    environments: [...prev.environments, env.id],
+                                    environments: [...prev.environments, env.environment],
                                   }));
                                 } else {
                                   setFormData(prev => ({
                                     ...prev,
-                                    environments: prev.environments.filter(id => id !== env.id),
+                                    environments: prev.environments.filter(id => id !== env.environment),
                                   }));
                                 }
                               }}
@@ -1638,7 +1663,7 @@ const ApiTokensPage: React.FC = () => {
             onClick={handleEdit}
             variant="contained"
             startIcon={<SaveIcon />}
-            disabled={!isValidTokenName(formData.tokenName) || !expiresAtValidation.isValid}
+            disabled={!isValidTokenName(formData.tokenName) || !expiresAtValidation.isValid || (!!selectedToken && !isDirty)}
           >
             {t('common.save')}
           </Button>

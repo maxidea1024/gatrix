@@ -163,6 +163,29 @@ const WhitelistPage: React.FC = () => {
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [bulkData, setBulkData] = useState('');
+  const [fullEditingData, setFullEditingData] = useState<any>(null);
+
+  const isDirty = useMemo(() => {
+    if (!editDialog || !fullEditingData) return true;
+
+    const currentData = {
+      accountId: formData.accountId?.trim(),
+      ipAddress: formData.ipAddress?.trim() || '',
+      startDate: formData.startDate || '',
+      endDate: formData.endDate || '',
+      purpose: formData.purpose?.trim() || '',
+    };
+
+    const originalData = {
+      accountId: fullEditingData.accountId?.trim(),
+      ipAddress: fullEditingData.ipAddress?.trim() || '',
+      startDate: fullEditingData.startDate ? fullEditingData.startDate.split('T')[0] : '',
+      endDate: fullEditingData.endDate ? fullEditingData.endDate.split('T')[0] : '',
+      purpose: fullEditingData.purpose?.trim() || '',
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [editDialog, fullEditingData, formData]);
 
   // Selection handlers
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -327,6 +350,7 @@ const WhitelistPage: React.FC = () => {
         endDate: selectedWhitelist.endDate ? selectedWhitelist.endDate.split('T')[0] : '',
         purpose: selectedWhitelist.purpose || '',
       });
+      setFullEditingData(JSON.parse(JSON.stringify(selectedWhitelist)));
       setFormErrors({});
       setEditDialog(true);
 
@@ -396,6 +420,7 @@ const WhitelistPage: React.FC = () => {
         enqueueSnackbar(t('whitelist.toast.updated'), { variant: 'success' });
         setEditDialog(false);
         setSelectedWhitelist(null);
+        setFullEditingData(null);
       } else {
         console.log('Executing CREATE');
         await WhitelistService.createWhitelist(formData);
@@ -714,6 +739,7 @@ const WhitelistPage: React.FC = () => {
               open={addDialog || editDialog}
               onClose={() => {
                 setSelectedWhitelist(null);
+                setFullEditingData(null);
                 setAddDialog(false);
                 setEditDialog(false);
               }}
@@ -884,6 +910,7 @@ const WhitelistPage: React.FC = () => {
                   onClick={handleSave}
                   variant="contained"
                   startIcon={<SaveIcon />}
+                  disabled={loading || (editDialog && !!selectedWhitelist && !isDirty)}
                 >
                   {(editDialog && selectedWhitelist) ? t('whitelist.dialog.update') : t('whitelist.dialog.add')}
                 </Button>

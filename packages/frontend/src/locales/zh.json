@@ -900,7 +900,11 @@
     "system-settings_manage": "管理系统设置",
     "system-settings_manage_desc": "可以修改和保存系统设置。管理网络URL、Webhook、服务发现设置等。",
     "chat_access": "聊天访问",
-    "chat_access_desc": "可以访问团队聊天功能。"
+    "chat_access_desc": "可以访问团队聊天功能。",
+    "change-requests_view": "查看变更请求",
+    "change-requests_view_desc": "可以查看变更请求列表并确认其状态。",
+    "change-requests_manage": "管理变更请求",
+    "change-requests_manage_desc": "可以批准、拒绝和执行变更请求。"
   },
   "gameWorlds": {
     "worldId": "世界ID",
@@ -5108,6 +5112,7 @@
     "submitDialog.description": "输入标题和原因以提交。",
     "submitDialog.titleField": "标题",
     "submitDialog.reason": "原因",
+    "submitDialog.reasonOptional": "变更原因是可选的。",
     "createdForReview": "变更请求已创建，批准后将应用。",
     "pendingReviewBanner": "有 {{count}} 个变更请求待审核。点击查看。",
     "rejectionInfo": "拒绝信息",
@@ -5154,6 +5159,7 @@
     "actions.submitCreate": "请求创建",
     "actions.submitUpdate": "请求更新",
     "actions.submitDelete": "请求删除",
-    "actions.submitSave": "请求保存"
+    "actions.submitSave": "请求保存",
+    "collapse": "收起"
   }
 }

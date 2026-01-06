@@ -345,6 +345,7 @@ const GameWorldsPage: React.FC = () => {
     maintenanceMessage: '',
     supportsMultiLanguage: false,
     maintenanceLocales: [],
+    worldServerAddress: '',
     tagIds: [],
   });
   const [formTags, setFormTags] = useState<Tag[]>([]);

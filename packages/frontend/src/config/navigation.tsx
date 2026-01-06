@@ -198,13 +198,6 @@ export const getMenuCategories = (
   if (isAdmin) {
     categories.push(
       {
-        id: 'event-lens',
-        text: 'sidebar.eventLens',
-        icon: <InsightsIcon />,
-        adminOnly: true,
-        children: applyBadges(eventLensMenuItems),
-      },
-      {
         id: 'admin-panel',
         text: 'sidebar.adminPanel',
         icon: <AdminPanelSettings />,
@@ -217,6 +210,13 @@ export const getMenuCategories = (
         icon: <SportsEsportsIcon />,
         adminOnly: true,
         children: applyBadges(gameMenuItems),
+      },
+      {
+        id: 'event-lens',
+        text: 'sidebar.eventLens',
+        icon: <InsightsIcon />,
+        adminOnly: true,
+        children: applyBadges(eventLensMenuItems),
       }
     );
 

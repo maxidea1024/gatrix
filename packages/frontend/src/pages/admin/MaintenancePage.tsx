@@ -67,11 +67,11 @@ const MaintenancePage: React.FC = () => {
   const [kickDelayMinutes, setKickDelayMinutes] = useState<number>(5); // 유예시간 (분) - 기본값 5분
 
   // Input mode
-  const [inputMode, setInputMode] = useState<'direct'|'template'|''>('direct');
+  const [inputMode, setInputMode] = useState<'direct' | 'template' | ''>('direct');
 
   // Direct input state
   const [baseMsg, setBaseMsg] = useState('');
-  const [locales, setLocales] = useState<Array<{ lang: 'ko'|'en'|'zh'; message: string }>>([]);
+  const [locales, setLocales] = useState<Array<{ lang: 'ko' | 'en' | 'zh'; message: string }>>([]);
   const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
 
   // Templates
@@ -82,14 +82,14 @@ const MaintenancePage: React.FC = () => {
   const selectedTpl = tpls.find(t => t.id === selectedTplId);
   const hasMessageForStart = inputMode === 'template'
     ? !!(selectedTpl && (
-        (selectedTpl.defaultMessage && selectedTpl.defaultMessage.trim()) ||
-        (selectedTpl.locales && selectedTpl.locales.some(l => l.message && l.message.trim()))
-      ))
+      (selectedTpl.defaultMessage && selectedTpl.defaultMessage.trim()) ||
+      (selectedTpl.locales && selectedTpl.locales.some(l => l.message && l.message.trim()))
+    ))
     : !!((baseMsg && baseMsg.trim()) || locales.some(l => l.message && l.message.trim()));
 
   // Confirm dialog
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [confirmMode, setConfirmMode] = useState<'start'|'stop'|'update'|null>(null);
+  const [confirmMode, setConfirmMode] = useState<'start' | 'stop' | 'update' | null>(null);
   const [confirmInput, setConfirmInput] = useState('');
 
   // Periodically recompute maintenance status when scheduled
@@ -163,6 +163,35 @@ const MaintenancePage: React.FC = () => {
       setTpls([]);
     });
   }, []);
+
+  const isDirty = useMemo(() => {
+    if (!isMaintenance || !currentMaintenanceDetail || !editMode) return true;
+
+    const currentData = {
+      type,
+      startsAt: startsAt ? startsAt.format() : null,
+      endsAt: endsAt ? endsAt.format() : null,
+      kickExistingPlayers,
+      kickDelayMinutes: kickExistingPlayers ? kickDelayMinutes : undefined,
+      message: baseMsg || '',
+      localeMessages: supportsMultiLanguage && locales.length > 0 ? Object.fromEntries(locales.map(l => [l.lang, l.message])) : {},
+    };
+
+    const originalData = {
+      type: currentMaintenanceDetail.type,
+      startsAt: currentMaintenanceDetail.startsAt ? dayjs.utc(currentMaintenanceDetail.startsAt).tz(getStoredTimezone()).format() : null,
+      endsAt: currentMaintenanceDetail.endsAt ? dayjs.utc(currentMaintenanceDetail.endsAt).tz(getStoredTimezone()).format() : null,
+      kickExistingPlayers: !!currentMaintenanceDetail.kickExistingPlayers,
+      kickDelayMinutes: currentMaintenanceDetail.kickExistingPlayers ? currentMaintenanceDetail.kickDelayMinutes : undefined,
+      message: currentMaintenanceDetail.message || '',
+      localeMessages: currentMaintenanceDetail.localeMessages || {},
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [
+    isMaintenance, currentMaintenanceDetail, editMode,
+    type, startsAt, endsAt, kickExistingPlayers, kickDelayMinutes, baseMsg, locales, supportsMultiLanguage
+  ]);
 
   // Sync status with SSE
   useSSENotifications({
@@ -295,9 +324,9 @@ const MaintenancePage: React.FC = () => {
       // Only include localeMessages if multi-language is supported
       if (tpl?.supportsMultiLanguage) {
         result.localeMessages = {
-          ko: tpl?.locales?.find(l=>l.lang==='ko')?.message || undefined,
-          en: tpl?.locales?.find(l=>l.lang==='en')?.message || undefined,
-          zh: tpl?.locales?.find(l=>l.lang==='zh')?.message || undefined,
+          ko: tpl?.locales?.find(l => l.lang === 'ko')?.message || undefined,
+          en: tpl?.locales?.find(l => l.lang === 'en')?.message || undefined,
+          zh: tpl?.locales?.find(l => l.lang === 'zh')?.message || undefined,
         };
       }
       return result;
@@ -313,15 +342,13 @@ const MaintenancePage: React.FC = () => {
     };
 
     const response = await maintenanceService.setStatus(payload as any);
-    const { isUnderMaintenance } = response.data;
 
-    if (!isUnderMaintenance) {
-      // 점검이 시작되지 않은 경우 경고
-      enqueueSnackbar(t('maintenance.startFailedWarning'), { variant: 'warning' });
-      return;
+    if (response.isChangeRequest) {
+      showChangeRequestCreatedToast();
+    } else {
+      setIsMaintenance(true);
+      enqueueSnackbar(t('maintenance.startSuccess'), { variant: 'success' });
     }
-
-    setIsMaintenance(true);
   };
 
   const stopMaintenance = async () => {
@@ -350,9 +377,9 @@ const MaintenancePage: React.FC = () => {
       // Only include localeMessages if multi-language is supported
       if (tpl?.supportsMultiLanguage) {
         result.localeMessages = {
-          ko: tpl?.locales?.find(l=>l.lang==='ko')?.message || undefined,
-          en: tpl?.locales?.find(l=>l.lang==='en')?.message || undefined,
-          zh: tpl?.locales?.find(l=>l.lang==='zh')?.message || undefined,
+          ko: tpl?.locales?.find(l => l.lang === 'ko')?.message || undefined,
+          en: tpl?.locales?.find(l => l.lang === 'en')?.message || undefined,
+          zh: tpl?.locales?.find(l => l.lang === 'zh')?.message || undefined,
         };
       }
       return result;
@@ -369,14 +396,12 @@ const MaintenancePage: React.FC = () => {
 
     const result = await maintenanceService.setStatus(payload);
 
-    if (!result.data?.isUnderMaintenance) {
-      // 점검이 업데이트되지 않은 경우 경고
-      enqueueSnackbar(t('maintenance.updateFailedWarning'), { variant: 'warning' });
-      return;
+    if (result.isChangeRequest) {
+      showChangeRequestCreatedToast();
+    } else {
+      setEditMode(false);
+      enqueueSnackbar(t('maintenance.updateSuccess'), { variant: 'success' });
     }
-
-    setEditMode(false);
-    enqueueSnackbar(t('maintenance.updateSuccess'), { variant: 'success' });
   };
 
   // Don't render content until initial status is loaded to prevent flicker
@@ -419,14 +444,14 @@ const MaintenancePage: React.FC = () => {
       <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
         {/* 좌측 설정 영역 */}
         <Card sx={{
-          borderColor: (theme)=> isMaintenance ? theme.palette.error.main : theme.palette.success.main,
+          borderColor: (theme) => isMaintenance ? theme.palette.error.main : theme.palette.success.main,
           borderWidth: 1,
           borderStyle: 'solid',
           flex: 1,
           maxWidth: 800
         }}>
           <CardContent>
-              <Stack spacing={2} sx={{ mt: 1 }}>
+            <Stack spacing={2} sx={{ mt: 1 }}>
               {isMaintenance && !editMode ? (
                 <>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
@@ -750,7 +775,7 @@ const MaintenancePage: React.FC = () => {
 
                   {/* Input mode */}
                   <Box sx={{ width: 320 }}>
-                    <TextField select label={t('maintenance.messageSource')} value={inputMode} onChange={(e)=>setInputMode(e.target.value as any)} fullWidth>
+                    <TextField select label={t('maintenance.messageSource')} value={inputMode} onChange={(e) => setInputMode(e.target.value as any)} fullWidth>
                       <MenuItem value="direct">{t('maintenance.directInput')}</MenuItem>
                       <MenuItem value="template">{t('maintenance.useTemplate')}</MenuItem>
                     </TextField>
@@ -762,7 +787,7 @@ const MaintenancePage: React.FC = () => {
                   {inputMode === 'template' && (
                     <Stack spacing={2}>
                       <Box sx={{ width: 320 }}>
-                        <TextField select label={t('maintenance.selectTemplate')} value={selectedTplId} onChange={(e)=>setSelectedTplId(Number(e.target.value))} fullWidth>
+                        <TextField select label={t('maintenance.selectTemplate')} value={selectedTplId} onChange={(e) => setSelectedTplId(Number(e.target.value))} fullWidth>
                           <MenuItem value="">{t('common.select')}</MenuItem>
                           {tpls.map(tpl => (
                             <MenuItem key={tpl.id} value={tpl.id}>{tpl.name}</MenuItem>
@@ -772,18 +797,18 @@ const MaintenancePage: React.FC = () => {
                           {t('maintenance.selectTemplateHelp')}
                         </Typography>
                       </Box>
-                      {tpls.find(t=>t.id===selectedTplId) && (
+                      {tpls.find(t => t.id === selectedTplId) && (
                         <Card variant="outlined">
                           <CardContent>
                             <Typography variant="subtitle2" gutterBottom>{t('clientVersions.maintenance.defaultMessage')}</Typography>
-                            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{tpls.find(t=>t.id===selectedTplId)?.defaultMessage || '-'}</Typography>
+                            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{tpls.find(t => t.id === selectedTplId)?.defaultMessage || '-'}</Typography>
                             <Stack spacing={1} sx={{ mt: 2 }}>
-                              {(tpls.find(t=>t.id===selectedTplId)?.locales || []).map(l => {
+                              {(tpls.find(t => t.id === selectedTplId)?.locales || []).map(l => {
                                 const langLabels = { ko: '한국어', en: '영어', zh: '중국어' };
                                 return (
-                                  <Box key={l.lang} sx={{ display:'flex', gap:1, alignItems:'flex-start' }}>
-                                    <Chip label={langLabels[l.lang as keyof typeof langLabels] || l.lang} size="small" sx={{ width: 96, justifyContent:'flex-start' }} />
-                                    <Typography variant="body2" sx={{ whiteSpace:'pre-wrap' }}>{l.message}</Typography>
+                                  <Box key={l.lang} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                                    <Chip label={langLabels[l.lang as keyof typeof langLabels] || l.lang} size="small" sx={{ width: 96, justifyContent: 'flex-start' }} />
+                                    <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{l.message}</Typography>
                                   </Box>
                                 );
                               })}
@@ -809,9 +834,9 @@ const MaintenancePage: React.FC = () => {
                         if (supports) {
                           // 모든 언어 자동 추가
                           const allLangs = [
-                            { code: 'ko' as const, message: '' },
-                            { code: 'en' as const, message: '' },
-                            { code: 'zh' as const, message: '' }
+                            { lang: 'ko' as const, message: '' },
+                            { lang: 'en' as const, message: '' },
+                            { lang: 'zh' as const, message: '' }
                           ];
                           setLocales(allLangs);
                         } else {
@@ -902,7 +927,7 @@ const MaintenancePage: React.FC = () => {
                       setConfirmInput('');
                       setConfirmOpen(true);
                     }}
-                    disabled={!hasMessageForStart}
+                    disabled={!hasMessageForStart || !isDirty}
                     sx={{
                       width: 160,
                       height: 160,
@@ -960,7 +985,7 @@ const MaintenancePage: React.FC = () => {
         {/* Confirm dialog */}
         <Dialog
           open={confirmOpen}
-          onClose={()=>setConfirmOpen(false)}
+          onClose={() => setConfirmOpen(false)}
           maxWidth="md"
           fullWidth
           sx={{
@@ -974,13 +999,13 @@ const MaintenancePage: React.FC = () => {
           <DialogTitle sx={{ pb: 1 }}>
             <Typography variant="h6" component="div">
               {confirmMode === 'start' ? t('maintenance.confirmStartTitle') :
-               confirmMode === 'update' ? t('maintenance.confirmUpdateTitle') :
-               t('maintenance.confirmStopTitle')}
+                confirmMode === 'update' ? t('maintenance.confirmUpdateTitle') :
+                  t('maintenance.confirmStopTitle')}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
               {confirmMode === 'start' ? t('maintenance.confirmStartSubtitle') :
-               confirmMode === 'update' ? t('maintenance.confirmUpdateSubtitle') :
-               t('maintenance.confirmStopSubtitle')}
+                confirmMode === 'update' ? t('maintenance.confirmUpdateSubtitle') :
+                  t('maintenance.confirmStopSubtitle')}
             </Typography>
           </DialogTitle>
           <DialogContent sx={{ pt: 2 }}>
@@ -1232,43 +1257,43 @@ const MaintenancePage: React.FC = () => {
               {confirmMode === 'start'
                 ? t('maintenance.confirmStartMessage', { keyword: t('maintenance.confirmStartKeyword') })
                 : confirmMode === 'update'
-                ? t('maintenance.confirmUpdateMessage', { keyword: t('maintenance.confirmUpdateKeyword') })
-                : t('maintenance.confirmStopMessage', { keyword: t('maintenance.confirmStopKeyword') })}
+                  ? t('maintenance.confirmUpdateMessage', { keyword: t('maintenance.confirmUpdateKeyword') })
+                  : t('maintenance.confirmStopMessage', { keyword: t('maintenance.confirmStopKeyword') })}
             </Typography>
             <TextField
               autoFocus
               fullWidth
               size="medium"
               value={confirmInput}
-              onChange={(e)=>setConfirmInput(e.target.value)}
+              onChange={(e) => setConfirmInput(e.target.value)}
               placeholder={confirmMode === 'start' ? t('maintenance.confirmStartKeyword') :
-                         confirmMode === 'update' ? t('maintenance.confirmUpdateKeyword') :
-                         t('maintenance.confirmStopKeyword')}
+                confirmMode === 'update' ? t('maintenance.confirmUpdateKeyword') :
+                  t('maintenance.confirmStopKeyword')}
               sx={{ mb: 1 }}
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={()=>setConfirmOpen(false)}>{t('common.cancel')}</Button>
+            <Button onClick={() => setConfirmOpen(false)}>{t('common.cancel')}</Button>
             <Button
-              color={confirmMode==='start' ? 'error' : confirmMode==='update' ? 'primary' : 'success'}
+              color={confirmMode === 'start' ? 'error' : confirmMode === 'update' ? 'primary' : 'success'}
               variant="contained"
-              onClick={async()=>{
-                const expected = confirmMode==='start' ? t('maintenance.confirmStartKeyword') :
-                                confirmMode==='update' ? t('maintenance.confirmUpdateKeyword') :
-                                t('maintenance.confirmStopKeyword');
+              onClick={async () => {
+                const expected = confirmMode === 'start' ? t('maintenance.confirmStartKeyword') :
+                  confirmMode === 'update' ? t('maintenance.confirmUpdateKeyword') :
+                    t('maintenance.confirmStopKeyword');
                 if (confirmInput.trim().toLowerCase() !== expected.toLowerCase()) return;
                 setConfirmOpen(false);
-                if (confirmMode==='start') await startMaintenance();
-                if (confirmMode==='update') await updateMaintenance();
-                if (confirmMode==='stop') await stopMaintenance();
+                if (confirmMode === 'start') await startMaintenance();
+                if (confirmMode === 'update') await updateMaintenance();
+                if (confirmMode === 'stop') await stopMaintenance();
               }}
-              disabled={confirmInput.trim().toLowerCase() !== (confirmMode==='start' ? t('maintenance.confirmStartKeyword') :
-                                                              confirmMode==='update' ? t('maintenance.confirmUpdateKeyword') :
-                                                              t('maintenance.confirmStopKeyword')).toLowerCase()}
+              disabled={confirmInput.trim().toLowerCase() !== (confirmMode === 'start' ? t('maintenance.confirmStartKeyword') :
+                confirmMode === 'update' ? t('maintenance.confirmUpdateKeyword') :
+                  t('maintenance.confirmStopKeyword')).toLowerCase()}
             >
-              {confirmMode==='start' ? t('maintenance.start') :
-               confirmMode==='update' ? t('maintenance.update') :
-               t('maintenance.stop')}
+              {confirmMode === 'start' ? t('maintenance.start') :
+                confirmMode === 'update' ? t('maintenance.update') :
+                  t('maintenance.stop')}
             </Button>
           </DialogActions>
         </Dialog>

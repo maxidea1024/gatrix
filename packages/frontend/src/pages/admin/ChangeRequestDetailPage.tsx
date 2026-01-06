@@ -14,6 +14,7 @@ import {
     Alert,
     Tabs,
     Tab,
+    Collapse,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
@@ -57,6 +58,8 @@ interface TimelineEvent {
     timestamp: string;
     user?: { name?: string; email?: string };
     comment?: string;
+    title?: string;
+    reason?: string;
 }
 
 // Field Change
@@ -81,6 +84,7 @@ const ChangeRequestDetailPage: React.FC = () => {
     const [submitReason, setSubmitReason] = useState('');
     const [activeTab, setActiveTab] = useState(0);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [expandedReasons, setExpandedReasons] = useState<Record<number, boolean>>({});
 
     // Delete handler for error dialog
     const handleDeleteFromError = async () => {
@@ -112,7 +116,7 @@ const ChangeRequestDetailPage: React.FC = () => {
         events.push({ type: 'created', timestamp: cr.createdAt, user: cr.requester });
 
         if (cr.status !== 'draft') {
-            events.push({ type: 'submitted', timestamp: cr.updatedAt, user: cr.requester });
+            events.push({ type: 'submitted', timestamp: cr.updatedAt, user: cr.requester, title: cr.title, reason: cr.reason });
         }
 
         if (cr.approvals?.length) {
@@ -346,83 +350,154 @@ const ChangeRequestDetailPage: React.FC = () => {
                         {/* Main */}
                         <Box sx={{ flex: 1 }}>
                             {/* Initial Comment */}
-                            <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-                                {/* Time column */}
-                                <Box sx={{ width: 48, flexShrink: 0, pt: 1.25, textAlign: 'right' }}>
-                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500, fontFamily: 'monospace' }}>
-                                        {new Date(cr.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
-                                    </Typography>
-                                </Box>
-                                <Paper variant="outlined" sx={{ flex: 1, overflow: 'hidden' }}>
-                                    <Box sx={{ bgcolor: 'action.hover', px: 2, py: 1, borderBottom: (cr.reason || cr.description) ? 1 : 0, borderColor: 'divider' }}>
-                                        <Typography variant="body2">
-                                            <strong>{cr.requester?.name || cr.requester?.email}</strong>
-                                            {' '}{t('changeRequest.opened')}{' '}
-                                            <RelativeTime date={cr.createdAt} />
-                                        </Typography>
-                                    </Box>
-                                    {(cr.reason || cr.description) && (
-                                        <Box sx={{ p: 2 }}>
-                                            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-                                                {cr.reason || cr.description}
-                                            </Typography>
-                                        </Box>
-                                    )}
-                                </Paper>
-                            </Box>
-
-                            {/* Timeline line - connecting initial to others */}
-                            {timeline.filter(e => e.type !== 'created').length > 0 && (
+                            <Box sx={{ display: 'flex', mb: 2 }}>
+                                {/* Time column with triangle pointer */}
                                 <Box sx={{
-                                    ml: '80px', // Center of avatar: 48 (time) + 16 (gap) + 16 (half avatar circle)
-                                    width: 2,
-                                    height: 16,
-                                    bgcolor: 'divider',
-                                    mt: -3,
-                                    mb: -1
-                                }} />
-                            )}
-
-                            {/* Timeline Events */}
-                            {timeline.filter(e => e.type !== 'created').map((event, idx) => (
-                                <Box key={idx} sx={{ display: 'flex', gap: 2, mb: 3, position: 'relative' }}>
-                                    {/* Time column */}
-                                    <Box sx={{ width: 48, flexShrink: 0, pt: 1.25, textAlign: 'right' }}>
-                                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500, fontFamily: 'monospace' }}>
-                                            {new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
-                                        </Typography>
-                                    </Box>
-
-                                    {/* Timeline line */}
+                                    width: 72,
+                                    flexShrink: 0,
+                                    display: 'flex',
+                                    alignItems: 'flex-start',
+                                    justifyContent: 'flex-end',
+                                    pr: 1,
+                                    pt: 1.5,
+                                }}>
                                     <Box sx={{
-                                        position: 'absolute',
-                                        left: 80, // Center of avatar: 48 (time) + 16 (gap) + 16 (half avatar circle)
-                                        transform: 'translateX(-50%)',
-                                        top: 32,
-                                        bottom: -24,
-                                        width: 2,
-                                        bgcolor: 'divider',
-                                        display: idx === timeline.filter(e => e.type !== 'created').length - 1 ? 'none' : 'block',
-                                    }} />
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 0.5,
+                                    }}>
+                                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>
+                                            {new Date(cr.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                                        </Typography>
+                                        <Box sx={{
+                                            width: 0,
+                                            height: 0,
+                                            borderTop: '6px solid transparent',
+                                            borderBottom: '6px solid transparent',
+                                            borderLeft: (theme) => `6px solid ${alpha(theme.palette.text.secondary, 0.3)}`,
+                                        }} />
+                                    </Box>
+                                </Box>
 
-                                    {/* Avatar */}
+                                {/* Timeline connector column */}
+                                <Box sx={{
+                                    width: 48,
+                                    flexShrink: 0,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    position: 'relative',
+                                }}>
                                     <Avatar sx={{
                                         width: 32,
                                         height: 32,
-                                        bgcolor: event.type === 'rejected' ? 'error.main'
-                                            : event.type === 'approved' ? 'success.main'
-                                                : event.type === 'executed' ? 'info.main'
-                                                    : 'primary.main',
+                                        bgcolor: 'grey.500',
+                                        mt: 0.5,
                                         zIndex: 1,
                                     }}>
-                                        {event.type === 'submitted' && <SendIcon sx={{ fontSize: 16 }} />}
-                                        {event.type === 'approved' && <CheckIcon sx={{ fontSize: 16 }} />}
-                                        {event.type === 'rejected' && <CloseIcon sx={{ fontSize: 16 }} />}
-                                        {event.type === 'executed' && <MergeIcon sx={{ fontSize: 16 }} />}
+                                        <PersonIcon sx={{ fontSize: 18 }} />
                                     </Avatar>
+                                    {timeline.filter(e => e.type !== 'created').length > 0 && (
+                                        <Box sx={{
+                                            flex: 1,
+                                            width: 2,
+                                            bgcolor: 'divider',
+                                            mt: 1,
+                                        }} />
+                                    )}
+                                </Box>
 
-                                    {/* Content */}
-                                    <Box sx={{ flex: 1, pt: 0.5 }}>
+                                {/* Content column */}
+                                <Box sx={{ flex: 1, pl: 1.5 }}>
+                                    <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
+                                        <Box sx={{ bgcolor: 'action.hover', px: 2, py: 1, borderBottom: (cr.reason || cr.description) ? 1 : 0, borderColor: 'divider' }}>
+                                            <Typography variant="body2">
+                                                <strong>{cr.requester?.name || cr.requester?.email}</strong>
+                                                {' '}{t('changeRequest.opened')}{' '}
+                                                <RelativeTime date={cr.createdAt} />
+                                            </Typography>
+                                        </Box>
+                                        {(cr.reason || cr.description) && (
+                                            <Box sx={{ p: 2 }}>
+                                                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                                                    {cr.reason || cr.description}
+                                                </Typography>
+                                            </Box>
+                                        )}
+                                    </Paper>
+                                </Box>
+                            </Box>
+
+                            {/* Timeline Events */}
+                            {timeline.filter(e => e.type !== 'created').map((event, idx, arr) => (
+                                <Box key={idx} sx={{ display: 'flex', mb: 2 }}>
+                                    {/* Time column with triangle pointer */}
+                                    <Box sx={{
+                                        width: 72,
+                                        flexShrink: 0,
+                                        display: 'flex',
+                                        alignItems: 'flex-start',
+                                        justifyContent: 'flex-end',
+                                        pr: 1,
+                                        pt: 0.5,
+                                    }}>
+                                        <Box sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 0.5,
+                                        }}>
+                                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>
+                                                {new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                                            </Typography>
+                                            <Box sx={{
+                                                width: 0,
+                                                height: 0,
+                                                borderTop: '6px solid transparent',
+                                                borderBottom: '6px solid transparent',
+                                                borderLeft: (theme) => `6px solid ${event.type === 'rejected' ? theme.palette.error.main
+                                                    : event.type === 'approved' ? theme.palette.success.main
+                                                        : event.type === 'executed' ? theme.palette.info.main
+                                                            : theme.palette.primary.main
+                                                    }`,
+                                            }} />
+                                        </Box>
+                                    </Box>
+
+                                    {/* Timeline connector column */}
+                                    <Box sx={{
+                                        width: 48,
+                                        flexShrink: 0,
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        position: 'relative',
+                                    }}>
+                                        <Avatar sx={{
+                                            width: 32,
+                                            height: 32,
+                                            bgcolor: event.type === 'rejected' ? 'error.main'
+                                                : event.type === 'approved' ? 'success.main'
+                                                    : event.type === 'executed' ? 'info.main'
+                                                        : 'primary.main',
+                                            zIndex: 1,
+                                        }}>
+                                            {event.type === 'submitted' && <SendIcon sx={{ fontSize: 16 }} />}
+                                            {event.type === 'approved' && <CheckIcon sx={{ fontSize: 16 }} />}
+                                            {event.type === 'rejected' && <CloseIcon sx={{ fontSize: 16 }} />}
+                                            {event.type === 'executed' && <MergeIcon sx={{ fontSize: 16 }} />}
+                                        </Avatar>
+                                        {idx < arr.length - 1 && (
+                                            <Box sx={{
+                                                flex: 1,
+                                                width: 2,
+                                                bgcolor: 'divider',
+                                                mt: 1,
+                                            }} />
+                                        )}
+                                    </Box>
+
+                                    {/* Content column */}
+                                    <Box sx={{ flex: 1, pl: 1.5 }}>
                                         <Typography variant="body2">
                                             <strong>{event.user?.name || event.user?.email || 'System'}</strong>
                                             {' '}
@@ -435,6 +510,51 @@ const ChangeRequestDetailPage: React.FC = () => {
                                                 <RelativeTime date={event.timestamp} />
                                             </Typography>
                                         </Typography>
+
+                                        {/* Submitted event: show title with expandable reason */}
+                                        {event.type === 'submitted' && event.title && (
+                                            <Box sx={{ mt: 1 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                                                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                                        {event.title}
+                                                    </Typography>
+                                                    {event.reason && (
+                                                        <Chip
+                                                            label={expandedReasons[idx] ? t('changeRequest.collapse') : '...'}
+                                                            size="small"
+                                                            onClick={() => setExpandedReasons(prev => ({ ...prev, [idx]: !prev[idx] }))}
+                                                            sx={{
+                                                                height: 20,
+                                                                fontSize: 11,
+                                                                fontWeight: 500,
+                                                                bgcolor: (theme) => alpha(theme.palette.text.primary, 0.08),
+                                                                color: 'text.secondary',
+                                                                cursor: 'pointer',
+                                                                '&:hover': {
+                                                                    bgcolor: (theme) => alpha(theme.palette.text.primary, 0.15),
+                                                                },
+                                                            }}
+                                                        />
+                                                    )}
+                                                </Box>
+                                                <Collapse in={!!expandedReasons[idx]} timeout={200}>
+                                                    {event.reason && (
+                                                        <Paper
+                                                            variant="outlined"
+                                                            sx={{
+                                                                mt: 1,
+                                                                p: 1.5,
+                                                                bgcolor: 'action.hover',
+                                                            }}
+                                                        >
+                                                            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                                                                {event.reason}
+                                                            </Typography>
+                                                        </Paper>
+                                                    )}
+                                                </Collapse>
+                                            </Box>
+                                        )}
 
                                         {event.comment && (
                                             <Paper
@@ -459,7 +579,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                                 </Box>
                             ))}
 
-                            <Divider sx={{ my: 3 }} />
+                            <Divider sx={{ my: 3, borderStyle: 'dashed' }} />
 
                             {/* Review Box */}
                             {cr.status === 'open' && (
@@ -587,8 +707,8 @@ const ChangeRequestDetailPage: React.FC = () => {
                                         <Typography variant="subtitle2">{t('changeRequest.submitDialog.title')}</Typography>
                                     </Box>
                                     <Box sx={{ p: 2 }}>
-                                        <TextField autoFocus fullWidth label={t('changeRequest.submitDialog.titleField')} value={submitTitle} onChange={(e) => setSubmitTitle(e.target.value)} sx={{ mb: 2 }} />
-                                        <TextField fullWidth multiline rows={3} label={t('changeRequest.submitDialog.reason')} value={submitReason} onChange={(e) => setSubmitReason(e.target.value)} sx={{ mb: 2 }} />
+                                        <TextField autoFocus fullWidth label={t('changeRequest.submitDialog.titleField')} value={submitTitle} onChange={(e) => setSubmitTitle(e.target.value)} sx={{ mb: 2 }} required />
+                                        <TextField fullWidth multiline rows={3} label={t('changeRequest.submitDialog.reason')} value={submitReason} onChange={(e) => setSubmitReason(e.target.value)} sx={{ mb: 2 }} helperText={t('changeRequest.submitDialog.reasonOptional')} />
                                         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
                                             <Button onClick={() => setShowSubmitForm(false)} disabled={actionLoading}>{t('common.cancel')}</Button>
                                             <Button variant="contained" onClick={handleSubmit} disabled={actionLoading}>{t('changeRequest.actions.submit')}</Button>

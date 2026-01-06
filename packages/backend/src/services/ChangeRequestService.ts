@@ -309,7 +309,7 @@ export class ChangeRequestService {
         // Update Status with rejection info
         await cr.$query().patch({
             status: 'rejected',
-            rejectedBy: rejectedBy,  // Will be null for system rejections
+            rejectedBy: rejectedBy ?? undefined,  // Will be undefined for system rejections
             rejectedAt: knex.fn.now(),
             rejectionReason: comment
         });
@@ -344,7 +344,7 @@ export class ChangeRequestService {
             if (cr.status !== 'rejected') throw new Error('Only REJECTED requests can be reopened');
 
             const user = await User.query(trx).findById(requesterId);
-            const isAdmin = user?.role === 'admin' || user?.role === 0;
+            const isAdmin = user?.role === 'admin' || String(user?.role) === '0';
 
             // Validate ownership: Only the original requester or an admin can reopen
             if (cr.requesterId !== requesterId && !isAdmin) {

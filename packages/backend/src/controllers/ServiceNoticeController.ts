@@ -179,8 +179,8 @@ class ServiceNoticeController {
         'g_service_notices',
         String(id),
         data,
-        async () => {
-          const notice = await ServiceNoticeService.getServiceNoticeById(id, environment);
+        async (processedData: any) => {
+          const notice = await ServiceNoticeService.updateServiceNotice(id, processedData, environment);
           return { notice };
         }
       );
@@ -318,11 +318,11 @@ class ServiceNoticeController {
         environment,
         'g_service_notices',
         String(id),
-        async (currentNotice: any) => {
-          return { isActive: !currentNotice.isActive };
+        async (currentData: any) => {
+          return { isActive: !currentData.isActive };
         },
-        async () => {
-          const notice = await ServiceNoticeService.getServiceNoticeById(id, environment);
+        async (processedData: any) => {
+          const notice = await ServiceNoticeService.updateServiceNotice(id, processedData, environment);
           return { notice };
         }
       );

@@ -82,7 +82,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
-import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import { formatRelativeTime } from '@/utils/dateFormat';
 import { messageTemplateService, MessageTemplate, MessageTemplateLocale, MessageTemplateType } from '@/services/messageTemplateService';
 import { tagService, Tag } from '@/services/tagService';
 import translationService from '@/services/translationService';
@@ -248,7 +248,35 @@ const MessageTemplatesPage: React.FC = () => {
   const [selectedTemplateForTags, setSelectedTemplateForTags] = useState<MessageTemplate | null>(null);
   const [templateTags, setTemplateTags] = useState<Tag[]>([]);
 
+  const [fullEditingData, setFullEditingData] = useState<MessageTemplate | null>(null);
   const [form, setForm] = useState<MessageTemplate>({ name: '', type: 'maintenance', isEnabled: true, defaultMessage: '', locales: [] });
+
+  const isDirty = useMemo(() => {
+    if (!editing) return true;
+    if (!fullEditingData) return true;
+
+    const currentData = {
+      name: form.name.trim(),
+      type: form.type,
+      isEnabled: !!form.isEnabled,
+      supportsMultiLanguage: !!form.supportsMultiLanguage,
+      defaultMessage: form.defaultMessage?.trim() || '',
+      locales: (form.locales || []).map(l => ({ lang: l.lang, message: (l.message || '').trim() })).sort((a, b) => a.lang.localeCompare(b.lang)),
+      tags: (form.tags || []).map(t => t.id).sort((a, b) => a - b),
+    };
+
+    const originalData = {
+      name: fullEditingData.name.trim(),
+      type: fullEditingData.type,
+      isEnabled: !!fullEditingData.isEnabled,
+      supportsMultiLanguage: !!fullEditingData.supportsMultiLanguage,
+      defaultMessage: (fullEditingData.defaultMessage || '').trim(),
+      locales: (fullEditingData.locales || []).map(l => ({ lang: l.lang, message: (l.message || '').trim() })).sort((a, b) => a.lang.localeCompare(b.lang)),
+      tags: (fullEditingData.tags || []).map(t => t.id).sort((a, b) => a - b),
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [editing, fullEditingData, form]);
 
   // Column configuration
   const defaultColumns: ColumnConfig[] = [
@@ -497,12 +525,14 @@ const MessageTemplatesPage: React.FC = () => {
 
   const handleAdd = () => {
     setEditing(null);
+    setFullEditingData(null);
     setForm({ name: '', type: 'maintenance', isEnabled: true, supportsMultiLanguage: false, defaultMessage: '', locales: [], tags: [] });
     setDialogOpen(true);
   };
 
   const handleEdit = (row: MessageTemplate) => {
     setEditing(row);
+    setFullEditingData(JSON.parse(JSON.stringify(row)));
     setForm({
       id: row.id,
       name: row.name,
@@ -595,6 +625,8 @@ const MessageTemplatesPage: React.FC = () => {
       }
 
       setDialogOpen(false);
+      setEditing(null);
+      setFullEditingData(null);
       await load();
     } catch (error: any) {
       // Handle duplicate name error - 두 가지 오류 구조 모두 처리
@@ -691,7 +723,7 @@ const MessageTemplatesPage: React.FC = () => {
           </Box>
         );
       case 'createdAt':
-        return <Typography variant="body2">{formatDateTimeDetailed(template.createdAt)}</Typography>;
+        return <Typography variant="body2">{formatRelativeTime(template.createdAt)}</Typography>;
       default:
         return null;
     }
@@ -1020,7 +1052,7 @@ const MessageTemplatesPage: React.FC = () => {
               value={form.tags?.map(tag => tag.id) || []}
               onChange={(e) => {
                 const selectedIds = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
-                const selectedTags = allTags.filter(tag => selectedIds.includes(tag.id));
+                const selectedTags = allTags.filter(tag => selectedIds.includes(String(tag.id)));
                 setForm(prev => ({ ...prev, tags: selectedTags }));
               }}
               SelectProps={{
@@ -1085,7 +1117,7 @@ const MessageTemplatesPage: React.FC = () => {
           <Button
             variant="contained"
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || (!!editing && !isDirty)}
             startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
           >
             {saving ? t('common.saving') : t('common.save')}
@@ -1197,7 +1229,7 @@ const MessageTemplatesPage: React.FC = () => {
               value={templateTags.map(tag => tag.id)}
               onChange={(e) => {
                 const selectedIds = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
-                const selectedTags = allTags.filter(tag => selectedIds.includes(tag.id));
+                const selectedTags = allTags.filter(tag => selectedIds.includes(String(tag.id)));
                 setTemplateTags(selectedTags);
               }}
               SelectProps={{

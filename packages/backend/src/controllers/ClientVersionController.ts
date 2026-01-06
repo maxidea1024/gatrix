@@ -515,12 +515,15 @@ export class ClientVersionController {
     const environment = req.environment || 'development';
 
     // Use UnifiedChangeGateway for CR support
-    const gatewayResult = await UnifiedChangeGateway.requestModification(
+    const gatewayResult = await UnifiedChangeGateway.processChange(
       userId,
       environment,
       'g_client_versions',
       String(id),
-      updateData
+      updateData,
+      async (processedData: any) => {
+        return await ClientVersionService.updateClientVersion(id, processedData, environment);
+      }
     );
 
     if (gatewayResult.mode === 'DIRECT') {

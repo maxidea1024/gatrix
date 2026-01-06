@@ -845,7 +845,11 @@
     "system-settings_manage": "시스템 설정 관리",
     "system-settings_manage_desc": "시스템 설정을 변경하고 저장할 수 있습니다. 네트워크 URL, 웹훅, 서비스 디스커버리 설정 등을 관리합니다.",
     "chat_access": "채팅 접근",
-    "chat_access_desc": "팀 채팅 기능에 접근할 수 있습니다."
+    "chat_access_desc": "팀 채팅 기능에 접근할 수 있습니다.",
+    "change-requests_view": "변경 요청 조회",
+    "change-requests_view_desc": "변경 요청 목록을 조회하고 상태를 확인할 수 있습니다.",
+    "change-requests_manage": "변경 요청 관리",
+    "change-requests_manage_desc": "변경 요청을 승인, 거절, 실행할 수 있습니다."
   },
   "gameWorlds": {
     "worldId": "월드 ID",
@@ -5054,6 +5058,7 @@
     "submitDialog.description": "변경 요청을 제출하려면 제목과 변경 사유를 입력해주세요.",
     "submitDialog.titleField": "제목",
     "submitDialog.reason": "변경 사유",
+    "submitDialog.reasonOptional": "변경 사유는 선택 항목입니다.",
     "errors.submitFieldsRequired": "제목과 변경 사유를 모두 입력해주세요.",
     "errors.executeFailed": "변경 요청 적용에 실패했습니다.",
     "errors.approveFailed": "승인 처리에 실패했습니다.",
@@ -5107,6 +5112,7 @@
     "actions.submitCreate": "생성 요청",
     "actions.submitUpdate": "수정 요청",
     "actions.submitDelete": "삭제 요청",
-    "actions.submitSave": "저장 요청"
+    "actions.submitSave": "저장 요청",
+    "collapse": "접기"
   }
 }

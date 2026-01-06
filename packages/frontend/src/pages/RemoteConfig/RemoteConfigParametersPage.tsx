@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, createContext } from 'react';
+import React, { useState, useEffect, useContext, createContext, useMemo } from 'react';
 import {
   Box,
   Card,
@@ -221,11 +221,11 @@ const VersionContext = createContext<VersionContextType>({
   hasChanges: false,
   pendingChanges: 0,
   changesList: [],
-  markAsChanged: () => {},
-  discardChanges: () => {},
-  deployChanges: () => {},
-  showDiscardDialog: () => {},
-  showDeployDialog: () => {}
+  markAsChanged: () => { },
+  discardChanges: () => { },
+  deployChanges: () => { },
+  showDiscardDialog: () => { },
+  showDeployDialog: () => { }
 });
 
 // Version Provider
@@ -494,8 +494,8 @@ const PageHeader: React.FC = () => {
       }}
     >
       <Box sx={{ px: 3, py: 2 }}>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
                 {t('remoteConfig.title')}
@@ -509,8 +509,8 @@ const PageHeader: React.FC = () => {
                 />
               )}
             </Box>
-          </Grid>
-          <Grid item>
+          </Box>
+          <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               {hasChanges && (
                 <>
@@ -533,8 +533,8 @@ const PageHeader: React.FC = () => {
                 </>
               )}
             </Box>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Box>
     </Paper>
   );
@@ -562,6 +562,40 @@ const ConfigsManagement: React.FC = () => {
     defaultValue: '',
     description: ''
   });
+  const [fullEditingData, setFullEditingData] = useState<any>(null);
+
+  const isDirty = useMemo(() => {
+    if (dialogType !== 'edit' || !fullEditingData) return true;
+
+    let processedValue: any = formData.defaultValue;
+    if (formData.type === 'number') {
+      processedValue = Number(formData.defaultValue);
+    } else if (formData.type === 'boolean') {
+      processedValue = formData.defaultValue === 'true';
+    } else if (formData.type === 'json') {
+      try {
+        processedValue = JSON.parse(formData.defaultValue);
+      } catch (e) {
+        processedValue = formData.defaultValue;
+      }
+    }
+
+    const currentData = {
+      key: formData.key,
+      type: formData.type,
+      defaultValue: processedValue,
+      description: formData.description
+    };
+
+    const originalData = {
+      key: fullEditingData.key,
+      type: fullEditingData.type,
+      defaultValue: fullEditingData.defaultValue,
+      description: fullEditingData.description
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [dialogType, fullEditingData, formData]);
 
   useEffect(() => {
     loadConfigs();
@@ -617,6 +651,7 @@ const ConfigsManagement: React.FC = () => {
         : String(config.defaultValue),
       description: config.description
     });
+    setFullEditingData(JSON.parse(JSON.stringify(config)));
     setDialogOpen(true);
   };
 
@@ -734,7 +769,7 @@ const ConfigsManagement: React.FC = () => {
           timestamp: new Date().toISOString()
         });
       }
-
+      setFullEditingData(null);
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to save config:', error);
@@ -807,247 +842,247 @@ const ConfigsManagement: React.FC = () => {
 
   return (
     <>
-    <Card>
-      <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h6" component="h2">
-            {t('remoteConfig.parameters')}
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAddConfig}
-            size="small"
+      <Card>
+        <CardContent>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6" component="h2">
+              {t('remoteConfig.parameters')}
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddConfig}
+              size="small"
+            >
+              {t('remoteConfig.addParameter')}
+            </Button>
+          </Box>
+
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t('remoteConfig.parameterKey')}</TableCell>
+                  <TableCell>{t('remoteConfig.type')}</TableCell>
+                  <TableCell>{t('remoteConfig.defaultValue')}</TableCell>
+                  <TableCell>{t('remoteConfig.description')}</TableCell>
+                  <TableCell>{t('remoteConfig.features')}</TableCell>
+                  <TableCell>{t('remoteConfig.lastUpdated')}</TableCell>
+                  <TableCell>{t('common.actions')}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {configs
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((config) => (
+                    <TableRow key={config.id}>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                          {config.key}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={config.type}
+                          size="small"
+                          color={getTypeColor(config.type) as any}
+                          variant="outlined"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {config.defaultValue === null || config.defaultValue === undefined || config.defaultValue === '' ? (
+                          <Typography variant="body2" color="text.disabled" sx={{ fontStyle: 'italic' }}>
+                            {t('remoteConfig.noValue')}
+                          </Typography>
+                        ) : (
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                            {typeof config.defaultValue === 'object'
+                              ? JSON.stringify(config.defaultValue)
+                              : String(config.defaultValue)}
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {config.description}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                          {config.variants && (
+                            <Chip
+                              label={`${config.variants.length} variants`}
+                              size="small"
+                              icon={<VariantsIcon />}
+                              variant="outlined"
+                              color="secondary"
+                            />
+                          )}
+                          {config.campaigns && config.campaigns.length > 0 && (
+                            <Chip
+                              label={`${config.campaigns.length} campaigns`}
+                              size="small"
+                              icon={<CampaignIcon />}
+                              variant="outlined"
+                              color="warning"
+                            />
+                          )}
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {formatDateTimeDetailed(config.updatedAt)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEditConfig(config)}
+                            color="primary"
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteConfig(config)}
+                            color="error"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <SimplePagination
+            count={configs.length}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Create/Edit Parameter Side Panel */}
+      <SidePanel
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={dialogType === 'create'
+          ? t('remoteConfig.addParameter')
+          : t('remoteConfig.editParameter')
+        }
+        storageKey="remoteConfigParameterFormWidth"
+        defaultWidth={600}
+        minWidth={450}
+        actions={
+          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+            <Button onClick={() => setDialogOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              onClick={handleSaveConfig}
+              variant="contained"
+              disabled={!isValidParameterKey(formData.key) || !formData.description || (dialogType === 'edit' && !isDirty)}
+            >
+              {dialogType === 'create' ? t('common.create') : t('common.update')}
+            </Button>
+          </Box>
+        }
+      >
+        <TextField
+          label={t('remoteConfig.parameterKey')}
+          value={formData.key}
+          onChange={(e) => setFormData(prev => ({ ...prev, key: e.target.value }))}
+          fullWidth
+          required
+          autoFocus={dialogType === 'create'}
+          disabled={dialogType === 'edit'}
+          placeholder="feature_flag"
+          error={dialogType === 'create' && formData.key.length > 0 && !isValidParameterKey(formData.key)}
+          helperText={dialogType === 'edit'
+            ? t('remoteConfig.helpTexts.parameterKeyEdit')
+            : t('remoteConfig.helpTexts.parameterKey')}
+          sx={{ fontFamily: 'monospace' }}
+        />
+
+        <FormControl fullWidth required>
+          <InputLabel>{t('remoteConfig.type')}</InputLabel>
+          <Select
+            value={formData.type}
+            onChange={(e) => setFormData(prev => ({
+              ...prev,
+              type: e.target.value as any,
+              defaultValue: e.target.value === 'boolean' ? 'false' : ''
+            }))}
+            label={t('remoteConfig.type')}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  zIndex: 9999
+                }
+              }
+            }}
           >
-            {t('remoteConfig.addParameter')}
-          </Button>
+            <MenuItem value="string">String</MenuItem>
+            <MenuItem value="number">Number</MenuItem>
+            <MenuItem value="boolean">Boolean</MenuItem>
+            <MenuItem value="json">JSON</MenuItem>
+          </Select>
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
+            {t('remoteConfig.helpTexts.parameterType')}
+          </Typography>
+        </FormControl>
+
+        <Box>
+          <Typography variant="subtitle2" sx={{ mb: 1 }}>
+            {t('remoteConfig.defaultValue')}
+          </Typography>
+          {renderValueInput()}
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+            {t('remoteConfig.helpTexts.parameterDefaultValue')}
+          </Typography>
         </Box>
 
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('remoteConfig.parameterKey')}</TableCell>
-                <TableCell>{t('remoteConfig.type')}</TableCell>
-                <TableCell>{t('remoteConfig.defaultValue')}</TableCell>
-                <TableCell>{t('remoteConfig.description')}</TableCell>
-                <TableCell>{t('remoteConfig.features')}</TableCell>
-                <TableCell>{t('remoteConfig.lastUpdated')}</TableCell>
-                <TableCell>{t('common.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {configs
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((config) => (
-                <TableRow key={config.id}>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
-                      {config.key}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={config.type}
-                      size="small"
-                      color={getTypeColor(config.type) as any}
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    {config.defaultValue === null || config.defaultValue === undefined || config.defaultValue === '' ? (
-                      <Typography variant="body2" color="text.disabled" sx={{ fontStyle: 'italic' }}>
-                        {t('remoteConfig.noValue')}
-                      </Typography>
-                    ) : (
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                        {typeof config.defaultValue === 'object'
-                          ? JSON.stringify(config.defaultValue)
-                          : String(config.defaultValue)}
-                      </Typography>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {config.description}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                      {config.variants && (
-                        <Chip
-                          label={`${config.variants.length} variants`}
-                          size="small"
-                          icon={<VariantsIcon />}
-                          variant="outlined"
-                          color="secondary"
-                        />
-                      )}
-                      {config.campaigns && config.campaigns.length > 0 && (
-                        <Chip
-                          label={`${config.campaigns.length} campaigns`}
-                          size="small"
-                          icon={<CampaignIcon />}
-                          variant="outlined"
-                          color="warning"
-                        />
-                      )}
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {formatDateTimeDetailed(config.updatedAt)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 0.5 }}>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleEditConfig(config)}
-                        color="primary"
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDeleteConfig(config)}
-                        color="error"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <SimplePagination
-          count={configs.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={[10, 25, 50, 100]}
+        <TextField
+          label={t('remoteConfig.description')}
+          value={formData.description}
+          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+          fullWidth
+          required
+          multiline
+          rows={2}
+          placeholder="Description of this parameter"
+          helperText={t('remoteConfig.helpTexts.parameterDescription')}
         />
-      </CardContent>
-    </Card>
+      </SidePanel>
 
-    {/* Create/Edit Parameter Side Panel */}
-    <SidePanel
-      open={dialogOpen}
-      onClose={() => setDialogOpen(false)}
-      title={dialogType === 'create'
-        ? t('remoteConfig.addParameter')
-        : t('remoteConfig.editParameter')
-      }
-      storageKey="remoteConfigParameterFormWidth"
-      defaultWidth={600}
-      minWidth={450}
-      actions={
-        <>
-          <Button onClick={() => setDialogOpen(false)}>
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>{t('remoteConfig.deleteParameter')}</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {t('remoteConfig.deleteParameterConfirm')} "{configToDelete?.key}"?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            {t('remoteConfig.deleteParameterWarning')}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button
-            onClick={handleSaveConfig}
-            variant="contained"
-            disabled={!isValidParameterKey(formData.key) || !formData.description}
-          >
-            {dialogType === 'create' ? t('common.create') : t('common.update')}
+          <Button onClick={confirmDelete} color="error" variant="contained">
+            {t('common.delete')}
           </Button>
-        </>
-      }
-    >
-      <TextField
-        label={t('remoteConfig.parameterKey')}
-        value={formData.key}
-        onChange={(e) => setFormData(prev => ({ ...prev, key: e.target.value }))}
-        fullWidth
-        required
-        autoFocus={dialogType === 'create'}
-        disabled={dialogType === 'edit'}
-        placeholder="feature_flag"
-        error={dialogType === 'create' && formData.key.length > 0 && !isValidParameterKey(formData.key)}
-        helperText={dialogType === 'edit'
-          ? t('remoteConfig.helpTexts.parameterKeyEdit')
-          : t('remoteConfig.helpTexts.parameterKey')}
-        sx={{ fontFamily: 'monospace' }}
-      />
-
-      <FormControl fullWidth required>
-        <InputLabel>{t('remoteConfig.type')}</InputLabel>
-        <Select
-          value={formData.type}
-          onChange={(e) => setFormData(prev => ({
-            ...prev,
-            type: e.target.value as any,
-            defaultValue: e.target.value === 'boolean' ? 'false' : ''
-          }))}
-          label={t('remoteConfig.type')}
-          MenuProps={{
-            PaperProps: {
-              style: {
-                zIndex: 9999
-              }
-            }
-          }}
-        >
-          <MenuItem value="string">String</MenuItem>
-          <MenuItem value="number">Number</MenuItem>
-          <MenuItem value="boolean">Boolean</MenuItem>
-          <MenuItem value="json">JSON</MenuItem>
-        </Select>
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
-          {t('remoteConfig.helpTexts.parameterType')}
-        </Typography>
-      </FormControl>
-
-      <Box>
-        <Typography variant="subtitle2" sx={{ mb: 1 }}>
-          {t('remoteConfig.defaultValue')}
-        </Typography>
-        {renderValueInput()}
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-          {t('remoteConfig.helpTexts.parameterDefaultValue')}
-        </Typography>
-      </Box>
-
-      <TextField
-        label={t('remoteConfig.description')}
-        value={formData.description}
-        onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-        fullWidth
-        required
-        multiline
-        rows={2}
-        placeholder="Description of this parameter"
-        helperText={t('remoteConfig.helpTexts.parameterDescription')}
-      />
-    </SidePanel>
-
-    {/* Delete Confirmation Dialog */}
-    <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-      <DialogTitle>{t('remoteConfig.deleteParameter')}</DialogTitle>
-      <DialogContent>
-        <Typography>
-          {t('remoteConfig.deleteParameterConfirm')} "{configToDelete?.key}"?
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {t('remoteConfig.deleteParameterWarning')}
-        </Typography>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setDeleteDialogOpen(false)}>
-          {t('common.cancel')}
-        </Button>
-        <Button onClick={confirmDelete} color="error" variant="contained">
-          {t('common.delete')}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  </>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
@@ -1078,6 +1113,45 @@ const CampaignsManagement: React.FC = () => {
     trafficPercentage: 100,
     targetSegments: [] as string[]
   });
+  const [fullEditingData, setFullEditingData] = useState<any>(null);
+
+  const isDirty = useMemo(() => {
+    if (dialogType !== 'edit' || !fullEditingData) return true;
+
+    let processedValue: any = formData.overrideValue;
+    try {
+      processedValue = JSON.parse(formData.overrideValue);
+    } catch (e) {
+      if (formData.overrideValue === 'true') processedValue = true;
+      else if (formData.overrideValue === 'false') processedValue = false;
+      else if (!isNaN(Number(formData.overrideValue))) processedValue = Number(formData.overrideValue);
+      else processedValue = formData.overrideValue;
+    }
+
+    const currentData = {
+      name: formData.name,
+      configKey: formData.configKey,
+      overrideValue: processedValue,
+      startDate: formData.startDate + 'T00:00:00Z',
+      endDate: formData.endDate + 'T23:59:59Z',
+      isActive: formData.isActive,
+      trafficPercentage: formData.trafficPercentage,
+      targetSegments: formData.targetSegments
+    };
+
+    const originalData = {
+      name: fullEditingData.name,
+      configKey: fullEditingData.configKey,
+      overrideValue: fullEditingData.overrideValue,
+      startDate: fullEditingData.startDate,
+      endDate: fullEditingData.endDate,
+      isActive: fullEditingData.isActive,
+      trafficPercentage: fullEditingData.trafficPercentage,
+      targetSegments: fullEditingData.targetSegments || []
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [dialogType, fullEditingData, formData]);
 
   useEffect(() => {
     loadCampaigns();
@@ -1146,6 +1220,7 @@ const CampaignsManagement: React.FC = () => {
       trafficPercentage: campaign.trafficPercentage,
       targetSegments: campaign.targetSegments || []
     });
+    setFullEditingData(JSON.parse(JSON.stringify(campaign)));
     setDialogOpen(true);
   };
 
@@ -1229,6 +1304,7 @@ const CampaignsManagement: React.FC = () => {
       }
 
       await loadCampaigns();
+      setFullEditingData(null);
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to save campaign:', error);
@@ -1247,278 +1323,278 @@ const CampaignsManagement: React.FC = () => {
 
   return (
     <>
-    <Card>
-      <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h6" component="h2">
-            {t('remoteConfig.campaigns')}
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAddCampaign}
-            size="small"
-          >
-            {t('remoteConfig.addCampaign')}
-          </Button>
-        </Box>
+      <Card>
+        <CardContent>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6" component="h2">
+              {t('remoteConfig.campaigns')}
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddCampaign}
+              size="small"
+            >
+              {t('remoteConfig.addCampaign')}
+            </Button>
+          </Box>
 
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('remoteConfig.campaignName')}</TableCell>
-                <TableCell>{t('remoteConfig.targetParameter')}</TableCell>
-                <TableCell>{t('remoteConfig.overrideValue')}</TableCell>
-                <TableCell>{t('remoteConfig.period')}</TableCell>
-                <TableCell>{t('remoteConfig.traffic')}</TableCell>
-                <TableCell>{t('remoteConfig.status')}</TableCell>
-                <TableCell>{t('common.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {campaigns
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((campaign) => (
-                <TableRow key={campaign.id}>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {campaign.name}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                      {campaign.configKey}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                      {typeof campaign.overrideValue === 'object'
-                        ? JSON.stringify(campaign.overrideValue)
-                        : String(campaign.overrideValue)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {formatDateTimeDetailed(campaign.startDate)} - {formatDateTimeDetailed(campaign.endDate)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {campaign.trafficPercentage}%
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={campaign.isActive ? t('common.active') : t('common.inactive')}
-                      size="small"
-                      color={campaign.isActive ? 'success' : 'default'}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 0.5 }}>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleEditCampaign(campaign)}
-                        color="primary"
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDeleteCampaign(campaign)}
-                        color="error"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t('remoteConfig.campaignName')}</TableCell>
+                  <TableCell>{t('remoteConfig.targetParameter')}</TableCell>
+                  <TableCell>{t('remoteConfig.overrideValue')}</TableCell>
+                  <TableCell>{t('remoteConfig.period')}</TableCell>
+                  <TableCell>{t('remoteConfig.traffic')}</TableCell>
+                  <TableCell>{t('remoteConfig.status')}</TableCell>
+                  <TableCell>{t('common.actions')}</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {campaigns
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((campaign) => (
+                    <TableRow key={campaign.id}>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {campaign.name}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                          {campaign.configKey}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                          {typeof campaign.overrideValue === 'object'
+                            ? JSON.stringify(campaign.overrideValue)
+                            : String(campaign.overrideValue)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {formatDateTimeDetailed(campaign.startDate)} - {formatDateTimeDetailed(campaign.endDate)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {campaign.trafficPercentage}%
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={campaign.isActive ? t('common.active') : t('common.inactive')}
+                          size="small"
+                          color={campaign.isActive ? 'success' : 'default'}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEditCampaign(campaign)}
+                            color="primary"
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteCampaign(campaign)}
+                            color="error"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-        <SimplePagination
-          count={campaigns.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={[10, 25, 50, 100]}
-        />
-      </CardContent>
-    </Card>
+          <SimplePagination
+            count={campaigns.length}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+          />
+        </CardContent>
+      </Card>
 
-    {/* Create/Edit Campaign Side Panel */}
-    <SidePanel
-      open={dialogOpen}
-      onClose={() => setDialogOpen(false)}
-      title={dialogType === 'create'
-        ? t('remoteConfig.addCampaign')
-        : t('remoteConfig.editCampaign')
-      }
-      storageKey="remoteConfigCampaignFormWidth"
-      defaultWidth={600}
-      minWidth={450}
-      actions={
-        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-          <Button onClick={() => setDialogOpen(false)}>
+      {/* Create/Edit Campaign Side Panel */}
+      <SidePanel
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={dialogType === 'create'
+          ? t('remoteConfig.addCampaign')
+          : t('remoteConfig.editCampaign')
+        }
+        storageKey="remoteConfigCampaignFormWidth"
+        defaultWidth={600}
+        minWidth={450}
+        actions={
+          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+            <Button onClick={() => setDialogOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              onClick={handleSaveCampaign}
+              variant="contained"
+              disabled={!formData.name || !formData.configKey || !formData.overrideValue || !formData.startDate || !formData.endDate || (dialogType === 'edit' && !isDirty)}
+            >
+              {dialogType === 'create' ? t('common.create') : t('common.update')}
+            </Button>
+          </Box>
+        }
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <TextField
+            label={t('remoteConfig.campaignName')}
+            value={formData.name}
+            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+            fullWidth
+            required
+            autoFocus={dialogType === 'create'}
+            placeholder="holiday_promotion"
+            helperText={t('remoteConfig.helperCampaignName')}
+          />
+
+          <FormControl fullWidth required>
+            <InputLabel id="target-parameter-label">{t('remoteConfig.targetParameter')}</InputLabel>
+            <Select
+              labelId="target-parameter-label"
+              value={formData.configKey}
+              label={t('remoteConfig.targetParameter')}
+              onChange={(e) => setFormData(prev => ({ ...prev, configKey: e.target.value }))}
+              sx={{ fontFamily: 'monospace' }}
+            >
+              {availableParameters.length === 0 ? (
+                <MenuItem value="" disabled>
+                  {t('remoteConfig.noParametersAvailable')}
+                </MenuItem>
+              ) : (
+                availableParameters.map((param) => (
+                  <MenuItem key={param.key} value={param.key} sx={{ fontFamily: 'monospace' }}>
+                    {param.key}
+                    <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+                      ({param.type})
+                    </Typography>
+                  </MenuItem>
+                ))
+              )}
+            </Select>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
+              {t('remoteConfig.helperTargetParameter')}
+            </Typography>
+          </FormControl>
+
+          <TextField
+            label={t('remoteConfig.overrideValue')}
+            value={formData.overrideValue}
+            onChange={(e) => setFormData(prev => ({ ...prev, overrideValue: e.target.value }))}
+            fullWidth
+            required
+            multiline
+            rows={3}
+            placeholder="New value for this campaign"
+            helperText={t('remoteConfig.helperOverrideValue')}
+          />
+
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+              label={t('remoteConfig.startDate')}
+              type="date"
+              value={formData.startDate}
+              onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
+              fullWidth
+              required
+              InputLabelProps={{ shrink: true }}
+              helperText={t('remoteConfig.helperStartDate')}
+            />
+
+            <TextField
+              label={t('remoteConfig.endDate')}
+              type="date"
+              value={formData.endDate}
+              onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
+              fullWidth
+              required
+              InputLabelProps={{ shrink: true }}
+              helperText={t('remoteConfig.helperEndDate')}
+            />
+          </Box>
+
+          <Box>
+            <Typography variant="body2" gutterBottom>
+              {t('remoteConfig.trafficPercentage')}
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Slider
+                value={formData.trafficPercentage}
+                onChange={(_, value) => setFormData(prev => ({ ...prev, trafficPercentage: value as number }))}
+                min={1}
+                max={100}
+                valueLabelDisplay="auto"
+                sx={{ flex: 1 }}
+              />
+              <TextField
+                type="number"
+                value={formData.trafficPercentage}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value);
+                  if (value >= 1 && value <= 100) {
+                    setFormData(prev => ({ ...prev, trafficPercentage: value }));
+                  }
+                }}
+                inputProps={{ min: 1, max: 100 }}
+                sx={{ width: 80 }}
+                size="small"
+              />
+              <Typography variant="body2" color="text.secondary">%</Typography>
+            </Box>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+              {t('remoteConfig.helperTrafficPercentage')}
+            </Typography>
+          </Box>
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={formData.isActive}
+                onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+              />
+            }
+            label={t('remoteConfig.isActive')}
+          />
+        </Box>
+      </SidePanel>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>{t('remoteConfig.deleteCampaign')}</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {t('remoteConfig.deleteCampaignConfirm')} "{campaignToDelete?.name}"?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            {t('remoteConfig.deleteCampaignWarning')}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button
-            onClick={handleSaveCampaign}
-            variant="contained"
-            disabled={!formData.name || !formData.configKey || !formData.overrideValue || !formData.startDate || !formData.endDate}
-          >
-            {dialogType === 'create' ? t('common.create') : t('common.update')}
+          <Button onClick={confirmDeleteCampaign} color="error" variant="contained">
+            {t('common.delete')}
           </Button>
-        </Box>
-      }
-    >
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <TextField
-          label={t('remoteConfig.campaignName')}
-          value={formData.name}
-          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-          fullWidth
-          required
-          autoFocus={dialogType === 'create'}
-          placeholder="holiday_promotion"
-          helperText={t('remoteConfig.helperCampaignName')}
-        />
-
-        <FormControl fullWidth required>
-          <InputLabel id="target-parameter-label">{t('remoteConfig.targetParameter')}</InputLabel>
-          <Select
-            labelId="target-parameter-label"
-            value={formData.configKey}
-            label={t('remoteConfig.targetParameter')}
-            onChange={(e) => setFormData(prev => ({ ...prev, configKey: e.target.value }))}
-            sx={{ fontFamily: 'monospace' }}
-          >
-            {availableParameters.length === 0 ? (
-              <MenuItem value="" disabled>
-                {t('remoteConfig.noParametersAvailable')}
-              </MenuItem>
-            ) : (
-              availableParameters.map((param) => (
-                <MenuItem key={param.key} value={param.key} sx={{ fontFamily: 'monospace' }}>
-                  {param.key}
-                  <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                    ({param.type})
-                  </Typography>
-                </MenuItem>
-              ))
-            )}
-          </Select>
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
-            {t('remoteConfig.helperTargetParameter')}
-          </Typography>
-        </FormControl>
-
-        <TextField
-          label={t('remoteConfig.overrideValue')}
-          value={formData.overrideValue}
-          onChange={(e) => setFormData(prev => ({ ...prev, overrideValue: e.target.value }))}
-          fullWidth
-          required
-          multiline
-          rows={3}
-          placeholder="New value for this campaign"
-          helperText={t('remoteConfig.helperOverrideValue')}
-        />
-
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <TextField
-            label={t('remoteConfig.startDate')}
-            type="date"
-            value={formData.startDate}
-            onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
-            fullWidth
-            required
-            InputLabelProps={{ shrink: true }}
-            helperText={t('remoteConfig.helperStartDate')}
-          />
-
-          <TextField
-            label={t('remoteConfig.endDate')}
-            type="date"
-            value={formData.endDate}
-            onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
-            fullWidth
-            required
-            InputLabelProps={{ shrink: true }}
-            helperText={t('remoteConfig.helperEndDate')}
-          />
-        </Box>
-
-        <Box>
-          <Typography variant="body2" gutterBottom>
-            {t('remoteConfig.trafficPercentage')}
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Slider
-              value={formData.trafficPercentage}
-              onChange={(_, value) => setFormData(prev => ({ ...prev, trafficPercentage: value as number }))}
-              min={1}
-              max={100}
-              valueLabelDisplay="auto"
-              sx={{ flex: 1 }}
-            />
-            <TextField
-              type="number"
-              value={formData.trafficPercentage}
-              onChange={(e) => {
-                const value = parseInt(e.target.value);
-                if (value >= 1 && value <= 100) {
-                  setFormData(prev => ({ ...prev, trafficPercentage: value }));
-                }
-              }}
-              inputProps={{ min: 1, max: 100 }}
-              sx={{ width: 80 }}
-              size="small"
-            />
-            <Typography variant="body2" color="text.secondary">%</Typography>
-          </Box>
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
-            {t('remoteConfig.helperTrafficPercentage')}
-          </Typography>
-        </Box>
-
-        <FormControlLabel
-          control={
-            <Switch
-              checked={formData.isActive}
-              onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-            />
-          }
-          label={t('remoteConfig.isActive')}
-        />
-      </Box>
-    </SidePanel>
-
-    {/* Delete Confirmation Dialog */}
-    <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-      <DialogTitle>{t('remoteConfig.deleteCampaign')}</DialogTitle>
-      <DialogContent>
-        <Typography>
-          {t('remoteConfig.deleteCampaignConfirm')} "{campaignToDelete?.name}"?
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {t('remoteConfig.deleteCampaignWarning')}
-        </Typography>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setDeleteDialogOpen(false)}>
-          {t('common.cancel')}
-        </Button>
-        <Button onClick={confirmDeleteCampaign} color="error" variant="contained">
-          {t('common.delete')}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  </>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
@@ -1544,6 +1620,27 @@ const ContextFieldsManagement: React.FC = () => {
     description: '',
     possibleValues: [] as string[]
   });
+  const [fullEditingData, setFullEditingData] = useState<any>(null);
+
+  const isDirty = useMemo(() => {
+    if (dialogType !== 'edit' || !fullEditingData) return true;
+
+    const currentData = {
+      name: formData.name,
+      type: formData.type,
+      description: formData.description,
+      possibleValues: formData.possibleValues
+    };
+
+    const originalData = {
+      name: fullEditingData.name,
+      type: fullEditingData.type,
+      description: fullEditingData.description,
+      possibleValues: fullEditingData.possibleValues || []
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [dialogType, fullEditingData, formData]);
   const [newValue, setNewValue] = useState('');
 
   useEffect(() => {
@@ -1584,6 +1681,7 @@ const ContextFieldsManagement: React.FC = () => {
       description: field.description,
       possibleValues: field.possibleValues || []
     });
+    setFullEditingData(JSON.parse(JSON.stringify(field)));
     setNewValue('');
     setDialogOpen(true);
   };
@@ -1656,6 +1754,7 @@ const ContextFieldsManagement: React.FC = () => {
       }
 
       await loadContextFields();
+      setFullEditingData(null);
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to save context field:', error);
@@ -1691,235 +1790,235 @@ const ContextFieldsManagement: React.FC = () => {
 
   return (
     <>
-    <Card>
-      <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h6" component="h2">
-            {t('remoteConfig.contextFields')}
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAddContextField}
-            size="small"
-          >
-            {t('remoteConfig.addContextField')}
-          </Button>
-        </Box>
-
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('remoteConfig.fieldName')}</TableCell>
-                <TableCell>{t('remoteConfig.type')}</TableCell>
-                <TableCell>{t('remoteConfig.description')}</TableCell>
-                <TableCell>{t('remoteConfig.possibleValues')}</TableCell>
-                <TableCell>{t('common.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {contextFields
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((field) => (
-                <TableRow key={field.id}>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
-                      {field.name}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={field.type}
-                      size="small"
-                      color="primary"
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {field.description}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    {field.possibleValues ? (
-                      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                        {field.possibleValues.map((value, index) => (
-                          <Chip
-                            key={index}
-                            label={value}
-                            size="small"
-                            variant="outlined"
-                          />
-                        ))}
-                      </Box>
-                    ) : (
-                      <Typography variant="body2" color="text.secondary">
-                        Any value
-                      </Typography>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 0.5 }}>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleEditContextField(field)}
-                        color="primary"
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDeleteContextField(field)}
-                        color="error"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <SimplePagination
-          count={contextFields.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={[10, 25, 50, 100]}
-        />
-      </CardContent>
-    </Card>
-
-    {/* Create/Edit Context Field Side Panel */}
-    <SidePanel
-      open={dialogOpen}
-      onClose={() => setDialogOpen(false)}
-      title={dialogType === 'create'
-        ? t('remoteConfig.addContextField')
-        : t('remoteConfig.editContextField')
-      }
-      storageKey="remoteConfigContextFieldFormWidth"
-      defaultWidth={600}
-      minWidth={450}
-      actions={
-        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-          <Button onClick={() => setDialogOpen(false)}>
-            {t('common.cancel')}
-          </Button>
-          <Button
-            onClick={handleSaveContextField}
-            variant="contained"
-            disabled={!formData.name || !formData.description}
-          >
-            {dialogType === 'create' ? t('common.create') : t('common.update')}
-          </Button>
-        </Box>
-      }
-    >
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <TextField
-          label={t('remoteConfig.fieldName')}
-          value={formData.name}
-          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-          fullWidth
-          required
-          disabled={dialogType === 'edit'}
-          placeholder="userType"
-          sx={{ fontFamily: 'monospace' }}
-        />
-
-        <FormControl fullWidth required>
-          <InputLabel>{t('remoteConfig.type')}</InputLabel>
-          <Select
-            value={formData.type}
-            onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as any }))}
-            label={t('remoteConfig.type')}
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  zIndex: 9999
-                }
-              }
-            }}
-          >
-            <MenuItem value="string">String</MenuItem>
-            <MenuItem value="number">Number</MenuItem>
-            <MenuItem value="boolean">Boolean</MenuItem>
-          </Select>
-        </FormControl>
-
-        <TextField
-          label={t('remoteConfig.description')}
-          value={formData.description}
-          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-          fullWidth
-          required
-          multiline
-          rows={2}
-          placeholder="Description of this context field"
-        />
-
-        <Box>
-          <Typography variant="subtitle2" sx={{ mb: 1 }}>
-            {t('remoteConfig.possibleValues')} ({t('remoteConfig.optional')})
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-            <TextField
-              value={newValue}
-              onChange={(e) => setNewValue(e.target.value)}
-              placeholder="Add possible value"
+      <Card>
+        <CardContent>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6" component="h2">
+              {t('remoteConfig.contextFields')}
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddContextField}
               size="small"
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  addPossibleValue();
-                }
-              }}
-            />
-            <Button onClick={addPossibleValue} variant="outlined">
-              {t('common.add')}
+            >
+              {t('remoteConfig.addContextField')}
             </Button>
           </Box>
-          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-            {formData.possibleValues.map((value, index) => (
-              <Chip
-                key={index}
-                label={value}
-                onDelete={() => removePossibleValue(value)}
+
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t('remoteConfig.fieldName')}</TableCell>
+                  <TableCell>{t('remoteConfig.type')}</TableCell>
+                  <TableCell>{t('remoteConfig.description')}</TableCell>
+                  <TableCell>{t('remoteConfig.possibleValues')}</TableCell>
+                  <TableCell>{t('common.actions')}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {contextFields
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((field) => (
+                    <TableRow key={field.id}>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                          {field.name}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={field.type}
+                          size="small"
+                          color="primary"
+                          variant="outlined"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {field.description}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        {field.possibleValues ? (
+                          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                            {field.possibleValues.map((value, index) => (
+                              <Chip
+                                key={index}
+                                label={value}
+                                size="small"
+                                variant="outlined"
+                              />
+                            ))}
+                          </Box>
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">
+                            Any value
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEditContextField(field)}
+                            color="primary"
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteContextField(field)}
+                            color="error"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <SimplePagination
+            count={contextFields.length}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Create/Edit Context Field Side Panel */}
+      <SidePanel
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={dialogType === 'create'
+          ? t('remoteConfig.addContextField')
+          : t('remoteConfig.editContextField')
+        }
+        storageKey="remoteConfigContextFieldFormWidth"
+        defaultWidth={600}
+        minWidth={450}
+        actions={
+          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+            <Button onClick={() => setDialogOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              onClick={handleSaveContextField}
+              variant="contained"
+              disabled={!formData.name || !formData.description || (dialogType === 'edit' && !isDirty)}
+            >
+              {dialogType === 'create' ? t('common.create') : t('common.update')}
+            </Button>
+          </Box>
+        }
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <TextField
+            label={t('remoteConfig.fieldName')}
+            value={formData.name}
+            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+            fullWidth
+            required
+            disabled={dialogType === 'edit'}
+            placeholder="userType"
+            sx={{ fontFamily: 'monospace' }}
+          />
+
+          <FormControl fullWidth required>
+            <InputLabel>{t('remoteConfig.type')}</InputLabel>
+            <Select
+              value={formData.type}
+              onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as any }))}
+              label={t('remoteConfig.type')}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    zIndex: 9999
+                  }
+                }
+              }}
+            >
+              <MenuItem value="string">String</MenuItem>
+              <MenuItem value="number">Number</MenuItem>
+              <MenuItem value="boolean">Boolean</MenuItem>
+            </Select>
+          </FormControl>
+
+          <TextField
+            label={t('remoteConfig.description')}
+            value={formData.description}
+            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+            fullWidth
+            required
+            multiline
+            rows={2}
+            placeholder="Description of this context field"
+          />
+
+          <Box>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              {t('remoteConfig.possibleValues')} ({t('remoteConfig.optional')})
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+              <TextField
+                value={newValue}
+                onChange={(e) => setNewValue(e.target.value)}
+                placeholder="Add possible value"
                 size="small"
-                variant="outlined"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addPossibleValue();
+                  }
+                }}
               />
-            ))}
+              <Button onClick={addPossibleValue} variant="outlined">
+                {t('common.add')}
+              </Button>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+              {formData.possibleValues.map((value, index) => (
+                <Chip
+                  key={index}
+                  label={value}
+                  onDelete={() => removePossibleValue(value)}
+                  size="small"
+                  variant="outlined"
+                />
+              ))}
+            </Box>
           </Box>
         </Box>
-      </Box>
-    </SidePanel>
+      </SidePanel>
 
-    {/* Delete Confirmation Dialog */}
-    <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-      <DialogTitle>{t('remoteConfig.deleteContextField')}</DialogTitle>
-      <DialogContent>
-        <Typography>
-          {t('remoteConfig.deleteContextFieldConfirm')} "{fieldToDelete?.name}"?
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {t('remoteConfig.deleteContextFieldWarning')}
-        </Typography>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setDeleteDialogOpen(false)}>
-          {t('common.cancel')}
-        </Button>
-        <Button onClick={confirmDeleteField} color="error" variant="contained">
-          {t('common.delete')}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  </>
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>{t('remoteConfig.deleteContextField')}</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {t('remoteConfig.deleteContextFieldConfirm')} "{fieldToDelete?.name}"?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            {t('remoteConfig.deleteContextFieldWarning')}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button onClick={confirmDeleteField} color="error" variant="contained">
+            {t('common.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
@@ -1946,6 +2045,29 @@ const SegmentsManagement: React.FC = () => {
     isActive: true,
     conditions: [] as SegmentCondition[]
   });
+  const [fullEditingData, setFullEditingData] = useState<any>(null);
+
+  const isDirty = useMemo(() => {
+    if (dialogType !== 'edit' || !fullEditingData) return true;
+
+    const currentData = {
+      name: formData.name,
+      displayName: formData.displayName,
+      description: formData.description,
+      conditions: formData.conditions,
+      isActive: formData.isActive
+    };
+
+    const originalData = {
+      name: fullEditingData.name,
+      displayName: fullEditingData.displayName,
+      description: fullEditingData.description,
+      conditions: fullEditingData.conditions || [],
+      isActive: fullEditingData.isActive
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [dialogType, fullEditingData, formData]);
 
   useEffect(() => {
     loadSegments();
@@ -1986,6 +2108,7 @@ const SegmentsManagement: React.FC = () => {
       isActive: segment.isActive,
       conditions: segment.conditions
     });
+    setFullEditingData(JSON.parse(JSON.stringify(segment)));
     setDialogOpen(true);
   };
 
@@ -2058,6 +2181,7 @@ const SegmentsManagement: React.FC = () => {
       }
 
       await loadSegments();
+      setFullEditingData(null);
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to save segment:', error);
@@ -2099,270 +2223,270 @@ const SegmentsManagement: React.FC = () => {
 
   return (
     <>
-    <Card>
-      <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h6" component="h2">
-            {t('remoteConfig.segments')}
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAddSegment}
-            size="small"
-          >
-            {t('remoteConfig.addSegment')}
-          </Button>
-        </Box>
-
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('remoteConfig.segmentName')}</TableCell>
-                <TableCell>{t('remoteConfig.displayName')}</TableCell>
-                <TableCell>{t('remoteConfig.description')}</TableCell>
-                <TableCell>{t('remoteConfig.conditions')}</TableCell>
-                <TableCell>{t('remoteConfig.status')}</TableCell>
-                <TableCell>{t('remoteConfig.lastUpdated')}</TableCell>
-                <TableCell>{t('common.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {segments
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((segment) => (
-                <TableRow key={segment.id}>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
-                      {segment.name}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {segment.displayName}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {segment.description}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {segment.conditions.length} condition{segment.conditions.length !== 1 ? 's' : ''}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={segment.isActive ? t('common.active') : t('common.inactive')}
-                      size="small"
-                      color={segment.isActive ? 'success' : 'default'}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {formatDateTimeDetailed(segment.updatedAt)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 0.5 }}>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleEditSegment(segment)}
-                        color="primary"
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDeleteSegment(segment)}
-                        color="error"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <SimplePagination
-          count={segments.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={[10, 25, 50, 100]}
-        />
-      </CardContent>
-    </Card>
-
-    {/* Create/Edit Segment Side Panel */}
-    <SidePanel
-      open={dialogOpen}
-      onClose={() => setDialogOpen(false)}
-      title={dialogType === 'create'
-        ? t('remoteConfig.addSegment')
-        : t('remoteConfig.editSegment')
-      }
-      storageKey="remoteConfigSegmentFormWidth"
-      defaultWidth={700}
-      minWidth={500}
-      actions={
-        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-          <Button onClick={() => setDialogOpen(false)}>
-            {t('common.cancel')}
-          </Button>
-          <Button
-            onClick={handleSaveSegment}
-            variant="contained"
-            disabled={!formData.name || !formData.displayName || !formData.description}
-          >
-            {dialogType === 'create' ? t('common.create') : t('common.update')}
-          </Button>
-        </Box>
-      }
-    >
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <TextField
-          label={t('remoteConfig.segmentName')}
-          value={formData.name}
-          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-          fullWidth
-          required
-          disabled={dialogType === 'edit'}
-          placeholder="premium_users"
-          sx={{ fontFamily: 'monospace' }}
-        />
-
-        <TextField
-          label={t('remoteConfig.displayName')}
-          value={formData.displayName}
-          onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
-          fullWidth
-          required
-          placeholder="Premium Users"
-        />
-
-        <TextField
-          label={t('remoteConfig.description')}
-          value={formData.description}
-          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-          fullWidth
-          required
-          multiline
-          rows={2}
-          placeholder="Description of this segment"
-        />
-
-        <FormControlLabel
-          control={
-            <Switch
-              checked={formData.isActive}
-              onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-            />
-          }
-          label={t('remoteConfig.isActive')}
-        />
-
-        <Box>
+      <Card>
+        <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="subtitle2">
-              {t('remoteConfig.conditions')}
+            <Typography variant="h6" component="h2">
+              {t('remoteConfig.segments')}
             </Typography>
-            <Button onClick={addCondition} variant="outlined">
-              {t('remoteConfig.addCondition')}
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddSegment}
+              size="small"
+            >
+              {t('remoteConfig.addSegment')}
             </Button>
           </Box>
 
-          {formData.conditions.map((condition, index) => (
-            <Box key={index} sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}>
-              <TextField
-                label="Field"
-                value={condition.field}
-                onChange={(e) => updateCondition(index, 'field', e.target.value)}
-                size="small"
-                sx={{ flex: 1 }}
-                placeholder="userType"
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t('remoteConfig.segmentName')}</TableCell>
+                  <TableCell>{t('remoteConfig.displayName')}</TableCell>
+                  <TableCell>{t('remoteConfig.description')}</TableCell>
+                  <TableCell>{t('remoteConfig.conditions')}</TableCell>
+                  <TableCell>{t('remoteConfig.status')}</TableCell>
+                  <TableCell>{t('remoteConfig.lastUpdated')}</TableCell>
+                  <TableCell>{t('common.actions')}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {segments
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((segment) => (
+                    <TableRow key={segment.id}>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                          {segment.name}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {segment.displayName}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {segment.description}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {segment.conditions.length} condition{segment.conditions.length !== 1 ? 's' : ''}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={segment.isActive ? t('common.active') : t('common.inactive')}
+                          size="small"
+                          color={segment.isActive ? 'success' : 'default'}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {formatDateTimeDetailed(segment.updatedAt)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEditSegment(segment)}
+                            color="primary"
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteSegment(segment)}
+                            color="error"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <SimplePagination
+            count={segments.length}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Create/Edit Segment Side Panel */}
+      <SidePanel
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={dialogType === 'create'
+          ? t('remoteConfig.addSegment')
+          : t('remoteConfig.editSegment')
+        }
+        storageKey="remoteConfigSegmentFormWidth"
+        defaultWidth={700}
+        minWidth={500}
+        actions={
+          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+            <Button onClick={() => setDialogOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              onClick={handleSaveSegment}
+              variant="contained"
+              disabled={!formData.name || !formData.displayName || !formData.description || (dialogType === 'edit' && !isDirty)}
+            >
+              {dialogType === 'create' ? t('common.create') : t('common.update')}
+            </Button>
+          </Box>
+        }
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <TextField
+            label={t('remoteConfig.segmentName')}
+            value={formData.name}
+            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+            fullWidth
+            required
+            disabled={dialogType === 'edit'}
+            placeholder="premium_users"
+            sx={{ fontFamily: 'monospace' }}
+          />
+
+          <TextField
+            label={t('remoteConfig.displayName')}
+            value={formData.displayName}
+            onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
+            fullWidth
+            required
+            placeholder="Premium Users"
+          />
+
+          <TextField
+            label={t('remoteConfig.description')}
+            value={formData.description}
+            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+            fullWidth
+            required
+            multiline
+            rows={2}
+            placeholder="Description of this segment"
+          />
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={formData.isActive}
+                onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
               />
+            }
+            label={t('remoteConfig.isActive')}
+          />
 
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel>Operator</InputLabel>
-                <Select
-                  value={condition.operator}
-                  onChange={(e) => updateCondition(index, 'operator', e.target.value)}
-                  label="Operator"
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        zIndex: 9999
-                      }
-                    }
-                  }}
-                >
-                  <MenuItem value="equals">Equals</MenuItem>
-                  <MenuItem value="not_equals">Not Equals</MenuItem>
-                  <MenuItem value="contains">Contains</MenuItem>
-                  <MenuItem value="not_contains">Not Contains</MenuItem>
-                  <MenuItem value="greater_than">Greater Than</MenuItem>
-                  <MenuItem value="less_than">Less Than</MenuItem>
-                  <MenuItem value="in">In</MenuItem>
-                  <MenuItem value="not_in">Not In</MenuItem>
-                </Select>
-              </FormControl>
-
-              <TextField
-                label="Value"
-                value={condition.value}
-                onChange={(e) => updateCondition(index, 'value', e.target.value)}
-                size="small"
-                sx={{ flex: 1 }}
-                placeholder="premium"
-              />
-
-              <IconButton
-                size="small"
-                onClick={() => removeCondition(index)}
-                color="error"
-              >
-                <DeleteIcon />
-              </IconButton>
+          <Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="subtitle2">
+                {t('remoteConfig.conditions')}
+              </Typography>
+              <Button onClick={addCondition} variant="outlined">
+                {t('remoteConfig.addCondition')}
+              </Button>
             </Box>
-          ))}
 
-          {formData.conditions.length === 0 && (
-            <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-              {t('remoteConfig.noConditions')}
-            </Typography>
-          )}
+            {formData.conditions.map((condition, index) => (
+              <Box key={index} sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}>
+                <TextField
+                  label="Field"
+                  value={condition.field}
+                  onChange={(e) => updateCondition(index, 'field', e.target.value)}
+                  size="small"
+                  sx={{ flex: 1 }}
+                  placeholder="userType"
+                />
+
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <InputLabel>Operator</InputLabel>
+                  <Select
+                    value={condition.operator}
+                    onChange={(e) => updateCondition(index, 'operator', e.target.value)}
+                    label="Operator"
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          zIndex: 9999
+                        }
+                      }
+                    }}
+                  >
+                    <MenuItem value="equals">Equals</MenuItem>
+                    <MenuItem value="not_equals">Not Equals</MenuItem>
+                    <MenuItem value="contains">Contains</MenuItem>
+                    <MenuItem value="not_contains">Not Contains</MenuItem>
+                    <MenuItem value="greater_than">Greater Than</MenuItem>
+                    <MenuItem value="less_than">Less Than</MenuItem>
+                    <MenuItem value="in">In</MenuItem>
+                    <MenuItem value="not_in">Not In</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <TextField
+                  label="Value"
+                  value={condition.value}
+                  onChange={(e) => updateCondition(index, 'value', e.target.value)}
+                  size="small"
+                  sx={{ flex: 1 }}
+                  placeholder="premium"
+                />
+
+                <IconButton
+                  size="small"
+                  onClick={() => removeCondition(index)}
+                  color="error"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            ))}
+
+            {formData.conditions.length === 0 && (
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+                {t('remoteConfig.noConditions')}
+              </Typography>
+            )}
+          </Box>
         </Box>
-      </Box>
-    </SidePanel>
+      </SidePanel>
 
-    {/* Delete Confirmation Dialog */}
-    <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-      <DialogTitle>{t('remoteConfig.deleteSegment')}</DialogTitle>
-      <DialogContent>
-        <Typography>
-          {t('remoteConfig.deleteSegmentConfirm')} "{segmentToDelete?.name}"?
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {t('remoteConfig.deleteSegmentWarning')}
-        </Typography>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setDeleteDialogOpen(false)}>
-          {t('common.cancel')}
-        </Button>
-        <Button onClick={confirmDeleteSegment} color="error" variant="contained">
-          {t('common.delete')}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  </>
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>{t('remoteConfig.deleteSegment')}</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {t('remoteConfig.deleteSegmentConfirm')} "{segmentToDelete?.name}"?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            {t('remoteConfig.deleteSegmentWarning')}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button onClick={confirmDeleteSegment} color="error" variant="contained">
+            {t('common.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
@@ -2390,6 +2514,41 @@ const VariantsManagement: React.FC = () => {
     description: '',
     isActive: true
   });
+  const [fullEditingData, setFullEditingData] = useState<any>(null);
+
+  const isDirty = useMemo(() => {
+    if (dialogType !== 'edit' || !fullEditingData) return true;
+
+    let processedValue: any = formData.value;
+    try {
+      processedValue = JSON.parse(formData.value);
+    } catch (e) {
+      if (formData.value === 'true') processedValue = true;
+      else if (formData.value === 'false') processedValue = false;
+      else if (!isNaN(Number(formData.value))) processedValue = Number(formData.value);
+      else processedValue = formData.value;
+    }
+
+    const currentData = {
+      parameterKey: formData.parameterKey,
+      variantName: formData.variantName,
+      value: processedValue,
+      weight: formData.weight,
+      description: formData.description,
+      isActive: formData.isActive
+    };
+
+    const originalData = {
+      parameterKey: fullEditingData.parameterKey,
+      variantName: fullEditingData.variantName,
+      value: fullEditingData.value,
+      weight: fullEditingData.weight,
+      description: fullEditingData.description,
+      isActive: fullEditingData.isActive
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [dialogType, fullEditingData, formData]);
 
   useEffect(() => {
     loadVariants();
@@ -2434,6 +2593,7 @@ const VariantsManagement: React.FC = () => {
       description: variant.description,
       isActive: variant.isActive
     });
+    setFullEditingData(JSON.parse(JSON.stringify(variant)));
     setDialogOpen(true);
   };
 
@@ -2515,6 +2675,7 @@ const VariantsManagement: React.FC = () => {
       }
 
       await loadVariants();
+      setFullEditingData(null);
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to save variant:', error);
@@ -2543,236 +2704,237 @@ const VariantsManagement: React.FC = () => {
 
   return (
     <>
-    <Card>
-      <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h6" component="h2">
-            {t('remoteConfig.variants')}
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAddVariant}
-            size="small"
-          >
-            {t('remoteConfig.addVariant')}
-          </Button>
-        </Box>
+      <Card>
+        <CardContent>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6" component="h2">
+              {t('remoteConfig.variants')}
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddVariant}
+              size="small"
+            >
+              {t('remoteConfig.addVariant')}
+            </Button>
+          </Box>
 
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('remoteConfig.parameterKey')}</TableCell>
-                <TableCell>{t('remoteConfig.variantName')}</TableCell>
-                <TableCell>{t('remoteConfig.value')}</TableCell>
-                <TableCell>{t('remoteConfig.weight')}</TableCell>
-                <TableCell>{t('remoteConfig.description')}</TableCell>
-                <TableCell>{t('remoteConfig.status')}</TableCell>
-                <TableCell>{t('common.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {variants
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((variant) => {
-                  const totalWeight = getTotalWeight(variant.parameterKey);
-                  const isWeightValid = totalWeight <= 100;
-
-                  return (
-                <TableRow key={variant.id}>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
-                      {variant.parameterKey}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {variant.variantName}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                      {typeof variant.value === 'object'
-                        ? JSON.stringify(variant.value)
-                        : String(variant.value)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="body2">
-                        {variant.weight}%
-                      </Typography>
-                      {!isWeightValid && (
-                        <Chip
-                          label={`Total: ${totalWeight}%`}
-                          size="small"
-                          color="error"
-                          variant="outlined"
-                        />
-                      )}
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {variant.description}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={variant.isActive ? t('common.active') : t('common.inactive')}
-                      size="small"
-                      color={variant.isActive ? 'success' : 'default'}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 0.5 }}>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleEditVariant(variant)}
-                        color="primary"
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDeleteVariant(variant)}
-                        color="error"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t('remoteConfig.parameterKey')}</TableCell>
+                  <TableCell>{t('remoteConfig.variantName')}</TableCell>
+                  <TableCell>{t('remoteConfig.value')}</TableCell>
+                  <TableCell>{t('remoteConfig.weight')}</TableCell>
+                  <TableCell>{t('remoteConfig.description')}</TableCell>
+                  <TableCell>{t('remoteConfig.status')}</TableCell>
+                  <TableCell>{t('common.actions')}</TableCell>
                 </TableRow>
-              )})}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {variants
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((variant) => {
+                    const totalWeight = getTotalWeight(variant.parameterKey);
+                    const isWeightValid = totalWeight <= 100;
 
-        <SimplePagination
-          count={variants.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={[10, 25, 50, 100]}
-        />
-      </CardContent>
-    </Card>
+                    return (
+                      <TableRow key={variant.id}>
+                        <TableCell>
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                            {variant.parameterKey}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {variant.variantName}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                            {typeof variant.value === 'object'
+                              ? JSON.stringify(variant.value)
+                              : String(variant.value)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2">
+                              {variant.weight}%
+                            </Typography>
+                            {!isWeightValid && (
+                              <Chip
+                                label={`Total: ${totalWeight}%`}
+                                size="small"
+                                color="error"
+                                variant="outlined"
+                              />
+                            )}
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" color="text.secondary">
+                            {variant.description}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={variant.isActive ? t('common.active') : t('common.inactive')}
+                            size="small"
+                            color={variant.isActive ? 'success' : 'default'}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', gap: 0.5 }}>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleEditVariant(variant)}
+                              color="primary"
+                            >
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDeleteVariant(variant)}
+                              color="error"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-    {/* Create/Edit Variant Side Panel */}
-    <SidePanel
-      open={dialogOpen}
-      onClose={() => setDialogOpen(false)}
-      title={dialogType === 'create'
-        ? t('remoteConfig.addVariant')
-        : t('remoteConfig.editVariant')
-      }
-      storageKey="remoteConfigVariantFormWidth"
-      defaultWidth={600}
-      minWidth={450}
-      actions={
-        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-          <Button onClick={() => setDialogOpen(false)}>
+          <SimplePagination
+            count={variants.length}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Create/Edit Variant Side Panel */}
+      <SidePanel
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={dialogType === 'create'
+          ? t('remoteConfig.addVariant')
+          : t('remoteConfig.editVariant')
+        }
+        storageKey="remoteConfigVariantFormWidth"
+        defaultWidth={600}
+        minWidth={450}
+        actions={
+          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+            <Button onClick={() => setDialogOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              onClick={handleSaveVariant}
+              variant="contained"
+              disabled={!formData.parameterKey || !formData.variantName || !formData.value || (dialogType === 'edit' && !isDirty)}
+            >
+              {dialogType === 'create' ? t('common.create') : t('common.update')}
+            </Button>
+          </Box>
+        }
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <TextField
+            label={t('remoteConfig.parameterKey')}
+            value={formData.parameterKey}
+            onChange={(e) => setFormData(prev => ({ ...prev, parameterKey: e.target.value }))}
+            fullWidth
+            required
+            placeholder="enable_new_ui"
+            sx={{ fontFamily: 'monospace' }}
+          />
+
+          <TextField
+            label={t('remoteConfig.variantName')}
+            value={formData.variantName}
+            onChange={(e) => setFormData(prev => ({ ...prev, variantName: e.target.value }))}
+            fullWidth
+            required
+            placeholder="control"
+          />
+
+          <TextField
+            label={t('remoteConfig.value')}
+            value={formData.value}
+            onChange={(e) => setFormData(prev => ({ ...prev, value: e.target.value }))}
+            fullWidth
+            required
+            multiline
+            rows={3}
+            placeholder="true, false, 42, 'text', or JSON object"
+            helperText={t('remoteConfig.valueHelp')}
+          />
+
+          <TextField
+            label={t('remoteConfig.weight')}
+            type="number"
+            value={formData.weight}
+            onChange={(e) => setFormData(prev => ({ ...prev, weight: Number(e.target.value) }))}
+            fullWidth
+            required
+            inputProps={{ min: 0, max: 100 }}
+            helperText={t('remoteConfig.weightHelp')}
+          />
+
+          <TextField
+            label={t('remoteConfig.description')}
+            value={formData.description}
+            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+            fullWidth
+            required
+            multiline
+            rows={2}
+            placeholder="Description of this variant"
+          />
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={formData.isActive}
+                onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+              />
+            }
+            label={t('remoteConfig.isActive')}
+          />
+        </Box>
+      </SidePanel>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>{t('remoteConfig.deleteVariant')}</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {t('remoteConfig.deleteVariantConfirm')} "{variantToDelete?.variantName}"?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            {t('remoteConfig.deleteVariantWarning')}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button
-            onClick={handleSaveVariant}
-            variant="contained"
-            disabled={!formData.parameterKey || !formData.variantName || !formData.description}
-          >
-            {dialogType === 'create' ? t('common.create') : t('common.update')}
+          <Button onClick={confirmDeleteVariant} color="error" variant="contained">
+            {t('common.delete')}
           </Button>
-        </Box>
-      }
-    >
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <TextField
-          label={t('remoteConfig.parameterKey')}
-          value={formData.parameterKey}
-          onChange={(e) => setFormData(prev => ({ ...prev, parameterKey: e.target.value }))}
-          fullWidth
-          required
-          placeholder="enable_new_ui"
-          sx={{ fontFamily: 'monospace' }}
-        />
-
-        <TextField
-          label={t('remoteConfig.variantName')}
-          value={formData.variantName}
-          onChange={(e) => setFormData(prev => ({ ...prev, variantName: e.target.value }))}
-          fullWidth
-          required
-          placeholder="control"
-        />
-
-        <TextField
-          label={t('remoteConfig.value')}
-          value={formData.value}
-          onChange={(e) => setFormData(prev => ({ ...prev, value: e.target.value }))}
-          fullWidth
-          required
-          multiline
-          rows={3}
-          placeholder="true, false, 42, 'text', or JSON object"
-          helperText={t('remoteConfig.valueHelp')}
-        />
-
-        <TextField
-          label={t('remoteConfig.weight')}
-          type="number"
-          value={formData.weight}
-          onChange={(e) => setFormData(prev => ({ ...prev, weight: Number(e.target.value) }))}
-          fullWidth
-          required
-          inputProps={{ min: 0, max: 100 }}
-          helperText={t('remoteConfig.weightHelp')}
-        />
-
-        <TextField
-          label={t('remoteConfig.description')}
-          value={formData.description}
-          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-          fullWidth
-          required
-          multiline
-          rows={2}
-          placeholder="Description of this variant"
-        />
-
-        <FormControlLabel
-          control={
-            <Switch
-              checked={formData.isActive}
-              onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-            />
-          }
-          label={t('remoteConfig.isActive')}
-        />
-      </Box>
-    </SidePanel>
-
-    {/* Delete Confirmation Dialog */}
-    <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-      <DialogTitle>{t('remoteConfig.deleteVariant')}</DialogTitle>
-      <DialogContent>
-        <Typography>
-          {t('remoteConfig.deleteVariantConfirm')} "{variantToDelete?.variantName}"?
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {t('remoteConfig.deleteVariantWarning')}
-        </Typography>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setDeleteDialogOpen(false)}>
-          {t('common.cancel')}
-        </Button>
-        <Button onClick={confirmDeleteVariant} color="error" variant="contained">
-          {t('common.delete')}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  </>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
@@ -2906,345 +3068,345 @@ const DeploymentHistoryManagement: React.FC = () => {
 
   return (
     <>
-    <Card>
-      <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h6" component="h2">
-            {t('remoteConfig.deploymentHistory')}
-          </Typography>
-        </Box>
-
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('remoteConfig.version')}</TableCell>
-                <TableCell>{t('remoteConfig.message')}</TableCell>
-                <TableCell>{t('remoteConfig.deployedBy')}</TableCell>
-                <TableCell>{t('remoteConfig.deployedAt')}</TableCell>
-                <TableCell>{t('remoteConfig.status')}</TableCell>
-                <TableCell>{t('remoteConfig.changes')}</TableCell>
-                <TableCell>{t('common.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {deployments
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((deployment) => (
-                <TableRow key={deployment.id}>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
-                      #{deployment.version}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ maxWidth: 300 }}>
-                      {deployment.message}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {deployment.deployedBy.name}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        ({deployment.deployedBy.email})
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {formatDateTimeDetailed(deployment.deployedAt)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={deployment.status}
-                      size="small"
-                      color={getStatusColor(deployment.status) as any}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {deployment.changes.length} change{deployment.changes.length !== 1 ? 's' : ''}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 0.5 }}>
-                      <Tooltip title={t('remoteConfig.viewDetails')}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleViewDetails(deployment)}
-                          color="primary"
-                        >
-                          <SettingsIcon />
-                        </IconButton>
-                      </Tooltip>
-                      {deployment.rollbackAvailable && deployment.status === 'success' && (
-                        <Tooltip title={t('remoteConfig.rollback')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleRollback(deployment)}
-                            color="warning"
-                          >
-                            <RestoreIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <SimplePagination
-          count={deployments.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={[10, 25, 50, 100]}
-        />
-      </CardContent>
-    </Card>
-
-    {/* Deployment Details Dialog */}
-    <Dialog open={detailDialogOpen} onClose={() => setDetailDialogOpen(false)} maxWidth="md" fullWidth>
-      <DialogTitle>
-        {t('remoteConfig.deploymentDetails')} - #{selectedDeployment?.version}
-      </DialogTitle>
-      <DialogContent>
-        {selectedDeployment && (
-          <Box sx={{ pt: 2 }}>
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-              <Grid size={{ xs: 6 }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {t('remoteConfig.version')}
-                </Typography>
-                <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>
-                  #{selectedDeployment.version}
-                </Typography>
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {t('remoteConfig.status')}
-                </Typography>
-                <Chip
-                  label={selectedDeployment.status}
-                  size="small"
-                  color={getStatusColor(selectedDeployment.status) as any}
-                />
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {t('remoteConfig.deployedBy')}
-                </Typography>
-                <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    {selectedDeployment.deployedBy.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {selectedDeployment.deployedBy.email}
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {t('remoteConfig.deployedAt')}
-                </Typography>
-                <Typography variant="body1">
-                  {formatDateTimeDetailed(selectedDeployment.deployedAt)}
-                </Typography>
-              </Grid>
-            </Grid>
-
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              {t('remoteConfig.changes')} ({selectedDeployment.changes.length})
+      <Card>
+        <CardContent>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6" component="h2">
+              {t('remoteConfig.deploymentHistory')}
             </Typography>
+          </Box>
 
-            <TableContainer>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>{t('remoteConfig.type')}</TableCell>
-                    <TableCell>{t('remoteConfig.action')}</TableCell>
-                    <TableCell>{t('remoteConfig.itemName')}</TableCell>
-                    <TableCell>{t('remoteConfig.changes')}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {selectedDeployment.changes.map((change, index) => (
-                    <TableRow key={index}>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t('remoteConfig.version')}</TableCell>
+                  <TableCell>{t('remoteConfig.message')}</TableCell>
+                  <TableCell>{t('remoteConfig.deployedBy')}</TableCell>
+                  <TableCell>{t('remoteConfig.deployedAt')}</TableCell>
+                  <TableCell>{t('remoteConfig.status')}</TableCell>
+                  <TableCell>{t('remoteConfig.changes')}</TableCell>
+                  <TableCell>{t('common.actions')}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {deployments
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((deployment) => (
+                    <TableRow key={deployment.id}>
                       <TableCell>
-                        <Chip
-                          label={change.type}
-                          size="small"
-                          variant="outlined"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={change.action}
-                          size="small"
-                          color={getActionColor(change.action) as any}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                          {change.itemName}
+                        <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                          #{deployment.version}
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        {change.action === 'created' && (
-                          <Typography variant="body2" color="success.main">
-                            Created with value: {JSON.stringify(change.newValue)}
+                        <Typography variant="body2" sx={{ maxWidth: 300 }}>
+                          {deployment.message}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {deployment.deployedBy.name}
                           </Typography>
-                        )}
-                        {change.action === 'updated' && (
-                          <Box>
-                            <Typography variant="body2" color="text.secondary">
-                              From: {JSON.stringify(change.oldValue)}
-                            </Typography>
-                            <Typography variant="body2" color="info.main">
-                              To: {JSON.stringify(change.newValue)}
-                            </Typography>
-                          </Box>
-                        )}
-                        {change.action === 'deleted' && (
-                          <Typography variant="body2" color="error.main">
-                            Deleted: {JSON.stringify(change.oldValue)}
+                          <Typography variant="caption" color="text.secondary">
+                            ({deployment.deployedBy.email})
                           </Typography>
-                        )}
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {formatDateTimeDetailed(deployment.deployedAt)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={deployment.status}
+                          size="small"
+                          color={getStatusColor(deployment.status) as any}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {deployment.changes.length} change{deployment.changes.length !== 1 ? 's' : ''}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                          <Tooltip title={t('remoteConfig.viewDetails')}>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleViewDetails(deployment)}
+                              color="primary"
+                            >
+                              <SettingsIcon />
+                            </IconButton>
+                          </Tooltip>
+                          {deployment.rollbackAvailable && deployment.status === 'success' && (
+                            <Tooltip title={t('remoteConfig.rollback')}>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleRollback(deployment)}
+                                color="warning"
+                              >
+                                <RestoreIcon />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                        </Box>
                       </TableCell>
                     </TableRow>
                   ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
-        )}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setDetailDialogOpen(false)}>
-          {t('common.close')}
-        </Button>
-      </DialogActions>
-    </Dialog>
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-    {/* Rollback Confirmation Dialog with Diff */}
-    <Dialog open={rollbackDialogOpen} onClose={() => setRollbackDialogOpen(false)} maxWidth="lg" fullWidth>
-      <DialogTitle>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <RestoreIcon color="warning" />
-          {t('remoteConfig.rollback')}
-        </Box>
-      </DialogTitle>
-      <DialogContent>
-        <Typography sx={{ mb: 2 }}>
-          {t('remoteConfig.rollbackConfirm')} "#{deploymentToRollback?.version}"?
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          {t('remoteConfig.rollbackWarning')}
-        </Typography>
+          <SimplePagination
+            count={deployments.length}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+          />
+        </CardContent>
+      </Card>
 
-        {deploymentToRollback && currentVersion && (
-          <>
-            {/* Version Comparison Info */}
-            <Box sx={{ mb: 3 }}>
-              <Grid container spacing={2}>
+      {/* Deployment Details Dialog */}
+      <Dialog open={detailDialogOpen} onClose={() => setDetailDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>
+          {t('remoteConfig.deploymentDetails')} - #{selectedDeployment?.version}
+        </DialogTitle>
+        <DialogContent>
+          {selectedDeployment && (
+            <Box sx={{ pt: 2 }}>
+              <Grid container spacing={2} sx={{ mb: 3 }}>
                 <Grid size={{ xs: 6 }}>
-                  <Paper sx={{ p: 2, bgcolor: 'error.light', color: 'error.contrastText' }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                      {t('remoteConfig.currentVersion')} (#{currentVersion.version})
-                    </Typography>
-                    <Typography variant="body2">
-                      {currentVersion.deployedBy.name}
-                    </Typography>
-                    <Typography variant="caption">
-                      {formatDateTimeDetailed(currentVersion.deployedAt)}
-                    </Typography>
-                  </Paper>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {t('remoteConfig.version')}
+                  </Typography>
+                  <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>
+                    #{selectedDeployment.version}
+                  </Typography>
                 </Grid>
                 <Grid size={{ xs: 6 }}>
-                  <Paper sx={{ p: 2, bgcolor: 'success.light', color: 'success.contrastText' }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                      {t('remoteConfig.targetVersion')} (#{deploymentToRollback.version})
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {t('remoteConfig.status')}
+                  </Typography>
+                  <Chip
+                    label={selectedDeployment.status}
+                    size="small"
+                    color={getStatusColor(selectedDeployment.status) as any}
+                  />
+                </Grid>
+                <Grid size={{ xs: 6 }}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {t('remoteConfig.deployedBy')}
+                  </Typography>
+                  <Box>
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      {selectedDeployment.deployedBy.name}
                     </Typography>
-                    <Typography variant="body2">
-                      {deploymentToRollback.deployedBy.name}
+                    <Typography variant="body2" color="text.secondary">
+                      {selectedDeployment.deployedBy.email}
                     </Typography>
-                    <Typography variant="caption">
-                      {formatDateTimeDetailed(deploymentToRollback.deployedAt)}
-                    </Typography>
-                  </Paper>
+                  </Box>
+                </Grid>
+                <Grid size={{ xs: 6 }}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {t('remoteConfig.deployedAt')}
+                  </Typography>
+                  <Typography variant="body1">
+                    {formatDateTimeDetailed(selectedDeployment.deployedAt)}
+                  </Typography>
                 </Grid>
               </Grid>
-            </Box>
 
-            {/* Diff Viewer */}
-            <Box sx={{ mb: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                {t('remoteConfig.configurationDiff')}
+                {t('remoteConfig.changes')} ({selectedDeployment.changes.length})
               </Typography>
-              <Paper sx={{ p: 1, bgcolor: 'background.default' }}>
-                {(() => {
-                  const diff = generateVersionDiff(currentVersion, deploymentToRollback);
-                  return (
-                    <ReactDiffViewer
-                      oldValue={diff.current}
-                      newValue={diff.target}
-                      splitView={true}
-                      leftTitle={`Current Version (#${currentVersion.version})`}
-                      rightTitle={`Target Version (#${deploymentToRollback.version})`}
-                      showDiffOnly={false}
-                      hideLineNumbers={false}
-                      styles={{
-                        variables: {
-                          light: {
-                            codeFoldGutterBackground: '#f7f7f7',
-                            codeFoldBackground: '#f1f8ff',
-                          }
-                        }
-                      }}
-                    />
-                  );
-                })()}
-              </Paper>
-            </Box>
 
-            {/* Rollback Details */}
-            <Box sx={{ p: 2, bgcolor: 'warning.light', borderRadius: 1 }}>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                {t('remoteConfig.rollbackDetails')}:
-              </Typography>
-              <Typography variant="body2">
-                • {t('remoteConfig.version')}: #{deploymentToRollback.version}
-              </Typography>
-              <Typography variant="body2">
-                • {t('remoteConfig.deployedBy')}: {deploymentToRollback.deployedBy.name} ({deploymentToRollback.deployedBy.email})
-              </Typography>
-              <Typography variant="body2">
-                • {t('remoteConfig.deployedAt')}: {formatDateTimeDetailed(deploymentToRollback.deployedAt)}
-              </Typography>
-              <Typography variant="body2">
-                • {t('remoteConfig.message')}: {deploymentToRollback.message}
-              </Typography>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>{t('remoteConfig.type')}</TableCell>
+                      <TableCell>{t('remoteConfig.action')}</TableCell>
+                      <TableCell>{t('remoteConfig.itemName')}</TableCell>
+                      <TableCell>{t('remoteConfig.changes')}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {selectedDeployment.changes.map((change, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <Chip
+                            label={change.type}
+                            size="small"
+                            variant="outlined"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={change.action}
+                            size="small"
+                            color={getActionColor(change.action) as any}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                            {change.itemName}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          {change.action === 'created' && (
+                            <Typography variant="body2" color="success.main">
+                              Created with value: {JSON.stringify(change.newValue)}
+                            </Typography>
+                          )}
+                          {change.action === 'updated' && (
+                            <Box>
+                              <Typography variant="body2" color="text.secondary">
+                                From: {JSON.stringify(change.oldValue)}
+                              </Typography>
+                              <Typography variant="body2" color="info.main">
+                                To: {JSON.stringify(change.newValue)}
+                              </Typography>
+                            </Box>
+                          )}
+                          {change.action === 'deleted' && (
+                            <Typography variant="body2" color="error.main">
+                              Deleted: {JSON.stringify(change.oldValue)}
+                            </Typography>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Box>
-          </>
-        )}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setRollbackDialogOpen(false)}>
-          {t('common.cancel')}
-        </Button>
-        <Button onClick={confirmRollback} color="warning" variant="contained">
-          {t('remoteConfig.confirmRollback')}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDetailDialogOpen(false)}>
+            {t('common.close')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Rollback Confirmation Dialog with Diff */}
+      <Dialog open={rollbackDialogOpen} onClose={() => setRollbackDialogOpen(false)} maxWidth="lg" fullWidth>
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <RestoreIcon color="warning" />
+            {t('remoteConfig.rollback')}
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ mb: 2 }}>
+            {t('remoteConfig.rollbackConfirm')} "#{deploymentToRollback?.version}"?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            {t('remoteConfig.rollbackWarning')}
+          </Typography>
+
+          {deploymentToRollback && currentVersion && (
+            <>
+              {/* Version Comparison Info */}
+              <Box sx={{ mb: 3 }}>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 6 }}>
+                    <Paper sx={{ p: 2, bgcolor: 'error.light', color: 'error.contrastText' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        {t('remoteConfig.currentVersion')} (#{currentVersion.version})
+                      </Typography>
+                      <Typography variant="body2">
+                        {currentVersion.deployedBy.name}
+                      </Typography>
+                      <Typography variant="caption">
+                        {formatDateTimeDetailed(currentVersion.deployedAt)}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                  <Grid size={{ xs: 6 }}>
+                    <Paper sx={{ p: 2, bgcolor: 'success.light', color: 'success.contrastText' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        {t('remoteConfig.targetVersion')} (#{deploymentToRollback.version})
+                      </Typography>
+                      <Typography variant="body2">
+                        {deploymentToRollback.deployedBy.name}
+                      </Typography>
+                      <Typography variant="caption">
+                        {formatDateTimeDetailed(deploymentToRollback.deployedAt)}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </Box>
+
+              {/* Diff Viewer */}
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  {t('remoteConfig.configurationDiff')}
+                </Typography>
+                <Paper sx={{ p: 1, bgcolor: 'background.default' }}>
+                  {(() => {
+                    const diff = generateVersionDiff(currentVersion, deploymentToRollback);
+                    return (
+                      <ReactDiffViewer
+                        oldValue={diff.current}
+                        newValue={diff.target}
+                        splitView={true}
+                        leftTitle={`Current Version (#${currentVersion.version})`}
+                        rightTitle={`Target Version (#${deploymentToRollback.version})`}
+                        showDiffOnly={false}
+                        hideLineNumbers={false}
+                        styles={{
+                          variables: {
+                            light: {
+                              codeFoldGutterBackground: '#f7f7f7',
+                              codeFoldBackground: '#f1f8ff',
+                            }
+                          }
+                        }}
+                      />
+                    );
+                  })()}
+                </Paper>
+              </Box>
+
+              {/* Rollback Details */}
+              <Box sx={{ p: 2, bgcolor: 'warning.light', borderRadius: 1 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                  {t('remoteConfig.rollbackDetails')}:
+                </Typography>
+                <Typography variant="body2">
+                  • {t('remoteConfig.version')}: #{deploymentToRollback.version}
+                </Typography>
+                <Typography variant="body2">
+                  • {t('remoteConfig.deployedBy')}: {deploymentToRollback.deployedBy.name} ({deploymentToRollback.deployedBy.email})
+                </Typography>
+                <Typography variant="body2">
+                  • {t('remoteConfig.deployedAt')}: {formatDateTimeDetailed(deploymentToRollback.deployedAt)}
+                </Typography>
+                <Typography variant="body2">
+                  • {t('remoteConfig.message')}: {deploymentToRollback.message}
+                </Typography>
+              </Box>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRollbackDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button onClick={confirmRollback} color="warning" variant="contained">
+            {t('remoteConfig.confirmRollback')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 

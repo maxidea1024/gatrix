@@ -167,8 +167,8 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
         speedMultiplier: s.speedMultiplier,
         loopMode: s.loopMode,
         frames: (s.frames || []).map(f => ({
-          imageId: f.imageId,
-          duration: f.duration,
+          imageUrl: f.imageUrl,
+          delay: f.delay,
           link: f.link || '',
         })),
       })),
@@ -186,8 +186,8 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
         speedMultiplier: s.speedMultiplier,
         loopMode: s.loopMode,
         frames: (s.frames || []).map(f => ({
-          imageId: f.imageId,
-          duration: f.duration,
+          imageUrl: f.imageUrl,
+          delay: f.delay,
           link: f.link || '',
         })),
       })),

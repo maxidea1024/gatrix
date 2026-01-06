@@ -316,6 +316,8 @@ const CouponSettingsPage: React.FC = () => {
     targetUserIds: '' as string,
     targetUserIdsInverted: false,
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [fullEditingData, setFullEditingData] = useState<any>(null);
   const [rewardMode, setRewardMode] = useState<'direct' | 'template'>('direct');
   // Track if description was manually edited by user
   const [isDescriptionManuallyEdited, setIsDescriptionManuallyEdited] = useState(false);
@@ -328,6 +330,83 @@ const CouponSettingsPage: React.FC = () => {
     rewards: true,
     rewardEmail: true,
   });
+
+  const isDirty = useMemo(() => {
+    if (!editing) return true;
+    if (!fullEditingData) return true;
+
+    const currentData = {
+      code: form.code,
+      type: form.type,
+      name: form.name,
+      description: form.description || '',
+      perUserLimit: form.perUserLimit || 1,
+      usageLimitType: form.usageLimitType || 'USER',
+      maxTotalUses: form.maxTotalUses ?? null,
+      startsAt: form.startsAt ? form.startsAt.toISOString() : null,
+      expiresAt: form.expiresAt ? form.expiresAt.toISOString() : null,
+      status: form.status,
+      rewardMode,
+      rewardData: rewardMode === 'direct' ? form.rewardData : null,
+      rewardTemplateId: rewardMode === 'template' ? form.rewardTemplateId : null,
+      rewardEmailTitle: form.rewardEmailTitle || '',
+      rewardEmailBody: form.rewardEmailBody || '',
+      targetPlatforms: [...(form.targetPlatforms || [])].sort(),
+      targetPlatformsInverted: !!form.targetPlatformsInverted,
+      targetChannelSubchannels: [...(form.targetChannelSubchannels || [])].map(item => ({
+        channel: item.channel,
+        subchannels: [...(item.subchannels || [])].sort()
+      })).sort((a, b) => a.channel.localeCompare(b.channel)),
+      targetChannelSubchannelsInverted: !!form.targetChannelSubchannelsInverted,
+      targetWorlds: [...(form.targetWorlds || [])].sort(),
+      targetWorldsInverted: !!form.targetWorldsInverted,
+      targetUserIds: (form.targetUserIds || '').split(',').map((id: string) => id.trim()).filter((id: string) => id).sort().join(','),
+      targetUserIdsInverted: !!form.targetUserIdsInverted,
+    };
+
+    const originalData = {
+      code: fullEditingData.code || '',
+      type: fullEditingData.type,
+      name: fullEditingData.name,
+      description: fullEditingData.description || '',
+      perUserLimit: fullEditingData.perUserLimit || 1,
+      usageLimitType: fullEditingData.usageLimitType || 'USER',
+      maxTotalUses: fullEditingData.maxTotalUses ?? null,
+      startsAt: fullEditingData.startsAt ? parseUTCForPicker(fullEditingData.startsAt)?.toISOString() : null,
+      expiresAt: parseUTCForPicker(fullEditingData.expiresAt)?.toISOString(),
+      status: fullEditingData.status,
+      rewardMode: fullEditingData.rewardTemplateId ? 'template' : 'direct',
+      rewardData: fullEditingData.rewardTemplateId ? null : (fullEditingData.rewardData || []),
+      rewardTemplateId: fullEditingData.rewardTemplateId || null,
+      rewardEmailTitle: fullEditingData.rewardEmailTitle || '',
+      rewardEmailBody: fullEditingData.rewardEmailBody || '',
+      targetPlatforms: [...(fullEditingData.targetPlatforms || [])].sort(),
+      targetPlatformsInverted: !!fullEditingData.targetPlatformsInverted,
+      targetChannelSubchannels: (() => {
+        const targetChannels = fullEditingData.targetChannels || [];
+        const targetSubchannels = fullEditingData.targetSubchannels || [];
+        const subchannelsByChannel: { [key: string]: string[] } = {};
+        targetSubchannels.forEach((subchannelKey: string) => {
+          const [channel, subchannel] = subchannelKey.split(':');
+          if (channel && subchannel) {
+            if (!subchannelsByChannel[channel]) subchannelsByChannel[channel] = [];
+            subchannelsByChannel[channel].push(subchannel);
+          }
+        });
+        return targetChannels.map((channel: string) => ({
+          channel,
+          subchannels: [...(subchannelsByChannel[channel] || [])].sort(),
+        })).sort((a: any, b: any) => a.channel.localeCompare(b.channel));
+      })(),
+      targetChannelSubchannelsInverted: !!fullEditingData.targetChannelsInverted,
+      targetWorlds: [...(fullEditingData.targetWorlds || [])].sort(),
+      targetWorldsInverted: !!fullEditingData.targetWorldsInverted,
+      targetUserIds: (fullEditingData.targetUsers || []).map((id: string) => String(id).trim()).filter((id: string) => id).sort().join(','),
+      targetUserIdsInverted: !!fullEditingData.targetUserIdsInverted,
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [editing, fullEditingData, form, rewardMode]);
   // Ref for channel table container
   const channelTableRef = useRef<HTMLDivElement>(null);
   const platformTableRef = useRef<HTMLDivElement>(null);
@@ -371,6 +450,7 @@ const CouponSettingsPage: React.FC = () => {
 
   const resetForm = () => {
     setEditing(null);
+    setFullEditingData(null);
     setForm({ code: '', type: 'NORMAL', name: '', description: '', quantity: 1, perUserLimit: 1, usageLimitType: 'USER', maxTotalUses: null, startsAt: null, expiresAt: null, status: 'ACTIVE', rewardData: [], rewardTemplateId: null, rewardEmailTitle: '', rewardEmailBody: '', targetPlatforms: [], targetChannelSubchannels: [], targetWorlds: [], targetUserIds: '' });
     setRewardMode('direct');
     setIsDescriptionManuallyEdited(false);
@@ -895,6 +975,7 @@ const CouponSettingsPage: React.FC = () => {
 
       console.log('[CouponSettings] handleEdit - final form state', newForm);
 
+      setFullEditingData(fullSetting);
       setForm(newForm);
       // When editing, mark description as manually edited (since it already has a value)
       setIsDescriptionManuallyEdited(true);
@@ -1181,14 +1262,21 @@ const CouponSettingsPage: React.FC = () => {
                                         </Box>
                                       </Box>
                                     ) : (
-                                      <Box>
-                                        <Button size="small" color="secondary" onClick={() => handleOpenCodes(it)} startIcon={<ListIcon fontSize="small" />}>
-                                          {t('coupons.couponSettings.viewIssuedCodes')}
-                                        </Button>
-                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                                          {t('coupons.couponSettings.issuedCount')}: {(it.generatedCount || it.issuedCount || 0).toLocaleString()}
-                                        </Typography>
-                                      </Box>
+                                      <Tooltip title={t('coupons.couponSettings.viewIssuedCodes')}>
+                                        <Chip
+                                          size="small"
+                                          variant="outlined"
+                                          label={`${t('coupons.couponSettings.issuedCount')}: ${(it.generatedCount || it.issuedCount || 0).toLocaleString()}`}
+                                          onClick={() => handleOpenCodes(it)}
+                                          sx={{
+                                            cursor: 'pointer',
+                                            '&:hover': {
+                                              bgcolor: 'action.hover',
+                                              borderColor: 'primary.main'
+                                            }
+                                          }}
+                                        />
+                                      </Tooltip>
                                     )}
                                   </Box>
                                 )}
@@ -1197,14 +1285,12 @@ const CouponSettingsPage: React.FC = () => {
                           case 'type':
                             return (
                               <TableCell key="type" align="center" sx={{ py: 1, px: 2 }}>
-                                <Tooltip title={it.type}>
-                                  <CardGiftcardIcon
-                                    fontSize="small"
-                                    sx={{
-                                      color: it.type === 'SPECIAL' ? 'primary.main' : 'text.primary',
-                                    }}
-                                  />
-                                </Tooltip>
+                                <Chip
+                                  size="small"
+                                  label={it.type}
+                                  color={it.type === 'SPECIAL' ? 'primary' : 'info'}
+                                  variant="filled"
+                                />
                               </TableCell>
                             );
                           case 'status': {
@@ -1850,7 +1936,7 @@ const CouponSettingsPage: React.FC = () => {
         {/* Footer */}
         <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider', bgcolor: 'background.paper', display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
           <Button onClick={() => setOpenForm(false)}>{t('common.cancel')}</Button>
-          <Button onClick={handleSave} variant="contained">{getActionLabel(editing ? 'update' : 'create', requiresApproval, t)}</Button>
+          <Button onClick={handleSave} variant="contained" disabled={submitting || (!!editing && !isDirty)}>{getActionLabel(editing ? 'update' : 'create', requiresApproval, t)}</Button>
         </Box>
       </ResizableDrawer>
 
