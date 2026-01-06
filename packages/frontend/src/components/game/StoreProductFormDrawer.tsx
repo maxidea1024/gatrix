@@ -29,7 +29,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { getContrastColor } from '@/utils/colorUtils';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { getActionLabel } from '../../utils/changeRequestToast';
-import { parseApiErrorMessage } from '../../utils/errorUtils';
+import { useHandleApiError } from '../../hooks/useHandleApiError';
 
 interface StoreProductFormDrawerProps {
   open: boolean;
@@ -87,6 +87,8 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
   const [saving, setSaving] = useState(false);
   const [loadingTags, setLoadingTags] = useState(false);
   const [isCopy, setIsCopy] = useState(false);
+
+  const { handleApiError, ErrorDialog } = useHandleApiError();
   const nameInputRef = React.useRef<HTMLInputElement>(null);
 
   // Check if this is edit mode (existing product)
@@ -265,7 +267,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
     } catch (error: any) {
       console.error('Failed to save store product:', error);
       const fallbackKey = requiresApproval ? 'storeProducts.requestSaveFailed' : 'common.saveFailed';
-      enqueueSnackbar(parseApiErrorMessage(error, fallbackKey), { variant: 'error' });
+      handleApiError(error, fallbackKey);
     } finally {
       setSaving(false);
     }
@@ -601,6 +603,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
           </Box>
         </Box>
       </LocalizationProvider>
+      <ErrorDialog />
     </ResizableDrawer>
   );
 };

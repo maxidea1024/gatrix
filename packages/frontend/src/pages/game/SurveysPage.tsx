@@ -48,6 +48,7 @@ import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../componen
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import RewardDisplay from '../../components/game/RewardDisplay';
 import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import { useHandleApiError } from '../../hooks/useHandleApiError';
 
 const SurveysPage: React.FC = () => {
   const { t } = useTranslation();
@@ -75,6 +76,7 @@ const SurveysPage: React.FC = () => {
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const { handleApiError, ErrorDialog } = useHandleApiError();
 
   // Default columns for reset
   const defaultColumns: ColumnConfig[] = [
@@ -257,7 +259,7 @@ const SurveysPage: React.FC = () => {
       setSelectedIds([]);
       loadSurveys();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('surveys.deleteFailed'), { variant: 'error' });
+      handleApiError(error, 'surveys.deleteFailed');
     } finally {
       setDeleteConfirmOpen(false);
       setDeletingSurvey(null);
@@ -283,7 +285,7 @@ const SurveysPage: React.FC = () => {
       setSelectedIds([]);
       loadSurveys();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('surveys.bulkDeleteFailed'), { variant: 'error' });
+      handleApiError(error, 'surveys.bulkDeleteFailed');
     } finally {
       setBulkDeleteConfirmOpen(false);
     }
@@ -303,7 +305,7 @@ const SurveysPage: React.FC = () => {
         loadSurveys();
       }
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('surveys.toggleFailed'), { variant: 'error' });
+      handleApiError(error, 'surveys.toggleFailed');
     }
   };
 
@@ -725,6 +727,7 @@ const SurveysPage: React.FC = () => {
         message={t('surveys.bulkDeleteConfirmMessage', { count: selectedIds.length })}
         warning={t('surveys.bulkDeleteWarning')}
       />
+      <ErrorDialog />
     </Box>
   );
 };

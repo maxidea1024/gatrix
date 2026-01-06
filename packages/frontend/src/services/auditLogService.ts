@@ -155,6 +155,27 @@ export class AuditLogService {
       'whitelist_bulk_create',
       'whitelist_bulk_delete',
       'whitelist_toggle_status',
+      'change_request_executed',
+      'change_request_rejected',
+      'api_token_create',
+      'api_token_update',
+      'api_token_regenerate',
+      'api_token_delete',
+      'service_notice_create',
+      'service_notice_update',
+      'service_notice_delete',
+      'service_notice_bulk_delete',
+      'service_notice_toggle_active',
+      'invitation_create',
+      'invitation_delete',
+      'user_role_updated',
+      'user_status_updated',
+      'user_tags_updated',
+      'whitelist_toggle',
+      'rollback',
+      'campaign_started',
+      'campaign_ended',
+      'approved',
     ];
   }
 
@@ -172,6 +193,11 @@ export class AuditLogService {
       'tag',
       'message_template',
       'job',
+      'change_request',
+      'console',
+      'api_token',
+      'invitation',
+      'service_notice',
     ];
   }
 

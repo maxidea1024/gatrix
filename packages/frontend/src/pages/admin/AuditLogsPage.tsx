@@ -76,7 +76,7 @@ import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { AuditLogService, AuditLogFilters } from '../../services/auditLogService';
 import { AuditLog } from '../../types';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -462,7 +462,13 @@ const AuditLogsPage: React.FC = () => {
   const renderCellContent = (log: AuditLog, columnId: string) => {
     switch (columnId) {
       case 'createdAt':
-        return <Typography variant="body2">{formatDateTimeDetailed((log as any).createdAt || log.created_at)}</Typography>;
+        return (
+          <Tooltip title={formatDateTimeDetailed((log as any).createdAt || log.created_at)}>
+            <Typography variant="body2">
+              {formatRelativeTime((log as any).createdAt || log.created_at, undefined, language)}
+            </Typography>
+          </Tooltip>
+        );
       case 'user':
         return log.user_name ? (
           <Box>
@@ -760,7 +766,9 @@ const AuditLogsPage: React.FC = () => {
                                   {t('auditLogs.date')}
                                 </Typography>
                                 <Typography variant="body1" sx={{ mt: 0.5, fontFamily: 'monospace' }}>
-                                  {formatDateTimeDetailed((log as any).createdAt || log.created_at)}
+                                  <Tooltip title={formatDateTimeDetailed((log as any).createdAt || log.created_at)}>
+                                    <span>{formatRelativeTime((log as any).createdAt || log.created_at, undefined, language)}</span>
+                                  </Tooltip>
                                 </Typography>
                               </Box>
 

@@ -119,7 +119,8 @@ import { ClientVersionService } from '../../services/clientVersionService';
 import ClientVersionForm from '../../components/admin/ClientVersionForm';
 import BulkClientVersionForm from '../../components/admin/BulkClientVersionForm';
 import PlatformDefaultsDialog from '../../components/admin/PlatformDefaultsDialog';
-import { formatDateTimeDetailed, parseUTCForPicker } from '../../utils/dateFormat';
+import { formatDateTimeDetailed, formatRelativeTime, parseUTCForPicker } from '../../utils/dateFormat';
+import { useI18n } from '../../contexts/I18nContext';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
@@ -300,6 +301,7 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
 
 const ClientVersionsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { language } = useI18n();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const theme = useTheme();
   const { platforms } = usePlatformConfig();
@@ -1216,9 +1218,11 @@ const ClientVersionsPage: React.FC = () => {
         );
       case 'createdAt':
         return (
-          <Typography variant="body2">
-            {formatDateTimeDetailed(clientVersion.createdAt)}
-          </Typography>
+          <Tooltip title={formatDateTimeDetailed(clientVersion.createdAt)}>
+            <Typography variant="body2">
+              {formatRelativeTime(clientVersion.createdAt, undefined, language)}
+            </Typography>
+          </Tooltip>
         );
       default:
         return null;

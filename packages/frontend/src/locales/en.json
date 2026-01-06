@@ -1629,7 +1629,9 @@
       "rollback": "Rollback",
       "campaign_started": "Campaign Started",
       "campaign_ended": "Campaign Ended",
-      "approved": "Approved"
+      "approved": "Approved",
+      "change_request_executed": "Change Request Executed",
+      "change_request_rejected": "Change Request Rejected"
     },
     "resources": {
       "user": "User",
@@ -1644,7 +1646,8 @@
       "console": "System Console",
       "api_token": "API Token",
       "invitation": "User Invitation",
-      "service_notice": "Service Notice"
+      "service_notice": "Service Notice",
+      "change_request": "Change Request"
     }
   },
   "auth": {
@@ -2470,8 +2473,9 @@
     "CR_ALREADY_APPROVED": "You have already approved this request.",
     "CR_SELF_APPROVAL_NOT_ALLOWED": "You cannot approve your own Change Request.",
     "CR_INSUFFICIENT_PERMISSIONS": "Insufficient permissions to approve.",
-    "CR_DATA_CONFLICT": "Data has changed since this request was created.",
-    "ResourceLockedException": "This item is locked by Change Request \"{{title}}\". It cannot be modified until the request is processed."
+    "CR_DATA_CONFLICT": "Data has changed since the request was created, resulting in a conflict.",
+    "ResourceLockedException": "This item is locked by Change Request \"{{title}}\". It cannot be modified until the request is processed.",
+    "RESOURCE_LOCKED": "This item is locked by Change Request \"{{changeRequestTitle}}\". It cannot be modified until the request is processed."
   },
   "jobs": {
     "title": "Job Management",
@@ -4109,6 +4113,7 @@
     "syncApplySuccess": "Sync completed successfully.",
     "syncApplyFailed": "Failed to apply sync.",
     "syncPreviewFailed": "Failed to get sync preview.",
+    "requestSaveFailed": "Failed to request store product save.",
     "syncSummary": "Summary",
     "syncToAdd": "To Add",
     "syncToUpdate": "To Update",
@@ -5011,6 +5016,7 @@
     "actions.reopen": "Reopen",
     "actions.execute": "Execute",
     "actions.rollback": "Rollback",
+    "messages.created": "Change request has been created.",
     "messages.submitted": "Change request submitted.",
     "messages.approved": "Change request approved.",
     "messages.rollbackCreated": "Rollback change request created successfully.",

@@ -39,8 +39,9 @@ export function parseApiErrorMessage(error: any, fallbackKey = 'common.saveFaile
     }
 
     // Handle specific CR-related errors by error code
-    if (errorCode === 'ResourceLockedException' && payload?.changeRequestTitle) {
-        return String(i18n.t('errors.ResourceLockedException', { title: payload.changeRequestTitle }));
+    if ((errorCode === 'ResourceLockedException' || errorCode === 'RESOURCE_LOCKED') && (payload?.changeRequestTitle || payload?.title)) {
+        const title = payload?.changeRequestTitle || payload?.title;
+        return String(i18n.t('errors.RESOURCE_LOCKED', { changeRequestTitle: title }));
     }
 
     if (errorCode === 'CR_DATA_CONFLICT') {
@@ -52,7 +53,49 @@ export function parseApiErrorMessage(error: any, fallbackKey = 'common.saveFaile
         return String(i18n.t(`errors.${errorCode}`, payload || {}));
     }
 
+    // Fallback if we have an error message inside errorData
+    if (errorData?.message && typeof errorData.message === 'string') {
+        return errorData.message;
+    }
+
     // Fallback to translation key
     return String(i18n.t(fallbackKey));
+}
+
+/**
+ * Extract conflict info from error
+ */
+export function extractConflictInfo(error: any): {
+    lockedBy?: number | string;
+    changeRequestId?: string;
+    changeRequestTitle?: string;
+    isLocked: boolean;
+} {
+    let errorData: any = null;
+
+    if (error?.response?.data?.error) {
+        errorData = error.response.data.error;
+    } else if (error?.message) {
+        try {
+            errorData = JSON.parse(error.message);
+        } catch {
+            errorData = null;
+        }
+    }
+
+    const errorCode = errorData?.error || errorData?.code || errorData?.errorCode;
+    const isLocked = errorCode === 'ResourceLockedException' || errorCode === 'RESOURCE_LOCKED';
+
+    if (isLocked) {
+        const payload = errorData?.payload || errorData?.details || {};
+        return {
+            lockedBy: payload.lockedBy,
+            changeRequestId: payload.changeRequestId,
+            changeRequestTitle: payload.changeRequestTitle || payload.title,
+            isLocked: true,
+        };
+    }
+
+    return { isLocked: false };
 }
 

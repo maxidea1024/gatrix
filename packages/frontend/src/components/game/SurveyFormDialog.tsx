@@ -35,10 +35,8 @@ import { useGameWorld } from '../../contexts/GameWorldContext';
 import surveyService, { Survey, TriggerCondition, ParticipationReward, ChannelSubchannelData } from '../../services/surveyService';
 import RewardSelector from './RewardSelector';
 import TargetSettingsGroup from './TargetSettingsGroup';
-import { ErrorCodes } from '@gatrix/shared';
-import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
-import { getActionLabel } from '../../utils/changeRequestToast';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { useHandleApiError } from '../../hooks/useHandleApiError';
 
 interface SurveyFormDialogProps {
   open: boolean;
@@ -60,6 +58,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const { platforms, channels } = usePlatformConfig();
   const { worlds } = useGameWorld();
+  const { handleApiError, ErrorDialog } = useHandleApiError();
 
   // Form state
   const [platformSurveyId, setPlatformSurveyId] = useState('');
@@ -393,13 +392,12 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
           enqueueSnackbar(t('surveys.createSuccess'), { variant: 'success' });
         }
       }
-
       onSuccess();
       onClose();
     } catch (error: any) {
       console.error('Failed to save survey:', error);
-      const fallbackKey = currentEnvironment?.requiresApproval ? 'surveys.requestSaveFailed' : 'surveys.saveFailed';
-      enqueueSnackbar(parseApiErrorMessage(error, fallbackKey), { variant: 'error' });
+      const fallbackKey = requiresApproval ? 'surveys.requestSaveFailed' : 'surveys.saveFailed';
+      handleApiError(error, fallbackKey);
     } finally {
       setSubmitting(false);
     }
@@ -751,6 +749,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
           {getActionLabel(survey ? 'update' : 'create', requiresApproval, t)}
         </Button>
       </Box>
+      <ErrorDialog />
     </ResizableDrawer>
   );
 };

@@ -22,6 +22,8 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import serviceNoticeService, { ServiceNotice } from '../../services/serviceNoticeService';
+import { formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
+import { Tooltip } from '@mui/material';
 
 const PREVIEW_WIDTH = 1536;
 const PREVIEW_HEIGHT = 928;
@@ -136,19 +138,10 @@ const saveReadNotices = (readNotices: Set<number>) => {
   }
 };
 
-// Format date and time in 24-hour format
-const formatDateTime = (date: string | Date): string => {
-  const d = new Date(date);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  const hours = String(d.getHours()).padStart(2, '0');
-  const minutes = String(d.getMinutes()).padStart(2, '0');
-  return `${year}. ${month}. ${day}. ${hours}:${minutes}`;
-};
+
 
 const ServiceNoticesPreviewPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [notices, setNotices] = useState<ServiceNotice[]>([]);
   const [selectedNotice, setSelectedNotice] = useState<ServiceNotice | null>(null);
   const [readNotices, setReadNotices] = useState<Set<number>>(getReadNotices());
@@ -523,14 +516,16 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                     border: `1px solid ${GAME_COLORS.border}`,
                   }}
                 />
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: GAME_COLORS.textSecondary, // Fixed color, not theme-dependent
-                  }}
-                >
-                  {formatDateTime(selectedNotice.createdAt)}
-                </Typography>
+                <Tooltip title={formatDateTimeDetailed(selectedNotice.createdAt)}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: GAME_COLORS.textSecondary, // Fixed color, not theme-dependent
+                    }}
+                  >
+                    {formatRelativeTime(selectedNotice.createdAt, undefined, i18n.language)}
+                  </Typography>
+                </Tooltip>
               </Box>
             </Box>
 

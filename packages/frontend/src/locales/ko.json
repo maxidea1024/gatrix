@@ -1630,7 +1630,9 @@
       "rollback": "롤백",
       "campaign_started": "캠페인 시작",
       "campaign_ended": "캠페인 종료",
-      "approved": "승인됨"
+      "approved": "승인됨",
+      "change_request_executed": "변경 요청 실행됨",
+      "change_request_rejected": "변경 요청 거절됨"
     },
     "resources": {
       "user": "사용자",
@@ -1645,7 +1647,8 @@
       "console": "시스템 콘솔",
       "api_token": "API 토큰",
       "invitation": "사용자 초대",
-      "service_notice": "서비스 공지"
+      "service_notice": "서비스 공지",
+      "change_request": "변경 요청"
     }
   },
   "auth": {
@@ -2473,7 +2476,8 @@
     "CR_SELF_APPROVAL_NOT_ALLOWED": "본인이 요청한 항목은 승인할 수 없습니다.",
     "CR_INSUFFICIENT_PERMISSIONS": "승인 권한이 부족합니다.",
     "CR_DATA_CONFLICT": "요청 생성 이후 데이터가 변경되어 충돌이 발생했습니다.",
-    "ResourceLockedException": "이 항목은 변경 요청 \"{{title}}\"에 의해 잠겨 있습니다. 해당 요청이 처리될 때까지 수정할 수 없습니다."
+    "ResourceLockedException": "이 항목은 변경 요청 \"{{title}}\"에 의해 잠겨 있습니다. 해당 요청이 처리될 때까지 수정할 수 없습니다.",
+    "RESOURCE_LOCKED": "이 항목은 변경 요청 \"{{changeRequestTitle}}\"에 의해 잠겨 있습니다. 해당 요청이 처리될 때까지 수정할 수 없습니다."
   },
   "jobs": {
     "title": "Job 관리",
@@ -4116,6 +4120,7 @@
     "syncApplySuccess": "동기화가 완료되었습니다.",
     "syncApplyFailed": "동기화 적용에 실패했습니다.",
     "syncPreviewFailed": "동기화 미리보기 조회에 실패했습니다.",
+    "requestSaveFailed": "상품 저장 요청에 실패했습니다.",
     "syncSummary": "요약",
     "syncToAdd": "추가 예정",
     "syncToUpdate": "수정 예정",
@@ -5009,6 +5014,7 @@
     "actions.reject": "거절",
     "actions.reopen": "재오픈",
     "actions.execute": "적용",
+    "messages.created": "변경 요청이 생성되었습니다.",
     "messages.submitted": "변경 요청이 제출되었습니다.",
     "messages.approved": "변경 요청이 승인되었습니다.",
     "messages.rollbackCreated": "롤백 변경 요청이 생성되었습니다.",

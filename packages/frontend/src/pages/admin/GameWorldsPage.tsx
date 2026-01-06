@@ -99,7 +99,8 @@ import { gameWorldService } from '../../services/gameWorldService';
 import { tagService, Tag } from '@/services/tagService';
 import { GameWorld, CreateGameWorldData, GameWorldMaintenanceLocale } from '../../types/gameWorld';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
+import { useI18n } from '../../contexts/I18nContext';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { computeMaintenanceStatus, getMaintenanceStatusDisplay, MaintenanceStatusType } from '@/utils/maintenanceStatusUtils';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
@@ -312,6 +313,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
 
 const GameWorldsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const { language } = useI18n();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const { currentEnvironmentId, currentEnvironment } = useEnvironment();
@@ -1433,9 +1435,11 @@ const GameWorldsPage: React.FC = () => {
         );
       case 'createdAt':
         return (
-          <Typography variant="body2">
-            {formatDateTimeDetailed(world.createdAt)}
-          </Typography>
+          <Tooltip title={formatDateTimeDetailed(world.createdAt)}>
+            <Typography variant="body2">
+              {formatRelativeTime(world.createdAt, undefined, language)}
+            </Typography>
+          </Tooltip>
         );
       default:
         return null;

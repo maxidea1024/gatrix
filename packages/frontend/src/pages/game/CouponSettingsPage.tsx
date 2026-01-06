@@ -19,7 +19,8 @@ import { useGameWorld } from '@/contexts/GameWorldContext';
 
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
-import { formatDateTime, parseUTCForPicker } from '@/utils/dateFormat';
+import { formatDateTime, parseUTCForPicker, formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
+import { useI18n } from '@/contexts/I18nContext';
 import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSettingsDialog';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import SDKGuideDrawer from '@/components/coupons/SDKGuideDrawer';
@@ -32,6 +33,7 @@ import { Dayjs } from 'dayjs';
 // Coupon Settings page (list and management of coupon definitions)
 const CouponSettingsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { language } = useI18n();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
@@ -1302,21 +1304,31 @@ const CouponSettingsPage: React.FC = () => {
                           case 'start':
                             return (
                               <TableCell key="start" sx={{ py: 1, px: 2 }}>
-                                <Typography variant="caption">
-                                  {it.startsAt ? formatDateTime(it.startsAt) : t('coupons.couponSettings.immediateStart')}
-                                </Typography>
+                                <Tooltip title={it.startsAt ? formatDateTimeDetailed(it.startsAt) : t('coupons.couponSettings.immediateStart')}>
+                                  <Typography variant="caption">
+                                    {it.startsAt ? formatRelativeTime(it.startsAt, undefined, language) : t('coupons.couponSettings.immediateStart')}
+                                  </Typography>
+                                </Tooltip>
                               </TableCell>
                             );
                           case 'end':
                             return (
                               <TableCell key="end" sx={{ py: 1, px: 2 }}>
-                                <Typography variant="caption">{formatDateTime(it.expiresAt)}</Typography>
+                                <Tooltip title={it.expiresAt ? formatDateTimeDetailed(it.expiresAt) : '-'}>
+                                  <Typography variant="caption">
+                                    {it.expiresAt ? formatRelativeTime(it.expiresAt, undefined, language) : '-'}
+                                  </Typography>
+                                </Tooltip>
                               </TableCell>
                             );
                           case 'createdAt':
                             return (
                               <TableCell key="createdAt" sx={{ py: 1, px: 2 }}>
-                                <Typography variant="caption">{formatDateTime((it as any).createdAt)}</Typography>
+                                <Tooltip title={formatDateTimeDetailed((it as any).createdAt)}>
+                                  <Typography variant="caption">
+                                    {formatRelativeTime((it as any).createdAt, undefined, language)}
+                                  </Typography>
+                                </Tooltip>
                               </TableCell>
                             );
                           case 'rewards':

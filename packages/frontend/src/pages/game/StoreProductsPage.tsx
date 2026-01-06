@@ -54,6 +54,7 @@ import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../componen
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 import { useNavigate } from 'react-router-dom';
+import { useHandleApiError } from '../../hooks/useHandleApiError';
 
 // Store display names
 const STORE_DISPLAY_NAMES: Record<string, string> = {
@@ -98,6 +99,7 @@ const StoreProductsPage: React.FC = () => {
 
   // Batch process state
   const [batchProcessDialogOpen, setBatchProcessDialogOpen] = useState(false);
+  const { handleApiError, ErrorDialog } = useHandleApiError();
 
   // Stats state
   const [productStats, setProductStats] = useState<StoreProductStats>({ total: 0, active: 0, inactive: 0 });
@@ -538,7 +540,7 @@ const StoreProductsPage: React.FC = () => {
       loadProducts();
       loadStats();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('storeProducts.deleteFailed'), { variant: 'error' });
+      handleApiError(error, 'storeProducts.deleteFailed');
     } finally {
       setDeleteConfirmOpen(false);
       setDeletingProduct(null);
@@ -565,7 +567,7 @@ const StoreProductsPage: React.FC = () => {
       loadProducts();
       loadStats();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('storeProducts.bulkDeleteFailed'), { variant: 'error' });
+      handleApiError(error, 'storeProducts.bulkDeleteFailed');
     } finally {
       setBulkDeleteConfirmOpen(false);
     }
@@ -589,7 +591,7 @@ const StoreProductsPage: React.FC = () => {
         loadStats();
       }
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'storeProducts.bulkActivateFailed'), { variant: 'error' });
+      handleApiError(error, 'storeProducts.bulkActivateFailed');
     }
   };
 
@@ -606,7 +608,7 @@ const StoreProductsPage: React.FC = () => {
         loadStats();
       }
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'storeProducts.bulkDeactivateFailed'), { variant: 'error' });
+      handleApiError(error, 'storeProducts.bulkDeactivateFailed');
     }
   };
 
@@ -625,7 +627,7 @@ const StoreProductsPage: React.FC = () => {
         loadStats();
       }
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), { variant: 'error' });
+      handleApiError(error, 'common.saveFailed');
     }
   };
 
@@ -1258,6 +1260,7 @@ const StoreProductsPage: React.FC = () => {
         onExecute={handleBatchProcessExecute}
         onGetCount={handleBatchProcessGetCount}
       />
+      <ErrorDialog />
     </Box>
   );
 };

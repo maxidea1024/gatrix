@@ -3,6 +3,8 @@ import { ChangeRequest } from '../models/ChangeRequest';
 import { ChangeRequestService } from './ChangeRequestService';
 import logger from '../config/logger';
 import knex from '../config/knex';
+import { ErrorCodes } from '@gatrix/shared';
+import { GatrixError } from '../middleware/errorHandler';
 
 export type ChangeOperationType = 'create' | 'update' | 'delete';
 
@@ -115,15 +117,19 @@ export class UnifiedChangeGateway {
                 .first();
 
             if (pendingRequest) {
-                throw new Error(JSON.stringify({
-                    error: 'ResourceLockedException',
-                    message: `This item is currently locked by active Change Request: ${pendingRequest.title}`,
-                    payload: {
-                        lockedBy: pendingRequest.requesterId,
-                        changeRequestId: pendingRequest.id,
-                        changeRequestTitle: pendingRequest.title
-                    }
-                }));
+                const conflictInfo = {
+                    lockedBy: pendingRequest.requesterId,
+                    changeRequestId: pendingRequest.id,
+                    changeRequestTitle: pendingRequest.title
+                };
+
+                throw new GatrixError(
+                    `This item is currently locked by active Change Request: ${pendingRequest.title}`,
+                    409, // Conflict
+                    true,
+                    ErrorCodes.RESOURCE_LOCKED,
+                    conflictInfo
+                );
             }
 
             // 3. Check if CR is required
@@ -206,11 +212,13 @@ export class UnifiedChangeGateway {
                     changeRequestTitle: pendingRequest.title
                 };
 
-                throw new Error(JSON.stringify({
-                    error: 'ResourceLockedException',
-                    message: `This item is currently locked by active Change Request: ${pendingRequest.title}`,
-                    payload: conflictInfo
-                }));
+                throw new GatrixError(
+                    `This item is currently locked by active Change Request: ${pendingRequest.title}`,
+                    409, // Conflict
+                    true,
+                    ErrorCodes.RESOURCE_LOCKED,
+                    conflictInfo
+                );
             }
 
             // 3. Resolve New Data
