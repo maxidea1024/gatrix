@@ -73,38 +73,55 @@ export class CouponRedeemService {
     }
 
     return await db.transaction(async (trx) => {
-      // 1. Find coupon code with lock
+      // 1. First try to find in g_coupons (NORMAL coupon)
       const coupon = await trx('g_coupons')
         .where('code', code)
         .where('environment', environment)
         .forUpdate()
         .first();
 
-      if (!coupon) {
+      let setting: any;
+      let isSpecialCoupon = false;
+      let couponId: string | null = null;
+
+      if (coupon) {
+        // NORMAL coupon found
+        couponId = coupon.id;
+
+        // Check if coupon is already used
+        if (coupon.status === 'USED') {
+          throw new GatrixError('Coupon has already been used', 409, true, CouponErrorCode.ALREADY_USED);
+        }
+
+        // Get coupon setting
+        setting = await trx('g_coupon_settings')
+          .where('id', coupon.settingId)
+          .where('environment', environment)
+          .first();
+      } else {
+        // Not found in g_coupons, try SPECIAL coupon in g_coupon_settings
+        setting = await trx('g_coupon_settings')
+          .where('code', code)
+          .where('environment', environment)
+          .where('type', 'SPECIAL')
+          .forUpdate()
+          .first();
+
+        if (setting) {
+          isSpecialCoupon = true;
+        }
+      }
+
+      if (!setting) {
         throw new GatrixError('Coupon code not found', 404, true, CouponErrorCode.CODE_NOT_FOUND);
       }
 
-      // 2. Check if coupon is already used
-      if (coupon.status === 'USED') {
-        throw new GatrixError('Coupon has already been used', 409, true, CouponErrorCode.ALREADY_USED);
-      }
-
-      // 3. Get coupon setting
-      const setting = await trx('g_coupon_settings')
-        .where('id', coupon.settingId)
-        .where('environment', environment)
-        .first();
-
-      if (!setting) {
-        throw new GatrixError('Coupon setting not found', 404, true, CouponErrorCode.CODE_NOT_FOUND);
-      }
-
-      // 4. Check if setting is active
+      // Check if setting is active
       if (setting.status !== 'ACTIVE') {
         throw new GatrixError('Coupon is not active', 422, true, CouponErrorCode.NOT_ACTIVE);
       }
 
-      // 5. Check date range
+      // Check date range
       const now = new Date();
       const startsAt = setting.startsAt ? new Date(setting.startsAt) : null;
       const expiresAt = new Date(setting.expiresAt);
@@ -117,10 +134,10 @@ export class CouponRedeemService {
         throw new GatrixError('Coupon has expired', 422, true, CouponErrorCode.EXPIRED);
       }
 
-      // 6. Check targeting conditions
+      // Check targeting conditions
       await this.validateTargeting(trx, setting.id, request, setting);
 
-      // 7. Check per-user/character limit based on usageLimitType
+      // Check per-user/character limit based on usageLimitType
       const usageLimitType = setting.usageLimitType || 'USER';
       const usageQuery = trx('g_coupon_uses').where('settingId', setting.id);
 
@@ -137,19 +154,30 @@ export class CouponRedeemService {
         throw new GatrixError('User has reached the usage limit for this coupon', 409, true, CouponErrorCode.USER_LIMIT_EXCEEDED);
       }
 
-      // 8. Update coupon status to USED
+      // For SPECIAL coupons, check maxTotalUses
+      if (isSpecialCoupon && setting.maxTotalUses && setting.maxTotalUses > 0) {
+        const totalUsedCount = Number(setting.usedCount || 0);
+        if (totalUsedCount >= setting.maxTotalUses) {
+          throw new GatrixError('Coupon has reached its maximum usage limit', 409, true, CouponErrorCode.ALREADY_USED);
+        }
+      }
+
       const usedAtISO = now.toISOString();
       const usedAtMySQL = now.toISOString().slice(0, 19).replace('T', ' ');
-      await trx('g_coupons').where('id', coupon.id).update({ status: 'USED', usedAt: usedAtMySQL });
 
-      // 9. Record usage
+      // Update coupon status to USED (only for NORMAL coupons)
+      if (!isSpecialCoupon && couponId) {
+        await trx('g_coupons').where('id', couponId).update({ status: 'USED', usedAt: usedAtMySQL });
+      }
+
+      // Record usage
       const sequence = userUsedCount + 1;
       const useId = ulid();
 
       await trx('g_coupon_uses').insert({
         id: useId,
         settingId: setting.id,
-        issuedCouponId: coupon.id,
+        issuedCouponId: couponId,  // null for SPECIAL coupons
         userId: request.userId,
         characterId: request.characterId || null,
         userName: sanitizedUserName,
@@ -161,10 +189,10 @@ export class CouponRedeemService {
         subchannel: request.subChannel || null,
       });
 
-      // 10. Update usedCount cache
+      // Update usedCount cache
       await trx('g_coupon_settings').where('id', setting.id).increment('usedCount', 1);
 
-      // 11. Check if all coupons are now used and auto-disable if needed
+      // Check if all coupons are now used and auto-disable if needed
       let shouldAutoDisable = false;
       if (setting.type === 'SPECIAL' && setting.maxTotalUses && setting.maxTotalUses > 0) {
         const newUsedCount = (setting.usedCount || 0) + 1;
@@ -200,10 +228,11 @@ export class CouponRedeemService {
         userId: request.userId,
         settingId: setting.id,
         sequence,
-        environment
+        environment,
+        isSpecialCoupon
       });
 
-      // 12. Build response
+      // Build response
       let reward: any[] = [];
 
       if (setting.rewardTemplateId) {
