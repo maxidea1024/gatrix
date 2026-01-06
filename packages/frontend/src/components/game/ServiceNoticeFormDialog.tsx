@@ -26,11 +26,16 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { useNavigate } from 'react-router-dom';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import { getActionLabel } from '../../utils/changeRequestToast';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { ServiceNotice, CreateServiceNoticeData, UpdateServiceNoticeData } from '../../services/serviceNoticeService';
 import RichTextEditor from '../mailbox/RichTextEditor';
 import { parseUTCForPicker } from '../../utils/dateFormat';
 import TargetSettingsGroup, { ChannelSubchannelData } from './TargetSettingsGroup';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 
 interface ServiceNoticeFormDialogProps {
   open: boolean;
@@ -49,7 +54,10 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   notice,
 }) => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const { platforms: platformConfig, channels: channelConfig } = usePlatformConfig();
   const [submitting, setSubmitting] = useState(false);
   const [previewCollapsed, setPreviewCollapsed] = useState(true); // Default: collapsed
@@ -314,6 +322,56 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     }
   }, [notice, open]);
 
+  // Check if form is dirty (data changed)
+  const isDirty = useMemo(() => {
+    if (!notice) return true;
+
+    // Current State -> Data Payload
+    const channels: string[] = [];
+    const subchannels: string[] = [];
+    channelSubchannels.forEach(item => {
+      if (!channels.includes(item.channel)) {
+        channels.push(item.channel);
+      }
+      item.subchannels.forEach(subchannel => {
+        const subchannelKey = `${item.channel}:${subchannel}`;
+        if (!subchannels.includes(subchannelKey)) {
+          subchannels.push(subchannelKey);
+        }
+      });
+    });
+
+    const currentData = {
+      isActive,
+      category,
+      platforms: [...platforms].sort(),
+      channels: channels.length > 0 ? [...channels].sort() : null,
+      subchannels: subchannels.length > 0 ? [...subchannels].sort() : null,
+      startDate: startDate ? startDate.toISOString() : null,
+      endDate: endDate ? endDate.toISOString() : null,
+      tabTitle: tabTitle.trim() || null,
+      title: title.trim(),
+      content: content.trim(),
+      description: description.trim() || null,
+    };
+
+    const originalData = {
+      isActive: notice.isActive,
+      category: notice.category,
+      platforms: [...(notice.platforms || [])].sort(),
+      channels: notice.channels ? [...notice.channels].sort() : null,
+      subchannels: notice.subchannels ? [...notice.subchannels].sort() : null,
+      startDate: notice.startDate ? dayjs(notice.startDate).toISOString() : null,
+      endDate: notice.endDate ? dayjs(notice.endDate).toISOString() : null,
+      tabTitle: notice.tabTitle || null,
+      title: notice.title,
+      content: notice.content,
+      description: notice.description || null,
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [notice, isActive, category, platforms, channelSubchannels, startDate, endDate, tabTitle, title, content, description]);
+
   const handleSubmit = async () => {
     // Validation
     if (!category) {
@@ -374,7 +432,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
           m.default.updateServiceNotice(notice.id, data)
         );
         if (result.isChangeRequest) {
-          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
           enqueueSnackbar(t('serviceNotices.updateSuccess'), { variant: 'success' });
         }
@@ -383,7 +441,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
           m.default.createServiceNotice(data as CreateServiceNoticeData)
         );
         if (result.isChangeRequest) {
-          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
           enqueueSnackbar(t('serviceNotices.createSuccess'), { variant: 'success' });
         }
@@ -393,7 +451,8 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       onClose();
     } catch (error: any) {
       console.error('Error saving service notice:', error);
-      enqueueSnackbar(error.message || t('serviceNotices.saveFailed'), { variant: 'error' });
+      const fallbackKey = requiresApproval ? 'serviceNotices.requestSaveFailed' : 'serviceNotices.saveFailed';
+      enqueueSnackbar(parseApiErrorMessage(error, fallbackKey), { variant: 'error' });
     } finally {
       setSubmitting(false);
     }
@@ -678,9 +737,9 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={submitting}
+          disabled={submitting || (!!notice && !isDirty)}
         >
-          {notice ? t('common.update') : t('common.create')}
+          {getActionLabel(notice ? 'update' : 'create', requiresApproval, t)}
         </Button>
       </Box>
     </ResizableDrawer>

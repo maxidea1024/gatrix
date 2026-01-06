@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -25,6 +25,11 @@ import {
 import ResizableDrawer from '../common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { useNavigate } from 'react-router-dom';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import { getActionLabel } from '../../utils/changeRequestToast';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 import rewardTemplateService, { RewardTemplate, ParticipationReward } from '../../services/rewardTemplateService';
 import RewardItemSelector, { RewardSelection } from './RewardItemSelector';
 import { tagService, Tag } from '../../services/tagService';
@@ -44,7 +49,10 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
   template,
 }) => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
 
   // Form state
   const [name, setName] = useState('');
@@ -159,6 +167,38 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
     }
   }, [template, open, availableTags]);
 
+  // Check if form is dirty (data changed)
+  const isDirty = useMemo(() => {
+    if (!template) return true;
+
+    // We only check for changes if template has an ID (edit mode)
+    if (!template.id) return true; // New or Copy mode
+
+    const currentData = {
+      name: name.trim(),
+      description: description.trim() || null,
+      rewardItems: rewardItems.map(item => ({
+        rewardType: item.rewardType,
+        itemId: item.itemId,
+        quantity: item.quantity,
+      })),
+      tagIds: selectedTags.map(tag => tag.id).sort((a, b) => a - b),
+    };
+
+    const originalData = {
+      name: template.name.trim(),
+      description: template.description?.trim() || null,
+      rewardItems: (template.rewardItems || []).map(item => ({
+        rewardType: item.rewardType,
+        itemId: item.itemId,
+        quantity: item.quantity,
+      })),
+      tagIds: (template.tags || []).map((tag: any) => tag.id).sort((a: number, b: number) => a - b),
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [template, name, description, rewardItems, selectedTags]);
+
   // Handlers
   const handleAddReward = () => {
     setRewardItems([
@@ -234,7 +274,7 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
           resultTags: result.data?.tags?.map((t: any) => ({ id: t.id, name: t.name })) || [],
         });
         if (result.isChangeRequest) {
-          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
           enqueueSnackbar(t('rewardTemplates.updateSuccess'), { variant: 'success' });
         }
@@ -247,7 +287,7 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
           tagIds,
         });
         if (result.isChangeRequest) {
-          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
           // Check if this is a copy operation (name contains " (Copy)" or localized equivalent)
           const isCopy = name.includes(`(${t('common.copy')})`);
@@ -257,7 +297,9 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
       }
       onSave();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('common.saveFailed'), { variant: 'error' });
+      console.error('[RewardTemplateFormDialog] Error saving template:', error);
+      const fallbackKey = requiresApproval ? 'rewardTemplates.requestSaveFailed' : 'common.saveFailed';
+      enqueueSnackbar(parseApiErrorMessage(error, fallbackKey), { variant: 'error' });
     } finally {
       setSaving(false);
     }
@@ -433,9 +475,9 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
           <Button
             variant="contained"
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || (!!template?.id && !isDirty)}
           >
-            {saving ? t('common.saving') : t('common.save')}
+            {saving ? t('common.saving') : getActionLabel(template ? 'update' : 'create', requiresApproval, t)}
           </Button>
         </Box>
       </Box>

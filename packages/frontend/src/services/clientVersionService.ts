@@ -133,16 +133,17 @@ export class ClientVersionService {
     );
 
     // Check if this is a change request response
-    if (response?.changeRequestId) {
+    // Backend returns: { success: true, data: { changeRequestId: "...", status: "DRAFT_SAVED" } }
+    if (response?.data?.changeRequestId || response?.changeRequestId) {
       return {
         clientVersion: undefined,
         isChangeRequest: true,
-        changeRequestId: response.changeRequestId,
+        changeRequestId: response?.data?.changeRequestId || response?.changeRequestId,
       };
     }
 
-    // 정상: { success: true, data: { ...created } }
-    if (response?.success && response?.data) {
+    // 정상 생성: { success: true, data: { ...created client version } }
+    if (response?.success && response?.data && response.data.id) {
       return {
         clientVersion: response.data,
         isChangeRequest: false,
@@ -218,16 +219,17 @@ export class ClientVersionService {
     );
 
     // Check if this is a change request response
-    if (response?.changeRequestId) {
+    // Backend returns: { success: true, data: { changeRequestId: "...", status: "DRAFT_SAVED" } }
+    if (response?.data?.changeRequestId || response?.changeRequestId) {
       return {
         clientVersion: undefined,
         isChangeRequest: true,
-        changeRequestId: response.changeRequestId,
+        changeRequestId: response?.data?.changeRequestId || response?.changeRequestId,
       };
     }
 
-    // ApiService.request()가 이미 response.data를 반환하므로
-    if (response?.success && response?.data) {
+    // 정상 수정: { success: true, data: { ...updated client version } }
+    if (response?.success && response?.data && response.data.id) {
       return {
         clientVersion: response.data,
         isChangeRequest: false,
@@ -241,8 +243,15 @@ export class ClientVersionService {
   /**
    * 클라이언트 버전 삭제
    */
-  static async deleteClientVersion(id: number): Promise<void> {
-    await apiService.delete(`${this.BASE_URL}/${id}`);
+  static async deleteClientVersion(id: number): Promise<{ isChangeRequest: boolean; changeRequestId?: string }> {
+    const response = await apiService.delete<ApiResponse<{ changeRequestId?: string; status?: string }>>(`${this.BASE_URL}/${id}`);
+    const data = response.data;
+    // 202 응답은 CR 생성을 의미
+    const isChangeRequest = !!(data?.changeRequestId);
+    return {
+      isChangeRequest,
+      changeRequestId: data?.changeRequestId,
+    };
   }
 
   /**

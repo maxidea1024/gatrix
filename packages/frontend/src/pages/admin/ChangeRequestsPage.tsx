@@ -815,7 +815,7 @@ const ChangeRequestsPage: React.FC = () => {
             </Box>
 
             <Card>
-                <CardContent sx={{ p: 0 }}>
+                <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
                     {/* Status Tabs */}
                     <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
                         <Tabs value={tabValue} onChange={handleTabChange}>

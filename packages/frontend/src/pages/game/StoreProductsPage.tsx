@@ -52,6 +52,8 @@ import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import StoreProductFormDrawer from '../../components/game/StoreProductFormDrawer';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import { useNavigate } from 'react-router-dom';
 
 // Store display names
 const STORE_DISPLAY_NAMES: Record<string, string> = {
@@ -66,7 +68,8 @@ const STORE_DISPLAY_NAMES: Record<string, string> = {
 
 const StoreProductsPage: React.FC = () => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const navigate = useNavigate();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.STORE_PRODUCTS_MANAGE]);
 
@@ -578,7 +581,7 @@ const StoreProductsPage: React.FC = () => {
     try {
       const result = await storeProductService.bulkUpdateActiveStatus(selectedIds, true);
       if (result.isChangeRequest) {
-        enqueueSnackbar(t('changeRequest.messages.created'), { variant: 'info' });
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
         enqueueSnackbar(t('storeProducts.bulkActivateSuccess'), { variant: 'success' });
         setSelectedIds([]);
@@ -595,7 +598,7 @@ const StoreProductsPage: React.FC = () => {
     try {
       const result = await storeProductService.bulkUpdateActiveStatus(selectedIds, false);
       if (result.isChangeRequest) {
-        enqueueSnackbar(t('changeRequest.messages.created'), { variant: 'info' });
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
         enqueueSnackbar(t('storeProducts.bulkDeactivateSuccess'), { variant: 'success' });
         setSelectedIds([]);
@@ -612,7 +615,7 @@ const StoreProductsPage: React.FC = () => {
     try {
       const result = await storeProductService.toggleActive(product.id, !product.isActive);
       if (result.isChangeRequest) {
-        enqueueSnackbar(t('changeRequest.messages.created'), { variant: 'info' });
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
         enqueueSnackbar(
           product.isActive ? t('storeProducts.deactivated') : t('storeProducts.activated'),

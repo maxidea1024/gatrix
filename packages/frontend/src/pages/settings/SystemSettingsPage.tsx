@@ -209,7 +209,7 @@ const SystemSettingsPage: React.FC = () => {
                   type="number"
                   label={t('settings.serviceDiscovery.defaultTtl')}
                   value={sdConfig.defaultTtl}
-                  onChange={(e) => setSdConfig({ ...sdConfig, defaultTtl: parseInt(e.target.value, 10) })}
+                  onChange={(e) => setSdConfig({ ...sdConfig, defaultTtl: e.target.value === '' ? '' : (parseInt(e.target.value, 10) || 30) })}
                   helperText={t('settings.serviceDiscovery.defaultTtlHelp')}
                   inputProps={{ min: 10, max: 300 }}
                 />
@@ -218,7 +218,7 @@ const SystemSettingsPage: React.FC = () => {
                   type="number"
                   label={t('settings.serviceDiscovery.heartbeatInterval')}
                   value={sdConfig.heartbeatInterval}
-                  onChange={(e) => setSdConfig({ ...sdConfig, heartbeatInterval: parseInt(e.target.value, 10) })}
+                  onChange={(e) => setSdConfig({ ...sdConfig, heartbeatInterval: e.target.value === '' ? '' : (parseInt(e.target.value, 10) || 15) })}
                   helperText={t('settings.serviceDiscovery.heartbeatIntervalHelp')}
                   inputProps={{ min: 5, max: 60 }}
                 />

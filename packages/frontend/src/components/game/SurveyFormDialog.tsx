@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
@@ -35,6 +36,9 @@ import surveyService, { Survey, TriggerCondition, ParticipationReward, ChannelSu
 import RewardSelector from './RewardSelector';
 import TargetSettingsGroup from './TargetSettingsGroup';
 import { ErrorCodes } from '@gatrix/shared';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import { getActionLabel } from '../../utils/changeRequestToast';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 
 interface SurveyFormDialogProps {
   open: boolean;
@@ -50,7 +54,10 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   survey,
 }) => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const { platforms, channels } = usePlatformConfig();
   const { worlds } = useGameWorld();
 
@@ -161,6 +168,75 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       setTargetWorldsInverted(false);
     }
   }, [survey, open]);
+
+  // Check if form is dirty (data changed)
+  const isDirty = useMemo(() => {
+    if (!survey) return true;
+
+    // Convert current target settings back to channels/subchannels for comparison
+    const currentChannels: string[] = [];
+    const currentSubchannels: string[] = [];
+    if (targetChannelSubchannels && targetChannelSubchannels.length > 0) {
+      targetChannelSubchannels.forEach((item: any) => {
+        if (!currentChannels.includes(item.channel)) {
+          currentChannels.push(item.channel);
+        }
+        item.subchannels.forEach((subchannel: string) => {
+          const subchannelKey = `${item.channel}:${subchannel}`;
+          if (!currentSubchannels.includes(subchannelKey)) {
+            currentSubchannels.push(subchannelKey);
+          }
+        });
+      });
+    }
+
+    const currentData = {
+      platformSurveyId: platformSurveyId.trim(),
+      surveyTitle: surveyTitle.trim(),
+      surveyContent: surveyContent.trim() || '',
+      triggerConditions: triggerConditions.map(c => ({ type: c.type, value: c.value })),
+      participationRewards: rewardMode === 'direct' ? participationRewards : null,
+      rewardTemplateId: rewardMode === 'template' ? rewardTemplateId : null,
+      rewardMailTitle: rewardMailTitle.trim() || '',
+      rewardMailContent: rewardMailContent.trim() || '',
+      isActive: !!isActive,
+      targetPlatforms: targetPlatforms.length > 0 ? [...targetPlatforms].sort() : null,
+      targetPlatformsInverted,
+      targetChannels: currentChannels.length > 0 ? [...currentChannels].sort() : null,
+      targetChannelsInverted: targetChannelSubchannelsInverted,
+      targetSubchannels: currentSubchannels.length > 0 ? [...currentSubchannels].sort() : null,
+      targetSubchannelsInverted: targetChannelSubchannelsInverted,
+      targetWorlds: targetWorlds.length > 0 ? [...targetWorlds].sort() : null,
+      targetWorldsInverted: targetWorldsInverted,
+    };
+
+    const originalData = {
+      platformSurveyId: survey.platformSurveyId.trim(),
+      surveyTitle: survey.surveyTitle.trim(),
+      surveyContent: survey.surveyContent?.trim() || '',
+      triggerConditions: (survey.triggerConditions || []).map(c => ({ type: c.type, value: c.value })),
+      participationRewards: survey.rewardTemplateId ? null : (survey.participationRewards || []),
+      rewardTemplateId: survey.rewardTemplateId || null,
+      rewardMailTitle: survey.rewardMailTitle?.trim() || '',
+      rewardMailContent: survey.rewardMailContent?.trim() || '',
+      isActive: !!survey.isActive,
+      targetPlatforms: (survey.targetPlatforms || []).length > 0 ? [...survey.targetPlatforms].sort() : null,
+      targetPlatformsInverted: survey.targetPlatformsInverted || false,
+      targetChannels: ((survey as any).targetChannels || []).length > 0 ? [...(survey as any).targetChannels].sort() : null,
+      targetChannelsInverted: survey.targetChannelSubchannelsInverted || false,
+      targetSubchannels: ((survey as any).targetSubchannels || []).length > 0 ? [...(survey as any).targetSubchannels].sort() : null,
+      targetSubchannelsInverted: survey.targetChannelSubchannelsInverted || false,
+      targetWorlds: (survey.targetWorlds || []).length > 0 ? [...survey.targetWorlds].sort() : null,
+      targetWorldsInverted: survey.targetWorldsInverted || false,
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [
+    survey, platformSurveyId, surveyTitle, surveyContent, triggerConditions,
+    participationRewards, rewardTemplateId, rewardMode, rewardMailTitle, rewardMailContent,
+    isActive, targetPlatforms, targetPlatformsInverted, targetChannelSubchannels,
+    targetChannelSubchannelsInverted, targetWorlds, targetWorldsInverted
+  ]);
 
   // Get available condition types (exclude already used types)
   const getAvailableConditionTypes = (currentIndex: number): ('userLevel' | 'joinDays')[] => {
@@ -305,14 +381,14 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       if (survey) {
         const result = await surveyService.updateSurvey(survey.id, data);
         if (result.isChangeRequest) {
-          enqueueSnackbar(t('changeRequest.messages.created'), { variant: 'info' });
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
           enqueueSnackbar(t('surveys.updateSuccess'), { variant: 'success' });
         }
       } else {
         const result = await surveyService.createSurvey(data);
         if (result.isChangeRequest) {
-          enqueueSnackbar(t('changeRequest.messages.created'), { variant: 'info' });
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
           enqueueSnackbar(t('surveys.createSuccess'), { variant: 'success' });
         }
@@ -321,34 +397,9 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       onSuccess();
       onClose();
     } catch (error: any) {
-      // Map backend error codes to localized messages
-      let errorMessage = t('surveys.saveFailed');
-
-      // Extract error code from standardized error response
-      const errorCode = error?.error?.code || error?.code || '';
-      const backendMessage = error?.error?.message || error?.message || '';
-
-      // Use error code for specific handling
-      switch (errorCode) {
-        case ErrorCodes.RESOURCE_ALREADY_EXISTS:
-        case ErrorCodes.SURVEY_ALREADY_EXISTS:
-          errorMessage = t('surveys.platformSurveyIdExists');
-          break;
-        case ErrorCodes.VALIDATION_ERROR:
-          if (backendMessage.includes('trigger')) {
-            errorMessage = t('surveys.triggerConditionRequired');
-          } else {
-            errorMessage = backendMessage || t('surveys.saveFailed');
-          }
-          break;
-        default:
-          // Fallback to backend message if available
-          if (backendMessage) {
-            errorMessage = backendMessage;
-          }
-      }
-
-      enqueueSnackbar(errorMessage, { variant: 'error' });
+      console.error('Failed to save survey:', error);
+      const fallbackKey = currentEnvironment?.requiresApproval ? 'surveys.requestSaveFailed' : 'surveys.saveFailed';
+      enqueueSnackbar(parseApiErrorMessage(error, fallbackKey), { variant: 'error' });
     } finally {
       setSubmitting(false);
     }
@@ -517,7 +568,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                         label={t('surveys.conditionValue')}
                         type="number"
                         value={condition.value}
-                        onChange={(e) => handleTriggerConditionChange(index, 'value', parseInt(e.target.value) || 0)}
+                        onChange={(e) => handleTriggerConditionChange(index, 'value', e.target.value === '' ? '' : parseInt(e.target.value) || 0)}
                         sx={{
                           flex: 1,
                           '& input[type=number]': {
@@ -695,9 +746,9 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={submitting}
+          disabled={submitting || (!!survey && !isDirty)}
         >
-          {survey ? t('common.update') : t('common.create')}
+          {getActionLabel(survey ? 'update' : 'create', requiresApproval, t)}
         </Button>
       </Box>
     </ResizableDrawer>

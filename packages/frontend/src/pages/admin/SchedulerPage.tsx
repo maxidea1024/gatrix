@@ -385,384 +385,384 @@ const SchedulerPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-        {/* Header */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <ScheduleIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                {t('scheduler.title')}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {t('scheduler.subtitle')}
-              </Typography>
+      {/* Header */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <ScheduleIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+              {t('scheduler.title')}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {t('scheduler.subtitle')}
+            </Typography>
+          </Box>
+        </Box>
+        {canManage && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAdd}
+          >
+            {t('scheduler.addEvent')}
+          </Button>
+        )}
+      </Box>
+
+      {/* Calendar */}
+      <Card>
+        <CardContent>
+          {loading && <LinearProgress sx={{ mb: 2 }} />}
+          <FullCalendar
+            ref={calendarRef}
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+            headerToolbar={{
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            }}
+            initialView="dayGridMonth"
+            editable={true}
+            selectable={true}
+            selectMirror={true}
+            dayMaxEvents={true}
+            weekends={true}
+            events={events}
+            select={handleDateSelect}
+            eventClick={handleEventClick}
+            height="auto"
+            locale={getCalendarLocale()}
+            buttonText={getButtonText()}
+            eventDisplay="block"
+            eventTimeFormat={{
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false
+            }}
+            nowIndicator={true}
+            scrollTime="09:00:00"
+          />
+        </CardContent>
+      </Card>
+
+      {/* Add/Edit Event Dialog */}
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
+        <FormDialogHeader
+          title={editingEvent ? '스케줄 이벤트 편집' : '스케줄 이벤트 추가'}
+          description={editingEvent
+            ? '기존 스케줄 이벤트의 정보를 수정하고 업데이트할 수 있습니다.'
+            : '새로운 스케줄 이벤트를 생성하고 실행 시간을 설정할 수 있습니다.'
+          }
+        />
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
+            {/* 기본 정보 */}
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 6 }}>
+                <DateTimePicker
+                  label="Start Date/Time"
+                  value={formData.start ? moment(formData.start) : null}
+                  onChange={(date) => setFormData({ ...formData, start: date ? date.toDate() : new Date() })}
+                  timeSteps={{ minutes: 1 }}
+                  slotProps={{ textField: { fullWidth: true, slotProps: { input: { readOnly: true } } } }}
+                />
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <DateTimePicker
+                  label="End Date/Time"
+                  value={formData.end ? moment(formData.end) : null}
+                  onChange={(date) => setFormData({ ...formData, end: date ? date.toDate() : undefined })}
+                  timeSteps={{ minutes: 1 }}
+                  slotProps={{ textField: { fullWidth: true, slotProps: { input: { readOnly: true } } } }}
+                />
+              </Grid>
+            </Grid>
+
+            {/* Calendar */}
+            <FormControl fullWidth>
+              <InputLabel>Calendar</InputLabel>
+              <Select
+                value={formData.calendar || '--- Not Set ---'}
+                label="Calendar"
+                onChange={(e) => setFormData({ ...formData, calendar: e.target.value })}
+              >
+                <MenuItem value="--- Not Set ---">--- Not Set ---</MenuItem>
+                <MenuItem value="BusinessCalendar">Business Calendar</MenuItem>
+                <MenuItem value="HolidayCalendar">Holiday Calendar</MenuItem>
+              </Select>
+            </FormControl>
+
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 6 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Misfire Instruction</InputLabel>
+                  <Select
+                    value={formData.misfireInstruction || 'Smart Policy'}
+                    label="Misfire Instruction"
+                    onChange={(e) => setFormData({ ...formData, misfireInstruction: e.target.value })}
+                  >
+                    <MenuItem value="Smart Policy">Smart Policy</MenuItem>
+                    <MenuItem value="Ignore Misfire Policy">Ignore Misfire Policy</MenuItem>
+                    <MenuItem value="Do Nothing">Do Nothing</MenuItem>
+                    <MenuItem value="Fire Now">Fire Now</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Priority</InputLabel>
+                  <Select
+                    value={formData.priority || 5}
+                    label="Priority"
+                    onChange={(e) => setFormData({ ...formData, priority: Number(e.target.value) })}
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                      <MenuItem key={num} value={num}>{num}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+
+            {/* Daily Time Interval Trigger Properties */}
+            <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
+              Daily Time Interval Trigger Properties
+            </Typography>
+
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 4 }}>
+                <TextField
+                  fullWidth
+                  label="Repeat Interval"
+                  type="number"
+                  value={formData.intervalMinutes}
+                  onChange={(e) => setFormData({ ...formData, intervalMinutes: e.target.value === '' ? '' : (Number(e.target.value) || 1) })}
+                  inputProps={{ min: 1 }}
+                />
+              </Grid>
+              <Grid size={{ xs: 4 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Unit</InputLabel>
+                  <Select
+                    value="Minute"
+                    label="Unit"
+                  >
+                    <MenuItem value="Second">Second</MenuItem>
+                    <MenuItem value="Minute">Minute</MenuItem>
+                    <MenuItem value="Hour">Hour</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 4 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Time Zone</InputLabel>
+                  <Select
+                    value={formData.timeZone || 'Asia/Seoul'}
+                    label="Time Zone"
+                    onChange={(e) => setFormData({ ...formData, timeZone: e.target.value })}
+                  >
+                    <MenuItem value="Asia/Seoul">(GMT+09:00) Asia/Seoul</MenuItem>
+                    <MenuItem value="UTC">(GMT+00:00) UTC</MenuItem>
+                    <MenuItem value="America/New_York">(GMT-05:00) America/New_York</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid size={{ xs: 6 }}>
+                <TextField
+                  fullWidth
+                  label="Repeat Count"
+                  type="number"
+                  value={formData.repeatCount === -1 ? '' : formData.repeatCount}
+                  onChange={(e) => setFormData({ ...formData, repeatCount: e.target.value ? Number(e.target.value) : -1 })}
+                  placeholder="Leave empty for infinite"
+                />
+              </Grid>
+              <Grid size={{ xs: 6 }} sx={{ display: 'flex', alignItems: 'center' }}>
+                <FormControl>
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Typography variant="body2">Repeat Forever</Typography>
+                    <input
+                      type="checkbox"
+                      checked={formData.repeatForever}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        repeatForever: e.target.checked,
+                        repeatCount: e.target.checked ? -1 : 1
+                      })}
+                    />
+                  </Stack>
+                </FormControl>
+              </Grid>
+            </Grid>
+
+            {/* 시간 범위 설정 */}
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid size={{ xs: 6 }}>
+                <TextField
+                  fullWidth
+                  label="Start Time of Day"
+                  type="time"
+                  value={formData.startTimeOfDay || '00:00:00'}
+                  onChange={(e) => setFormData({ ...formData, startTimeOfDay: e.target.value })}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <TextField
+                  fullWidth
+                  label="End Time of Day"
+                  type="time"
+                  value={formData.endTimeOfDay || '23:59:59'}
+                  onChange={(e) => setFormData({ ...formData, endTimeOfDay: e.target.value })}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+            </Grid>
+
+            {/* 요일 선택 */}
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" sx={{ mb: 1 }}>Days of Week</Typography>
+              <Grid container spacing={1}>
+                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
+                  <Grid key={day}>
+                    <FormControl>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <input
+                          type="checkbox"
+                          checked={formData.daysOfWeek?.includes(day) || false}
+                          onChange={(e) => {
+                            const days = formData.daysOfWeek || [];
+                            if (e.target.checked) {
+                              setFormData({ ...formData, daysOfWeek: [...days, day] });
+                            } else {
+                              setFormData({ ...formData, daysOfWeek: days.filter(d => d !== day) });
+                            }
+                          }}
+                        />
+                        <Typography variant="body2">{day}</Typography>
+                      </Stack>
+                    </FormControl>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+
+            {/* Job Data Map */}
+            <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
+              Job Data Map
+            </Typography>
+
+            <Box sx={{ border: '1px solid #ddd', borderRadius: 1, p: 2 }}>
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <Grid size={{ xs: 4 }}>
+                  <Typography variant="body2" fontWeight="bold">Name</Typography>
+                </Grid>
+                <Grid size={{ xs: 4 }}>
+                  <Typography variant="body2" fontWeight="bold">Value</Typography>
+                </Grid>
+                <Grid size={{ xs: 4 }}>
+                  <Typography variant="body2" fontWeight="bold">Type</Typography>
+                </Grid>
+              </Grid>
+
+              {/* 기본 Count 파라미터 */}
+              <Grid container spacing={2} sx={{ mb: 1 }}>
+                <Grid size={{ xs: 4 }}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    value="Count"
+                    disabled
+                  />
+                </Grid>
+                <Grid size={{ xs: 4 }}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    value="10"
+                    onChange={(e) => {
+                      const newJobDataMap = { ...formData.jobDataMap };
+                      newJobDataMap['Count'] = { value: e.target.value, type: 'Integer' };
+                      setFormData({ ...formData, jobDataMap: newJobDataMap });
+                    }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 4 }}>
+                  <FormControl fullWidth size="small">
+                    <Select value="Integer">
+                      <MenuItem value="String">String</MenuItem>
+                      <MenuItem value="Integer">Integer</MenuItem>
+                      <MenuItem value="Boolean">Boolean</MenuItem>
+                      <MenuItem value="Float">Float</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+
+              {/* 추가 파라미터 */}
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 4 }}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="Parameter Name"
+                  />
+                </Grid>
+                <Grid size={{ xs: 4 }}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="String"
+                  />
+                </Grid>
+                <Grid size={{ xs: 4 }}>
+                  <FormControl fullWidth size="small">
+                    <Select value="String">
+                      <MenuItem value="String">String</MenuItem>
+                      <MenuItem value="Integer">Integer</MenuItem>
+                      <MenuItem value="Boolean">Boolean</MenuItem>
+                      <MenuItem value="Float">Float</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
             </Box>
           </Box>
-          {canManage && (
+        </DialogContent>
+        <DialogActions>
+          <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
+            {editingEvent && (
+              <Button
+                onClick={handleDelete}
+                disabled={saving}
+                color="error"
+                startIcon={<DeleteIcon />}
+              >
+                {t('common.delete')}
+              </Button>
+            )}
+
+            <Box sx={{ flexGrow: 1 }} />
+
+            <Button onClick={() => setDialogOpen(false)} disabled={saving} startIcon={<CancelIcon />}>
+              {t('common.cancel')}
+            </Button>
+
             <Button
               variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAdd}
+              onClick={handleSave}
+              disabled={saving}
+              startIcon={saving ? undefined : <SaveIcon />}
             >
-              {t('scheduler.addEvent')}
+              {saving ? t('common.saving') : t('common.save')}
             </Button>
-          )}
-        </Box>
-
-        {/* Calendar */}
-        <Card>
-          <CardContent>
-            {loading && <LinearProgress sx={{ mb: 2 }} />}
-            <FullCalendar
-              ref={calendarRef}
-              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-              headerToolbar={{
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-              }}
-              initialView="dayGridMonth"
-              editable={true}
-              selectable={true}
-              selectMirror={true}
-              dayMaxEvents={true}
-              weekends={true}
-              events={events}
-              select={handleDateSelect}
-              eventClick={handleEventClick}
-              height="auto"
-              locale={getCalendarLocale()}
-              buttonText={getButtonText()}
-              eventDisplay="block"
-              eventTimeFormat={{
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-              }}
-              nowIndicator={true}
-              scrollTime="09:00:00"
-            />
-          </CardContent>
-        </Card>
-
-        {/* Add/Edit Event Dialog */}
-        <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-          <FormDialogHeader
-            title={editingEvent ? '스케줄 이벤트 편집' : '스케줄 이벤트 추가'}
-            description={editingEvent
-              ? '기존 스케줄 이벤트의 정보를 수정하고 업데이트할 수 있습니다.'
-              : '새로운 스케줄 이벤트를 생성하고 실행 시간을 설정할 수 있습니다.'
-            }
-          />
-          <DialogContent>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
-              {/* 기본 정보 */}
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 6 }}>
-                  <DateTimePicker
-                    label="Start Date/Time"
-                    value={formData.start ? moment(formData.start) : null}
-                    onChange={(date) => setFormData({ ...formData, start: date ? date.toDate() : new Date() })}
-                    timeSteps={{ minutes: 1 }}
-                    slotProps={{ textField: { fullWidth: true, slotProps: { input: { readOnly: true } } } }}
-                  />
-                </Grid>
-                <Grid size={{ xs: 6 }}>
-                  <DateTimePicker
-                    label="End Date/Time"
-                    value={formData.end ? moment(formData.end) : null}
-                    onChange={(date) => setFormData({ ...formData, end: date ? date.toDate() : undefined })}
-                    timeSteps={{ minutes: 1 }}
-                    slotProps={{ textField: { fullWidth: true, slotProps: { input: { readOnly: true } } } }}
-                  />
-                </Grid>
-              </Grid>
-
-              {/* Calendar */}
-              <FormControl fullWidth>
-                <InputLabel>Calendar</InputLabel>
-                <Select
-                  value={formData.calendar || '--- Not Set ---'}
-                  label="Calendar"
-                  onChange={(e) => setFormData({ ...formData, calendar: e.target.value })}
-                >
-                  <MenuItem value="--- Not Set ---">--- Not Set ---</MenuItem>
-                  <MenuItem value="BusinessCalendar">Business Calendar</MenuItem>
-                  <MenuItem value="HolidayCalendar">Holiday Calendar</MenuItem>
-                </Select>
-              </FormControl>
-
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 6 }}>
-                  <FormControl fullWidth>
-                    <InputLabel>Misfire Instruction</InputLabel>
-                    <Select
-                      value={formData.misfireInstruction || 'Smart Policy'}
-                      label="Misfire Instruction"
-                      onChange={(e) => setFormData({ ...formData, misfireInstruction: e.target.value })}
-                    >
-                      <MenuItem value="Smart Policy">Smart Policy</MenuItem>
-                      <MenuItem value="Ignore Misfire Policy">Ignore Misfire Policy</MenuItem>
-                      <MenuItem value="Do Nothing">Do Nothing</MenuItem>
-                      <MenuItem value="Fire Now">Fire Now</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid size={{ xs: 6 }}>
-                  <FormControl fullWidth>
-                    <InputLabel>Priority</InputLabel>
-                    <Select
-                      value={formData.priority || 5}
-                      label="Priority"
-                      onChange={(e) => setFormData({ ...formData, priority: Number(e.target.value) })}
-                    >
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-                        <MenuItem key={num} value={num}>{num}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
-
-              {/* Daily Time Interval Trigger Properties */}
-              <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
-                Daily Time Interval Trigger Properties
-              </Typography>
-
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 4 }}>
-                  <TextField
-                    fullWidth
-                    label="Repeat Interval"
-                    type="number"
-                    value={formData.intervalMinutes}
-                    onChange={(e) => setFormData({ ...formData, intervalMinutes: Number(e.target.value) })}
-                    inputProps={{ min: 1 }}
-                  />
-                </Grid>
-                <Grid size={{ xs: 4 }}>
-                  <FormControl fullWidth>
-                    <InputLabel>Unit</InputLabel>
-                    <Select
-                      value="Minute"
-                      label="Unit"
-                    >
-                      <MenuItem value="Second">Second</MenuItem>
-                      <MenuItem value="Minute">Minute</MenuItem>
-                      <MenuItem value="Hour">Hour</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid size={{ xs: 4 }}>
-                  <FormControl fullWidth>
-                    <InputLabel>Time Zone</InputLabel>
-                    <Select
-                      value={formData.timeZone || 'Asia/Seoul'}
-                      label="Time Zone"
-                      onChange={(e) => setFormData({ ...formData, timeZone: e.target.value })}
-                    >
-                      <MenuItem value="Asia/Seoul">(GMT+09:00) Asia/Seoul</MenuItem>
-                      <MenuItem value="UTC">(GMT+00:00) UTC</MenuItem>
-                      <MenuItem value="America/New_York">(GMT-05:00) America/New_York</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
-
-              <Grid container spacing={2} sx={{ mt: 1 }}>
-                <Grid size={{ xs: 6 }}>
-                  <TextField
-                    fullWidth
-                    label="Repeat Count"
-                    type="number"
-                    value={formData.repeatCount === -1 ? '' : formData.repeatCount}
-                    onChange={(e) => setFormData({ ...formData, repeatCount: e.target.value ? Number(e.target.value) : -1 })}
-                    placeholder="Leave empty for infinite"
-                  />
-                </Grid>
-                <Grid size={{ xs: 6 }} sx={{ display: 'flex', alignItems: 'center' }}>
-                  <FormControl>
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Typography variant="body2">Repeat Forever</Typography>
-                      <input
-                        type="checkbox"
-                        checked={formData.repeatForever}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          repeatForever: e.target.checked,
-                          repeatCount: e.target.checked ? -1 : 1
-                        })}
-                      />
-                    </Stack>
-                  </FormControl>
-                </Grid>
-              </Grid>
-
-              {/* 시간 범위 설정 */}
-              <Grid container spacing={2} sx={{ mt: 1 }}>
-                <Grid size={{ xs: 6 }}>
-                  <TextField
-                    fullWidth
-                    label="Start Time of Day"
-                    type="time"
-                    value={formData.startTimeOfDay || '00:00:00'}
-                    onChange={(e) => setFormData({ ...formData, startTimeOfDay: e.target.value })}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-                <Grid size={{ xs: 6 }}>
-                  <TextField
-                    fullWidth
-                    label="End Time of Day"
-                    type="time"
-                    value={formData.endTimeOfDay || '23:59:59'}
-                    onChange={(e) => setFormData({ ...formData, endTimeOfDay: e.target.value })}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-              </Grid>
-
-              {/* 요일 선택 */}
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="body2" sx={{ mb: 1 }}>Days of Week</Typography>
-                <Grid container spacing={1}>
-                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
-                    <Grid key={day}>
-                      <FormControl>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <input
-                            type="checkbox"
-                            checked={formData.daysOfWeek?.includes(day) || false}
-                            onChange={(e) => {
-                              const days = formData.daysOfWeek || [];
-                              if (e.target.checked) {
-                                setFormData({ ...formData, daysOfWeek: [...days, day] });
-                              } else {
-                                setFormData({ ...formData, daysOfWeek: days.filter(d => d !== day) });
-                              }
-                            }}
-                          />
-                          <Typography variant="body2">{day}</Typography>
-                        </Stack>
-                      </FormControl>
-                    </Grid>
-                  ))}
-                </Grid>
-              </Box>
-
-              {/* Job Data Map */}
-              <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
-                Job Data Map
-              </Typography>
-
-              <Box sx={{ border: '1px solid #ddd', borderRadius: 1, p: 2 }}>
-                <Grid container spacing={2} sx={{ mb: 2 }}>
-                  <Grid size={{ xs: 4 }}>
-                    <Typography variant="body2" fontWeight="bold">Name</Typography>
-                  </Grid>
-                  <Grid size={{ xs: 4 }}>
-                    <Typography variant="body2" fontWeight="bold">Value</Typography>
-                  </Grid>
-                  <Grid size={{ xs: 4 }}>
-                    <Typography variant="body2" fontWeight="bold">Type</Typography>
-                  </Grid>
-                </Grid>
-
-                {/* 기본 Count 파라미터 */}
-                <Grid container spacing={2} sx={{ mb: 1 }}>
-                  <Grid size={{ xs: 4 }}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      value="Count"
-                      disabled
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 4 }}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      value="10"
-                      onChange={(e) => {
-                        const newJobDataMap = { ...formData.jobDataMap };
-                        newJobDataMap['Count'] = { value: e.target.value, type: 'Integer' };
-                        setFormData({ ...formData, jobDataMap: newJobDataMap });
-                      }}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 4 }}>
-                    <FormControl fullWidth size="small">
-                      <Select value="Integer">
-                        <MenuItem value="String">String</MenuItem>
-                        <MenuItem value="Integer">Integer</MenuItem>
-                        <MenuItem value="Boolean">Boolean</MenuItem>
-                        <MenuItem value="Float">Float</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </Grid>
-
-                {/* 추가 파라미터 */}
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 4 }}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      placeholder="Parameter Name"
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 4 }}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      placeholder="String"
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 4 }}>
-                    <FormControl fullWidth size="small">
-                      <Select value="String">
-                        <MenuItem value="String">String</MenuItem>
-                        <MenuItem value="Integer">Integer</MenuItem>
-                        <MenuItem value="Boolean">Boolean</MenuItem>
-                        <MenuItem value="Float">Float</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
-              {editingEvent && (
-                <Button
-                  onClick={handleDelete}
-                  disabled={saving}
-                  color="error"
-                  startIcon={<DeleteIcon />}
-                >
-                  {t('common.delete')}
-                </Button>
-              )}
-
-              <Box sx={{ flexGrow: 1 }} />
-
-              <Button onClick={() => setDialogOpen(false)} disabled={saving} startIcon={<CancelIcon />}>
-                {t('common.cancel')}
-              </Button>
-
-              <Button
-                variant="contained"
-                onClick={handleSave}
-                disabled={saving}
-                startIcon={saving ? undefined : <SaveIcon />}
-              >
-                {saving ? t('common.saving') : t('common.save')}
-              </Button>
-            </Stack>
-          </DialogActions>
-        </Dialog>
-      </Box>
+          </Stack>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 

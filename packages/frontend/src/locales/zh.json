@@ -2107,7 +2107,8 @@
       "errorNotFound": "找不到客户端版本",
       "apiTest": "API 测试",
       "whitelistNote": "如果请求来自白名单 IP 地址，如果配置了白名单服务器地址（gameServerAddressForWhiteList、patchAddressForWhiteList），将返回这些地址。"
-    }
+    },
+    "saveError": "保存客户端版本失败。"
   },
   "common": {
     "action": "操作",
@@ -5126,6 +5127,20 @@
     "conflictDialog.viewCurrentData": "查看当前数据",
     "actions.recreate": "重新请求",
     "conflictDialog.crData": "变更请求的数据",
-    "conflictDialog.liveData": "当前实时数据"
+    "conflictDialog.liveData": "当前实时数据",
+    "actions": {
+      "label": "操作",
+      "submit": "提交",
+      "approve": "批准",
+      "reject": "拒绝",
+      "merge": "合并",
+      "reopen": "重新打开",
+      "rollback": "回滚",
+      "readyForReview": "准备审核",
+      "submitCreate": "请求创建",
+      "submitUpdate": "请求更新",
+      "submitDelete": "请求删除",
+      "submitSave": "请求保存"
+    }
   }
 }

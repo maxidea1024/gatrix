@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { PERMISSIONS } from '@/types/permissions';
 import {
@@ -46,10 +47,12 @@ import SurveyConfigDialog from '../../components/game/SurveyConfigDialog';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import RewardDisplay from '../../components/game/RewardDisplay';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 
 const SurveysPage: React.FC = () => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const navigate = useNavigate();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.SURVEYS_MANAGE]);
 
@@ -294,7 +297,7 @@ const SurveysPage: React.FC = () => {
     try {
       const result = await surveyService.toggleActive(survey.id);
       if (result.isChangeRequest) {
-        enqueueSnackbar(t('changeRequest.messages.created'), { variant: 'info' });
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
         enqueueSnackbar(t('surveys.toggleSuccess'), { variant: 'success' });
         loadSurveys();

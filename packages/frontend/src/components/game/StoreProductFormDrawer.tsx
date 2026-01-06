@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Button,
   TextField,
@@ -18,6 +18,8 @@ import {
 import ResizableDrawer from '../common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { useNavigate } from 'react-router-dom';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 import storeProductService, { StoreProduct } from '../../services/storeProductService';
 import { tagService, Tag } from '../../services/tagService';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -25,6 +27,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { getContrastColor } from '@/utils/colorUtils';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { getActionLabel } from '../../utils/changeRequestToast';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 
 interface StoreProductFormDrawerProps {
   open: boolean;
@@ -54,7 +59,10 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
   product,
 }) => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
+  const navigate = useNavigate();
 
   // Form state
   const [productId, setProductId] = useState('');
@@ -170,6 +178,28 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
     }
   }, [product, open, availableTags]);
 
+  // Check if form is dirty (data changed)
+  const isDirty = useMemo(() => {
+    if (!product) return true;
+    if (!product.id) return true; // New or Copy
+
+    const currentData = {
+      isActive,
+      saleStartAt: saleStartAt ? saleStartAt.toISOString() : null,
+      saleEndAt: saleEndAt ? saleEndAt.toISOString() : null,
+      tagIds: selectedTags.map(tag => tag.id).sort((a, b) => a - b),
+    };
+
+    const originalData = {
+      isActive: product.isActive,
+      saleStartAt: product.saleStartAt ? dayjs(product.saleStartAt).toISOString() : null,
+      saleEndAt: product.saleEndAt ? dayjs(product.saleEndAt).toISOString() : null,
+      tagIds: (product.tags || []).map((tag: any) => tag.id).sort((a: number, b: number) => a - b),
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [product, isActive, saleStartAt, saleEndAt, selectedTags]);
+
   const handleSave = async () => {
     // Validation
     if (!productId.trim()) {
@@ -217,7 +247,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
         // Update existing product
         const result = await storeProductService.updateStoreProduct(product.id, payload);
         if (result.isChangeRequest) {
-          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
           enqueueSnackbar(t('storeProducts.updateSuccess'), { variant: 'success' });
         }
@@ -225,7 +255,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
         // Create new product
         const result = await storeProductService.createStoreProduct(payload);
         if (result.isChangeRequest) {
-          enqueueSnackbar(t('changeRequests.createdForReview'), { variant: 'info' });
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
           const message = isCopy ? t('storeProducts.copySuccess') : t('storeProducts.createSuccess');
           enqueueSnackbar(message, { variant: 'success' });
@@ -233,7 +263,9 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
       }
       onSave();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('common.saveFailed'), { variant: 'error' });
+      console.error('Failed to save store product:', error);
+      const fallbackKey = requiresApproval ? 'storeProducts.requestSaveFailed' : 'common.saveFailed';
+      enqueueSnackbar(parseApiErrorMessage(error, fallbackKey), { variant: 'error' });
     } finally {
       setSaving(false);
     }
@@ -383,7 +415,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                   <TextField
                     type="number"
                     value={price}
-                    onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setPrice(e.target.value === '' ? '' : (parseFloat(e.target.value) || 0))}
                     fullWidth
                     size="small"
                     inputProps={{ min: 0, step: 0.01, readOnly: isEditMode }}
@@ -562,9 +594,9 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
             <Button
               variant="contained"
               onClick={handleSave}
-              disabled={saving}
+              disabled={saving || (!!product?.id && !isDirty)}
             >
-              {saving ? t('common.saving') : t('common.save')}
+              {saving ? t('common.saving') : getActionLabel('save', requiresApproval, t)}
             </Button>
           </Box>
         </Box>

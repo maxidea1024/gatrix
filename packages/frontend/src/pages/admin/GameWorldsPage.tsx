@@ -109,6 +109,8 @@ import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../componen
 import { messageTemplateService, MessageTemplate } from '@/services/messageTemplateService';
 import GameWorldSDKGuideDrawer from '../../components/gameWorlds/GameWorldSDKGuideDrawer';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import { getActionLabel } from '../../utils/changeRequestToast';
 import GameWorldForm from '../../components/admin/GameWorldForm';
 import MaintenanceSettingsInput from '../../components/common/MaintenanceSettingsInput';
 import { parseJson5 } from '../../components/common/JsonEditor';
@@ -310,11 +312,12 @@ const SortableRow: React.FC<SortableRowProps> = ({
 
 const GameWorldsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const { currentEnvironmentId } = useEnvironment();
+  const { currentEnvironmentId, currentEnvironment } = useEnvironment();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.GAME_WORLDS_MANAGE]);
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
 
   const [worlds, setWorlds] = useState<GameWorld[]>([]);
   const [loading, setLoading] = useState(true);
@@ -611,7 +614,65 @@ const GameWorldsPage: React.FC = () => {
     );
   };
 
+  // Check if form is dirty (data changed)
+  const isDirty = useMemo(() => {
+    if (!editingWorld) return true;
 
+    // Normalize payloads for comparison
+    let normalizedCurrentPayload = '{}';
+    try {
+      normalizedCurrentPayload = JSON.stringify(JSON.parse(customPayloadText || '{}'));
+    } catch (e) {
+      normalizedCurrentPayload = customPayloadText;
+    }
+
+    let normalizedOriginalPayload = '{}';
+    try {
+      normalizedOriginalPayload = JSON.stringify(editingWorld.customPayload || {});
+    } catch (e) {
+      normalizedOriginalPayload = '{}';
+    }
+
+    const currentData = {
+      worldId: formData.worldId,
+      name: formData.name,
+      isVisible: !!formData.isVisible,
+      isMaintenance: !!formData.isMaintenance,
+      description: formData.description || '',
+      worldServerAddress: formData.worldServerAddress || null,
+      maintenanceStartDate: formData.maintenanceStartDate || '',
+      maintenanceEndDate: formData.maintenanceEndDate || '',
+      maintenanceMessage: formData.maintenanceMessage || '',
+      supportsMultiLanguage: !!supportsMultiLanguage,
+      maintenanceLocales: maintenanceLocales.filter(l => l.message.trim() !== '').map(l => ({ lang: l.lang, message: l.message })),
+      forceDisconnect: !!formData.forceDisconnect,
+      gracePeriodMinutes: formData.forceDisconnect ? (formData.gracePeriodMinutes ?? 5) : undefined,
+      customPayload: normalizedCurrentPayload,
+      infraSettingsRaw: (infraSettingsText || '').trim(),
+      tagIds: (formTags || []).map(t => t.id).sort((a, b) => a - b),
+    };
+
+    const originalData = {
+      worldId: editingWorld.worldId,
+      name: editingWorld.name,
+      isVisible: !!editingWorld.isVisible,
+      isMaintenance: !!editingWorld.isMaintenance,
+      description: editingWorld.description || '',
+      worldServerAddress: editingWorld.worldServerAddress || null,
+      maintenanceStartDate: editingWorld.maintenanceStartDate || '',
+      maintenanceEndDate: editingWorld.maintenanceEndDate || '',
+      maintenanceMessage: editingWorld.maintenanceMessage || '',
+      supportsMultiLanguage: !!editingWorld.supportsMultiLanguage,
+      maintenanceLocales: (editingWorld.maintenanceLocales || []).filter(l => l.message.trim() !== '').map(l => ({ lang: l.lang, message: l.message })),
+      forceDisconnect: !!editingWorld.forceDisconnect,
+      gracePeriodMinutes: editingWorld.forceDisconnect ? (editingWorld.gracePeriodMinutes ?? 5) : undefined,
+      customPayload: normalizedOriginalPayload,
+      infraSettingsRaw: (editingWorld.infraSettingsRaw || JSON.stringify(editingWorld.infraSettings || {}, null, 2)).trim(),
+      tagIds: (editingWorld.tags || []).map(t => t.id).sort((a, b) => a - b),
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [editingWorld, formData, supportsMultiLanguage, maintenanceLocales, customPayloadText, infraSettingsText, formTags]);
 
   useEffect(() => {
     let isMounted = true;
@@ -949,38 +1010,14 @@ const GameWorldsPage: React.FC = () => {
       if (editingWorld) {
         savedWorld = await gameWorldService.updateGameWorld(editingWorld.id, dataToSend);
         if (savedWorld.isChangeRequest) {
-          enqueueSnackbar(t('changeRequests.createdForReview'), {
-            variant: 'info',
-            autoHideDuration: 5000,
-            action: (key) => (
-              <Button
-                color="inherit"
-                size="small"
-                onClick={() => navigate(`/admin/change-requests/${savedWorld.changeRequestId}`)}
-              >
-                {t('common.view')}
-              </Button>
-            )
-          });
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
           enqueueSnackbar(t('gameWorlds.worldUpdated'), { variant: 'success' });
         }
       } else {
         savedWorld = await gameWorldService.createGameWorld(dataToSend);
         if (savedWorld.isChangeRequest) {
-          enqueueSnackbar(t('changeRequests.createdForReview'), {
-            variant: 'info',
-            autoHideDuration: 5000,
-            action: (key) => (
-              <Button
-                color="inherit"
-                size="small"
-                onClick={() => navigate(`/admin/change-requests/${savedWorld.changeRequestId}`)}
-              >
-                {t('common.view')}
-              </Button>
-            )
-          });
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
           enqueueSnackbar(t('gameWorlds.worldCreated'), { variant: 'success' });
         }
@@ -991,17 +1028,17 @@ const GameWorldsPage: React.FC = () => {
     } catch (error: any) {
       console.error('Failed to save game world:', error);
       const status = error?.status || error?.response?.status;
-      let message = error?.error?.message || error?.response?.data?.error?.message || error?.response?.data?.message;
       if (status === 409) {
-        message = t('gameWorlds.errors.alreadyExists');
+        enqueueSnackbar(t('gameWorlds.errors.alreadyExists'), { variant: 'error', autoHideDuration: 4000 });
         // Focus the World ID field for quick correction
         setTimeout(() => {
           worldIdRef.current?.focus();
           worldIdRef.current?.select();
         }, 0);
+      } else {
+        const fallbackKey = currentEnvironment?.requiresApproval ? 'gameWorlds.errors.requestSaveFailed' : 'gameWorlds.errors.saveFailed';
+        enqueueSnackbar(parseApiErrorMessage(error, fallbackKey), { variant: 'error', autoHideDuration: 4000 });
       }
-      if (!message) message = t('gameWorlds.errors.saveFailed');
-      enqueueSnackbar(message, { variant: 'error', autoHideDuration: 4000 });
     } finally {
       setSaving(false);
     }
@@ -1039,20 +1076,7 @@ const GameWorldsPage: React.FC = () => {
     try {
       const result = await gameWorldService.toggleVisibility(world.id);
       if (result.isChangeRequest) {
-        enqueueSnackbar(t('changeRequest.messages.created'), {
-          variant: 'info',
-          action: (key) => (
-            <Button
-              size="small"
-              color="inherit"
-              onClick={() => {
-                navigate(`/admin/change-requests/${result.changeRequestId}`);
-              }}
-            >
-              {t('common.view')}
-            </Button>
-          ),
-        });
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
         enqueueSnackbar(t('gameWorlds.visibilityToggled'), { variant: 'success' });
         loadGameWorlds();
@@ -1680,11 +1704,11 @@ const GameWorldsPage: React.FC = () => {
           <Button
             onClick={handleSaveWorld}
             variant="contained"
-            disabled={saving || formActiveTab !== 0}
+            disabled={saving || formActiveTab !== 0 || (!!editingWorld && !isDirty)}
             startIcon={saving ? <CircularProgress size={20} /> : (editingWorld ? <SaveIcon /> : <AddIcon />)}
             title={formActiveTab !== 0 ? t('gameWorlds.form.switchToBasicInfoToSave') : undefined}
           >
-            {saving ? t('common.saving') : (editingWorld ? t('gameWorlds.saveWorld') : t('gameWorlds.addGameWorld'))}
+            {saving ? t('common.saving') : getActionLabel(editingWorld ? 'update' : 'create', requiresApproval, t)}
           </Button>
         </Box>
       </ResizableDrawer>

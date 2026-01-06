@@ -2046,7 +2046,8 @@
       "errorNotFound": "Client version not found",
       "apiTest": "API Test",
       "whitelistNote": "If the request is from a whitelisted IP address, the whitelist server addresses (gameServerAddressForWhiteList, patchAddressForWhiteList) will be returned if configured."
-    }
+    },
+    "saveError": "Failed to save client version."
   },
   "common": {
     "targetSettings": "Target Settings",
@@ -5085,6 +5086,20 @@
     "conflictDialog.viewCurrentData": "View Current Data",
     "actions.recreate": "Recreate Request",
     "conflictDialog.crData": "Change Request Data",
-    "conflictDialog.liveData": "Current Live Data"
+    "conflictDialog.liveData": "Current Live Data",
+    "actions": {
+      "label": "Actions",
+      "submit": "Submit",
+      "approve": "Approve",
+      "reject": "Reject",
+      "merge": "Merge",
+      "reopen": "Reopen",
+      "rollback": "Rollback",
+      "readyForReview": "Ready for Review",
+      "submitCreate": "Request Create",
+      "submitUpdate": "Request Update",
+      "submitDelete": "Request Delete",
+      "submitSave": "Request Save"
+    }
   }
 }

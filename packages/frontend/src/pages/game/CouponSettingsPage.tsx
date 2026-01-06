@@ -1,10 +1,14 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { PERMISSIONS } from '@/types/permissions';
 import { Box, Typography, Button, TextField, IconButton, Chip, MenuItem, Stack, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, Tooltip, TableSortLabel, FormControlLabel, Checkbox, LinearProgress, Dialog, DialogTitle, DialogContent, DialogActions, Menu, Divider, FormHelperText, Paper, Collapse } from '@mui/material';
 import { Settings as SettingsIcon, Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon, Search as SearchIcon, ViewColumn as ViewColumnIcon, List as ListIcon, ContentCopy as ContentCopyIcon, Code as CodeIcon, CardGiftcard as CardGiftcardIcon, HourglassEmpty as HourglassEmptyIcon, Download as DownloadIcon, ArrowDropDown as ArrowDropDownIcon, CheckCircle as CheckCircleIcon, TableChart as TableChartIcon, Description as ExcelIcon, ExpandMore as ExpandMoreIcon, ExpandLess as ExpandLessIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import { getActionLabel } from '../../utils/changeRequestToast';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useDebounce } from '@/hooks/useDebounce';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import SimplePagination from '@/components/common/SimplePagination';
@@ -28,7 +32,10 @@ import { Dayjs } from 'dayjs';
 // Coupon Settings page (list and management of coupon definitions)
 const CouponSettingsPage: React.FC = () => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const { platforms, channels } = usePlatformConfig();
   const { worlds } = useGameWorld();
   const { hasPermission } = useAuth();
@@ -505,9 +512,9 @@ const CouponSettingsPage: React.FC = () => {
     return t('coupons.couponSettings.form.codeHelp');
   };
 
-  const quantityError = form.type === 'NORMAL' && (!form.quantity || Number(form.quantity) < 1);
-  const maxTotalUsesError = isSpecial && form.maxTotalUses !== null && Number(form.maxTotalUses) < 1;
-  const perUserLimitError = form.type === 'NORMAL' && (form.perUserLimit == null || Number(form.perUserLimit) < 1);
+  const quantityError = form.type === 'NORMAL' && form.quantity !== '' && (form.quantity == null || Number(form.quantity) < 1);
+  const maxTotalUsesError = isSpecial && form.maxTotalUses !== null && form.maxTotalUses !== '' && Number(form.maxTotalUses) < 1;
+  const perUserLimitError = form.type === 'NORMAL' && form.perUserLimit !== '' && (form.perUserLimit == null || Number(form.perUserLimit) < 1);
 
 
 
@@ -772,7 +779,7 @@ const CouponSettingsPage: React.FC = () => {
         setOpenForm(false);
         resetForm();
         if (result.isChangeRequest) {
-          enqueueSnackbar(t('changeRequests.createdForReview') as string, { variant: 'info' });
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
           enqueueSnackbar(t('common.saveSuccess') as string, { variant: 'success' });
         }
@@ -784,7 +791,7 @@ const CouponSettingsPage: React.FC = () => {
         resetForm();
 
         if (result.isChangeRequest) {
-          enqueueSnackbar(t('changeRequests.createdForReview') as string, { variant: 'info' });
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
           // Show success message
           const isLargeQuantity = payload.type === 'NORMAL' && (payload.quantity || 1) >= 10000;
@@ -1572,7 +1579,7 @@ const CouponSettingsPage: React.FC = () => {
                       fullWidth
                       label={t('coupons.couponSettings.form.quantity')}
                       value={form.quantity}
-                      onChange={(e) => setForm((s: any) => ({ ...s, quantity: Number(e.target.value) }))}
+                      onChange={(e) => setForm((s: any) => ({ ...s, quantity: e.target.value === '' ? '' : Number(e.target.value) }))}
                       error={quantityError}
                       helperText={quantityError ? t('coupons.couponSettings.form.quantityMinError') : t('coupons.couponSettings.form.quantityHelp')}
                       sx={{
@@ -1623,7 +1630,7 @@ const CouponSettingsPage: React.FC = () => {
                         type="number"
                         label={form.usageLimitType === 'CHARACTER' ? t('coupons.couponSettings.form.perCharacterLimit') : t('coupons.couponSettings.form.perUserLimit')}
                         value={form.perUserLimit}
-                        onChange={(e) => setForm((s: any) => ({ ...s, perUserLimit: Number(e.target.value) }))}
+                        onChange={(e) => setForm((s: any) => ({ ...s, perUserLimit: e.target.value === '' ? '' : Number(e.target.value) }))}
                         error={perUserLimitError}
                         helperText={perUserLimitError ? t('coupons.couponSettings.form.perUserLimitMinError') : (form.usageLimitType === 'CHARACTER' ? t('coupons.couponSettings.form.perCharacterLimitHelp') : t('coupons.couponSettings.form.perUserLimitHelp'))}
                         sx={{
@@ -1641,7 +1648,7 @@ const CouponSettingsPage: React.FC = () => {
                         fullWidth
                         label={t('coupons.couponSettings.form.maxTotalUses')}
                         value={form.maxTotalUses ?? ''}
-                        onChange={(e) => setForm((s: any) => ({ ...s, maxTotalUses: e.target.value === '' ? null : Number(e.target.value) }))}
+                        onChange={(e) => setForm((s: any) => ({ ...s, maxTotalUses: e.target.value === '' ? '' : Number(e.target.value) }))}
                         error={maxTotalUsesError}
                         helperText={maxTotalUsesError ? t('coupons.couponSettings.form.maxTotalUsesMinError') : t('coupons.couponSettings.form.maxTotalUsesHelp')}
                         disabled={form.maxTotalUses === null}
@@ -1831,7 +1838,7 @@ const CouponSettingsPage: React.FC = () => {
         {/* Footer */}
         <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider', bgcolor: 'background.paper', display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
           <Button onClick={() => setOpenForm(false)}>{t('common.cancel')}</Button>
-          <Button onClick={handleSave} variant="contained">{t('common.save')}</Button>
+          <Button onClick={handleSave} variant="contained">{getActionLabel(editing ? 'update' : 'create', requiresApproval, t)}</Button>
         </Box>
       </ResizableDrawer>
 
