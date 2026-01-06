@@ -642,8 +642,37 @@ export class ChangeRequestService {
 function compareData(live: unknown, snapshot: unknown): boolean {
     // If both null/undefined/empty
     if (!live && !snapshot) return true;
+
+    // Normalize objects to handle field order differences
+    // This is necessary because DB JSON fields may be returned with different key orders
+    const normalizedLive = normalizeForComparison(live);
+    const normalizedSnapshot = normalizeForComparison(snapshot);
+
     // Utilize deep-diff
-    const differences = diff(live, snapshot);
+    const differences = diff(normalizedLive, normalizedSnapshot);
     // If diff is undefined, they are equal
     return !differences;
+}
+
+// Recursively sort object keys to ensure consistent comparison regardless of field order
+function normalizeForComparison(value: unknown): unknown {
+    if (value === null || value === undefined) {
+        return value;
+    }
+
+    if (Array.isArray(value)) {
+        return value.map(item => normalizeForComparison(item));
+    }
+
+    if (typeof value === 'object') {
+        const obj = value as Record<string, unknown>;
+        const sortedKeys = Object.keys(obj).sort();
+        const result: Record<string, unknown> = {};
+        for (const key of sortedKeys) {
+            result[key] = normalizeForComparison(obj[key]);
+        }
+        return result;
+    }
+
+    return value;
 }
