@@ -35,7 +35,9 @@ export function parseApiErrorMessage(error: any, fallbackKey = 'common.saveFaile
     // Extract error code and payload
     if (errorData) {
         errorCode = errorData.error || errorData.code || errorData.errorCode;
-        payload = errorData.payload;
+        // The backend GatrixError wraps the payload inside details.payload 
+        // in the errorHandler middleware.
+        payload = errorData.payload || errorData.details?.payload || errorData.details;
     }
 
     // Handle specific CR-related errors by error code
@@ -87,7 +89,8 @@ export function extractConflictInfo(error: any): {
     const isLocked = errorCode === 'ResourceLockedException' || errorCode === 'RESOURCE_LOCKED';
 
     if (isLocked) {
-        const payload = errorData?.payload || errorData?.details || {};
+        // Backend GatrixError wraps the payload inside details.payload 
+        const payload = errorData?.payload || errorData?.details?.payload || errorData?.details || {};
         return {
             lockedBy: payload.lockedBy,
             changeRequestId: payload.changeRequestId,
