@@ -660,6 +660,11 @@ function normalizeForComparison(value: unknown): unknown {
         return value;
     }
 
+    // Handle Date objects - convert to ISO string for consistent comparison
+    if (value instanceof Date) {
+        return value.toISOString();
+    }
+
     if (Array.isArray(value)) {
         return value.map(item => normalizeForComparison(item));
     }
