@@ -755,6 +755,10 @@ export class ChangeRequestService {
                             if (!dbData.updatedAt) {
                                 dbData.updatedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
                             }
+                            // Set createdBy for new records (use the executor's userId)
+                            if (dbData.createdBy === undefined) {
+                                dbData.createdBy = userId;
+                            }
                             // Set initial version for new records
                             if (dbData.version === undefined) {
                                 dbData.version = 1;
