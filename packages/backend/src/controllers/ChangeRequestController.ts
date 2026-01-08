@@ -4,6 +4,7 @@ import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { ChangeRequestService } from '../services/ChangeRequestService';
 import { ChangeRequest } from '../models/ChangeRequest';
 import { ChangeItem } from '../models/ChangeItem';
+import { ActionGroup } from '../models/ActionGroup';
 import { Approval } from '../models/Approval';
 import logger from '../config/logger';
 
@@ -99,7 +100,7 @@ export class ChangeRequestController {
 
         let cr = await ChangeRequest.query()
             .findById(id)
-            .withGraphFetched('[requester, rejector, environmentModel, changeItems, approvals.approver, executor]');
+            .withGraphFetched('[requester, rejector, environmentModel, changeItems, actionGroups.changeItems, approvals.approver, executor]');
 
         if (!cr) {
             throw new GatrixError('Change Request not found', 404);
@@ -271,24 +272,33 @@ export class ChangeRequestController {
                 message: 'Change request applied successfully',
             });
         } catch (error: any) {
-            // Check if it's a conflict error (GatrixError) or duplicate error (raw MySQL or GatrixError)
-            const isGatrixConflict = error instanceof GatrixError && (error.code === 'CR_DATA_CONFLICT' || error.code === 'DUPLICATE_ENTRY');
+            // Log full error details for internal debugging
+            logger.error('[ChangeRequest] Execution failed', {
+                changeRequestId: id,
+                executorId: userId,
+                errorMessage: error.message,
+                errorCode: error.code,
+                errorStack: error.stack,
+                sqlState: error.sqlState,
+                errno: error.errno,
+            });
+
+            // Check if it's a known GatrixError (safe to expose)
+            const isGatrixError = error instanceof GatrixError;
+            const isConflictError = isGatrixError && error.code === 'CR_DATA_CONFLICT';
+            const isDuplicateError = isGatrixError && error.code === 'DUPLICATE_ENTRY';
+
+            // Check for MySQL duplicate entry error
             const isMySQLDuplicate = error.errno === 1062 || error.code === 'ER_DUP_ENTRY';
 
-            if (isGatrixConflict || isMySQLDuplicate) {
+            if (isConflictError || isDuplicateError || isMySQLDuplicate) {
                 // Mark CR as rejected automatically since execution failed significantly
                 try {
                     let reason: string;
-                    if (error instanceof GatrixError && error.code === 'CR_DATA_CONFLICT') {
+                    if (isConflictError) {
                         reason = 'System: Data conflict detected during execution (Live data changed)';
                     } else {
-                        // Extract duplicate info from MySQL error if possible
-                        const match = error.message?.match(/Duplicate entry \'(.+)\' for key \'(.+)\'/);
-                        if (match) {
-                            reason = `System: Duplicate entry '${match[1]}' for key '${match[2]}'`;
-                        } else {
-                            reason = `System: Duplicate entry detected during execution`;
-                        }
+                        reason = 'System: Duplicate entry detected during execution';
                     }
 
                     await ChangeRequestService.rejectChangeRequest(id, null, reason);
@@ -296,9 +306,27 @@ export class ChangeRequestController {
                 } catch (rejectError) {
                     logger.error('[ChangeRequest] Failed to auto-reject conflicted/duplicate CR', rejectError);
                 }
-                throw error; // Re-throw to be handled by global error handler
+
+                // Throw a safe error message for conflict/duplicate cases
+                if (isConflictError) {
+                    throw error; // GatrixError is safe to expose
+                }
+                throw new GatrixError(
+                    'Change request execution failed: duplicate entry detected',
+                    409,
+                    true,
+                    'DUPLICATE_ENTRY'
+                );
             }
-            throw error;
+
+            // For all other errors (including internal SQL errors), throw a generic secure error
+            // Do NOT expose internal error details to frontend
+            throw new GatrixError(
+                'Change request execution failed due to an internal error. Please contact the administrator.',
+                500,
+                true,
+                'CR_EXECUTION_FAILED'
+            );
         }
     });
 
@@ -318,8 +346,9 @@ export class ChangeRequestController {
             throw new GatrixError('Only draft or rejected change requests can be deleted', 400);
         }
 
-        // Delete related items and approvals first
+        // Delete related items, action groups, and approvals first
         await ChangeItem.query().where('changeRequestId', id).delete();
+        await ActionGroup.query().where('changeRequestId', id).delete();
         await Approval.query().where('changeRequestId', id).delete();
         await ChangeRequest.query().deleteById(id);
 
@@ -359,10 +388,15 @@ export class ChangeRequestController {
             .withGraphFetched('[requester, changeItems]')
             .orderBy('updatedAt', 'desc');
 
+        // Separate drafts from other own requests for banner display
+        const myDrafts = asRequester.filter(cr => cr.status === 'draft');
+        const myNonDraftRequests = asRequester.filter(cr => cr.status !== 'draft');
+
         res.json({
             success: true,
             data: {
-                myRequests: asRequester,
+                myRequests: myNonDraftRequests,
+                myDrafts,
                 pendingApproval,
             },
         });
@@ -388,6 +422,25 @@ export class ChangeRequestController {
             success: true,
             data: newCr,
             message: 'Rollback change request created',
+        });
+    });
+    /**
+     * Get change request statistics
+     * GET /api/v1/admin/change-requests/stats
+     */
+    static getStats = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const environment = getEnvironment(req);
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            throw new GatrixError('User not authenticated', 401);
+        }
+
+        const stats = await ChangeRequestService.getChangeRequestCounts(environment, userId);
+
+        res.json({
+            success: true,
+            data: stats,
         });
     });
 }

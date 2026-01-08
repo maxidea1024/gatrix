@@ -23,6 +23,13 @@ router.get('/', ChangeRequestController.list);
 router.get('/my', ChangeRequestController.getMyRequests);
 
 /**
+ * @route GET /api/v1/admin/change-requests/stats
+ * @desc Get change request statistics
+ * @access Admin
+ */
+router.get('/stats', ChangeRequestController.getStats);
+
+/**
  * @route GET /api/v1/admin/change-requests/:id
  * @desc Get single change request details
  * @access Admin

@@ -1061,9 +1061,14 @@ const GameWorldsPage: React.FC = () => {
   const handleConfirmDelete = async () => {
     if (deleteConfirmDialog.world && deleteConfirmDialog.inputValue === deleteConfirmDialog.world.name) {
       try {
-        await gameWorldService.deleteGameWorld(deleteConfirmDialog.world.id);
-        enqueueSnackbar(t('gameWorlds.worldDeleted'), { variant: 'success' });
-        loadGameWorlds();
+        const result = await gameWorldService.deleteGameWorld(deleteConfirmDialog.world.id);
+
+        if (result.isChangeRequest) {
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+        } else {
+          enqueueSnackbar(t('gameWorlds.worldDeleted'), { variant: 'success' });
+          loadGameWorlds();
+        }
         setDeleteConfirmDialog({ open: false, world: null, inputValue: '' });
       } catch (error) {
         console.error('Failed to delete game world:', error);

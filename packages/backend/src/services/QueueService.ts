@@ -473,6 +473,29 @@ export class QueueService {
           logger.info('change-request:cleanup completed', { jobId: job.id, deleted, retentionDays });
           break;
         }
+        case 'outbox:process': {
+          // Dynamic import to avoid circular dependency
+          const { processOutboxJob } = await import('./outboxScheduler');
+          const batchSize = job.data?.payload?.batchSize ?? 20;
+          const processed = await processOutboxJob(batchSize);
+          logger.info('outbox:process completed', { jobId: job.id, processed });
+          break;
+        }
+        case 'outbox:cleanup': {
+          // Dynamic import to avoid circular dependency
+          const { cleanupOutboxJob } = await import('./outboxScheduler');
+          const outboxRetentionDays = job.data?.payload?.retentionDays ?? 7;
+          const outboxDeleted = await cleanupOutboxJob(outboxRetentionDays);
+          logger.info('outbox:cleanup completed', { jobId: job.id, deleted: outboxDeleted });
+          break;
+        }
+        case 'lock:cleanup': {
+          // Dynamic import to avoid circular dependency
+          const { cleanupLocksJob } = await import('./outboxScheduler');
+          const locksDeleted = await cleanupLocksJob();
+          logger.info('lock:cleanup completed', { jobId: job.id, deleted: locksDeleted });
+          break;
+        }
         default: {
           logger.info('Unhandled scheduler job type, logging only', { jobId: job.id, jobType, payload: job.data?.payload });
         }

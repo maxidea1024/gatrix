@@ -31,6 +31,7 @@ export class ChangeRequest extends Model {
     rejector?: User;
     environmentModel?: Environment;
     changeItems?: any[];
+    actionGroups?: any[];
     approvals?: any[];
 
     static get jsonSchema() {
@@ -62,6 +63,7 @@ export class ChangeRequest extends Model {
     static get relationMappings() {
         // Lazy load to avoid circular dependencies
         const { ChangeItem } = require('./ChangeItem');
+        const { ActionGroup } = require('./ActionGroup');
         const { Approval } = require('./Approval');
 
         return {
@@ -103,6 +105,14 @@ export class ChangeRequest extends Model {
                 join: {
                     from: 'g_change_requests.id',
                     to: 'g_change_items.changeRequestId'
+                }
+            },
+            actionGroups: {
+                relation: Model.HasManyRelation,
+                modelClass: ActionGroup,
+                join: {
+                    from: 'g_change_requests.id',
+                    to: 'g_action_groups.changeRequestId'
                 }
             },
             approvals: {

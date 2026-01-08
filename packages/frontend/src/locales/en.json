@@ -2106,6 +2106,7 @@
     "cannotCopySystemItem": "System items cannot be copied",
     "create": "Create",
     "createdAt": "Created At",
+    "environment": "Environment",
     "createdBy": "Created By",
     "cron": "Cron",
     "day": "Day",
@@ -5070,6 +5071,7 @@
     "submitDialog.reasonOptional": "Reason is optional.",
     "createdForReview": "Change request created. Will be applied after approval.",
     "pendingReviewBanner": "{{count}} change request(s) pending. Click to review.",
+    "myDraftsBanner": "My Drafts ({{count}}) - Click to view",
     "rejectionInfo": "Rejection Info",
     "rejectedBy": "Rejected By",
     "rejectedAt": "Rejected At",
@@ -5121,5 +5123,49 @@
     "actions.submitDelete": "Request Delete",
     "actions.submitSave": "Request Save",
     "collapse": "Collapse"
+  },
+  "gameWorlds": {
+    "infraSettings": "Infra Settings",
+    "forceDisconnect": "Force Disconnect",
+    "gracePeriodMinutes": "Grace Period (min)",
+    "maintenanceEndDate": "Maintenance End Date",
+    "maintenanceLocales": "Maintenance Locales",
+    "maintenanceMessage": "Maintenance Message",
+    "maintenanceStartDate": "Maintenance Start Date",
+    "supportsMultiLanguage": "Supports Multi Language",
+    "name": "Game World Name",
+    "description": "Description",
+    "isVisible": "Visible",
+    "isMaintenance": "In Maintenance",
+    "worldServerAddress": "World Server Address",
+    "customPayload": "Custom Payload",
+    "tags": "Tags"
+  },
+  "targetSettings": {
+    "platforms": "Target Platforms",
+    "channels": "Target Channels",
+    "subchannels": "Target Subchannels"
+  },
+  "actionGroup": {
+    "types": {
+      "create_entity": "Create",
+      "update_entity": "Update",
+      "delete_entity": "Delete",
+      "toggle_flag": "Toggle",
+      "update_rule": "Update Rule",
+      "batch_update": "Batch Update"
+    }
+  },
+  "tables": {
+    "serviceNotices": "Service Notices",
+    "ingamePopupNotices": "Ingame Popup Notices",
+    "coupons": "Coupons",
+    "events": "Events",
+    "remoteConfigs": "Remote Configs",
+    "storeProducts": "Store Products",
+    "serverLifecycleEvents": "Server Lifecycle Events",
+    "users": "Users",
+    "clientVersions": "Client Versions",
+    "gameWorlds": "Game Worlds"
   }
 }

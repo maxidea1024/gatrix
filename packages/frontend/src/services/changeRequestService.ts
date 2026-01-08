@@ -7,11 +7,26 @@ export type ChangeRequestPriority = 'low' | 'medium' | 'high' | 'critical';
 export interface ChangeItem {
     id: string;
     changeRequestId: string;
+    actionGroupId?: string;
     targetTable: string;
     targetId: string;
     operation: 'create' | 'update' | 'delete';
     beforeData: any;
     afterData: any;
+    entityVersion?: number;
+}
+
+export type ActionGroupType = 'CREATE_ENTITY' | 'UPDATE_ENTITY' | 'DELETE_ENTITY' | 'TOGGLE_FLAG' | 'UPDATE_RULE' | 'BATCH_UPDATE' | 'REVERT';
+
+export interface ActionGroup {
+    id: string;
+    changeRequestId: string;
+    actionType: ActionGroupType;
+    title: string;
+    description?: string;
+    orderIndex: number;
+    createdAt: string;
+    changeItems?: ChangeItem[];
 }
 
 export interface Approval {
@@ -59,6 +74,7 @@ export interface ChangeRequest {
         requiredApprovers: number;
     };
     changeItems?: ChangeItem[];
+    actionGroups?: ActionGroup[];
     approvals?: Approval[];
     executedBy?: number;
     executor?: {
@@ -80,6 +96,7 @@ export interface ChangeRequestListResponse {
 
 export interface MyRequestsResponse {
     myRequests: ChangeRequest[];
+    myDrafts: ChangeRequest[];
     pendingApproval: ChangeRequest[];
 }
 
@@ -182,6 +199,13 @@ class ChangeRequestService {
      */
     async rollback(id: string): Promise<ChangeRequest> {
         const response = await api.post(`/admin/change-requests/${id}/rollback`);
+        return response.data;
+    }
+    /**
+     * Get change request statistics
+     */
+    async getStats(): Promise<Record<string, number>> {
+        const response = await api.get('/admin/change-requests/stats');
         return response.data;
     }
 }

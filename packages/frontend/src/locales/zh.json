@@ -2166,6 +2166,7 @@
     "cannotCopySystemItem": "系统项目无法复制",
     "create": "创建",
     "createdAt": "创建时间",
+    "environment": "环境",
     "createdBy": "创建者",
     "cron": "定时任务",
     "day": "日",
@@ -5115,6 +5116,7 @@
     "submitDialog.reasonOptional": "变更原因是可选的。",
     "createdForReview": "变更请求已创建，批准后将应用。",
     "pendingReviewBanner": "有 {{count}} 个变更请求待审核。点击查看。",
+    "myDraftsBanner": "我的草稿 ({{count}} 个) - 点击查看",
     "rejectionInfo": "拒绝信息",
     "rejectedBy": "拒绝人",
     "rejectedAt": "拒绝时间",
@@ -5161,5 +5163,10 @@
     "actions.submitDelete": "请求删除",
     "actions.submitSave": "请求保存",
     "collapse": "收起"
+  },
+  "targetSettings": {
+    "platforms": "目标平台",
+    "channels": "目标渠道",
+    "subchannels": "目标子渠道"
   }
 }
