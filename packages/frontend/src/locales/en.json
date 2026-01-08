@@ -5225,8 +5225,9 @@
     "takeOverConfirm": "Cancel {{userName}}'s edit and take over?",
     "pendingCR": "Notice: There is a pending change request for this item.",
     "pendingCRDetail": "Change request \"{{crTitle}}\" (ID: {{crId}}) is awaiting approval.",
-    "lockAcquired": "Edit lock acquired.",
+    "lockAcquired": "Edit rights acquired.",
     "lockReleased": "Edit lock released.",
-    "lockTakenOver": "Edit taken over successfully."
+    "lockTakenOver": "Edit taken over successfully.",
+    "lockTakenBy": "{{userName}} ({{userEmail}}) has taken over editing."
   }
 }

@@ -5215,8 +5215,9 @@
     "takeOverConfirm": "{{userName}}님의 편집을 취소하고 편집권을 가져오시겠습니까?",
     "pendingCR": "주의: 이 항목에 대해 대기 중인 변경 요청이 있습니다.",
     "pendingCRDetail": "변경 요청 \"{{crTitle}}\" (ID: {{crId}})이 승인 대기 중입니다.",
-    "lockAcquired": "편집 잠금이 설정되었습니다.",
+    "lockAcquired": "편집권을 획득했습니다.",
     "lockReleased": "편집 잠금이 해제되었습니다.",
-    "lockTakenOver": "편집권을 가져왔습니다."
+    "lockTakenOver": "편집권을 가져왔습니다.",
+    "lockTakenBy": "{{userName}}({{userEmail}})님이 편집권을 가져갔습니다."
   }
 }

@@ -5200,5 +5200,17 @@
     "CR_DATA_CONFLICT": "发生数据冲突。",
     "DATA_CONFLICT_DURING_EXECUTION": "执行期间检测到数据冲突。(实时数据已更改)",
     "DUPLICATE_ENTRY_DURING_EXECUTION": "执行期间检测到重复条目。"
+  },
+  "entityLock": {
+    "warning": "警告: {{userName}} ({{userEmail}}) 正在编辑此项目。",
+    "warningWithTime": "{{userName}} 从 {{lockedAt}} 开始编辑中。({{expiresAt}} 过期)",
+    "takeOver": "接管编辑",
+    "takeOverConfirm": "取消 {{userName}} 的编辑并接管?",
+    "pendingCR": "注意: 此项目有待处理的变更请求。",
+    "pendingCRDetail": "变更请求 \"{{crTitle}}\" (ID: {{crId}}) 正在等待批准。",
+    "lockAcquired": "已获得编辑权限。",
+    "lockReleased": "编辑锁已释放。",
+    "lockTakenOver": "已成功接管编辑。",
+    "lockTakenBy": "{{userName}} ({{userEmail}}) 已接管编辑权限。"
   }
 }

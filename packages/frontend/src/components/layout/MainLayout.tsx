@@ -1785,69 +1785,78 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 2,
               px: 2,
-              py: 1,
-              bgcolor: myDraftCount > 0 ? 'warning.main' : 'info.main',
-              color: myDraftCount > 0 ? 'warning.contrastText' : 'info.contrastText',
+              py: 0.75,
+              bgcolor: 'warning.main',
+              color: 'warning.contrastText',
             }}
           >
-            {/* My drafts section */}
-            {myDraftCount > 0 && (
-              <Box
-                onClick={() => navigate('/admin/change-requests?status=draft')}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  cursor: 'pointer',
-                  px: 1.5,
-                  py: 0.5,
-                  borderRadius: 1,
-                  bgcolor: 'rgba(0,0,0,0.1)',
-                  '&:hover': {
-                    bgcolor: 'rgba(0,0,0,0.2)',
-                  },
-                  transition: 'background-color 0.2s',
-                }}
-              >
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                  {t('changeRequest.myDraftsBanner', { count: myDraftCount })}
-                </Typography>
-                <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 16 }} />
-              </Box>
-            )}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                bgcolor: 'rgba(0,0,0,0.08)',
+                borderRadius: 2,
+                px: 0.5,
+                py: 0.25,
+              }}
+            >
+              {/* My drafts section */}
+              {myDraftCount > 0 && (
+                <Box
+                  onClick={() => navigate('/admin/change-requests?status=draft')}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    cursor: 'pointer',
+                    px: 1.5,
+                    py: 0.5,
+                    borderRadius: 1.5,
+                    '&:hover': {
+                      bgcolor: 'rgba(0,0,0,0.15)',
+                    },
+                    transition: 'background-color 0.2s',
+                  }}
+                >
+                  <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.8125rem' }}>
+                    {t('changeRequest.myDraftsBanner', { count: myDraftCount })}
+                  </Typography>
+                  <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 14 }} />
+                </Box>
+              )}
 
-            {/* Separator */}
-            {myDraftCount > 0 && pendingCRCount > 0 && (
-              <Box sx={{ width: 1, height: 20, bgcolor: 'rgba(255,255,255,0.3)' }} />
-            )}
+              {/* Separator */}
+              {myDraftCount > 0 && pendingCRCount > 0 && (
+                <Typography sx={{ opacity: 0.5, fontSize: '0.875rem' }}>|</Typography>
+              )}
 
-            {/* Pending approvals section */}
-            {pendingCRCount > 0 && (
-              <Box
-                onClick={() => navigate('/admin/change-requests?status=open')}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  cursor: 'pointer',
-                  px: 1.5,
-                  py: 0.5,
-                  borderRadius: 1,
-                  bgcolor: 'rgba(0,0,0,0.1)',
-                  '&:hover': {
-                    bgcolor: 'rgba(0,0,0,0.2)',
-                  },
-                  transition: 'background-color 0.2s',
-                }}
-              >
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                  {t('changeRequest.pendingReviewBanner', { count: pendingCRCount })}
-                </Typography>
-                <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 16 }} />
-              </Box>
-            )}
+              {/* Pending approvals section */}
+              {pendingCRCount > 0 && (
+                <Box
+                  onClick={() => navigate('/admin/change-requests?status=open')}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    cursor: 'pointer',
+                    px: 1.5,
+                    py: 0.5,
+                    borderRadius: 1.5,
+                    '&:hover': {
+                      bgcolor: 'rgba(0,0,0,0.15)',
+                    },
+                    transition: 'background-color 0.2s',
+                  }}
+                >
+                  <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.8125rem' }}>
+                    {t('changeRequest.pendingReviewBanner', { count: pendingCRCount })}
+                  </Typography>
+                  <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 14 }} />
+                </Box>
+              )}
+            </Box>
           </Box>
         )}
 
