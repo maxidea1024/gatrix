@@ -1,7 +1,7 @@
 import { transaction } from 'objection';
 import { ulid } from 'ulid';
 import { ChangeRequest, ChangeRequestStatus } from '../models/ChangeRequest';
-import { ChangeItem } from '../models/ChangeItem';
+import { ChangeItem, FieldOp, EntityOpType } from '../models/ChangeItem';
 import { Approval } from '../models/Approval';
 import { Environment } from '../models/Environment';
 import { User } from '../models/User';
@@ -14,12 +14,124 @@ import { ErrorCodes } from '@gatrix/shared';
 import { diff } from 'deep-diff';
 import { OutboxService } from './OutboxService';
 
+/**
+ * Generate ops from beforeData and afterData
+ */
+function generateOps(beforeData: Record<string, any> | null, afterData: Record<string, any> | null): FieldOp[] {
+    const ops: FieldOp[] = [];
+    const before = beforeData || {};
+    const after = afterData || {};
+    const allKeys = new Set([...Object.keys(before), ...Object.keys(after)]);
+
+    // Skip internal fields
+    const skipFields = ['createdAt', 'updatedAt', 'createdBy', 'updatedBy', 'version'];
+
+    allKeys.forEach((key) => {
+        if (skipFields.includes(key)) return;
+
+        const oldVal = before[key];
+        const newVal = after[key];
+
+        // Only include if values differ
+        if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+            let opType: 'SET' | 'DEL' | 'MOD' = 'MOD';
+            if (oldVal === undefined || oldVal === null) {
+                opType = 'SET';
+            } else if (newVal === undefined || newVal === null) {
+                opType = 'DEL';
+            }
+            ops.push({ path: key, oldValue: oldVal ?? null, newValue: newVal ?? null, opType });
+        }
+    });
+
+    return ops;
+}
+
+/**
+ * Determine entity operation type from beforeData and afterData
+ */
+function determineOpType(beforeData: Record<string, any> | null, afterData: Record<string, any> | null): EntityOpType {
+    const isBeforeEmpty = !beforeData || Object.keys(beforeData).length === 0;
+    const isAfterEmpty = !afterData || Object.keys(afterData).length === 0;
+
+    if (isBeforeEmpty && !isAfterEmpty) return 'CREATE';
+    if (!isBeforeEmpty && isAfterEmpty) return 'DELETE';
+    return 'UPDATE';
+}
+
+/**
+ * Apply ops to base data to get the final data
+ * For CREATE: base is empty, apply all SET ops
+ * For UPDATE: base is current data, apply ops
+ * For DELETE: returns null
+ */
+function applyOpsToData(baseData: Record<string, any> | null, ops: FieldOp[], opType: EntityOpType): Record<string, any> | null {
+    if (opType === 'DELETE') {
+        return null; // Delete operation
+    }
+
+    const result = { ...(baseData || {}) };
+
+    for (const op of ops) {
+        if (op.opType === 'DEL') {
+            delete result[op.path];
+        } else {
+            result[op.path] = op.newValue;
+        }
+    }
+
+    return result;
+}
+
+/**
+ * Generate inverse ops for rollback
+ * SET -> DEL (or SET with old value if it existed)
+ * DEL -> SET
+ * MOD -> MOD (swap old/new)
+ */
+function generateInverseOps(ops: FieldOp[]): FieldOp[] {
+    return ops.map(op => {
+        if (op.opType === 'SET') {
+            // Was added, so remove it (or restore old if there was one)
+            return {
+                path: op.path,
+                oldValue: op.newValue,
+                newValue: op.oldValue,
+                opType: op.oldValue === null ? 'DEL' : 'MOD'
+            };
+        } else if (op.opType === 'DEL') {
+            // Was removed, so add it back
+            return {
+                path: op.path,
+                oldValue: op.newValue, // was null
+                newValue: op.oldValue, // restore
+                opType: 'SET'
+            };
+        } else {
+            // MOD: just swap
+            return {
+                path: op.path,
+                oldValue: op.newValue,
+                newValue: op.oldValue,
+                opType: 'MOD'
+            };
+        }
+    });
+}
+
+/**
+ * Determine inverse operation type for rollback
+ */
+function getInverseOpType(opType: EntityOpType): EntityOpType {
+    if (opType === 'CREATE') return 'DELETE';
+    if (opType === 'DELETE') return 'CREATE';
+    return 'UPDATE';
+}
+
 export class ChangeRequestService {
     /**
      * Upsert a Draft Change Request or Add Item to Existing Draft
-     * If a draft exists for (user + env + title?), reuse it? 
-     * Simplification: Always create new or explicitly target existing by ID.
-     * This method assumes creating a NEW request or updating known one.
+     * Now uses ops-based model
      */
     static async upsertChangeRequestItem(
         userId: number,
@@ -27,7 +139,7 @@ export class ChangeRequestService {
         targetTable: string,
         targetId: string,
         beforeData: Record<string, any> | null,
-        afterData: Record<string, any>, // This is the proposed change
+        afterData: Record<string, any> | null,
         changeRequestId?: string
     ): Promise<{ changeRequestId: string; status: ChangeRequestStatus }> {
         try {
@@ -44,13 +156,10 @@ export class ChangeRequestService {
                 }
             } else {
                 // 2. Create new Draft CR
-                // Generate a more readable title
                 const cleanTable = targetTable.startsWith('g_') ? targetTable.slice(2) : targetTable;
                 const isNew = targetId.startsWith('NEW_');
-
-                // Try to find a human-readable identifier in the data
                 const identifier = afterData?.name || afterData?.title || afterData?.displayName || afterData?.worldId || afterData?.id || (isNew ? 'New Item' : targetId);
-                const action = isNew ? 'Create' : 'Update';
+                const action = isNew ? 'Create' : (afterData === null ? 'Delete' : 'Update');
 
                 cr = await ChangeRequest.query().insert({
                     id: ulid(),
@@ -63,52 +172,44 @@ export class ChangeRequestService {
                 });
             }
 
-            // 3. Upsert Change Item
-            // Check if item for this target already exists in this CR
+            // 3. Determine operation type and generate ops
+            const opType = determineOpType(beforeData, afterData);
+
+            // For UPDATE, merge to get full object
+            let mergedAfterData = afterData;
+            if (opType === 'UPDATE' && beforeData && afterData) {
+                mergedAfterData = { ...beforeData, ...afterData };
+            }
+
+            const ops = generateOps(beforeData, mergedAfterData);
+
+            // 4. Check if item for this target already exists
             const existingItem = await ChangeItem.query()
                 .where('changeRequestId', cr.id)
                 .where('targetTable', targetTable)
                 .where('targetId', targetId)
                 .first();
 
-            // For UPDATE operations, merge afterData with beforeData to ensure full object
-            // This prevents showing unchanged fields as "deleted" when only partial data is sent
-            let mergedAfterData = afterData;
-            const isNew = targetId.startsWith('NEW_');
-            const isDelete = afterData === null || (afterData && Object.keys(afterData).length === 0 && beforeData) || (afterData && afterData.__deleted === true);
-
-            if (!isNew && !isDelete && beforeData && afterData) {
-                // Merge: start with beforeData, overlay with afterData changes
-                mergedAfterData = { ...beforeData, ...afterData };
-            }
-
             if (existingItem) {
+                // Update existing item's ops
                 await ChangeItem.query()
                     .findById(existingItem.id)
-                    .patch({
-                        afterData: mergedAfterData, // Update with merged data
-                        beforeData: beforeData // Update baseline if needed
-                    });
+                    .patch({ ops, opType });
             } else {
-                // Determine ActionGroup type based on operation (using already computed isNew/isDelete)
-                let actionType: ActionGroupType;
-                if (isNew) {
-                    actionType = ACTION_GROUP_TYPES.CREATE_ENTITY;
-                } else if (isDelete) {
-                    actionType = ACTION_GROUP_TYPES.DELETE_ENTITY;
-                } else {
-                    actionType = ACTION_GROUP_TYPES.UPDATE_ENTITY;
-                }
+                // Determine ActionGroup type
+                let actionGroupType: ActionGroupType = ACTION_GROUP_TYPES.UPDATE_ENTITY;
+                if (opType === 'CREATE') actionGroupType = ACTION_GROUP_TYPES.CREATE_ENTITY;
+                else if (opType === 'DELETE') actionGroupType = ACTION_GROUP_TYPES.DELETE_ENTITY;
 
-                // Find or create ActionGroup for this table + actionType combination
+                // Find or create ActionGroup
                 let actionGroup = await ActionGroup.query()
                     .where('changeRequestId', cr.id)
-                    .where('actionType', actionType)
+                    .where('actionType', actionGroupType)
                     .first();
 
                 if (!actionGroup) {
                     const cleanTable = targetTable.startsWith('g_') ? targetTable.slice(2) : targetTable;
-                    const actionLabel = isNew ? 'Create' : isDelete ? 'Delete' : 'Update';
+                    const actionLabel = opType === 'CREATE' ? 'Create' : opType === 'DELETE' ? 'Delete' : 'Update';
                     const maxOrder = await ActionGroup.query()
                         .where('changeRequestId', cr.id)
                         .max('orderIndex as maxOrder')
@@ -118,25 +219,25 @@ export class ChangeRequestService {
                     actionGroup = await ActionGroup.query().insert({
                         id: ulid(),
                         changeRequestId: cr.id,
-                        actionType,
+                        actionType: actionGroupType,
                         title: `${actionLabel} ${cleanTable}`,
                         orderIndex: nextOrder,
                     });
                 }
 
-                // Insert ChangeItem with ActionGroup reference (using mergedAfterData)
+                // Insert ChangeItem with ops
                 await ChangeItem.query().insert({
                     id: ulid(),
                     changeRequestId: cr.id,
                     actionGroupId: actionGroup.id,
                     targetTable,
                     targetId,
-                    beforeData,
-                    afterData: mergedAfterData
+                    opType,
+                    ops
                 });
             }
 
-            // 4. Update Title Dynamically if more than one item
+            // 5. Update Title Dynamically if more than one item
             const items = await ChangeItem.query().where('changeRequestId', cr.id);
             if (items.length > 1) {
                 const user = await User.query().findById(userId);
@@ -149,8 +250,6 @@ export class ChangeRequestService {
                 if (tables.length === 1) {
                     const table = cleanTables[0];
                     const count = items.length;
-
-                    // Localization
                     if (lang === 'ko') {
                         newTitle = `[${table}] ${count}개 항목`;
                     } else if (lang === 'zh') {
@@ -160,7 +259,6 @@ export class ChangeRequestService {
                     }
                 } else {
                     const count = items.length;
-                    // Localization
                     if (lang === 'ko') {
                         newTitle = `복합 변경 (${count}개 항목)`;
                     } else if (lang === 'zh') {
@@ -170,8 +268,6 @@ export class ChangeRequestService {
                     }
                 }
 
-                // Only update if current title seems like a default one (starts with [Table])
-                // or contains the old default "Change Request for"
                 if (cr.title.startsWith('[') || cr.title.includes('Change Request for') || cr.title.startsWith('Mixed Changes') || cr.title.startsWith('복합 변경') || cr.title.startsWith('混合变更')) {
                     await ChangeRequest.query().findById(cr.id).patch({ title: newTitle });
                 }
@@ -414,7 +510,9 @@ export class ChangeRequestService {
         return await transaction(ChangeRequest.knex(), async (trx) => {
             const cr = await ChangeRequest.query(trx).findById(changeRequestId);
             if (!cr) throw new Error('Change Request not found');
-            if (cr.status !== 'rejected') throw new Error('Only REJECTED requests can be reopened');
+            if (cr.status !== 'rejected' && cr.status !== 'conflict') {
+                throw new Error('Only REJECTED or CONFLICT requests can be reopened');
+            }
 
             const user = await User.query(trx).findById(requesterId);
             const isAdmin = user?.role === 'admin' || String(user?.role) === '0';
@@ -500,7 +598,15 @@ export class ChangeRequestService {
 
                 if (hasConflict) {
                     if (strictConflictCheck) {
-                        // Block execution on conflict
+                        // Set status to 'conflict' and save before throwing error
+                        await ChangeRequest.query(trx)
+                            .findById(changeRequestId)
+                            .patch({
+                                status: 'conflict',
+                                rejectionReason: `Data conflict: ${conflictReason}`,
+                                updatedAt: new Date().toISOString().slice(0, 19).replace('T', ' ') as any
+                            });
+
                         throw new GatrixError(
                             conflictReason,
                             409,
@@ -520,9 +626,28 @@ export class ChangeRequestService {
                     }
                 }
 
-                // 4. Apply Update - Check if service handler exists
-                if (item.afterData) {
-                    const isCreate = !liveData;
+                // 4. Apply Update based on opType
+                // For DELETE operations, remove the record
+                if (item.opType === 'DELETE') {
+                    await trx(item.targetTable).where('id', item.targetId).delete();
+                    logger.info(`[ChangeRequest] Deleted ${item.targetTable}:${item.targetId}`);
+
+                    if (hasServiceHandler(item.targetTable)) {
+                        serviceCallsNeeded.push({
+                            targetTable: item.targetTable,
+                            targetId: item.targetId,
+                            afterData: null,
+                            beforeData: liveData,
+                            isCreate: false
+                        });
+                    }
+                    continue; // Move to next item
+                }
+
+                // For CREATE/UPDATE: apply ops to get final data
+                const afterData = applyOpsToData(liveData, item.ops, item.opType);
+                if (afterData) {
+                    const isCreate = item.opType === 'CREATE';
 
                     // Common non-column fields to strip for direct DB operations
                     const fieldsToStrip = [
@@ -537,14 +662,11 @@ export class ChangeRequestService {
                         'environmentModel' // Joined data
                     ];
 
-                    const dbData = { ...item.afterData };
+                    const dbData = { ...afterData };
                     fieldsToStrip.forEach(f => delete dbData[f]);
 
-                    // Set ownership fields
-                    if (isCreate && dbData.createdBy === undefined) {
-                        dbData.createdBy = cr.requesterId;
-                    }
-                    dbData.updatedBy = userId;
+                    // Note: Not all tables have createdBy/updatedBy columns
+                    // These should be set in the ops/afterData if needed
 
                     // Convert ISO 8601 datetime strings to MySQL format
                     const dateFields = ['createdAt', 'updatedAt', 'startDate', 'endDate', 'saleStartAt', 'saleEndAt', 'maintenanceStartDate', 'maintenanceEndDate'];
@@ -759,6 +881,55 @@ export class ChangeRequestService {
         return result.cr;
     }
 
+    /**
+     * Preview what a rollback would look like without creating the CR
+     * Returns the inverse operations that would be applied
+     */
+    static async previewRollback(changeRequestId: string): Promise<{
+        originalCr: ChangeRequest;
+        rollbackItems: Array<{
+            targetTable: string;
+            targetId: string;
+            opType: EntityOpType;
+            ops: FieldOp[];
+            actionType: string;
+        }>;
+    }> {
+        const originalCr = await ChangeRequest.query()
+            .findById(changeRequestId)
+            .withGraphFetched('changeItems');
+
+        if (!originalCr) throw new GatrixError('Change Request not found', 404);
+        if (originalCr.status !== 'applied') throw new GatrixError('Only APPLIED requests can be rolled back', 400);
+
+        const rollbackItems: Array<{
+            targetTable: string;
+            targetId: string;
+            opType: EntityOpType;
+            ops: FieldOp[];
+            actionType: string;
+        }> = [];
+
+        for (const item of (originalCr.changeItems || [])) {
+            const inverseOpType = getInverseOpType(item.opType);
+            const inverseOps = generateInverseOps(item.ops);
+
+            let actionType = 'UPDATE_ENTITY';
+            if (inverseOpType === 'CREATE') actionType = 'CREATE_ENTITY';
+            else if (inverseOpType === 'DELETE') actionType = 'DELETE_ENTITY';
+
+            rollbackItems.push({
+                targetTable: item.targetTable,
+                targetId: item.targetId,
+                opType: inverseOpType,
+                ops: inverseOps,
+                actionType
+            });
+        }
+
+        return { originalCr, rollbackItems };
+    }
+
     static async rollbackChangeRequest(changeRequestId: string, userId: number): Promise<ChangeRequest> {
         return await transaction(ChangeRequest.knex(), async (trx) => {
             const originalCr = await ChangeRequest.query(trx)
@@ -782,29 +953,26 @@ export class ChangeRequestService {
                 category: originalCr.category || 'general'
             });
 
-            // Process items - Reversing the operations
+            // Process items - Generate inverse operations
             for (const item of (originalCr.changeItems || [])) {
-                // Determine action type for rollback
-                let actionType: ActionGroupType = ACTION_GROUP_TYPES.UPDATE_ENTITY;
-                if (!item.beforeData) {
-                    // Original was CREATE (before was null), so rollback is DELETE
-                    actionType = ACTION_GROUP_TYPES.DELETE_ENTITY;
-                } else if (!item.afterData) {
-                    // Original was DELETE (after was null), so rollback is CREATE
-                    actionType = ACTION_GROUP_TYPES.CREATE_ENTITY;
-                }
+                // Determine inverse operation type
+                const inverseOpType = getInverseOpType(item.opType);
 
-                // Find or create ActionGroup for the new CR to maintain UI consistency
+                // Determine ActionGroup type for rollback
+                let actionGroupType: ActionGroupType = ACTION_GROUP_TYPES.UPDATE_ENTITY;
+                if (inverseOpType === 'CREATE') actionGroupType = ACTION_GROUP_TYPES.CREATE_ENTITY;
+                else if (inverseOpType === 'DELETE') actionGroupType = ACTION_GROUP_TYPES.DELETE_ENTITY;
+
+                // Find or create ActionGroup for the new CR
                 let actionGroup = await ActionGroup.query(trx)
                     .where('changeRequestId', newCrKey)
-                    .where('actionType', actionType)
-                    .where('title', 'like', `%${item.targetTable.startsWith('g_') ? item.targetTable.slice(2) : item.targetTable}%`)
+                    .where('actionType', actionGroupType)
                     .first();
 
                 if (!actionGroup) {
                     const cleanTable = item.targetTable.startsWith('g_') ? item.targetTable.slice(2) : item.targetTable;
-                    const actionLabel = actionType === ACTION_GROUP_TYPES.CREATE_ENTITY ? 'Restore' :
-                        actionType === ACTION_GROUP_TYPES.DELETE_ENTITY ? 'Remove' : 'Revert';
+                    const actionLabel = inverseOpType === 'CREATE' ? 'Restore' :
+                        inverseOpType === 'DELETE' ? 'Remove' : 'Revert';
 
                     const maxOrder = await ActionGroup.query(trx)
                         .where('changeRequestId', newCrKey)
@@ -815,28 +983,23 @@ export class ChangeRequestService {
                     actionGroup = await ActionGroup.query(trx).insert({
                         id: ulid(),
                         changeRequestId: newCrKey,
-                        actionType,
+                        actionType: actionGroupType,
                         title: `${actionLabel} ${cleanTable}`,
                         orderIndex: nextOrder
                     });
                 }
 
-                // Fetch current live data to use as "beforeData" for the rollback item
-                let currentLive = null;
-                const tableExists = await trx.schema.hasTable(item.targetTable);
-                if (tableExists) {
-                    currentLive = await trx(item.targetTable).where('id', item.targetId).first();
-                }
+                // Generate inverse ops
+                const inverseOps = generateInverseOps(item.ops);
 
-                // Desired state for rollback is the "beforeData" of the original change
                 await ChangeItem.query(trx).insert({
                     id: ulid(),
                     changeRequestId: newCrKey,
                     actionGroupId: actionGroup.id,
                     targetTable: item.targetTable,
                     targetId: item.targetId,
-                    beforeData: currentLive ?? null,  // Current state
-                    afterData: item.beforeData ?? null   // Original baseline (restoring this)
+                    opType: inverseOpType,
+                    ops: inverseOps
                 });
             }
 

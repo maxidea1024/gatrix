@@ -48,7 +48,14 @@ router.patch('/:id', ChangeRequestController.updateMetadata);
  * @desc Delete draft change request
  * @access Admin
  */
-router.delete('/:id', ChangeRequestController.delete);
+router.delete('/:id', ChangeRequestController.remove);
+
+/**
+ * @route DELETE /api/v1/admin/change-requests/:id/items/:itemId
+ * @desc Delete a specific change item from a draft change request
+ * @access Admin
+ */
+router.delete('/:id/items/:itemId', ChangeRequestController.deleteChangeItem);
 
 /**
  * @route POST /api/v1/admin/change-requests/:id/submit
@@ -84,6 +91,13 @@ router.post('/:id/reopen', ChangeRequestController.reopen);
  * @access Admin
  */
 router.post('/:id/execute', ChangeRequestController.execute);
+
+/**
+ * @route GET /api/v1/admin/change-requests/:id/rollback-preview
+ * @desc Preview rollback changes without creating CR
+ * @access Admin
+ */
+router.get('/:id/rollback-preview', ChangeRequestController.previewRollback);
 
 /**
  * @route POST /api/v1/admin/change-requests/:id/rollback

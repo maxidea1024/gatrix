@@ -2,7 +2,7 @@ import { Model } from 'objection';
 import { User } from './User';
 import { Environment } from './Environment';
 
-export type ChangeRequestStatus = 'draft' | 'open' | 'approved' | 'applied' | 'rejected';
+export type ChangeRequestStatus = 'draft' | 'open' | 'approved' | 'applied' | 'rejected' | 'conflict';
 export type ChangeRequestPriority = 'low' | 'medium' | 'high' | 'critical';
 
 export class ChangeRequest extends Model {
@@ -42,7 +42,7 @@ export class ChangeRequest extends Model {
                 id: { type: 'string' },
                 requesterId: { type: 'integer' },
                 environment: { type: 'string' },
-                status: { type: 'string', enum: ['draft', 'open', 'approved', 'applied', 'rejected'] },
+                status: { type: 'string', enum: ['draft', 'open', 'approved', 'applied', 'rejected', 'conflict'] },
                 title: { type: 'string', minLength: 1, maxLength: 255 },
                 description: { type: ['string', 'null'] },
                 reason: { type: ['string', 'null'] },

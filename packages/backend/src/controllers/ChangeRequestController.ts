@@ -17,6 +17,23 @@ function getEnvironment(req: AuthenticatedRequest): string {
     return env;
 }
 
+// Minimum delay for CR operations (prevents rapid clicks, ensures UI feedback visibility)
+const CR_REQUEST_DELAY_MS = parseInt(process.env.CR_REQUEST_DELAY_MS || '0', 10);
+
+async function withMinimumDelay<T>(operation: Promise<T>): Promise<T> {
+    if (CR_REQUEST_DELAY_MS <= 0) {
+        return operation;
+    }
+    const startTime = Date.now();
+    const result = await operation;
+    const elapsed = Date.now() - startTime;
+    const remainingDelay = CR_REQUEST_DELAY_MS - elapsed;
+    if (remainingDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingDelay));
+    }
+    return result;
+}
+
 export class ChangeRequestController {
     /**
      * Get list of change requests for current environment
@@ -185,7 +202,9 @@ export class ChangeRequestController {
             throw new GatrixError('User not authenticated', 401);
         }
 
-        const approved = await ChangeRequestService.approveChangeRequest(id, userId, comment);
+        const approved = await withMinimumDelay(
+            ChangeRequestService.approveChangeRequest(id, userId, comment)
+        );
 
         logger.info('[ChangeRequest] Approved', { changeRequestId: id, approverId: userId });
 
@@ -215,7 +234,9 @@ export class ChangeRequestController {
             throw new GatrixError('Rejection comment is required', 400);
         }
 
-        const rejected = await ChangeRequestService.rejectChangeRequest(id, userId, comment);
+        const rejected = await withMinimumDelay(
+            ChangeRequestService.rejectChangeRequest(id, userId, comment)
+        );
 
         logger.info('[ChangeRequest] Rejected', { changeRequestId: id, rejectorId: userId });
 
@@ -238,7 +259,9 @@ export class ChangeRequestController {
             throw new GatrixError('User not authenticated', 401);
         }
 
-        const reopened = await ChangeRequestService.reopenChangeRequest(id, userId);
+        const reopened = await withMinimumDelay(
+            ChangeRequestService.reopenChangeRequest(id, userId)
+        );
 
         logger.info('[ChangeRequest] Reopened', { changeRequestId: id, userId });
 
@@ -262,7 +285,9 @@ export class ChangeRequestController {
         }
 
         try {
-            const executed = await ChangeRequestService.executeChangeRequest(id, userId);
+            const executed = await withMinimumDelay(
+                ChangeRequestService.executeChangeRequest(id, userId)
+            );
 
             logger.info('[ChangeRequest] Executed', { changeRequestId: id, executorId: userId });
 
@@ -292,19 +317,23 @@ export class ChangeRequestController {
             const isMySQLDuplicate = error.errno === 1062 || error.code === 'ER_DUP_ENTRY';
 
             if (isConflictError || isDuplicateError || isMySQLDuplicate) {
-                // Mark CR as rejected automatically since execution failed significantly
                 try {
-                    let reason: string;
                     if (isConflictError) {
-                        reason = 'System: Data conflict detected during execution (Live data changed)';
+                        // Set status to 'conflict' for data conflicts
+                        await ChangeRequest.query()
+                            .findById(id)
+                            .patch({
+                                status: 'conflict',
+                                rejectionReason: '$i18n:errors.DATA_CONFLICT_DURING_EXECUTION',
+                            });
+                        logger.info('[ChangeRequest] Marked as conflict', { changeRequestId: id });
                     } else {
-                        reason = 'System: Duplicate entry detected during execution';
+                        // Reject for duplicate entry errors
+                        await ChangeRequestService.rejectChangeRequest(id, null, '$i18n:errors.DUPLICATE_ENTRY_DURING_EXECUTION');
+                        logger.info('[ChangeRequest] Auto-rejected due to duplicate', { changeRequestId: id });
                     }
-
-                    await ChangeRequestService.rejectChangeRequest(id, null, reason);
-                    logger.info('[ChangeRequest] Auto-rejected due to conflict/duplicate', { changeRequestId: id, reason });
-                } catch (rejectError) {
-                    logger.error('[ChangeRequest] Failed to auto-reject conflicted/duplicate CR', rejectError);
+                } catch (updateError) {
+                    logger.error('[ChangeRequest] Failed to update CR status after execution failure', updateError);
                 }
 
                 // Throw a safe error message for conflict/duplicate cases
@@ -403,6 +432,21 @@ export class ChangeRequestController {
     });
 
     /**
+     * Preview rollback - shows what changes would be made without creating the CR
+     * GET /api/v1/admin/change-requests/:id/rollback-preview
+     */
+    static previewRollback = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const { id } = req.params;
+
+        const preview = await ChangeRequestService.previewRollback(id);
+
+        res.json({
+            success: true,
+            data: preview,
+        });
+    });
+
+    /**
      * Rollback an applied change request
      * POST /api/v1/admin/change-requests/:id/rollback
      */
@@ -441,6 +485,75 @@ export class ChangeRequestController {
         res.json({
             success: true,
             data: stats,
+        });
+    });
+
+    /**
+     * Delete a draft change request
+     * DELETE /api/v1/admin/change-requests/:id
+     */
+    static remove = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const { id } = req.params;
+
+        await withMinimumDelay((async () => {
+            const cr = await ChangeRequest.query().findById(id);
+            if (!cr) {
+                throw new GatrixError('Change Request not found', 404);
+            }
+            if (!['draft', 'rejected', 'conflict'].includes(cr.status)) {
+                throw new GatrixError('Only draft, rejected, or conflict change requests can be deleted', 400);
+            }
+
+            // Delete related items first
+            await ChangeItem.query().where('changeRequestId', id).delete();
+            await ActionGroup.query().where('changeRequestId', id).delete();
+            await Approval.query().where('changeRequestId', id).delete();
+            await ChangeRequest.query().deleteById(id);
+
+            logger.info('[ChangeRequest] Deleted', { changeRequestId: id, userId: req.user?.userId });
+        })());
+
+        res.json({
+            success: true,
+            message: 'Change request deleted',
+        });
+    });
+
+    /**
+     * Delete a specific change item from a draft change request
+     * DELETE /api/v1/admin/change-requests/:id/items/:itemId
+     */
+    static deleteChangeItem = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const { id, itemId } = req.params;
+
+        const cr = await ChangeRequest.query().findById(id);
+        if (!cr) {
+            throw new GatrixError('Change Request not found', 404);
+        }
+        if (cr.status !== 'draft') {
+            throw new GatrixError('Can only delete items from draft change requests', 400);
+        }
+
+        const item = await ChangeItem.query().findById(itemId);
+        if (!item || item.changeRequestId !== id) {
+            throw new GatrixError('Change Item not found in this request', 404);
+        }
+
+        await ChangeItem.query().deleteById(itemId);
+
+        // Check if action group is now empty and delete if so
+        if (item.actionGroupId) {
+            const remainingItems = await ChangeItem.query().where('actionGroupId', item.actionGroupId);
+            if (remainingItems.length === 0) {
+                await ActionGroup.query().deleteById(item.actionGroupId);
+            }
+        }
+
+        logger.info('[ChangeRequest] Item deleted', { changeRequestId: id, itemId, userId: req.user?.userId });
+
+        res.json({
+            success: true,
+            message: 'Change item deleted',
         });
     });
 }

@@ -1,7 +1,7 @@
 import api from './api';
 
 // Types
-export type ChangeRequestStatus = 'draft' | 'open' | 'approved' | 'applied' | 'rejected';
+export type ChangeRequestStatus = 'draft' | 'open' | 'approved' | 'applied' | 'rejected' | 'conflict';
 export type ChangeRequestPriority = 'low' | 'medium' | 'high' | 'critical';
 
 export interface ChangeItem {
@@ -195,12 +195,28 @@ class ChangeRequestService {
     }
 
     /**
+     * Get rollback preview (inverse ops without creating CR)
+     */
+    async getRollbackPreview(id: string): Promise<any> {
+        const response = await api.get(`/admin/change-requests/${id}/rollback-preview`);
+        return response.data;
+    }
+
+    /**
      * Rollback applied change request
      */
     async rollback(id: string): Promise<ChangeRequest> {
         const response = await api.post(`/admin/change-requests/${id}/rollback`);
         return response.data;
     }
+
+    /**
+     * Delete a specific change item from a change request
+     */
+    async deleteChangeItem(changeRequestId: string, itemId: string): Promise<void> {
+        await api.delete(`/admin/change-requests/${changeRequestId}/items/${itemId}`);
+    }
+
     /**
      * Get change request statistics
      */

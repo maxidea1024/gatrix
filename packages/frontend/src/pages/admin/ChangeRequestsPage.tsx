@@ -23,6 +23,7 @@ import {
     DialogContentText,
     DialogActions,
     TextField,
+    Paper,
 } from '@mui/material';
 import {
     Refresh as RefreshIcon,
@@ -45,6 +46,7 @@ import changeRequestService, {
 import SimplePagination from '@/components/common/SimplePagination';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import ChangeRequestDetailDrawer from '@/components/admin/ChangeRequestDetailDrawer';
+import RollbackPreviewDrawer from '@/components/admin/RollbackPreviewDrawer';
 import { formatChangeRequestTitle } from '@/utils/changeRequestFormatter';
 
 // JSON Diff wrapper component
@@ -201,6 +203,7 @@ const STATUS_CONFIG: Record<ChangeRequestStatus, { color: 'default' | 'primary' 
     approved: { color: 'success', labelKey: 'changeRequest.status.approved' },
     applied: { color: 'primary', labelKey: 'changeRequest.status.applied' },
     rejected: { color: 'error', labelKey: 'changeRequest.status.rejected' },
+    conflict: { color: 'warning', labelKey: 'changeRequest.status.conflict' },
 };
 
 // Priority configuration
@@ -230,7 +233,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
     const [submitTitle, setSubmitTitle] = useState('');
     const [submitReason, setSubmitReason] = useState('');
     const [reopenDialogOpen, setReopenDialogOpen] = useState(false);
-    const [rollbackDialogOpen, setRollbackDialogOpen] = useState(false);
+    const [rollbackPreviewOpen, setRollbackPreviewOpen] = useState(false);
     const { handleApiError, ErrorDialog } = useHandleApiError();
 
 
@@ -315,33 +318,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
     };
 
     const handleRollback = () => {
-        setRollbackDialogOpen(true);
-    };
-
-    const confirmRollback = async () => {
-        setActionLoading(true);
-        try {
-            const newCr = await changeRequestService.rollback(cr.id);
-            enqueueSnackbar(t('changeRequest.messages.rollbackCreated'), {
-                variant: 'success',
-                autoHideDuration: 5000,
-                action: (key) => (
-                    <Button
-                        color="inherit"
-                        size="small"
-                        onClick={() => navigate(`/admin/change-requests/${newCr.id}`)}
-                    >
-                        {t('common.view')}
-                    </Button>
-                )
-            });
-            setRollbackDialogOpen(false);
-            onRefresh();
-        } catch (err: any) {
-            handleApiError(err, 'changeRequest.errors.rollbackFailed');
-        } finally {
-            setActionLoading(false);
-        }
+        setRollbackPreviewOpen(true);
     };
 
     // ... (rest of existing handlers like handleDelete)
@@ -519,21 +496,13 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
                 </DialogActions>
             </Dialog >
 
-            {/* Rollback Confirmation Dialog */}
-            < Dialog open={rollbackDialogOpen} onClose={() => setRollbackDialogOpen(false)} maxWidth="sm" fullWidth >
-                <DialogTitle>{t('changeRequest.rollbackDialog.title')}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        {t('changeRequest.rollbackDialog.description')}
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setRollbackDialogOpen(false)}>{t('common.cancel')}</Button>
-                    <Button onClick={confirmRollback} color="warning" variant="contained" disabled={actionLoading}>
-                        {t('changeRequest.actions.rollback')}
-                    </Button>
-                </DialogActions>
-            </Dialog >
+            {/* Rollback Preview Drawer */}
+            <RollbackPreviewDrawer
+                open={rollbackPreviewOpen}
+                onClose={() => setRollbackPreviewOpen(false)}
+                changeRequestId={cr.id}
+                onRollbackCreated={() => onRefresh()}
+            />
 
             <ErrorDialog />
         </>
@@ -548,7 +517,7 @@ const ChangeRequestsPage: React.FC = () => {
 
     // Tab state controlled by URL param
     const [searchParams, setSearchParams] = useSearchParams();
-    const statusFilters: (ChangeRequestStatus | undefined)[] = [undefined, 'draft', 'open', 'approved', 'applied', 'rejected'];
+    const statusFilters: (ChangeRequestStatus | undefined)[] = [undefined, 'draft', 'open', 'approved', 'applied', 'rejected', 'conflict'];
 
     // Initialize/Get tab value from URL
     const tabValue = useMemo(() => {
@@ -663,6 +632,7 @@ const ChangeRequestsPage: React.FC = () => {
                             <Tab label={t('changeRequest.tabs.approved') + (stats?.approved ? ` (${stats.approved})` : '')} />
                             <Tab label={t('changeRequest.tabs.applied') + (stats?.applied ? ` (${stats.applied})` : '')} />
                             <Tab label={t('changeRequest.tabs.rejected') + (stats?.rejected ? ` (${stats.rejected})` : '')} />
+                            <Tab label={t('changeRequest.tabs.conflict') + (stats?.conflict ? ` (${stats.conflict})` : '')} />
                         </Tabs>
                     </Box>
 
