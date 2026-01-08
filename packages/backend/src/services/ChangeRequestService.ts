@@ -610,6 +610,14 @@ export class ChangeRequestService {
                             if (!usesStringId && result) {
                                 realId = result;
                             }
+
+                            // Update ChangeItem's targetId to the real ID for future rollback
+                            if (item.targetId.startsWith('NEW_') && realId !== item.targetId) {
+                                await ChangeItem.query(trx).findById(item.id).patch({
+                                    targetId: String(realId)
+                                });
+                                logger.info(`[ChangeRequest] Updated ChangeItem targetId: ${item.targetId} -> ${realId}`);
+                            }
                         } else {
                             // Increment version on update
                             if (typeof liveData?.version === 'number') {
@@ -659,7 +667,16 @@ export class ChangeRequestService {
                             if (dbData.version === undefined) {
                                 dbData.version = 1;
                             }
-                            await trx(item.targetTable).insert(dbData);
+                            const [insertResult] = await trx(item.targetTable).insert(dbData);
+
+                            // Update ChangeItem's targetId to the real ID for future rollback
+                            let realId: string | number = dbData.id || insertResult;
+                            if (item.targetId.startsWith('NEW_') && realId && realId !== item.targetId) {
+                                await ChangeItem.query(trx).findById(item.id).patch({
+                                    targetId: String(realId)
+                                });
+                                logger.info(`[ChangeRequest] Updated ChangeItem targetId: ${item.targetId} -> ${realId}`);
+                            }
                         } else {
                             // Increment version on update
                             if (typeof liveData?.version === 'number') {

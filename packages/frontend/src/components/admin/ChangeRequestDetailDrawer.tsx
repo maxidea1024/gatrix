@@ -192,26 +192,49 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         return cr.changeItems.map((item) => {
             const before = item.beforeData || {};
             const after = item.afterData || {};
-            const allKeys = new Set([...Object.keys(before), ...Object.keys(after)]);
             const changes: FieldChange[] = [];
 
-            allKeys.forEach((key) => {
-                const oldVal = before[key];
-                const newVal = after[key];
-                if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
-                    let operation: 'added' | 'removed' | 'modified' = 'modified';
-                    if (oldVal === undefined) operation = 'added';
-                    else if (newVal === undefined) operation = 'removed';
-                    changes.push({ field: key, oldValue: oldVal, newValue: newVal, operation });
-                }
-            });
-
-            // Compute operation type based on targetId and data
+            // Determine operation type FIRST based on data presence
             let operation: 'create' | 'update' | 'delete' = 'update';
-            if (item.targetId.startsWith('NEW_')) {
-                operation = 'create';
-            } else if (!item.afterData || Object.keys(item.afterData).length === 0) {
+            const isAfterEmpty = !item.afterData || Object.keys(item.afterData).length === 0;
+            const isBeforeEmpty = !item.beforeData || Object.keys(item.beforeData).length === 0;
+
+            if (isAfterEmpty && !isBeforeEmpty) {
+                // afterData is empty but beforeData has data = DELETE
                 operation = 'delete';
+            } else if (isBeforeEmpty && !isAfterEmpty) {
+                // beforeData is empty but afterData has data = CREATE
+                operation = 'create';
+            } else if (item.targetId.startsWith('NEW_')) {
+                // Fallback for legacy data
+                operation = 'create';
+            }
+
+            // For CREATE: show all afterData fields as 'added'
+            if (operation === 'create') {
+                Object.keys(after).forEach((key) => {
+                    changes.push({ field: key, oldValue: undefined, newValue: after[key], operation: 'added' });
+                });
+            }
+            // For DELETE: show all beforeData fields as 'removed'
+            else if (operation === 'delete') {
+                Object.keys(before).forEach((key) => {
+                    changes.push({ field: key, oldValue: before[key], newValue: undefined, operation: 'removed' });
+                });
+            }
+            // For UPDATE: compare fields
+            else {
+                const allKeys = new Set([...Object.keys(before), ...Object.keys(after)]);
+                allKeys.forEach((key) => {
+                    const oldVal = before[key];
+                    const newVal = after[key];
+                    if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+                        let fieldOp: 'added' | 'removed' | 'modified' = 'modified';
+                        if (oldVal === undefined) fieldOp = 'added';
+                        else if (newVal === undefined) fieldOp = 'removed';
+                        changes.push({ field: key, oldValue: oldVal, newValue: newVal, operation: fieldOp });
+                    }
+                });
             }
 
             return { table: item.targetTable, targetId: item.targetId, operation, changes, actionGroupId: item.actionGroupId };
