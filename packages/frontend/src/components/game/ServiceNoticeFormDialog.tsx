@@ -19,6 +19,8 @@ import {
   IconButton,
   AppBar,
   Toolbar,
+  Alert,
+  AlertTitle,
 } from '@mui/material';
 import { Close as CloseIcon, ChevronRight as ChevronRightIcon, ChevronLeft as ChevronLeftIcon } from '@mui/icons-material';
 import ResizableDrawer from '../common/ResizableDrawer';
@@ -36,6 +38,7 @@ import { parseUTCForPicker } from '../../utils/dateFormat';
 import TargetSettingsGroup, { ChannelSubchannelData } from './TargetSettingsGroup';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
+import { useEntityLock } from '../../hooks/useEntityLock';
 
 interface ServiceNoticeFormDialogProps {
   open: boolean;
@@ -61,6 +64,14 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   const { platforms: platformConfig, channels: channelConfig } = usePlatformConfig();
   const [submitting, setSubmitting] = useState(false);
   const [previewCollapsed, setPreviewCollapsed] = useState(true); // Default: collapsed
+
+  // Entity Lock for edit mode
+  const { hasLock, lockedBy, pendingCR, forceTakeover } = useEntityLock({
+    table: 'g_service_notices',
+    entityId: notice?.id || null,
+    isEditing: open && !!notice,
+    // onLockLost is called when lock is taken - toast is now handled by useEntityLock via SSE
+  });
 
   // Form state
   const [isActive, setIsActive] = useState(true);
@@ -511,6 +522,28 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
           }}
         >
           <Stack spacing={3}>
+            {/* Lock Warning */}
+            {notice && lockedBy && !hasLock && (
+              <Alert
+                severity="warning"
+                action={
+                  <Button color="inherit" size="small" onClick={forceTakeover}>
+                    {t('entityLock.takeOver')}
+                  </Button>
+                }
+              >
+                <AlertTitle>{t('entityLock.warning', { userName: lockedBy.userName, userEmail: lockedBy.userEmail })}</AlertTitle>
+              </Alert>
+            )}
+
+            {/* Pending CR Warning */}
+            {notice && pendingCR && (
+              <Alert severity="info">
+                <AlertTitle>{t('entityLock.pendingCR')}</AlertTitle>
+                {t('entityLock.pendingCRDetail', { crTitle: pendingCR.crTitle, crId: pendingCR.crId })}
+              </Alert>
+            )}
+
             {/* Active Status */}
             <Box>
               <FormControlLabel

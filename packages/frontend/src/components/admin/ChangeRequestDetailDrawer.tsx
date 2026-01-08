@@ -103,6 +103,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
     const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
     const [rollbackPreviewOpen, setRollbackPreviewOpen] = useState(false);
+    const [rollbackTargetId, setRollbackTargetId] = useState<string | null>(null);
 
     // Delete handler for error dialog
     const handleDeleteFromError = async () => {
@@ -971,6 +972,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                                     color="warning"
                                                     startIcon={<UndoIcon />}
                                                     onClick={() => {
+                                                        setRollbackTargetId(changeRequestId);
                                                         setRollbackPreviewOpen(true);
                                                         onClose();
                                                     }}
@@ -1314,8 +1316,11 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
             {/* Rollback Preview Drawer - Outside main drawer so it persists when main closes */}
             <RollbackPreviewDrawer
                 open={rollbackPreviewOpen}
-                onClose={() => setRollbackPreviewOpen(false)}
-                changeRequestId={changeRequestId}
+                onClose={() => {
+                    setRollbackPreviewOpen(false);
+                    setRollbackTargetId(null);
+                }}
+                changeRequestId={rollbackTargetId}
                 onRollbackCreated={() => {
                     mutate();
                     onRefresh?.();

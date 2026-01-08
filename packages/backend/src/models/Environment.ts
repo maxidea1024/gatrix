@@ -23,6 +23,8 @@ export interface EnvironmentData {
   requiresApproval: boolean;
   requiredApprovers: number;
   strictConflictCheck?: boolean; // CR version conflict check strictness
+  enableSoftLock?: boolean; // Soft lock for concurrent editing
+  enableHardLock?: boolean; // Hard lock warning for pending CRs
   createdBy: number;
   updatedBy?: number;
   createdAt?: Date;
@@ -46,6 +48,8 @@ export class Environment extends Model implements EnvironmentData {
   requiresApproval!: boolean;
   requiredApprovers!: number;
   strictConflictCheck?: boolean; // CR version conflict check strictness
+  enableSoftLock?: boolean; // Soft lock for concurrent editing
+  enableHardLock?: boolean; // Hard lock warning for pending CRs
   createdBy!: number;
   updatedBy?: number;
   createdAt?: Date;
@@ -79,6 +83,8 @@ export class Environment extends Model implements EnvironmentData {
         requiresApproval: { type: 'boolean' },
         requiredApprovers: { type: 'integer', minimum: 1, maximum: 10 },
         strictConflictCheck: { type: 'boolean' },
+        enableSoftLock: { type: 'boolean' },
+        enableHardLock: { type: 'boolean' },
         createdBy: { type: 'integer' },
         updatedBy: { type: ['integer', 'null'] },
         createdAt: { type: 'string', format: 'date-time' },

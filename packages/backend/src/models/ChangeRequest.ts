@@ -134,4 +134,26 @@ export class ChangeRequest extends Model {
     $beforeUpdate() {
         this.updatedAt = new Date();
     }
+
+    $formatJson(json: any) {
+        const formatted = super.$formatJson(json);
+        // Convert Date objects to ISO strings for proper timezone handling
+        if (formatted.createdAt instanceof Date) {
+            formatted.createdAt = formatted.createdAt.toISOString();
+        } else if (formatted.createdAt && typeof formatted.createdAt === 'string' && !formatted.createdAt.endsWith('Z')) {
+            // MySQL DATETIME format - append Z to indicate UTC
+            formatted.createdAt = formatted.createdAt.replace(' ', 'T') + '.000Z';
+        }
+        if (formatted.updatedAt instanceof Date) {
+            formatted.updatedAt = formatted.updatedAt.toISOString();
+        } else if (formatted.updatedAt && typeof formatted.updatedAt === 'string' && !formatted.updatedAt.endsWith('Z')) {
+            formatted.updatedAt = formatted.updatedAt.replace(' ', 'T') + '.000Z';
+        }
+        if (formatted.rejectedAt instanceof Date) {
+            formatted.rejectedAt = formatted.rejectedAt.toISOString();
+        } else if (formatted.rejectedAt && typeof formatted.rejectedAt === 'string' && !formatted.rejectedAt.endsWith('Z')) {
+            formatted.rejectedAt = formatted.rejectedAt.replace(' ', 'T') + '.000Z';
+        }
+        return formatted;
+    }
 }

@@ -26,20 +26,32 @@ function generateOps(beforeData: Record<string, any> | null, afterData: Record<s
     // Skip internal fields
     const skipFields = ['createdAt', 'updatedAt', 'createdBy', 'updatedBy', 'version'];
 
+    // Normalize value for comparison (handle MySQL TINYINT boolean)
+    const normalizeValue = (val: any): any => {
+        if (val === true) return 1;
+        if (val === false) return 0;
+        return val;
+    };
+
     allKeys.forEach((key) => {
         if (skipFields.includes(key)) return;
 
         const oldVal = before[key];
         const newVal = after[key];
 
-        // Only include if values differ
-        if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+        // Normalize values for comparison
+        const normalizedOld = normalizeValue(oldVal);
+        const normalizedNew = normalizeValue(newVal);
+
+        // Only include if values differ (using normalized comparison)
+        if (JSON.stringify(normalizedOld) !== JSON.stringify(normalizedNew)) {
             let opType: 'SET' | 'DEL' | 'MOD' = 'MOD';
             if (oldVal === undefined || oldVal === null) {
                 opType = 'SET';
             } else if (newVal === undefined || newVal === null) {
                 opType = 'DEL';
             }
+            // Store original values in ops for display (not normalized)
             ops.push({ path: key, oldValue: oldVal ?? null, newValue: newVal ?? null, opType });
         }
     });
@@ -627,9 +639,29 @@ export class ChangeRequestService {
                 }
 
                 // 4. Apply Update based on opType
-                // For DELETE operations, remove the record
+                // For DELETE operations, remove the record with optimistic lock
                 if (item.opType === 'DELETE') {
-                    await trx(item.targetTable).where('id', item.targetId).delete();
+                    let affectedRows: number;
+
+                    // Use optimistic locking if version column exists
+                    if (hasVersionColumn && storedEntityVersion !== undefined) {
+                        affectedRows = await trx(item.targetTable)
+                            .where('id', item.targetId)
+                            .where('version', storedEntityVersion)
+                            .delete();
+
+                        if (affectedRows === 0) {
+                            throw new GatrixError(
+                                `Optimistic lock failed: version changed during delete (table: ${item.targetTable}, id: ${item.targetId})`,
+                                409,
+                                true,
+                                'CR_DATA_CONFLICT'
+                            );
+                        }
+                    } else {
+                        affectedRows = await trx(item.targetTable).where('id', item.targetId).delete();
+                    }
+
                     logger.info(`[ChangeRequest] Deleted ${item.targetTable}:${item.targetId}`);
 
                     if (hasServiceHandler(item.targetTable)) {
@@ -741,11 +773,26 @@ export class ChangeRequestService {
                                 logger.info(`[ChangeRequest] Updated ChangeItem targetId: ${item.targetId} -> ${realId}`);
                             }
                         } else {
-                            // Increment version on update
-                            if (typeof liveData?.version === 'number') {
+                            // Optimistic locking: increment version and add to WHERE clause
+                            if (typeof liveData?.version === 'number' && storedEntityVersion !== undefined) {
                                 dbData.version = liveData.version + 1;
+                                const affectedRows = await trx(item.targetTable)
+                                    .where('id', item.targetId)
+                                    .where('version', storedEntityVersion)
+                                    .update(dbData);
+
+                                if (affectedRows === 0) {
+                                    throw new GatrixError(
+                                        `Optimistic lock failed: version changed during update (table: ${item.targetTable}, id: ${item.targetId})`,
+                                        409,
+                                        true,
+                                        'CR_DATA_CONFLICT'
+                                    );
+                                }
+                            } else {
+                                // No version column - update without optimistic lock
+                                await trx(item.targetTable).where('id', item.targetId).update(dbData);
                             }
-                            await trx(item.targetTable).where('id', item.targetId).update(dbData);
                         }
 
                         // Will call service after transaction commits
@@ -800,11 +847,26 @@ export class ChangeRequestService {
                                 logger.info(`[ChangeRequest] Updated ChangeItem targetId: ${item.targetId} -> ${realId}`);
                             }
                         } else {
-                            // Increment version on update
-                            if (typeof liveData?.version === 'number') {
+                            // Optimistic locking: increment version and add to WHERE clause
+                            if (typeof liveData?.version === 'number' && storedEntityVersion !== undefined) {
                                 dbData.version = liveData.version + 1;
+                                const affectedRows = await trx(item.targetTable)
+                                    .where('id', item.targetId)
+                                    .where('version', storedEntityVersion)
+                                    .update(dbData);
+
+                                if (affectedRows === 0) {
+                                    throw new GatrixError(
+                                        `Optimistic lock failed: version changed during update (table: ${item.targetTable}, id: ${item.targetId})`,
+                                        409,
+                                        true,
+                                        'CR_DATA_CONFLICT'
+                                    );
+                                }
+                            } else {
+                                // No version column - update without optimistic lock
+                                await trx(item.targetTable).where('id', item.targetId).update(dbData);
                             }
-                            await trx(item.targetTable).where('id', item.targetId).update(dbData);
                         }
                         logger.warn(`[ChangeRequest] No service handler for ${item.targetTable}, events not published`);
                     }
@@ -992,6 +1054,29 @@ export class ChangeRequestService {
                 // Generate inverse ops
                 const inverseOps = generateInverseOps(item.ops);
 
+                // Fetch current live data for proper conflict detection during rollback execution
+                let currentLiveData: Record<string, any> | null = null;
+                let currentVersion: number | undefined;
+
+                if (inverseOpType !== 'CREATE') {
+                    // For UPDATE/DELETE rollback, need to capture current state
+                    try {
+                        currentLiveData = await trx(item.targetTable)
+                            .where('id', item.targetId)
+                            .first();
+                        if (currentLiveData?.version !== undefined) {
+                            currentVersion = currentLiveData.version;
+                        }
+                    } catch (err) {
+                        logger.warn(`[Rollback] Could not fetch live data for ${item.targetTable}:${item.targetId}`, err);
+                    }
+                }
+
+                // Calculate afterData by applying inverse ops to current live data
+                const afterData = inverseOpType === 'DELETE'
+                    ? null
+                    : applyOpsToData(currentLiveData, inverseOps, inverseOpType);
+
                 await ChangeItem.query(trx).insert({
                     id: ulid(),
                     changeRequestId: newCrKey,
@@ -999,8 +1084,11 @@ export class ChangeRequestService {
                     targetTable: item.targetTable,
                     targetId: item.targetId,
                     opType: inverseOpType,
-                    ops: inverseOps
-                });
+                    ops: inverseOps,
+                    beforeData: currentLiveData,
+                    afterData: afterData,
+                    entityVersion: currentVersion
+                } as any);
             }
 
             // Notify
@@ -1125,6 +1213,16 @@ function normalizeForComparison(value: unknown): unknown {
     // Handle Date objects - convert to ISO string for consistent comparison
     if (value instanceof Date) {
         return value.toISOString();
+    }
+
+    // Normalize boolean/number for MySQL TINYINT compatibility
+    // MySQL stores boolean as 0/1, but JS may have true/false
+    if (typeof value === 'boolean') {
+        return value ? 1 : 0;
+    }
+    // Also normalize 0/1 to stay consistent
+    if (typeof value === 'number' && (value === 0 || value === 1)) {
+        return value;
     }
 
     if (Array.isArray(value)) {

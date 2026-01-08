@@ -4931,7 +4931,25 @@
     "show": "Show",
     "hideSuccess": "Environment is now hidden",
     "showSuccess": "Environment is now visible",
-    "toggleVisibilityFailed": "Failed to toggle environment visibility"
+    "toggleVisibilityFailed": "Failed to toggle environment visibility",
+    "changeRequestSettings": "Change Request Settings",
+    "changeRequestSettingsDescription": "Configure whether approval process is required when applying changes in this environment.",
+    "requiredApproversHelperText": "Minimum number of approvers required to approve a change request.",
+    "lockSettings": "Edit Lock Settings",
+    "lockSettingsDescription": "Configure lock features to prevent concurrent editing conflicts. Only available when Change Request is enabled.",
+    "enableSoftLock": "Enable Soft Lock",
+    "enableSoftLockDescription": "Shows a warning when accessing an item being edited by another user. You can take over the edit rights.",
+    "enableHardLock": "Enable Hard Lock Warning",
+    "enableHardLockDescription": "Shows a warning when there is a pending Change Request (CR) for the item. Alerts you to potential conflicts."
+  },
+  "entityLock": {
+    "warning": "{{userName}} ({{userEmail}}) is currently editing this item.",
+    "takeOver": "Take Over Edit",
+    "lockTakenOver": "Edit rights transferred successfully.",
+    "lockAcquired": "Edit rights acquired.",
+    "lockTakenBy": "{{userName}} ({{userEmail}}) has taken over editing.",
+    "pendingCR": "Pending Change Request",
+    "pendingCRDetail": "There is a pending change request '{{crTitle}}' for this item. (ID: {{crId}})"
   },
   "serverLifecycle": {
     "title": "Server LifeCycle Events",
@@ -5199,5 +5217,16 @@
     "CR_DATA_CONFLICT": "A data conflict occurred.",
     "DATA_CONFLICT_DURING_EXECUTION": "Data conflict detected during execution. (Live data has changed)",
     "DUPLICATE_ENTRY_DURING_EXECUTION": "Duplicate entry detected during execution."
+  },
+  "entityLock": {
+    "warning": "Warning: {{userName}} ({{userEmail}}) is currently editing this item.",
+    "warningWithTime": "{{userName}} has been editing since {{lockedAt}}. (Expires at {{expiresAt}})",
+    "takeOver": "Take Over Edit",
+    "takeOverConfirm": "Cancel {{userName}}'s edit and take over?",
+    "pendingCR": "Notice: There is a pending change request for this item.",
+    "pendingCRDetail": "Change request \"{{crTitle}}\" (ID: {{crId}}) is awaiting approval.",
+    "lockAcquired": "Edit lock acquired.",
+    "lockReleased": "Edit lock released.",
+    "lockTakenOver": "Edit taken over successfully."
   }
 }

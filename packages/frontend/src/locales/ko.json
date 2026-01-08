@@ -4966,7 +4966,22 @@
     "toggleVisibilityFailed": "환경 표시 상태 변경에 실패했습니다",
     "changeRequestSettings": "변경 요청 설정",
     "changeRequestSettingsDescription": "이 환경에서 변경사항 적용 시 승인 절차 필요 여부를 설정합니다.",
-    "requiredApproversHelperText": "변경 요청을 승인하기 위해 필요한 최소 승인자 수입니다."
+    "requiredApproversHelperText": "변경 요청을 승인하기 위해 필요한 최소 승인자 수입니다.",
+    "lockSettings": "편집 잠금 설정",
+    "lockSettingsDescription": "동시 편집 충돌 방지를 위한 잠금 기능을 설정합니다. 변경 요청 기능이 활성화된 경우에만 사용할 수 있습니다.",
+    "enableSoftLock": "소프트락 활성화",
+    "enableSoftLockDescription": "다른 사용자가 편집 중인 항목에 접근할 때 경고를 표시합니다. 편집권을 가져올 수 있습니다.",
+    "enableHardLock": "하드락 경고 활성화",
+    "enableHardLockDescription": "해당 항목에 대기 중인 변경 요청(CR)이 있을 때 경고를 표시합니다. 충돌 가능성을 미리 알려줍니다."
+  },
+  "entityLock": {
+    "warning": "{{userName}}({{userEmail}})님이 이 항목을 편집 중입니다.",
+    "takeOver": "편집권 가져오기",
+    "lockTakenOver": "편집권을 가져왔습니다.",
+    "lockAcquired": "편집권을 획득했습니다.",
+    "lockTakenBy": "{{userName}}({{userEmail}})님이 편집권을 가져갔습니다.",
+    "pendingCR": "대기 중인 변경 요청 있음",
+    "pendingCRDetail": "이 항목에 대해 '{{crTitle}}' 변경 요청이 대기 중입니다. (ID: {{crId}})"
   },
   "projects": {
     "title": "프로젝트",
@@ -5192,5 +5207,16 @@
     "CR_DATA_CONFLICT": "데이터 충돌이 발생했습니다.",
     "DATA_CONFLICT_DURING_EXECUTION": "실행 중 데이터 충돌이 감지되었습니다. (라이브 데이터가 변경됨)",
     "DUPLICATE_ENTRY_DURING_EXECUTION": "실행 중 중복 데이터가 감지되었습니다."
+  },
+  "entityLock": {
+    "warning": "경고: 현재 {{userName}}({{userEmail}})님이 이 항목을 편집 중입니다.",
+    "warningWithTime": "{{userName}}님이 {{lockedAt}}부터 편집 중입니다. ({{expiresAt}} 만료 예정)",
+    "takeOver": "편집권 가져오기",
+    "takeOverConfirm": "{{userName}}님의 편집을 취소하고 편집권을 가져오시겠습니까?",
+    "pendingCR": "주의: 이 항목에 대해 대기 중인 변경 요청이 있습니다.",
+    "pendingCRDetail": "변경 요청 \"{{crTitle}}\" (ID: {{crId}})이 승인 대기 중입니다.",
+    "lockAcquired": "편집 잠금이 설정되었습니다.",
+    "lockReleased": "편집 잠금이 해제되었습니다.",
+    "lockTakenOver": "편집권을 가져왔습니다."
   }
 }

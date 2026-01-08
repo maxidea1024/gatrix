@@ -19,6 +19,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Alert,
+  AlertTitle,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -41,6 +43,7 @@ import bannerService, { Banner, Sequence, LoopModeType } from '../../services/ba
 import { generateULID } from '../../utils/ulid';
 import SequenceEditor from './SequenceEditor';
 import BannerPreview from './BannerPreview';
+import { useEntityLock } from '../../hooks/useEntityLock';
 
 interface BannerFormDialogProps {
   open: boolean;
@@ -89,6 +92,14 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
   const [shuffle, setShuffle] = useState(false);
   const [sequences, setSequences] = useState<Sequence[]>([]);
   const [saving, setSaving] = useState(false);
+
+  // Entity Lock for edit mode
+  const { hasLock, lockedBy, pendingCR, forceTakeover } = useEntityLock({
+    table: 'g_banners',
+    entityId: banner?.bannerId || null,
+    isEditing: open && !!banner,
+    // onLockLost is called when lock is taken - toast is now handled by useEntityLock via SSE
+  });
 
   // Accordion expansion states
   const [basicInfoExpanded, setBasicInfoExpanded] = useState(true);
@@ -405,6 +416,28 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           flex: 1,
         }}
       >
+        {/* Lock Warnings */}
+        {banner && lockedBy && !hasLock && (
+          <Alert
+            severity="warning"
+            sx={{ mb: 2 }}
+            action={
+              <Button color="inherit" size="small" onClick={forceTakeover}>
+                {t('entityLock.takeOver')}
+              </Button>
+            }
+          >
+            <AlertTitle>{t('entityLock.warning', { userName: lockedBy.userName, userEmail: lockedBy.userEmail })}</AlertTitle>
+          </Alert>
+        )}
+
+        {banner && pendingCR && (
+          <Alert severity="info" sx={{ mb: 2 }}>
+            <AlertTitle>{t('entityLock.pendingCR')}</AlertTitle>
+            {t('entityLock.pendingCRDetail', { crTitle: pendingCR.crTitle, crId: pendingCR.crId })}
+          </Alert>
+        )}
+
         {/* Basic Info Accordion */}
         <Accordion
           expanded={basicInfoExpanded}

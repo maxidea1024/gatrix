@@ -19,6 +19,8 @@ import {
   Stack,
   Collapse,
   OutlinedInput,
+  Alert,
+  AlertTitle,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -38,6 +40,7 @@ import TargetSettingsGroup from './TargetSettingsGroup';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useHandleApiError } from '../../hooks/useHandleApiError';
 import { showChangeRequestCreatedToast, getActionLabel } from '../../utils/changeRequestToast';
+import { useEntityLock } from '../../hooks/useEntityLock';
 
 interface SurveyFormDialogProps {
   open: boolean;
@@ -60,6 +63,14 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   const { platforms, channels } = usePlatformConfig();
   const { worlds } = useGameWorld();
   const { handleApiError, ErrorDialog } = useHandleApiError();
+
+  // Entity Lock for edit mode
+  const { hasLock, lockedBy, pendingCR, forceTakeover } = useEntityLock({
+    table: 'g_surveys',
+    entityId: survey?.id || null,
+    isEditing: open && !!survey,
+    // onLockLost is called when lock is taken - toast is now handled by useEntityLock via SSE
+  });
 
   // Form state
   const [platformSurveyId, setPlatformSurveyId] = useState('');
@@ -424,6 +435,28 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         }}
       >
         <Stack spacing={3}>
+          {/* Lock Warning */}
+          {survey && lockedBy && !hasLock && (
+            <Alert
+              severity="warning"
+              action={
+                <Button color="inherit" size="small" onClick={forceTakeover}>
+                  {t('entityLock.takeOver')}
+                </Button>
+              }
+            >
+              <AlertTitle>{t('entityLock.warning', { userName: lockedBy.userName, userEmail: lockedBy.userEmail })}</AlertTitle>
+            </Alert>
+          )}
+
+          {/* Pending CR Warning */}
+          {survey && pendingCR && (
+            <Alert severity="info">
+              <AlertTitle>{t('entityLock.pendingCR')}</AlertTitle>
+              {t('entityLock.pendingCRDetail', { crTitle: pendingCR.crTitle, crId: pendingCR.crId })}
+            </Alert>
+          )}
+
           {/* Basic Settings */}
           <Box>
             <FormControlLabel

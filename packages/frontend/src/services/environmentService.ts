@@ -13,6 +13,8 @@ export interface Environment {
   color?: string;
   requiresApproval: boolean; // Change Request approval required
   requiredApprovers: number; // Minimum number of approvers for CR
+  enableSoftLock?: boolean; // Soft lock for concurrent editing
+  enableHardLock?: boolean; // Hard lock warning for pending CRs
   createdAt: string;
   updatedAt: string;
 }
@@ -38,6 +40,8 @@ export interface UpdateEnvironmentData {
   isHidden?: boolean;
   requiresApproval?: boolean; // Change Request approval required
   requiredApprovers?: number; // Minimum number of approvers for CR
+  enableSoftLock?: boolean; // Soft lock for concurrent editing
+  enableHardLock?: boolean; // Hard lock warning for pending CRs
 }
 
 export interface CopyOptions {

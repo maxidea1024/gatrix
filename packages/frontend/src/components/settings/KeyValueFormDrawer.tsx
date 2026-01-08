@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Button,
@@ -305,6 +305,30 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
 
   const isSystemDefined = item?.isSystemDefined || false;
 
+  // Check if form is dirty (has changes)
+  const isDirty = useMemo(() => {
+    // For new items or duplicates, consider dirty if form has values
+    if (!item?.id) return true;
+
+    // Parse original array element type from description
+    let originalArrayElementType: VarValueType | undefined = undefined;
+    if (item.valueType === 'array' && item.description) {
+      const match = item.description.match(/\[elementType:(\w+)\]/);
+      if (match) {
+        originalArrayElementType = match[1] as VarValueType;
+      }
+    }
+    const originalDescription = item.description?.replace(/\[elementType:\w+\]\s*/, '') || '';
+
+    return (
+      formData.varKey !== item.varKey.replace('kv:', '') ||
+      formData.varValue !== (item.varValue || '') ||
+      formData.valueType !== item.valueType ||
+      formData.description !== originalDescription ||
+      formData.arrayElementType !== originalArrayElementType
+    );
+  }, [item, formData]);
+
   return (
     <ResizableDrawer
       open={open}
@@ -456,7 +480,7 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={submitting}
+          disabled={submitting || (!!item?.id && !isDirty)}
         >
           {item?.id ? t('common.update') : t('common.create')}
         </Button>
