@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { PERMISSIONS } from '@/types/permissions';
 import {
@@ -46,10 +47,13 @@ import SurveyConfigDialog from '../../components/game/SurveyConfigDialog';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import RewardDisplay from '../../components/game/RewardDisplay';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import { useHandleApiError } from '../../hooks/useHandleApiError';
 
 const SurveysPage: React.FC = () => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const navigate = useNavigate();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.SURVEYS_MANAGE]);
 
@@ -72,6 +76,7 @@ const SurveysPage: React.FC = () => {
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const { handleApiError, ErrorDialog } = useHandleApiError();
 
   // Default columns for reset
   const defaultColumns: ColumnConfig[] = [
@@ -254,7 +259,7 @@ const SurveysPage: React.FC = () => {
       setSelectedIds([]);
       loadSurveys();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('surveys.deleteFailed'), { variant: 'error' });
+      handleApiError(error, 'surveys.deleteFailed');
     } finally {
       setDeleteConfirmOpen(false);
       setDeletingSurvey(null);
@@ -280,7 +285,7 @@ const SurveysPage: React.FC = () => {
       setSelectedIds([]);
       loadSurveys();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('surveys.bulkDeleteFailed'), { variant: 'error' });
+      handleApiError(error, 'surveys.bulkDeleteFailed');
     } finally {
       setBulkDeleteConfirmOpen(false);
     }
@@ -292,11 +297,15 @@ const SurveysPage: React.FC = () => {
 
   const handleToggleActive = async (survey: Survey) => {
     try {
-      await surveyService.toggleActive(survey.id);
-      enqueueSnackbar(t('surveys.toggleSuccess'), { variant: 'success' });
-      loadSurveys();
+      const result = await surveyService.toggleActive(survey.id);
+      if (result.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+      } else {
+        enqueueSnackbar(t('surveys.toggleSuccess'), { variant: 'success' });
+        loadSurveys();
+      }
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('surveys.toggleFailed'), { variant: 'error' });
+      handleApiError(error, 'surveys.toggleFailed');
     }
   };
 
@@ -718,6 +727,7 @@ const SurveysPage: React.FC = () => {
         message={t('surveys.bulkDeleteConfirmMessage', { count: selectedIds.length })}
         warning={t('surveys.bulkDeleteWarning')}
       />
+      <ErrorDialog />
     </Box>
   );
 };

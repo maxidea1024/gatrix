@@ -41,11 +41,11 @@ export class MessageTemplateModel {
       const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
       const environment = filters.environment;
 
-      console.log('🔍 MessageTemplate query filters:', filters);
+      logger.debug('🔍 MessageTemplate query filters:', { filters });
 
       // 테스트: 테이블에 데이터가 있는지 확인
       const testCount = await db('g_message_templates').where('environment', environment).count('* as count').first();
-      console.log('🔍 Total records in g_message_templates:', testCount);
+      logger.debug('🔍 Total records in g_message_templates:', { testCount });
 
       // 기본 쿼리 빌더 with environment filter
       const baseQuery = () => db('g_message_templates as mt')

@@ -233,7 +233,7 @@ export class AuthController {
           frontendOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
         } catch (e) {
           // Use default if referer parsing fails
-          console.log('Failed to parse referer for pending redirect, using default:', frontendOrigin);
+          logger.debug('Failed to parse referer for pending redirect, using default:', { frontendOrigin });
         }
       }
 
@@ -268,11 +268,11 @@ export class AuthController {
         frontendOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
       } catch (e) {
         // Use default if referer parsing fails
-        console.log('Failed to parse referer, using default frontend origin:', frontendOrigin);
+        logger.debug('Failed to parse referer, using default frontend origin:', { frontendOrigin });
       }
     }
 
-    console.log('🔄 OAuth success redirect:', {
+    logger.debug('🔄 OAuth success redirect:', {
       frontendOrigin,
       referer,
       tokenLength: accessToken.length
@@ -301,14 +301,12 @@ export class AuthController {
         frontendOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
       } catch (e) {
         // Use default if referer parsing fails
-        console.log('Failed to parse referer for failure redirect, using default:', frontendOrigin);
+        logger.debug('Failed to parse referer for failure redirect, using default:', { frontendOrigin });
       }
     }
 
     const redirectUrl = `${frontendOrigin}/login?error=oauth_failed`;
-    console.log('OAuth failure redirect URL:', redirectUrl);
-    console.log('Referer:', referer);
-    console.log('Frontend origin:', frontendOrigin);
+    logger.debug('OAuth failure redirect URL:', { redirectUrl, referer, frontendOrigin });
     res.redirect(redirectUrl);
   });
 

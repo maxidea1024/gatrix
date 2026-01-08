@@ -29,6 +29,7 @@ import {
   FormHelperText,
   FormControlLabel,
   Checkbox,
+  Switch,
 } from '@mui/material';
 import {
   ContentCopy as CopyIcon,
@@ -276,6 +277,8 @@ const EnvironmentsPage: React.FC = () => {
       environmentType: env.environmentType,
       color: env.color || '#2e7d32',
       displayOrder: env.displayOrder,
+      requiresApproval: env.requiresApproval || false,
+      requiredApprovers: env.requiredApprovers || 1,
     });
     setEditDialogOpen(true);
   };
@@ -385,6 +388,7 @@ const EnvironmentsPage: React.FC = () => {
                 <TableCell>{t('environments.description')}</TableCell>
                 <TableCell align="center">{t('environments.isDefault')}</TableCell>
                 <TableCell align="center">{t('environments.isSystemDefined')}</TableCell>
+                <TableCell align="center">{t('environments.requiresApproval')}</TableCell>
                 {canManage && <TableCell align="center">{t('common.visible')}</TableCell>}
                 {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
               </TableRow>
@@ -444,6 +448,13 @@ const EnvironmentsPage: React.FC = () => {
                     </TableCell>
                     <TableCell align="center">
                       {env.isSystemDefined ? <Chip label="✓" color="default" size="small" /> : '-'}
+                    </TableCell>
+                    <TableCell align="center">
+                      {env.requiresApproval ? (
+                        <Chip label={`${env.requiredApprovers || 1}`} color="warning" size="small" />
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">-</Typography>
+                      )}
                     </TableCell>
                     {canManage && (
                       <TableCell align="center">
@@ -608,13 +619,50 @@ const EnvironmentsPage: React.FC = () => {
               </Select>
               <FormHelperText>{t('environments.baseEnvironmentDescription')}</FormHelperText>
             </FormControl>
+
+            {/* Change Request Settings for New Environment */}
+            <Box sx={{ mt: 1, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+                {t('environments.changeRequestSettings')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('environments.changeRequestSettingsDescription')}
+              </Typography>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={newEnv.requiresApproval || false}
+                    onChange={(e) => setNewEnv({ ...newEnv, requiresApproval: e.target.checked })}
+                    color="primary"
+                    disabled={creating}
+                  />
+                }
+                label={t('environments.requiresApproval')}
+              />
+              {newEnv.requiresApproval && (
+                <FormControl fullWidth margin="normal" size="small">
+                  <InputLabel>{t('environments.requiredApprovers')}</InputLabel>
+                  <Select
+                    value={newEnv.requiredApprovers || 1}
+                    label={t('environments.requiredApprovers')}
+                    onChange={(e) => setNewEnv({ ...newEnv, requiredApprovers: Number(e.target.value) })}
+                    disabled={creating}
+                  >
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <MenuItem key={n} value={n}>{n}</MenuItem>
+                    ))}
+                  </Select>
+                  <FormHelperText>{t('environments.requiredApproversHelperText')}</FormHelperText>
+                </FormControl>
+              )}
+            </Box>
           </Box>
 
           {creating && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
               <CircularProgress size={20} />
               <Typography variant="body2" color="text.secondary">
-                {baseEnvironmentId ? t('environments.creatingWithCopy') : t('common.creating')}
+                {baseEnvironment ? t('environments.creatingWithCopy') : t('common.creating')}
               </Typography>
             </Box>
           )}
@@ -823,6 +871,41 @@ const EnvironmentsPage: React.FC = () => {
                 {editEnv.color || '#2e7d32'}
               </Typography>
             </Box>
+          </Box>
+
+          {/* Change Request Settings */}
+          <Box sx={{ mt: 3, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+            <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+              {t('environments.changeRequestSettings')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              {t('environments.changeRequestSettingsDescription')}
+            </Typography>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={editEnv.requiresApproval || false}
+                  onChange={(e) => setEditEnv({ ...editEnv, requiresApproval: e.target.checked })}
+                  color="primary"
+                />
+              }
+              label={t('environments.requiresApproval')}
+            />
+            {editEnv.requiresApproval && (
+              <FormControl fullWidth margin="normal" size="small">
+                <InputLabel>{t('environments.requiredApprovers')}</InputLabel>
+                <Select
+                  value={editEnv.requiredApprovers || 1}
+                  label={t('environments.requiredApprovers')}
+                  onChange={(e) => setEditEnv({ ...editEnv, requiredApprovers: Number(e.target.value) })}
+                >
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <MenuItem key={n} value={n}>{n}</MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText>{t('environments.requiredApproversHelperText')}</FormHelperText>
+              </FormControl>
+            )}
           </Box>
 
           {updating && (

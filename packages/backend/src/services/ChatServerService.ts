@@ -4,15 +4,7 @@ import { createLogger } from '../config/logger';
 
 const logger = createLogger('ChatServerService');
 
-interface ChatServerTokenResponse {
-  success: boolean;
-  data: {
-    token: string;
-    expiresIn: string;
-    permissions: string[];
-    serverId: string;
-  };
-}
+
 
 interface UserData {
   id: number;
@@ -52,7 +44,7 @@ export class ChatServerService {
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       (error) => {
-        console.error('Chat Server API Error:', {
+        logger.error('Chat Server API Error:', {
           url: error.config?.url,
           method: error.config?.method,
           status: error.response?.status,
@@ -81,7 +73,7 @@ export class ChatServerService {
    */
   async syncUser(userData: UserData): Promise<void> {
     try {
-      console.log(`🔄 Syncing user ${userData.id} (${userData.username}) to Chat Server...`);
+      logger.info(`🔄 Syncing user ${userData.id} (${userData.username}) to Chat Server...`);
 
       const response = await this.axiosInstance.post(
         '/api/v1/users/upsert',
@@ -92,9 +84,9 @@ export class ChatServerService {
         throw new Error(`Chat Server responded with error: ${response.data.error?.message}`);
       }
 
-      console.log(`✅ User ${userData.id} synced successfully to Chat Server`);
+      logger.info(`✅ User ${userData.id} synced successfully to Chat Server`);
     } catch (error: any) {
-      console.error(`❌ Failed to sync user ${userData.id} to Chat Server:`, error.message);
+      logger.error(`❌ Failed to sync user ${userData.id} to Chat Server:`, { message: error.message });
       throw error;
     }
   }
@@ -115,7 +107,7 @@ export class ChatServerService {
       }
     } catch (error) {
       // 확인 실패하면 동기화 시도
-      console.log(`🔍 Could not check user existence, proceeding with sync...`);
+      logger.debug(`🔍 Could not check user existence, proceeding with sync...`);
     }
 
     // 사용자가 없거나 확인 실패한 경우 동기화
@@ -126,7 +118,7 @@ export class ChatServerService {
    * 여러 사용자를 한 번에 동기화 (개선된 bulk 처리)
    */
   async syncUsers(users: UserData[]): Promise<void> {
-    console.log(`🔄 Bulk syncing ${users.length} users to Chat Server...`);
+    logger.info(`🔄 Bulk syncing ${users.length} users to Chat Server...`);
 
     try {
       const response = await this.axiosInstance.post(
@@ -138,21 +130,21 @@ export class ChatServerService {
         throw new Error(`Chat Server responded with error: ${response.data.error?.message}`);
       }
 
-      console.log(`✅ Bulk synced ${users.length} users successfully to Chat Server`);
+      logger.info(`✅ Bulk synced ${users.length} users successfully to Chat Server`);
     } catch (error: any) {
-      console.error(`❌ Failed to bulk sync users to Chat Server:`, error.message);
+      logger.error(`❌ Failed to bulk sync users to Chat Server:`, { message: error.message });
 
       // Fallback to individual sync if bulk fails
-      console.log(`🔄 Falling back to individual sync...`);
+      logger.info(`🔄 Falling back to individual sync...`);
       const results = await Promise.allSettled(
         users.map(user => this.syncUser(user))
       );
 
       const failed = results.filter(result => result.status === 'rejected');
       if (failed.length > 0) {
-        console.error(`❌ Failed to sync ${failed.length} out of ${users.length} users`);
+        logger.error(`❌ Failed to sync ${failed.length} out of ${users.length} users`);
       } else {
-        console.log(`✅ All ${users.length} users synced successfully (fallback)`);
+        logger.info(`✅ All ${users.length} users synced successfully (fallback)`);
       }
     }
   }
@@ -171,9 +163,9 @@ export class ChatServerService {
         throw new Error(`Chat Server responded with error: ${response.data.error?.message}`);
       }
 
-      console.log(`✅ User ${userId} status updated to ${status}`);
+      logger.info(`✅ User ${userId} status updated to ${status}`);
     } catch (error: any) {
-      console.error(`❌ Failed to update user ${userId} status:`, error.message);
+      logger.error(`❌ Failed to update user ${userId} status:`, { message: error.message });
       throw error;
     }
   }
@@ -191,9 +183,9 @@ export class ChatServerService {
         throw new Error(`Chat Server responded with error: ${response.data.error?.message}`);
       }
 
-      console.log(`✅ User ${userId} deleted from Chat Server`);
+      logger.info(`✅ User ${userId} deleted from Chat Server`);
     } catch (error: any) {
-      console.error(`❌ Failed to delete user ${userId} from Chat Server:`, error.message);
+      logger.error(`❌ Failed to delete user ${userId} from Chat Server:`, { message: error.message });
       throw error;
     }
   }

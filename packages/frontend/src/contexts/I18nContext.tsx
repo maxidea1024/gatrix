@@ -82,7 +82,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
       localStorage.setItem('i18nextLng', legacy);
       i18nInstance.changeLanguage(legacy as Language);
     }
-  } catch {}
+  } catch { }
 
   const changeLanguage = async (lang: Language) => {
     // 프론트엔드 언어 변경
@@ -135,6 +135,7 @@ export const useTranslations = () => {
     // Common translations
     common: {
       loading: t('common.loading'),
+      loadFailed: t('common.loadFailed'),
       error: t('common.error'),
       success: t('common.success'),
       warning: t('common.warning'),

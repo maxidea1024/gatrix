@@ -51,6 +51,10 @@ import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import StoreProductFormDrawer from '../../components/game/StoreProductFormDrawer';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import { useNavigate } from 'react-router-dom';
+import { useHandleApiError } from '../../hooks/useHandleApiError';
 
 // Store display names
 const STORE_DISPLAY_NAMES: Record<string, string> = {
@@ -65,7 +69,8 @@ const STORE_DISPLAY_NAMES: Record<string, string> = {
 
 const StoreProductsPage: React.FC = () => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const navigate = useNavigate();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.STORE_PRODUCTS_MANAGE]);
 
@@ -94,6 +99,7 @@ const StoreProductsPage: React.FC = () => {
 
   // Batch process state
   const [batchProcessDialogOpen, setBatchProcessDialogOpen] = useState(false);
+  const { handleApiError, ErrorDialog } = useHandleApiError();
 
   // Stats state
   const [productStats, setProductStats] = useState<StoreProductStats>({ total: 0, active: 0, inactive: 0 });
@@ -534,7 +540,7 @@ const StoreProductsPage: React.FC = () => {
       loadProducts();
       loadStats();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('storeProducts.deleteFailed'), { variant: 'error' });
+      handleApiError(error, 'storeProducts.deleteFailed');
     } finally {
       setDeleteConfirmOpen(false);
       setDeletingProduct(null);
@@ -561,7 +567,7 @@ const StoreProductsPage: React.FC = () => {
       loadProducts();
       loadStats();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('storeProducts.bulkDeleteFailed'), { variant: 'error' });
+      handleApiError(error, 'storeProducts.bulkDeleteFailed');
     } finally {
       setBulkDeleteConfirmOpen(false);
     }
@@ -575,41 +581,53 @@ const StoreProductsPage: React.FC = () => {
   const handleBulkActivate = async () => {
     if (selectedIds.length === 0) return;
     try {
-      await storeProductService.bulkUpdateActiveStatus(selectedIds, true);
-      enqueueSnackbar(t('storeProducts.bulkActivateSuccess'), { variant: 'success' });
-      setSelectedIds([]);
-      loadProducts();
-      loadStats();
+      const result = await storeProductService.bulkUpdateActiveStatus(selectedIds, true);
+      if (result.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+      } else {
+        enqueueSnackbar(t('storeProducts.bulkActivateSuccess'), { variant: 'success' });
+        setSelectedIds([]);
+        loadProducts();
+        loadStats();
+      }
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('storeProducts.bulkActivateFailed'), { variant: 'error' });
+      handleApiError(error, 'storeProducts.bulkActivateFailed');
     }
   };
 
   const handleBulkDeactivate = async () => {
     if (selectedIds.length === 0) return;
     try {
-      await storeProductService.bulkUpdateActiveStatus(selectedIds, false);
-      enqueueSnackbar(t('storeProducts.bulkDeactivateSuccess'), { variant: 'success' });
-      setSelectedIds([]);
-      loadProducts();
-      loadStats();
+      const result = await storeProductService.bulkUpdateActiveStatus(selectedIds, false);
+      if (result.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+      } else {
+        enqueueSnackbar(t('storeProducts.bulkDeactivateSuccess'), { variant: 'success' });
+        setSelectedIds([]);
+        loadProducts();
+        loadStats();
+      }
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('storeProducts.bulkDeactivateFailed'), { variant: 'error' });
+      handleApiError(error, 'storeProducts.bulkDeactivateFailed');
     }
   };
 
   // Toggle active status
   const handleToggleActive = async (product: StoreProduct) => {
     try {
-      await storeProductService.toggleActive(product.id, !product.isActive);
-      enqueueSnackbar(
-        product.isActive ? t('storeProducts.deactivated') : t('storeProducts.activated'),
-        { variant: 'success' }
-      );
-      loadProducts();
-      loadStats();
+      const result = await storeProductService.toggleActive(product.id, !product.isActive);
+      if (result.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+      } else {
+        enqueueSnackbar(
+          product.isActive ? t('storeProducts.deactivated') : t('storeProducts.activated'),
+          { variant: 'success' }
+        );
+        loadProducts();
+        loadStats();
+      }
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('common.saveFailed'), { variant: 'error' });
+      handleApiError(error, 'common.saveFailed');
     }
   };
 
@@ -1242,6 +1260,7 @@ const StoreProductsPage: React.FC = () => {
         onExecute={handleBatchProcessExecute}
         onGetCount={handleBatchProcessGetCount}
       />
+      <ErrorDialog />
     </Box>
   );
 };

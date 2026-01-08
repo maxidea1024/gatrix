@@ -88,6 +88,7 @@ import TimezoneSelector from '../common/TimezoneSelector';
 import EnvironmentSelector from '@/components/EnvironmentSelector';
 import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceService';
 import { useSSENotifications } from '@/hooks/useSSENotifications';
+import changeRequestService from '@/services/changeRequestService';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { computeMaintenanceStatus, getMaintenanceStatusDisplay, MaintenanceStatusType } from '@/utils/maintenanceStatusUtils';
@@ -202,7 +203,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const { toggleTheme, mode, isDark } = useCustomTheme();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const { environments, isLoading: environmentsLoading } = useEnvironment();
+  const { environments, isLoading: environmentsLoading, currentEnvironmentId, currentEnvironment } = useEnvironment();
+
+  // Pending CR count for banner
+  const [pendingCRCount, setPendingCRCount] = useState(0);
 
   // Check if admin user has environment access
   const hasEnvironmentAccess = isAdmin() && !environmentsLoading && environments.length > 0;
@@ -245,18 +249,23 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   // Get filtered menu categories
   const getFilteredMenuCategories = useCallback((): MenuCategory[] => {
-    const categories = getMenuCategories(isAdmin());
+    const categories = getMenuCategories(isAdmin(), {
+      'sidebar.changeRequests': pendingCRCount
+    }, {
+      requiresApproval: currentEnvironment?.requiresApproval
+    });
     return categories.map(category => ({
       ...category,
       children: filterMenuItems(category.children)
     })).filter(category => category.children.length > 0);
-  }, [isAdmin, filterMenuItems]);
+  }, [isAdmin, filterMenuItems, pendingCRCount, currentEnvironment]);
 
   // Mail notification state
   const [unreadMailCount, setUnreadMailCount] = useState(0);
 
   // Role/Permission change dialog state
   const [roleChangeDialogOpen, setRoleChangeDialogOpen] = useState(false);
+
 
   // Handle role/permission change notification
   useEffect(() => {
@@ -292,6 +301,71 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       window.removeEventListener('user-suspended', handleUserSuspended as EventListener);
     };
   }, [user?.id, navigate]);
+
+  // Handle change request notifications
+  useEffect(() => {
+    const handleCRNotification = (event: CustomEvent) => {
+      const { action, title, requesterName, approverName, rejectorName } = event.detail || {};
+
+      switch (action) {
+        case 'submitted':
+          enqueueSnackbar(t('notifications.changeRequest.submitted', { title, requester: requesterName || 'Unknown' }), {
+            variant: 'info',
+            autoHideDuration: 8000,
+            action: () => (
+              <IconButton size="small" color="inherit" onClick={() => navigate('/admin/change-requests?status=open')}>
+                <ArrowBackIcon sx={{ transform: 'rotate(180deg)' }} />
+              </IconButton>
+            ),
+          });
+          break;
+        case 'approved':
+          enqueueSnackbar(t('notifications.changeRequest.approved', { title, approver: approverName || 'Unknown' }), {
+            variant: 'success',
+            autoHideDuration: 5000,
+          });
+          break;
+        case 'rejected':
+          enqueueSnackbar(t('notifications.changeRequest.rejected', { title, rejector: rejectorName || 'Unknown' }), {
+            variant: 'warning',
+            autoHideDuration: 5000,
+          });
+          break;
+        case 'executed':
+          enqueueSnackbar(t('notifications.changeRequest.executed', { title }), {
+            variant: 'success',
+            autoHideDuration: 5000,
+          });
+          break;
+      }
+      // Refresh pending CR count when CR is submitted
+      if (action === 'submitted' || action === 'approved' || action === 'rejected' || action === 'executed') {
+        loadPendingCRCount();
+      }
+    };
+
+    window.addEventListener('change-request-notification', handleCRNotification as EventListener);
+    return () => {
+      window.removeEventListener('change-request-notification', handleCRNotification as EventListener);
+    };
+  }, [enqueueSnackbar, t, navigate]);
+
+  // Load pending CR count
+  const loadPendingCRCount = useCallback(async () => {
+    try {
+      const response = await changeRequestService.getMyRequests();
+      setPendingCRCount(response?.pendingApproval?.length || 0);
+    } catch (error) {
+      // Silently fail - don't spam errors for optional feature
+    }
+  }, []);
+
+  // Load pending CR count on mount and environment change
+  useEffect(() => {
+    if (hasEnvironmentAccess) {
+      loadPendingCRCount();
+    }
+  }, [hasEnvironmentAccess, currentEnvironmentId, loadPendingCRCount]);
 
   // Handle role change dialog confirmation
   const handleRoleChangeConfirm = useCallback(async () => {
@@ -706,12 +780,29 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         minWidth: 40,
                         justifyContent: 'center'
                       }}>
-                        {child.icon}
+                        {sidebarCollapsed ? (
+                          <Badge badgeContent={child.badge} color="primary">
+                            {child.icon}
+                          </Badge>
+                        ) : (
+                          child.icon
+                        )}
                       </ListItemIcon>
-                      <ListItemText
-                        primary={t(child.text)}
-                        primaryTypographyProps={{ fontSize: '0.875rem' }}
-                      />
+                      {!sidebarCollapsed && (
+                        <>
+                          <ListItemText
+                            primary={t(child.text)}
+                            primaryTypographyProps={{ fontSize: '0.875rem' }}
+                          />
+                          {child.badge && (
+                            <Badge
+                              badgeContent={child.badge}
+                              color="primary"
+                              sx={{ ml: 1, '& .MuiBadge-badge': { fontSize: '0.625rem' } }}
+                            />
+                          )}
+                        </>
+                      )}
                     </ListItemButton>
                   );
                 })}
@@ -941,11 +1032,21 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 <ListItemButton
                   key={category.id}
                   onClick={() => {
-                    setSelectedCategory(category.id);
-                    try {
-                      localStorage.setItem('sidebarSelectedCategory', category.id);
-                    } catch (error) {
-                      console.warn('Failed to save selected category:', error);
+                    if (category.path) {
+                      navigate(category.path);
+                      setSelectedCategory(null);
+                      try {
+                        localStorage.removeItem('sidebarSelectedCategory');
+                      } catch (error) {
+                        console.warn('Failed to clear selected category:', error);
+                      }
+                    } else {
+                      setSelectedCategory(category.id);
+                      try {
+                        localStorage.setItem('sidebarSelectedCategory', category.id);
+                      } catch (error) {
+                        console.warn('Failed to save selected category:', error);
+                      }
                     }
                   }}
                   sx={{
@@ -968,16 +1069,31 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     minWidth: sidebarCollapsed ? 0 : 40,
                     justifyContent: 'center'
                   }}>
-                    {category.icon}
+                    {sidebarCollapsed ? (
+                      <Badge badgeContent={category.badge} color="primary">
+                        {category.icon}
+                      </Badge>
+                    ) : (
+                      category.icon
+                    )}
                   </ListItemIcon>
                   {!sidebarCollapsed && (
-                    <ListItemText
-                      primary={t(category.text)}
-                      primaryTypographyProps={{
-                        fontSize: '0.875rem',
-                        fontWeight: 500
-                      }}
-                    />
+                    <>
+                      <ListItemText
+                        primary={t(category.text)}
+                        primaryTypographyProps={{
+                          fontSize: '0.875rem',
+                          fontWeight: 500
+                        }}
+                      />
+                      {category.badge && (
+                        <Badge
+                          badgeContent={category.badge}
+                          color="primary"
+                          sx={{ ml: 1, '& .MuiBadge-badge': { fontSize: '0.625rem' } }}
+                        />
+                      )}
+                    </>
                   )}
                 </ListItemButton>
               );
@@ -1658,6 +1774,33 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             </Box>
           </Toolbar>
         </AppBar>
+
+        {/* Pending CR Review Banner - only show when CR is enabled for current environment */}
+        {currentEnvironment?.requiresApproval && pendingCRCount > 0 && !location.pathname.startsWith('/admin/change-requests') && (
+          <Box
+            onClick={() => navigate('/admin/change-requests?status=open')}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
+              px: 2,
+              py: 1,
+              bgcolor: 'info.main',
+              color: 'info.contrastText',
+              cursor: 'pointer',
+              '&:hover': {
+                bgcolor: 'info.dark',
+              },
+              transition: 'background-color 0.2s',
+            }}
+          >
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+              {t('changeRequest.pendingReviewBanner', { count: pendingCRCount })}
+            </Typography>
+            <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 18 }} />
+          </Box>
+        )}
 
         {/* 메인 컨텐츠 */}
         <Box

@@ -53,13 +53,15 @@ import SimplePagination from '../../components/common/SimplePagination';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
-import { formatDateTime } from '../../utils/dateFormat';
+import { formatDateTime, formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
+import { useI18n } from '../../contexts/I18nContext';
 import { useDebounce } from '../../hooks/useDebounce';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 
 const ServiceNoticesPage: React.FC = () => {
   const { t } = useTranslation();
+  const { language } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const { currentEnvironment } = useEnvironment();
@@ -774,21 +776,27 @@ const ServiceNoticesPage: React.FC = () => {
                         if (column.id === 'period') {
                           return (
                             <TableCell key={column.id}>
-                              <Typography variant="caption" display="block">
-                                {notice.startDate ? formatDateTime(notice.startDate) : t('serviceNotices.startImmediately')}
-                              </Typography>
-                              <Typography variant="caption" display="block" color="text.secondary">
-                                ~ {notice.endDate ? formatDateTime(notice.endDate) : t('serviceNotices.permanent')}
-                              </Typography>
+                              <Tooltip title={notice.startDate ? formatDateTimeDetailed(notice.startDate) : t('serviceNotices.startImmediately')}>
+                                <Typography variant="caption" display="block">
+                                  {notice.startDate ? formatRelativeTime(notice.startDate, undefined, language) : t('serviceNotices.startImmediately')}
+                                </Typography>
+                              </Tooltip>
+                              <Tooltip title={notice.endDate ? formatDateTimeDetailed(notice.endDate) : t('serviceNotices.permanent')}>
+                                <Typography variant="caption" display="block" color="text.secondary">
+                                  ~ {notice.endDate ? formatRelativeTime(notice.endDate, undefined, language) : t('serviceNotices.permanent')}
+                                </Typography>
+                              </Tooltip>
                             </TableCell>
                           );
                         }
                         if (column.id === 'createdAt') {
                           return (
                             <TableCell key={column.id}>
-                              <Typography variant="caption">
-                                {formatDateTime(notice.createdAt)}
-                              </Typography>
+                              <Tooltip title={formatDateTimeDetailed(notice.createdAt)}>
+                                <Typography variant="caption">
+                                  {formatRelativeTime(notice.createdAt, undefined, language)}
+                                </Typography>
+                              </Tooltip>
                             </TableCell>
                           );
                         }

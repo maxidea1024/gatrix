@@ -2,9 +2,6 @@ import { BaseJob, JobExecutionResult } from './JobFactory';
 import logger from '../../config/logger';
 import knex from '../../config/knex';
 
-interface CampaignCheckJobData {
-  // No specific data needed for campaign check
-}
 
 export class CampaignCheckJob extends BaseJob {
   async execute(): Promise<JobExecutionResult> {
@@ -49,7 +46,7 @@ export class CampaignCheckJob extends BaseJob {
       const campaignsToStart = await knex('g_remote_config_campaigns')
         .where('isActive', true)
         .whereIn('status', ['draft', 'scheduled'])
-        .where(function() {
+        .where(function () {
           this.whereNull('startDate').orWhere('startDate', '<=', now);
         });
 

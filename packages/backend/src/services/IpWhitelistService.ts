@@ -6,7 +6,6 @@ import {
   IpWhitelistFilters,
   IpWhitelistListResponse
 } from '../models/IpWhitelist';
-import { Environment } from '../models/Environment';
 import { GatrixError } from '../middleware/errorHandler';
 import { normalizeIPOrCIDR, isValidIPOrCIDR } from '../utils/ipValidation';
 import logger from '../config/logger';

@@ -1,7 +1,6 @@
 import { EventEmitter } from 'events';
 import { Queue, Worker, Job } from 'bullmq';
 import { createClient, RedisClientType } from 'redis';
-import { ulid } from 'ulid';
 import { config } from '../config';
 import redisClient from '../config/redis';
 import logger from '../config/logger';

@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { asyncHandler } from '../middleware/errorHandler';
 import BannerService from '../services/BannerService';
+import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
 
 export class BannerController {
   /**
@@ -53,24 +54,46 @@ export class BannerController {
   static createBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { name, description, width, height, metadata, playbackSpeed, sequences } = req.body;
     const environment = req.environment || 'development';
+    const userId = req.user?.userId;
 
-    const banner = await BannerService.createBanner({
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.requestCreation(
+      userId!,
       environment,
-      name,
-      description,
-      width,
-      height,
-      metadata,
-      playbackSpeed,
-      sequences,
-      createdBy: req.user?.userId,
-    });
+      'g_banners',
+      { name, description, width, height, metadata, playbackSpeed, sequences, environment, createdBy: userId },
+      async () => {
+        const banner = await BannerService.createBanner({
+          environment,
+          name,
+          description,
+          width,
+          height,
+          metadata,
+          playbackSpeed,
+          sequences,
+          createdBy: userId,
+        });
+        return banner;
+      }
+    );
 
-    res.status(201).json({
-      success: true,
-      data: { banner },
-      message: 'Banner created successfully',
-    });
+    if (gatewayResult.mode === 'DIRECT') {
+      res.status(201).json({
+        success: true,
+        data: { banner: gatewayResult.data },
+        message: 'Banner created successfully',
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. The banner will be created after approval.',
+      });
+    }
   });
 
   /**
@@ -81,23 +104,37 @@ export class BannerController {
     const { bannerId } = req.params;
     const { name, description, width, height, metadata, playbackSpeed, sequences } = req.body;
     const environment = req.environment || 'development';
+    const userId = req.user?.userId;
 
-    const banner = await BannerService.updateBanner(bannerId, environment, {
-      name,
-      description,
-      width,
-      height,
-      metadata,
-      playbackSpeed,
-      sequences,
-      updatedBy: req.user?.userId,
-    });
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.processChange(
+      userId!,
+      environment,
+      'g_banners',
+      bannerId,
+      { name, description, width, height, metadata, playbackSpeed, sequences, updatedBy: userId },
+      async () => {
+        const banner = await BannerService.getBannerById(bannerId, environment);
+        return { banner };
+      }
+    );
 
-    res.json({
-      success: true,
-      data: { banner },
-      message: 'Banner updated successfully',
-    });
+    if (gatewayResult.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        data: gatewayResult.data,
+        message: 'Banner updated successfully',
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. The update will be applied after approval.',
+      });
+    }
   });
 
   /**
@@ -107,13 +144,34 @@ export class BannerController {
   static deleteBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
     const environment = req.environment || 'development';
+    const userId = req.user?.userId;
 
-    await BannerService.deleteBanner(bannerId, environment);
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.requestDeletion(
+      userId!,
+      environment,
+      'g_banners',
+      bannerId,
+      async () => {
+        await BannerService.deleteBanner(bannerId, environment);
+      }
+    );
 
-    res.json({
-      success: true,
-      message: 'Banner deleted successfully',
-    });
+    if (gatewayResult.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        message: 'Banner deleted successfully',
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. The deletion will be applied after approval.',
+      });
+    }
   });
 
   /**
@@ -123,14 +181,37 @@ export class BannerController {
   static publishBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
     const environment = req.environment || 'development';
+    const userId = req.user?.userId;
 
-    const banner = await BannerService.publishBanner(bannerId, environment, req.user?.userId);
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.processChange(
+      userId!,
+      environment,
+      'g_banners',
+      bannerId,
+      { status: 'published', updatedBy: userId },
+      async () => {
+        const banner = await BannerService.getBannerById(bannerId, environment);
+        return { banner };
+      }
+    );
 
-    res.json({
-      success: true,
-      data: { banner },
-      message: 'Banner published successfully',
-    });
+    if (gatewayResult.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        data: gatewayResult.data,
+        message: 'Banner published successfully',
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. The publish action will be applied after approval.',
+      });
+    }
   });
 
   /**
@@ -140,14 +221,37 @@ export class BannerController {
   static archiveBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
     const environment = req.environment || 'development';
+    const userId = req.user?.userId;
 
-    const banner = await BannerService.archiveBanner(bannerId, environment, req.user?.userId);
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.processChange(
+      userId!,
+      environment,
+      'g_banners',
+      bannerId,
+      { status: 'archived', updatedBy: userId },
+      async () => {
+        const banner = await BannerService.getBannerById(bannerId, environment);
+        return { banner };
+      }
+    );
 
-    res.json({
-      success: true,
-      data: { banner },
-      message: 'Banner archived successfully',
-    });
+    if (gatewayResult.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        data: gatewayResult.data,
+        message: 'Banner archived successfully',
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. The archive action will be applied after approval.',
+      });
+    }
   });
 
   /**
@@ -157,14 +261,36 @@ export class BannerController {
   static duplicateBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
     const environment = req.environment || 'development';
+    const userId = req.user?.userId;
 
-    const banner = await BannerService.duplicateBanner(bannerId, environment, req.user?.userId);
+    // Use UnifiedChangeGateway for CR support (Creation)
+    const gatewayResult = await UnifiedChangeGateway.requestCreation(
+      userId!,
+      environment,
+      'g_banners',
+      { duplicateFrom: bannerId, environment, createdBy: userId },
+      async () => {
+        const banner = await BannerService.duplicateBanner(bannerId, environment, userId);
+        return banner;
+      }
+    );
 
-    res.json({
-      success: true,
-      data: { banner },
-      message: 'Banner duplicated successfully',
-    });
+    if (gatewayResult.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        data: { banner: gatewayResult.data },
+        message: 'Banner duplicated successfully',
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. The duplication will be applied after approval.',
+      });
+    }
   });
 }
 

@@ -1,6 +1,7 @@
 {
     "name": "@gatrix/shared",
     "version": "1.0.0",
+    "license": "UNLICENSED",
     "description": "Shared types, constants, and utilities for Gatrix packages",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   Button,
   TextField,
@@ -32,6 +32,11 @@ import {
 import ResizableDrawer from '../common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { useNavigate } from 'react-router-dom';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import { getActionLabel } from '../../utils/changeRequestToast';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 import bannerService, { Banner, Sequence, LoopModeType } from '../../services/bannerService';
 import { generateULID } from '../../utils/ulid';
 import SequenceEditor from './SequenceEditor';
@@ -69,7 +74,10 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
   banner,
 }) => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
 
   // Form state
   const [name, setName] = useState('');
@@ -142,6 +150,51 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
       setHistoryIndex(0);
     }
   }, [banner, open, getSizePresetValue]);
+
+  // Check if form is dirty (data changed)
+  const isDirty = useMemo(() => {
+    if (!banner) return true;
+
+    const currentData = {
+      name: name.trim(),
+      description: description.trim() || '',
+      width,
+      height,
+      playbackSpeed,
+      shuffle: !!shuffle,
+      sequences: sequences.map(s => ({
+        name: s.name,
+        speedMultiplier: s.speedMultiplier,
+        loopMode: s.loopMode,
+        frames: (s.frames || []).map(f => ({
+          imageUrl: f.imageUrl,
+          delay: f.delay,
+          link: f.link || '',
+        })),
+      })),
+    };
+
+    const originalData = {
+      name: banner.name.trim(),
+      description: banner.description?.trim() || '',
+      width: banner.width,
+      height: banner.height,
+      playbackSpeed: banner.playbackSpeed,
+      shuffle: !!banner.shuffle,
+      sequences: (banner.sequences || []).map(s => ({
+        name: s.name,
+        speedMultiplier: s.speedMultiplier,
+        loopMode: s.loopMode,
+        frames: (s.frames || []).map(f => ({
+          imageUrl: f.imageUrl,
+          delay: f.delay,
+          link: f.link || '',
+        })),
+      })),
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [banner, name, description, width, height, playbackSpeed, shuffle, sequences]);
 
   // Focus name input when dialog opens
   useEffect(() => {
@@ -259,7 +312,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
     setSaving(true);
     try {
       if (banner) {
-        await bannerService.updateBanner(banner.bannerId, {
+        const result = await bannerService.updateBanner(banner.bannerId, {
           name,
           description,
           width,
@@ -268,9 +321,13 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           shuffle,
           sequences,
         });
-        enqueueSnackbar(t('banners.updateSuccess'), { variant: 'success' });
+        if (result.isChangeRequest) {
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+        } else {
+          enqueueSnackbar(t('banners.updateSuccess'), { variant: 'success' });
+        }
       } else {
-        await bannerService.createBanner({
+        const result = await bannerService.createBanner({
           name,
           description,
           width,
@@ -279,7 +336,11 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           shuffle,
           sequences,
         });
-        enqueueSnackbar(t('banners.createSuccess'), { variant: 'success' });
+        if (result.isChangeRequest) {
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+        } else {
+          enqueueSnackbar(t('banners.createSuccess'), { variant: 'success' });
+        }
       }
       onSave();
     } catch (error: any) {
@@ -290,7 +351,8 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
       } else if (errorCode === 'INVALID_NAME_FORMAT') {
         enqueueSnackbar(t('banners.nameInvalidFormat'), { variant: 'error' });
       } else {
-        enqueueSnackbar(error.message || t('banners.saveFailed'), { variant: 'error' });
+        const fallbackKey = currentEnvironment?.requiresApproval ? 'banners.requestSaveFailed' : 'banners.saveFailed';
+        enqueueSnackbar(parseApiErrorMessage(error, fallbackKey), { variant: 'error' });
       }
     } finally {
       setSaving(false);
@@ -621,8 +683,8 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
       <Divider />
       <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
         <Button onClick={onClose}>{t('common.cancel')}</Button>
-        <Button variant="contained" onClick={handleSave} disabled={saving}>
-          {saving ? t('common.saving') : (isEditing ? t('common.save') : t('common.create'))}
+        <Button variant="contained" onClick={handleSave} disabled={saving || (!!banner && !isDirty)}>
+          {saving ? t('common.saving') : getActionLabel(isEditing ? 'update' : 'create', requiresApproval, t)}
         </Button>
       </Box>
     </ResizableDrawer>

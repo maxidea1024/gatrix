@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { AuthenticatedRequest } from '../types/auth';
 import { RemoteConfigModel } from '../models/RemoteConfig';
 import SegmentModel from '../models/Segment';
 import { pubSubService } from '../services/PubSubService';
@@ -10,8 +11,10 @@ import {
   UpdateRemoteConfigData,
   RemoteConfigFilters,
   PublishRequest,
-  RollbackRequest
+  RollbackRequest,
+  ConfigValueType
 } from '../types/remoteConfig';
+import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
 
 export class RemoteConfigController {
   /**
@@ -33,7 +36,7 @@ export class RemoteConfigController {
       const filters: RemoteConfigFilters = {
         environment: (req.query.environment as string) || 'development',
         search: req.query.search as string,
-        valueType: req.query.valueType as any,
+        valueType: req.query.valueType as ConfigValueType,
         isActive: isActiveFilter,
         createdBy: req.query.createdBy ? parseInt(req.query.createdBy as string) : undefined,
         sortBy: req.query.sortBy as string,
@@ -85,7 +88,7 @@ export class RemoteConfigController {
    */
   static async create(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).user?.id;
+      const userId = (req as AuthenticatedRequest).user?.id || 0;
       const environment = req.body.environment || 'development';
 
       const data: CreateRemoteConfigData = {
@@ -112,19 +115,42 @@ export class RemoteConfigController {
         throw new GatrixError('Remote config with this key already exists', 409);
       }
 
-      const config = await RemoteConfigModel.create({ ...data, environment });
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.requestCreation(
+        userId,
+        environment,
+        'g_remote_configs',
+        { ...data, environment },
+        async () => {
+          const config = await RemoteConfigModel.create({ ...data, environment });
 
-      // Send notification via PubSub (multi-instance)
-      await pubSubService.publishNotification({
-        type: 'remote_config_change',
-        data: { configId: config.id, action: 'created', config },
-        targetChannels: ['remote_config', 'admin']
-      });
+          // Send notification via PubSub (multi-instance)
+          await pubSubService.publishNotification({
+            type: 'remote_config_change',
+            data: { configId: config.id, action: 'created', config },
+            targetChannels: ['remote_config', 'admin']
+          });
 
-      res.status(201).json({
-        success: true,
-        data: { config }
-      });
+          return { config };
+        }
+      );
+
+      if (gatewayResult.mode === 'DIRECT') {
+        res.status(201).json({
+          success: true,
+          data: gatewayResult.data,
+          message: 'Remote config created successfully'
+        });
+      } else {
+        res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message: 'Change request created. The remote config will be created after approval.',
+        });
+      }
     } catch (error) {
       logger.error('Error in RemoteConfigController.create:', error);
       if (error instanceof GatrixError) {
@@ -140,7 +166,7 @@ export class RemoteConfigController {
   static async update(req: Request, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id);
-      const userId = (req as any).user?.id;
+      const userId = (req as AuthenticatedRequest).user?.id || 0;
       const environment = req.body.environment || 'development';
 
       const data: UpdateRemoteConfigData = {
@@ -166,23 +192,43 @@ export class RemoteConfigController {
         }
       }
 
-      // Git-style update: Create new draft version instead of updating existing
-      const config = await RemoteConfigModel.update(id, data, environment);
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.processChange(
+        userId,
+        environment,
+        'g_remote_configs',
+        String(id),
+        data,
+        async (processedData) => {
+          const config = await RemoteConfigModel.update(id, processedData as any, environment);
 
-      // Version management removed - configs are now managed through template versions
-      // Changes will be captured when publish is called
+          // Send notification via PubSub (multi-instance)
+          await pubSubService.publishNotification({
+            type: 'remote_config_change',
+            data: { configId: config.id, action: 'updated', config },
+            targetChannels: ['remote_config', 'admin']
+          });
 
-      // Send notification via PubSub (multi-instance)
-      await pubSubService.publishNotification({
-        type: 'remote_config_change',
-        data: { configId: config.id, action: 'updated', config },
-        targetChannels: ['remote_config', 'admin']
-      });
+          return { config };
+        }
+      );
 
-      res.json({
-        success: true,
-        data: { config }
-      });
+      if (gatewayResult.mode === 'DIRECT') {
+        res.json({
+          success: true,
+          data: gatewayResult.data,
+          message: 'Remote config updated successfully'
+        });
+      } else {
+        res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message: 'Change request created. The update will be applied after approval.',
+        });
+      }
     } catch (error) {
       logger.error('Error in RemoteConfigController.update:', error);
       if (error instanceof GatrixError) {
@@ -206,19 +252,45 @@ export class RemoteConfigController {
         throw new GatrixError('Remote config not found', 404);
       }
 
-      await RemoteConfigModel.delete(id, environment);
+      // Resolve authenticated user id
+      const userId = (req as any).user?.id || (req as any).user?.userId;
+      if (!userId) {
+        throw new GatrixError('User authentication required', 401);
+      }
 
-      // Send notification via PubSub (multi-instance)
-      await pubSubService.publishNotification({
-        type: 'remote_config_change',
-        data: { configId: id, action: 'deleted', id, keyName: existing.keyName },
-        targetChannels: ['remote_config', 'admin']
-      });
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.requestDeletion(
+        userId,
+        environment,
+        'g_remote_configs',
+        String(id),
+        async () => {
+          await RemoteConfigModel.delete(id, environment);
 
-      res.json({
-        success: true,
-        message: 'Remote config deleted successfully'
-      });
+          // Send notification via PubSub (multi-instance)
+          await pubSubService.publishNotification({
+            type: 'remote_config_change',
+            data: { configId: id, action: 'deleted', id, keyName: existing.keyName },
+            targetChannels: ['remote_config', 'admin']
+          });
+        }
+      );
+
+      if (gatewayResult.mode === 'DIRECT') {
+        res.json({
+          success: true,
+          message: 'Remote config deleted successfully'
+        });
+      } else {
+        res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message: 'Change request created. The deletion will be applied after approval.',
+        });
+      }
     } catch (error) {
       logger.error('Error in RemoteConfigController.delete:', error);
       if (error instanceof GatrixError) {
@@ -346,77 +418,108 @@ export class RemoteConfigController {
       const { key, type, defaultValue, description } = req.body;
 
       // Get current template
-      let template = await db('g_remote_config_templates')
+      const template = await db('g_remote_config_templates')
         .where('templateName', 'default_template')
         .first();
 
-      let templateData: any = {
-        parameters: {},
-        campaigns: {},
-        segments: {},
-        contextFields: {},
-        variants: {}
-      };
+      const environment = req.body.environment || 'development';
 
-      if (template && template.templateData) {
-        templateData = typeof template.templateData === 'string'
-          ? JSON.parse(template.templateData)
-          : template.templateData;
-      }
+      const gatewayResult = await UnifiedChangeGateway.processChange(
+        userId,
+        environment,
+        'g_remote_config_templates',
+        template ? String(template.id) : 'new_template',
+        async (currentTemplate: any) => {
+          let currentData: any = {
+            parameters: {},
+            campaigns: {},
+            segments: {},
+            contextFields: {},
+            variants: {}
+          };
 
-      // Check if parameter already exists
-      if (templateData.parameters[key]) {
-        throw new GatrixError(`Parameter '${key}' already exists. Use PUT to update existing parameters.`, 409);
-      }
+          if (currentTemplate && currentTemplate.templateData) {
+            currentData = typeof currentTemplate.templateData === 'string'
+              ? JSON.parse(currentTemplate.templateData)
+              : currentTemplate.templateData;
+          }
 
-      // Add new parameter
-      templateData.parameters[key] = {
-        id: Date.now(), // Simple ID generation
-        key,
-        type,
-        defaultValue,
-        description,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
+          // Check if parameter already exists
+          if (currentData.parameters[key]) {
+            throw new GatrixError(`Parameter '${key}' already exists. Use PUT to update existing parameters.`, 409);
+          }
 
-      // Update template
-      if (!template) {
-        const [templateId] = await db('g_remote_config_templates').insert({
-          environmentId: 1,
-          templateName: 'default_template',
-          displayName: 'Default Template',
-          description: 'Default remote config template',
-          templateType: 'client',
-          status: 'draft',
-          version: 1,
-          templateData: JSON.stringify(templateData),
-          etag: `etag_${Date.now()}`,
-          createdBy: userId,
-          updatedBy: userId,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          // Return the full template data with new parameter
+          return {
+            ...currentTemplate,
+            templateData: {
+              ...currentData,
+              parameters: {
+                ...currentData.parameters,
+                [key]: {
+                  id: Date.now(),
+                  key,
+                  type,
+                  defaultValue,
+                  description,
+                  isActive: true,
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString()
+                }
+              }
+            }
+          };
+        },
+        async (processedTemplate: any) => {
+          const { templateData: processedData } = processedTemplate;
+
+          if (!template) {
+            await db('g_remote_config_templates').insert({
+              environmentId: 1,
+              templateName: 'default_template',
+              displayName: 'Default Template',
+              description: 'Default remote config template',
+              templateType: 'client',
+              status: 'draft',
+              version: 1,
+              templateData: JSON.stringify(processedData),
+              etag: `etag_${Date.now()}`,
+              createdBy: userId,
+              updatedBy: userId,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            });
+            return { parameter: processedData.parameters[key] };
+          } else {
+            await db('g_remote_config_templates')
+              .where('id', template.id)
+              .update({
+                templateData: JSON.stringify(processedData),
+                etag: `etag_${Date.now()}`,
+                updatedBy: userId,
+                updatedAt: new Date()
+              });
+            return { parameter: processedData.parameters[key] };
+          }
+        }
+      );
+
+      if (gatewayResult.mode === 'DIRECT') {
+        res.json({
+          success: true,
+          message: 'Parameter added successfully',
+          data: gatewayResult.data
         });
-        template = { id: templateId };
       } else {
-        await db('g_remote_config_templates')
-          .where('id', template.id)
-          .update({
-            templateData: JSON.stringify(templateData),
-            etag: `etag_${Date.now()}`,
-            updatedBy: userId,
-            updatedAt: new Date()
-          });
+        res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message: 'Change request created. The parameter will be added after approval.',
+        });
       }
-
-      res.json({
-        success: true,
-        message: 'Parameter added successfully',
-        data: { parameter: templateData.parameters[key] }
-      });
-
-      logger.info(`Parameter ${key} added by user ${userId}`);
     } catch (error) {
       logger.error('Error in RemoteConfigController.addParameter:', error);
       if (error instanceof GatrixError) {
@@ -445,42 +548,72 @@ export class RemoteConfigController {
         throw new GatrixError('Template not found', 404);
       }
 
-      const templateData = typeof template.templateData === 'string'
-        ? JSON.parse(template.templateData)
-        : template.templateData;
+      const environment = req.body.environment || 'development';
 
-      // Check if parameter exists
-      if (!templateData.parameters[key]) {
-        throw new GatrixError(`Parameter '${key}' not found. Use POST to create new parameters.`, 404);
-      }
+      const gatewayResult = await UnifiedChangeGateway.processChange(
+        userId,
+        environment,
+        'g_remote_config_templates',
+        String(template.id),
+        async (currentTemplate: any) => {
+          const currentData = typeof currentTemplate.templateData === 'string'
+            ? JSON.parse(currentTemplate.templateData)
+            : currentTemplate.templateData;
 
-      // Update existing parameter
-      const existingParam = templateData.parameters[key];
-      templateData.parameters[key] = {
-        ...existingParam,
-        ...(type && { type }),
-        ...(defaultValue !== undefined && { defaultValue }),
-        ...(description !== undefined && { description }),
-        updatedAt: new Date().toISOString()
-      };
+          // Check if parameter exists
+          if (!currentData.parameters[key]) {
+            throw new GatrixError(`Parameter '${key}' not found. Use POST to create new parameters.`, 404);
+          }
 
-      // Update template
-      await db('g_remote_config_templates')
-        .where('id', template.id)
-        .update({
-          templateData: JSON.stringify(templateData),
-          etag: `etag_${Date.now()}`,
-          updatedBy: userId,
-          updatedAt: new Date()
+          // Update existing parameter
+          const existingParam = currentData.parameters[key];
+          return {
+            ...currentTemplate,
+            templateData: {
+              ...currentData,
+              parameters: {
+                ...currentData.parameters,
+                [key]: {
+                  ...existingParam,
+                  ...(type && { type }),
+                  ...(defaultValue !== undefined && { defaultValue }),
+                  ...(description !== undefined && { description }),
+                  updatedAt: new Date().toISOString()
+                }
+              }
+            }
+          };
+        },
+        async (processedTemplate: any) => {
+          const processedData = processedTemplate.templateData;
+          await db('g_remote_config_templates')
+            .where('id', template.id)
+            .update({
+              templateData: JSON.stringify(processedData),
+              etag: `etag_${Date.now()}`,
+              updatedBy: userId,
+              updatedAt: new Date()
+            });
+          return { parameter: processedData.parameters[key] };
+        }
+      );
+
+      if (gatewayResult.mode === 'DIRECT') {
+        res.json({
+          success: true,
+          message: 'Parameter updated successfully',
+          data: gatewayResult.data
         });
-
-      res.json({
-        success: true,
-        message: 'Parameter updated successfully',
-        data: { parameter: templateData.parameters[key] }
-      });
-
-      logger.info(`Parameter ${key} updated by user ${userId}`);
+      } else {
+        res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message: 'Change request created. The update will be applied after approval.',
+        });
+      }
     } catch (error) {
       logger.error('Error in RemoteConfigController.updateParameter:', error);
       if (error instanceof GatrixError) {
@@ -507,33 +640,62 @@ export class RemoteConfigController {
         throw new GatrixError('Template not found', 404);
       }
 
-      const templateData = typeof template.templateData === 'string'
-        ? JSON.parse(template.templateData)
-        : template.templateData;
+      const environment = (req.query.environment as string) || (req.body.environment as string) || 'development';
 
-      if (!templateData.parameters || !templateData.parameters[key]) {
-        throw new GatrixError('Parameter not found', 404);
-      }
+      const gatewayResult = await UnifiedChangeGateway.processChange(
+        userId,
+        environment,
+        'g_remote_config_templates',
+        String(template.id),
+        async (currentTemplate: any) => {
+          const currentData = typeof currentTemplate.templateData === 'string'
+            ? JSON.parse(currentTemplate.templateData)
+            : currentTemplate.templateData;
 
-      // Delete parameter
-      delete templateData.parameters[key];
+          if (!currentData.parameters || !currentData.parameters[key]) {
+            throw new GatrixError('Parameter not found', 404);
+          }
 
-      // Update template
-      await db('g_remote_config_templates')
-        .where('id', template.id)
-        .update({
-          templateData: JSON.stringify(templateData),
-          etag: `etag_${Date.now()}`,
-          updatedBy: userId,
-          updatedAt: new Date()
+          // Delete parameter
+          const newParameters = { ...currentData.parameters };
+          delete newParameters[key];
+
+          return {
+            ...currentTemplate,
+            templateData: {
+              ...currentData,
+              parameters: newParameters
+            }
+          };
+        },
+        async (processedTemplate: any) => {
+          const processedData = processedTemplate.templateData;
+          await db('g_remote_config_templates')
+            .where('id', template.id)
+            .update({
+              templateData: JSON.stringify(processedData),
+              etag: `etag_${Date.now()}`,
+              updatedBy: userId,
+              updatedAt: new Date()
+            });
+        }
+      );
+
+      if (gatewayResult.mode === 'DIRECT') {
+        res.json({
+          success: true,
+          message: 'Parameter deleted successfully'
         });
-
-      res.json({
-        success: true,
-        message: 'Parameter deleted successfully'
-      });
-
-      logger.info(`Parameter ${key} deleted by user ${userId}`);
+      } else {
+        res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message: 'Change request created. The deletion will be applied after approval.',
+        });
+      }
     } catch (error) {
       logger.error('Error in RemoteConfigController.deleteParameter:', error);
       if (error instanceof GatrixError) {
@@ -543,18 +705,25 @@ export class RemoteConfigController {
     }
   }
 
-  /**
-   * Publish template as new version
-   */
   static async publish(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).user?.id;
-      const { deploymentName, description }: PublishRequest = req.body;
+      const authReq = req as AuthenticatedRequest;
+      const userId = authReq.user?.userId;
+      const { description }: PublishRequest = req.body;
+      const environment = authReq.environment || 'development';
+
+      if (!userId) {
+        throw new GatrixError('User authentication required', 401);
+      }
 
       // Get current template data from the latest template version
       const latestTemplate = await db('g_remote_config_templates')
         .where('templateName', 'default_template')
         .first();
+
+      if (!latestTemplate) {
+        throw new GatrixError('Default template not found', 404);
+      }
 
       let templateData: any = {
         parameters: {},
@@ -564,79 +733,85 @@ export class RemoteConfigController {
         variants: {}
       };
 
-      if (latestTemplate && latestTemplate.templateData) {
+      if (latestTemplate.templateData) {
         // Use existing template data as base
         templateData = typeof latestTemplate.templateData === 'string'
           ? JSON.parse(latestTemplate.templateData)
           : latestTemplate.templateData;
       }
 
-      // Get or create default template
-      let template = await db('g_remote_config_templates')
-        .where('templateName', 'default_template')
-        .first();
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.processChange(
+        userId,
+        environment,
+        'g_remote_config_templates',
+        String(latestTemplate.id),
+        // No-op for changeDataOrFunction because we already have the data and we are just publishing
+        // But we want to ensure any changes in templateData are captured.
+        // For publish, we are usually just bumping the version, 
+        // but often it's also about updating the templateData from draft state.
+        templateData,
+        async (processedData: any) => {
+          // Update existing template
+          await db('g_remote_config_templates')
+            .where('id', latestTemplate.id)
+            .update({
+              templateData: JSON.stringify(processedData),
+              updatedBy: userId,
+              updatedAt: new Date()
+            });
 
-      if (!template) {
-        const [templateId] = await db('g_remote_config_templates').insert({
-          templateName: 'default_template',
-          displayName: 'Default Template',
-          description: 'Default template for remote config',
-          templateData: JSON.stringify(templateData),
-          status: 'published',
-          createdBy: userId,
-          updatedBy: userId,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        });
-        template = { id: templateId };
-      } else {
-        // Update existing template
-        await db('g_remote_config_templates')
-          .where('id', template.id)
-          .update({
-            templateData: JSON.stringify(templateData),
-            updatedBy: userId,
-            updatedAt: new Date()
+          // Get next version number
+          const latestVersion = await db('g_remote_config_template_versions')
+            .where('templateId', latestTemplate.id)
+            .orderBy('version', 'desc')
+            .first();
+
+          const nextVersion = latestVersion ? latestVersion.version + 1 : 1;
+
+          // Create new template version
+          const [versionId] = await db('g_remote_config_template_versions').insert({
+            templateId: latestTemplate.id,
+            version: nextVersion,
+            templateData: JSON.stringify(processedData),
+            changeDescription: description || 'Published template version',
+            createdBy: userId,
+            createdAt: new Date()
           });
-      }
 
-      // Get next version number
-      const latestVersion = await db('g_remote_config_template_versions')
-        .where('templateId', template.id)
-        .orderBy('version', 'desc')
-        .first();
+          // Send real-time notification via PubSub (multi-instance)
+          await pubSubService.publishNotification({
+            type: 'remote_config_change',
+            data: { configId: latestTemplate.id, action: 'updated', templateName: 'default_template' },
+            targetChannels: ['remote_config', 'admin']
+          });
 
-      const nextVersion = latestVersion ? latestVersion.version + 1 : 1;
-
-      // Create new template version
-      const [versionId] = await db('g_remote_config_template_versions').insert({
-        templateId: template.id,
-        version: nextVersion,
-        templateData: JSON.stringify(templateData),
-        changeDescription: description || 'Published template version',
-        createdBy: userId,
-        createdAt: new Date()
-      });
-
-      // Send real-time notification via PubSub (multi-instance)
-      await pubSubService.publishNotification({
-        type: 'remote_config_change',
-        data: { configId: template.id, action: 'updated', templateName: 'default_template' },
-        targetChannels: ['remote_config', 'admin']
-      });
-
-      res.json({
-        success: true,
-        message: `Published template version ${nextVersion}`,
-        data: {
-          templateId: template.id,
-          versionId,
-          version: nextVersion,
-          publishedAt: new Date().toISOString()
+          return {
+            templateId: latestTemplate.id,
+            versionId,
+            version: nextVersion,
+            publishedAt: new Date().toISOString()
+          };
         }
-      });
+      );
 
-      logger.info(`Published template version ${nextVersion} by user ${userId}`);
+      if (gatewayResult.mode === 'DIRECT') {
+        res.json({
+          success: true,
+          message: `Published template version ${gatewayResult.data.version}`,
+          data: gatewayResult.data
+        });
+        logger.info(`Published template version ${gatewayResult.data.version} by user ${userId}`);
+      } else {
+        res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message: 'Change request created. Template will be published after approval.',
+        });
+      }
     } catch (error) {
       logger.error('Error in RemoteConfigController.publish:', error);
       if (error instanceof GatrixError) {

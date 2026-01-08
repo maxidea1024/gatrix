@@ -18,6 +18,8 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from '../../hooks/useDebounce';
+import { getActionLabel } from '../../utils/changeRequestToast';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 
 interface BatchProcessDialogProps {
   open: boolean;
@@ -40,6 +42,8 @@ const BatchProcessDialog: React.FC<BatchProcessDialogProps> = ({
   onGetCount,
 }) => {
   const { t } = useTranslation();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
 
   const [searchTerm, setSearchTerm] = useState('');
   const [targetStatus, setTargetStatus] = useState<TargetStatus>('all');
@@ -124,7 +128,7 @@ const BatchProcessDialog: React.FC<BatchProcessDialogProps> = ({
     }
   };
 
-  const getActionLabel = () => {
+  const getDialogActionLabel = () => {
     return action === 'activate'
       ? t('storeProducts.batchActionActivate')
       : t('storeProducts.batchActionDeactivate');
@@ -222,7 +226,7 @@ const BatchProcessDialog: React.FC<BatchProcessDialogProps> = ({
           {loading ? (
             <CircularProgress size={20} color="inherit" />
           ) : (
-            `${t('storeProducts.batchExecute')} (${getActionLabel()})`
+            `${getActionLabel('update', requiresApproval, t)} (${getDialogActionLabel()})`
           )}
         </Button>
       </DialogActions>

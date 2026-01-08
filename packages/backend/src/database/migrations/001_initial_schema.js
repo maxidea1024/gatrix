@@ -1328,11 +1328,13 @@ exports.up = async function (connection) {
     'coupons.view', 'coupons.manage', 'surveys.view', 'surveys.manage',
     'operation-events.view', 'operation-events.manage', 'store-products.view', 'store-products.manage',
     'reward-templates.view', 'reward-templates.manage', 'banners.view', 'banners.manage',
-    'planning-data.view', 'planning-data.manage', 'event-lens.view', 'event-lens.manage',
+    'planning-data.view', 'planning-data.manage', 'change-requests.view', 'change-requests.manage',
+    'event-lens.view', 'event-lens.manage',
     'tags.view', 'tags.manage', 'data-management.view', 'data-management.manage',
     'environments.view', 'environments.manage', 'system-settings.view', 'system-settings.manage',
     'chat.access'
   ];
+
 
   const adminUserId = 1; // From initial seed
   if (adminUserId) {

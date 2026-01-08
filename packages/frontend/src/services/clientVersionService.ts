@@ -12,6 +12,13 @@ import {
   CLIENT_VERSION_DEFAULTS,
 } from '../types/clientVersion';
 
+// Extended response type to indicate if change request was created
+export interface ClientVersionMutationResult {
+  clientVersion?: ClientVersion;
+  isChangeRequest: boolean;
+  changeRequestId?: string;
+}
+
 export class ClientVersionService {
   private static readonly BASE_URL = '/admin/client-versions';
 
@@ -119,22 +126,40 @@ export class ClientVersionService {
   /**
    * 클라이언트 버전 생성
    */
-  static async createClientVersion(data: ClientVersionFormData): Promise<ClientVersion> {
-    const response = await apiService.post<ApiResponse<ClientVersion>>(
+  static async createClientVersion(data: ClientVersionFormData): Promise<ClientVersionMutationResult> {
+    const response: any = await apiService.post<ApiResponse<ClientVersion>>(
       this.BASE_URL,
       data
     );
 
-    // 정상: { success: true, data: { ...created } }
-    if (response?.success && response?.data) {
-      return response.data;
+    // Check if this is a change request response
+    // Backend returns: { success: true, data: { changeRequestId: "...", status: "DRAFT_SAVED" } }
+    if (response?.data?.changeRequestId || response?.changeRequestId) {
+      return {
+        clientVersion: undefined,
+        isChangeRequest: true,
+        changeRequestId: response?.data?.changeRequestId || response?.changeRequestId,
+      };
+    }
+
+    // 정상 생성: { success: true, data: { ...created client version } }
+    if (response?.success && response?.data && response.data.id) {
+      return {
+        clientVersion: response.data,
+        isChangeRequest: false,
+      };
     }
 
     // 일부 서버는 생성 시 본문 없이 { success: true }만 반환할 수 있음
     if (response?.success && !response?.data) {
       try {
         const found = await this.findByPlatformAndVersion(data.platform, data.clientVersion);
-        if (found) return found;
+        if (found) {
+          return {
+            clientVersion: found,
+            isChangeRequest: false,
+          };
+        }
       } catch (e) {
         console.warn('Fallback lookup after create failed:', e);
       }
@@ -187,15 +212,28 @@ export class ClientVersionService {
   static async updateClientVersion(
     id: number,
     data: Partial<ClientVersionFormData>
-  ): Promise<ClientVersion> {
-    const response = await apiService.put<ApiResponse<ClientVersion>>(
+  ): Promise<ClientVersionMutationResult> {
+    const response: any = await apiService.put<ApiResponse<ClientVersion>>(
       `${this.BASE_URL}/${id}`,
       data
     );
 
-    // ApiService.request()가 이미 response.data를 반환하므로
-    if (response?.success && response?.data) {
-      return response.data;
+    // Check if this is a change request response
+    // Backend returns: { success: true, data: { changeRequestId: "...", status: "DRAFT_SAVED" } }
+    if (response?.data?.changeRequestId || response?.changeRequestId) {
+      return {
+        clientVersion: undefined,
+        isChangeRequest: true,
+        changeRequestId: response?.data?.changeRequestId || response?.changeRequestId,
+      };
+    }
+
+    // 정상 수정: { success: true, data: { ...updated client version } }
+    if (response?.success && response?.data && response.data.id) {
+      return {
+        clientVersion: response.data,
+        isChangeRequest: false,
+      };
     }
 
     console.error('Unexpected update response structure:', response);
@@ -205,8 +243,15 @@ export class ClientVersionService {
   /**
    * 클라이언트 버전 삭제
    */
-  static async deleteClientVersion(id: number): Promise<void> {
-    await apiService.delete(`${this.BASE_URL}/${id}`);
+  static async deleteClientVersion(id: number): Promise<{ isChangeRequest: boolean; changeRequestId?: string }> {
+    const response = await apiService.delete<ApiResponse<{ changeRequestId?: string; status?: string }>>(`${this.BASE_URL}/${id}`);
+    const data = response.data;
+    // 202 응답은 CR 생성을 의미
+    const isChangeRequest = !!(data?.changeRequestId);
+    return {
+      isChangeRequest,
+      changeRequestId: data?.changeRequestId,
+    };
   }
 
   /**

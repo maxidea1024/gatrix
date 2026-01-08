@@ -46,6 +46,8 @@ import MaintenanceSettingsInput from '../common/MaintenanceSettingsInput';
 import { MessageTemplate, messageTemplateService } from '../../services/messageTemplateService';
 import ResizableDrawer from '../common/ResizableDrawer';
 import { getContrastColor } from '@/utils/colorUtils';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { getActionLabel } from '../../utils/changeRequestToast';
 
 // 클라이언트 상태 라벨 매핑
 const ClientStatusLabels = {
@@ -140,6 +142,8 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { platforms } = usePlatformConfig();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const [loading, setLoading] = useState(false);
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
 
@@ -843,7 +847,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
             disabled={loading || isSubmitting}
             startIcon={<SaveIcon />}
           >
-            {loading ? t('clientVersions.creating') : t('clientVersions.bulkCreate')}
+            {loading ? t('clientVersions.creating') : getActionLabel('create', requiresApproval, t)}
           </Button>
         </Box>
       </form>

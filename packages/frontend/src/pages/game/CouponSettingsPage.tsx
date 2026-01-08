@@ -1,10 +1,14 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { PERMISSIONS } from '@/types/permissions';
 import { Box, Typography, Button, TextField, IconButton, Chip, MenuItem, Stack, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, Tooltip, TableSortLabel, FormControlLabel, Checkbox, LinearProgress, Dialog, DialogTitle, DialogContent, DialogActions, Menu, Divider, FormHelperText, Paper, Collapse } from '@mui/material';
 import { Settings as SettingsIcon, Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon, Search as SearchIcon, ViewColumn as ViewColumnIcon, List as ListIcon, ContentCopy as ContentCopyIcon, Code as CodeIcon, CardGiftcard as CardGiftcardIcon, HourglassEmpty as HourglassEmptyIcon, Download as DownloadIcon, ArrowDropDown as ArrowDropDownIcon, CheckCircle as CheckCircleIcon, TableChart as TableChartIcon, Description as ExcelIcon, ExpandMore as ExpandMoreIcon, ExpandLess as ExpandLessIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import { getActionLabel } from '../../utils/changeRequestToast';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useDebounce } from '@/hooks/useDebounce';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import SimplePagination from '@/components/common/SimplePagination';
@@ -15,7 +19,8 @@ import { useGameWorld } from '@/contexts/GameWorldContext';
 
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
-import { formatDateTime, parseUTCForPicker } from '@/utils/dateFormat';
+import { formatDateTime, parseUTCForPicker, formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
+import { useI18n } from '@/contexts/I18nContext';
 import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSettingsDialog';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import SDKGuideDrawer from '@/components/coupons/SDKGuideDrawer';
@@ -28,7 +33,11 @@ import { Dayjs } from 'dayjs';
 // Coupon Settings page (list and management of coupon definitions)
 const CouponSettingsPage: React.FC = () => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { language } = useI18n();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const { platforms, channels } = usePlatformConfig();
   const { worlds } = useGameWorld();
   const { hasPermission } = useAuth();
@@ -307,6 +316,8 @@ const CouponSettingsPage: React.FC = () => {
     targetUserIds: '' as string,
     targetUserIdsInverted: false,
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [fullEditingData, setFullEditingData] = useState<any>(null);
   const [rewardMode, setRewardMode] = useState<'direct' | 'template'>('direct');
   // Track if description was manually edited by user
   const [isDescriptionManuallyEdited, setIsDescriptionManuallyEdited] = useState(false);
@@ -319,6 +330,83 @@ const CouponSettingsPage: React.FC = () => {
     rewards: true,
     rewardEmail: true,
   });
+
+  const isDirty = useMemo(() => {
+    if (!editing) return true;
+    if (!fullEditingData) return true;
+
+    const currentData = {
+      code: form.code,
+      type: form.type,
+      name: form.name,
+      description: form.description || '',
+      perUserLimit: form.perUserLimit || 1,
+      usageLimitType: form.usageLimitType || 'USER',
+      maxTotalUses: form.maxTotalUses ?? null,
+      startsAt: form.startsAt ? form.startsAt.toISOString() : null,
+      expiresAt: form.expiresAt ? form.expiresAt.toISOString() : null,
+      status: form.status,
+      rewardMode,
+      rewardData: rewardMode === 'direct' ? form.rewardData : null,
+      rewardTemplateId: rewardMode === 'template' ? form.rewardTemplateId : null,
+      rewardEmailTitle: form.rewardEmailTitle || '',
+      rewardEmailBody: form.rewardEmailBody || '',
+      targetPlatforms: [...(form.targetPlatforms || [])].sort(),
+      targetPlatformsInverted: !!form.targetPlatformsInverted,
+      targetChannelSubchannels: [...(form.targetChannelSubchannels || [])].map(item => ({
+        channel: item.channel,
+        subchannels: [...(item.subchannels || [])].sort()
+      })).sort((a, b) => a.channel.localeCompare(b.channel)),
+      targetChannelSubchannelsInverted: !!form.targetChannelSubchannelsInverted,
+      targetWorlds: [...(form.targetWorlds || [])].sort(),
+      targetWorldsInverted: !!form.targetWorldsInverted,
+      targetUserIds: (form.targetUserIds || '').split(',').map((id: string) => id.trim()).filter((id: string) => id).sort().join(','),
+      targetUserIdsInverted: !!form.targetUserIdsInverted,
+    };
+
+    const originalData = {
+      code: fullEditingData.code || '',
+      type: fullEditingData.type,
+      name: fullEditingData.name,
+      description: fullEditingData.description || '',
+      perUserLimit: fullEditingData.perUserLimit || 1,
+      usageLimitType: fullEditingData.usageLimitType || 'USER',
+      maxTotalUses: fullEditingData.maxTotalUses ?? null,
+      startsAt: fullEditingData.startsAt ? parseUTCForPicker(fullEditingData.startsAt)?.toISOString() : null,
+      expiresAt: parseUTCForPicker(fullEditingData.expiresAt)?.toISOString(),
+      status: fullEditingData.status,
+      rewardMode: fullEditingData.rewardTemplateId ? 'template' : 'direct',
+      rewardData: fullEditingData.rewardTemplateId ? null : (fullEditingData.rewardData || []),
+      rewardTemplateId: fullEditingData.rewardTemplateId || null,
+      rewardEmailTitle: fullEditingData.rewardEmailTitle || '',
+      rewardEmailBody: fullEditingData.rewardEmailBody || '',
+      targetPlatforms: [...(fullEditingData.targetPlatforms || [])].sort(),
+      targetPlatformsInverted: !!fullEditingData.targetPlatformsInverted,
+      targetChannelSubchannels: (() => {
+        const targetChannels = fullEditingData.targetChannels || [];
+        const targetSubchannels = fullEditingData.targetSubchannels || [];
+        const subchannelsByChannel: { [key: string]: string[] } = {};
+        targetSubchannels.forEach((subchannelKey: string) => {
+          const [channel, subchannel] = subchannelKey.split(':');
+          if (channel && subchannel) {
+            if (!subchannelsByChannel[channel]) subchannelsByChannel[channel] = [];
+            subchannelsByChannel[channel].push(subchannel);
+          }
+        });
+        return targetChannels.map((channel: string) => ({
+          channel,
+          subchannels: [...(subchannelsByChannel[channel] || [])].sort(),
+        })).sort((a: any, b: any) => a.channel.localeCompare(b.channel));
+      })(),
+      targetChannelSubchannelsInverted: !!fullEditingData.targetChannelsInverted,
+      targetWorlds: [...(fullEditingData.targetWorlds || [])].sort(),
+      targetWorldsInverted: !!fullEditingData.targetWorldsInverted,
+      targetUserIds: (fullEditingData.targetUsers || []).map((id: string) => String(id).trim()).filter((id: string) => id).sort().join(','),
+      targetUserIdsInverted: !!fullEditingData.targetUserIdsInverted,
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [editing, fullEditingData, form, rewardMode]);
   // Ref for channel table container
   const channelTableRef = useRef<HTMLDivElement>(null);
   const platformTableRef = useRef<HTMLDivElement>(null);
@@ -362,6 +450,7 @@ const CouponSettingsPage: React.FC = () => {
 
   const resetForm = () => {
     setEditing(null);
+    setFullEditingData(null);
     setForm({ code: '', type: 'NORMAL', name: '', description: '', quantity: 1, perUserLimit: 1, usageLimitType: 'USER', maxTotalUses: null, startsAt: null, expiresAt: null, status: 'ACTIVE', rewardData: [], rewardTemplateId: null, rewardEmailTitle: '', rewardEmailBody: '', targetPlatforms: [], targetChannelSubchannels: [], targetWorlds: [], targetUserIds: '' });
     setRewardMode('direct');
     setIsDescriptionManuallyEdited(false);
@@ -505,9 +594,9 @@ const CouponSettingsPage: React.FC = () => {
     return t('coupons.couponSettings.form.codeHelp');
   };
 
-  const quantityError = form.type === 'NORMAL' && (!form.quantity || Number(form.quantity) < 1);
-  const maxTotalUsesError = isSpecial && form.maxTotalUses !== null && Number(form.maxTotalUses) < 1;
-  const perUserLimitError = form.type === 'NORMAL' && (form.perUserLimit == null || Number(form.perUserLimit) < 1);
+  const quantityError = form.type === 'NORMAL' && form.quantity !== '' && (form.quantity == null || Number(form.quantity) < 1);
+  const maxTotalUsesError = isSpecial && form.maxTotalUses !== null && form.maxTotalUses !== '' && Number(form.maxTotalUses) < 1;
+  const perUserLimitError = form.type === 'NORMAL' && form.perUserLimit !== '' && (form.perUserLimit == null || Number(form.perUserLimit) < 1);
 
 
 
@@ -768,23 +857,31 @@ const CouponSettingsPage: React.FC = () => {
 
     try {
       if (editing) {
-        await couponService.updateSetting(editing.id, payload);
+        const result = await couponService.updateSetting(editing.id, payload);
         setOpenForm(false);
         resetForm();
-        enqueueSnackbar(t('common.saveSuccess') as string, { variant: 'success' });
+        if (result.isChangeRequest) {
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+        } else {
+          enqueueSnackbar(t('common.saveSuccess') as string, { variant: 'success' });
+        }
         await load();
       } else {
         // For create: close form immediately and load in background
-        await couponService.createSetting(payload);
+        const result = await couponService.createSetting(payload);
         setOpenForm(false);
         resetForm();
 
-        // Show success message
-        const isLargeQuantity = payload.type === 'NORMAL' && (payload.quantity || 1) >= 10000;
-        if (isLargeQuantity) {
-          enqueueSnackbar(t('coupons.couponSettings.generatingInBackground') as string, { variant: 'info' });
+        if (result.isChangeRequest) {
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
-          enqueueSnackbar(t('common.saveSuccess') as string, { variant: 'success' });
+          // Show success message
+          const isLargeQuantity = payload.type === 'NORMAL' && (payload.quantity || 1) >= 10000;
+          if (isLargeQuantity) {
+            enqueueSnackbar(t('coupons.couponSettings.generatingInBackground') as string, { variant: 'info' });
+          } else {
+            enqueueSnackbar(t('common.saveSuccess') as string, { variant: 'success' });
+          }
         }
 
         // Load list in background (don't await)
@@ -878,6 +975,7 @@ const CouponSettingsPage: React.FC = () => {
 
       console.log('[CouponSettings] handleEdit - final form state', newForm);
 
+      setFullEditingData(fullSetting);
       setForm(newForm);
       // When editing, mark description as manually edited (since it already has a value)
       setIsDescriptionManuallyEdited(true);
@@ -1164,14 +1262,21 @@ const CouponSettingsPage: React.FC = () => {
                                         </Box>
                                       </Box>
                                     ) : (
-                                      <Box>
-                                        <Button size="small" color="secondary" onClick={() => handleOpenCodes(it)} startIcon={<ListIcon fontSize="small" />}>
-                                          {t('coupons.couponSettings.viewIssuedCodes')}
-                                        </Button>
-                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                                          {t('coupons.couponSettings.issuedCount')}: {(it.generatedCount || it.issuedCount || 0).toLocaleString()}
-                                        </Typography>
-                                      </Box>
+                                      <Tooltip title={t('coupons.couponSettings.viewIssuedCodes')}>
+                                        <Chip
+                                          size="small"
+                                          variant="outlined"
+                                          label={`${t('coupons.couponSettings.issuedCount')}: ${(it.generatedCount || it.issuedCount || 0).toLocaleString()}`}
+                                          onClick={() => handleOpenCodes(it)}
+                                          sx={{
+                                            cursor: 'pointer',
+                                            '&:hover': {
+                                              bgcolor: 'action.hover',
+                                              borderColor: 'primary.main'
+                                            }
+                                          }}
+                                        />
+                                      </Tooltip>
                                     )}
                                   </Box>
                                 )}
@@ -1180,14 +1285,12 @@ const CouponSettingsPage: React.FC = () => {
                           case 'type':
                             return (
                               <TableCell key="type" align="center" sx={{ py: 1, px: 2 }}>
-                                <Tooltip title={it.type}>
-                                  <CardGiftcardIcon
-                                    fontSize="small"
-                                    sx={{
-                                      color: it.type === 'SPECIAL' ? 'primary.main' : 'text.primary',
-                                    }}
-                                  />
-                                </Tooltip>
+                                <Chip
+                                  size="small"
+                                  label={it.type}
+                                  color={it.type === 'SPECIAL' ? 'primary' : 'info'}
+                                  variant="filled"
+                                />
                               </TableCell>
                             );
                           case 'status': {
@@ -1287,21 +1390,31 @@ const CouponSettingsPage: React.FC = () => {
                           case 'start':
                             return (
                               <TableCell key="start" sx={{ py: 1, px: 2 }}>
-                                <Typography variant="caption">
-                                  {it.startsAt ? formatDateTime(it.startsAt) : t('coupons.couponSettings.immediateStart')}
-                                </Typography>
+                                <Tooltip title={it.startsAt ? formatDateTimeDetailed(it.startsAt) : t('coupons.couponSettings.immediateStart')}>
+                                  <Typography variant="caption">
+                                    {it.startsAt ? formatRelativeTime(it.startsAt, undefined, language) : t('coupons.couponSettings.immediateStart')}
+                                  </Typography>
+                                </Tooltip>
                               </TableCell>
                             );
                           case 'end':
                             return (
                               <TableCell key="end" sx={{ py: 1, px: 2 }}>
-                                <Typography variant="caption">{formatDateTime(it.expiresAt)}</Typography>
+                                <Tooltip title={it.expiresAt ? formatDateTimeDetailed(it.expiresAt) : '-'}>
+                                  <Typography variant="caption">
+                                    {it.expiresAt ? formatRelativeTime(it.expiresAt, undefined, language) : '-'}
+                                  </Typography>
+                                </Tooltip>
                               </TableCell>
                             );
                           case 'createdAt':
                             return (
                               <TableCell key="createdAt" sx={{ py: 1, px: 2 }}>
-                                <Typography variant="caption">{formatDateTime((it as any).createdAt)}</Typography>
+                                <Tooltip title={formatDateTimeDetailed((it as any).createdAt)}>
+                                  <Typography variant="caption">
+                                    {formatRelativeTime((it as any).createdAt, undefined, language)}
+                                  </Typography>
+                                </Tooltip>
                               </TableCell>
                             );
                           case 'rewards':
@@ -1564,7 +1677,7 @@ const CouponSettingsPage: React.FC = () => {
                       fullWidth
                       label={t('coupons.couponSettings.form.quantity')}
                       value={form.quantity}
-                      onChange={(e) => setForm((s: any) => ({ ...s, quantity: Number(e.target.value) }))}
+                      onChange={(e) => setForm((s: any) => ({ ...s, quantity: e.target.value === '' ? '' : Number(e.target.value) }))}
                       error={quantityError}
                       helperText={quantityError ? t('coupons.couponSettings.form.quantityMinError') : t('coupons.couponSettings.form.quantityHelp')}
                       sx={{
@@ -1615,7 +1728,7 @@ const CouponSettingsPage: React.FC = () => {
                         type="number"
                         label={form.usageLimitType === 'CHARACTER' ? t('coupons.couponSettings.form.perCharacterLimit') : t('coupons.couponSettings.form.perUserLimit')}
                         value={form.perUserLimit}
-                        onChange={(e) => setForm((s: any) => ({ ...s, perUserLimit: Number(e.target.value) }))}
+                        onChange={(e) => setForm((s: any) => ({ ...s, perUserLimit: e.target.value === '' ? '' : Number(e.target.value) }))}
                         error={perUserLimitError}
                         helperText={perUserLimitError ? t('coupons.couponSettings.form.perUserLimitMinError') : (form.usageLimitType === 'CHARACTER' ? t('coupons.couponSettings.form.perCharacterLimitHelp') : t('coupons.couponSettings.form.perUserLimitHelp'))}
                         sx={{
@@ -1633,7 +1746,7 @@ const CouponSettingsPage: React.FC = () => {
                         fullWidth
                         label={t('coupons.couponSettings.form.maxTotalUses')}
                         value={form.maxTotalUses ?? ''}
-                        onChange={(e) => setForm((s: any) => ({ ...s, maxTotalUses: e.target.value === '' ? null : Number(e.target.value) }))}
+                        onChange={(e) => setForm((s: any) => ({ ...s, maxTotalUses: e.target.value === '' ? '' : Number(e.target.value) }))}
                         error={maxTotalUsesError}
                         helperText={maxTotalUsesError ? t('coupons.couponSettings.form.maxTotalUsesMinError') : t('coupons.couponSettings.form.maxTotalUsesHelp')}
                         disabled={form.maxTotalUses === null}
@@ -1823,7 +1936,7 @@ const CouponSettingsPage: React.FC = () => {
         {/* Footer */}
         <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider', bgcolor: 'background.paper', display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
           <Button onClick={() => setOpenForm(false)}>{t('common.cancel')}</Button>
-          <Button onClick={handleSave} variant="contained">{t('common.save')}</Button>
+          <Button onClick={handleSave} variant="contained" disabled={submitting || (!!editing && !isDirty)}>{getActionLabel(editing ? 'update' : 'create', requiresApproval, t)}</Button>
         </Box>
       </ResizableDrawer>
 

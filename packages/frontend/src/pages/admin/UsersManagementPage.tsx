@@ -99,7 +99,7 @@ import { apiService } from '@/services/api';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { tagService } from '@/services/tagService';
 import { UserService } from '@/services/users';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatRelativeTime } from '../../utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
 import { PERMISSIONS } from '@/types/permissions';
 import SimplePagination from '../../components/common/SimplePagination';
@@ -1168,7 +1168,7 @@ const UsersManagementPage: React.FC = () => {
         if (origEnvs !== newEnvs) {
           const getEnvNames = (ids: string[]) =>
             ids.map(id => {
-              const env = environments.find(e => e.id === id);
+              const env = environments.find(e => e.environment === id);
               return env?.displayName || env?.environmentName || id;
             }).join(', ') || '-';
           changes.push({
@@ -1638,13 +1638,13 @@ const UsersManagementPage: React.FC = () => {
       case 'joinDate':
         return (
           <Typography variant="body2">
-            {formatDateTimeDetailed(user.createdAt)}
+            {formatRelativeTime(user.createdAt)}
           </Typography>
         );
       case 'lastLogin':
         return (
           <Typography variant="body2">
-            {user.lastLoginAt ? formatDateTimeDetailed(user.lastLoginAt) : '-'}
+            {user.lastLoginAt ? formatRelativeTime(user.lastLoginAt) : '-'}
           </Typography>
         );
       default:
@@ -2236,7 +2236,8 @@ const UsersManagementPage: React.FC = () => {
                 showSelectAll={false}
                 showEnvironments={true}
                 environments={environments.map(env => ({
-                  id: env.id,
+                  id: env.environment,
+                  environment: env.environment,
                   name: env.environmentName,
                   displayName: env.displayName,
                   environmentName: env.environmentName
@@ -2474,7 +2475,8 @@ const UsersManagementPage: React.FC = () => {
                 showTitle={false}
                 showEnvironments={true}
                 environments={environments.map(env => ({
-                  id: env.id,
+                  id: env.environment,
+                  environment: env.environment,
                   name: env.environmentName,
                   displayName: env.displayName,
                   environmentName: env.environmentName
@@ -2829,7 +2831,8 @@ const UsersManagementPage: React.FC = () => {
                   loading={permissionsLoading}
                   showEnvironments={true}
                   environments={environments.map(env => ({
-                    id: env.id,
+                    id: env.environment,
+                    environment: env.environment,
                     name: env.environmentName,
                     displayName: env.displayName,
                     environmentName: env.environmentName
@@ -2878,6 +2881,7 @@ const UsersManagementPage: React.FC = () => {
             onClick={handleOpenReview}
             variant="contained"
             startIcon={<PreviewIcon />}
+            disabled={getChanges().length === 0}
           >
             {t('common.review')}
           </Button>

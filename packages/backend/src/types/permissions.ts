@@ -97,6 +97,10 @@ export const PERMISSIONS = {
   PLANNING_DATA_VIEW: 'planning-data.view',
   PLANNING_DATA_MANAGE: 'planning-data.manage',
 
+  // Game Management - Change Requests
+  CHANGE_REQUESTS_VIEW: 'change-requests.view',
+  CHANGE_REQUESTS_MANAGE: 'change-requests.manage',
+
   // Event Lens
   EVENT_LENS_VIEW: 'event-lens.view',
   EVENT_LENS_MANAGE: 'event-lens.manage',
@@ -178,6 +182,8 @@ export const PERMISSION_CATEGORIES = {
       PERMISSIONS.BANNERS_MANAGE,
       PERMISSIONS.PLANNING_DATA_VIEW,
       PERMISSIONS.PLANNING_DATA_MANAGE,
+      PERMISSIONS.CHANGE_REQUESTS_VIEW,
+      PERMISSIONS.CHANGE_REQUESTS_MANAGE,
     ],
   },
   EVENT_LENS: {

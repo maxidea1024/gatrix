@@ -6,7 +6,6 @@ import { TagService } from './TagService';
 import { PlanningDataService } from './PlanningDataService';
 import { CmsCashShopProduct } from './CmsCashShopService';
 import { pubSubService } from './PubSubService';
-import { Environment } from '../models/Environment';
 import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 
 export interface StoreProduct {

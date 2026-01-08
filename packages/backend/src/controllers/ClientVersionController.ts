@@ -6,6 +6,7 @@ import { ClientStatus } from '../models/ClientVersion';
 import { ClientVersionModel } from '../models/ClientVersion';
 import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
+import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
 
 /**
  * Convert ISO 8601 datetime string to MySQL DATETIME format
@@ -355,12 +356,34 @@ export class ClientVersionController {
     };
 
     const environment = req.environment || 'development';
-    const clientVersion = await ClientVersionService.createClientVersion(clientVersionData, environment);
 
-    res.status(201).json({
-      success: true,
-      data: clientVersion,
-    });
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.requestCreation(
+      userId,
+      environment,
+      'g_client_versions',
+      clientVersionData,
+      async () => {
+        return await ClientVersionService.createClientVersion(clientVersionData, environment);
+      }
+    );
+
+    if (gatewayResult.mode === 'DIRECT') {
+      res.status(201).json({
+        success: true,
+        data: gatewayResult.data,
+        message: 'Client version created successfully',
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. The client version will be created after approval.',
+      });
+    }
   }
 
   // 클라이언트 버전 간편 생성
@@ -392,21 +415,66 @@ export class ClientVersionController {
       environment,
     };
 
-    let clientVersions;
-    try {
-      clientVersions = await ClientVersionService.bulkCreateClientVersions(bulkCreateData, environment);
-    } catch (error: any) {
-      if (error.message && error.message.includes('Duplicate client versions found')) {
-        throw new GatrixError(error.message, 409);
-      }
-      throw error;
-    }
+    // Check if CR is required
+    const requiresApproval = await UnifiedChangeGateway.requiresApproval(environment);
 
-    res.status(201).json({
-      success: true,
-      data: clientVersions,
-      message: `Successfully created ${clientVersions.length} client versions`,
-    });
+    if (requiresApproval) {
+      let lastResult;
+      for (const platform of value.platforms) {
+        const itemData = {
+          environment,
+          platform: platform.platform,
+          clientVersion: value.clientVersion,
+          clientStatus: value.clientStatus,
+          gameServerAddress: platform.gameServerAddress,
+          gameServerAddressForWhiteList: platform.gameServerAddressForWhiteList || null,
+          patchAddress: platform.patchAddress,
+          patchAddressForWhiteList: platform.patchAddressForWhiteList || null,
+          guestModeAllowed: value.guestModeAllowed,
+          externalClickLink: value.externalClickLink || null,
+          memo: value.memo || null,
+          customPayload: value.customPayload || null,
+          maintenanceStartDate: bulkCreateData.maintenanceStartDate,
+          maintenanceEndDate: bulkCreateData.maintenanceEndDate,
+          maintenanceLocales: value.maintenanceLocales || [],
+          createdBy: userId,
+          updatedBy: userId,
+        };
+
+        lastResult = await UnifiedChangeGateway.requestCreation(
+          userId,
+          environment,
+          'g_client_versions',
+          itemData,
+          async () => { /* won't be called if requiresApproval is true */ }
+        );
+      }
+
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: lastResult?.changeRequestId,
+          status: lastResult?.status,
+        },
+        message: 'Change request created. The client versions will be created after approval.',
+      });
+    } else {
+      let clientVersions;
+      try {
+        clientVersions = await ClientVersionService.bulkCreateClientVersions(bulkCreateData, environment);
+      } catch (error: any) {
+        if (error.message && error.message.includes('Duplicate client versions found')) {
+          throw new GatrixError(error.message, 409);
+        }
+        throw error;
+      }
+
+      res.status(201).json({
+        success: true,
+        data: clientVersions,
+        message: `Successfully created ${clientVersions.length} client versions`,
+      });
+    }
   }
 
   // 클라이언트 버전 수정
@@ -445,18 +513,43 @@ export class ClientVersionController {
     };
 
     const environment = req.environment || 'development';
-    const clientVersion = await ClientVersionService.updateClientVersion(id, updateData, environment);
-    if (!clientVersion) {
-      return res.status(404).json({
-        success: false,
-        message: 'Client version not found',
+
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.processChange(
+      userId,
+      environment,
+      'g_client_versions',
+      String(id),
+      updateData,
+      async (processedData: any) => {
+        return await ClientVersionService.updateClientVersion(id, processedData, environment);
+      }
+    );
+
+    if (gatewayResult.mode === 'DIRECT') {
+      const clientVersion = await ClientVersionService.updateClientVersion(id, updateData, environment);
+      if (!clientVersion) {
+        return res.status(404).json({
+          success: false,
+          message: 'Client version not found',
+        });
+      }
+
+      res.json({
+        success: true,
+        data: clientVersion,
+        message: 'Client version updated successfully',
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. The update will be applied after approval.',
       });
     }
-
-    res.json({
-      success: true,
-      data: clientVersion,
-    });
   }
 
   // 클라이언트 버전 삭제
@@ -470,18 +563,40 @@ export class ClientVersionController {
     }
 
     const environment = req.environment || 'development';
-    const deleted = await ClientVersionService.deleteClientVersion(id, environment);
-    if (!deleted) {
-      return res.status(404).json({
+    const userId = (req as any).user?.userId;
+    if (!userId) {
+      return res.status(401).json({
         success: false,
-        message: 'Client version not found',
+        message: 'User not authenticated',
       });
     }
 
-    res.json({
-      success: true,
-      message: 'Client version deleted successfully',
-    });
+    // Use UnifiedChangeGateway for CR support
+    const gatewayResult = await UnifiedChangeGateway.requestDeletion(
+      userId,
+      environment,
+      'g_client_versions',
+      String(id),
+      async () => {
+        await ClientVersionService.deleteClientVersion(id, environment);
+      }
+    );
+
+    if (gatewayResult.mode === 'DIRECT') {
+      res.json({
+        success: true,
+        message: 'Client version deleted successfully',
+      });
+    } else {
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: gatewayResult.changeRequestId,
+          status: gatewayResult.status,
+        },
+        message: 'Change request created. The deletion will be applied after approval.',
+      });
+    }
   }
 
   // 일괄 상태 변경
@@ -511,14 +626,51 @@ export class ClientVersionController {
     };
 
     const environment = req.environment || 'development';
-    const updatedCount = await ClientVersionService.bulkUpdateStatus(bulkUpdateData, environment);
 
-    res.json({
-      success: true,
-      data: {
-        updatedCount,
-      },
-    });
+    // Check if CR is required
+    const requiresApproval = await UnifiedChangeGateway.requiresApproval(environment);
+
+    if (requiresApproval) {
+      let lastResult;
+      for (const id of value.ids) {
+        // We need only the fields that are actually changing in the bulk update
+        const updateDataAttrs = {
+          clientStatus: value.clientStatus,
+          maintenanceStartDate: bulkUpdateData.maintenanceStartDate,
+          maintenanceEndDate: bulkUpdateData.maintenanceEndDate,
+          maintenanceMessage: value.maintenanceMessage || null,
+          supportsMultiLanguage: value.supportsMultiLanguage || false,
+          maintenanceLocales: value.maintenanceLocales || [],
+          messageTemplateId: value.messageTemplateId || null,
+          updatedBy: userId
+        };
+
+        lastResult = await UnifiedChangeGateway.requestModification(
+          userId,
+          environment,
+          'g_client_versions',
+          String(id),
+          updateDataAttrs
+        );
+      }
+
+      res.status(202).json({
+        success: true,
+        data: {
+          changeRequestId: lastResult?.changeRequestId,
+          status: lastResult?.status,
+        },
+        message: 'Change request created. The bulk status update will be applied after approval.',
+      });
+    } else {
+      const updatedCount = await ClientVersionService.bulkUpdateStatus(bulkUpdateData, environment);
+      res.json({
+        success: true,
+        data: {
+          updatedCount,
+        },
+      });
+    }
   }
 
   // 채널 목록 조회

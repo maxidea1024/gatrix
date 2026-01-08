@@ -123,9 +123,19 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
     });
   };
 
-  const handleQuantityChange = (newQuantity: number) => {
+  const handleQuantityChange = (newQuantity: number | string) => {
+    if (newQuantity === '') {
+      onChange({
+        ...value,
+        quantity: '' as any,
+      });
+      return;
+    }
+    const val = parseInt(String(newQuantity));
+    if (isNaN(val)) return;
+
     // Ensure quantity is at least minQuantity
-    const validQuantity = Math.max(minQuantity, newQuantity);
+    const validQuantity = Math.max(minQuantity, val);
     onChange({
       ...value,
       quantity: validQuantity,
@@ -165,8 +175,8 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
             loadingTypes || rewardTypes.length === 0
               ? ''
               : value.rewardType && rewardTypes.some(t => t.value === parseInt(value.rewardType))
-              ? String(value.rewardType)
-              : ''
+                ? String(value.rewardType)
+                : ''
           }
           onChange={(e) => handleRewardTypeChange(e.target.value)}
           disabled={disabled || loadingTypes}
@@ -276,7 +286,7 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
           <TextField
             type="number"
             value={value.quantity}
-            onChange={(e) => handleQuantityChange(parseInt(e.target.value) || minQuantity)}
+            onChange={(e) => handleQuantityChange(e.target.value)}
             disabled={disabled}
             error={error}
             placeholder={t('rewards.quantity')}

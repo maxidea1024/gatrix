@@ -729,7 +729,7 @@ export class PlanningDataService {
         };
       }
 
-      let changedFiles: string[] = [];
+      const changedFiles: string[] = [];
       const fileDiffs: Record<string, {
         added: Array<{ path: string; value: any }>;
         removed: Array<{ path: string; value: any }>;

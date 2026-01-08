@@ -9,6 +9,7 @@ import {
   ErrorCodes,
 } from '../utils/apiResponse';
 import logger from '../config/logger';
+import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
 
 class ServiceNoticeController {
   /**
@@ -101,6 +102,7 @@ class ServiceNoticeController {
     try {
       const data = req.body;
       const environment = req.environment;
+      const userId = req.user?.userId;
 
       if (!environment) {
         return sendBadRequest(res, 'Environment is required', { field: 'environment' });
@@ -127,9 +129,30 @@ class ServiceNoticeController {
         return sendBadRequest(res, 'Content is required', { field: 'content' });
       }
 
-      const notice = await ServiceNoticeService.createServiceNotice(data, environment);
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.requestCreation(
+        userId!,
+        environment,
+        'g_service_notices',
+        { ...data, environment },
+        async () => {
+          const notice = await ServiceNoticeService.createServiceNotice(data, environment);
+          return notice;
+        }
+      );
 
-      return sendSuccessResponse(res, { notice }, 'Service notice created successfully', 201);
+      if (gatewayResult.mode === 'DIRECT') {
+        return sendSuccessResponse(res, { notice: gatewayResult.data }, 'Service notice created successfully', 201);
+      } else {
+        return res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message: 'Change request created. The service notice will be created after approval.',
+        });
+      }
     } catch (error) {
       return sendInternalError(res, 'Failed to create service notice', error, ErrorCodes.RESOURCE_CREATE_FAILED);
     }
@@ -143,14 +166,37 @@ class ServiceNoticeController {
       const id = parseInt(req.params.id);
       const data = req.body;
       const environment = req.environment;
+      const userId = req.user?.userId;
 
       if (!environment) {
         return sendBadRequest(res, 'Environment is required', { field: 'environment' });
       }
 
-      const notice = await ServiceNoticeService.updateServiceNotice(id, data, environment);
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.processChange(
+        userId!,
+        environment,
+        'g_service_notices',
+        String(id),
+        data,
+        async (processedData: any) => {
+          const notice = await ServiceNoticeService.updateServiceNotice(id, processedData, environment);
+          return { notice };
+        }
+      );
 
-      return sendSuccessResponse(res, { notice }, 'Service notice updated successfully');
+      if (gatewayResult.mode === 'DIRECT') {
+        return sendSuccessResponse(res, gatewayResult.data, 'Service notice updated successfully');
+      } else {
+        return res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message: 'Change request created. The update will be applied after approval.',
+        });
+      }
     } catch (error) {
       return sendInternalError(res, 'Failed to update service notice', error, ErrorCodes.RESOURCE_UPDATE_FAILED);
     }
@@ -163,14 +209,35 @@ class ServiceNoticeController {
     try {
       const id = parseInt(req.params.id);
       const environment = req.environment;
+      const userId = req.user?.userId;
 
       if (!environment) {
         return sendBadRequest(res, 'Environment is required', { field: 'environment' });
       }
 
-      await ServiceNoticeService.deleteServiceNotice(id, environment);
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.requestDeletion(
+        userId!,
+        environment,
+        'g_service_notices',
+        String(id),
+        async () => {
+          await ServiceNoticeService.deleteServiceNotice(id, environment);
+        }
+      );
 
-      return sendSuccessResponse(res, undefined, 'Service notice deleted successfully');
+      if (gatewayResult.mode === 'DIRECT') {
+        return sendSuccessResponse(res, undefined, 'Service notice deleted successfully');
+      } else {
+        return res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message: 'Change request created. The deletion will be applied after approval.',
+        });
+      }
     } catch (error) {
       return sendInternalError(res, 'Failed to delete service notice', error, ErrorCodes.RESOURCE_DELETE_FAILED);
     }
@@ -183,6 +250,7 @@ class ServiceNoticeController {
     try {
       const { ids } = req.body;
       const environment = req.environment;
+      const userId = req.user?.userId;
 
       if (!environment) {
         return sendBadRequest(res, 'Environment is required', { field: 'environment' });
@@ -192,9 +260,34 @@ class ServiceNoticeController {
         return sendBadRequest(res, 'IDs array is required', { field: 'ids' });
       }
 
-      await ServiceNoticeService.deleteMultipleServiceNotices(ids, environment);
+      // For bulk delete, check if CR is required
+      const requiresCR = await UnifiedChangeGateway.requiresApproval(environment);
 
-      return sendSuccessResponse(res, undefined, `${ids.length} service notice(s) deleted successfully`);
+      if (requiresCR) {
+        // Create individual CRs for each item
+        const results = [];
+        for (const id of ids) {
+          const gatewayResult = await UnifiedChangeGateway.requestDeletion(
+            userId!,
+            environment,
+            'g_service_notices',
+            String(id),
+            async () => {
+              await ServiceNoticeService.deleteServiceNotice(id, environment);
+            }
+          );
+          results.push({ id, changeRequestId: gatewayResult.changeRequestId });
+        }
+
+        return res.status(202).json({
+          success: true,
+          data: { results },
+          message: `Change requests created for ${ids.length} service notice(s). Deletions will be applied after approval.`,
+        });
+      } else {
+        await ServiceNoticeService.deleteMultipleServiceNotices(ids, environment);
+        return sendSuccessResponse(res, undefined, `${ids.length} service notice(s) deleted successfully`);
+      }
     } catch (error) {
       return sendInternalError(res, 'Failed to delete service notices', error, ErrorCodes.RESOURCE_DELETE_FAILED);
     }
@@ -207,14 +300,45 @@ class ServiceNoticeController {
     try {
       const id = parseInt(req.params.id);
       const environment = req.environment;
+      const userId = req.user?.userId;
 
       if (!environment) {
         return sendBadRequest(res, 'Environment is required', { field: 'environment' });
       }
 
-      const notice = await ServiceNoticeService.toggleActive(id, environment);
+      // Get current state
+      const currentNotice = await ServiceNoticeService.getServiceNoticeById(id, environment);
+      if (!currentNotice) {
+        return sendNotFound(res, 'Service notice not found', ErrorCodes.RESOURCE_NOT_FOUND);
+      }
 
-      return sendSuccessResponse(res, { notice }, 'Service notice status toggled successfully');
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.processChange(
+        userId!,
+        environment,
+        'g_service_notices',
+        String(id),
+        async (currentData: any) => {
+          return { isActive: !currentData.isActive };
+        },
+        async (processedData: any) => {
+          const notice = await ServiceNoticeService.updateServiceNotice(id, processedData, environment);
+          return { notice };
+        }
+      );
+
+      if (gatewayResult.mode === 'DIRECT') {
+        return sendSuccessResponse(res, gatewayResult.data, 'Service notice status toggled successfully');
+      } else {
+        return res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message: 'Change request created. Status toggle will be applied after approval.',
+        });
+      }
     } catch (error) {
       return sendInternalError(res, 'Failed to toggle service notice status', error, ErrorCodes.RESOURCE_UPDATE_FAILED);
     }

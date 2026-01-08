@@ -11,20 +11,22 @@ export class GatrixError extends Error implements AppError {
   public statusCode: number;
   public isOperational: boolean;
   public code?: string;
+  public payload?: Record<string, any>;
 
-  constructor(message: string, statusCode: number = 500, isOperational: boolean = true, code?: string) {
+  constructor(message: string, statusCode: number = 500, isOperational: boolean = true, code?: string, payload?: Record<string, any>) {
     super(message);
     this.statusCode = statusCode;
     this.isOperational = isOperational;
     this.code = code;
+    this.payload = payload;
 
     //TODO 개발 환경에서만 callstack을 추적하는게?
     Error.captureStackTrace(this, this.constructor);
   }
 }
 
-export const createError = (message: string, statusCode: number = 500, code?: string): GatrixError => {
-  return new GatrixError(message, statusCode, true, code);
+export const createError = (message: string, statusCode: number = 500, code?: string, payload?: Record<string, any>): GatrixError => {
+  return new GatrixError(message, statusCode, true, code, payload);
 };
 
 export const errorHandler = (
@@ -89,6 +91,16 @@ export const errorHandler = (
     statusCode = 400;
     errorCode = ErrorCodes.BAD_REQUEST;
     message = 'Invalid ID format';
+  } else if ((error as any).errno === 1062 || (error as any).code === 'ER_DUP_ENTRY') {
+    statusCode = 409;
+    errorCode = ErrorCodes.DUPLICATE_ENTRY;
+    // Extract duplicate value from MySQL error message if possible: "Duplicate entry '...' for key '...'"
+    const match = error.message.match(/Duplicate entry '(.+)' for key '(.+)'/);
+    if (match) {
+      message = `Duplicate entry: '${match[1]}' for index '${match[2]}'`;
+    } else {
+      message = 'A record with the same unique identifier already exists.';
+    }
   }
 
   // For client aborts, don't send response (connection is already closed)
@@ -101,13 +113,19 @@ export const errorHandler = (
     message = 'Internal Server Error';
   }
 
+  const errorResponse: any = {
+    code: errorCode,
+    message,
+    ...((error as any).validationErrors && { details: { validationErrors: (error as any).validationErrors } }),
+  };
+
+  if ((error as any).payload) {
+    errorResponse.details = { ...errorResponse.details, payload: (error as any).payload };
+  }
+
   res.status(statusCode).json({
     success: false,
-    error: {
-      code: errorCode,
-      message,
-      ...((error as any).validationErrors && { details: { validationErrors: (error as any).validationErrors } }),
-    },
+    error: errorResponse,
   });
 };
 

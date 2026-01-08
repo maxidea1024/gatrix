@@ -9,12 +9,14 @@ import { useDebounce } from '@/hooks/useDebounce';
 import DynamicFilterBar, { ActiveFilter, FilterDefinition } from '@/components/common/DynamicFilterBar';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import { couponService, CouponSetting, UsageRecord } from '@/services/couponService';
-import { formatDateTime, getStoredTimezone } from '@/utils/dateFormat';
+import { formatDateTime, getStoredTimezone, formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
+import { useI18n } from '@/contexts/I18nContext';
 import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSettingsDialog';
 
 // Coupon Usage page (admin view of redemption records)
 const CouponUsagePage: React.FC = () => {
   const { t } = useTranslation();
+  const { language } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
 
   // settings list
@@ -451,15 +453,27 @@ const CouponUsagePage: React.FC = () => {
                             );
                           case 'usedAt':
                             return (
-                              <TableCell key="usedAt"><Typography variant="caption">{formatDateTime(r.usedAt)}</Typography></TableCell>
+                              <TableCell key="usedAt">
+                                <Tooltip title={formatDateTimeDetailed(r.usedAt)}>
+                                  <Typography variant="caption">{formatRelativeTime(r.usedAt, undefined, language)}</Typography>
+                                </Tooltip>
+                              </TableCell>
                             );
                           case 'couponStartsAt':
                             return (
-                              <TableCell key="couponStartsAt"><Typography variant="caption">{r.couponStartsAt ? formatDateTime(r.couponStartsAt) : '-'}</Typography></TableCell>
+                              <TableCell key="couponStartsAt">
+                                <Tooltip title={r.couponStartsAt ? formatDateTimeDetailed(r.couponStartsAt) : '-'}>
+                                  <Typography variant="caption">{r.couponStartsAt ? formatRelativeTime(r.couponStartsAt, undefined, language) : '-'}</Typography>
+                                </Tooltip>
+                              </TableCell>
                             );
                           case 'couponExpiresAt':
                             return (
-                              <TableCell key="couponExpiresAt"><Typography variant="caption">{r.couponExpiresAt ? formatDateTime(r.couponExpiresAt) : '-'}</Typography></TableCell>
+                              <TableCell key="couponExpiresAt">
+                                <Tooltip title={r.couponExpiresAt ? formatDateTimeDetailed(r.couponExpiresAt) : '-'}>
+                                  <Typography variant="caption">{r.couponExpiresAt ? formatRelativeTime(r.couponExpiresAt, undefined, language) : '-'}</Typography>
+                                </Tooltip>
+                              </TableCell>
                             );
                           case 'gameWorldId':
                             return (

@@ -18,6 +18,7 @@ import {
   sendSuccessResponse,
   ErrorCodes,
 } from '../utils/apiResponse';
+import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
 
 // Validation schemas
 const createIngamePopupNoticeSchema = Joi.object({
@@ -176,18 +177,40 @@ class IngamePopupNoticeController {
         return sendUnauthorized(res, 'Unauthorized', ErrorCodes.UNAUTHORIZED);
       }
 
-      const notice = await IngamePopupNoticeService.createIngamePopupNotice(data, createdBy, environment);
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.requestCreation(
+        createdBy,
+        environment,
+        'g_ingame_popup_notices',
+        { ...data, environment },
+        async () => {
+          const notice = await IngamePopupNoticeService.createIngamePopupNotice(data, createdBy, environment);
 
-      // Publish event for SDK real-time updates
-      await pubSubService.publishNotification({
-        type: 'popup.created',
-        data: { notice },
-        targetChannels: ['popup', 'admin'],
-      });
+          // Publish event for SDK real-time updates
+          await pubSubService.publishNotification({
+            type: 'popup.created',
+            data: { notice },
+            targetChannels: ['popup', 'admin'],
+          });
 
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
 
-      return sendSuccessResponse(res, { notice }, 'Ingame popup notice created successfully', 201);
+          return notice;
+        }
+      );
+
+      if (gatewayResult.mode === 'DIRECT') {
+        return sendSuccessResponse(res, { notice: gatewayResult.data }, 'Ingame popup notice created successfully', 201);
+      } else {
+        return res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message: 'Change request created. The notice will be created after approval.',
+        });
+      }
     } catch (error) {
       next(error);
     }
@@ -219,18 +242,41 @@ class IngamePopupNoticeController {
         return sendUnauthorized(res, 'Unauthorized', ErrorCodes.UNAUTHORIZED);
       }
 
-      const notice = await IngamePopupNoticeService.updateIngamePopupNotice(id, data, updatedBy, environment);
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.processChange(
+        updatedBy,
+        environment,
+        'g_ingame_popup_notices',
+        String(id),
+        data,
+        async (processedData: any) => {
+          const notice = await IngamePopupNoticeService.updateIngamePopupNotice(id, processedData as any, updatedBy, environment);
 
-      // Publish event for SDK real-time updates
-      await pubSubService.publishNotification({
-        type: 'popup.updated',
-        data: { notice },
-        targetChannels: ['popup', 'admin'],
-      });
+          // Publish event for SDK real-time updates
+          await pubSubService.publishNotification({
+            type: 'popup.updated',
+            data: { notice },
+            targetChannels: ['popup', 'admin'],
+          });
 
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
 
-      return sendSuccessResponse(res, { notice }, 'Ingame popup notice updated successfully');
+          return notice;
+        }
+      );
+
+      if (gatewayResult.mode === 'DIRECT') {
+        return sendSuccessResponse(res, { notice: gatewayResult.data }, 'Ingame popup notice updated successfully');
+      } else {
+        return res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message: 'Change request created. The notice update will be applied after approval.',
+        });
+      }
     } catch (error) {
       next(error);
     }
@@ -244,23 +290,48 @@ class IngamePopupNoticeController {
     try {
       const id = parseInt(req.params.id);
       const environment = req.environment;
+      const userId = req.user?.userId;
 
       if (!environment) {
         throw new GatrixError('Environment is required', 400);
       }
 
-      await IngamePopupNoticeService.deleteIngamePopupNotice(id, environment);
+      if (!userId) {
+        return sendUnauthorized(res, 'Unauthorized', ErrorCodes.UNAUTHORIZED);
+      }
 
-      // Publish event for SDK real-time updates
-      await pubSubService.publishNotification({
-        type: 'popup.deleted',
-        data: { noticeId: id },
-        targetChannels: ['popup', 'admin'],
-      });
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.requestDeletion(
+        userId,
+        environment,
+        'g_ingame_popup_notices',
+        String(id),
+        async () => {
+          await IngamePopupNoticeService.deleteIngamePopupNotice(id, environment);
 
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
+          // Publish event for SDK real-time updates
+          await pubSubService.publishNotification({
+            type: 'popup.deleted',
+            data: { noticeId: id },
+            targetChannels: ['popup', 'admin'],
+          });
 
-      return sendSuccessResponse(res, undefined, 'Ingame popup notice deleted successfully');
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
+        }
+      );
+
+      if (gatewayResult.mode === 'DIRECT') {
+        return sendSuccessResponse(res, undefined, 'Ingame popup notice deleted successfully');
+      } else {
+        return res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message: 'Change request created. The deletion will be applied after approval.',
+        });
+      }
     } catch (error) {
       next(error);
     }
@@ -279,15 +350,40 @@ class IngamePopupNoticeController {
         throw new GatrixError('Environment is required', 400);
       }
 
-      if (!Array.isArray(ids) || ids.length === 0) {
-        return sendBadRequest(res, 'Invalid or empty ids array', { field: 'ids' });
+      const userId = req.user?.userId;
+      if (!userId) {
+        return sendUnauthorized(res, 'Unauthorized', ErrorCodes.UNAUTHORIZED);
       }
 
-      await IngamePopupNoticeService.deleteMultipleIngamePopupNotices(ids, environment);
+      // Check if CR is required
+      const requiresCR = await UnifiedChangeGateway.requiresApproval(environment);
 
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
+      if (requiresCR) {
+        // Create individual CRs for each item
+        const results = [];
+        for (const id of ids) {
+          const gatewayResult = await UnifiedChangeGateway.requestDeletion(
+            userId,
+            environment,
+            'g_ingame_popup_notices',
+            String(id),
+            async () => {
+              await IngamePopupNoticeService.deleteIngamePopupNotice(id, environment);
+            }
+          );
+          results.push({ id, changeRequestId: gatewayResult.changeRequestId });
+        }
 
-      return sendSuccessResponse(res, undefined, `${ids.length} ingame popup notice(s) deleted successfully`);
+        return res.status(202).json({
+          success: true,
+          data: { results },
+          message: `Change requests created for ${ids.length} notice(s). Deletions will be applied after approval.`,
+        });
+      } else {
+        await IngamePopupNoticeService.deleteMultipleIngamePopupNotices(ids, environment);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
+        return sendSuccessResponse(res, undefined, `${ids.length} ingame popup notice(s) deleted successfully`);
+      }
     } catch (error) {
       next(error);
     }
@@ -301,16 +397,53 @@ class IngamePopupNoticeController {
     try {
       const id = parseInt(req.params.id);
       const environment = req.environment;
+      const userId = req.user?.userId;
 
       if (!environment) {
         throw new GatrixError('Environment is required', 400);
       }
 
-      const notice = await IngamePopupNoticeService.toggleActive(id, environment);
+      if (!userId) {
+        return sendUnauthorized(res, 'Unauthorized', ErrorCodes.UNAUTHORIZED);
+      }
 
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.processChange(
+        userId,
+        environment,
+        'g_ingame_popup_notices',
+        String(id),
+        async (currentNotice: any) => {
+          return { isActive: !currentNotice.isActive };
+        },
+        async (processedData: any) => {
+          const notice = await IngamePopupNoticeService.updateIngamePopupNotice(id, processedData as any, userId, environment);
 
-      return sendSuccessResponse(res, { notice }, 'Ingame popup notice status toggled successfully');
+          // Publish event for SDK real-time updates
+          await pubSubService.publishNotification({
+            type: 'popup.updated',
+            data: { notice },
+            targetChannels: ['popup', 'admin'],
+          });
+
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
+
+          return notice;
+        }
+      );
+
+      if (gatewayResult.mode === 'DIRECT') {
+        return sendSuccessResponse(res, { notice: gatewayResult.data }, 'Ingame popup notice status toggled successfully');
+      } else {
+        return res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message: 'Change request created. Status toggle will be applied after approval.',
+        });
+      }
     } catch (error) {
       next(error);
     }

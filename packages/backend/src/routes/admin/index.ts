@@ -41,6 +41,7 @@ import dataManagementRoutes from './dataManagement';
 import bannerRoutes from './banners';
 import cmsCashShopRoutes from './cmsCashShop';
 import serverLifecycleRoutes from './serverLifecycle';
+import changeRequestRoutes from './changeRequests';
 
 const router = express.Router();
 
@@ -158,5 +159,8 @@ router.use('/cms/cash-shop', requirePermission([PERMISSIONS.STORE_PRODUCTS_VIEW,
 
 // Server Lifecycle Events - requires servers.view permission
 router.use('/server-lifecycle', requirePermission(PERMISSIONS.SERVERS_VIEW) as any, serverLifecycleRoutes);
+
+// Change Requests - requires change-requests.view or change-requests.manage permission
+router.use('/change-requests', requirePermission([PERMISSIONS.CHANGE_REQUESTS_VIEW, PERMISSIONS.CHANGE_REQUESTS_MANAGE]) as any, changeRequestRoutes);
 
 export default router;

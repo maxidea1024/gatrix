@@ -523,7 +523,7 @@ export class EnvironmentCopyService {
       const sources = await knex(tableName).where('environment', sourceEnv);
       for (const item of sources) {
         try {
-          const { id, createdAt, updatedAt, ...data } = item;
+          const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
           await knex(tableName).insert({
             ...data, environment: targetEnv, createdBy: userId, createdAt: new Date(), updatedAt: new Date()
           });
@@ -545,7 +545,7 @@ export class EnvironmentCopyService {
           .where('version', item.version)
           .first();
         if (existing && !overwrite) { result.skipped++; continue; }
-        const { id, createdAt, updatedAt, ...data } = item;
+        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
         if (existing) {
           await knex('g_client_versions').where('id', existing.id).update({
             ...data, environment: targetEnv, updatedBy: userId, updatedAt: new Date()
@@ -570,7 +570,7 @@ export class EnvironmentCopyService {
         const existing = await knex('g_coupons')
           .where('environment', targetEnv).where('code', item.code).first();
         if (existing && !overwrite) { result.skipped++; continue; }
-        const { id, createdAt, updatedAt, usedCount, ...data } = item;
+        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, usedCount: _usedCount, ...data } = item;
         if (existing) {
           await knex('g_coupons').where('id', existing.id).update({
             ...data, environment: targetEnv, usedCount: 0, updatedBy: userId, updatedAt: new Date()
@@ -594,7 +594,7 @@ export class EnvironmentCopyService {
         const existing = await knex('g_message_templates')
           .where('environment', targetEnv).where('templateKey', item.templateKey).first();
         if (existing && !overwrite) { result.skipped++; continue; }
-        const { id, createdAt, updatedAt, ...data } = item;
+        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
         let newId: number;
         if (existing) {
           await knex('g_message_templates').where('id', existing.id).update({
@@ -612,7 +612,7 @@ export class EnvironmentCopyService {
         // Copy locales
         const locales = await knex('g_message_template_locales').where('templateId', item.id);
         for (const locale of locales) {
-          const { id: localeId, templateId, ...localeData } = locale;
+          const { id: _localeId, templateId: _templateId, ...localeData } = locale;
           await knex('g_message_template_locales').insert({ ...localeData, templateId: newId });
         }
         result.copied++;
@@ -629,7 +629,7 @@ export class EnvironmentCopyService {
         const existing = await knex('g_reward_templates')
           .where('environment', targetEnv).where('templateKey', item.templateKey).first();
         if (existing && !overwrite) { result.skipped++; continue; }
-        const { id, createdAt, updatedAt, ...data } = item;
+        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
         let newId: number;
         if (existing) {
           await knex('g_reward_templates').where('id', existing.id).update({
@@ -647,7 +647,7 @@ export class EnvironmentCopyService {
         // Copy reward items
         const items = await knex('g_reward_items').where('templateId', item.id);
         for (const rewardItem of items) {
-          const { id: itemId, templateId, ...itemData } = rewardItem;
+          const { id: _itemId, templateId: _templateId, ...itemData } = rewardItem;
           await knex('g_reward_items').insert({ ...itemData, templateId: newId });
         }
         result.copied++;
@@ -661,7 +661,7 @@ export class EnvironmentCopyService {
     const sources = await knex('g_service_maintenance').where('environment', sourceEnv);
     for (const item of sources) {
       try {
-        const { id, createdAt, updatedAt, ...data } = item;
+        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
         const [newId] = await knex('g_service_maintenance').insert({
           ...data, environment: targetEnv, isActive: false, // Start inactive in new env
           createdBy: userId, createdAt: new Date(), updatedAt: new Date()
@@ -669,7 +669,7 @@ export class EnvironmentCopyService {
         // Copy locales
         const locales = await knex('g_service_maintenance_locales').where('maintenanceId', item.id);
         for (const locale of locales) {
-          const { id: localeId, maintenanceId, ...localeData } = locale;
+          const { id: _localeId, maintenanceId: _maintenanceId, ...localeData } = locale;
           await knex('g_service_maintenance_locales').insert({ ...localeData, maintenanceId: newId });
         }
         result.copied++;
@@ -686,7 +686,7 @@ export class EnvironmentCopyService {
         const existing = await knex('g_vars')
           .where('environment', targetEnv).where('varKey', item.varKey).first();
         if (existing && !overwrite) { result.skipped++; continue; }
-        const { id, createdAt, updatedAt, ...data } = item;
+        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
         if (existing) {
           await knex('g_vars').where('id', existing.id).update({
             ...data, environment: targetEnv, updatedBy: userId, updatedAt: new Date()
@@ -710,7 +710,7 @@ export class EnvironmentCopyService {
         const existing = await knex('g_remote_config_context_fields')
           .where('environment', targetEnv).where('fieldKey', item.fieldKey).first();
         if (existing && !overwrite) { result.skipped++; continue; }
-        const { id, createdAt, updatedAt, ...data } = item;
+        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
         if (existing) {
           await knex('g_remote_config_context_fields').where('id', existing.id).update({
             ...data, environment: targetEnv, updatedBy: userId, updatedAt: new Date()
@@ -734,7 +734,7 @@ export class EnvironmentCopyService {
         const existing = await knex('g_remote_config_campaigns')
           .where('environment', targetEnv).where('campaignName', item.campaignName).first();
         if (existing && !overwrite) { result.skipped++; continue; }
-        const { id, createdAt, updatedAt, ...data } = item;
+        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
         if (existing) {
           await knex('g_remote_config_campaigns').where('id', existing.id).update({
             ...data, environment: targetEnv, status: 'draft', updatedBy: userId, updatedAt: new Date()
@@ -758,7 +758,7 @@ export class EnvironmentCopyService {
         const existing = await knex('g_account_whitelist')
           .where('environment', targetEnv).where('accountId', item.accountId).first();
         if (existing && !overwrite) { result.skipped++; continue; }
-        const { id, createdAt, updatedAt, ...data } = item;
+        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
         if (existing) {
           await knex('g_account_whitelist').where('id', existing.id).update({
             ...data, environment: targetEnv, updatedBy: userId, updatedAt: new Date()
@@ -782,7 +782,7 @@ export class EnvironmentCopyService {
         const existing = await knex('g_ip_whitelist')
           .where('environment', targetEnv).where('ipAddress', item.ipAddress).first();
         if (existing && !overwrite) { result.skipped++; continue; }
-        const { id, createdAt, updatedAt, ...data } = item;
+        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
         if (existing) {
           await knex('g_ip_whitelist').where('id', existing.id).update({
             ...data, environment: targetEnv, updatedBy: userId, updatedAt: new Date()
@@ -806,7 +806,7 @@ export class EnvironmentCopyService {
         const existing = await knex('g_jobs')
           .where('environment', targetEnv).where('name', item.name).first();
         if (existing && !overwrite) { result.skipped++; continue; }
-        const { id, createdAt, updatedAt, ...data } = item;
+        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
         if (existing) {
           await knex('g_jobs').where('id', existing.id).update({
             ...data, environment: targetEnv, updatedBy: userId, updatedAt: new Date()

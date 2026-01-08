@@ -4,6 +4,8 @@
  * 모든 날짜는 UTC로 저장되며, MySQL DATETIME 형식으로 변환됩니다.
  */
 
+import logger from '../config/logger';
+
 /**
  * ISO 8601 날짜 문자열을 MySQL DATETIME 형식(UTC)으로 변환
  * 
@@ -19,20 +21,20 @@
  */
 export function convertToMySQLDateTime(dateValue: string | Date | null | undefined): string | null {
   if (!dateValue) return null;
-  
+
   try {
     const date = new Date(dateValue);
-    
+
     // 유효한 날짜인지 확인
     if (isNaN(date.getTime())) {
-      console.warn(`Invalid date value: ${dateValue}`);
+      logger.warn(`Invalid date value: ${dateValue}`);
       return null;
     }
-    
+
     // UTC 시간으로 MySQL DATETIME 형식 변환: YYYY-MM-DD HH:MM:SS
     return date.toISOString().slice(0, 19).replace('T', ' ');
   } catch (error) {
-    console.error(`Error converting date: ${dateValue}`, error);
+    logger.error(`Error converting date: ${dateValue}`, error);
     return null;
   }
 }
@@ -117,7 +119,7 @@ export function convertFromMySQLDateTime(mysqlDateTime: string | Date | null | u
     // If already a Date object, convert directly
     if (mysqlDateTime instanceof Date) {
       if (isNaN(mysqlDateTime.getTime())) {
-        console.warn(`Invalid Date object: ${mysqlDateTime}`);
+        logger.warn(`Invalid Date object: ${mysqlDateTime}`);
         return null;
       }
       return mysqlDateTime.toISOString();
@@ -128,13 +130,13 @@ export function convertFromMySQLDateTime(mysqlDateTime: string | Date | null | u
     const date = new Date(isoString);
 
     if (isNaN(date.getTime())) {
-      console.warn(`Invalid MySQL datetime value: ${mysqlDateTime}`);
+      logger.warn(`Invalid MySQL datetime value: ${mysqlDateTime}`);
       return null;
     }
 
     return date.toISOString();
   } catch (error) {
-    console.error(`Error converting MySQL datetime: ${mysqlDateTime}`, error);
+    logger.error(`Error converting MySQL datetime: ${mysqlDateTime}`, error);
     return null;
   }
 }
@@ -151,13 +153,13 @@ export function convertDateFieldsFromMySQL<T extends Record<string, any>>(
   dateFields: (keyof T)[]
 ): T {
   const converted = { ...data };
-  
+
   dateFields.forEach(field => {
     if (converted[field] !== undefined) {
       converted[field] = convertFromMySQLDateTime(converted[field] as any) as any;
     }
   });
-  
+
   return converted;
 }
 
@@ -194,7 +196,7 @@ export function convertMySQLDateTimeToTimezone(
     const date = new Date(mysqlDateTimeStr + 'Z');
 
     if (isNaN(date.getTime())) {
-      console.warn(`Invalid MySQL datetime: ${mysqlDateTimeStr}`);
+      logger.warn(`Invalid MySQL datetime: ${mysqlDateTimeStr}`);
       return null;
     }
 
@@ -220,7 +222,7 @@ export function convertMySQLDateTimeToTimezone(
 
     return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
   } catch (error) {
-    console.error(`Error converting MySQL datetime to timezone: ${mysqlDateTimeStr}`, error);
+    logger.error(`Error converting MySQL datetime to timezone: ${mysqlDateTimeStr}`, error);
     return null;
   }
 }

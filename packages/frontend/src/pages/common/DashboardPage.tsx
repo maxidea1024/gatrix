@@ -63,7 +63,7 @@ import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceSer
 import { CrashEvent } from '@/types/crash';
 import { BugReport as BugReportIcon } from '@mui/icons-material';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
-import { formatDateTime, formatRelativeTime } from '@/utils/dateFormat';
+import { formatDateTime, formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import serverLifecycleService, { ServerLifecycleEvent } from '@/services/serverLifecycleService';
 
 // Stats card component with modern design
@@ -263,7 +263,7 @@ const DashboardPage: React.FC = () => {
   const theme = useTheme();
   const { user, isAdmin, hasPermission, permissionsLoading } = useAuth();
   const { data: statsData, isLoading: statsLoading, mutate: refreshStats } = useUserStats();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const isAdminUser = isAdmin();
   const { switchEnvironment, currentEnvironmentId } = useEnvironment();
@@ -884,9 +884,11 @@ const DashboardPage: React.FC = () => {
                           <Typography variant="body2" color="text.secondary">
                             {t('dashboard.maintenanceStartsAt')}
                           </Typography>
-                          <Typography variant="body2" fontWeight={500}>
-                            {formatDateTime(startsAt)}
-                          </Typography>
+                          <Tooltip title={formatDateTimeDetailed(startsAt)}>
+                            <Typography variant="body2" fontWeight={500}>
+                              {formatRelativeTime(startsAt, undefined, i18n.language)}
+                            </Typography>
+                          </Tooltip>
                         </Box>
                       )}
                       {endsAt && (
@@ -894,9 +896,11 @@ const DashboardPage: React.FC = () => {
                           <Typography variant="body2" color="text.secondary">
                             {t('dashboard.maintenanceEndsAt')}
                           </Typography>
-                          <Typography variant="body2" fontWeight={500}>
-                            {formatDateTime(endsAt)}
-                          </Typography>
+                          <Tooltip title={formatDateTimeDetailed(endsAt)}>
+                            <Typography variant="body2" fontWeight={500}>
+                              {formatRelativeTime(endsAt, undefined, i18n.language)}
+                            </Typography>
+                          </Tooltip>
                         </Box>
                       )}
                       {detail.message && (
@@ -1394,7 +1398,7 @@ const DashboardPage: React.FC = () => {
                               </Typography>
                               <Typography variant="caption" color="text.disabled">•</Typography>
                               <Typography variant="caption" color="text.secondary">
-                                {formatRelativeTime(activity.timestamp)}
+                                {formatRelativeTime(activity.timestamp, undefined, i18n.language)}
                               </Typography>
                             </Box>
                           }
@@ -1480,7 +1484,7 @@ const DashboardPage: React.FC = () => {
                                     <Chip label={event.platform} size="small" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
                                     <Chip label={event.branch} size="small" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
                                     <Typography variant="caption" color="text.secondary">
-                                      {formatRelativeTime(event.createdAt)}
+                                      {formatRelativeTime(event.createdAt, undefined, i18n.language)}
                                     </Typography>
                                   </Box>
                                 }
@@ -1585,7 +1589,7 @@ const DashboardPage: React.FC = () => {
                                         {event.instanceId}
                                       </Typography>
                                       <Typography variant="caption" color="text.secondary">
-                                        {formatRelativeTime(event.createdAt)}
+                                        {formatRelativeTime(event.createdAt, undefined, i18n.language)}
                                       </Typography>
                                       {event.cloudRegion && (
                                         <Typography variant="caption" sx={{ bgcolor: 'action.selected', px: 0.5, borderRadius: 0.5, fontSize: '0.65rem' }}>

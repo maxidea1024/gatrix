@@ -233,24 +233,24 @@ const createLogger = (category: string): winston.Logger => {
       // Add file transports only in production or when LOG_DIR is specified
       ...(process.env.NODE_ENV === 'production' || process.env.LOG_DIR
         ? [
-            new DailyRotateFile({
-              filename: path.join(logDir, 'error-%DATE%.log'),
-              datePattern: 'YYYY-MM-DD',
-              level: 'error',
-              format: fileFormat,
-              maxSize: '20m',
-              maxFiles: '14d',
-              zippedArchive: true,
-            }),
-            new DailyRotateFile({
-              filename: path.join(logDir, 'combined-%DATE%.log'),
-              datePattern: 'YYYY-MM-DD',
-              format: fileFormat,
-              maxSize: '20m',
-              maxFiles: '14d',
-              zippedArchive: true,
-            }),
-          ]
+          new DailyRotateFile({
+            filename: path.join(logDir, 'error-%DATE%.log'),
+            datePattern: 'YYYY-MM-DD',
+            level: 'error',
+            format: fileFormat,
+            maxSize: '20m',
+            maxFiles: '14d',
+            zippedArchive: true,
+          }),
+          new DailyRotateFile({
+            filename: path.join(logDir, 'combined-%DATE%.log'),
+            datePattern: 'YYYY-MM-DD',
+            format: fileFormat,
+            maxSize: '20m',
+            maxFiles: '14d',
+            zippedArchive: true,
+          }),
+        ]
         : []),
     ],
   });

@@ -1,4 +1,5 @@
 import api from './api';
+import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
 
 export interface IngamePopupNotice {
   id: number;
@@ -68,6 +69,8 @@ export interface IngamePopupNoticesResponse {
   total: number;
 }
 
+export type IngamePopupNoticeMutationResult = MutationResult<IngamePopupNotice>;
+
 class IngamePopupNoticeService {
   /**
    * Get ingame popup notices with pagination and filters
@@ -116,45 +119,47 @@ class IngamePopupNoticeService {
    */
   async getIngamePopupNoticeById(id: number): Promise<IngamePopupNotice> {
     const response = await api.get(`/admin/ingame-popup-notices/${id}`);
-    return response.notice;
+    return response.data.notice;
   }
 
   /**
    * Create ingame popup notice
    */
-  async createIngamePopupNotice(data: CreateIngamePopupNoticeData): Promise<IngamePopupNotice> {
+  async createIngamePopupNotice(data: CreateIngamePopupNoticeData): Promise<IngamePopupNoticeMutationResult> {
     const response = await api.post('/admin/ingame-popup-notices', data);
-    return response.notice;
+    return parseChangeRequestResponse<IngamePopupNotice>(response, (r) => r?.notice);
   }
 
   /**
    * Update ingame popup notice
    */
-  async updateIngamePopupNotice(id: number, data: UpdateIngamePopupNoticeData): Promise<IngamePopupNotice> {
+  async updateIngamePopupNotice(id: number, data: UpdateIngamePopupNoticeData): Promise<IngamePopupNoticeMutationResult> {
     const response = await api.put(`/admin/ingame-popup-notices/${id}`, data);
-    return response.notice;
+    return parseChangeRequestResponse<IngamePopupNotice>(response, (r) => r?.notice);
   }
 
   /**
    * Delete ingame popup notice
    */
-  async deleteIngamePopupNotice(id: number): Promise<void> {
-    await api.delete(`/admin/ingame-popup-notices/${id}`);
+  async deleteIngamePopupNotice(id: number): Promise<MutationResult<void>> {
+    const response = await api.delete(`/admin/ingame-popup-notices/${id}`);
+    return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
   /**
    * Delete multiple ingame popup notices
    */
-  async deleteMultipleIngamePopupNotices(ids: number[]): Promise<void> {
-    await api.post('/admin/ingame-popup-notices/bulk-delete', { ids });
+  async deleteMultipleIngamePopupNotices(ids: number[]): Promise<MutationResult<void>> {
+    const response = await api.post('/admin/ingame-popup-notices/bulk-delete', { ids });
+    return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
   /**
    * Toggle active status
    */
-  async toggleActive(id: number): Promise<IngamePopupNotice> {
+  async toggleActive(id: number): Promise<IngamePopupNoticeMutationResult> {
     const response = await api.patch(`/admin/ingame-popup-notices/${id}/toggle-active`);
-    return response.notice;
+    return parseChangeRequestResponse<IngamePopupNotice>(response, (r) => r?.notice);
   }
 }
 

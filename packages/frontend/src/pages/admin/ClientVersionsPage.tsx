@@ -119,14 +119,18 @@ import { ClientVersionService } from '../../services/clientVersionService';
 import ClientVersionForm from '../../components/admin/ClientVersionForm';
 import BulkClientVersionForm from '../../components/admin/BulkClientVersionForm';
 import PlatformDefaultsDialog from '../../components/admin/PlatformDefaultsDialog';
-import { formatDateTimeDetailed, parseUTCForPicker } from '../../utils/dateFormat';
+import { formatDateTimeDetailed, formatRelativeTime, parseUTCForPicker } from '../../utils/dateFormat';
+import { useI18n } from '../../contexts/I18nContext';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import ClientVersionGuideDrawer from '../../components/admin/ClientVersionGuideDrawer';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { getContrastColor } from '@/utils/colorUtils';
+import { showChangeRequestCreatedToast, getActionLabel } from '../../utils/changeRequestToast';
+import { useNavigate } from 'react-router-dom';
 
 // HSV를 RGB로 변환하는 함수
 const hsvToRgb = (h: number, s: number, v: number): [number, number, number] => {
@@ -297,9 +301,13 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
 
 const ClientVersionsPage: React.FC = () => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { language } = useI18n();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const theme = useTheme();
   const { platforms } = usePlatformConfig();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
+  const navigate = useNavigate();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.CLIENT_VERSIONS_MANAGE]);
 
@@ -696,8 +704,12 @@ const ClientVersionsPage: React.FC = () => {
     if (!selectedClientVersion) return;
 
     try {
-      await ClientVersionService.deleteClientVersion(selectedClientVersion.id);
-      enqueueSnackbar(t('clientVersions.deleteSuccess'), { variant: 'success' });
+      const result = await ClientVersionService.deleteClientVersion(selectedClientVersion.id);
+      if (result?.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+      } else {
+        enqueueSnackbar(t('clientVersions.deleteSuccess'), { variant: 'success' });
+      }
       setDeleteDialogOpen(false);
       setSelectedClientVersion(null);
       mutateVersions(); // SWR cache 갱신
@@ -706,7 +718,7 @@ const ClientVersionsPage: React.FC = () => {
       console.error('Error deleting client version:', error);
       enqueueSnackbar(error.message || t('clientVersions.deleteError'), { variant: 'error' });
     }
-  }, [selectedClientVersion, t, enqueueSnackbar, mutateVersions]);
+  }, [selectedClientVersion, t, enqueueSnackbar, closeSnackbar, navigate, mutateVersions]);
 
   // 일괄 상태 변경 핸들러
   const handleBulkStatusUpdate = useCallback(async () => {
@@ -737,7 +749,7 @@ const ClientVersionsPage: React.FC = () => {
             supportsMultiLanguage: supportsMultiLanguage,
             maintenanceLocales: maintenanceLocales.filter(l => l.message.trim() !== ''),
           } : {
-            messageTemplateId: selectedTemplateId,
+            messageTemplateId: selectedTemplateId === '' ? undefined : Number(selectedTemplateId),
           }),
         }),
       };
@@ -1206,9 +1218,11 @@ const ClientVersionsPage: React.FC = () => {
         );
       case 'createdAt':
         return (
-          <Typography variant="body2">
-            {formatDateTimeDetailed(clientVersion.createdAt)}
-          </Typography>
+          <Tooltip title={formatDateTimeDetailed(clientVersion.createdAt)}>
+            <Typography variant="body2">
+              {formatRelativeTime(clientVersion.createdAt, undefined, language)}
+            </Typography>
+          </Tooltip>
         );
       default:
         return null;
@@ -1770,7 +1784,7 @@ const ClientVersionsPage: React.FC = () => {
             variant="contained"
             startIcon={<DeleteIcon />}
           >
-            {t('common.delete')}
+            {getActionLabel('delete', requiresApproval, t)}
           </Button>
         </Box>
       </Drawer>

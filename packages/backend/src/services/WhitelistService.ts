@@ -1,7 +1,5 @@
 import { WhitelistModel, Whitelist, CreateWhitelistData, UpdateWhitelistData, WhitelistFilters, WhitelistListResponse } from '../models/AccountWhitelist';
-import { Environment } from '../models/Environment';
 import { GatrixError } from '../middleware/errorHandler';
-import { getCurrentEnvironmentId } from '../utils/environmentContext';
 import logger from '../config/logger';
 import { pubSubService } from './PubSubService';
 import { SERVER_SDK_ETAG } from '../constants/cacheKeys';

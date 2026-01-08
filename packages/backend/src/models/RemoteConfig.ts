@@ -306,7 +306,7 @@ export class RemoteConfigModel {
   /**
    * Transform database row to RemoteConfig object
    */
-  private static transformConfig(row: any): RemoteConfig {
+  private static transformConfig(row: Record<string, any>): RemoteConfig {
     return {
       id: row.id,
       environment: row.environment,
@@ -329,7 +329,7 @@ export class RemoteConfigModel {
   /**
    * Transform database row to ConfigVersion object
    */
-  private static transformConfigVersion(row: any): ConfigVersion {
+  private static transformConfigVersion(row: Record<string, any>): ConfigVersion {
     return {
       id: row.id,
       configId: row.configId,
@@ -347,7 +347,7 @@ export class RemoteConfigModel {
   /**
    * Transform database row to ConfigRule object
    */
-  private static transformConfigRule(row: any): ConfigRule {
+  private static transformConfigRule(row: Record<string, any>): ConfigRule {
     return {
       id: row.id,
       configId: row.configId,
@@ -366,7 +366,7 @@ export class RemoteConfigModel {
   /**
    * Transform database row to ConfigVariant object
    */
-  private static transformConfigVariant(row: any): ConfigVariant {
+  private static transformConfigVariant(row: Record<string, any>): ConfigVariant {
     return {
       id: row.id,
       configId: row.configId,

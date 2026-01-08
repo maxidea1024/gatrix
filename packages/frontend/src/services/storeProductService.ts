@@ -1,5 +1,6 @@
 import api from './api';
 import { Tag } from './tagService';
+import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
 
 export interface StoreProduct {
   id: string;
@@ -146,24 +147,25 @@ class StoreProductService {
   /**
    * Create a new store product
    */
-  async createStoreProduct(input: CreateStoreProductInput): Promise<StoreProduct> {
+  async createStoreProduct(input: CreateStoreProductInput): Promise<MutationResult<StoreProduct>> {
     const response = await api.post('/admin/store-products', input);
-    return response.data.product;
+    return parseChangeRequestResponse<StoreProduct>(response, (r) => r?.product);
   }
 
   /**
    * Update a store product
    */
-  async updateStoreProduct(id: string, input: UpdateStoreProductInput): Promise<StoreProduct> {
+  async updateStoreProduct(id: string, input: UpdateStoreProductInput): Promise<MutationResult<StoreProduct>> {
     const response = await api.put(`/admin/store-products/${id}`, input);
-    return response.data.product;
+    return parseChangeRequestResponse<StoreProduct>(response, (r) => r?.product);
   }
 
   /**
    * Delete a store product
    */
-  async deleteStoreProduct(id: string): Promise<void> {
-    await api.delete(`/admin/store-products/${id}`);
+  async deleteStoreProduct(id: string): Promise<MutationResult<void>> {
+    const response = await api.delete(`/admin/store-products/${id}`);
+    return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
   /**
@@ -177,17 +179,17 @@ class StoreProductService {
   /**
    * Toggle store product active status
    */
-  async toggleActive(id: string, isActive: boolean): Promise<StoreProduct> {
+  async toggleActive(id: string, isActive: boolean): Promise<MutationResult<StoreProduct>> {
     const response = await api.patch(`/admin/store-products/${id}/toggle-active`, { isActive });
-    return response.data.product;
+    return parseChangeRequestResponse<StoreProduct>(response, (r) => r?.product);
   }
 
   /**
    * Bulk update active status for multiple products
    */
-  async bulkUpdateActiveStatus(ids: string[], isActive: boolean): Promise<number> {
+  async bulkUpdateActiveStatus(ids: string[], isActive: boolean): Promise<MutationResult<number>> {
     const response = await api.patch('/admin/store-products/bulk-active', { ids, isActive });
-    return response.data.affectedCount;
+    return parseChangeRequestResponse<number>(response, (r) => r?.affectedCount);
   }
 
   /**

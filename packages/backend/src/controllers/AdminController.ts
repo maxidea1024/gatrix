@@ -104,7 +104,7 @@ export class AdminController {
       const tags = req.query.tags;
       const tagsOperator = req.query.tags_operator as 'any_of' | 'include_all' | undefined;
 
-      const filters: any = {};
+      const filters: Record<string, any> = {};
       if (roleValue) {
         filters.role = roleValue;
         if (roleOperator) filters.role_operator = roleOperator;
@@ -120,7 +120,7 @@ export class AdminController {
         if (tagsOperator) filters.tags_operator = tagsOperator;
       }
 
-      console.log('[AdminController] User filters:', JSON.stringify(filters, null, 2));
+      logger.debug('[AdminController] User filters:', { filters });
 
       const result = await UserService.getAllUsers(filters, { page, limit });
 
@@ -230,9 +230,6 @@ export class AdminController {
         });
         return;
       }
-
-      const updatedBy = req.user.userId;
-
       let user = await UserService.updateUser(userId, updates);
 
       // 태그 설정 (tagIds가 제공된 경우에만)

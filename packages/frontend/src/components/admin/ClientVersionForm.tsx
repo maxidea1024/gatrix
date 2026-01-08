@@ -59,6 +59,11 @@ import MaintenanceSettingsInput from '../common/MaintenanceSettingsInput';
 import { MessageTemplate, messageTemplateService } from '../../services/messageTemplateService';
 import { MessageLocale } from '../common/MultiLanguageMessageInput';
 import { getContrastColor } from '@/utils/colorUtils';
+import { parseApiErrorMessage } from '@/utils/errorUtils';
+import { showChangeRequestCreatedToast } from '@/utils/changeRequestToast';
+import { useNavigate } from 'react-router-dom';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { getActionLabel } from '@/utils/changeRequestToast';
 
 interface ClientVersionFormProps {
   open: boolean;
@@ -141,7 +146,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   isCopyMode = false,
 }) => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const { platforms } = usePlatformConfig();
   const [loading, setLoading] = useState(false);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
@@ -188,7 +196,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
     reset,
     watch,
     setValue,
@@ -347,7 +355,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
     if (!maintenanceLocales.find(l => l.lang === lang)) {
       const newLocales = [...maintenanceLocales, { lang, message: '' }];
       setMaintenanceLocales(newLocales);
-      setValue('maintenanceLocales', newLocales);
+      setValue('maintenanceLocales', newLocales, { shouldDirty: true });
     }
   };
 
@@ -356,19 +364,19 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       l.lang === lang ? { ...l, message } : l
     );
     setMaintenanceLocales(newLocales);
-    setValue('maintenanceLocales', newLocales);
+    setValue('maintenanceLocales', newLocales, { shouldDirty: true });
   };
 
   const removeMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
     const newLocales = maintenanceLocales.filter(l => l.lang !== lang);
     setMaintenanceLocales(newLocales);
-    setValue('maintenanceLocales', newLocales);
+    setValue('maintenanceLocales', newLocales, { shouldDirty: true });
   };
 
   // 언어별 메시지 사용 여부 변경
   const handleSupportsMultiLanguageChange = (enabled: boolean) => {
     setSupportsMultiLanguage(enabled);
-    setValue('supportsMultiLanguage', enabled);
+    setValue('supportsMultiLanguage', enabled, { shouldDirty: true });
     if (enabled) {
       // 활성화 시, 기존 값을 보존하면서 누락된 언어만 추가
       const merged = availableLanguages.map((lang) => {
@@ -376,7 +384,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         return { lang: lang.code, message: existing?.message || '' } as any;
       });
       setMaintenanceLocales(merged);
-      setValue('maintenanceLocales', merged);
+      setValue('maintenanceLocales', merged, { shouldDirty: true });
     } else {
       // 비활성화 시, 입력값은 유지하고 UI만 숨김 (state/폼 값은 건드리지 않음)
       // no-op
@@ -523,8 +531,16 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         }
 
         console.log('About to call updateClientVersion API...');
-        await ClientVersionService.updateClientVersion(clientVersion.id, cleanedData);
+        const updateResult = await ClientVersionService.updateClientVersion(clientVersion.id, cleanedData);
         console.log('updateClientVersion API call completed');
+
+        if (updateResult.isChangeRequest) {
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          onSuccess();
+          onClose();
+          return;
+        }
+
         clientVersionId = clientVersion.id;
         enqueueSnackbar(t('clientVersions.updateSuccess'), { variant: 'success' });
       } else {
@@ -534,9 +550,17 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           hasClientVersion: !!clientVersion
         });
         console.log('About to call createClientVersion API...');
-        const created = await ClientVersionService.createClientVersion(cleanedData);
+        const createResult = await ClientVersionService.createClientVersion(cleanedData);
         console.log('createClientVersion API call completed');
-        clientVersionId = created?.id;
+
+        if (createResult.isChangeRequest) {
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          onSuccess();
+          onClose();
+          return;
+        }
+
+        clientVersionId = createResult.clientVersion?.id;
         if (!clientVersionId) {
           throw new Error(t('common.cannotGetClientVersionId'));
         }
@@ -562,36 +586,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       onClose();
     } catch (error: any) {
       console.error('Error saving client version:', error);
-
-      // Handle version validation error
-      let rawMessage = error.message;
-
-      // apiService가 throw한 에러 객체 처리 ({ error: { message: ... } } 또는 { message: ... })
-      if (!rawMessage && error.error?.message) {
-        rawMessage = error.error.message;
-      } else if (!rawMessage && error.response?.data?.error?.message) {
-        rawMessage = error.response.data.error.message;
-      } else if (!rawMessage && error.response?.data?.message) {
-        rawMessage = error.response.data.message;
-      } else if (!rawMessage && typeof error === 'string') {
-        rawMessage = error;
-      }
-
-      let errorMessage = rawMessage || t('clientVersions.saveError');
-
-      if (rawMessage?.startsWith('VERSION_TOO_OLD:')) {
-        const latestVersion = rawMessage.split(':')[1];
-        errorMessage = t('clientVersions.versionTooOld', {
-          newVersion: data.clientVersion,
-          latestVersion
-        });
-      } else if (rawMessage?.startsWith('DUPLICATE_CLIENT_VERSIONS:')) {
-        const duplicates = rawMessage.split(':')[1];
-        errorMessage = t('clientVersions.duplicateClientVersions', {
-          duplicates
-        });
-      }
-
+      const errorMessage = parseApiErrorMessage(error, 'clientVersions.saveError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setLoading(false);
@@ -794,12 +789,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     maintenanceLocales={maintenanceLocales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
                     onMaintenanceLocalesChange={(locales) => {
                       setMaintenanceLocales(locales);
-                      setValue('maintenanceLocales', locales);
+                      setValue('maintenanceLocales', locales, { shouldDirty: true });
                       // 번역 결과가 있으면 자동으로 언어별 메시지 사용 활성화
                       const hasNonEmptyLocales = locales.some(l => l.message && l.message.trim() !== '');
                       if (hasNonEmptyLocales && !supportsMultiLanguage) {
                         setSupportsMultiLanguage(true);
-                        setValue('supportsMultiLanguage', true);
+                        setValue('supportsMultiLanguage', true, { shouldDirty: true });
                       }
                     }}
                     templates={templates}
@@ -937,7 +932,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                 value={selectedTags}
                 onChange={(_, value) => {
                   setSelectedTags(value);
-                  setValue('tags', value);
+                  setValue('tags', value, { shouldDirty: true });
                 }}
                 slotProps={{
                   popper: {
@@ -1093,7 +1088,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           <Button
             type="submit"
             variant="contained"
-            disabled={isSubmitting || loading || !!duplicateError}
+            disabled={isSubmitting || loading || !!duplicateError || (displayIsEdit && !isDirty)}
             startIcon={displayIsCopy ? <CopyIcon /> : <SaveIcon />}
             onClick={() => {
               console.log('Submit button clicked!', {
@@ -1108,9 +1103,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           >
             {displayIsCopy
               ? t('clientVersions.form.copyTitle')
-              : displayIsEdit
-                ? t('clientVersions.form.updateTitle')
-                : t('clientVersions.form.createTitle')
+              : getActionLabel(displayIsEdit ? 'update' : 'create', requiresApproval, t)
             }
           </Button>
         </Box>

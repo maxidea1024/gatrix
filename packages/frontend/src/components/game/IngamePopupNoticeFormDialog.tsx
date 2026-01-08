@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Button,
   TextField,
@@ -22,6 +22,10 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { useNavigate } from 'react-router-dom';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import { getActionLabel } from '../../utils/changeRequestToast';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import { useGameWorld } from '../../contexts/GameWorldContext';
 import {
@@ -34,6 +38,7 @@ import { messageTemplateService, MessageTemplate } from '../../services/messageT
 import MultiLanguageMessageInput from '../common/MultiLanguageMessageInput';
 import { parseUTCForPicker } from '../../utils/dateFormat';
 import TargetSettingsGroup, { ChannelSubchannelData } from './TargetSettingsGroup';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 
 interface IngamePopupNoticeFormDialogProps {
   open: boolean;
@@ -49,7 +54,10 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
   notice,
 }) => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const { platforms, channels } = usePlatformConfig();
   const { worlds } = useGameWorld();
   const [submitting, setSubmitting] = useState(false);
@@ -188,6 +196,78 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
     }
   }, [useTemplate, messageTemplateId, templates]);
 
+  // Check if form is dirty (data changed)
+  const isDirty = useMemo(() => {
+    if (!notice) return true;
+
+    // Convert current target settings back to channels/subchannels for comparison
+    const currentChannels: string[] = [];
+    const currentSubchannels: string[] = [];
+    if (targetChannelSubchannels && targetChannelSubchannels.length > 0) {
+      targetChannelSubchannels.forEach((item: any) => {
+        if (!currentChannels.includes(item.channel)) {
+          currentChannels.push(item.channel);
+        }
+        item.subchannels.forEach((subchannel: string) => {
+          const subchannelKey = `${item.channel}:${subchannel}`;
+          if (!currentSubchannels.includes(subchannelKey)) {
+            currentSubchannels.push(subchannelKey);
+          }
+        });
+      }
+      );
+    }
+
+    const currentData = {
+      isActive,
+      content: content.trim(),
+      targetPlatforms: targetPlatforms.length > 0 ? [...targetPlatforms].sort() : null,
+      targetPlatformsInverted,
+      targetChannels: currentChannels.length > 0 ? [...currentChannels].sort() : null,
+      targetChannelsInverted: targetChannelSubchannelsInverted,
+      targetSubchannels: currentSubchannels.length > 0 ? [...currentSubchannels].sort() : null,
+      targetWorlds: targetWorlds.length > 0 ? [...targetWorlds].sort() : null,
+      targetWorldsInverted,
+      targetUserIds: targetUserIds.trim() || null,
+      targetUserIdsInverted,
+      displayPriority,
+      showOnce,
+      startDate: startDate ? startDate.toISOString() : null,
+      endDate: endDate ? endDate.toISOString() : null,
+      useTemplate,
+      messageTemplateId: useTemplate ? messageTemplateId : null,
+      description: description.trim() || null,
+    };
+
+    const originalData = {
+      isActive: notice.isActive,
+      content: notice.content.trim(),
+      targetPlatforms: (notice.targetPlatforms || []).length > 0 ? [...notice.targetPlatforms].sort() : null,
+      targetPlatformsInverted: notice.targetPlatformsInverted || false,
+      targetChannels: (notice.targetChannels || []).length > 0 ? [...notice.targetChannels].sort() : null,
+      targetChannelsInverted: notice.targetChannelsInverted || false,
+      targetSubchannels: (notice.targetSubchannels || []).length > 0 ? [...notice.targetSubchannels].sort() : null,
+      targetWorlds: (notice.targetWorlds || []).length > 0 ? [...notice.targetWorlds].sort() : null,
+      targetWorldsInverted: notice.targetWorldsInverted || false,
+      targetUserIds: (notice as any).targetUserIds?.trim() || null,
+      targetUserIdsInverted: (notice as any).targetUserIdsInverted || false,
+      displayPriority: notice.displayPriority,
+      showOnce: notice.showOnce,
+      startDate: notice.startDate ? dayjs(notice.startDate).toISOString() : null,
+      endDate: notice.endDate ? dayjs(notice.endDate).toISOString() : null,
+      useTemplate: notice.useTemplate,
+      messageTemplateId: notice.useTemplate ? notice.messageTemplateId : null,
+      description: notice.description?.trim() || null,
+    };
+
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  }, [
+    notice, isActive, content, targetPlatforms, targetPlatformsInverted,
+    targetChannelSubchannels, targetChannelSubchannelsInverted,
+    targetWorlds, targetWorldsInverted, targetUserIds, targetUserIdsInverted,
+    displayPriority, showOnce, startDate, endDate, useTemplate, messageTemplateId, description
+  ]);
+
   const handleSubmit = async () => {
     // Validation
     if (!content.trim()) {
@@ -242,18 +322,27 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
       };
 
       if (notice) {
-        await ingamePopupNoticeService.updateIngamePopupNotice(notice.id, data);
-        enqueueSnackbar(t('ingamePopupNotices.updateSuccess'), { variant: 'success' });
+        const result = await ingamePopupNoticeService.updateIngamePopupNotice(notice.id, data);
+        if (result.isChangeRequest) {
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+        } else {
+          enqueueSnackbar(t('ingamePopupNotices.updateSuccess'), { variant: 'success' });
+        }
       } else {
-        await ingamePopupNoticeService.createIngamePopupNotice(data as CreateIngamePopupNoticeData);
-        enqueueSnackbar(t('ingamePopupNotices.createSuccess'), { variant: 'success' });
+        const result = await ingamePopupNoticeService.createIngamePopupNotice(data as CreateIngamePopupNoticeData);
+        if (result.isChangeRequest) {
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+        } else {
+          enqueueSnackbar(t('ingamePopupNotices.createSuccess'), { variant: 'success' });
+        }
       }
 
       onSuccess();
       onClose();
     } catch (error: any) {
       console.error('Failed to save ingame popup notice:', error);
-      enqueueSnackbar(error?.error?.message || t('ingamePopupNotices.saveFailed'), { variant: 'error' });
+      const fallbackKey = requiresApproval ? 'ingamePopupNotices.requestSaveFailed' : 'ingamePopupNotices.saveFailed';
+      enqueueSnackbar(parseApiErrorMessage(error, fallbackKey), { variant: 'error' });
     } finally {
       setSubmitting(false);
     }
@@ -380,7 +469,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
             label={t('ingamePopupNotices.displayPriority')}
             type="number"
             value={displayPriority}
-            onChange={(e) => setDisplayPriority(parseInt(e.target.value) || 100)}
+            onChange={(e) => setDisplayPriority(e.target.value === '' ? '' : (parseInt(e.target.value) || 100))}
             fullWidth
             helperText={t('ingamePopupNotices.displayPriorityHelp')}
           />
@@ -486,9 +575,9 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={submitting}
+          disabled={submitting || (!!notice && !isDirty)}
         >
-          {notice ? t('common.update') : t('common.create')}
+          {getActionLabel(notice ? 'update' : 'create', requiresApproval, t)}
         </Button>
       </Box>
     </ResizableDrawer>
