@@ -516,14 +516,14 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                     border: `1px solid ${GAME_COLORS.border}`,
                   }}
                 />
-                <Tooltip title={formatDateTimeDetailed(selectedNotice.createdAt)}>
+                <Tooltip title={formatDateTimeDetailed(selectedNotice.updatedAt)}>
                   <Typography
                     variant="caption"
                     sx={{
                       color: GAME_COLORS.textSecondary, // Fixed color, not theme-dependent
                     }}
                   >
-                    {formatRelativeTime(selectedNotice.createdAt, undefined, i18n.language)}
+                    {formatRelativeTime(selectedNotice.updatedAt, undefined, i18n.language)}
                   </Typography>
                 </Tooltip>
               </Box>
