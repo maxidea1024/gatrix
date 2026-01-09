@@ -115,7 +115,7 @@ export class ChangeRequestController {
     static getById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
         const { id } = req.params;
 
-        let cr = await ChangeRequest.query()
+        const cr = await ChangeRequest.query()
             .findById(id)
             .withGraphFetched('[requester, rejector, environmentModel, changeItems, actionGroups.changeItems, approvals.approver, executor]');
 

@@ -36,7 +36,7 @@ async function createDefaultAdmin() {
         emailVerifiedAt,
         createdAt,
         updatedAt
-      ) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), NOW())
+      ) VALUES (?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP(), UTC_TIMESTAMP())
     `, [
       adminEmail,
       hashedPassword,

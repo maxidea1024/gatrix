@@ -2,7 +2,7 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import database from '../config/database';
 import { convertDateFieldsFromMySQL, convertToMySQLDateTime } from '../utils/dateUtils';
 import { pubSubService } from './PubSubService';
-import { Environment } from '../models/Environment';
+
 import logger from '../config/logger';
 import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 
@@ -66,7 +66,7 @@ class ServiceNoticeService {
     const pool = database.getPool();
     const offset = (page - 1) * limit;
     const whereClauses: string[] = [];
-    const queryParams: any[] = [];
+    const queryParams: (string | number | boolean | null)[] = [];
 
     // Environment filter (always applied)
     const environment = filters.environment;
@@ -83,9 +83,9 @@ class ServiceNoticeService {
       // Filter by currently visible (isActive + within date range)
       // startDate is optional - if null, treat as immediately available
       if (filters.currentlyVisible) {
-        whereClauses.push('isActive = 1 AND (startDate IS NULL OR startDate <= NOW()) AND endDate >= NOW()');
+        whereClauses.push('isActive = 1 AND (startDate IS NULL OR startDate <= UTC_TIMESTAMP()) AND endDate >= UTC_TIMESTAMP()');
       } else {
-        whereClauses.push('(isActive = 0 OR (startDate IS NOT NULL AND startDate > NOW()) OR endDate < NOW())');
+        whereClauses.push('(isActive = 0 OR (startDate IS NOT NULL AND startDate > UTC_TIMESTAMP()) OR endDate < UTC_TIMESTAMP())');
       }
     }
 
@@ -171,7 +171,7 @@ class ServiceNoticeService {
 
     // Get paginated results
     const [rows] = await pool.execute<RowDataPacket[]>(
-      `SELECT * FROM g_service_notices ${whereClause} ORDER BY createdAt DESC LIMIT ${limit} OFFSET ${offset}`,
+      `SELECT * FROM g_service_notices ${whereClause} ORDER BY updatedAt DESC LIMIT ${limit} OFFSET ${offset}`,
       queryParams
     );
 
@@ -299,7 +299,7 @@ class ServiceNoticeService {
   async updateServiceNotice(id: number, data: UpdateServiceNoticeData, environment: string): Promise<ServiceNotice> {
     const pool = database.getPool();
     const updates: string[] = [];
-    const values: any[] = [];
+    const values: (string | number | boolean | null)[] = [];
 
     if (data.isActive !== undefined) {
       updates.push('isActive = ?');
@@ -356,7 +356,7 @@ class ServiceNoticeService {
       values.push(data.description || null);
     }
 
-    updates.push('updatedAt = NOW()');
+    updates.push('updatedAt = UTC_TIMESTAMP()');
     values.push(id, environment);
 
     await pool.execute(
@@ -448,7 +448,7 @@ class ServiceNoticeService {
   async toggleActive(id: number, environment: string): Promise<ServiceNotice> {
     const pool = database.getPool();
     await pool.execute(
-      'UPDATE g_service_notices SET isActive = NOT isActive, updatedAt = NOW() WHERE id = ? AND environment = ?',
+      'UPDATE g_service_notices SET isActive = NOT isActive, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environment = ?',
       [id, environment]
     );
 

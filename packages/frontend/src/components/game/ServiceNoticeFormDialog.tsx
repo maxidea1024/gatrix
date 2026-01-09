@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Button,
   TextField,
@@ -86,6 +86,9 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [description, setDescription] = useState('');
+
+  // Ref to track initial content after Quill normalization
+  const initialContentRef = useRef<string | null>(null);
 
   // Debounced preview values to prevent flickering
   const [debouncedTabTitle, setDebouncedTabTitle] = useState(tabTitle);
@@ -324,6 +327,60 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     .content .video-wrapper {
       max-width: 100%;
     }
+    
+    /* Text animation effects */
+    @keyframes ql-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    @keyframes ql-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    @keyframes ql-shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      75% { transform: translateX(3px); }
+    }
+    @keyframes ql-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    @keyframes ql-glow-pulse {
+      0%, 100% { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
+      50% { text-shadow: 0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor; }
+    }
+    @keyframes ql-rainbow {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes ql-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes ql-jelly {
+      0%, 100% { transform: scale(1, 1); }
+      25% { transform: scale(0.95, 1.05); }
+      50% { transform: scale(1.05, 0.95); }
+      75% { transform: scale(0.95, 1.05); }
+    }
+    @keyframes ql-swing {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(5deg); }
+      75% { transform: rotate(-5deg); }
+    }
+    @keyframes ql-heartbeat {
+      0%, 100% { transform: scale(1); }
+      14% { transform: scale(1.15); }
+      28% { transform: scale(1); }
+      42% { transform: scale(1.15); }
+      70% { transform: scale(1); }
+    }
+    
+    /* Page background color wrapper */
+    .page-background {
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
@@ -373,6 +430,8 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       setTabTitle(notice.tabTitle || '');
       setTitle(notice.title);
       setContent(notice.content);
+      // Reset initialContentRef - will be set on first RichTextEditor onChange
+      initialContentRef.current = null;
       setDescription(notice.description || '');
     } else {
       // Reset form
@@ -410,14 +469,20 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       });
     });
 
+    // Format date to minute precision for comparison (ignore seconds/milliseconds)
+    const formatDateForCompare = (date: Dayjs | null) =>
+      date ? date.format('YYYY-MM-DDTHH:mm') : null;
+    const formatStringDateForCompare = (dateStr: string | null) =>
+      dateStr ? dayjs(dateStr).format('YYYY-MM-DDTHH:mm') : null;
+
     const currentData = {
       isActive,
       category,
       platforms: [...platforms].sort(),
       channels: channels.length > 0 ? [...channels].sort() : null,
       subchannels: subchannels.length > 0 ? [...subchannels].sort() : null,
-      startDate: startDate ? startDate.toISOString() : null,
-      endDate: endDate ? endDate.toISOString() : null,
+      startDate: formatDateForCompare(startDate),
+      endDate: formatDateForCompare(endDate),
       tabTitle: tabTitle.trim() || null,
       title: title.trim(),
       content: content.trim(),
@@ -430,12 +495,12 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       platforms: [...(notice.platforms || [])].sort(),
       channels: notice.channels ? [...notice.channels].sort() : null,
       subchannels: notice.subchannels ? [...notice.subchannels].sort() : null,
-      startDate: notice.startDate ? dayjs(notice.startDate).toISOString() : null,
-      endDate: notice.endDate ? dayjs(notice.endDate).toISOString() : null,
-      tabTitle: notice.tabTitle || null,
-      title: notice.title,
-      content: notice.content,
-      description: notice.description || null,
+      startDate: formatStringDateForCompare(notice.startDate),
+      endDate: formatStringDateForCompare(notice.endDate),
+      tabTitle: notice.tabTitle?.trim() || null,
+      title: notice.title?.trim() || '',
+      content: initialContentRef.current?.trim() || notice.content?.trim() || '',
+      description: notice.description?.trim() || null,
     };
 
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
@@ -456,7 +521,9 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       return;
     }
 
-    if (!content.trim()) {
+    // Check if content is empty (excluding HTML tags)
+    const strippedContent = content.replace(/<[^>]*>/g, '').trim();
+    if (!strippedContent && !content.includes('<img') && !content.includes('<iframe')) {
       enqueueSnackbar(t('serviceNotices.contentRequired'), { variant: 'error' });
       return;
     }
@@ -734,7 +801,13 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
                 </Typography>
                 <RichTextEditor
                   value={content}
-                  onChange={setContent}
+                  onChange={(val) => {
+                    // Capture first content change as baseline for isDirty comparison
+                    if (notice && initialContentRef.current === null) {
+                      initialContentRef.current = val;
+                    }
+                    setContent(val);
+                  }}
                   placeholder={t('serviceNotices.contentPlaceholder')}
                   minHeight={200}
                 />

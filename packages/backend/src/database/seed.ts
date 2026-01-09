@@ -24,7 +24,7 @@ async function createAdminUser() {
     // Create admin user
     const result = await database.query(
       `INSERT INTO g_users (email, passwordHash, name, role, status, emailVerified, emailVerifiedAt)
-       VALUES (?, ?, ?, 'admin', 'active', TRUE, NOW())`,
+       VALUES (?, ?, ?, 'admin', 'active', TRUE, UTC_TIMESTAMP())`,
       [config.admin.email, passwordHash, config.admin.name]
     );
 
@@ -90,7 +90,7 @@ async function createSampleUsers() {
       
       const result = await database.query(
         `INSERT INTO g_users (email, passwordHash, name, role, status, emailVerified, emailVerifiedAt)
-         VALUES (?, ?, ?, 'user', ?, TRUE, NOW())`,
+         VALUES (?, ?, ?, 'user', ?, TRUE, UTC_TIMESTAMP())`,
         [user.email, passwordHash, user.name, user.status]
       );
 

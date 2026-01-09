@@ -172,6 +172,15 @@ class ServiceNoticeController {
         return sendBadRequest(res, 'Environment is required', { field: 'environment' });
       }
 
+      // Validation
+      if (data.title !== undefined && !data.title.trim()) {
+        return sendBadRequest(res, 'Title cannot be empty', { field: 'title' });
+      }
+
+      if (data.content !== undefined && !data.content.trim()) {
+        return sendBadRequest(res, 'Content cannot be empty', { field: 'content' });
+      }
+
       // Use UnifiedChangeGateway for CR support
       const gatewayResult = await UnifiedChangeGateway.processChange(
         userId!,

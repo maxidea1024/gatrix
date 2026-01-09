@@ -28,7 +28,27 @@ import {
   AccordionSummary,
   AccordionDetails,
   ClickAwayListener,
+  Portal,
 } from '@mui/material';
+import {
+  EmojiEmotions as EmojiIcon,
+  FormatBold as BoldIcon,
+  FormatItalic as ItalicIcon,
+  FormatUnderlined as UnderlineIcon,
+  FormatStrikethrough as StrikethroughIcon,
+  Link as LinkIcon,
+  FormatClear as ClearIcon,
+  Image as ImageIcon,
+  ExpandMore as ExpandMoreIcon,
+  Edit as EditIcon,
+  ContentCopy as CopyIcon,
+  ContentCut as CutIcon,
+  ContentPaste as PasteIcon,
+  Delete as DeleteIcon,
+  VideoLibrary as VideoIcon,
+  FormatSize as SizeIcon,
+  FormatColorText as ColorIcon,
+} from '@mui/icons-material';
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useTheme } from '@mui/material/styles';
@@ -141,48 +161,130 @@ class VideoBlot extends BlockEmbed {
 Quill.register(CustomImageBlot, true); // true to overwrite default image format
 Quill.register(VideoBlot, true); // true to suppress overwrite warning
 
-// Register Font Attributor
-const Font = Quill.import('attributors/style/font') as any;
+// Centralized effect styles map for text effects
+const Inline = Quill.import('blots/inline') as any;
+
+const TEXT_EFFECT_STYLES: { [key: string]: string } = {
+  // Shadow effects
+  'shadow': 'text-shadow: 2px 2px 4px rgba(0,0,0,0.5)',
+  'shadow-light': 'text-shadow: 1px 1px 2px rgba(0,0,0,0.3)',
+  'shadow-hard': 'text-shadow: 3px 3px 0 rgba(0,0,0,0.8)',
+  'shadow-multi': 'text-shadow: 1px 1px 0 #000, 2px 2px 0 #333, 3px 3px 0 #666',
+  // Glow effects
+  'glow': 'text-shadow: 0 0 10px currentColor, 0 0 20px currentColor',
+  'glow-blue': 'text-shadow: 0 0 10px #00bfff, 0 0 20px #00bfff, 0 0 30px #00bfff',
+  'glow-gold': 'text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 30px #ffd700',
+  'glow-red': 'text-shadow: 0 0 10px #ff4444, 0 0 20px #ff4444, 0 0 30px #ff4444',
+  'glow-green': 'text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88, 0 0 30px #00ff88',
+  'glow-purple': 'text-shadow: 0 0 10px #a855f7, 0 0 20px #a855f7, 0 0 30px #a855f7',
+  // Outline effects
+  'outline': '-webkit-text-stroke: 1px currentColor; paint-order: stroke fill',
+  'outline-white': '-webkit-text-stroke: 1px white; paint-order: stroke fill',
+  'outline-black': '-webkit-text-stroke: 1px black; paint-order: stroke fill',
+  'outline-thick': '-webkit-text-stroke: 2px currentColor; paint-order: stroke fill',
+  // 3D effects
+  'emboss': 'text-shadow: -1px -1px 0 rgba(255,255,255,0.5), 1px 1px 0 rgba(0,0,0,0.5)',
+  'engrave': 'text-shadow: 1px 1px 0 rgba(255,255,255,0.5), -1px -1px 0 rgba(0,0,0,0.5)',
+  '3d': 'text-shadow: 0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 4px 0 #b9b9b9, 0 5px 0 #aaa, 0 6px 1px rgba(0,0,0,.1), 0 0 5px rgba(0,0,0,.1)',
+  'retro': 'text-shadow: 3px 3px 0 #f0f, 6px 6px 0 #0ff',
+  // Neon effects
+  'neon': 'text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff00de, 0 0 20px #ff00de',
+  'neon-cyan': 'text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff',
+  'neon-orange': 'text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff6b00, 0 0 20px #ff6b00, 0 0 30px #ff6b00',
+  // Gradient text (using background-clip)
+  'gradient-rainbow': 'background: linear-gradient(90deg, #ff0000, #ff8000, #ffff00, #00ff00, #00ffff, #0000ff, #8000ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text',
+  'gradient-gold': 'background: linear-gradient(180deg, #ffd700, #ffb700, #ff9500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text',
+  'gradient-silver': 'background: linear-gradient(180deg, #e8e8e8, #bbb, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text',
+  'gradient-fire': 'background: linear-gradient(180deg, #ff0000, #ff6600, #ffcc00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text',
+  'gradient-ice': 'background: linear-gradient(180deg, #00bfff, #87ceeb, #e0ffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text',
+  'gradient-sunset': 'background: linear-gradient(90deg, #ff512f, #dd2476); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text',
+  // Animation effects (pure CSS)
+  'anim-blink': 'animation: ql-blink 1s step-end infinite',
+  'anim-pulse': 'animation: ql-pulse 1.5s ease-in-out infinite; display: inline-block',
+  'anim-shake': 'animation: ql-shake 0.5s ease-in-out infinite; display: inline-block',
+  'anim-bounce': 'animation: ql-bounce 0.6s ease infinite; display: inline-block',
+  'anim-glow-pulse': 'animation: ql-glow-pulse 1.5s ease-in-out infinite',
+  'anim-rainbow': 'background: linear-gradient(90deg, #ff0000, #ff8000, #ffff00, #00ff00, #00ffff, #0000ff, #8000ff, #ff0000); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: ql-rainbow 3s linear infinite',
+  'anim-float': 'animation: ql-float 2s ease-in-out infinite; display: inline-block',
+  'anim-jelly': 'animation: ql-jelly 0.8s ease infinite; display: inline-block',
+  'anim-swing': 'animation: ql-swing 1s ease-in-out infinite; display: inline-block; transform-origin: top center',
+  'anim-heartbeat': 'animation: ql-heartbeat 1.2s ease-in-out infinite; display: inline-block',
+};
+
+class TextEffectBlot extends Inline {
+  static blotName = 'textEffect';
+  static tagName = 'span';
+  static className = 'ql-text-effect';
+
+  static create(value: string) {
+    const node = super.create() as HTMLElement;
+    node.setAttribute('data-effect', value);
+    const style = TEXT_EFFECT_STYLES[value];
+    if (style) {
+      node.setAttribute('style', style);
+    }
+    return node;
+  }
+
+  static formats(node: HTMLElement) {
+    return node.getAttribute('data-effect');
+  }
+
+  format(name: string, value: any) {
+    if (name === 'textEffect' && value) {
+      this.domNode.setAttribute('data-effect', value);
+      const style = TEXT_EFFECT_STYLES[value];
+      if (style) {
+        this.domNode.setAttribute('style', style);
+      }
+    } else {
+      super.format(name, value);
+    }
+  }
+}
+
+Quill.register(TextEffectBlot, true);
+
+// Font list for editor - Universal fonts first, then CJK fonts
 const fontList = [
-  'Arial',
-  'Verdana',
-  'Helvetica',
-  'Tahoma',
-  'Trebuchet MS',
-  'Times New Roman',
-  'Georgia',
-  'Garamond',
-  'Courier New',
-  'Brush Script MT',
+  // Universal / Multi-language fonts
+  'Noto Sans',
   'Inter',
   'Roboto',
-  'Microsoft YaHei',
-  'SimSun',
-  'SimHei',
+  // Korean fonts
+  'Noto Sans KR',
+  'Pretendard',
+  'Spoqa Han Sans Neo',
+  'Nanum Gothic',
+  'Nanum Myeongjo',
+  'Malgun Gothic',
+  // Chinese fonts
+  'Noto Sans SC',
   'Source Han Sans SC',
-  'Noto Sans SC'
+  'Microsoft YaHei',
+  'SimHei',
+  'SimSun',
+  // Western fonts
+  'Arial',
+  'Helvetica',
+  'Verdana',
+  'Times New Roman',
+  'Georgia',
+  'Courier New',
 ];
-Font.whitelist = fontList;
-Quill.register(Font, true);
-import {
-  EmojiEmotions as EmojiIcon,
-  FormatBold as BoldIcon,
-  FormatItalic as ItalicIcon,
-  FormatUnderlined as UnderlineIcon,
-  FormatStrikethrough as StrikethroughIcon,
-  Link as LinkIcon,
-  FormatClear as ClearIcon,
-  Image as ImageIcon,
-  ExpandMore as ExpandMoreIcon,
-  Edit as EditIcon,
-  ContentCopy as CopyIcon,
-  ContentCut as CutIcon,
-  ContentPaste as PasteIcon,
-  Delete as DeleteIcon,
-  VideoLibrary as VideoIcon,
-  FormatSize as SizeIcon,
-  FormatColorText as ColorIcon,
-} from '@mui/icons-material';
+
+// Register Font, Size, and Align Attributors as styles instead of classes 
+// to ensure they are preserved during copy-paste and better portability
+const FontAttributor = Quill.import('attributors/style/font') as any;
+FontAttributor.whitelist = fontList;
+Quill.register(FontAttributor, true);
+
+const SizeAttributor = Quill.import('attributors/style/size') as any;
+SizeAttributor.whitelist = ['0.75em', '1.5em', '2.5em'];
+Quill.register(SizeAttributor, true);
+
+const AlignAttributor = Quill.import('attributors/style/align') as any;
+Quill.register(AlignAttributor, true);
 
 interface RichTextEditorProps {
   value: string;
@@ -203,6 +305,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const { t } = useTranslation();
   const quillRef = useRef<ReactQuill>(null);
   const [emojiAnchorEl, setEmojiAnchorEl] = useState<HTMLElement | null>(null);
+  const [emojiPosition, setEmojiPosition] = useState<{ top: number; left: number } | null>(null);
   const [contextMenu, setContextMenu] = useState<{ mouseX: number; mouseY: number } | null>(null);
   const [imageContextMenu, setImageContextMenu] = useState<{ mouseX: number; mouseY: number; imgElement: HTMLImageElement } | null>(null);
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
@@ -251,6 +354,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     left: number;
   }>({ visible: false, top: 0, left: 0 });
   const floatingToolbarRef = useRef<HTMLDivElement | null>(null);
+
+  // Floating toolbar dropdown states (controlled to ensure only one is open at a time)
+  const [floatingFontOpen, setFloatingFontOpen] = useState(false);
+  const [floatingSizeOpen, setFloatingSizeOpen] = useState(false);
+  const [floatingEffectOpen, setFloatingEffectOpen] = useState(false);
 
   // Save advanced options state to localStorage
   const handleAdvancedOptionsChange = (event: React.SyntheticEvent, isExpanded: boolean) => {
@@ -310,6 +418,38 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     };
   }, [imageUrl]);
 
+  // Apply last used font when editor opens with empty content
+  useEffect(() => {
+    // Use a small timeout to ensure Quill is fully initialized
+    const timeoutId = setTimeout(() => {
+      if (quillRef.current && !readOnly) {
+        const editor = quillRef.current.getEditor();
+        const text = editor.getText().trim();
+
+        // Only apply last used font if content is truly empty (just a newline from Quill)
+        if (text === '') {
+          const lastUsedFont = localStorage.getItem('richTextEditor.lastUsedFont');
+          if (lastUsedFont && fontList.includes(lastUsedFont)) {
+            // Set format for the editor so new text will use this font
+            editor.format('font', lastUsedFont);
+
+            // Also update the toolbar UI to reflect the selected font
+            const toolbar = editor.getModule('toolbar') as any;
+            if (toolbar?.container) {
+              const fontPickerLabel = toolbar.container.querySelector('.ql-font .ql-picker-label');
+              if (fontPickerLabel) {
+                fontPickerLabel.setAttribute('data-value', lastUsedFont);
+              }
+            }
+          }
+        }
+      }
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run only once on mount
+
   // Save cursor position continuously and show floating toolbar on text selection
   useEffect(() => {
     if (quillRef.current) {
@@ -327,16 +467,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               const nativeRange = selection.getRangeAt(0);
               const rect = nativeRange.getBoundingClientRect();
 
-              // Position the toolbar above the selection
-              const editorContainer = quillRef.current?.getEditor()?.root?.parentElement;
-              if (editorContainer) {
-                const containerRect = editorContainer.getBoundingClientRect();
-                setFloatingToolbar({
-                  visible: true,
-                  top: rect.top - containerRect.top - 45, // 45px above selection
-                  left: rect.left - containerRect.left + (rect.width / 2) - 100, // Center the toolbar
-                });
-              }
+              // Position the toolbar above the selection using viewport coordinates
+              // Use fixed positioning to avoid clipping by parent overflow
+              setFloatingToolbar({
+                visible: true,
+                top: rect.top - 45, // 45px above selection (viewport-relative)
+                left: rect.left + (rect.width / 2) - 200, // Center the toolbar (wider now with font/size selectors)
+              });
             }
           } else {
             setFloatingToolbar(prev => ({ ...prev, visible: false }));
@@ -542,13 +679,20 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         const emojiButton = toolbar.container.querySelector('.ql-emoji');
         if (emojiButton) {
           setEmojiAnchorEl(emojiButton as HTMLElement);
+          return;
         }
+      }
+      // Fallback: use the editor container as anchor
+      const editorContainer = editor.container as HTMLElement;
+      if (editorContainer) {
+        setEmojiAnchorEl(editorContainer);
       }
     }
   };
 
   const handleEmojiClose = () => {
     setEmojiAnchorEl(null);
+    setEmojiPosition(null);
   };
 
   const handleEmojiSelect = (emojiData: EmojiClickData) => {
@@ -589,12 +733,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   };
 
   const insertEmoji = () => {
+    // Save context menu position for emoji picker
+    const position = contextMenu ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : null;
     handleContextMenuClose();
-    // Trigger emoji picker
-    const emojiButton = document.querySelector('[aria-label="Insert emoji"]') as HTMLButtonElement;
-    if (emojiButton) {
-      emojiButton.click();
+    // Trigger emoji picker with position
+    if (position) {
+      setEmojiPosition(position);
     }
+    handleEmojiClick();
   };
 
   const insertLink = () => {
@@ -875,6 +1021,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const handlePaste = async () => {
     if (quillRef.current) {
       const editor = quillRef.current.getEditor();
+      const Delta = Quill.import('delta');
       const selection = savedSelectionRef.current || { index: editor.getLength(), length: 0 };
       try {
         const clipboardItems = await navigator.clipboard.read();
@@ -897,10 +1044,26 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         }
 
         if (html) {
-          // Insert HTML with formatting using clipboard API directly
-          editor.clipboard.dangerouslyPasteHTML(selection.index, html);
+          // Convert HTML to delta
+          const delta = editor.clipboard.convert(html);
+
+          // Trim trailing newline if it exists to prevent extra line feed
+          const ops = delta.ops;
+          if (ops && ops.length > 0) {
+            const lastOp = ops[ops.length - 1];
+            if (typeof lastOp.insert === 'string' && lastOp.insert.endsWith('\n')) {
+              lastOp.insert = lastOp.insert.slice(0, -1);
+            }
+          }
+
+          // Insert the delta
+          editor.updateContents(
+            new Delta().retain(selection.index).concat(delta)
+          );
+          editor.setSelection(selection.index + delta.length(), 0);
         } else if (text) {
           editor.insertText(selection.index, text);
+          editor.setSelection(selection.index + text.length, 0);
         }
 
         setFloatingToolbar(prev => ({ ...prev, visible: false }));
@@ -913,7 +1076,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             editor.deleteText(selection.index, selection.length);
           }
           editor.insertText(selection.index, text);
+          editor.setSelection(selection.index + text.length, 0);
           setFloatingToolbar(prev => ({ ...prev, visible: false }));
+          editor.focus();
         } catch (fallbackErr) {
           console.error('Failed to paste:', fallbackErr);
         }
@@ -1281,7 +1446,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           container: [
             [{ font: fontList }], // Font selector
             [{ header: [1, 2, 3, false] }],
-            [{ size: ['small', false, 'large', 'huge'] }], // Font size selector
+            [{ size: ['0.75em', false, '1.5em', '2.5em'] }], // Font size selector using em values for styles
             ['bold', 'italic', 'underline', 'strike'],
             [{ color: [] }, { background: [] }],
             [{ list: 'ordered' }, { list: 'bullet' }],
@@ -1373,6 +1538,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     'link',
     'image',
     'video',
+    'textEffect',
   ];
 
   // Add tooltips to toolbar buttons and setup emoji button icon
@@ -1403,6 +1569,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       '.ql-image': t('richTextEditor.image'),
       '.ql-video': t('richTextEditor.video'),
       '.ql-emoji': t('richTextEditor.emoji', 'Emoji'),
+      '.ql-pageBackground': t('richTextEditor.pageBackground', 'Page Background'),
       '.ql-clean': t('richTextEditor.clean'),
       '.ql-font .ql-picker-label': t('richTextEditor.font', 'Font'),
       '.ql-font .ql-picker-item': '', // No tooltip for items
@@ -1432,6 +1599,17 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <circle cx="6" cy="7" r="1" class="ql-fill"/>
           <circle cx="12" cy="7" r="1" class="ql-fill"/>
           <path d="M5.5 11 Q9 14 12.5 11" class="ql-stroke" fill="none" stroke-width="1"/>
+        </svg>
+      `;
+    }
+
+    // Add page background icon (paint bucket)
+    const pageBackgroundButton = container.querySelector('.ql-pageBackground') as HTMLButtonElement;
+    if (pageBackgroundButton && !pageBackgroundButton.innerHTML.includes('svg')) {
+      pageBackgroundButton.innerHTML = `
+        <svg viewBox="0 0 18 18">
+          <rect x="2" y="2" width="14" height="14" rx="2" class="ql-stroke" fill="none" stroke-width="1"/>
+          <rect x="4" y="10" width="10" height="4" class="ql-fill"/>
         </svg>
       `;
     }
@@ -1466,6 +1644,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         const pickerItem = target.closest('.ql-picker-item') as HTMLElement;
 
         if (pickerItem) {
+          // If this is a font change, always save to localStorage
+          if (formatName === 'font') {
+            const selectedValue = pickerItem.getAttribute('data-value');
+            if (selectedValue) {
+              localStorage.setItem('richTextEditor.lastUsedFont', selectedValue);
+            }
+          }
+
           // Save current selection before Quill processes the click
           const selection = savedSelectionRef.current;
 
@@ -1509,8 +1695,69 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     };
   }, [readOnly]);
 
+  // Create localized styles for the size picker
+  const localizedSizeStyles = useMemo(() => `
+    .ql-picker.ql-size .ql-picker-label::before, .ql-picker.ql-size .ql-picker-item::before { content: "${t('richTextEditor.sizeNormal', 'Normal')}" !important; }
+    .ql-picker.ql-size .ql-picker-label[data-value="0.75em"]::before, .ql-picker.ql-size .ql-picker-item[data-value="0.75em"]::before { content: "${t('richTextEditor.sizeSmall', 'Small')}" !important; }
+    .ql-picker.ql-size .ql-picker-label[data-value="1.5em"]::before, .ql-picker.ql-size .ql-picker-item[data-value="1.5em"]::before { content: "${t('richTextEditor.sizeLarge', 'Large')}" !important; }
+    .ql-picker.ql-size .ql-picker-label[data-value="2.5em"]::before, .ql-picker.ql-size .ql-picker-item[data-value="2.5em"]::before { content: "${t('richTextEditor.sizeHuge', 'Huge')}" !important; }
+  `, [t]);
+
+  // CSS keyframes for animation effects (works in webviews)
+  const animationKeyframes = `
+    @keyframes ql-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    @keyframes ql-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    @keyframes ql-shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      75% { transform: translateX(3px); }
+    }
+    @keyframes ql-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    @keyframes ql-glow-pulse {
+      0%, 100% { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
+      50% { text-shadow: 0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor; }
+    }
+    @keyframes ql-rainbow {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes ql-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes ql-jelly {
+      0%, 100% { transform: scale(1, 1); }
+      25% { transform: scale(0.95, 1.05); }
+      50% { transform: scale(1.05, 0.95); }
+      75% { transform: scale(0.95, 1.05); }
+    }
+    @keyframes ql-swing {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(5deg); }
+      75% { transform: rotate(-5deg); }
+    }
+    @keyframes ql-heartbeat {
+      0%, 100% { transform: scale(1); }
+      14% { transform: scale(1.15); }
+      28% { transform: scale(1); }
+      42% { transform: scale(1.15); }
+      70% { transform: scale(1); }
+    }
+  `;
+
   return (
     <Box sx={{ position: 'relative' }}>
+      <style>{localizedSizeStyles}</style>
+      <style>{animationKeyframes}</style>
       <Paper
         variant="outlined"
         sx={{
@@ -1575,6 +1822,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           },
           // Font picker specific styling
           '& .ql-font.ql-picker': {
+            '& .ql-picker-label': {
+              maxWidth: '100px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              display: 'inline-block',
+            },
             '& .ql-picker-options': {
               zIndex: 99999,
               maxHeight: '200px',
@@ -1637,100 +1891,276 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         }}
       >
         <Box onContextMenu={handleContextMenu} sx={{ position: 'relative' }}>
-          {/* Floating Toolbar for text selection */}
+          {/* Floating Toolbar for text selection - using Portal to avoid clipping */}
           {floatingToolbar.visible && (
-            <Paper
-              ref={floatingToolbarRef}
-              elevation={4}
-              sx={{
-                position: 'absolute',
-                top: floatingToolbar.top,
-                left: floatingToolbar.left,
-                zIndex: 1000,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-                p: 0.5,
-                borderRadius: 1,
-                backgroundColor: theme.palette.background.paper,
-                border: `1px solid ${theme.palette.divider}`,
-              }}
-              onMouseDown={(e) => e.preventDefault()} // Prevent losing selection
-            >
-              {/* Formatting buttons */}
-              <IconButton
-                size="small"
-                onClick={formatBold}
-                title={t('richTextEditor.bold')}
-                sx={{ padding: '4px' }}
+            <Portal>
+              <Paper
+                ref={floatingToolbarRef}
+                elevation={4}
+                sx={{
+                  position: 'fixed',
+                  top: floatingToolbar.top,
+                  left: floatingToolbar.left,
+                  zIndex: 9999,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  p: 0.5,
+                  borderRadius: 1,
+                  backgroundColor: theme.palette.background.paper,
+                  border: `1px solid ${theme.palette.divider}`,
+                }}
+                onMouseDown={(e) => e.preventDefault()} // Prevent losing selection
               >
-                <BoldIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                onClick={formatItalic}
-                title={t('richTextEditor.italic')}
-                sx={{ padding: '4px' }}
-              >
-                <ItalicIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                onClick={formatUnderline}
-                title={t('richTextEditor.underline')}
-                sx={{ padding: '4px' }}
-              >
-                <UnderlineIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                onClick={formatStrikethrough}
-                title={t('richTextEditor.strike')}
-                sx={{ padding: '4px' }}
-              >
-                <StrikethroughIcon fontSize="small" />
-              </IconButton>
+                {/* Font selector */}
+                <Select
+                  size="small"
+                  value=""
+                  displayEmpty
+                  open={floatingFontOpen}
+                  onOpen={() => {
+                    setFloatingSizeOpen(false);
+                    setFloatingEffectOpen(false);
+                    setFloatingFontOpen(true);
+                  }}
+                  onClose={() => setFloatingFontOpen(false)}
+                  onChange={(e) => {
+                    if (quillRef.current && e.target.value) {
+                      const editor = quillRef.current.getEditor();
+                      const selection = savedSelectionRef.current;
+                      if (selection && selection.length > 0) {
+                        editor.formatText(selection.index, selection.length, 'font', e.target.value);
+                        // Save as last used font
+                        localStorage.setItem('richTextEditor.lastUsedFont', e.target.value);
+                      }
+                    }
+                    setFloatingFontOpen(false);
+                  }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  MenuProps={{
+                    anchorOrigin: { vertical: 'top', horizontal: 'left' },
+                    transformOrigin: { vertical: 'bottom', horizontal: 'left' },
+                    PaperProps: { sx: { maxHeight: 300, mb: 1 } },
+                    container: floatingToolbarRef.current,
+                  }}
+                  sx={{
+                    minWidth: 100,
+                    height: 28,
+                    '& .MuiSelect-select': { py: 0.5, fontSize: '0.75rem' }
+                  }}
+                  title={t('richTextEditor.font')}
+                  renderValue={() => <SizeIcon fontSize="small" sx={{ mt: 0.5 }} />}
+                >
+                  {fontList.map((font) => (
+                    <MenuItem key={font} value={font} sx={{ fontFamily: font, fontSize: '0.85rem' }}>
+                      {font}
+                    </MenuItem>
+                  ))}
+                </Select>
 
-              <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                {/* Size selector */}
+                <Select
+                  size="small"
+                  value=""
+                  displayEmpty
+                  open={floatingSizeOpen}
+                  onOpen={() => {
+                    setFloatingFontOpen(false);
+                    setFloatingEffectOpen(false);
+                    setFloatingSizeOpen(true);
+                  }}
+                  onClose={() => setFloatingSizeOpen(false)}
+                  onChange={(e) => {
+                    if (quillRef.current && e.target.value !== undefined) {
+                      const editor = quillRef.current.getEditor();
+                      const selection = savedSelectionRef.current;
+                      if (selection && selection.length > 0) {
+                        editor.formatText(selection.index, selection.length, 'size', e.target.value || false);
+                      }
+                    }
+                    setFloatingSizeOpen(false);
+                  }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  MenuProps={{
+                    anchorOrigin: { vertical: 'top', horizontal: 'left' },
+                    transformOrigin: { vertical: 'bottom', horizontal: 'left' },
+                    PaperProps: { sx: { mb: 1 } },
+                    container: floatingToolbarRef.current,
+                  }}
+                  sx={{
+                    minWidth: 70,
+                    height: 28,
+                    '& .MuiSelect-select': { py: 0.5, fontSize: '0.75rem' }
+                  }}
+                  title={t('richTextEditor.size')}
+                  renderValue={() => t('richTextEditor.size')}
+                >
+                  <MenuItem value="">{t('richTextEditor.sizeNormal')}</MenuItem>
+                  <MenuItem value="0.75em">{t('richTextEditor.sizeSmall')}</MenuItem>
+                  <MenuItem value="1.5em">{t('richTextEditor.sizeLarge')}</MenuItem>
+                  <MenuItem value="2.5em">{t('richTextEditor.sizeHuge')}</MenuItem>
+                </Select>
 
-              {/* Clipboard buttons */}
-              <IconButton
-                size="small"
-                onClick={handleCut}
-                title={t('common.cut', 'Cut')}
-                sx={{ padding: '4px' }}
-              >
-                <CutIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                onClick={handleCopy}
-                title={t('common.copy', 'Copy')}
-                sx={{ padding: '4px' }}
-              >
-                <CopyIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                onClick={handlePaste}
-                title={t('common.paste', 'Paste')}
-                sx={{ padding: '4px' }}
-              >
-                <PasteIcon fontSize="small" />
-              </IconButton>
+                {/* Text effect selector */}
+                <Select
+                  size="small"
+                  value=""
+                  displayEmpty
+                  open={floatingEffectOpen}
+                  onOpen={() => {
+                    setFloatingFontOpen(false);
+                    setFloatingSizeOpen(false);
+                    setFloatingEffectOpen(true);
+                  }}
+                  onClose={() => setFloatingEffectOpen(false)}
+                  onChange={(e) => {
+                    if (quillRef.current && e.target.value) {
+                      const editor = quillRef.current.getEditor();
+                      const selection = savedSelectionRef.current;
+                      if (selection && selection.length > 0) {
+                        // Apply effect using Quill's formatText with custom textEffect format
+                        editor.formatText(selection.index, selection.length, 'textEffect', e.target.value);
+                      }
+                    }
+                    setFloatingEffectOpen(false);
+                  }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  MenuProps={{
+                    anchorOrigin: { vertical: 'top', horizontal: 'left' },
+                    transformOrigin: { vertical: 'bottom', horizontal: 'left' },
+                    PaperProps: { sx: { maxHeight: 300, mb: 1 } },
+                    container: floatingToolbarRef.current,
+                  }}
+                  sx={{
+                    minWidth: 70,
+                    height: 28,
+                    '& .MuiSelect-select': { py: 0.5, fontSize: '0.75rem' }
+                  }}
+                  title={t('richTextEditor.effect', 'Effect')}
+                  renderValue={() => t('richTextEditor.effect', 'Effect')}
+                >
+                  <MenuItem value="" disabled><em>{t('richTextEditor.effectNone', 'None')}</em></MenuItem>
+                  {/* Shadow Effects */}
+                  <MenuItem value="shadow" sx={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>{t('richTextEditor.effectShadow', 'Shadow')}</MenuItem>
+                  <MenuItem value="shadow-light" sx={{ textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}>{t('richTextEditor.effectShadowLight', 'Light Shadow')}</MenuItem>
+                  <MenuItem value="shadow-hard" sx={{ textShadow: '3px 3px 0 rgba(0,0,0,0.8)' }}>{t('richTextEditor.effectShadowHard', 'Hard Shadow')}</MenuItem>
+                  {/* Glow Effects */}
+                  <MenuItem value="glow" sx={{ textShadow: '0 0 10px currentColor' }}>{t('richTextEditor.effectGlow', 'Glow')}</MenuItem>
+                  <MenuItem value="glow-blue" sx={{ textShadow: '0 0 10px #00bfff, 0 0 20px #00bfff' }}>{t('richTextEditor.effectGlowBlue', 'Blue Glow')}</MenuItem>
+                  <MenuItem value="glow-gold" sx={{ textShadow: '0 0 10px #ffd700, 0 0 20px #ffd700' }}>{t('richTextEditor.effectGlowGold', 'Gold Glow')}</MenuItem>
+                  <MenuItem value="glow-red" sx={{ textShadow: '0 0 10px #ff4444, 0 0 20px #ff4444' }}>{t('richTextEditor.effectGlowRed', 'Red Glow')}</MenuItem>
+                  <MenuItem value="glow-green" sx={{ textShadow: '0 0 10px #00ff88, 0 0 20px #00ff88' }}>{t('richTextEditor.effectGlowGreen', 'Green Glow')}</MenuItem>
+                  <MenuItem value="glow-purple" sx={{ textShadow: '0 0 10px #a855f7, 0 0 20px #a855f7' }}>{t('richTextEditor.effectGlowPurple', 'Purple Glow')}</MenuItem>
+                  {/* Outline Effects */}
+                  <MenuItem value="outline" sx={{ WebkitTextStroke: '1px currentColor' }}>{t('richTextEditor.effectOutline', 'Outline')}</MenuItem>
+                  <MenuItem value="outline-white" sx={{ WebkitTextStroke: '1px white', color: 'black' }}>{t('richTextEditor.effectOutlineWhite', 'White Outline')}</MenuItem>
+                  <MenuItem value="outline-black" sx={{ WebkitTextStroke: '1px black' }}>{t('richTextEditor.effectOutlineBlack', 'Black Outline')}</MenuItem>
+                  {/* 3D Effects */}
+                  <MenuItem value="emboss" sx={{ textShadow: '-1px -1px 0 rgba(255,255,255,0.5), 1px 1px 0 rgba(0,0,0,0.5)' }}>{t('richTextEditor.effectEmboss', 'Emboss')}</MenuItem>
+                  <MenuItem value="engrave" sx={{ textShadow: '1px 1px 0 rgba(255,255,255,0.5), -1px -1px 0 rgba(0,0,0,0.5)' }}>{t('richTextEditor.effectEngrave', 'Engrave')}</MenuItem>
+                  <MenuItem value="3d" sx={{ textShadow: '0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb' }}>{t('richTextEditor.effect3D', '3D')}</MenuItem>
+                  <MenuItem value="retro" sx={{ textShadow: '3px 3px 0 #f0f, 6px 6px 0 #0ff' }}>{t('richTextEditor.effectRetro', 'Retro')}</MenuItem>
+                  {/* Neon Effects */}
+                  <MenuItem value="neon" sx={{ textShadow: '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff00de' }}>{t('richTextEditor.effectNeon', 'Neon')}</MenuItem>
+                  <MenuItem value="neon-cyan" sx={{ textShadow: '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #00ffff' }}>{t('richTextEditor.effectNeonCyan', 'Cyan Neon')}</MenuItem>
+                  <MenuItem value="neon-orange" sx={{ textShadow: '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff6b00' }}>{t('richTextEditor.effectNeonOrange', 'Orange Neon')}</MenuItem>
+                  {/* Gradient Effects */}
+                  <MenuItem value="gradient-rainbow" sx={{ background: 'linear-gradient(90deg, #ff0000, #ff8000, #ffff00, #00ff00, #00ffff, #0000ff)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{t('richTextEditor.effectGradientRainbow', 'Rainbow')}</MenuItem>
+                  <MenuItem value="gradient-gold" sx={{ background: 'linear-gradient(180deg, #ffd700, #ffb700, #ff9500)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{t('richTextEditor.effectGradientGold', 'Gold Gradient')}</MenuItem>
+                  <MenuItem value="gradient-silver" sx={{ background: 'linear-gradient(180deg, #e8e8e8, #bbb, #888)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{t('richTextEditor.effectGradientSilver', 'Silver Gradient')}</MenuItem>
+                  <MenuItem value="gradient-fire" sx={{ background: 'linear-gradient(180deg, #ff0000, #ff6600, #ffcc00)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{t('richTextEditor.effectGradientFire', 'Fire Gradient')}</MenuItem>
+                  <MenuItem value="gradient-ice" sx={{ background: 'linear-gradient(180deg, #00bfff, #87ceeb, #e0ffff)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{t('richTextEditor.effectGradientIce', 'Ice Gradient')}</MenuItem>
+                  <MenuItem value="gradient-sunset" sx={{ background: 'linear-gradient(90deg, #ff512f, #dd2476)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{t('richTextEditor.effectGradientSunset', 'Sunset Gradient')}</MenuItem>
+                  {/* Animation Effects */}
+                  <MenuItem value="anim-blink" sx={{ animation: 'ql-blink 1s step-end infinite' }}>{t('richTextEditor.effectAnimBlink', 'Blink')}</MenuItem>
+                  <MenuItem value="anim-pulse" sx={{ animation: 'ql-pulse 1.5s ease-in-out infinite' }}>{t('richTextEditor.effectAnimPulse', 'Pulse')}</MenuItem>
+                  <MenuItem value="anim-shake" sx={{ animation: 'ql-shake 0.5s ease-in-out infinite', display: 'inline-block' }}>{t('richTextEditor.effectAnimShake', 'Shake')}</MenuItem>
+                  <MenuItem value="anim-bounce" sx={{ animation: 'ql-bounce 0.6s ease infinite', display: 'inline-block' }}>{t('richTextEditor.effectAnimBounce', 'Bounce')}</MenuItem>
+                  <MenuItem value="anim-glow-pulse" sx={{ animation: 'ql-glow-pulse 1.5s ease-in-out infinite' }}>{t('richTextEditor.effectAnimGlowPulse', 'Glow Pulse')}</MenuItem>
+                  <MenuItem value="anim-float" sx={{ animation: 'ql-float 2s ease-in-out infinite', display: 'inline-block' }}>{t('richTextEditor.effectAnimFloat', 'Float')}</MenuItem>
+                  <MenuItem value="anim-jelly" sx={{ animation: 'ql-jelly 0.8s ease infinite', display: 'inline-block' }}>{t('richTextEditor.effectAnimJelly', 'Jelly')}</MenuItem>
+                  <MenuItem value="anim-swing" sx={{ animation: 'ql-swing 1s ease-in-out infinite', display: 'inline-block' }}>{t('richTextEditor.effectAnimSwing', 'Swing')}</MenuItem>
+                  <MenuItem value="anim-heartbeat" sx={{ animation: 'ql-heartbeat 1.2s ease-in-out infinite', display: 'inline-block' }}>{t('richTextEditor.effectAnimHeartbeat', 'Heartbeat')}</MenuItem>
+                  <MenuItem value="anim-rainbow" sx={{ background: 'linear-gradient(90deg, #ff0000, #ff8000, #ffff00, #00ff00, #00ffff, #0000ff, #8000ff, #ff0000)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundSize: '200% auto', animation: 'ql-rainbow 3s linear infinite' }}>{t('richTextEditor.effectAnimRainbow', 'Rainbow Wave')}</MenuItem>
+                </Select>
 
-              <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
 
-              {/* Clear formatting */}
-              <IconButton
-                size="small"
-                onClick={clearFormatting}
-                title={t('richTextEditor.clearFormatting')}
-                sx={{ padding: '4px' }}
-              >
-                <ClearIcon fontSize="small" />
-              </IconButton>
-            </Paper>
+                {/* Formatting buttons */}
+                <IconButton
+                  size="small"
+                  onClick={formatBold}
+                  title={t('richTextEditor.bold')}
+                  sx={{ padding: '4px' }}
+                >
+                  <BoldIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={formatItalic}
+                  title={t('richTextEditor.italic')}
+                  sx={{ padding: '4px' }}
+                >
+                  <ItalicIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={formatUnderline}
+                  title={t('richTextEditor.underline')}
+                  sx={{ padding: '4px' }}
+                >
+                  <UnderlineIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={formatStrikethrough}
+                  title={t('richTextEditor.strike')}
+                  sx={{ padding: '4px' }}
+                >
+                  <StrikethroughIcon fontSize="small" />
+                </IconButton>
+
+                <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+                {/* Clipboard buttons */}
+                <IconButton
+                  size="small"
+                  onClick={handleCut}
+                  title={t('common.cut', 'Cut')}
+                  sx={{ padding: '4px' }}
+                >
+                  <CutIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={handleCopy}
+                  title={t('common.copy', 'Copy')}
+                  sx={{ padding: '4px' }}
+                >
+                  <CopyIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={handlePaste}
+                  title={t('common.paste', 'Paste')}
+                  sx={{ padding: '4px' }}
+                >
+                  <PasteIcon fontSize="small" />
+                </IconButton>
+
+                <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+                {/* Clear formatting */}
+                <IconButton
+                  size="small"
+                  onClick={clearFormatting}
+                  title={t('richTextEditor.clearFormatting')}
+                  sx={{ padding: '4px' }}
+                >
+                  <ClearIcon fontSize="small" />
+                </IconButton>
+              </Paper>
+            </Portal>
           )}
 
           <ReactQuill
@@ -1751,7 +2181,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       {/* Emoji Picker Popover */}
       <Popover
         open={emojiOpen}
-        anchorEl={emojiAnchorEl}
+        anchorEl={emojiPosition ? undefined : emojiAnchorEl}
+        anchorReference={emojiPosition ? 'anchorPosition' : 'anchorEl'}
+        anchorPosition={emojiPosition ? { top: emojiPosition.top, left: emojiPosition.left } : undefined}
         onClose={handleEmojiClose}
         anchorOrigin={{
           vertical: 'bottom',
@@ -1759,7 +2191,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         }}
         transformOrigin={{
           vertical: 'top',
-          horizontal: 'right',
+          horizontal: 'left',
         }}
         // Hide the backdrop completely
         hideBackdrop
@@ -1819,8 +2251,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         </ClickAwayListener>
       </Popover>
 
-
-
       {/* Dynamic styles for font picker */}
       <style>
         {`
@@ -1845,6 +2275,25 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             : undefined
         }
       >
+        <MenuItem onClick={() => { handleContextMenuClose(); handleCut(); }}>
+          <ListItemIcon>
+            <CutIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.cut', 'Cut')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => { handleContextMenuClose(); handleCopy(); }}>
+          <ListItemIcon>
+            <CopyIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.copy', 'Copy')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => { handleContextMenuClose(); handlePaste(); }}>
+          <ListItemIcon>
+            <PasteIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.paste', 'Paste')}</ListItemText>
+        </MenuItem>
+        <Divider />
         <MenuItem onClick={insertEmoji}>
           <ListItemIcon>
             <EmojiIcon fontSize="small" />

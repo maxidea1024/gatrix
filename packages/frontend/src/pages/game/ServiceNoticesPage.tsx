@@ -137,6 +137,7 @@ const ServiceNoticesPage: React.FC = () => {
     { id: 'targetAudience', labelKey: 'serviceNotices.targetAudience', visible: true },
     { id: 'period', labelKey: 'serviceNotices.period', visible: true },
     { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
+    { id: 'updatedAt', labelKey: 'common.updatedAt', visible: true },
   ];
 
   // Column settings
@@ -817,6 +818,17 @@ const ServiceNoticesPage: React.FC = () => {
                             </TableCell>
                           );
                         }
+                        if (column.id === 'updatedAt') {
+                          return (
+                            <TableCell key={column.id}>
+                              <Tooltip title={formatDateTimeDetailed(notice.updatedAt)}>
+                                <Typography variant="caption">
+                                  {formatRelativeTime(notice.updatedAt, undefined, language)}
+                                </Typography>
+                              </Tooltip>
+                            </TableCell>
+                          );
+                        }
                         return null;
                       })}
                       {canManage && (
@@ -868,6 +880,7 @@ const ServiceNoticesPage: React.FC = () => {
 
       {/* Form Drawer */}
       <ServiceNoticeFormDialog
+        key={editingNotice?.id ?? 'new'}
         open={formDrawerOpen}
         onClose={() => setFormDrawerOpen(false)}
         onSuccess={loadNotices}

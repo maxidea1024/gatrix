@@ -1,5 +1,6 @@
 import { ulid } from 'ulid';
 import database from '../config/database';
+import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { TagService } from './TagService';
@@ -118,7 +119,7 @@ class StoreProductService {
 
     // Build WHERE clause
     const conditions: string[] = ['environment = ?'];
-    const queryParams: any[] = [environment];
+    const queryParams: (string | number | boolean | null)[] = [environment];
 
     if (search) {
       // Check if search is a number (for CMS ID search)
@@ -155,14 +156,14 @@ class StoreProductService {
 
     try {
       // Get total count
-      const [countResult] = await pool.execute<any[]>(
+      const [countResult] = await pool.execute<RowDataPacket[]>(
         `SELECT COUNT(*) as total FROM g_store_products ${whereClause}`,
         queryParams
       );
       const total = countResult[0].total;
 
       // Get products (use template literal for LIMIT/OFFSET as they are already validated numbers)
-      const [products] = await pool.execute<any[]>(
+      const [products] = await pool.execute<RowDataPacket[]>(
         `SELECT * FROM g_store_products ${whereClause} ORDER BY ${safeSortBy} ${safeSortOrder} LIMIT ${limit} OFFSET ${offset}`,
         queryParams
       );
@@ -199,7 +200,7 @@ class StoreProductService {
     const pool = database.getPool();
 
     try {
-      const [result] = await pool.execute<any[]>(
+      const [result] = await pool.execute<RowDataPacket[]>(
         `SELECT
           COUNT(*) as total,
           SUM(CASE WHEN isActive = 1 THEN 1 ELSE 0 END) as active,
@@ -226,7 +227,7 @@ class StoreProductService {
     const pool = database.getPool();
 
     try {
-      const [products] = await pool.execute<any[]>(
+      const [products] = await pool.execute<RowDataPacket[]>(
         'SELECT * FROM g_store_products WHERE id = ? AND environment = ?',
         [id, environment]
       );
@@ -259,7 +260,7 @@ class StoreProductService {
     const pool = database.getPool();
 
     try {
-      const [products] = await pool.execute<any[]>(
+      const [products] = await pool.execute<RowDataPacket[]>(
         'SELECT * FROM g_store_products WHERE id = ?',
         [id]
       );
@@ -297,7 +298,7 @@ class StoreProductService {
          (id, environment, isActive, productId, productName, nameKo, nameEn, nameZh,
           store, price, currency, saleStartAt, saleEndAt, description,
           descriptionKo, descriptionEn, descriptionZh, metadata, createdBy, createdAt, updatedAt)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
         [
           id,
           environment,
@@ -359,7 +360,7 @@ class StoreProductService {
 
     // Build dynamic update query
     const updates: string[] = [];
-    const values: any[] = [];
+    const values: (string | number | boolean | null)[] = [];
 
     if (input.productId !== undefined) {
       updates.push('productId = ?');
@@ -436,11 +437,11 @@ class StoreProductService {
       return this.getStoreProductById(id, environment);
     }
 
-    updates.push('updatedAt = NOW()');
+    updates.push('updatedAt = UTC_TIMESTAMP()');
     values.push(id, environment);
 
     try {
-      const [result] = await pool.execute<any>(
+      const [result] = await pool.execute<ResultSetHeader>(
         `UPDATE g_store_products SET ${updates.join(', ')} WHERE id = ? AND environment = ?`,
         values
       );
@@ -490,7 +491,7 @@ class StoreProductService {
       // Delete associated tags first (set to empty array)
       await TagService.setTagsForEntity('store_product', id, []);
 
-      const [result] = await pool.execute<any>(
+      const [result] = await pool.execute<ResultSetHeader>(
         'DELETE FROM g_store_products WHERE id = ? AND environment = ?',
         [id, environment]
       );
@@ -537,7 +538,7 @@ class StoreProductService {
       }
 
       const placeholders = ids.map(() => '?').join(',');
-      const [result] = await pool.execute<any>(
+      const [result] = await pool.execute<ResultSetHeader>(
         `DELETE FROM g_store_products WHERE id IN (${placeholders}) AND environment = ?`,
         [...ids, environment]
       );
@@ -587,8 +588,8 @@ class StoreProductService {
 
     try {
       const placeholders = ids.map(() => '?').join(',');
-      const [result] = await pool.execute<any>(
-        `UPDATE g_store_products SET isActive = ?, updatedBy = ?, updatedAt = NOW() WHERE id IN (${placeholders}) AND environment = ?`,
+      const [result] = await pool.execute<ResultSetHeader>(
+        `UPDATE g_store_products SET isActive = ?, updatedBy = ?, updatedAt = UTC_TIMESTAMP() WHERE id IN (${placeholders}) AND environment = ?`,
         [isActive ? 1 : 0, updatedBy || null, ...ids, environment]
       );
 
@@ -640,7 +641,7 @@ class StoreProductService {
     try {
       // Build WHERE clause
       const conditions: string[] = ['environment = ?'];
-      const queryParams: any[] = [environment];
+      const queryParams: (string | number | boolean | null)[] = [environment];
 
       if (params.search) {
         conditions.push('(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ?)');
@@ -656,19 +657,19 @@ class StoreProductService {
       const whereClause = `WHERE ${conditions.join(' AND ')}`;
 
       // First, get the IDs that will be affected
-      const [affectedRows] = await pool.execute<any[]>(
+      const [affectedRows] = await pool.execute<RowDataPacket[]>(
         `SELECT id FROM g_store_products ${whereClause}`,
         queryParams
       );
-      const affectedIds = affectedRows.map((row: any) => row.id);
+      const affectedIds = affectedRows.map((row: RowDataPacket) => row.id);
 
       if (affectedIds.length === 0) {
         return { affectedCount: 0, affectedIds: [] };
       }
 
       // Perform the update
-      const [result] = await pool.execute<any>(
-        `UPDATE g_store_products SET isActive = ?, updatedBy = ?, updatedAt = NOW() ${whereClause}`,
+      const [result] = await pool.execute<ResultSetHeader>(
+        `UPDATE g_store_products SET isActive = ?, updatedBy = ?, updatedAt = UTC_TIMESTAMP() ${whereClause}`,
         [params.targetIsActive ? 1 : 0, updatedBy || null, ...queryParams]
       );
 
@@ -722,7 +723,7 @@ class StoreProductService {
     try {
       // Build WHERE clause
       const conditions: string[] = ['environment = ?'];
-      const queryParams: any[] = [environment];
+      const queryParams: (string | number | boolean | null)[] = [environment];
 
       if (params.search) {
         conditions.push('(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ?)');
@@ -737,7 +738,7 @@ class StoreProductService {
 
       const whereClause = `WHERE ${conditions.join(' AND ')}`;
 
-      const [rows] = await pool.execute<any[]>(
+      const [rows] = await pool.execute<RowDataPacket[]>(
         `SELECT COUNT(*) as total FROM g_store_products ${whereClause}`,
         queryParams
       );
@@ -926,7 +927,7 @@ class StoreProductService {
             nameKo, nameEn, nameZh, store, price, currency,
             saleStartAt, saleEndAt, description, descriptionKo, descriptionEn, descriptionZh,
             metadata, createdBy, createdAt, updatedAt)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
           [
             id,
             environment,
@@ -985,7 +986,7 @@ class StoreProductService {
         if (updates.length > 0) {
           updates.push('updatedBy = ?');
           values.push(userId || null);
-          updates.push('updatedAt = NOW()');
+          updates.push('updatedAt = UTC_TIMESTAMP()');
           values.push(item.id);
 
           await pool.execute(

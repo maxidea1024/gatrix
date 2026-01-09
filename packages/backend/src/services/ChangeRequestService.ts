@@ -915,7 +915,7 @@ export class ChangeRequestService {
                             const [insertResult] = await trx(item.targetTable).insert(dbData);
 
                             // Update ChangeItem's targetId to the real ID for future rollback
-                            let realId: string | number = dbData.id || insertResult;
+                            const realId: string | number = dbData.id || insertResult;
                             if (item.targetId.startsWith('NEW_') && realId && realId !== item.targetId) {
                                 await ChangeItem.query(trx).findById(item.id).patch({
                                     targetId: String(realId)
