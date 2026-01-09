@@ -46,7 +46,7 @@ import changeRequestService, {
 import SimplePagination from '@/components/common/SimplePagination';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import ChangeRequestDetailDrawer from '@/components/admin/ChangeRequestDetailDrawer';
-import RollbackPreviewDrawer from '@/components/admin/RollbackPreviewDrawer';
+import RevertPreviewDrawer from '@/components/admin/RevertPreviewDrawer';
 import { formatChangeRequestTitle } from '@/utils/changeRequestFormatter';
 
 // JSON Diff wrapper component
@@ -396,7 +396,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
                 <TableCell align="center">
                     {cr.status === 'applied' && (
                         <Chip
-                            label={t('changeRequest.actions.rollback')}
+                            label={t('changeRequest.actions.revert')}
                             color="warning"
                             size="small"
                             variant="outlined"
@@ -497,7 +497,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
             </Dialog >
 
             {/* Rollback Preview Drawer */}
-            <RollbackPreviewDrawer
+            <RevertPreviewDrawer
                 open={rollbackPreviewOpen}
                 onClose={() => setRollbackPreviewOpen(false)}
                 changeRequestId={cr.id}

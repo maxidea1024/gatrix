@@ -5082,10 +5082,10 @@
     "messages.rollbackCreated": "回滚变更请求已创建。",
     "messages.deleted": "变更请求已删除。",
     "actions.label": "操作",
-    "actions.rollback": "回滚",
-    "rollbackDialog": {
-      "title": "创建回滚请求",
-      "description": "您确定要为此项目创建回滚变更请求吗？回滚请求需要在应用前获得批准。"
+    "actions.revert": "还原",
+    "revertDialog": {
+      "title": "创建还原请求",
+      "description": "您确定要为此项目创建还原变更请求吗？还原请求需要在应用前获得批准。"
     },
     "conflictDialog.description": "自此请求创建以来，实时服务器上的数据已更改。请求已被自动拒绝，以防止数据损坏。请确认更改后再试。",
     "conflictDialog.liveData": "当前实时数据",
@@ -5169,12 +5169,12 @@
     "actions.submitSave": "请求保存",
     "collapse": "收起",
     "appliedMessage": "此变更请求已成功应用。",
-    "rollbackPreview": "回滚预览",
-    "rollbackPreviewTitle": "回滚变更",
-    "rollbackPreviewDesc": "正在为 \"{{title}}\" 创建回滚。将应用以下变更。",
-    "rollbackChanges": "要回滚的变更",
-    "rollbackCreated": "回滚变更请求已创建。",
-    "createRollbackCR": "创建回滚请求",
+    "revertPreview": "还原预览",
+    "revertPreviewTitle": "还原变更",
+    "revertPreviewDesc": "正在为 \"{{title}}\" 创建还原。将应用以下变更。",
+    "revertChanges": "要还原的变更",
+    "revertCreated": "还原变更请求已创建。",
+    "createRevertCR": "创建还原请求",
     "noFieldChanges": "无字段变更。",
     "before": "之前",
     "after": "之后",

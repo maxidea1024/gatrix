@@ -46,7 +46,7 @@ import changeRequestService, {
     ChangeItem,
 } from '@/services/changeRequestService';
 import { formatChangeRequestTitle, formatChangeItemTitle } from '@/utils/changeRequestFormatter';
-import RollbackPreviewDrawer from './RollbackPreviewDrawer';
+import RevertPreviewDrawer from './RevertPreviewDrawer';
 import SubmitPreviewDrawer from './SubmitPreviewDrawer';
 
 interface ChangeRequestDetailDrawerProps {
@@ -978,7 +978,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                                     }}
                                                     disabled={actionLoading}
                                                 >
-                                                    {t('changeRequest.actions.rollback')}
+                                                    {t('changeRequest.actions.revert')}
                                                 </Button>
                                             </Box>
                                         </Paper>
@@ -1314,7 +1314,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
             </ResizableDrawer>
 
             {/* Rollback Preview Drawer - Outside main drawer so it persists when main closes */}
-            <RollbackPreviewDrawer
+            <RevertPreviewDrawer
                 open={rollbackPreviewOpen}
                 onClose={() => {
                     setRollbackPreviewOpen(false);

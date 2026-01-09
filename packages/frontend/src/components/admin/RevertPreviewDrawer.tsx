@@ -36,7 +36,7 @@ interface FieldOp {
     opType: 'SET' | 'DEL' | 'MOD';
 }
 
-interface RollbackItem {
+interface RevertItem {
     targetTable: string;
     targetId: string;
     opType: 'CREATE' | 'UPDATE' | 'DELETE';
@@ -196,7 +196,7 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
             anchor="right"
             open={open}
             onClose={onClose}
-            title={t('changeRequest.rollbackPreview')}
+            title={t('changeRequest.revertPreview')}
             defaultWidth={650}
             minWidth={500}
         >
@@ -222,20 +222,20 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                                     <UndoIcon color="warning" />
                                     <Typography variant="h6">
-                                        {t('changeRequest.rollbackPreviewTitle')}
+                                        {t('changeRequest.revertPreviewTitle')}
                                     </Typography>
                                 </Box>
                                 <Typography variant="body2" color="text.secondary">
-                                    {t('changeRequest.rollbackPreviewDesc', { title: preview.originalCr?.title })}
+                                    {t('changeRequest.revertPreviewDesc', { title: preview.originalCr?.title })}
                                 </Typography>
                             </Paper>
 
                             {/* Rollback Items */}
                             <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-                                {t('changeRequest.rollbackChanges')} ({preview.rollbackItems?.length || 0})
+                                {t('changeRequest.revertChanges')} ({preview.revertItems?.length || 0})
                             </Typography>
 
-                            {preview.rollbackItems?.map((item: RollbackItem, index: number) => (
+                            {preview.revertItems?.map((item: RevertItem, index: number) => (
                                 <Paper
                                     key={index}
                                     variant="outlined"
@@ -335,10 +335,10 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
                         variant="contained"
                         color="warning"
                         startIcon={isCreating ? <CircularProgress size={16} color="inherit" /> : <UndoIcon />}
-                        onClick={handleCreateRollback}
+                        onClick={handleCreateRevert}
                         disabled={isCreating || isLoading || !!error}
                     >
-                        {t('changeRequest.createRollbackCR')}
+                        {t('changeRequest.createRevertCR')}
                     </Button>
                 </Box>
             </Box>
