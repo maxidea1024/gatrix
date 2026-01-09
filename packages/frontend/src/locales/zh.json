@@ -5177,6 +5177,7 @@
     "revertPreviewDesc": "正在为 \"{{title}}\" 创建还原。将应用以下变更。",
     "revertChanges": "要还原的变更",
     "revertCreated": "还原变更请求已创建。",
+    "messages.revertCreated": "还原变更请求已创建。",
     "createRevertCR": "创建还原请求",
     "noFieldChanges": "无字段变更。",
     "before": "之前",
