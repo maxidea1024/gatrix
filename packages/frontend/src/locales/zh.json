@@ -2849,7 +2849,20 @@
     "openApi": "Open API",
     "banners": "横幅管理",
     "environments": "环境管理",
-    "serverLifecycle": "服务器运行历史"
+    "serverLifecycle": "服务器运行历史",
+    "serviceControl": "服务控制",
+    "playerConnections": "玩家连接管理"
+  },
+  "playerConnections": {
+    "title": "玩家连接管理",
+    "subtitle": "管理游戏服务器上的玩家连接状态。",
+    "comingSoon": "此功能正在开发中，即将推出。",
+    "plannedFeatures": "计划功能",
+    "feature": {
+      "monitoring": "实时并发用户监控",
+      "kick": "玩家连接终止（踢出）",
+      "statistics": "连接统计和分析"
+    }
   },
   "signUpPrompt": {
     "backToLogin": "返回登录",

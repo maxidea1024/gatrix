@@ -40,6 +40,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 import bannerService, { Banner, BannerStatus } from '../../services/bannerService';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
@@ -141,7 +142,7 @@ const BannerManagementPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Failed to load banners:', error);
-      enqueueSnackbar(error.message || t('banners.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'banners.loadFailed'), { variant: 'error' });
       setBanners([]);
       setTotal(0);
     } finally {
@@ -217,7 +218,7 @@ const BannerManagementPage: React.FC = () => {
       setSelectedIds([]);
       loadBanners();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('banners.deleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'banners.deleteFailed'), { variant: 'error' });
     } finally {
       setDeleteConfirmOpen(false);
       setDeletingBanner(null);
@@ -242,7 +243,7 @@ const BannerManagementPage: React.FC = () => {
       setSelectedIds([]);
       loadBanners();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('banners.bulkDeleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'banners.bulkDeleteFailed'), { variant: 'error' });
     } finally {
       setBulkDeleteConfirmOpen(false);
     }
@@ -270,7 +271,7 @@ const BannerManagementPage: React.FC = () => {
       enqueueSnackbar(t('banners.duplicateSuccess'), { variant: 'success' });
       loadBanners();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('banners.duplicateFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'banners.duplicateFailed'), { variant: 'error' });
     } finally {
       handleActionMenuClose();
     }
@@ -283,7 +284,7 @@ const BannerManagementPage: React.FC = () => {
       enqueueSnackbar(t('banners.publishSuccess'), { variant: 'success' });
       loadBanners();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('banners.publishFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'banners.publishFailed'), { variant: 'error' });
     } finally {
       handleActionMenuClose();
     }
@@ -296,7 +297,7 @@ const BannerManagementPage: React.FC = () => {
       enqueueSnackbar(t('banners.archiveSuccess'), { variant: 'success' });
       loadBanners();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('banners.archiveFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'banners.archiveFailed'), { variant: 'error' });
     } finally {
       handleActionMenuClose();
     }

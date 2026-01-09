@@ -362,9 +362,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
         </>
       )}
 
-      {/* Version display */}
-      <Box sx={{ p: 2, pt: 0 }}>
-        <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
+      {/* Version display - pushed to bottom */}
+      <Box sx={{
+        mt: 'auto',
+        p: 2,
+        borderTop: `1px solid ${theme => theme.palette.divider}`,
+        backgroundColor: 'background.paper'
+      }}>
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.secondary',
+            fontWeight: 500,
+            fontSize: '0.75rem',
+            display: 'block'
+          }}
+        >
           Gatrix v1.0.1
         </Typography>
       </Box>
@@ -574,6 +587,7 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
         '& .MuiDrawer-paper': {
           boxSizing: 'border-box',
           width: width,
+          height: '100vh',
           display: 'flex',
           flexDirection: 'column',
         },
@@ -611,9 +625,22 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
         </>
       )}
 
-      {/* Version display */}
-      <Box sx={{ p: 2, pt: 0 }}>
-        <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
+      {/* Version display - pushed to bottom using mt: 'auto' */}
+      <Box sx={{
+        mt: 'auto',
+        p: 2,
+        borderTop: `1px solid ${theme => theme.palette.divider}`,
+        backgroundColor: 'background.paper'
+      }}>
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.secondary',
+            fontWeight: 500,
+            fontSize: '0.75rem',
+            display: 'block'
+          }}
+        >
           Gatrix v1.0.1
         </Typography>
       </Box>

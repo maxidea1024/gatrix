@@ -71,6 +71,7 @@ import WhitelistPage from './pages/admin/WhitelistPage';
 import ClientVersionsPage from './pages/admin/ClientVersionsPage';
 import AuditLogsPage from './pages/admin/AuditLogsPage';
 import MaintenancePage from './pages/admin/MaintenancePage';
+import PlayerConnectionsPage from './pages/admin/PlayerConnectionsPage';
 
 import MessageTemplatesPage from './pages/admin/MessageTemplatesPage';
 import SchedulerPage from './pages/admin/SchedulerPage';
@@ -417,6 +418,7 @@ const AppContent: React.FC = () => {
                                 <Route path="client-versions" element={<ClientVersionsPage />} />
                                 <Route path="game-worlds" element={<GameWorldsPage />} />
                                 <Route path="maintenance" element={<MaintenancePage />} />
+                                <Route path="player-connections" element={<PlayerConnectionsPage />} />
                                 <Route path="maintenance-templates" element={<MessageTemplatesPage />} />
                                 <Route path="scheduler" element={<SchedulerPage />} />
                                 <Route path="whitelist" element={<WhitelistPage />} />

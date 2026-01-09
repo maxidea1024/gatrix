@@ -40,6 +40,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import ingamePopupNoticeService, { IngamePopupNotice, IngamePopupNoticeFilters } from '../../services/ingamePopupNoticeService';
 import IngamePopupNoticeFormDialog from '../../components/game/IngamePopupNoticeFormDialog';
@@ -219,7 +220,7 @@ const IngamePopupNoticesPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Failed to load ingame popup notices:', error);
-      enqueueSnackbar(error.message || t('ingamePopupNotices.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'ingamePopupNotices.loadFailed'), { variant: 'error' });
       setNotices([]);
       setTotal(0);
     } finally {
@@ -318,7 +319,7 @@ const IngamePopupNoticesPage: React.FC = () => {
       setDeletingNotice(null);
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('ingamePopupNotices.deleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'ingamePopupNotices.deleteFailed'), { variant: 'error' });
     }
   };
 
@@ -335,7 +336,7 @@ const IngamePopupNoticesPage: React.FC = () => {
       setSelectedIds([]);
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('ingamePopupNotices.bulkDeleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'ingamePopupNotices.bulkDeleteFailed'), { variant: 'error' });
     }
   };
 
@@ -345,7 +346,7 @@ const IngamePopupNoticesPage: React.FC = () => {
       enqueueSnackbar(t('ingamePopupNotices.toggleSuccess'), { variant: 'success' });
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('ingamePopupNotices.toggleFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'ingamePopupNotices.toggleFailed'), { variant: 'error' });
     }
   };
 

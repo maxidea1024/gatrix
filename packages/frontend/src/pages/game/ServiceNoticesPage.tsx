@@ -58,6 +58,7 @@ import { useI18n } from '../../contexts/I18nContext';
 import { useDebounce } from '../../hooks/useDebounce';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 
 const ServiceNoticesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -253,7 +254,7 @@ const ServiceNoticesPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Failed to load service notices:', error);
-      enqueueSnackbar(error.message || t('serviceNotices.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'serviceNotices.loadFailed'), { variant: 'error' });
       setNotices([]);
       setTotal(0);
     } finally {
@@ -360,7 +361,7 @@ const ServiceNoticesPage: React.FC = () => {
       setDeletingNotice(null);
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('serviceNotices.deleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'serviceNotices.deleteFailed'), { variant: 'error' });
     }
   };
 
@@ -385,7 +386,7 @@ const ServiceNoticesPage: React.FC = () => {
       setSelectedIds([]);
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('serviceNotices.bulkDeleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'serviceNotices.bulkDeleteFailed'), { variant: 'error' });
     }
   };
 
@@ -442,7 +443,7 @@ const ServiceNoticesPage: React.FC = () => {
       enqueueSnackbar(t('serviceNotices.toggleSuccess'), { variant: 'success' });
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('serviceNotices.toggleFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'serviceNotices.toggleFailed'), { variant: 'error' });
     }
   };
 

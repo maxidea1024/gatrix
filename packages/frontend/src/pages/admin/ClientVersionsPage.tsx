@@ -99,6 +99,7 @@ import {
 import { InputAdornment } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -716,7 +717,7 @@ const ClientVersionsPage: React.FC = () => {
       mutateClientVersions(); // 모든 client versions 캐시 갱신
     } catch (error: any) {
       console.error('Error deleting client version:', error);
-      enqueueSnackbar(error.message || t('clientVersions.deleteError'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'clientVersions.deleteError'), { variant: 'error' });
     }
   }, [selectedClientVersion, t, enqueueSnackbar, closeSnackbar, navigate, mutateVersions]);
 
@@ -777,7 +778,7 @@ const ClientVersionsPage: React.FC = () => {
       mutateClientVersions(); // 모든 client versions 캐시 갱신
     } catch (error: any) {
       console.error('Error updating status:', error);
-      enqueueSnackbar(error.message || t('clientVersions.statusUpdateError'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'clientVersions.statusUpdateError'), { variant: 'error' });
     }
   }, [selectedIds, bulkStatus, inputMode, maintenanceStartDate, maintenanceEndDate, maintenanceMessage, supportsMultiLanguage, maintenanceLocales, selectedTemplateId, enqueueSnackbar, mutateVersions, t]);
 
@@ -797,7 +798,7 @@ const ClientVersionsPage: React.FC = () => {
       mutateClientVersions(); // 모든 client versions 캐시 갱신
     } catch (error: any) {
       console.error('Failed to delete client versions:', error);
-      enqueueSnackbar(error.message || t('clientVersions.bulkDeleteError'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'clientVersions.bulkDeleteError'), { variant: 'error' });
     }
   }, [selectedIds, t, enqueueSnackbar, mutateVersions]);
 
@@ -876,7 +877,7 @@ const ClientVersionsPage: React.FC = () => {
       setExportMenuAnchor(null);
     } catch (error: any) {
       console.error('Error exporting:', error);
-      enqueueSnackbar(error.message || t('clientVersions.exportError'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'clientVersions.exportError'), { variant: 'error' });
     }
   }, [pageState.filters, t, enqueueSnackbar]);
 
@@ -1000,7 +1001,7 @@ const ClientVersionsPage: React.FC = () => {
       setSelectedExportMenuAnchor(null);
     } catch (error: any) {
       console.error('Failed to export selected versions:', error);
-      enqueueSnackbar(error.message || t('clientVersions.exportSelectedError'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'clientVersions.exportSelectedError'), { variant: 'error' });
     }
   }, [selectedIds, clientVersions, t, enqueueSnackbar]);
 

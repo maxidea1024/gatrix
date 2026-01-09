@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { PERMISSIONS } from '@/types/permissions';
 import { Box, Typography, Button, TextField, IconButton, Chip, MenuItem, Stack, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, Tooltip, TableSortLabel, FormControlLabel, Checkbox, LinearProgress, Dialog, DialogTitle, DialogContent, DialogActions, Menu, Divider, FormHelperText, Paper, Collapse } from '@mui/material';
 import { Settings as SettingsIcon, Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon, Search as SearchIcon, ViewColumn as ViewColumnIcon, List as ListIcon, ContentCopy as ContentCopyIcon, Code as CodeIcon, CardGiftcard as CardGiftcardIcon, HourglassEmpty as HourglassEmptyIcon, Download as DownloadIcon, ArrowDropDown as ArrowDropDownIcon, CheckCircle as CheckCircleIcon, TableChart as TableChartIcon, Description as ExcelIcon, ExpandMore as ExpandMoreIcon, ExpandLess as ExpandLessIcon } from '@mui/icons-material';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
@@ -274,7 +275,7 @@ const CouponSettingsPage: React.FC = () => {
           setExportingCodes(false);
           setExportError(error.message || t('coupons.couponSettings.exportError'));
         } else {
-          enqueueSnackbar(error.message || t('coupons.couponSettings.exportError'), { variant: 'error' });
+          enqueueSnackbar(parseApiErrorMessage(error, 'coupons.couponSettings.exportError'), { variant: 'error' });
         }
       }
     } finally {
@@ -891,7 +892,7 @@ const CouponSettingsPage: React.FC = () => {
       const err: any = e;
       const errorMessage = err?.response?.data?.error?.message || err?.message || t('common.saveFailed');
       console.error('[CouponSettings] save failed', err?.response?.status, err?.response?.data || err?.message || err);
-      enqueueSnackbar(errorMessage, { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(err, 'common.saveFailed'), { variant: 'error' });
     }
   };
 
@@ -983,7 +984,7 @@ const CouponSettingsPage: React.FC = () => {
       setOpenForm(true);
     } catch (error) {
       console.error('[CouponSettings] handleEdit error:', error);
-      enqueueSnackbar(t('common.error'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'common.error'), { variant: 'error' });
     }
   };
 
@@ -1002,7 +1003,7 @@ const CouponSettingsPage: React.FC = () => {
       setDeleteTarget(null);
       await load();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('common.error'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'common.error'), { variant: 'error' });
     }
   };
 

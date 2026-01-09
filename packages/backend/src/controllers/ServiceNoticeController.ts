@@ -198,6 +198,16 @@ class ServiceNoticeController {
         });
       }
     } catch (error) {
+      if ((error as any).code === ErrorCodes.RESOURCE_LOCKED) {
+        return res.status(409).json({
+          success: false,
+          error: {
+            code: ErrorCodes.RESOURCE_LOCKED,
+            message: (error as any).message,
+            payload: (error as any).payload
+          }
+        });
+      }
       return sendInternalError(res, 'Failed to update service notice', error, ErrorCodes.RESOURCE_UPDATE_FAILED);
     }
   }
@@ -239,6 +249,16 @@ class ServiceNoticeController {
         });
       }
     } catch (error) {
+      if ((error as any).code === ErrorCodes.RESOURCE_LOCKED) {
+        return res.status(409).json({
+          success: false,
+          error: {
+            code: ErrorCodes.RESOURCE_LOCKED,
+            message: (error as any).message,
+            payload: (error as any).payload
+          }
+        });
+      }
       return sendInternalError(res, 'Failed to delete service notice', error, ErrorCodes.RESOURCE_DELETE_FAILED);
     }
   }
@@ -289,6 +309,16 @@ class ServiceNoticeController {
         return sendSuccessResponse(res, undefined, `${ids.length} service notice(s) deleted successfully`);
       }
     } catch (error) {
+      if ((error as any).code === ErrorCodes.RESOURCE_LOCKED) {
+        return res.status(409).json({
+          success: false,
+          error: {
+            code: ErrorCodes.RESOURCE_LOCKED,
+            message: (error as any).message,
+            payload: (error as any).payload
+          }
+        });
+      }
       return sendInternalError(res, 'Failed to delete service notices', error, ErrorCodes.RESOURCE_DELETE_FAILED);
     }
   }
@@ -340,6 +370,16 @@ class ServiceNoticeController {
         });
       }
     } catch (error) {
+      if ((error as any).code === ErrorCodes.RESOURCE_LOCKED) {
+        return res.status(409).json({
+          success: false,
+          error: {
+            code: ErrorCodes.RESOURCE_LOCKED,
+            message: (error as any).message,
+            payload: (error as any).payload
+          }
+        });
+      }
       return sendInternalError(res, 'Failed to toggle service notice status', error, ErrorCodes.RESOURCE_UPDATE_FAILED);
     }
   }

@@ -1263,6 +1263,33 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </Box>
         </List>
       </Box>
+
+      {/* Version display - Balanced Minimal */}
+      <Box
+        sx={{
+          p: 2,
+          textAlign: 'center',
+          borderTop: `1px solid ${theme.palette.divider}`,
+          opacity: 0.7,
+          transition: 'all 0.2s',
+          '&:hover': {
+            opacity: 1,
+            bgcolor: 'action.hover'
+          }
+        }}
+      >
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.secondary',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            display: 'block'
+          }}
+        >
+          {sidebarCollapsed ? 'v1.0' : 'Gatrix v1.0.1'}
+        </Typography>
+      </Box>
     </Box>
   );
 

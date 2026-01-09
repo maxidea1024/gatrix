@@ -35,6 +35,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 import rewardTemplateService, { RewardTemplate } from '../../services/rewardTemplateService';
 import { tagService } from '../../services/tagService';
 import SimplePagination from '../../components/common/SimplePagination';
@@ -283,7 +284,7 @@ const RewardTemplatesPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Failed to load templates:', error);
-      enqueueSnackbar(error.message || t('rewardTemplates.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'rewardTemplates.loadFailed'), { variant: 'error' });
       setTemplates([]);
       setAllTemplates([]);
       setTotal(0);
@@ -437,7 +438,7 @@ const RewardTemplatesPage: React.FC = () => {
       setSelectedIds([]);
       loadTemplates();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('rewardTemplates.deleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'rewardTemplates.deleteFailed'), { variant: 'error' });
     } finally {
       setDeleteConfirmOpen(false);
       setDeletingTemplate(null);
@@ -463,7 +464,7 @@ const RewardTemplatesPage: React.FC = () => {
       setSelectedIds([]);
       loadTemplates();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('rewardTemplates.bulkDeleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'rewardTemplates.bulkDeleteFailed'), { variant: 'error' });
     } finally {
       setBulkDeleteConfirmOpen(false);
     }

@@ -1212,7 +1212,7 @@ const GameWorldsPage: React.FC = () => {
       setToggleSelectedTemplateId('');
     } catch (error: any) {
       console.error('Failed to toggle maintenance:', error);
-      enqueueSnackbar(error.message || t('gameWorlds.errors.toggleMaintenanceFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'gameWorlds.errors.toggleMaintenanceFailed'), { variant: 'error' });
     }
   };
 
@@ -1249,7 +1249,7 @@ const GameWorldsPage: React.FC = () => {
         enqueueSnackbar(t('gameWorlds.orderUpdated', { name: movedWorld?.name || 'Unknown' }), { variant: 'success' });
       } catch (error) {
         console.error('Failed to update order:', error);
-        enqueueSnackbar(t('gameWorlds.errors.orderUpdateFailed'), { variant: 'error' });
+        enqueueSnackbar(parseApiErrorMessage(error, 'gameWorlds.errors.orderUpdateFailed'), { variant: 'error' });
         // Reload to get correct order
         loadGameWorlds();
       }
