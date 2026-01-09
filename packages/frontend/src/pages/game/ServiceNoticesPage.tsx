@@ -346,8 +346,16 @@ const ServiceNoticesPage: React.FC = () => {
     if (!deletingNotice) return;
 
     try {
-      await serviceNoticeService.deleteServiceNotice(deletingNotice.id);
-      enqueueSnackbar(t('serviceNotices.deleteSuccess'), { variant: 'success' });
+      const result = await serviceNoticeService.deleteServiceNotice(deletingNotice.id);
+
+      if (result.isChangeRequest) {
+        // CR was created, not immediately deleted
+        enqueueSnackbar(t('serviceNotices.deleteChangeRequestCreated'), { variant: 'info' });
+      } else {
+        // Directly deleted
+        enqueueSnackbar(t('serviceNotices.deleteSuccess'), { variant: 'success' });
+      }
+
       setDeleteDialogOpen(false);
       setDeletingNotice(null);
       loadNotices();
@@ -363,8 +371,16 @@ const ServiceNoticesPage: React.FC = () => {
 
   const confirmBulkDelete = async () => {
     try {
-      await serviceNoticeService.deleteMultipleServiceNotices(selectedIds);
-      enqueueSnackbar(t('serviceNotices.bulkDeleteSuccess', { count: selectedIds.length }), { variant: 'success' });
+      const result = await serviceNoticeService.deleteMultipleServiceNotices(selectedIds);
+
+      if (result.isChangeRequest) {
+        // CR was created, not immediately deleted
+        enqueueSnackbar(t('serviceNotices.bulkDeleteChangeRequestCreated', { count: selectedIds.length }), { variant: 'info' });
+      } else {
+        // Directly deleted
+        enqueueSnackbar(t('serviceNotices.bulkDeleteSuccess', { count: selectedIds.length }), { variant: 'success' });
+      }
+
       setBulkDeleteDialogOpen(false);
       setSelectedIds([]);
       loadNotices();
