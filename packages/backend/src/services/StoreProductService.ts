@@ -1,7 +1,6 @@
 import { ulid } from 'ulid';
 import database from '../config/database';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
-import { convertDateFieldsFromMySQL } from '../utils/dateUtils';
 import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { TagService } from './TagService';
@@ -173,17 +172,17 @@ class StoreProductService {
       const productsWithTags = await Promise.all(
         products.map(async (product) => {
           const tags = await TagService.listTagsForEntity('store_product', product.id);
-          return convertDateFieldsFromMySQL({
+          return {
             ...product,
             isActive: Boolean(product.isActive),
             metadata: typeof product.metadata === 'string' ? JSON.parse(product.metadata) : product.metadata,
             tags,
-          }, ['createdAt', 'updatedAt', 'saleStartAt', 'saleEndAt']);
+          };
         })
       );
 
       return {
-        products: productsWithTags,
+        products: productsWithTags as StoreProduct[],
         total,
         page,
         limit,
@@ -240,12 +239,12 @@ class StoreProductService {
       const product = products[0];
       const tags = await TagService.listTagsForEntity('store_product', id);
 
-      return convertDateFieldsFromMySQL({
+      return {
         ...product,
         isActive: Boolean(product.isActive),
         metadata: typeof product.metadata === 'string' ? JSON.parse(product.metadata) : product.metadata,
         tags,
-      }, ['createdAt', 'updatedAt', 'saleStartAt', 'saleEndAt']);
+      } as StoreProduct;
     } catch (error) {
       if (error instanceof GatrixError) throw error;
       logger.error('Failed to get store product by ID', { error, id });
@@ -273,12 +272,12 @@ class StoreProductService {
       const product = products[0];
       const tags = await TagService.listTagsForEntity('store_product', id);
 
-      return convertDateFieldsFromMySQL({
+      return {
         ...product,
         isActive: Boolean(product.isActive),
         metadata: typeof product.metadata === 'string' ? JSON.parse(product.metadata) : product.metadata,
         tags,
-      }, ['createdAt', 'updatedAt', 'saleStartAt', 'saleEndAt']);
+      } as StoreProduct;
     } catch (error) {
       logger.error('Failed to get store product by ID across environments', { error, id });
       return null;
@@ -402,11 +401,11 @@ class StoreProductService {
     }
     if (input.saleStartAt !== undefined) {
       updates.push('saleStartAt = ?');
-      values.push(input.saleStartAt);
+      values.push(input.saleStartAt ? input.saleStartAt.toISOString() : null);
     }
     if (input.saleEndAt !== undefined) {
       updates.push('saleEndAt = ?');
-      values.push(input.saleEndAt);
+      values.push(input.saleEndAt ? input.saleEndAt.toISOString() : null);
     }
     if (input.description !== undefined) {
       updates.push('description = ?');
