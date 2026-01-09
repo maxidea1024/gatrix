@@ -169,14 +169,19 @@ import {
   FormatBold as BoldIcon,
   FormatItalic as ItalicIcon,
   FormatUnderlined as UnderlineIcon,
+  FormatStrikethrough as StrikethroughIcon,
   Link as LinkIcon,
   FormatClear as ClearIcon,
   Image as ImageIcon,
   ExpandMore as ExpandMoreIcon,
   Edit as EditIcon,
   ContentCopy as CopyIcon,
+  ContentCut as CutIcon,
+  ContentPaste as PasteIcon,
   Delete as DeleteIcon,
   VideoLibrary as VideoIcon,
+  FormatSize as SizeIcon,
+  FormatColorText as ColorIcon,
 } from '@mui/icons-material';
 
 interface RichTextEditorProps {
@@ -239,6 +244,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const imageValidationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const videoValidationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Floating toolbar state
+  const [floatingToolbar, setFloatingToolbar] = useState<{
+    visible: boolean;
+    top: number;
+    left: number;
+  }>({ visible: false, top: 0, left: 0 });
+  const floatingToolbarRef = useRef<HTMLDivElement | null>(null);
+
   // Save advanced options state to localStorage
   const handleAdvancedOptionsChange = (event: React.SyntheticEvent, isExpanded: boolean) => {
     setAdvancedOptionsExpanded(isExpanded);
@@ -297,15 +310,44 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     };
   }, [imageUrl]);
 
-  // Save cursor position continuously
+  // Save cursor position continuously and show floating toolbar on text selection
   useEffect(() => {
     if (quillRef.current) {
       const editor = quillRef.current.getEditor();
 
-      const handleSelectionChange = () => {
-        const selection = editor.getSelection();
-        if (selection) {
-          savedSelectionRef.current = selection;
+      const handleSelectionChange = (range: { index: number; length: number } | null) => {
+        if (range) {
+          savedSelectionRef.current = range;
+
+          // Show floating toolbar when text is selected
+          if (range.length > 0 && !readOnly) {
+            // Get selection bounds using native browser API
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+              const nativeRange = selection.getRangeAt(0);
+              const rect = nativeRange.getBoundingClientRect();
+
+              // Position the toolbar above the selection
+              const editorContainer = quillRef.current?.getEditor()?.root?.parentElement;
+              if (editorContainer) {
+                const containerRect = editorContainer.getBoundingClientRect();
+                setFloatingToolbar({
+                  visible: true,
+                  top: rect.top - containerRect.top - 45, // 45px above selection
+                  left: rect.left - containerRect.left + (rect.width / 2) - 100, // Center the toolbar
+                });
+              }
+            }
+          } else {
+            setFloatingToolbar(prev => ({ ...prev, visible: false }));
+          }
+        } else {
+          // Delay hiding to allow clicking on toolbar buttons
+          setTimeout(() => {
+            if (!floatingToolbarRef.current?.contains(document.activeElement)) {
+              setFloatingToolbar(prev => ({ ...prev, visible: false }));
+            }
+          }, 150);
         }
       };
 
@@ -316,7 +358,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         editor.off('selection-change', handleSelectionChange);
       };
     }
-  }, []);
+  }, [readOnly]);
 
   // Handle image right-click context menu
   useEffect(() => {
@@ -743,6 +785,69 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       if (selection && selection.length > 0) {
         editor.removeFormat(selection.index, selection.length);
         editor.focus();
+      }
+    }
+  };
+
+  const formatStrikethrough = () => {
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const selection = savedSelectionRef.current;
+      if (selection && selection.length > 0) {
+        const format = editor.getFormat(selection.index, selection.length);
+        editor.formatText(selection.index, selection.length, 'strike', !format.strike);
+        editor.focus();
+      }
+    }
+  };
+
+  // Clipboard functions for floating toolbar
+  const handleCut = async () => {
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const selection = savedSelectionRef.current;
+      if (selection && selection.length > 0) {
+        const text = editor.getText(selection.index, selection.length);
+        try {
+          await navigator.clipboard.writeText(text);
+          editor.deleteText(selection.index, selection.length);
+          setFloatingToolbar(prev => ({ ...prev, visible: false }));
+        } catch (err) {
+          console.error('Failed to cut:', err);
+        }
+      }
+    }
+  };
+
+  const handleCopy = async () => {
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const selection = savedSelectionRef.current;
+      if (selection && selection.length > 0) {
+        const text = editor.getText(selection.index, selection.length);
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (err) {
+          console.error('Failed to copy:', err);
+        }
+      }
+    }
+  };
+
+  const handlePaste = async () => {
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const selection = savedSelectionRef.current || { index: editor.getLength(), length: 0 };
+      try {
+        const text = await navigator.clipboard.readText();
+        if (selection.length > 0) {
+          editor.deleteText(selection.index, selection.length);
+        }
+        editor.insertText(selection.index, text);
+        editor.setSelection(selection.index + text.length, 0);
+        setFloatingToolbar(prev => ({ ...prev, visible: false }));
+      } catch (err) {
+        console.error('Failed to paste:', err);
       }
     }
   };
@@ -1462,7 +1567,103 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           },
         }}
       >
-        <Box onContextMenu={handleContextMenu}>
+        <Box onContextMenu={handleContextMenu} sx={{ position: 'relative' }}>
+          {/* Floating Toolbar for text selection */}
+          {floatingToolbar.visible && (
+            <Paper
+              ref={floatingToolbarRef}
+              elevation={4}
+              sx={{
+                position: 'absolute',
+                top: floatingToolbar.top,
+                left: floatingToolbar.left,
+                zIndex: 1000,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                p: 0.5,
+                borderRadius: 1,
+                backgroundColor: theme.palette.background.paper,
+                border: `1px solid ${theme.palette.divider}`,
+              }}
+              onMouseDown={(e) => e.preventDefault()} // Prevent losing selection
+            >
+              {/* Formatting buttons */}
+              <IconButton
+                size="small"
+                onClick={formatBold}
+                title={t('richTextEditor.bold')}
+                sx={{ padding: '4px' }}
+              >
+                <BoldIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={formatItalic}
+                title={t('richTextEditor.italic')}
+                sx={{ padding: '4px' }}
+              >
+                <ItalicIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={formatUnderline}
+                title={t('richTextEditor.underline')}
+                sx={{ padding: '4px' }}
+              >
+                <UnderlineIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={formatStrikethrough}
+                title={t('richTextEditor.strike')}
+                sx={{ padding: '4px' }}
+              >
+                <StrikethroughIcon fontSize="small" />
+              </IconButton>
+
+              <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+              {/* Clipboard buttons */}
+              <IconButton
+                size="small"
+                onClick={handleCut}
+                title={t('common.cut', 'Cut')}
+                sx={{ padding: '4px' }}
+              >
+                <CutIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={handleCopy}
+                title={t('common.copy', 'Copy')}
+                sx={{ padding: '4px' }}
+              >
+                <CopyIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={handlePaste}
+                title={t('common.paste', 'Paste')}
+                sx={{ padding: '4px' }}
+              >
+                <PasteIcon fontSize="small" />
+              </IconButton>
+
+              <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+              {/* Clear formatting */}
+              <IconButton
+                size="small"
+                onClick={clearFormatting}
+                title={t('richTextEditor.clearFormatting')}
+                sx={{ padding: '4px' }}
+              >
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            </Paper>
+          )}
+
           <ReactQuill
             ref={quillRef}
             theme="snow"
