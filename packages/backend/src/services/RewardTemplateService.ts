@@ -2,6 +2,7 @@ import { ulid } from 'ulid';
 import database from '../config/database';
 import { RowDataPacket } from 'mysql2';
 import { GatrixError } from '../middleware/errorHandler';
+import { convertDateFieldsFromMySQL } from '../utils/dateUtils';
 import logger from '../config/logger';
 import { TagService } from './TagService';
 
@@ -104,11 +105,11 @@ class RewardTemplateService {
       const parsedTemplates = await Promise.all((templates as RowDataPacket[]).map(async (t) => {
         const tags = await TagService.listTagsForEntity('reward_template', t.id);
         logger.debug(`Loaded tags for template ${t.id}:`, { templateId: t.id, tagCount: tags.length, tags });
-        return {
+        return convertDateFieldsFromMySQL({
           ...t,
           rewardItems: typeof t.rewardItems === 'string' ? JSON.parse(t.rewardItems) : t.rewardItems,
           tags: tags,
-        };
+        }, ['createdAt', 'updatedAt']);
       }));
 
       return {
@@ -140,11 +141,11 @@ class RewardTemplateService {
 
       const template = templates[0];
       const tags = await TagService.listTagsForEntity('reward_template', id);
-      return {
+      return convertDateFieldsFromMySQL({
         ...template,
         rewardItems: typeof template.rewardItems === 'string' ? JSON.parse(template.rewardItems) : template.rewardItems,
         tags: tags,
-      };
+      }, ['createdAt', 'updatedAt']);
     } catch (error) {
       if (error instanceof GatrixError) throw error;
       logger.error('Failed to get reward template', { error, id });

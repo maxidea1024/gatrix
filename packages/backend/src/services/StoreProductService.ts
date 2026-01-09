@@ -1,6 +1,7 @@
 import { ulid } from 'ulid';
 import database from '../config/database';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
+import { convertDateFieldsFromMySQL } from '../utils/dateUtils';
 import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { TagService } from './TagService';
@@ -172,12 +173,12 @@ class StoreProductService {
       const productsWithTags = await Promise.all(
         products.map(async (product) => {
           const tags = await TagService.listTagsForEntity('store_product', product.id);
-          return {
+          return convertDateFieldsFromMySQL({
             ...product,
             isActive: Boolean(product.isActive),
             metadata: typeof product.metadata === 'string' ? JSON.parse(product.metadata) : product.metadata,
             tags,
-          };
+          }, ['createdAt', 'updatedAt', 'saleStartAt', 'saleEndAt']);
         })
       );
 
@@ -239,12 +240,12 @@ class StoreProductService {
       const product = products[0];
       const tags = await TagService.listTagsForEntity('store_product', id);
 
-      return {
+      return convertDateFieldsFromMySQL({
         ...product,
         isActive: Boolean(product.isActive),
         metadata: typeof product.metadata === 'string' ? JSON.parse(product.metadata) : product.metadata,
         tags,
-      };
+      }, ['createdAt', 'updatedAt', 'saleStartAt', 'saleEndAt']);
     } catch (error) {
       if (error instanceof GatrixError) throw error;
       logger.error('Failed to get store product by ID', { error, id });
@@ -272,12 +273,12 @@ class StoreProductService {
       const product = products[0];
       const tags = await TagService.listTagsForEntity('store_product', id);
 
-      return {
+      return convertDateFieldsFromMySQL({
         ...product,
         isActive: Boolean(product.isActive),
         metadata: typeof product.metadata === 'string' ? JSON.parse(product.metadata) : product.metadata,
         tags,
-      };
+      }, ['createdAt', 'updatedAt', 'saleStartAt', 'saleEndAt']);
     } catch (error) {
       logger.error('Failed to get store product by ID across environments', { error, id });
       return null;

@@ -440,22 +440,28 @@ class IngamePopupNoticeService {
    * Format notice from database row
    */
   private formatNotice(row: RowDataPacket): IngamePopupNotice {
-    // Helper function to convert dates safely (can return null)
-    const convertDate = (date: any): string | null => {
+    // Helper function to convert mysql2 Date to UTC ISO string
+    // mysql2 returns DATETIME as Date interpreted as local time, but DB stores UTC
+    // So we extract local time components and format them as UTC
+    const convertDateToUTC = (date: any): string | null => {
       if (!date) return null;
       if (date instanceof Date) {
-        return date.toISOString();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        const ms = String(date.getMilliseconds()).padStart(3, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${ms}Z`;
       }
       return convertFromMySQLDateTime(date) || null;
     };
 
     // Helper function to convert dates (must return string)
     const convertDateRequired = (date: any): string => {
-      if (!date) return new Date().toISOString();
-      if (date instanceof Date) {
-        return date.toISOString();
-      }
-      return convertFromMySQLDateTime(date) || new Date().toISOString();
+      const result = convertDateToUTC(date);
+      return result || new Date().toISOString();
     };
 
     return {
@@ -476,8 +482,8 @@ class IngamePopupNoticeService {
       targetUserIdsInverted: Boolean(row.targetUserIdsInverted),
       displayPriority: Number(row.displayPriority) || 100,
       showOnce: Boolean(row.showOnce),
-      startDate: convertDate(row.startDate),
-      endDate: convertDate(row.endDate),
+      startDate: convertDateToUTC(row.startDate),
+      endDate: convertDateToUTC(row.endDate),
       messageTemplateId: row.messageTemplateId || null,
       useTemplate: Boolean(row.useTemplate),
       description: row.description || null,
