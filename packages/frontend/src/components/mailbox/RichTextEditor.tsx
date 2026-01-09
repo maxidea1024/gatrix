@@ -801,19 +801,39 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
 
-  // Clipboard functions for floating toolbar
+  // Clipboard functions for floating toolbar - use HTML to preserve formatting
   const handleCut = async () => {
     if (quillRef.current) {
       const editor = quillRef.current.getEditor();
       const selection = savedSelectionRef.current;
       if (selection && selection.length > 0) {
+        // Get HTML content for the selection
+        const contents = editor.getContents(selection.index, selection.length);
+        const tempContainer = document.createElement('div');
+        const tempQuill = new Quill(tempContainer);
+        tempQuill.setContents(contents);
+        const html = tempContainer.querySelector('.ql-editor')?.innerHTML || '';
         const text = editor.getText(selection.index, selection.length);
+
         try {
-          await navigator.clipboard.writeText(text);
+          // Write both HTML and plain text to clipboard
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              'text/html': new Blob([html], { type: 'text/html' }),
+              'text/plain': new Blob([text], { type: 'text/plain' }),
+            }),
+          ]);
           editor.deleteText(selection.index, selection.length);
           setFloatingToolbar(prev => ({ ...prev, visible: false }));
         } catch (err) {
-          console.error('Failed to cut:', err);
+          // Fallback to plain text
+          try {
+            await navigator.clipboard.writeText(text);
+            editor.deleteText(selection.index, selection.length);
+            setFloatingToolbar(prev => ({ ...prev, visible: false }));
+          } catch (fallbackErr) {
+            console.error('Failed to cut:', fallbackErr);
+          }
         }
       }
     }
@@ -824,11 +844,29 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const editor = quillRef.current.getEditor();
       const selection = savedSelectionRef.current;
       if (selection && selection.length > 0) {
+        // Get HTML content for the selection
+        const contents = editor.getContents(selection.index, selection.length);
+        const tempContainer = document.createElement('div');
+        const tempQuill = new Quill(tempContainer);
+        tempQuill.setContents(contents);
+        const html = tempContainer.querySelector('.ql-editor')?.innerHTML || '';
         const text = editor.getText(selection.index, selection.length);
+
         try {
-          await navigator.clipboard.writeText(text);
+          // Write both HTML and plain text to clipboard
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              'text/html': new Blob([html], { type: 'text/html' }),
+              'text/plain': new Blob([text], { type: 'text/plain' }),
+            }),
+          ]);
         } catch (err) {
-          console.error('Failed to copy:', err);
+          // Fallback to plain text
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch (fallbackErr) {
+            console.error('Failed to copy:', fallbackErr);
+          }
         }
       }
     }
@@ -839,15 +877,46 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const editor = quillRef.current.getEditor();
       const selection = savedSelectionRef.current || { index: editor.getLength(), length: 0 };
       try {
-        const text = await navigator.clipboard.readText();
+        const clipboardItems = await navigator.clipboard.read();
+        let html = '';
+        let text = '';
+
+        for (const item of clipboardItems) {
+          if (item.types.includes('text/html')) {
+            const blob = await item.getType('text/html');
+            html = await blob.text();
+          }
+          if (item.types.includes('text/plain')) {
+            const blob = await item.getType('text/plain');
+            text = await blob.text();
+          }
+        }
+
         if (selection.length > 0) {
           editor.deleteText(selection.index, selection.length);
         }
-        editor.insertText(selection.index, text);
-        editor.setSelection(selection.index + text.length, 0);
+
+        if (html) {
+          // Insert HTML with formatting using clipboard API directly
+          editor.clipboard.dangerouslyPasteHTML(selection.index, html);
+        } else if (text) {
+          editor.insertText(selection.index, text);
+        }
+
         setFloatingToolbar(prev => ({ ...prev, visible: false }));
+        editor.focus();
       } catch (err) {
-        console.error('Failed to paste:', err);
+        // Fallback to plain text
+        try {
+          const text = await navigator.clipboard.readText();
+          if (selection.length > 0) {
+            editor.deleteText(selection.index, selection.length);
+          }
+          editor.insertText(selection.index, text);
+          setFloatingToolbar(prev => ({ ...prev, visible: false }));
+        } catch (fallbackErr) {
+          console.error('Failed to paste:', fallbackErr);
+        }
       }
     }
   };
