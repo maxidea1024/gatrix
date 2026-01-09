@@ -96,7 +96,7 @@ function applyOpsToData(baseData: Record<string, any> | null, ops: FieldOp[], op
 }
 
 /**
- * Generate inverse ops for rollback
+ * Generate inverse ops for revert
  * SET -> DEL (or SET with old value if it existed)
  * DEL -> SET
  * MOD -> MOD (swap old/new)
@@ -132,7 +132,7 @@ function generateInverseOps(ops: FieldOp[]): FieldOp[] {
 }
 
 /**
- * Determine inverse operation type for rollback
+ * Determine inverse operation type for revert
  */
 function getInverseOpType(opType: EntityOpType): EntityOpType {
     if (opType === 'CREATE') return 'DELETE';
@@ -157,6 +157,23 @@ export class ChangeRequestService {
         try {
             let cr: ChangeRequest | undefined;
 
+            // Phase 3: Check if user has a pending review request (open status)
+            // Block new edits when review is pending
+            const pendingReview = await ChangeRequest.query()
+                .where('requesterId', userId)
+                .where('environment', environmentName)
+                .where('status', 'open')
+                .first();
+
+            if (pendingReview) {
+                throw new GatrixError(
+                    'You have a pending review request. Withdraw it or wait for approval/rejection before making new changes.',
+                    409,
+                    true,
+                    'PENDING_REVIEW_EXISTS'
+                );
+            }
+
             // 1. If ID provided, verify it exists and is in DRAFT
             if (changeRequestId) {
                 cr = await ChangeRequest.query()
@@ -166,22 +183,44 @@ export class ChangeRequestService {
                 if (!cr) {
                     throw new Error('Change Request not found or not in DRAFT status.');
                 }
-            } else {
-                // 2. Create new Draft CR
-                const cleanTable = targetTable.startsWith('g_') ? targetTable.slice(2) : targetTable;
-                const isNew = targetId.startsWith('NEW_');
-                const identifier = afterData?.name || afterData?.title || afterData?.displayName || afterData?.worldId || afterData?.id || (isNew ? 'New Item' : targetId);
-                const action = isNew ? 'Create' : (afterData === null ? 'Delete' : 'Update');
 
-                cr = await ChangeRequest.query().insert({
-                    id: ulid(),
-                    requesterId: userId,
-                    environment: environmentName,
-                    status: 'draft',
-                    title: `[${cleanTable}] ${action}: ${identifier}`,
-                    priority: 'medium',
-                    category: 'general'
-                });
+                // Verify the CR belongs to this user
+                if (cr.requesterId !== userId) {
+                    throw new GatrixError(
+                        'You cannot modify another user\'s draft.',
+                        403,
+                        true,
+                        'NOT_DRAFT_OWNER'
+                    );
+                }
+            } else {
+                // Phase 2: Check if user already has a draft - enforce single draft rule
+                const existingDraft = await ChangeRequest.query()
+                    .where('requesterId', userId)
+                    .where('environment', environmentName)
+                    .where('status', 'draft')
+                    .first();
+
+                if (existingDraft) {
+                    // Use existing draft instead of creating a new one
+                    cr = existingDraft;
+                } else {
+                    // 2. Create new Draft CR
+                    const cleanTable = targetTable.startsWith('g_') ? targetTable.slice(2) : targetTable;
+                    const isNew = targetId.startsWith('NEW_');
+                    const identifier = afterData?.name || afterData?.title || afterData?.displayName || afterData?.worldId || afterData?.id || (isNew ? 'New Item' : targetId);
+                    const action = isNew ? 'Create' : (afterData === null ? 'Delete' : 'Update');
+
+                    cr = await ChangeRequest.query().insert({
+                        id: ulid(),
+                        requesterId: userId,
+                        environment: environmentName,
+                        status: 'draft',
+                        title: `[${cleanTable}] ${action}: ${identifier}`,
+                        priority: 'medium',
+                        category: 'general'
+                    });
+                }
             }
 
             // 3. Determine operation type and generate ops
@@ -532,6 +571,39 @@ export class ChangeRequestService {
             // Validate ownership: Only the original requester or an admin can reopen
             if (cr.requesterId !== requesterId && !isAdmin) {
                 throw new Error('Only the original requester or an admin can reopen this request.');
+            }
+
+            // Phase 4: Check for existing draft - prevent reopen conflict
+            const existingDraft = await ChangeRequest.query(trx)
+                .where('requesterId', cr.requesterId)
+                .where('environment', cr.environment)
+                .where('status', 'draft')
+                .first();
+
+            if (existingDraft) {
+                throw new GatrixError(
+                    'Cannot reopen: you already have an active draft. Delete or submit it first.',
+                    409,
+                    true,
+                    'REOPEN_CONFLICT',
+                    { existingDraftId: existingDraft.id }
+                );
+            }
+
+            // Also check for pending review
+            const pendingReview = await ChangeRequest.query(trx)
+                .where('requesterId', cr.requesterId)
+                .where('environment', cr.environment)
+                .where('status', 'open')
+                .first();
+
+            if (pendingReview) {
+                throw new GatrixError(
+                    'Cannot reopen: you have a pending review request. Wait for approval/rejection first.',
+                    409,
+                    true,
+                    'PENDING_REVIEW_EXISTS'
+                );
             }
 
             // Reset to Draft
@@ -948,12 +1020,12 @@ export class ChangeRequestService {
     }
 
     /**
-     * Preview what a rollback would look like without creating the CR
+     * Preview what a revert would look like without creating the CR
      * Returns the inverse operations that would be applied
      */
-    static async previewRollback(changeRequestId: string): Promise<{
+    static async previewRevert(changeRequestId: string): Promise<{
         originalCr: ChangeRequest;
-        rollbackItems: Array<{
+        revertItems: Array<{
             targetTable: string;
             targetId: string;
             opType: EntityOpType;
@@ -966,9 +1038,9 @@ export class ChangeRequestService {
             .withGraphFetched('changeItems');
 
         if (!originalCr) throw new GatrixError('Change Request not found', 404);
-        if (originalCr.status !== 'applied') throw new GatrixError('Only APPLIED requests can be rolled back', 400);
+        if (originalCr.status !== 'applied') throw new GatrixError('Only APPLIED requests can be reverted', 400);
 
-        const rollbackItems: Array<{
+        const revertItems: Array<{
             targetTable: string;
             targetId: string;
             opType: EntityOpType;
@@ -984,7 +1056,7 @@ export class ChangeRequestService {
             if (inverseOpType === 'CREATE') actionType = 'CREATE_ENTITY';
             else if (inverseOpType === 'DELETE') actionType = 'DELETE_ENTITY';
 
-            rollbackItems.push({
+            revertItems.push({
                 targetTable: item.targetTable,
                 targetId: item.targetId,
                 opType: inverseOpType,
@@ -993,28 +1065,28 @@ export class ChangeRequestService {
             });
         }
 
-        return { originalCr, rollbackItems };
+        return { originalCr, revertItems };
     }
 
-    static async rollbackChangeRequest(changeRequestId: string, userId: number): Promise<ChangeRequest> {
+    static async revertChangeRequest(changeRequestId: string, userId: number): Promise<ChangeRequest> {
         return await transaction(ChangeRequest.knex(), async (trx) => {
             const originalCr = await ChangeRequest.query(trx)
                 .findById(changeRequestId)
                 .withGraphFetched('changeItems');
 
             if (!originalCr) throw new GatrixError('Change Request not found', 404);
-            if (originalCr.status !== 'applied') throw new GatrixError('Only APPLIED requests can be rolled back', 400);
+            if (originalCr.status !== 'applied') throw new GatrixError('Only APPLIED requests can be reverted', 400);
 
-            // Create new CR for rollback
+            // Create new CR for revert
             const newCrKey = ulid();
             const newCr = await ChangeRequest.query(trx).insert({
                 id: newCrKey,
-                title: `Rollback: ${originalCr.title}`,
-                description: `Rollback of request #${originalCr.id}`,
+                title: `Revert: ${originalCr.title}`,
+                description: `Revert of request #${originalCr.id}`,
                 requesterId: userId,
                 environment: originalCr.environment,
                 status: 'open',
-                type: 'rollback',
+                type: 'revert',
                 priority: originalCr.priority || 'medium',
                 category: originalCr.category || 'general'
             });
@@ -1024,7 +1096,7 @@ export class ChangeRequestService {
                 // Determine inverse operation type
                 const inverseOpType = getInverseOpType(item.opType);
 
-                // Determine ActionGroup type for rollback
+                // Determine ActionGroup type for revert
                 let actionGroupType: ActionGroupType = ACTION_GROUP_TYPES.UPDATE_ENTITY;
                 if (inverseOpType === 'CREATE') actionGroupType = ACTION_GROUP_TYPES.CREATE_ENTITY;
                 else if (inverseOpType === 'DELETE') actionGroupType = ACTION_GROUP_TYPES.DELETE_ENTITY;
@@ -1058,12 +1130,12 @@ export class ChangeRequestService {
                 // Generate inverse ops
                 const inverseOps = generateInverseOps(item.ops);
 
-                // Fetch current live data for proper conflict detection during rollback execution
+                // Fetch current live data for proper conflict detection during revert execution
                 let currentLiveData: Record<string, any> | null = null;
                 let currentVersion: number | undefined;
 
                 if (inverseOpType !== 'CREATE') {
-                    // For UPDATE/DELETE rollback, need to capture current state
+                    // For UPDATE/DELETE revert, need to capture current state
                     try {
                         currentLiveData = await trx(item.targetTable)
                             .where('id', item.targetId)
@@ -1072,7 +1144,7 @@ export class ChangeRequestService {
                             currentVersion = currentLiveData.version;
                         }
                     } catch (err) {
-                        logger.warn(`[Rollback] Could not fetch live data for ${item.targetTable}:${item.targetId}`, err);
+                        logger.warn(`[Revert] Could not fetch live data for ${item.targetTable}:${item.targetId}`, err);
                     }
                 }
 
@@ -1098,7 +1170,7 @@ export class ChangeRequestService {
             // Notify
             const requester = await User.query(trx).findById(userId);
             try {
-                // Treating rollback creation as a new submission for notification purposes
+                // Treating revert creation as a new submission for notification purposes
                 await ChangeRequestNotifications.notifySubmitted({
                     id: newCr.id,
                     title: newCr.title,
@@ -1107,7 +1179,7 @@ export class ChangeRequestService {
                     requesterName: requester?.name || requester?.email
                 });
             } catch (err) {
-                logger.error('[ChangeRequest] Failed to send rollback notification', err);
+                logger.error('[ChangeRequest] Failed to send revert notification', err);
             }
 
             // Return the full CR with items AND action groups
@@ -1116,7 +1188,7 @@ export class ChangeRequestService {
                 .withGraphFetched('[changeItems, actionGroups.changeItems]');
 
             if (!result) {
-                throw new Error('Failed to create rollback request');
+                throw new Error('Failed to create revert request');
             }
 
             return result;

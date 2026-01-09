@@ -432,13 +432,13 @@ export class ChangeRequestController {
     });
 
     /**
-     * Preview rollback - shows what changes would be made without creating the CR
-     * GET /api/v1/admin/change-requests/:id/rollback-preview
+     * Preview revert - shows what changes would be made without creating the CR
+     * GET /api/v1/admin/change-requests/:id/revert-preview
      */
-    static previewRollback = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    static previewRevert = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
         const { id } = req.params;
 
-        const preview = await ChangeRequestService.previewRollback(id);
+        const preview = await ChangeRequestService.previewRevert(id);
 
         res.json({
             success: true,
@@ -447,10 +447,10 @@ export class ChangeRequestController {
     });
 
     /**
-     * Rollback an applied change request
-     * POST /api/v1/admin/change-requests/:id/rollback
+     * Revert an applied change request
+     * POST /api/v1/admin/change-requests/:id/revert
      */
-    static rollback = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    static revert = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
         const { id } = req.params;
         const userId = req.user?.userId;
 
@@ -458,14 +458,14 @@ export class ChangeRequestController {
             throw new GatrixError('User not authenticated', 401);
         }
 
-        const newCr = await ChangeRequestService.rollbackChangeRequest(id, userId);
+        const newCr = await ChangeRequestService.revertChangeRequest(id, userId);
 
-        logger.info('[ChangeRequest] Rolled back', { originalId: id, newId: newCr.id, userId });
+        logger.info('[ChangeRequest] Reverted', { originalId: id, newId: newCr.id, userId });
 
         res.json({
             success: true,
             data: newCr,
-            message: 'Rollback change request created',
+            message: 'Revert change request created',
         });
     });
     /**

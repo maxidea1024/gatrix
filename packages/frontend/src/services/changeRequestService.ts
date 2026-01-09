@@ -195,18 +195,18 @@ class ChangeRequestService {
     }
 
     /**
-     * Get rollback preview (inverse ops without creating CR)
+     * Get revert preview (inverse ops without creating CR)
      */
-    async getRollbackPreview(id: string): Promise<any> {
-        const response = await api.get(`/admin/change-requests/${id}/rollback-preview`);
+    async getRevertPreview(id: string): Promise<any> {
+        const response = await api.get(`/admin/change-requests/${id}/revert-preview`);
         return response.data;
     }
 
     /**
-     * Rollback applied change request
+     * Revert applied change request
      */
-    async rollback(id: string): Promise<ChangeRequest> {
-        const response = await api.post(`/admin/change-requests/${id}/rollback`);
+    async revert(id: string): Promise<ChangeRequest> {
+        const response = await api.post(`/admin/change-requests/${id}/revert`);
         return response.data;
     }
 

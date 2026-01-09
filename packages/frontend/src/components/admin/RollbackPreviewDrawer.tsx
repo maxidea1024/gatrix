@@ -44,40 +44,40 @@ interface RollbackItem {
     actionType: string;
 }
 
-interface RollbackPreviewDrawerProps {
+interface RevertPreviewDrawerProps {
     open: boolean;
     onClose: () => void;
     changeRequestId: string | null;
-    onRollbackCreated?: (newCrId: string) => void;
+    onRevertCreated?: (newCrId: string) => void;
 }
 
-const RollbackPreviewDrawer: React.FC<RollbackPreviewDrawerProps> = ({
+const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
     open,
     onClose,
     changeRequestId,
-    onRollbackCreated,
+    onRevertCreated,
 }) => {
     const { t } = useTranslation();
     const { enqueueSnackbar } = useSnackbar();
     const { handleApiError } = useHandleApiError();
     const [isCreating, setIsCreating] = useState(false);
 
-    // Fetch rollback preview
+    // Fetch revert preview
     const { data: preview, error, isLoading } = useSWR(
-        open && changeRequestId ? `/admin/change-requests/${changeRequestId}/rollback-preview` : null,
-        () => changeRequestService.getRollbackPreview(changeRequestId!)
+        open && changeRequestId ? `/admin/change-requests/${changeRequestId}/revert-preview` : null,
+        () => changeRequestService.getRevertPreview(changeRequestId!)
     );
 
-    const handleCreateRollback = async () => {
+    const handleCreateRevert = async () => {
         if (!changeRequestId) return;
 
         setIsCreating(true);
         try {
-            const result = await changeRequestService.rollback(changeRequestId);
-            enqueueSnackbar(t('changeRequest.messages.rollbackCreated'), { variant: 'success' });
+            const result = await changeRequestService.revert(changeRequestId);
+            enqueueSnackbar(t('changeRequest.messages.revertCreated'), { variant: 'success' });
             onClose();
-            if (onRollbackCreated) {
-                onRollbackCreated(result.id);
+            if (onRevertCreated) {
+                onRevertCreated(result.id);
             }
         } catch (err) {
             handleApiError(err);
@@ -346,4 +346,4 @@ const RollbackPreviewDrawer: React.FC<RollbackPreviewDrawerProps> = ({
     );
 };
 
-export default RollbackPreviewDrawer;
+export default RevertPreviewDrawer;

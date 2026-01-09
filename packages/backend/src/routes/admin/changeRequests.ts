@@ -93,17 +93,17 @@ router.post('/:id/reopen', ChangeRequestController.reopen);
 router.post('/:id/execute', ChangeRequestController.execute);
 
 /**
- * @route GET /api/v1/admin/change-requests/:id/rollback-preview
- * @desc Preview rollback changes without creating CR
+ * @route GET /api/v1/admin/change-requests/:id/revert-preview
+ * @desc Preview revert changes without creating CR
  * @access Admin
  */
-router.get('/:id/rollback-preview', ChangeRequestController.previewRollback);
+router.get('/:id/revert-preview', ChangeRequestController.previewRevert);
 
 /**
- * @route POST /api/v1/admin/change-requests/:id/rollback
- * @desc Rollback applied change request
+ * @route POST /api/v1/admin/change-requests/:id/revert
+ * @desc Revert applied change request
  * @access Admin
  */
-router.post('/:id/rollback', ChangeRequestController.rollback);
+router.post('/:id/revert', ChangeRequestController.revert);
 
 export default router;
