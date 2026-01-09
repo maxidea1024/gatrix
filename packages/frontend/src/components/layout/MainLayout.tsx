@@ -78,6 +78,8 @@ import {
   ArrowBack as ArrowBackIcon,
   Api as ApiIcon,
   Refresh as RefreshIcon,
+  Lock as LockIcon,
+  HelpOutline as HelpOutlineIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -209,6 +211,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [pendingCRCount, setPendingCRCount] = useState(0);
   // My draft CR count for banner
   const [myDraftCount, setMyDraftCount] = useState(0);
+  // My pending review count (open status - edits are locked)
+  const [myPendingReviewCount, setMyPendingReviewCount] = useState(0);
 
   // Check if admin user has environment access
   const hasEnvironmentAccess = isAdmin() && !environmentsLoading && environments.length > 0;
@@ -358,6 +362,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       const response = await changeRequestService.getMyRequests();
       setPendingCRCount(response?.pendingApproval?.length || 0);
       setMyDraftCount(response?.myDrafts?.length || 0);
+      // Count my own CRs that are in 'open' status (pending review)
+      const myOpenCount = (response?.myRequests || []).filter((cr: any) => cr.status === 'open').length;
+      setMyPendingReviewCount(myOpenCount);
     } catch (error) {
       // Silently fail - don't spam errors for optional feature
     }
@@ -1777,6 +1784,53 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             </Box>
           </Toolbar>
         </AppBar>
+
+        {/* Pending Review Lock Banner - shows when user has open CRs (edits are locked) */}
+        {currentEnvironment?.requiresApproval && myPendingReviewCount > 0 && !location.pathname.startsWith('/admin/change-requests') && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
+              px: 2,
+              py: 0.75,
+              bgcolor: 'error.main',
+              color: 'error.contrastText',
+            }}
+          >
+            <LockIcon sx={{ fontSize: 16 }} />
+            <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.8125rem' }}>
+              {t('changeRequest.pendingReviewLockBanner')}
+            </Typography>
+            <Tooltip title={t('changeRequest.pendingReviewLockTooltip')}>
+              <HelpOutlineIcon sx={{ fontSize: 16, opacity: 0.8, cursor: 'help' }} />
+            </Tooltip>
+            <Box
+              onClick={() => navigate('/admin/change-requests?status=open')}
+              sx={{
+                ml: 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                cursor: 'pointer',
+                px: 1.5,
+                py: 0.25,
+                borderRadius: 1.5,
+                bgcolor: 'rgba(255,255,255,0.15)',
+                '&:hover': {
+                  bgcolor: 'rgba(255,255,255,0.25)',
+                },
+                transition: 'background-color 0.2s',
+              }}
+            >
+              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.75rem' }}>
+                {t('changeRequest.viewMyPendingReviews')}
+              </Typography>
+              <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 12 }} />
+            </Box>
+          </Box>
+        )}
 
         {/* CR Status Banner - shows pending approvals and/or my drafts */}
         {currentEnvironment?.requiresApproval && (pendingCRCount > 0 || myDraftCount > 0) && !location.pathname.startsWith('/admin/change-requests') && (
