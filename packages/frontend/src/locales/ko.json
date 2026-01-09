@@ -955,6 +955,13 @@
     "confirmEndMaintenance": "정말로 \"{{name}}\" 게임 월드의 점검을 종료하시겠습니까?",
     "normal": "정상",
     "maintenance": "점검중",
+    "forceDisconnect": "강제 접속 종료",
+    "gracePeriodMinutes": "유예 시간(분)",
+    "maintenanceEndDate": "점검 종료 일시",
+    "maintenanceLocales": "점검 메시지 언어 설정",
+    "maintenanceMessage": "점검 메시지",
+    "maintenanceStartDate": "점검 시작 일시",
+    "supportsMultiLanguage": "다국어 지원 여부",
     "maintenanceConfig": {
       "title": "점검 설정",
       "description": "점검 기간과 메시지를 설정하세요.",
@@ -5155,23 +5162,6 @@
     "selectChanges": "변경 사항 선택",
     "fieldChanges": "개 필드 변경",
     "submitExcludeWarning": "{{count}}개 항목이 제외됩니다. 제외된 항목은 삭제됩니다."
-  },
-  "gameWorlds": {
-    "infraSettings": "인프라 설정",
-    "forceDisconnect": "강제 접속 종료",
-    "gracePeriodMinutes": "유예 시간(분)",
-    "maintenanceEndDate": "점검 종료 일시",
-    "maintenanceLocales": "점검 메시지 언어 설정",
-    "maintenanceMessage": "점검 메시지",
-    "maintenanceStartDate": "점검 시작 일시",
-    "supportsMultiLanguage": "다국어 지원 여부",
-    "name": "게임월드 이름",
-    "description": "설명",
-    "isVisible": "표시 여부",
-    "isMaintenance": "점검 여부",
-    "worldServerAddress": "월드 서버 주소",
-    "customPayload": "커스텀 페이로드",
-    "tags": "태그"
   },
   "targetSettings": {
     "platforms": "대상 플랫폼",

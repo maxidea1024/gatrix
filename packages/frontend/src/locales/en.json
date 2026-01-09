@@ -954,6 +954,13 @@
     "confirmEndMaintenance": "Are you sure you want to end maintenance for the \"{{name}}\" game world?",
     "normal": "Normal",
     "maintenance": "Maintenance",
+    "forceDisconnect": "Force Disconnect",
+    "gracePeriodMinutes": "Grace Period (min)",
+    "maintenanceEndDate": "Maintenance End Date",
+    "maintenanceLocales": "Maintenance Locales",
+    "maintenanceMessage": "Maintenance Message",
+    "maintenanceStartDate": "Maintenance Start Date",
+    "supportsMultiLanguage": "Supports Multi Language",
     "maintenanceConfig": {
       "title": "Maintenance Settings",
       "description": "Configure maintenance period and messages.",
@@ -5165,23 +5172,6 @@
     "selectChanges": "Select Changes",
     "fieldChanges": "field changes",
     "submitExcludeWarning": "{{count}} items will be excluded. Excluded items will be deleted."
-  },
-  "gameWorlds": {
-    "infraSettings": "Infra Settings",
-    "forceDisconnect": "Force Disconnect",
-    "gracePeriodMinutes": "Grace Period (min)",
-    "maintenanceEndDate": "Maintenance End Date",
-    "maintenanceLocales": "Maintenance Locales",
-    "maintenanceMessage": "Maintenance Message",
-    "maintenanceStartDate": "Maintenance Start Date",
-    "supportsMultiLanguage": "Supports Multi Language",
-    "name": "Game World Name",
-    "description": "Description",
-    "isVisible": "Visible",
-    "isMaintenance": "In Maintenance",
-    "worldServerAddress": "World Server Address",
-    "customPayload": "Custom Payload",
-    "tags": "Tags"
   },
   "targetSettings": {
     "platforms": "Target Platforms",
