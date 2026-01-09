@@ -117,9 +117,9 @@ const iconMap: Record<string, React.ReactElement> = {
 // Helper to get icon name from React element
 const getIconName = (icon: React.ReactElement): string => {
   const typeName = (icon.type as any)?.type?.render?.displayName ||
-                   (icon.type as any)?.displayName ||
-                   (icon.type as any)?.name ||
-                   'Dashboard';
+    (icon.type as any)?.displayName ||
+    (icon.type as any)?.name ||
+    'Dashboard';
   return typeName.replace('Icon', '');
 };
 
@@ -361,6 +361,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
           </Box>
         </>
       )}
+
+      {/* Version display */}
+      <Box sx={{ p: 2, pt: 0 }}>
+        <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
+          Gatrix v1.0.1
+        </Typography>
+      </Box>
     </Box>
   );
 
@@ -567,6 +574,8 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
         '& .MuiDrawer-paper': {
           boxSizing: 'border-box',
           width: width,
+          display: 'flex',
+          flexDirection: 'column',
         },
       }}
     >
@@ -601,6 +610,13 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
           </Box>
         </>
       )}
+
+      {/* Version display */}
+      <Box sx={{ p: 2, pt: 0 }}>
+        <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
+          Gatrix v1.0.1
+        </Typography>
+      </Box>
     </Drawer>
   );
 };
