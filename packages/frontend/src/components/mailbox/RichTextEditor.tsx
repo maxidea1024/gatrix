@@ -27,6 +27,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  ClickAwayListener,
 } from '@mui/material';
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -196,7 +197,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const theme = useTheme();
   const { t } = useTranslation();
   const quillRef = useRef<ReactQuill>(null);
-  const [emojiAnchorEl, setEmojiAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [emojiAnchorEl, setEmojiAnchorEl] = useState<HTMLElement | null>(null);
   const [contextMenu, setContextMenu] = useState<{ mouseX: number; mouseY: number } | null>(null);
   const [imageContextMenu, setImageContextMenu] = useState<{ mouseX: number; mouseY: number; imgElement: HTMLImageElement } | null>(null);
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
@@ -484,8 +485,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
 
-  // Handle emoji picker
-  const handleEmojiClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  // Handle emoji picker - used as Quill toolbar handler
+  const handleEmojiClick = () => {
     // Save current selection before opening picker
     if (quillRef.current) {
       const editor = quillRef.current.getEditor();
@@ -493,8 +494,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       if (selection) {
         savedSelectionRef.current = selection;
       }
+      // Find the emoji button in the toolbar to use as anchor
+      const toolbar = editor.getModule('toolbar') as any;
+      if (toolbar?.container) {
+        const emojiButton = toolbar.container.querySelector('.ql-emoji');
+        if (emojiButton) {
+          setEmojiAnchorEl(emojiButton as HTMLElement);
+        }
+      }
     }
-    setEmojiAnchorEl(event.currentTarget);
   };
 
   const handleEmojiClose = () => {
@@ -1104,12 +1112,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             [{ color: [] }, { background: [] }],
             [{ list: 'ordered' }, { list: 'bullet' }],
             [{ align: [] }], // Text alignment
-            ['link', 'image', 'video'],
+            ['link', 'image', 'video', 'emoji'],
             ['clean'],
           ],
           handlers: {
             image: imageHandler,
             video: insertVideo,
+            emoji: handleEmojiClick,
           },
         },
       clipboard: {
@@ -1192,7 +1201,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     'video',
   ];
 
-  // Add tooltips to toolbar buttons
+  // Add tooltips to toolbar buttons and setup emoji button icon
   useEffect(() => {
     if (!quillRef.current || readOnly) return;
 
@@ -1219,6 +1228,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       '.ql-link': t('richTextEditor.link'),
       '.ql-image': t('richTextEditor.image'),
       '.ql-video': t('richTextEditor.video'),
+      '.ql-emoji': t('richTextEditor.emoji', 'Emoji'),
       '.ql-clean': t('richTextEditor.clean'),
       '.ql-font .ql-picker-label': t('richTextEditor.font', 'Font'),
       '.ql-font .ql-picker-item': '', // No tooltip for items
@@ -1237,9 +1247,23 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     if (headerPicker) {
       headerPicker.setAttribute('title', t('richTextEditor.header'));
     }
+
+    // Add emoji icon to emoji button (it doesn't have a default icon)
+    const emojiButton = container.querySelector('.ql-emoji') as HTMLButtonElement;
+    if (emojiButton && !emojiButton.innerHTML.includes('svg')) {
+      // Use emoji smiley face SVG icon matching Quill's icon style
+      emojiButton.innerHTML = `
+        <svg viewBox="0 0 18 18">
+          <circle cx="9" cy="9" r="7" class="ql-stroke" fill="none" stroke-width="1"/>
+          <circle cx="6" cy="7" r="1" class="ql-fill"/>
+          <circle cx="12" cy="7" r="1" class="ql-fill"/>
+          <path d="M5.5 11 Q9 14 12.5 11" class="ql-stroke" fill="none" stroke-width="1"/>
+        </svg>
+      `;
+    }
   }, [t, readOnly]);
 
-  // Handle font picker to prevent selection loss
+  // Handle font, size, and header picker to prevent selection loss
   useEffect(() => {
     if (!quillRef.current || readOnly) return;
 
@@ -1248,52 +1272,66 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     if (!toolbar || !toolbar.container) return;
 
     const container = toolbar.container as HTMLElement;
+
+    // Get all pickers that need selection preservation
     const fontPicker = container.querySelector('.ql-font');
-    if (!fontPicker) return;
+    const sizePicker = container.querySelector('.ql-size');
+    const headerPicker = container.querySelector('.ql-header');
 
-    // Handle font picker item clicks
-    const handleFontItemClick = (e: Event) => {
-      const target = e.target as HTMLElement;
-      const pickerItem = target.closest('.ql-picker-item') as HTMLElement;
+    const cleanupFunctions: (() => void)[] = [];
 
-      if (pickerItem) {
-        e.preventDefault();
-        e.stopPropagation();
+    // Generic handler factory for picker clicks
+    const createPickerHandlers = (
+      picker: Element | null,
+      formatName: string
+    ) => {
+      if (!picker) return;
 
-        // Get font value from data-value attribute
-        const fontValue = pickerItem.getAttribute('data-value');
+      const handleItemClick = (e: Event) => {
+        const target = e.target as HTMLElement;
+        const pickerItem = target.closest('.ql-picker-item') as HTMLElement;
 
-        // Restore saved selection and apply font
-        const selection = savedSelectionRef.current;
-        if (selection && selection.length > 0) {
-          // Apply font to saved selection
-          editor.formatText(selection.index, selection.length, 'font', fontValue || false);
-          // Restore selection
-          editor.setSelection(selection.index, selection.length);
+        if (pickerItem) {
+          // Save current selection before Quill processes the click
+          const selection = savedSelectionRef.current;
+
+          // Let Quill handle the format application naturally
+          // We just need to restore the selection after Quill finishes
+          if (selection && selection.length > 0) {
+            // Use setTimeout to restore selection after Quill's native handler runs
+            setTimeout(() => {
+              editor.setSelection(selection.index, selection.length);
+              editor.focus();
+            }, 0);
+          }
         }
+      };
 
-        // Close the picker
-        fontPicker.classList.remove('ql-expanded');
+      // Prevent mousedown from stealing focus on the entire picker
+      const handleMouseDown = (e: Event) => {
+        const target = e.target as HTMLElement;
+        // Prevent focus loss when clicking on picker label or options
+        if (target.closest('.ql-picker-options') || target.closest('.ql-picker-label')) {
+          e.preventDefault();
+        }
+      };
 
-        // Focus back to editor
-        editor.focus();
-      }
+      picker.addEventListener('mousedown', handleMouseDown, true);
+      picker.addEventListener('click', handleItemClick, true);
+
+      cleanupFunctions.push(() => {
+        picker.removeEventListener('mousedown', handleMouseDown, true);
+        picker.removeEventListener('click', handleItemClick, true);
+      });
     };
 
-    // Prevent mousedown from stealing focus
-    const handleMouseDown = (e: Event) => {
-      const target = e.target as HTMLElement;
-      if (target.closest('.ql-picker-options')) {
-        e.preventDefault();
-      }
-    };
-
-    fontPicker.addEventListener('mousedown', handleMouseDown, true);
-    fontPicker.addEventListener('click', handleFontItemClick, true);
+    // Setup handlers for each picker
+    createPickerHandlers(fontPicker, 'font');
+    createPickerHandlers(sizePicker, 'size');
+    createPickerHandlers(headerPicker, 'header');
 
     return () => {
-      fontPicker.removeEventListener('mousedown', handleMouseDown, true);
-      fontPicker.removeEventListener('click', handleFontItemClick, true);
+      cleanupFunctions.forEach((cleanup) => cleanup());
     };
   }, [readOnly]);
 
@@ -1304,14 +1342,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         sx={{
           overflow: 'visible', // Changed from 'hidden' to allow tooltip to show
           borderRadius: 2,
-          borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
-          '&:hover': {
-            borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-          },
-          '&:focus-within': {
-            borderColor: 'primary.main',
-            borderWidth: 2,
-          },
+          border: 'none',
           '& .quill': {
             display: 'flex',
             flexDirection: 'column',
@@ -1321,7 +1352,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             borderTop: 'none',
             borderLeft: 'none',
             borderRight: 'none',
-            borderBottom: `1px solid ${theme.palette.divider}`,
+            borderBottom: `1px dashed ${theme.palette.divider}`,
             backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.01)',
             padding: '8px',
             display: 'flex',
@@ -1445,29 +1476,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         </Box>
       </Paper>
 
-      {/* Emoji Button - Fixed position, doesn't scroll */}
-      {!readOnly && (
-        <IconButton
-          onClick={handleEmojiClick}
-          size="small"
-          aria-label="Insert emoji"
-          sx={{
-            position: 'absolute',
-            top: '8px',
-            right: '8px',
-            zIndex: 10,
-            backgroundColor: theme.palette.background.paper,
-            color: theme.palette.text.primary,
-            boxShadow: 1,
-            '&:hover': {
-              backgroundColor: theme.palette.action.hover,
-            },
-          }}
-          title={t('richTextEditor.emoji', 'Emoji')}
-        >
-          <EmojiIcon fontSize="small" />
-        </IconButton>
-      )}
+
 
       {/* Emoji Picker Popover */}
       <Popover
@@ -1482,62 +1491,62 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           vertical: 'top',
           horizontal: 'right',
         }}
-        slotProps={{
-          backdrop: {
-            sx: {
-              backgroundColor: 'transparent',
-            },
-          },
-        }}
+        // Hide the backdrop completely
+        hideBackdrop
+        disableScrollLock
       >
-        <EmojiPicker
-          onEmojiClick={handleEmojiSelect}
-          theme={theme.palette.mode === 'dark' ? EmojiTheme.DARK : EmojiTheme.LIGHT}
-          width={350}
-          height={400}
-          searchPlaceholder={t('richTextEditor.emojiSearch', 'Search emoji...')}
-          previewConfig={{
-            showPreview: false,
-          }}
-          categories={[
-            {
-              category: Categories.SUGGESTED,
-              name: t('richTextEditor.emojiFrequentlyUsed', 'Frequently Used'),
-            },
-            {
-              category: Categories.SMILEYS_PEOPLE,
-              name: t('richTextEditor.emojiSmileysAndPeople', 'Smileys & People'),
-            },
-            {
-              category: Categories.ANIMALS_NATURE,
-              name: t('richTextEditor.emojiAnimalsAndNature', 'Animals & Nature'),
-            },
-            {
-              category: Categories.FOOD_DRINK,
-              name: t('richTextEditor.emojiFoodAndDrink', 'Food & Drink'),
-            },
-            {
-              category: Categories.TRAVEL_PLACES,
-              name: t('richTextEditor.emojiTravelAndPlaces', 'Travel & Places'),
-            },
-            {
-              category: Categories.ACTIVITIES,
-              name: t('richTextEditor.emojiActivities', 'Activities'),
-            },
-            {
-              category: Categories.OBJECTS,
-              name: t('richTextEditor.emojiObjects', 'Objects'),
-            },
-            {
-              category: Categories.SYMBOLS,
-              name: t('richTextEditor.emojiSymbols', 'Symbols'),
-            },
-            {
-              category: Categories.FLAGS,
-              name: t('richTextEditor.emojiFlags', 'Flags'),
-            },
-          ]}
-        />
+        <ClickAwayListener onClickAway={handleEmojiClose}>
+          <Box>
+            <EmojiPicker
+              onEmojiClick={handleEmojiSelect}
+              theme={theme.palette.mode === 'dark' ? EmojiTheme.DARK : EmojiTheme.LIGHT}
+              width={350}
+              height={400}
+              searchPlaceholder={t('richTextEditor.emojiSearch', 'Search emoji...')}
+              previewConfig={{
+                showPreview: false,
+              }}
+              categories={[
+                {
+                  category: Categories.SUGGESTED,
+                  name: t('richTextEditor.emojiFrequentlyUsed', 'Frequently Used'),
+                },
+                {
+                  category: Categories.SMILEYS_PEOPLE,
+                  name: t('richTextEditor.emojiSmileysAndPeople', 'Smileys & People'),
+                },
+                {
+                  category: Categories.ANIMALS_NATURE,
+                  name: t('richTextEditor.emojiAnimalsAndNature', 'Animals & Nature'),
+                },
+                {
+                  category: Categories.FOOD_DRINK,
+                  name: t('richTextEditor.emojiFoodAndDrink', 'Food & Drink'),
+                },
+                {
+                  category: Categories.TRAVEL_PLACES,
+                  name: t('richTextEditor.emojiTravelAndPlaces', 'Travel & Places'),
+                },
+                {
+                  category: Categories.ACTIVITIES,
+                  name: t('richTextEditor.emojiActivities', 'Activities'),
+                },
+                {
+                  category: Categories.OBJECTS,
+                  name: t('richTextEditor.emojiObjects', 'Objects'),
+                },
+                {
+                  category: Categories.SYMBOLS,
+                  name: t('richTextEditor.emojiSymbols', 'Symbols'),
+                },
+                {
+                  category: Categories.FLAGS,
+                  name: t('richTextEditor.emojiFlags', 'Flags'),
+                },
+              ]}
+            />
+          </Box>
+        </ClickAwayListener>
       </Popover>
 
 
