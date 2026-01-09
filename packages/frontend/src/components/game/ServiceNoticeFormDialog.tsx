@@ -139,11 +139,16 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     .title {
       font-size: 18px;
       font-weight: 600;
-      margin: 0 0 16px 0;
+      margin: 0 0 12px 0;
       color: #000;
     }
+    .title-divider {
+      border: none;
+      border-top: 1px solid #e0e0e0;
+      margin: 0 0 16px 0;
+    }
     .content {
-      margin-top: 16px;
+      margin-top: 0;
       font-size: 14px;
       line-height: 1.42;
       box-sizing: border-box;
@@ -197,15 +202,67 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     .content ol li:before {
       content: counter(list-0, decimal) '. ';
     }
-    .content h1 {
+    
+    /* Heading styles - Quill classes */
+    .content h1,
+    .content .ql-size-huge {
       font-size: 2em;
     }
-    .content h2 {
+    .content h2,
+    .content .ql-size-large {
       font-size: 1.5em;
     }
     .content h3 {
       font-size: 1.17em;
     }
+    
+    /* Quill size classes */
+    .content .ql-size-small {
+      font-size: 0.75em;
+    }
+    .content .ql-size-large {
+      font-size: 1.5em;
+    }
+    .content .ql-size-huge {
+      font-size: 2.5em;
+    }
+    
+    /* Quill font classes */
+    .content .ql-font-serif {
+      font-family: Georgia, "Times New Roman", serif;
+    }
+    .content .ql-font-monospace {
+      font-family: Monaco, "Courier New", monospace;
+    }
+    
+    /* Quill alignment classes */
+    .content .ql-align-center {
+      text-align: center;
+    }
+    .content .ql-align-right {
+      text-align: right;
+    }
+    .content .ql-align-justify {
+      text-align: justify;
+    }
+    
+    /* Quill indent classes */
+    .content .ql-indent-1 {
+      padding-left: 3em;
+    }
+    .content .ql-indent-2 {
+      padding-left: 6em;
+    }
+    .content .ql-indent-3 {
+      padding-left: 9em;
+    }
+    .content .ql-indent-4 {
+      padding-left: 12em;
+    }
+    .content .ql-indent-5 {
+      padding-left: 15em;
+    }
+    
     .content strong {
       font-weight: bold;
     }
@@ -271,6 +328,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
 </head>
 <body>
   <div class="title">${displayTitle}</div>
+  <hr class="title-divider" />
   <div class="content">
     ${debouncedContent || `<p style="color: #999;">${t('serviceNotices.noContent')}</p>`}
   </div>
