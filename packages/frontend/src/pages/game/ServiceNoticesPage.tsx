@@ -58,6 +58,7 @@ import { useI18n } from '../../contexts/I18nContext';
 import { useDebounce } from '../../hooks/useDebounce';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 
 const ServiceNoticesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -136,6 +137,7 @@ const ServiceNoticesPage: React.FC = () => {
     { id: 'targetAudience', labelKey: 'serviceNotices.targetAudience', visible: true },
     { id: 'period', labelKey: 'serviceNotices.period', visible: true },
     { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
+    { id: 'updatedAt', labelKey: 'common.updatedAt', visible: true },
   ];
 
   // Column settings
@@ -253,7 +255,7 @@ const ServiceNoticesPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Failed to load service notices:', error);
-      enqueueSnackbar(error.message || t('serviceNotices.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'serviceNotices.loadFailed'), { variant: 'error' });
       setNotices([]);
       setTotal(0);
     } finally {
@@ -346,13 +348,21 @@ const ServiceNoticesPage: React.FC = () => {
     if (!deletingNotice) return;
 
     try {
-      await serviceNoticeService.deleteServiceNotice(deletingNotice.id);
-      enqueueSnackbar(t('serviceNotices.deleteSuccess'), { variant: 'success' });
+      const result = await serviceNoticeService.deleteServiceNotice(deletingNotice.id);
+
+      if (result.isChangeRequest) {
+        // CR was created, not immediately deleted
+        enqueueSnackbar(t('serviceNotices.deleteChangeRequestCreated'), { variant: 'info' });
+      } else {
+        // Directly deleted
+        enqueueSnackbar(t('serviceNotices.deleteSuccess'), { variant: 'success' });
+      }
+
       setDeleteDialogOpen(false);
       setDeletingNotice(null);
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('serviceNotices.deleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'serviceNotices.deleteFailed'), { variant: 'error' });
     }
   };
 
@@ -363,13 +373,21 @@ const ServiceNoticesPage: React.FC = () => {
 
   const confirmBulkDelete = async () => {
     try {
-      await serviceNoticeService.deleteMultipleServiceNotices(selectedIds);
-      enqueueSnackbar(t('serviceNotices.bulkDeleteSuccess', { count: selectedIds.length }), { variant: 'success' });
+      const result = await serviceNoticeService.deleteMultipleServiceNotices(selectedIds);
+
+      if (result.isChangeRequest) {
+        // CR was created, not immediately deleted
+        enqueueSnackbar(t('serviceNotices.bulkDeleteChangeRequestCreated', { count: selectedIds.length }), { variant: 'info' });
+      } else {
+        // Directly deleted
+        enqueueSnackbar(t('serviceNotices.bulkDeleteSuccess', { count: selectedIds.length }), { variant: 'success' });
+      }
+
       setBulkDeleteDialogOpen(false);
       setSelectedIds([]);
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('serviceNotices.bulkDeleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'serviceNotices.bulkDeleteFailed'), { variant: 'error' });
     }
   };
 
@@ -426,7 +444,7 @@ const ServiceNoticesPage: React.FC = () => {
       enqueueSnackbar(t('serviceNotices.toggleSuccess'), { variant: 'success' });
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('serviceNotices.toggleFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'serviceNotices.toggleFailed'), { variant: 'error' });
     }
   };
 
@@ -800,6 +818,17 @@ const ServiceNoticesPage: React.FC = () => {
                             </TableCell>
                           );
                         }
+                        if (column.id === 'updatedAt') {
+                          return (
+                            <TableCell key={column.id}>
+                              <Tooltip title={formatDateTimeDetailed(notice.updatedAt)}>
+                                <Typography variant="caption">
+                                  {formatRelativeTime(notice.updatedAt, undefined, language)}
+                                </Typography>
+                              </Tooltip>
+                            </TableCell>
+                          );
+                        }
                         return null;
                       })}
                       {canManage && (
@@ -851,6 +880,7 @@ const ServiceNoticesPage: React.FC = () => {
 
       {/* Form Drawer */}
       <ServiceNoticeFormDialog
+        key={editingNotice?.id ?? 'new'}
         open={formDrawerOpen}
         onClose={() => setFormDrawerOpen(false)}
         onSuccess={loadNotices}

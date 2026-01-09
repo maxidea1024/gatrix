@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { PERMISSIONS } from '../../types/permissions';
 import {
@@ -279,6 +279,8 @@ const EnvironmentsPage: React.FC = () => {
       displayOrder: env.displayOrder,
       requiresApproval: env.requiresApproval || false,
       requiredApprovers: env.requiredApprovers || 1,
+      enableSoftLock: env.enableSoftLock || false,
+      enableHardLock: env.enableHardLock || false,
     });
     setEditDialogOpen(true);
   };
@@ -290,6 +292,23 @@ const EnvironmentsPage: React.FC = () => {
       setEditEnv({});
     }
   };
+
+  // Check if edit form is dirty
+  const isEditDirty = useMemo(() => {
+    if (!selectedEnvForEdit) return false;
+
+    return (
+      editEnv.displayName !== selectedEnvForEdit.displayName ||
+      (editEnv.description || '') !== (selectedEnvForEdit.description || '') ||
+      editEnv.environmentType !== selectedEnvForEdit.environmentType ||
+      (editEnv.color || '#2e7d32') !== (selectedEnvForEdit.color || '#2e7d32') ||
+      editEnv.displayOrder !== selectedEnvForEdit.displayOrder ||
+      (editEnv.requiresApproval || false) !== (selectedEnvForEdit.requiresApproval || false) ||
+      (editEnv.requiredApprovers || 1) !== (selectedEnvForEdit.requiredApprovers || 1) ||
+      (editEnv.enableSoftLock || false) !== (selectedEnvForEdit.enableSoftLock || false) ||
+      (editEnv.enableHardLock || false) !== (selectedEnvForEdit.enableHardLock || false)
+    );
+  }, [selectedEnvForEdit, editEnv]);
 
   const handleUpdateEnvironment = async () => {
     if (!selectedEnvForEdit) return;
@@ -908,6 +927,56 @@ const EnvironmentsPage: React.FC = () => {
             )}
           </Box>
 
+          {/* Lock Settings - only show when CR is enabled */}
+          {editEnv.requiresApproval && (
+            <Box sx={{ mt: 2, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+                {t('environments.lockSettings')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('environments.lockSettingsDescription')}
+              </Typography>
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={(editEnv as any).enableSoftLock || false}
+                      onChange={(e) => setEditEnv({ ...editEnv, enableSoftLock: e.target.checked } as any)}
+                      color="primary"
+                    />
+                  }
+                  label={
+                    <Box>
+                      <Typography variant="body2">{t('environments.enableSoftLock')}</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('environments.enableSoftLockDescription')}
+                      </Typography>
+                    </Box>
+                  }
+                />
+
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={(editEnv as any).enableHardLock || false}
+                      onChange={(e) => setEditEnv({ ...editEnv, enableHardLock: e.target.checked } as any)}
+                      color="primary"
+                    />
+                  }
+                  label={
+                    <Box>
+                      <Typography variant="body2">{t('environments.enableHardLock')}</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('environments.enableHardLockDescription')}
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </Box>
+            </Box>
+          )}
+
           {updating && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
               <CircularProgress size={20} />
@@ -924,7 +993,7 @@ const EnvironmentsPage: React.FC = () => {
           <Button
             variant="contained"
             onClick={handleUpdateEnvironment}
-            disabled={!editEnv.displayName || updating}
+            disabled={!editEnv.displayName || updating || !isEditDirty}
           >
             {t('common.save')}
           </Button>

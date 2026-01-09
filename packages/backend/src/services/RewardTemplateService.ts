@@ -1,6 +1,8 @@
 import { ulid } from 'ulid';
 import database from '../config/database';
+import { RowDataPacket } from 'mysql2';
 import { GatrixError } from '../middleware/errorHandler';
+import { convertDateFieldsFromMySQL } from '../utils/dateUtils';
 import logger from '../config/logger';
 import { TagService } from './TagService';
 
@@ -72,7 +74,7 @@ class RewardTemplateService {
 
     try {
       const whereConditions: string[] = ['environment = ?'];
-      const queryParams: any[] = [environment];
+      const queryParams: (string | number | boolean | null)[] = [environment];
 
       if (search) {
         whereConditions.push('(name LIKE ? OR description LIKE ?)');
@@ -91,23 +93,23 @@ class RewardTemplateService {
         `SELECT COUNT(*) as count FROM g_reward_templates ${whereClause}`,
         queryParams
       );
-      const total = countRows[0]?.count || 0;
+      const total = (countRows[0] as RowDataPacket)?.count || 0;
 
       // Get templates with sorting
-      const [templates] = await pool.execute<any[]>(
+      const [templates] = await pool.execute<RowDataPacket[]>(
         `SELECT * FROM g_reward_templates ${whereClause} ORDER BY ${safeSortBy} ${safeSortOrder} LIMIT ${limit} OFFSET ${offset}`,
         queryParams
       );
 
       // Parse JSON fields and load tags
-      const parsedTemplates = await Promise.all((templates as any[]).map(async (t) => {
+      const parsedTemplates = await Promise.all((templates as RowDataPacket[]).map(async (t) => {
         const tags = await TagService.listTagsForEntity('reward_template', t.id);
         logger.debug(`Loaded tags for template ${t.id}:`, { templateId: t.id, tagCount: tags.length, tags });
-        return {
+        return convertDateFieldsFromMySQL({
           ...t,
           rewardItems: typeof t.rewardItems === 'string' ? JSON.parse(t.rewardItems) : t.rewardItems,
           tags: tags,
-        };
+        }, ['createdAt', 'updatedAt']);
       }));
 
       return {
@@ -128,7 +130,7 @@ class RewardTemplateService {
   static async getRewardTemplateById(id: string, environment: string): Promise<RewardTemplate> {
     const pool = database.getPool();
     try {
-      const [templates] = await pool.execute<any[]>(
+      const [templates] = await pool.execute<RowDataPacket[]>(
         'SELECT * FROM g_reward_templates WHERE id = ? AND environment = ?',
         [id, environment]
       );
@@ -139,11 +141,11 @@ class RewardTemplateService {
 
       const template = templates[0];
       const tags = await TagService.listTagsForEntity('reward_template', id);
-      return {
+      return convertDateFieldsFromMySQL({
         ...template,
         rewardItems: typeof template.rewardItems === 'string' ? JSON.parse(template.rewardItems) : template.rewardItems,
         tags: tags,
-      };
+      }, ['createdAt', 'updatedAt']);
     } catch (error) {
       if (error instanceof GatrixError) throw error;
       logger.error('Failed to get reward template', { error, id });
@@ -162,7 +164,7 @@ class RewardTemplateService {
       await pool.execute(
         `INSERT INTO g_reward_templates
          (id, environment, name, description, rewardItems, tags, createdBy, createdAt, updatedAt)
-         VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
         [
           id,
           environment,
@@ -191,7 +193,7 @@ class RewardTemplateService {
       await this.getRewardTemplateById(id, environment);
 
       const updates: string[] = [];
-      const params: any[] = [];
+      const params: (string | number | boolean | null)[] = [];
 
       if (input.name !== undefined) {
         updates.push('name = ?');
@@ -218,7 +220,7 @@ class RewardTemplateService {
         params.push(input.updatedBy);
       }
 
-      updates.push('updatedAt = NOW()');
+      updates.push('updatedAt = UTC_TIMESTAMP()');
 
       params.push(id, environment);
 
@@ -242,7 +244,7 @@ class RewardTemplateService {
     const pool = database.getPool();
     try {
       // Check coupons that reference this template
-      const [coupons] = await pool.execute<any[]>(
+      const [coupons] = await pool.execute<RowDataPacket[]>(
         `SELECT id, code, type, name, rewardTemplateId
          FROM g_coupon_settings
          WHERE rewardTemplateId = ? AND environment = ?`,
@@ -251,7 +253,7 @@ class RewardTemplateService {
 
       return {
         surveys: [],
-        coupons: coupons.map((c: any) => ({
+        coupons: coupons.map((c: RowDataPacket) => ({
           id: c.id,
           code: c.code,
           type: c.type,

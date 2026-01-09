@@ -57,6 +57,7 @@ import {
 } from '@mui/icons-material';
 
 import { useSnackbar } from 'notistack';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { WhitelistService, Whitelist, CreateWhitelistData } from '../../services/whitelistService';
 import SimplePagination from '../../components/common/SimplePagination';
@@ -226,7 +227,7 @@ const WhitelistPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Error loading whitelists:', error);
-      enqueueSnackbar(error.message || t('whitelist.errors.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'whitelist.errors.loadFailed'), { variant: 'error' });
       setWhitelists([]);
       setTotal(0);
     } finally {
@@ -309,7 +310,7 @@ const WhitelistPage: React.FC = () => {
       loadWhitelists();
     } catch (error) {
       console.error('Failed to toggle whitelist status:', error);
-      enqueueSnackbar(t('whitelist.toggleStatusFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'whitelist.toggleStatusFailed'), { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -374,7 +375,7 @@ const WhitelistPage: React.FC = () => {
             enqueueSnackbar(t('whitelist.toast.deleted'), { variant: 'success' });
             loadWhitelists();
           } catch (error: any) {
-            enqueueSnackbar(error.message || t('whitelist.errors.deleteFailed'), { variant: 'error' });
+            enqueueSnackbar(parseApiErrorMessage(error, 'whitelist.errors.deleteFailed'), { variant: 'error' });
           }
           setConfirmDialog(prev => ({ ...prev, open: false }));
         },
@@ -434,7 +435,7 @@ const WhitelistPage: React.FC = () => {
       }, 100);
     } catch (error: any) {
       console.error('Error saving whitelist:', error);
-      enqueueSnackbar(error.message || t('whitelist.errors.saveFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'whitelist.errors.saveFailed'), { variant: 'error' });
     }
   };
 
@@ -461,7 +462,7 @@ const WhitelistPage: React.FC = () => {
       setBulkData('');
       loadWhitelists();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('whitelist.errors.bulkCreateFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'whitelist.errors.bulkCreateFailed'), { variant: 'error' });
     }
   };
 

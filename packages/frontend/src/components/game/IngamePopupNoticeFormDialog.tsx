@@ -15,6 +15,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Alert,
+  AlertTitle,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import ResizableDrawer from '../common/ResizableDrawer';
@@ -39,6 +41,7 @@ import MultiLanguageMessageInput from '../common/MultiLanguageMessageInput';
 import { parseUTCForPicker } from '../../utils/dateFormat';
 import TargetSettingsGroup, { ChannelSubchannelData } from './TargetSettingsGroup';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
+import { useEntityLock } from '../../hooks/useEntityLock';
 
 interface IngamePopupNoticeFormDialogProps {
   open: boolean;
@@ -61,6 +64,14 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
   const { platforms, channels } = usePlatformConfig();
   const { worlds } = useGameWorld();
   const [submitting, setSubmitting] = useState(false);
+
+  // Entity Lock for edit mode
+  const { hasLock, lockedBy, pendingCR, forceTakeover } = useEntityLock({
+    table: 'g_ingame_popup_notices',
+    entityId: notice?.id || null,
+    isEditing: open && !!notice,
+    // onLockLost is called when lock is taken - toast is now handled by useEntityLock via SSE
+  });
 
   // Form state
   const [isActive, setIsActive] = useState(true);
@@ -370,6 +381,28 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
         }}
       >
         <Stack spacing={3}>
+          {/* Lock Warning */}
+          {notice && lockedBy && !hasLock && (
+            <Alert
+              severity="warning"
+              action={
+                <Button color="inherit" size="small" onClick={forceTakeover}>
+                  {t('entityLock.takeOver')}
+                </Button>
+              }
+            >
+              <AlertTitle>{t('entityLock.warning', { userName: lockedBy.userName, userEmail: lockedBy.userEmail })}</AlertTitle>
+            </Alert>
+          )}
+
+          {/* Pending CR Warning */}
+          {notice && pendingCR && (
+            <Alert severity="info">
+              <AlertTitle>{t('entityLock.pendingCR')}</AlertTitle>
+              {t('entityLock.pendingCRDetail', { crTitle: pendingCR.crTitle, crId: pendingCR.crId })}
+            </Alert>
+          )}
+
           {/* Active Status */}
           <Box>
             <FormControlLabel

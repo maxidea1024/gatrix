@@ -516,14 +516,14 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                     border: `1px solid ${GAME_COLORS.border}`,
                   }}
                 />
-                <Tooltip title={formatDateTimeDetailed(selectedNotice.createdAt)}>
+                <Tooltip title={formatDateTimeDetailed(selectedNotice.updatedAt)}>
                   <Typography
                     variant="caption"
                     sx={{
                       color: GAME_COLORS.textSecondary, // Fixed color, not theme-dependent
                     }}
                   >
-                    {formatRelativeTime(selectedNotice.createdAt, undefined, i18n.language)}
+                    {formatRelativeTime(selectedNotice.updatedAt, undefined, i18n.language)}
                   </Typography>
                 </Tooltip>
               </Box>
@@ -700,6 +700,58 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                   '& .video-wrapper iframe': {
                     border: 'none',
                     display: 'block',
+                  },
+                  // Page background wrapper
+                  '& .page-background': {
+                    borderRadius: '4px',
+                  },
+                  // Animation keyframes - defined inline via @keyframes in global styles
+                  '@keyframes ql-blink': {
+                    '0%, 100%': { opacity: 1 },
+                    '50%': { opacity: 0 },
+                  },
+                  '@keyframes ql-pulse': {
+                    '0%, 100%': { transform: 'scale(1)' },
+                    '50%': { transform: 'scale(1.05)' },
+                  },
+                  '@keyframes ql-shake': {
+                    '0%, 100%': { transform: 'translateX(0)' },
+                    '25%': { transform: 'translateX(-3px)' },
+                    '75%': { transform: 'translateX(3px)' },
+                  },
+                  '@keyframes ql-bounce': {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-5px)' },
+                  },
+                  '@keyframes ql-glow-pulse': {
+                    '0%, 100%': { textShadow: '0 0 5px currentColor, 0 0 10px currentColor' },
+                    '50%': { textShadow: '0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor' },
+                  },
+                  '@keyframes ql-rainbow': {
+                    '0%': { backgroundPosition: '0% center' },
+                    '100%': { backgroundPosition: '200% center' },
+                  },
+                  '@keyframes ql-float': {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-8px)' },
+                  },
+                  '@keyframes ql-jelly': {
+                    '0%, 100%': { transform: 'scale(1, 1)' },
+                    '25%': { transform: 'scale(0.95, 1.05)' },
+                    '50%': { transform: 'scale(1.05, 0.95)' },
+                    '75%': { transform: 'scale(0.95, 1.05)' },
+                  },
+                  '@keyframes ql-swing': {
+                    '0%, 100%': { transform: 'rotate(0deg)' },
+                    '25%': { transform: 'rotate(5deg)' },
+                    '75%': { transform: 'rotate(-5deg)' },
+                  },
+                  '@keyframes ql-heartbeat': {
+                    '0%, 100%': { transform: 'scale(1)' },
+                    '14%': { transform: 'scale(1.15)' },
+                    '28%': { transform: 'scale(1)' },
+                    '42%': { transform: 'scale(1.15)' },
+                    '70%': { transform: 'scale(1)' },
                   },
                 }}
                 dangerouslySetInnerHTML={{ __html: selectedNotice.content }}

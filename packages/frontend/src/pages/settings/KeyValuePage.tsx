@@ -28,6 +28,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { varsService, VarItem } from '@/services/varsService';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
@@ -62,7 +63,7 @@ const KeyValuePage: React.FC = () => {
       const data = await varsService.getAllKV();
       setItems(data);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('settings.kv.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'settings.kv.loadFailed'), { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -167,7 +168,7 @@ const KeyValuePage: React.FC = () => {
       setDeleteConfirm({ open: false, item: null });
       loadItems();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('settings.kv.deleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'settings.kv.deleteFailed'), { variant: 'error' });
     }
   };
 

@@ -36,6 +36,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 import surveyService, { Survey } from '../../services/surveyService';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
@@ -164,7 +165,7 @@ const SurveysPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Failed to load surveys:', error);
-      enqueueSnackbar(error.message || error.error?.message || t('surveys.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'surveys.loadFailed'), { variant: 'error' });
       setSurveys([]);
       setTotal(0);
     } finally {

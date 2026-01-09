@@ -14,6 +14,8 @@ import {
   Select,
   FormControl,
   CircularProgress,
+  Alert,
+  AlertTitle,
 } from '@mui/material';
 import ResizableDrawer from '../common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +32,7 @@ import { getContrastColor } from '@/utils/colorUtils';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { getActionLabel } from '../../utils/changeRequestToast';
 import { useHandleApiError } from '../../hooks/useHandleApiError';
+import { useEntityLock } from '../../hooks/useEntityLock';
 
 interface StoreProductFormDrawerProps {
   open: boolean;
@@ -90,6 +93,14 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
 
   const { handleApiError, ErrorDialog } = useHandleApiError();
   const nameInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Entity Lock for edit mode
+  const { hasLock, lockedBy, pendingCR, forceTakeover } = useEntityLock({
+    table: 'g_store_products',
+    entityId: product?.id || null,
+    isEditing: open && !!product?.id,
+    // onLockLost is called when lock is taken - toast is now handled by useEntityLock via SSE
+  });
 
   // Check if this is edit mode (existing product)
   const isEditMode = !!product?.id;
@@ -291,9 +302,30 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
     >
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-          {/* Content */}
           <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
             <Stack spacing={2}>
+              {/* Lock Warning */}
+              {product?.id && lockedBy && !hasLock && (
+                <Alert
+                  severity="warning"
+                  action={
+                    <Button color="inherit" size="small" onClick={forceTakeover}>
+                      {t('entityLock.takeOver')}
+                    </Button>
+                  }
+                >
+                  <AlertTitle>{t('entityLock.warning', { userName: lockedBy.userName, userEmail: lockedBy.userEmail })}</AlertTitle>
+                </Alert>
+              )}
+
+              {/* Pending CR Warning */}
+              {product?.id && pendingCR && (
+                <Alert severity="info">
+                  <AlertTitle>{t('entityLock.pendingCR')}</AlertTitle>
+                  {t('entityLock.pendingCRDetail', { crTitle: pendingCR.crTitle, crId: pendingCR.crId })}
+                </Alert>
+              )}
+
               {/* Active Status */}
               <FormControlLabel
                 control={

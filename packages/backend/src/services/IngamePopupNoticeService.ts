@@ -82,7 +82,7 @@ class IngamePopupNoticeService {
     const pool = database.getPool();
     const offset = (page - 1) * limit;
     const whereClauses: string[] = [];
-    const queryParams: any[] = [];
+    const queryParams: (string | number | boolean | null)[] = [];
 
     // Environment filter (always applied)
     const environment = filters.environment;
@@ -100,9 +100,9 @@ class IngamePopupNoticeService {
       // startDate is optional - if null, treat as immediately available
       // endDate is optional - if null, treat as permanent (no end date)
       if (filters.currentlyVisible) {
-        whereClauses.push('isActive = 1 AND (startDate IS NULL OR startDate <= NOW()) AND (endDate IS NULL OR endDate >= NOW())');
+        whereClauses.push('isActive = 1 AND (startDate IS NULL OR startDate <= UTC_TIMESTAMP()) AND (endDate IS NULL OR endDate >= UTC_TIMESTAMP())');
       } else {
-        whereClauses.push('(isActive = 0 OR (startDate IS NOT NULL AND startDate > NOW()) OR (endDate IS NOT NULL AND endDate < NOW()))');
+        whereClauses.push('(isActive = 0 OR (startDate IS NOT NULL AND startDate > UTC_TIMESTAMP()) OR (endDate IS NOT NULL AND endDate < UTC_TIMESTAMP()))');
       }
     }
 
@@ -251,7 +251,7 @@ class IngamePopupNoticeService {
   async updateIngamePopupNotice(id: number, data: UpdateIngamePopupNoticeData, updatedBy: number, environment: string): Promise<IngamePopupNotice> {
     const pool = database.getPool();
     const updates: string[] = [];
-    const values: any[] = [];
+    const values: (string | number | boolean | null)[] = [];
 
     if (data.isActive !== undefined) {
       updates.push('isActive = ?');
@@ -336,7 +336,7 @@ class IngamePopupNoticeService {
     updates.push('updatedBy = ?');
     values.push(updatedBy);
 
-    updates.push('updatedAt = NOW()');
+    updates.push('updatedAt = UTC_TIMESTAMP()');
     values.push(id, environment);
 
     await pool.execute(
@@ -413,7 +413,7 @@ class IngamePopupNoticeService {
   async toggleActive(id: number, environment: string): Promise<IngamePopupNotice> {
     const pool = database.getPool();
     await pool.execute(
-      'UPDATE g_ingame_popup_notices SET isActive = NOT isActive, updatedAt = NOW() WHERE id = ? AND environment = ?',
+      'UPDATE g_ingame_popup_notices SET isActive = NOT isActive, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environment = ?',
       [id, environment]
     );
 
@@ -439,23 +439,29 @@ class IngamePopupNoticeService {
   /**
    * Format notice from database row
    */
-  private formatNotice(row: any): IngamePopupNotice {
-    // Helper function to convert dates safely (can return null)
-    const convertDate = (date: any): string | null => {
+  private formatNotice(row: RowDataPacket): IngamePopupNotice {
+    // Helper function to convert mysql2 Date to UTC ISO string
+    // mysql2 returns DATETIME as Date interpreted as local time, but DB stores UTC
+    // So we extract local time components and format them as UTC
+    const convertDateToUTC = (date: any): string | null => {
       if (!date) return null;
       if (date instanceof Date) {
-        return date.toISOString();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        const ms = String(date.getMilliseconds()).padStart(3, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${ms}Z`;
       }
       return convertFromMySQLDateTime(date) || null;
     };
 
     // Helper function to convert dates (must return string)
     const convertDateRequired = (date: any): string => {
-      if (!date) return new Date().toISOString();
-      if (date instanceof Date) {
-        return date.toISOString();
-      }
-      return convertFromMySQLDateTime(date) || new Date().toISOString();
+      const result = convertDateToUTC(date);
+      return result || new Date().toISOString();
     };
 
     return {
@@ -476,8 +482,8 @@ class IngamePopupNoticeService {
       targetUserIdsInverted: Boolean(row.targetUserIdsInverted),
       displayPriority: Number(row.displayPriority) || 100,
       showOnce: Boolean(row.showOnce),
-      startDate: convertDate(row.startDate),
-      endDate: convertDate(row.endDate),
+      startDate: convertDateToUTC(row.startDate),
+      endDate: convertDateToUTC(row.endDate),
       messageTemplateId: row.messageTemplateId || null,
       useTemplate: Boolean(row.useTemplate),
       description: row.description || null,
@@ -493,9 +499,9 @@ class IngamePopupNoticeService {
    * Returns only essential fields for game client
    * Note: row is already formatted by formatNotice, so dates are already ISO 8601 strings
    */
-  formatNoticeForServerSDK(row: any): any {
+  formatNoticeForServerSDK(row: IngamePopupNotice): any {
     // Helper function to parse array fields
-    const parseArray = (value: any): any[] => {
+    const parseArray = (value: string | string[] | null | undefined): any[] => {
       if (Array.isArray(value)) return value;
       if (typeof value === 'string') {
         try {

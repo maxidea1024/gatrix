@@ -2,7 +2,7 @@ import { Model } from 'objection';
 import { User } from './User';
 import { Environment } from './Environment';
 
-export type ChangeRequestStatus = 'draft' | 'open' | 'approved' | 'applied' | 'rejected';
+export type ChangeRequestStatus = 'draft' | 'open' | 'approved' | 'applied' | 'rejected' | 'conflict';
 export type ChangeRequestPriority = 'low' | 'medium' | 'high' | 'critical';
 
 export class ChangeRequest extends Model {
@@ -31,6 +31,7 @@ export class ChangeRequest extends Model {
     rejector?: User;
     environmentModel?: Environment;
     changeItems?: any[];
+    actionGroups?: any[];
     approvals?: any[];
 
     static get jsonSchema() {
@@ -41,7 +42,7 @@ export class ChangeRequest extends Model {
                 id: { type: 'string' },
                 requesterId: { type: 'integer' },
                 environment: { type: 'string' },
-                status: { type: 'string', enum: ['draft', 'open', 'approved', 'applied', 'rejected'] },
+                status: { type: 'string', enum: ['draft', 'open', 'approved', 'applied', 'rejected', 'conflict'] },
                 title: { type: 'string', minLength: 1, maxLength: 255 },
                 description: { type: ['string', 'null'] },
                 reason: { type: ['string', 'null'] },
@@ -62,6 +63,7 @@ export class ChangeRequest extends Model {
     static get relationMappings() {
         // Lazy load to avoid circular dependencies
         const { ChangeItem } = require('./ChangeItem');
+        const { ActionGroup } = require('./ActionGroup');
         const { Approval } = require('./Approval');
 
         return {
@@ -105,6 +107,14 @@ export class ChangeRequest extends Model {
                     to: 'g_change_items.changeRequestId'
                 }
             },
+            actionGroups: {
+                relation: Model.HasManyRelation,
+                modelClass: ActionGroup,
+                join: {
+                    from: 'g_change_requests.id',
+                    to: 'g_action_groups.changeRequestId'
+                }
+            },
             approvals: {
                 relation: Model.HasManyRelation,
                 modelClass: Approval,
@@ -123,5 +133,27 @@ export class ChangeRequest extends Model {
 
     $beforeUpdate() {
         this.updatedAt = new Date();
+    }
+
+    $formatJson(json: any) {
+        const formatted = super.$formatJson(json);
+        // Convert Date objects to ISO strings for proper timezone handling
+        if (formatted.createdAt instanceof Date) {
+            formatted.createdAt = formatted.createdAt.toISOString();
+        } else if (formatted.createdAt && typeof formatted.createdAt === 'string' && !formatted.createdAt.endsWith('Z')) {
+            // MySQL DATETIME format - append Z to indicate UTC
+            formatted.createdAt = formatted.createdAt.replace(' ', 'T') + '.000Z';
+        }
+        if (formatted.updatedAt instanceof Date) {
+            formatted.updatedAt = formatted.updatedAt.toISOString();
+        } else if (formatted.updatedAt && typeof formatted.updatedAt === 'string' && !formatted.updatedAt.endsWith('Z')) {
+            formatted.updatedAt = formatted.updatedAt.replace(' ', 'T') + '.000Z';
+        }
+        if (formatted.rejectedAt instanceof Date) {
+            formatted.rejectedAt = formatted.rejectedAt.toISOString();
+        } else if (formatted.rejectedAt && typeof formatted.rejectedAt === 'string' && !formatted.rejectedAt.endsWith('Z')) {
+            formatted.rejectedAt = formatted.rejectedAt.replace(' ', 'T') + '.000Z';
+        }
+        return formatted;
     }
 }

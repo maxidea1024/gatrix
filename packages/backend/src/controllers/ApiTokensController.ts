@@ -486,7 +486,7 @@ class ApiTokensController {
 
       // Get recently used tokens (last 7 days)
       const [{ count: recentlyUsed }] = await knex('g_api_access_tokens')
-        .where('lastUsedAt', '>=', knex.raw('DATE_SUB(NOW(), INTERVAL 7 DAY)'))
+        .where('lastUsedAt', '>=', knex.raw('DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)'))
         .count('* as count');
 
       res.json({

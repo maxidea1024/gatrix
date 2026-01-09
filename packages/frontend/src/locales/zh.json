@@ -2121,6 +2121,7 @@
     "action": "操作",
     "actions": "操作",
     "add": "添加",
+    "newItem": "新项目",
     "addFirstItem": "添加您的第一个项目开始使用",
     "addTag": "添加标签",
     "all": "全部",
@@ -2166,6 +2167,7 @@
     "cannotCopySystemItem": "系统项目无法复制",
     "create": "创建",
     "createdAt": "创建时间",
+    "environment": "环境",
     "createdBy": "创建者",
     "cron": "定时任务",
     "day": "日",
@@ -2228,6 +2230,7 @@
     "info": "信息",
     "insert": "插入",
     "loadFailed": "加载数据失败",
+    "errorLoading": "加载数据失败。",
     "loading": "加载中",
     "loadingData": "Loading data...",
     "loadingWhitelist": "Loading whitelist...",
@@ -2246,6 +2249,7 @@
     "name": "名称",
     "next": "下一个",
     "no": "否",
+    "none": "未设置",
     "of": "的",
     "ok": "确定",
     "pause": "暂停",
@@ -2845,7 +2849,20 @@
     "openApi": "Open API",
     "banners": "横幅管理",
     "environments": "环境管理",
-    "serverLifecycle": "服务器运行历史"
+    "serverLifecycle": "服务器运行历史",
+    "serviceControl": "服务控制",
+    "playerConnections": "玩家连接管理"
+  },
+  "playerConnections": {
+    "title": "玩家连接管理",
+    "subtitle": "管理游戏服务器上的玩家连接状态。",
+    "comingSoon": "此功能正在开发中，即将推出。",
+    "plannedFeatures": "计划功能",
+    "feature": {
+      "monitoring": "实时并发用户监控",
+      "kick": "玩家连接终止（踢出）",
+      "statistics": "连接统计和分析"
+    }
   },
   "signUpPrompt": {
     "backToLogin": "返回登录",
@@ -3618,7 +3635,9 @@
     "createSuccess": "公告创建成功",
     "updateSuccess": "公告更新成功",
     "deleteSuccess": "公告删除成功",
+    "deleteChangeRequestCreated": "删除请求已添加到变更请求。审批后将删除该公告。",
     "bulkDeleteSuccess": "成功删除{{count}}个公告",
+    "bulkDeleteChangeRequestCreated": "已将{{count}}个公告的删除请求添加到变更请求。审批后将删除。",
     "toggleSuccess": "公告状态更改成功",
     "saveFailed": "保存公告失败",
     "loadFailed": "加载公告失败",
@@ -5053,6 +5072,7 @@
     "status.approved": "已批准",
     "status.applied": "已应用",
     "status.rejected": "已拒绝",
+    "status.conflict": "冲突",
     "priority.low": "低",
     "priority.medium": "中",
     "priority.high": "高",
@@ -5063,6 +5083,7 @@
     "tabs.approved": "已批准",
     "tabs.applied": "已应用",
     "tabs.rejected": "已拒绝",
+    "tabs.conflict": "冲突",
     "actions.submit": "提交",
     "actions.approve": "批准",
     "actions.reject": "拒绝",
@@ -5077,10 +5098,10 @@
     "messages.rollbackCreated": "回滚变更请求已创建。",
     "messages.deleted": "变更请求已删除。",
     "actions.label": "操作",
-    "actions.rollback": "回滚",
-    "rollbackDialog": {
-      "title": "创建回滚请求",
-      "description": "您确定要为此项目创建回滚变更请求吗？回滚请求需要在应用前获得批准。"
+    "actions.revert": "还原",
+    "revertDialog": {
+      "title": "创建还原请求",
+      "description": "您确定要为此项目创建还原变更请求吗？还原请求需要在应用前获得批准。"
     },
     "conflictDialog.description": "自此请求创建以来，实时服务器上的数据已更改。请求已被自动拒绝，以防止数据损坏。请确认更改后再试。",
     "conflictDialog.liveData": "当前实时数据",
@@ -5102,6 +5123,7 @@
     "operationCreate": "创建",
     "operationModify": "修改",
     "operationDelete": "删除",
+    "opDelete": "此数据将被永久删除。",
     "showAll": "显示全部",
     "showChangesOnly": "仅显示变更",
     "field": "字段",
@@ -5115,6 +5137,10 @@
     "submitDialog.reasonOptional": "变更原因是可选的。",
     "createdForReview": "变更请求已创建，批准后将应用。",
     "pendingReviewBanner": "有 {{count}} 个变更请求待审核。点击查看。",
+    "myDraftsBanner": "我的草稿 ({{count}} 个) - 点击查看",
+    "pendingReviewLockBanner": "审核中 - 新编辑已被阻止。",
+    "pendingReviewLockTooltip": "您有一个变更请求正在审核中。在审核批准或拒绝之前，无法进行新的编辑。",
+    "viewMyPendingReviews": "查看待审核请求",
     "rejectionInfo": "拒绝信息",
     "rejectedBy": "拒绝人",
     "rejectedAt": "拒绝时间",
@@ -5160,6 +5186,51 @@
     "actions.submitUpdate": "请求更新",
     "actions.submitDelete": "请求删除",
     "actions.submitSave": "请求保存",
-    "collapse": "收起"
+    "collapse": "收起",
+    "appliedMessage": "此变更请求已成功应用。",
+    "revertPreview": "还原预览",
+    "revertPreviewTitle": "还原变更",
+    "revertPreviewDesc": "正在为 \"{{title}}\" 创建还原。将应用以下变更。",
+    "revertChanges": "要还原的变更",
+    "revertCreated": "还原变更请求已创建。",
+    "messages.revertCreated": "还原变更请求已创建。",
+    "createRevertCR": "创建还原请求",
+    "noFieldChanges": "无字段变更。",
+    "before": "之前",
+    "after": "之后",
+    "opCreate": "创建",
+    "opUpdate": "更新",
+    "opDelete": "删除",
+    "submitPreview": "提交预览",
+    "submitPreviewTitle": "提交变更请求",
+    "submitPreviewDesc": "请确认要提交的变更。取消勾选以排除项目。",
+    "selectChanges": "选择变更",
+    "fieldChanges": "个字段变更",
+    "submitExcludeWarning": "{{count}}个项目将被排除。已排除的项目将被删除。"
+  },
+  "targetSettings": {
+    "platforms": "目标平台",
+    "channels": "目标渠道",
+    "subchannels": "目标子渠道"
+  },
+  "errors": {
+    "CR_ALREADY_APPROVED": "此请求已被批准。",
+    "CR_EXECUTION_FAILED": "执行变更请求时发生错误。请联系管理员。",
+    "RESOURCE_LOCKED": "资源已锁定: {{changeRequestTitle}}",
+    "CR_DATA_CONFLICT": "发生数据冲突。",
+    "DATA_CONFLICT_DURING_EXECUTION": "执行期间检测到数据冲突。(实时数据已更改)",
+    "DUPLICATE_ENTRY_DURING_EXECUTION": "执行期间检测到重复条目。"
+  },
+  "entityLock": {
+    "warning": "警告: {{userName}} ({{userEmail}}) 正在编辑此项目。",
+    "warningWithTime": "{{userName}} 从 {{lockedAt}} 开始编辑中。({{expiresAt}} 过期)",
+    "takeOver": "接管编辑",
+    "takeOverConfirm": "取消 {{userName}} 的编辑并接管?",
+    "pendingCR": "注意: 此项目有待处理的变更请求。",
+    "pendingCRDetail": "变更请求 \"{{crTitle}}\" (ID: {{crId}}) 正在等待批准。",
+    "lockAcquired": "已获得编辑权限。",
+    "lockReleased": "编辑锁已释放。",
+    "lockTakenOver": "已成功接管编辑。",
+    "lockTakenBy": "{{userName}} ({{userEmail}}) 已接管编辑权限。"
   }
 }

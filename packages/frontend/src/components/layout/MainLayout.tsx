@@ -78,6 +78,8 @@ import {
   ArrowBack as ArrowBackIcon,
   Api as ApiIcon,
   Refresh as RefreshIcon,
+  Lock as LockIcon,
+  HelpOutline as HelpOutlineIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -207,6 +209,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   // Pending CR count for banner
   const [pendingCRCount, setPendingCRCount] = useState(0);
+  // My draft CR count for banner
+  const [myDraftCount, setMyDraftCount] = useState(0);
+  // My pending review count (open status - edits are locked)
+  const [myPendingReviewCount, setMyPendingReviewCount] = useState(0);
 
   // Check if admin user has environment access
   const hasEnvironmentAccess = isAdmin() && !environmentsLoading && environments.length > 0;
@@ -350,11 +356,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     };
   }, [enqueueSnackbar, t, navigate]);
 
-  // Load pending CR count
+  // Load pending CR count and my draft count
   const loadPendingCRCount = useCallback(async () => {
     try {
       const response = await changeRequestService.getMyRequests();
       setPendingCRCount(response?.pendingApproval?.length || 0);
+      setMyDraftCount(response?.myDrafts?.length || 0);
+      // Count my own CRs that are in 'open' status (pending review)
+      const myOpenCount = (response?.myRequests || []).filter((cr: any) => cr.status === 'open').length;
+      setMyPendingReviewCount(myOpenCount);
     } catch (error) {
       // Silently fail - don't spam errors for optional feature
     }
@@ -1253,6 +1263,33 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </Box>
         </List>
       </Box>
+
+      {/* Version display - Balanced Minimal */}
+      <Box
+        sx={{
+          p: 2,
+          textAlign: 'center',
+          borderTop: `1px solid ${theme.palette.divider}`,
+          opacity: 0.7,
+          transition: 'all 0.2s',
+          '&:hover': {
+            opacity: 1,
+            bgcolor: 'action.hover'
+          }
+        }}
+      >
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.secondary',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            display: 'block'
+          }}
+        >
+          {sidebarCollapsed ? 'v1.0' : 'Gatrix v1.0.1'}
+        </Typography>
+      </Box>
     </Box>
   );
 
@@ -1775,30 +1812,132 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </Toolbar>
         </AppBar>
 
-        {/* Pending CR Review Banner - only show when CR is enabled for current environment */}
-        {currentEnvironment?.requiresApproval && pendingCRCount > 0 && !location.pathname.startsWith('/admin/change-requests') && (
+        {/* Pending Review Lock Banner - shows when user has open CRs (edits are locked) */}
+        {currentEnvironment?.requiresApproval && myPendingReviewCount > 0 && !location.pathname.startsWith('/admin/change-requests') && (
           <Box
-            onClick={() => navigate('/admin/change-requests?status=open')}
             sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: 1,
               px: 2,
-              py: 1,
-              bgcolor: 'info.main',
-              color: 'info.contrastText',
-              cursor: 'pointer',
-              '&:hover': {
-                bgcolor: 'info.dark',
-              },
-              transition: 'background-color 0.2s',
+              py: 0.75,
+              bgcolor: 'error.main',
+              color: 'error.contrastText',
             }}
           >
-            <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              {t('changeRequest.pendingReviewBanner', { count: pendingCRCount })}
+            <LockIcon sx={{ fontSize: 16 }} />
+            <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.8125rem' }}>
+              {t('changeRequest.pendingReviewLockBanner')}
             </Typography>
-            <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 18 }} />
+            <Tooltip title={t('changeRequest.pendingReviewLockTooltip')}>
+              <HelpOutlineIcon sx={{ fontSize: 16, opacity: 0.8, cursor: 'help' }} />
+            </Tooltip>
+            <Box
+              onClick={() => navigate('/admin/change-requests?status=open')}
+              sx={{
+                ml: 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                cursor: 'pointer',
+                px: 1.5,
+                py: 0.25,
+                borderRadius: 1.5,
+                bgcolor: 'rgba(255,255,255,0.15)',
+                '&:hover': {
+                  bgcolor: 'rgba(255,255,255,0.25)',
+                },
+                transition: 'background-color 0.2s',
+              }}
+            >
+              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.75rem' }}>
+                {t('changeRequest.viewMyPendingReviews')}
+              </Typography>
+              <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 12 }} />
+            </Box>
+          </Box>
+        )}
+
+        {/* CR Status Banner - shows pending approvals and/or my drafts */}
+        {currentEnvironment?.requiresApproval && (pendingCRCount > 0 || myDraftCount > 0) && !location.pathname.startsWith('/admin/change-requests') && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              px: 2,
+              py: 0.75,
+              bgcolor: 'warning.main',
+              color: 'warning.contrastText',
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                bgcolor: 'rgba(0,0,0,0.08)',
+                borderRadius: 2,
+                px: 0.5,
+                py: 0.25,
+              }}
+            >
+              {/* My drafts section */}
+              {myDraftCount > 0 && (
+                <Box
+                  onClick={() => navigate('/admin/change-requests?status=draft')}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    cursor: 'pointer',
+                    px: 1.5,
+                    py: 0.5,
+                    borderRadius: 1.5,
+                    '&:hover': {
+                      bgcolor: 'rgba(0,0,0,0.15)',
+                    },
+                    transition: 'background-color 0.2s',
+                  }}
+                >
+                  <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.8125rem' }}>
+                    {t('changeRequest.myDraftsBanner', { count: myDraftCount })}
+                  </Typography>
+                  <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 14 }} />
+                </Box>
+              )}
+
+              {/* Separator */}
+              {myDraftCount > 0 && pendingCRCount > 0 && (
+                <Typography sx={{ opacity: 0.5, fontSize: '0.875rem' }}>|</Typography>
+              )}
+
+              {/* Pending approvals section */}
+              {pendingCRCount > 0 && (
+                <Box
+                  onClick={() => navigate('/admin/change-requests?status=open')}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    cursor: 'pointer',
+                    px: 1.5,
+                    py: 0.5,
+                    borderRadius: 1.5,
+                    '&:hover': {
+                      bgcolor: 'rgba(0,0,0,0.15)',
+                    },
+                    transition: 'background-color 0.2s',
+                  }}
+                >
+                  <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.8125rem' }}>
+                    {t('changeRequest.pendingReviewBanner', { count: pendingCRCount })}
+                  </Typography>
+                  <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 14 }} />
+                </Box>
+              )}
+            </Box>
           </Box>
         )}
 

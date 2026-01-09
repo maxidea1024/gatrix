@@ -12,9 +12,6 @@ import {
     TableCell,
     TableBody,
     Chip,
-    IconButton,
-    Paper,
-    Collapse,
     LinearProgress,
     Button,
     Tabs,
@@ -26,17 +23,15 @@ import {
     DialogContentText,
     DialogActions,
     TextField,
+    Paper,
 } from '@mui/material';
 import {
     Refresh as RefreshIcon,
-    ExpandMore as ExpandMoreIcon,
-    ExpandLess as ExpandLessIcon,
     Check as CheckIcon,
     Close as CloseIcon,
     Undo as UndoIcon,
     PlayArrow as PlayArrowIcon,
     Delete as DeleteIcon,
-    Info as InfoIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -51,6 +46,8 @@ import changeRequestService, {
 import SimplePagination from '@/components/common/SimplePagination';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import ChangeRequestDetailDrawer from '@/components/admin/ChangeRequestDetailDrawer';
+import RevertPreviewDrawer from '@/components/admin/RevertPreviewDrawer';
+import { formatChangeRequestTitle } from '@/utils/changeRequestFormatter';
 
 // JSON Diff wrapper component
 interface FieldChange {
@@ -206,6 +203,7 @@ const STATUS_CONFIG: Record<ChangeRequestStatus, { color: 'default' | 'primary' 
     approved: { color: 'success', labelKey: 'changeRequest.status.approved' },
     applied: { color: 'primary', labelKey: 'changeRequest.status.applied' },
     rejected: { color: 'error', labelKey: 'changeRequest.status.rejected' },
+    conflict: { color: 'warning', labelKey: 'changeRequest.status.conflict' },
 };
 
 // Priority configuration
@@ -227,7 +225,7 @@ interface ChangeRequestRowProps {
 const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefresh, onOpenDrawer }) => {
     const { t, i18n } = useTranslation();
     const { enqueueSnackbar } = useSnackbar();
-    const [open, setOpen] = useState(false);
+
     const [actionLoading, setActionLoading] = useState(false);
     const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
     const [rejectComment, setRejectComment] = useState('');
@@ -235,7 +233,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
     const [submitTitle, setSubmitTitle] = useState('');
     const [submitReason, setSubmitReason] = useState('');
     const [reopenDialogOpen, setReopenDialogOpen] = useState(false);
-    const [rollbackDialogOpen, setRollbackDialogOpen] = useState(false);
+    const [rollbackPreviewOpen, setRollbackPreviewOpen] = useState(false);
     const { handleApiError, ErrorDialog } = useHandleApiError();
 
 
@@ -320,33 +318,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
     };
 
     const handleRollback = () => {
-        setRollbackDialogOpen(true);
-    };
-
-    const confirmRollback = async () => {
-        setActionLoading(true);
-        try {
-            const newCr = await changeRequestService.rollback(cr.id);
-            enqueueSnackbar(t('changeRequest.messages.rollbackCreated'), {
-                variant: 'success',
-                autoHideDuration: 5000,
-                action: (key) => (
-                    <Button
-                        color="inherit"
-                        size="small"
-                        onClick={() => navigate(`/admin/change-requests/${newCr.id}`)}
-                    >
-                        {t('common.view')}
-                    </Button>
-                )
-            });
-            setRollbackDialogOpen(false);
-            onRefresh();
-        } catch (err: any) {
-            handleApiError(err, 'changeRequest.errors.rollbackFailed');
-        } finally {
-            setActionLoading(false);
-        }
+        setRollbackPreviewOpen(true);
     };
 
     // ... (rest of existing handlers like handleDelete)
@@ -378,20 +350,10 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
         <>
             <TableRow
                 hover
-                sx={{
-                    '& > *': { borderBottom: 'unset' },
-                    cursor: 'pointer',
-                    bgcolor: index % 2 === 1
-                        ? (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.025)'
-                        : 'transparent',
-                }}
+                sx={{ cursor: 'pointer' }}
                 onClick={() => onOpenDrawer(cr.id)}
             >
-                <TableCell width={50}>
-                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); setOpen(!open); }}>
-                        {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                    </IconButton>
-                </TableCell>
+
                 <TableCell>
                     <Chip
                         label={t(statusConfig.labelKey)}
@@ -402,7 +364,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
                 </TableCell>
                 <TableCell>
                     <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {cr.title}
+                        {formatChangeRequestTitle(cr.title, t)}
                     </Typography>
                 </TableCell>
                 <TableCell>
@@ -434,7 +396,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
                 <TableCell align="center">
                     {cr.status === 'applied' && (
                         <Chip
-                            label={t('changeRequest.actions.rollback')}
+                            label={t('changeRequest.actions.revert')}
                             color="warning"
                             size="small"
                             variant="outlined"
@@ -449,114 +411,6 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
                 </TableCell>
             </TableRow>
 
-            {/* Expanded Details */}
-            <TableRow sx={{
-                bgcolor: index % 2 === 1
-                    ? (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.025)'
-                    : 'transparent',
-            }}>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={10}>
-                    <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Box sx={{ margin: 2 }}>
-                            <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <InfoIcon fontSize="small" /> {t('changeRequest.details')}
-                            </Typography>
-                            <Paper variant="outlined" sx={{ p: 2, bgcolor: 'action.hover' }}>
-                                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
-                                    {cr.description && (
-                                        <Box>
-                                            <Typography variant="caption" color="textSecondary">{t('changeRequest.description')}</Typography>
-                                            <Typography variant="body2">{cr.description}</Typography>
-                                        </Box>
-                                    )}
-                                    {cr.reason && (
-                                        <Box>
-                                            <Typography variant="caption" color="textSecondary">{t('changeRequest.reason')}</Typography>
-                                            <Typography variant="body2">{cr.reason}</Typography>
-                                        </Box>
-                                    )}
-                                    {cr.impactAnalysis && (
-                                        <Box sx={{ gridColumn: 'span 2' }}>
-                                            <Typography variant="caption" color="textSecondary">{t('changeRequest.impactAnalysis')}</Typography>
-                                            <Typography variant="body2">{cr.impactAnalysis}</Typography>
-                                        </Box>
-                                    )}
-                                </Box>
-
-                                {/* Change Items */}
-                                {cr.changeItems && cr.changeItems.length > 0 && (
-                                    <Box sx={{ mt: 2 }}>
-                                        <Typography variant="subtitle2" gutterBottom>{t('changeRequest.changeItems')}</Typography>
-                                        {cr.changeItems.map((item) => (
-                                            <Paper key={item.id} variant="outlined" sx={{ mb: 1, p: 2 }}>
-                                                <Box sx={{ display: 'flex', gap: 2, mb: 1 }}>
-                                                    <Chip label={item.targetTable} size="small" color="primary" variant="outlined" />
-                                                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                                                        ID: {item.targetId}
-                                                    </Typography>
-                                                </Box>
-                                                <JsonDiffView before={item.beforeData} after={item.afterData} />
-                                            </Paper>
-                                        ))}
-                                    </Box>
-                                )}
-
-
-
-                                {/* Rejection Info */}
-                                {cr.status === 'rejected' && cr.rejectionReason && (
-                                    <Box sx={{ mt: 2 }}>
-                                        <Typography variant="subtitle2" gutterBottom sx={{ color: 'error.main' }}>
-                                            {t('changeRequest.rejectionInfo')}
-                                        </Typography>
-                                        <Paper variant="outlined" sx={{ p: 2, bgcolor: 'error.main', color: 'error.contrastText', opacity: 0.9 }}>
-                                            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, mb: 1 }}>
-                                                <Box>
-                                                    <Typography variant="caption" sx={{ opacity: 0.8 }}>{t('changeRequest.rejectedBy')}</Typography>
-                                                    <Typography variant="body2" fontWeight={500}>
-                                                        {cr.rejector?.name || cr.rejector?.email || t('common.unknown')}
-                                                    </Typography>
-                                                </Box>
-                                                <Box>
-                                                    <Typography variant="caption" sx={{ opacity: 0.8 }}>{t('changeRequest.rejectedAt')}</Typography>
-                                                    <Typography variant="body2" fontWeight={500}>
-                                                        {cr.rejectedAt ? new Date(cr.rejectedAt).toLocaleString() : '-'}
-                                                    </Typography>
-                                                </Box>
-                                            </Box>
-                                            <Box>
-                                                <Typography variant="caption" sx={{ opacity: 0.8 }}>{t('changeRequest.rejectionReason')}</Typography>
-                                                <Typography variant="body2" sx={{ mt: 0.5, whiteSpace: 'pre-wrap' }}>
-                                                    {cr.rejectionReason}
-                                                </Typography>
-                                            </Box>
-                                        </Paper>
-                                    </Box>
-                                )}
-
-                                {/* Approvals */}
-                                {cr.approvals && cr.approvals.length > 0 && (
-                                    <Box sx={{ mt: 2 }}>
-                                        <Typography variant="subtitle2" gutterBottom>{t('changeRequest.approvals')}</Typography>
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                            {cr.approvals.map((approval) => (
-                                                <Chip
-                                                    key={approval.id}
-                                                    icon={<CheckIcon />}
-                                                    label={`${approval.approver?.name || approval.approver?.email || 'Unknown'}`}
-                                                    color="success"
-                                                    variant="outlined"
-                                                    size="small"
-                                                />
-                                            ))}
-                                        </Box>
-                                    </Box>
-                                )}
-                            </Paper>
-                        </Box>
-                    </Collapse>
-                </TableCell>
-            </TableRow>
 
             {/* Submit Dialog */}
             <Dialog open={submitDialogOpen} onClose={() => setSubmitDialogOpen(false)} maxWidth="sm" fullWidth>
@@ -590,10 +444,10 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
                         {t('changeRequest.actions.submit')}
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog >
 
             {/* Reject Dialog */}
-            <Dialog open={rejectDialogOpen} onClose={() => setRejectDialogOpen(false)} maxWidth="sm" fullWidth>
+            < Dialog open={rejectDialogOpen} onClose={() => setRejectDialogOpen(false)} maxWidth="sm" fullWidth >
                 <DialogTitle>{t('changeRequest.rejectDialog.title')}</DialogTitle>
                 <DialogContent>
                     <DialogContentText sx={{ mb: 2 }}>
@@ -616,10 +470,10 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
                         {t('changeRequest.actions.reject')}
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog >
 
             {/* Reopen Confirmation Dialog */}
-            <Dialog open={reopenDialogOpen} onClose={() => setReopenDialogOpen(false)} maxWidth="sm" fullWidth>
+            < Dialog open={reopenDialogOpen} onClose={() => setReopenDialogOpen(false)} maxWidth="sm" fullWidth >
                 <DialogTitle>{t('changeRequest.reopenDialog.title')}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
@@ -640,23 +494,15 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({ cr, index, onRefres
                         {t('changeRequest.actions.reopen')}
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog >
 
-            {/* Rollback Confirmation Dialog */}
-            <Dialog open={rollbackDialogOpen} onClose={() => setRollbackDialogOpen(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>{t('changeRequest.rollbackDialog.title')}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        {t('changeRequest.rollbackDialog.description')}
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setRollbackDialogOpen(false)}>{t('common.cancel')}</Button>
-                    <Button onClick={confirmRollback} color="warning" variant="contained" disabled={actionLoading}>
-                        {t('changeRequest.actions.rollback')}
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            {/* Rollback Preview Drawer */}
+            <RevertPreviewDrawer
+                open={rollbackPreviewOpen}
+                onClose={() => setRollbackPreviewOpen(false)}
+                changeRequestId={cr.id}
+                onRollbackCreated={() => onRefresh()}
+            />
 
             <ErrorDialog />
         </>
@@ -671,7 +517,7 @@ const ChangeRequestsPage: React.FC = () => {
 
     // Tab state controlled by URL param
     const [searchParams, setSearchParams] = useSearchParams();
-    const statusFilters: (ChangeRequestStatus | undefined)[] = [undefined, 'draft', 'open', 'approved', 'applied', 'rejected'];
+    const statusFilters: (ChangeRequestStatus | undefined)[] = [undefined, 'draft', 'open', 'approved', 'applied', 'rejected', 'conflict'];
 
     // Initialize/Get tab value from URL
     const tabValue = useMemo(() => {
@@ -732,9 +578,18 @@ const ChangeRequestsPage: React.FC = () => {
         }
     );
 
+    const { data: stats, mutate: mutateStats } = useSWR(
+        'change-requests-stats',
+        () => changeRequestService.getStats(),
+        {
+            revalidateOnFocus: false,
+        }
+    );
+
     const handleRefresh = useCallback(() => {
         mutate();
-    }, [mutate]);
+        mutateStats();
+    }, [mutate, mutateStats]);
 
     const handlePageChange = useCallback((_: unknown, newPage: number) => {
         setPage(newPage);
@@ -771,12 +626,13 @@ const ChangeRequestsPage: React.FC = () => {
                     {/* Status Tabs */}
                     <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
                         <Tabs value={tabValue} onChange={handleTabChange}>
-                            <Tab label={t('changeRequest.tabs.all')} />
-                            <Tab label={t('changeRequest.tabs.draft')} />
-                            <Tab label={t('changeRequest.tabs.open')} />
-                            <Tab label={t('changeRequest.tabs.approved')} />
-                            <Tab label={t('changeRequest.tabs.applied')} />
-                            <Tab label={t('changeRequest.tabs.rejected')} />
+                            <Tab label={t('changeRequest.tabs.all') + (stats?.all ? ` (${stats.all})` : '')} />
+                            <Tab label={t('changeRequest.tabs.draft') + (stats?.draft ? ` (${stats.draft})` : '')} />
+                            <Tab label={t('changeRequest.tabs.open') + (stats?.open ? ` (${stats.open})` : '')} />
+                            <Tab label={t('changeRequest.tabs.approved') + (stats?.approved ? ` (${stats.approved})` : '')} />
+                            <Tab label={t('changeRequest.tabs.applied') + (stats?.applied ? ` (${stats.applied})` : '')} />
+                            <Tab label={t('changeRequest.tabs.rejected') + (stats?.rejected ? ` (${stats.rejected})` : '')} />
+                            <Tab label={t('changeRequest.tabs.conflict') + (stats?.conflict ? ` (${stats.conflict})` : '')} />
                         </Tabs>
                     </Box>
 
@@ -786,7 +642,7 @@ const ChangeRequestsPage: React.FC = () => {
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell width={50} />
+
                                     <TableCell>{t('changeRequest.status')}</TableCell>
                                     <TableCell>{t('changeRequest.titleField')}</TableCell>
                                     <TableCell>{t('changeRequest.requester')}</TableCell>
@@ -803,7 +659,7 @@ const ChangeRequestsPage: React.FC = () => {
                                         <ChangeRequestRow key={cr.id} cr={cr} index={idx} onRefresh={handleRefresh} onOpenDrawer={handleOpenDrawer} />
                                     ))
                                 ) : (
-                                    <EmptyTableRow colSpan={9} message={t('changeRequest.noRequests')} />
+                                    <EmptyTableRow colSpan={8} message={t('changeRequest.noRequests')} />
                                 )}
                             </TableBody>
                         </Table>

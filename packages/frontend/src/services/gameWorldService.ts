@@ -113,8 +113,23 @@ export const gameWorldService = {
   },
 
   // Delete game world
-  async deleteGameWorld(id: number): Promise<void> {
-    await api.delete(`/admin/game-worlds/${id}`);
+  async deleteGameWorld(id: number): Promise<GameWorldMutationResult> {
+    const response: any = await api.delete(`/admin/game-worlds/${id}`);
+    const responseData = response.data || response;
+
+    // Check if this is a change request response
+    if (responseData?.changeRequestId) {
+      return {
+        world: undefined,
+        isChangeRequest: true,
+        changeRequestId: responseData.changeRequestId,
+      };
+    }
+
+    return {
+      world: undefined,
+      isChangeRequest: false,
+    };
   },
 
   // Toggle visibility

@@ -23,6 +23,13 @@ router.get('/', ChangeRequestController.list);
 router.get('/my', ChangeRequestController.getMyRequests);
 
 /**
+ * @route GET /api/v1/admin/change-requests/stats
+ * @desc Get change request statistics
+ * @access Admin
+ */
+router.get('/stats', ChangeRequestController.getStats);
+
+/**
  * @route GET /api/v1/admin/change-requests/:id
  * @desc Get single change request details
  * @access Admin
@@ -41,7 +48,14 @@ router.patch('/:id', ChangeRequestController.updateMetadata);
  * @desc Delete draft change request
  * @access Admin
  */
-router.delete('/:id', ChangeRequestController.delete);
+router.delete('/:id', ChangeRequestController.remove);
+
+/**
+ * @route DELETE /api/v1/admin/change-requests/:id/items/:itemId
+ * @desc Delete a specific change item from a draft change request
+ * @access Admin
+ */
+router.delete('/:id/items/:itemId', ChangeRequestController.deleteChangeItem);
 
 /**
  * @route POST /api/v1/admin/change-requests/:id/submit
@@ -79,10 +93,17 @@ router.post('/:id/reopen', ChangeRequestController.reopen);
 router.post('/:id/execute', ChangeRequestController.execute);
 
 /**
- * @route POST /api/v1/admin/change-requests/:id/rollback
- * @desc Rollback applied change request
+ * @route GET /api/v1/admin/change-requests/:id/revert-preview
+ * @desc Preview revert changes without creating CR
  * @access Admin
  */
-router.post('/:id/rollback', ChangeRequestController.rollback);
+router.get('/:id/revert-preview', ChangeRequestController.previewRevert);
+
+/**
+ * @route POST /api/v1/admin/change-requests/:id/revert
+ * @desc Revert applied change request
+ * @access Admin
+ */
+router.post('/:id/revert', ChangeRequestController.revert);
 
 export default router;

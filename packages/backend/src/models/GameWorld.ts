@@ -1,6 +1,6 @@
 import db from '../config/knex';
 import logger from '../config/logger';
-import { convertDateFieldsForMySQL } from '../utils/dateUtils';
+import { convertDateFieldsForMySQL, convertDateFieldsFromMySQL } from '../utils/dateUtils';
 
 export interface GameWorldMaintenanceLocale {
   id?: number;
@@ -132,10 +132,10 @@ export class GameWorldModel {
       .where('gameWorldId', id)
       .select('lang', 'message');
 
-    return {
+    return convertDateFieldsFromMySQL({
       ...gameWorld,
       maintenanceLocales: maintenanceLocales || []
-    } as any;
+    }, ['createdAt', 'updatedAt', 'maintenanceStartDate', 'maintenanceEndDate']) as GameWorld;
   }
 
   static async findByWorldId(worldId: string, environment: string): Promise<GameWorld | null> {
@@ -145,7 +145,8 @@ export class GameWorldModel {
         .where('environment', environment)
         .first();
 
-      return gameWorld || null;
+      if (!gameWorld) return null;
+      return convertDateFieldsFromMySQL(gameWorld, ['createdAt', 'updatedAt', 'maintenanceStartDate', 'maintenanceEndDate']) as GameWorld;
     } catch (error) {
       logger.error('Error finding game world by world ID:', error);
       throw error;
@@ -220,10 +221,10 @@ export class GameWorldModel {
             .where('gameWorldId', world.id)
             .select('lang', 'message');
 
-          return {
+          return convertDateFieldsFromMySQL({
             ...world,
             maintenanceLocales: maintenanceLocales || []
-          };
+          }, ['createdAt', 'updatedAt', 'maintenanceStartDate', 'maintenanceEndDate']) as GameWorld;
         })
       );
 

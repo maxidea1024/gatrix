@@ -1,17 +1,32 @@
 import api from './api';
 
 // Types
-export type ChangeRequestStatus = 'draft' | 'open' | 'approved' | 'applied' | 'rejected';
+export type ChangeRequestStatus = 'draft' | 'open' | 'approved' | 'applied' | 'rejected' | 'conflict';
 export type ChangeRequestPriority = 'low' | 'medium' | 'high' | 'critical';
 
 export interface ChangeItem {
     id: string;
     changeRequestId: string;
+    actionGroupId?: string;
     targetTable: string;
     targetId: string;
     operation: 'create' | 'update' | 'delete';
     beforeData: any;
     afterData: any;
+    entityVersion?: number;
+}
+
+export type ActionGroupType = 'CREATE_ENTITY' | 'UPDATE_ENTITY' | 'DELETE_ENTITY' | 'TOGGLE_FLAG' | 'UPDATE_RULE' | 'BATCH_UPDATE' | 'REVERT';
+
+export interface ActionGroup {
+    id: string;
+    changeRequestId: string;
+    actionType: ActionGroupType;
+    title: string;
+    description?: string;
+    orderIndex: number;
+    createdAt: string;
+    changeItems?: ChangeItem[];
 }
 
 export interface Approval {
@@ -59,6 +74,7 @@ export interface ChangeRequest {
         requiredApprovers: number;
     };
     changeItems?: ChangeItem[];
+    actionGroups?: ActionGroup[];
     approvals?: Approval[];
     executedBy?: number;
     executor?: {
@@ -80,6 +96,7 @@ export interface ChangeRequestListResponse {
 
 export interface MyRequestsResponse {
     myRequests: ChangeRequest[];
+    myDrafts: ChangeRequest[];
     pendingApproval: ChangeRequest[];
 }
 
@@ -178,10 +195,33 @@ class ChangeRequestService {
     }
 
     /**
-     * Rollback applied change request
+     * Get revert preview (inverse ops without creating CR)
      */
-    async rollback(id: string): Promise<ChangeRequest> {
-        const response = await api.post(`/admin/change-requests/${id}/rollback`);
+    async getRevertPreview(id: string): Promise<any> {
+        const response = await api.get(`/admin/change-requests/${id}/revert-preview`);
+        return response.data;
+    }
+
+    /**
+     * Revert applied change request
+     */
+    async revert(id: string): Promise<ChangeRequest> {
+        const response = await api.post(`/admin/change-requests/${id}/revert`);
+        return response.data;
+    }
+
+    /**
+     * Delete a specific change item from a change request
+     */
+    async deleteChangeItem(changeRequestId: string, itemId: string): Promise<void> {
+        await api.delete(`/admin/change-requests/${changeRequestId}/items/${itemId}`);
+    }
+
+    /**
+     * Get change request statistics
+     */
+    async getStats(): Promise<Record<string, number>> {
+        const response = await api.get('/admin/change-requests/stats');
         return response.data;
     }
 }

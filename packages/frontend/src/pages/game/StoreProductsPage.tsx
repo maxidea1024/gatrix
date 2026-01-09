@@ -37,8 +37,8 @@ import {
   PlaylistPlay as BatchProcessIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import i18n from 'i18next';
 import { useSnackbar } from 'notistack';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 import storeProductService, { StoreProduct, SyncPreviewResult, SelectedSyncItems, StoreProductStats } from '../../services/storeProductService';
 import { tagService } from '../../services/tagService';
 import SyncPreviewDialog, { SelectedSyncItems as DialogSelectedSyncItems } from '../../components/game/SyncPreviewDialog';
@@ -51,7 +51,6 @@ import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import StoreProductFormDrawer from '../../components/game/StoreProductFormDrawer';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
-import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 import { useNavigate } from 'react-router-dom';
 import { useHandleApiError } from '../../hooks/useHandleApiError';
@@ -68,7 +67,7 @@ const STORE_DISPLAY_NAMES: Record<string, string> = {
 };
 
 const StoreProductsPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const { hasPermission } = useAuth();
@@ -313,7 +312,7 @@ const StoreProductsPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Failed to load products:', error);
-      enqueueSnackbar(error.message || t('storeProducts.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'storeProducts.loadFailed'), { variant: 'error' });
       setProducts([]);
       setAllProducts([]);
       setTotal(0);
@@ -464,7 +463,7 @@ const StoreProductsPage: React.FC = () => {
       setSyncDialogOpen(true);
     } catch (error: any) {
       console.error('Failed to get sync preview:', error);
-      enqueueSnackbar(error.message || t('storeProducts.syncPreviewFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'storeProducts.syncPreviewFailed'), { variant: 'error' });
     } finally {
       setSyncLoading(false);
     }
@@ -486,7 +485,7 @@ const StoreProductsPage: React.FC = () => {
       loadStats();
     } catch (error: any) {
       console.error('Failed to apply sync:', error);
-      enqueueSnackbar(error.message || t('storeProducts.syncApplyFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'storeProducts.syncApplyFailed'), { variant: 'error' });
     } finally {
       setSyncLoading(false);
     }

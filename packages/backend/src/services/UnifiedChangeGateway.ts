@@ -161,7 +161,7 @@ export class UnifiedChangeGateway {
                 targetTable,
                 targetId,
                 currentData, // beforeData
-                { __deleted: true }, // afterData marker for deletion
+                null, // afterData is null for deletion (determineOpType will recognize as DELETE)
                 existingDraft?.id
             );
 

@@ -75,7 +75,12 @@ export const adminPanelMenuItems: MenuItem[] = [
   { text: 'sidebar.userManagement', icon: <PeopleIcon />, path: '/admin/users', adminOnly: true, requiredPermission: [PERMISSIONS.USERS_VIEW, PERMISSIONS.USERS_MANAGE] },
   { text: 'sidebar.clientVersions', icon: <WidgetsIcon />, path: '/admin/client-versions', adminOnly: true, requiredPermission: [PERMISSIONS.CLIENT_VERSIONS_VIEW, PERMISSIONS.CLIENT_VERSIONS_MANAGE] },
   { text: 'sidebar.gameWorlds', icon: <LanguageIcon />, path: '/admin/game-worlds', adminOnly: true, requiredPermission: [PERMISSIONS.GAME_WORLDS_VIEW, PERMISSIONS.GAME_WORLDS_MANAGE] },
-  { text: 'sidebar.maintenance', icon: <BuildIcon />, path: '/admin/maintenance', adminOnly: true, requiredPermission: [PERMISSIONS.MAINTENANCE_VIEW, PERMISSIONS.MAINTENANCE_MANAGE] },
+  {
+    text: 'sidebar.serviceControl', icon: <BuildIcon />, adminOnly: true, requiredPermission: [PERMISSIONS.MAINTENANCE_VIEW, PERMISSIONS.MAINTENANCE_MANAGE], children: [
+      { text: 'sidebar.maintenance', icon: <BuildIcon />, path: '/admin/maintenance', adminOnly: true, requiredPermission: [PERMISSIONS.MAINTENANCE_VIEW, PERMISSIONS.MAINTENANCE_MANAGE] },
+      { text: 'sidebar.playerConnections', icon: <PeopleIcon />, path: '/admin/player-connections', adminOnly: true, requiredPermission: [PERMISSIONS.MAINTENANCE_VIEW, PERMISSIONS.MAINTENANCE_MANAGE] },
+    ]
+  },
   { text: 'sidebar.maintenanceTemplates', icon: <TextIcon />, path: '/admin/maintenance-templates', adminOnly: true, requiredPermission: [PERMISSIONS.MAINTENANCE_TEMPLATES_VIEW, PERMISSIONS.MAINTENANCE_TEMPLATES_MANAGE] },
   {
     text: 'sidebar.scheduleManagement', icon: <ScheduleIcon />, adminOnly: true, requiredPermission: [PERMISSIONS.SCHEDULER_VIEW, PERMISSIONS.SCHEDULER_MANAGE], children: [

@@ -9,7 +9,7 @@
     "packages/sdks/*"
   ],
   "scripts": {
-    "dev": "concurrently -k \"yarn dev:backend\" \"wait-on http://localhost:45000/api/v1/ready && yarn dev:frontend\"",
+    "dev": "concurrently -k \"yarn dev:backend\" \"wait-on http://localhost:45000/api/v1/ready && yarn dev:frontend\" \"wait-on http://localhost:45000/api/v1/ready && yarn dev:edge\"",
     "dev:all": "concurrently -k \"yarn dev:backend\" \"wait-on http://localhost:45000/api/v1/ready && yarn dev:others\"",
     "dev:backend": "dotenv -e .env.local -- yarn workspace @gatrix/backend dev",
     "dev:frontend": "dotenv -e .env.local -- yarn workspace @gatrix/frontend dev",

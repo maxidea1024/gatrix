@@ -18,6 +18,7 @@ import { useSearchParams } from 'react-router-dom';
 import { varsService } from '@/services/varsService';
 import { serviceDiscoveryConfigService, ServiceDiscoveryConfig } from '@/services/serviceDiscoveryConfigService';
 import { useSnackbar } from 'notistack';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 import KeyValuePage from './KeyValuePage';
 
 import { useEnvironment } from '@/contexts/EnvironmentContext';
@@ -89,7 +90,7 @@ const SystemSettingsPage: React.FC = () => {
       await serviceDiscoveryConfigService.updateConfig(sdConfig);
       enqueueSnackbar(t('settings.serviceDiscovery.saved'), { variant: 'success' });
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('settings.serviceDiscovery.saveFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'settings.serviceDiscovery.saveFailed'), { variant: 'error' });
     }
   };
 

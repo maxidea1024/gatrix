@@ -296,6 +296,16 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         window.dispatchEvent(new CustomEvent('change-request-notification', { detail: { ...event.data, action: 'executed' } }));
         break;
 
+      case 'entity_lock.released':
+        // Dispatch custom event for entity lock release
+        window.dispatchEvent(new CustomEvent('entity-lock-released', { detail: event.data }));
+        break;
+
+      case 'entity_lock.taken_over':
+        // Dispatch custom event for entity lock takeover
+        window.dispatchEvent(new CustomEvent('entity-lock-taken-over', { detail: event.data }));
+        break;
+
       default:
         break;
     }

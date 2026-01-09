@@ -81,6 +81,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import { messageTemplateService, MessageTemplate, MessageTemplateLocale, MessageTemplateType } from '@/services/messageTemplateService';
@@ -342,7 +343,7 @@ const MessageTemplatesPage: React.FC = () => {
       setItems(result.templates);
       setTotal(result.total);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('messageTemplates.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'messageTemplates.loadFailed'), { variant: 'error' });
       setItems([]);
       setTotal(0);
     } finally {
@@ -470,7 +471,7 @@ const MessageTemplatesPage: React.FC = () => {
       load();
     } catch (error: any) {
       console.error('Error bulk deleting templates:', error);
-      enqueueSnackbar(error.message || t('messageTemplates.bulkDeleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'messageTemplates.bulkDeleteFailed'), { variant: 'error' });
     }
   }, [selectedIds, t, enqueueSnackbar, load]);
 
@@ -498,7 +499,7 @@ const MessageTemplatesPage: React.FC = () => {
       load();
     } catch (error: any) {
       console.error('Error bulk updating templates:', error);
-      enqueueSnackbar(error.message || t('messageTemplates.bulkUpdateFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'messageTemplates.bulkUpdateFailed'), { variant: 'error' });
     }
   }, [selectedIds, items, t, enqueueSnackbar, load]);
 
@@ -519,7 +520,7 @@ const MessageTemplatesPage: React.FC = () => {
       load();
     } catch (error: any) {
       console.error('Error deleting template:', error);
-      enqueueSnackbar(error.message || t('common.deleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'common.deleteFailed'), { variant: 'error' });
     }
   }, [deletingTemplate, t, enqueueSnackbar, load]);
 
@@ -633,16 +634,11 @@ const MessageTemplatesPage: React.FC = () => {
       const status = error?.response?.status || error?.status;
       const errorData = error?.response?.data?.error || error?.error;
 
-      if (status === 409) {
-        if (errorData?.code === 'DUPLICATE_NAME') {
-          const templateName = errorData?.value || form.name;
-          enqueueSnackbar(t('common.duplicateNameErrorWithValue', { name: templateName }), { variant: 'error' });
-        } else {
-          enqueueSnackbar(t('common.duplicateNameError'), { variant: 'error' });
-        }
+      if (status === 409 && errorData?.code === 'DUPLICATE_NAME') {
+        const templateName = errorData?.value || form.name;
+        enqueueSnackbar(t('common.duplicateNameErrorWithValue', { name: templateName }), { variant: 'error' });
       } else {
-        const message = error?.response?.data?.error?.message || error?.error?.message || error?.message || t('common.saveFailed');
-        enqueueSnackbar(message, { variant: 'error' });
+        enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), { variant: 'error' });
       }
     } finally {
       setSaving(false);

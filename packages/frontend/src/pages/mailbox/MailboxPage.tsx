@@ -134,11 +134,11 @@ const MailboxPage: React.FC = () => {
         // Load sent mails
         const response = await mailService.getSentMails(pageToLoad, ITEMS_PER_PAGE);
         if (reset) {
-          setMails(response.data);
+          setMails(response?.data || []);
         } else {
-          setMails(prev => [...prev, ...response.data]);
+          setMails(prev => [...prev, ...(response?.data || [])]);
         }
-        setHasNextPage(response.pagination.page < response.pagination.totalPages);
+        setHasNextPage((response?.pagination?.page || 0) < (response?.pagination?.totalPages || 0));
       } else {
         // Load received mails
         const filters: MailFilters = {
@@ -154,11 +154,11 @@ const MailboxPage: React.FC = () => {
 
         const response = await mailService.getMails(filters);
         if (reset) {
-          setMails(response.data);
+          setMails(response?.data || []);
         } else {
-          setMails(prev => [...prev, ...response.data]);
+          setMails(prev => [...prev, ...(response?.data || [])]);
         }
-        setHasNextPage(response.pagination.page < response.pagination.totalPages);
+        setHasNextPage((response?.pagination?.page || 0) < (response?.pagination?.totalPages || 0));
       }
 
       // Reset new mail notification when refreshing
@@ -704,12 +704,15 @@ const MailboxPage: React.FC = () => {
             display: 'flex',
             flexDirection: 'column',
             maxWidth: 400,
+            minHeight: 200,
             position: 'relative',
             borderTopLeftRadius: 0,
             borderTopRightRadius: 0,
           }}>
+            {/* Debug log */}
+            {console.log('[MailboxPage] loading:', loading, 'mails:', mails, 'mails.length:', mails?.length)}
             {loading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1, minHeight: 200 }}>
                 <CircularProgress
                   size={32}
                   thickness={2.5}
@@ -719,8 +722,8 @@ const MailboxPage: React.FC = () => {
                   }}
                 />
               </Box>
-            ) : mails.length === 0 ? (
-              <Box sx={{ p: 4, textAlign: 'center' }}>
+            ) : (!mails || mails.length === 0) ? (
+              <Box sx={{ p: 4, textAlign: 'center', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
                 <Typography variant="body2" color="text.secondary">
                   {filter === 'unread' ? t('mailbox.noUnreadMails') :
                     filter === 'starred' ? t('mailbox.noStarredMails') :

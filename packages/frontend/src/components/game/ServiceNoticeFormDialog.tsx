@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Button,
   TextField,
@@ -19,6 +19,8 @@ import {
   IconButton,
   AppBar,
   Toolbar,
+  Alert,
+  AlertTitle,
 } from '@mui/material';
 import { Close as CloseIcon, ChevronRight as ChevronRightIcon, ChevronLeft as ChevronLeftIcon } from '@mui/icons-material';
 import ResizableDrawer from '../common/ResizableDrawer';
@@ -36,6 +38,7 @@ import { parseUTCForPicker } from '../../utils/dateFormat';
 import TargetSettingsGroup, { ChannelSubchannelData } from './TargetSettingsGroup';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
+import { useEntityLock } from '../../hooks/useEntityLock';
 
 interface ServiceNoticeFormDialogProps {
   open: boolean;
@@ -62,6 +65,14 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [previewCollapsed, setPreviewCollapsed] = useState(true); // Default: collapsed
 
+  // Entity Lock for edit mode
+  const { hasLock, lockedBy, pendingCR, forceTakeover } = useEntityLock({
+    table: 'g_service_notices',
+    entityId: notice?.id || null,
+    isEditing: open && !!notice,
+    // onLockLost is called when lock is taken - toast is now handled by useEntityLock via SSE
+  });
+
   // Form state
   const [isActive, setIsActive] = useState(true);
   const [category, setCategory] = useState<string>('notice');
@@ -75,6 +86,9 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [description, setDescription] = useState('');
+
+  // Ref to track initial content after Quill normalization
+  const initialContentRef = useRef<string | null>(null);
 
   // Debounced preview values to prevent flickering
   const [debouncedTabTitle, setDebouncedTabTitle] = useState(tabTitle);
@@ -128,11 +142,16 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     .title {
       font-size: 18px;
       font-weight: 600;
-      margin: 0 0 16px 0;
+      margin: 0 0 12px 0;
       color: #000;
     }
+    .title-divider {
+      border: none;
+      border-top: 1px solid #e0e0e0;
+      margin: 0 0 16px 0;
+    }
     .content {
-      margin-top: 16px;
+      margin-top: 0;
       font-size: 14px;
       line-height: 1.42;
       box-sizing: border-box;
@@ -186,15 +205,67 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     .content ol li:before {
       content: counter(list-0, decimal) '. ';
     }
-    .content h1 {
+    
+    /* Heading styles - Quill classes */
+    .content h1,
+    .content .ql-size-huge {
       font-size: 2em;
     }
-    .content h2 {
+    .content h2,
+    .content .ql-size-large {
       font-size: 1.5em;
     }
     .content h3 {
       font-size: 1.17em;
     }
+    
+    /* Quill size classes */
+    .content .ql-size-small {
+      font-size: 0.75em;
+    }
+    .content .ql-size-large {
+      font-size: 1.5em;
+    }
+    .content .ql-size-huge {
+      font-size: 2.5em;
+    }
+    
+    /* Quill font classes */
+    .content .ql-font-serif {
+      font-family: Georgia, "Times New Roman", serif;
+    }
+    .content .ql-font-monospace {
+      font-family: Monaco, "Courier New", monospace;
+    }
+    
+    /* Quill alignment classes */
+    .content .ql-align-center {
+      text-align: center;
+    }
+    .content .ql-align-right {
+      text-align: right;
+    }
+    .content .ql-align-justify {
+      text-align: justify;
+    }
+    
+    /* Quill indent classes */
+    .content .ql-indent-1 {
+      padding-left: 3em;
+    }
+    .content .ql-indent-2 {
+      padding-left: 6em;
+    }
+    .content .ql-indent-3 {
+      padding-left: 9em;
+    }
+    .content .ql-indent-4 {
+      padding-left: 12em;
+    }
+    .content .ql-indent-5 {
+      padding-left: 15em;
+    }
+    
     .content strong {
       font-weight: bold;
     }
@@ -256,10 +327,65 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     .content .video-wrapper {
       max-width: 100%;
     }
+    
+    /* Text animation effects */
+    @keyframes ql-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    @keyframes ql-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    @keyframes ql-shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      75% { transform: translateX(3px); }
+    }
+    @keyframes ql-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    @keyframes ql-glow-pulse {
+      0%, 100% { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
+      50% { text-shadow: 0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor; }
+    }
+    @keyframes ql-rainbow {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes ql-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes ql-jelly {
+      0%, 100% { transform: scale(1, 1); }
+      25% { transform: scale(0.95, 1.05); }
+      50% { transform: scale(1.05, 0.95); }
+      75% { transform: scale(0.95, 1.05); }
+    }
+    @keyframes ql-swing {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(5deg); }
+      75% { transform: rotate(-5deg); }
+    }
+    @keyframes ql-heartbeat {
+      0%, 100% { transform: scale(1); }
+      14% { transform: scale(1.15); }
+      28% { transform: scale(1); }
+      42% { transform: scale(1.15); }
+      70% { transform: scale(1); }
+    }
+    
+    /* Page background color wrapper */
+    .page-background {
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
   <div class="title">${displayTitle}</div>
+  <hr class="title-divider" />
   <div class="content">
     ${debouncedContent || `<p style="color: #999;">${t('serviceNotices.noContent')}</p>`}
   </div>
@@ -304,6 +430,8 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       setTabTitle(notice.tabTitle || '');
       setTitle(notice.title);
       setContent(notice.content);
+      // Reset initialContentRef - will be set on first RichTextEditor onChange
+      initialContentRef.current = null;
       setDescription(notice.description || '');
     } else {
       // Reset form
@@ -341,14 +469,20 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       });
     });
 
+    // Format date to minute precision for comparison (ignore seconds/milliseconds)
+    const formatDateForCompare = (date: Dayjs | null) =>
+      date ? date.format('YYYY-MM-DDTHH:mm') : null;
+    const formatStringDateForCompare = (dateStr: string | null) =>
+      dateStr ? dayjs(dateStr).format('YYYY-MM-DDTHH:mm') : null;
+
     const currentData = {
       isActive,
       category,
       platforms: [...platforms].sort(),
       channels: channels.length > 0 ? [...channels].sort() : null,
       subchannels: subchannels.length > 0 ? [...subchannels].sort() : null,
-      startDate: startDate ? startDate.toISOString() : null,
-      endDate: endDate ? endDate.toISOString() : null,
+      startDate: formatDateForCompare(startDate),
+      endDate: formatDateForCompare(endDate),
       tabTitle: tabTitle.trim() || null,
       title: title.trim(),
       content: content.trim(),
@@ -361,12 +495,12 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       platforms: [...(notice.platforms || [])].sort(),
       channels: notice.channels ? [...notice.channels].sort() : null,
       subchannels: notice.subchannels ? [...notice.subchannels].sort() : null,
-      startDate: notice.startDate ? dayjs(notice.startDate).toISOString() : null,
-      endDate: notice.endDate ? dayjs(notice.endDate).toISOString() : null,
-      tabTitle: notice.tabTitle || null,
-      title: notice.title,
-      content: notice.content,
-      description: notice.description || null,
+      startDate: formatStringDateForCompare(notice.startDate),
+      endDate: formatStringDateForCompare(notice.endDate),
+      tabTitle: notice.tabTitle?.trim() || null,
+      title: notice.title?.trim() || '',
+      content: initialContentRef.current?.trim() || notice.content?.trim() || '',
+      description: notice.description?.trim() || null,
     };
 
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
@@ -387,7 +521,9 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       return;
     }
 
-    if (!content.trim()) {
+    // Check if content is empty (excluding HTML tags)
+    const strippedContent = content.replace(/<[^>]*>/g, '').trim();
+    if (!strippedContent && !content.includes('<img') && !content.includes('<iframe')) {
       enqueueSnackbar(t('serviceNotices.contentRequired'), { variant: 'error' });
       return;
     }
@@ -511,6 +647,28 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
           }}
         >
           <Stack spacing={3}>
+            {/* Lock Warning */}
+            {notice && lockedBy && !hasLock && (
+              <Alert
+                severity="warning"
+                action={
+                  <Button color="inherit" size="small" onClick={forceTakeover}>
+                    {t('entityLock.takeOver')}
+                  </Button>
+                }
+              >
+                <AlertTitle>{t('entityLock.warning', { userName: lockedBy.userName, userEmail: lockedBy.userEmail })}</AlertTitle>
+              </Alert>
+            )}
+
+            {/* Pending CR Warning */}
+            {notice && pendingCR && (
+              <Alert severity="info">
+                <AlertTitle>{t('entityLock.pendingCR')}</AlertTitle>
+                {t('entityLock.pendingCRDetail', { crTitle: pendingCR.crTitle, crId: pendingCR.crId })}
+              </Alert>
+            )}
+
             {/* Active Status */}
             <Box>
               <FormControlLabel
@@ -643,7 +801,13 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
                 </Typography>
                 <RichTextEditor
                   value={content}
-                  onChange={setContent}
+                  onChange={(val) => {
+                    // Capture first content change as baseline for isDirty comparison
+                    if (notice && initialContentRef.current === null) {
+                      initialContentRef.current = val;
+                    }
+                    setContent(val);
+                  }}
                   placeholder={t('serviceNotices.contentPlaceholder')}
                   minHeight={200}
                 />
