@@ -671,31 +671,10 @@ const GatrixEdgesPage: React.FC = () => {
         const hasInstances = group.instances && group.instances.length > 0;
 
         return (
-            <Box key={group.id} sx={{ ml: depth > 0 ? 3 : 0, mt: depth > 0 ? 1 : 0, position: 'relative' }}>
-                {depth > 0 && (
-                    <Box sx={{
-                        position: 'absolute',
-                        left: -12,
-                        top: -8,
-                        bottom: '50%',
-                        width: 2,
-                        bgcolor: theme.palette.divider
-                    }} />
-                )}
-                {depth > 0 && (
-                    <Box sx={{
-                        position: 'absolute',
-                        left: -12,
-                        top: '50%',
-                        width: 12,
-                        height: 2,
-                        bgcolor: theme.palette.divider
-                    }} />
-                )}
+            <Box key={group.id} sx={{ ml: depth > 0 ? 3 : 0, mt: depth > 0 ? 1 : 0, mb: depth === 0 ? 1 : 0, position: 'relative' }}>
 
                 <Card
                     sx={{
-                        mb: 1,
                         border: `1px solid ${theme.palette.divider}`,
                         boxShadow: depth === 0 ? theme.shadows[1] : 'none'
                     }}
@@ -894,51 +873,87 @@ const GatrixEdgesPage: React.FC = () => {
                     <CircularProgress />
                 </Box>
             ) : (
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                    {/* Root Node */}
-                    <Card
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', gap: 0 }}>
+                    {/* Root Node with Connector Line Wrapper */}
+                    <Box
                         sx={{
-                            minWidth: 180,
-                            textAlign: 'center',
-                            border: `2px solid ${theme.palette.primary.main}`,
-                            boxShadow: theme.shadows[2],
-                            zIndex: 1,
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            // Add padding bottom if there are groups to make space for the line
+                            pb: groups.length > 0 ? 4 : 0,
+                            // Draw line using pseudo-element for perfect alignment and overlap
+                            '&::after': groups.length > 0 ? {
+                                content: '""',
+                                position: 'absolute',
+                                bottom: 0,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                width: 2,
+                                // Height = padding(32px) + overlap(2px)
+                                height: '34px',
+                                bgcolor: 'divider',
+                                zIndex: 0
+                            } : undefined
                         }}
                     >
-                        <CardContent sx={{ py: 2 }}>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                                <Box
-                                    sx={{
-                                        width: 48,
-                                        height: 48,
-                                        bgcolor: 'primary.main',
-                                        borderRadius: 1,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: 'white'
-                                    }}
-                                >
-                                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>G</Typography>
+                        <Card
+                            sx={{
+                                minWidth: 180,
+                                textAlign: 'center',
+                                border: `2px solid ${theme.palette.primary.main}`,
+                                boxShadow: theme.shadows[2],
+                                // Ensure card sits on top of the line
+                                zIndex: 1,
+                                position: 'relative',
+                                mb: 0
+                            }}
+                        >
+                            <CardContent sx={{ pt: 2, pb: 0, '&:last-child': { pb: 0 } }}>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                                    <Box
+                                        sx={{
+                                            width: 48,
+                                            height: 48,
+                                            bgcolor: 'primary.main',
+                                            borderRadius: 1,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: 'white'
+                                        }}
+                                    >
+                                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>G</Typography>
+                                    </Box>
+                                    <Typography variant="h6" fontWeight="bold">Gatrix Core</Typography>
                                 </Box>
-                                <Typography variant="h6" fontWeight="bold">Gatrix Core</Typography>
-                            </Box>
-                        </CardContent>
-                    </Card>
+                            </CardContent>
+                        </Card>
+                    </Box>
 
                     {/* Groups container - Width reduced to 480 as requested */}
                     <Box sx={{ width: '100%', maxWidth: 480, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         {groups.map((group, index) => (
                             <React.Fragment key={group.id}>
-                                {/* Vertical line piece from previous to current group */}
-                                <Box sx={{
-                                    width: 2,
-                                    height: index === 0 ? 32 : 16,
-                                    bgcolor: theme.palette.divider,
-                                    mb: index === 0 ? -0.5 : 0,
-                                    mt: 0
-                                }} />
-                                <Box sx={{ width: '100%' }}>
+                                <Box
+                                    sx={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        gap: 0
+                                    }}
+                                >
+                                    {/* Vertical line between groups (not for first group) */}
+                                    {index > 0 && (
+                                        <Box sx={{
+                                            width: 2,
+                                            height: 16,
+                                            bgcolor: theme.palette.divider,
+                                            flexShrink: 0
+                                        }} />
+                                    )}
                                     {renderGroup(group, 0)}
                                 </Box>
                             </React.Fragment>
