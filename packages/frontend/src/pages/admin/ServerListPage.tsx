@@ -141,7 +141,7 @@ interface ClusterViewProps {
   services: ServiceInstance[];
   heartbeatIds: Set<string>;
   t: (key: string) => string;
-  groupingBy?: GroupingOption;
+  groupingLevels?: GroupingField[];
   onContextMenu?: (event: React.MouseEvent, service: ServiceInstance) => void;
 }
 
@@ -164,7 +164,9 @@ const getStatusColor = (status: string): string => {
   }
 };
 
-const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, groupingBy = 'none', onContextMenu }) => {
+const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, groupingLevels = [], onContextMenu }) => {
+  // ClusterView uses first grouping level only for now
+  const groupingBy: GroupingOption = groupingLevels.length > 0 ? groupingLevels[0] : 'none';
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const [nodes, setNodes] = useState<ClusterNode[]>([]);
@@ -1234,7 +1236,8 @@ interface CheckerboardViewProps {
   services: ServiceInstance[];
   updatedServiceIds: Map<string, ServiceStatus>;
   heartbeatIds: Set<string>;
-  groupingBy: GroupingOption;
+  groupingLevels: GroupingField[];
+  getGroupingLabel: (field: GroupingField) => string;
   t: (key: string) => string;
   onContextMenu: (event: React.MouseEvent, service: ServiceInstance) => void;
 }
@@ -1324,7 +1327,8 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(({
   services,
   updatedServiceIds,
   heartbeatIds,
-  groupingBy,
+  groupingLevels,
+  getGroupingLabel,
   t,
   onContextMenu
 }) => {
@@ -1633,38 +1637,157 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(({
     );
   };
 
-  // Group services if grouping is enabled
-  if (groupingBy !== 'none') {
-    const groups = new Map<string, ServiceInstance[]>();
-    services.forEach((service) => {
-      let groupKey = '';
-      switch (groupingBy) {
-        case 'service':
-          groupKey = service.labels.service || 'Unknown';
-          break;
-        case 'group':
-          groupKey = service.labels.group || 'Default';
-          break;
-        case 'environment':
-          groupKey = service.labels.environment || 'Unknown';
-          break;
-        case 'cloudProvider':
-          groupKey = service.labels.cloudProvider || 'Unknown';
-          break;
-        case 'cloudRegion':
-          groupKey = service.labels.cloudRegion || 'Unknown';
-          break;
-        case 'cloudZone':
-          groupKey = service.labels.cloudZone || 'Unknown';
-          break;
+  // Multi-level hierarchical group structure (inline definition to avoid import)
+  interface LocalServerGroup {
+    id: string;
+    name: string;
+    level: number;
+    fieldName: GroupingField;
+    instances: ServiceInstance[];
+    children?: LocalServerGroup[];
+  }
+
+  // Build hierarchical groups recursively
+  const buildGroups = (
+    items: ServiceInstance[],
+    levels: GroupingField[],
+    currentLevel: number = 0
+  ): LocalServerGroup[] => {
+    if (levels.length === 0 || currentLevel >= levels.length) {
+      return [];
+    }
+
+    const currentField = levels[currentLevel];
+    const nextLevel = currentLevel + 1;
+    const hasMoreLevels = nextLevel < levels.length;
+
+    const groupMap = new Map<string, ServiceInstance[]>();
+
+    items.forEach(service => {
+      const value = service.labels[currentField] || 'Unknown';
+      if (!groupMap.has(value)) {
+        groupMap.set(value, []);
       }
-      if (!groups.has(groupKey)) {
-        groups.set(groupKey, []);
-      }
-      groups.get(groupKey)!.push(service);
+      groupMap.get(value)?.push(service);
     });
 
-    const sortedGroupKeys = Array.from(groups.keys()).sort();
+    return Array.from(groupMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([name, instances]) => ({
+        id: levels.slice(0, currentLevel + 1).join('-') + '-' + name,
+        name: name === 'Unknown' ? `(${getGroupingLabel(currentField)} N/A)` : name,
+        level: currentLevel,
+        fieldName: currentField,
+        instances: hasMoreLevels ? [] : instances.sort((a, b) => a.instanceId.localeCompare(b.instanceId)),
+        children: hasMoreLevels ? buildGroups(instances, levels, nextLevel) : undefined,
+      }));
+  };
+
+  // Collect all instances from a group (including nested)
+  const collectAllInstances = (group: LocalServerGroup): ServiceInstance[] => {
+    if (group.children && group.children.length > 0) {
+      return group.children.flatMap(collectAllInstances);
+    }
+    return group.instances;
+  };
+
+  // Render a group recursively with its children
+  const renderGroup = (group: LocalServerGroup, depth: number): React.ReactNode => {
+    const allInstances = collectAllInstances(group);
+    const hasChildren = group.children && group.children.length > 0;
+
+    return (
+      <Paper
+        key={group.id}
+        elevation={0}
+        sx={{
+          width: '100%',
+          boxSizing: 'border-box',
+          mb: depth === 0 ? 3 : 2,
+          ml: depth * 2,
+          p: 2,
+          bgcolor: (theme) => alpha(theme.palette.background.paper, 0.4 - depth * 0.1),
+          borderRadius: 2,
+          borderLeft: depth > 0 ? 3 : 0,
+          borderColor: 'primary.main',
+          backdropFilter: 'blur(8px)',
+          boxShadow: (theme) => theme.palette.mode === 'dark'
+            ? '0 4px 20px rgba(0,0,0,0.4)'
+            : '0 4px 20px rgba(0,0,0,0.05)',
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5, gap: 1.5, pb: 1, borderBottom: 1, borderColor: 'divider' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'stretch',
+              height: 28,
+              borderRadius: 1,
+              border: 1,
+              borderColor: 'divider',
+              overflow: 'hidden',
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                px: 1,
+                fontSize: '0.7rem',
+                fontWeight: 600,
+                color: 'text.secondary',
+                bgcolor: 'action.hover',
+                textTransform: 'uppercase',
+              }}
+            >
+              {getGroupingLabel(group.fieldName)}
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                px: 1.5,
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                color: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100],
+                bgcolor: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[200] : theme.palette.grey[700],
+              }}
+            >
+              {group.name}
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: 28,
+                px: 1,
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                color: 'primary.contrastText',
+                bgcolor: 'primary.main',
+              }}
+            >
+              {allInstances.length}
+            </Box>
+          </Box>
+          <Box sx={{ flex: 1 }} />
+          <StatusStatsDisplay services={allInstances} t={t} />
+        </Box>
+        {hasChildren ? (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {group.children!.map((child) => renderGroup(child, depth + 1))}
+          </Box>
+        ) : (
+          renderItemsGrid(group.instances, group.id)
+        )}
+      </Paper>
+    );
+  };
+
+  // Group services if grouping is enabled (multi-level)
+  if (groupingLevels.length > 0) {
+    const groups = buildGroups(services, groupingLevels);
 
     return (
       <Box sx={{
@@ -1674,71 +1797,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(({
         px: 0,
         py: 2,
       }}>
-        {sortedGroupKeys.map((groupKey) => (
-          <Paper
-            key={groupKey}
-            elevation={0}
-
-            sx={{
-              width: '100%',
-              boxSizing: 'border-box',
-              mb: 3,
-              p: 2.5,
-              bgcolor: (theme) => alpha(theme.palette.background.paper, 0.4),
-              borderRadius: 2,
-              backdropFilter: 'blur(8px)',
-              boxShadow: (theme) => theme.palette.mode === 'dark'
-                ? '0 4px 20px rgba(0,0,0,0.4)'
-                : '0 4px 20px rgba(0,0,0,0.05)',
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 1.5, pb: 1.5, borderBottom: 1, borderColor: 'divider' }}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'stretch',
-                  height: 32,
-                  borderRadius: 1,
-                  border: 1,
-                  borderColor: 'divider',
-                  overflow: 'hidden',
-                }}
-              >
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    px: 1.5,
-                    fontSize: '0.9rem',
-                    fontWeight: 700,
-                    color: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100],
-                    bgcolor: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[200] : theme.palette.grey[700],
-                  }}
-                >
-                  {groupKey}
-                </Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    minWidth: 32,
-                    px: 1,
-                    fontSize: '0.85rem',
-                    fontWeight: 700,
-                    color: 'primary.contrastText',
-                    bgcolor: 'primary.main',
-                  }}
-                >
-                  {groups.get(groupKey)!.length}
-                </Box>
-              </Box>
-              <Box sx={{ flex: 1 }} />
-              <StatusStatsDisplay services={groups.get(groupKey)!} t={t} />
-            </Box>
-            {renderItemsGrid(groups.get(groupKey)!, groupKey)}
-          </Paper>
-        ))}
+        {groups.map((group) => renderGroup(group, 0))}
       </Box>
     );
   }
@@ -1766,9 +1825,10 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(({
   // 1. Services selection/order changed
   // 2. Heartbeat IDs changed
   // 3. Updated service IDs changed
-  // 4. Grouping changed
+  // 4. Grouping levels changed
 
-  if (prevProps.groupingBy !== nextProps.groupingBy) return false;
+  if (prevProps.groupingLevels.length !== nextProps.groupingLevels.length) return false;
+  if (prevProps.groupingLevels.some((level, i) => level !== nextProps.groupingLevels[i])) return false;
 
   // Shallow compare services array (length check first)
   if (prevProps.services !== nextProps.services) {
@@ -4266,7 +4326,8 @@ const ServerListPage: React.FC = () => {
           services={gridDisplayServices}
           updatedServiceIds={updatedServiceIds}
           heartbeatIds={heartbeatIds}
-          groupingBy={groupingBy}
+          groupingLevels={groupingLevels}
+          getGroupingLabel={getGroupingLabel}
           t={t}
           onContextMenu={handleContextMenu}
         />
@@ -4614,7 +4675,7 @@ const ServerListPage: React.FC = () => {
           services={gridDisplayServices}
           heartbeatIds={heartbeatIds}
           t={t}
-          groupingBy={groupingBy}
+          groupingLevels={groupingLevels}
           onContextMenu={handleContextMenu}
         />
       )}
