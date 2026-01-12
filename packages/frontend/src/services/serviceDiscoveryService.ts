@@ -90,6 +90,7 @@ class ServiceDiscoveryService {
     status: string;
     timestamp?: string;
     lastRefreshedAt?: string | null;
+    invalidationCount?: number;
     summary?: Record<string, Record<string, number>>;
     detail?: Record<string, any>;
     latency?: number;

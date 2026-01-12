@@ -46,6 +46,7 @@ import Editor from '@monaco-editor/react';
 import serviceDiscoveryService, { ServiceInstance } from '../../services/serviceDiscoveryService';
 import { RelativeTime } from '../../components/common/RelativeTime';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import { formatDateTimeDetailed } from '../../utils/dateFormat';
 
 // Grouping options - Cloud-related only
 type GroupingField = 'cloudProvider' | 'cloudRegion';
@@ -61,6 +62,7 @@ interface CacheStatus {
     status: string;
     timestamp?: string;
     lastRefreshedAt?: string | null;
+    invalidationCount?: number;
     summary?: Record<string, Record<string, number>>;
     detail?: Record<string, any>;
     latency?: number;
@@ -103,6 +105,31 @@ const GatrixEdgesPage: React.FC = () => {
     // Cache status per instance
     const [cacheStatuses, setCacheStatuses] = useState<Map<string, CacheStatus>>(new Map());
     const cachePollingRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Refresh interval state (persisted in localStorage)
+    const [refreshInterval, setRefreshInterval] = useState<number | null>(() => {
+        try {
+            const stored = localStorage.getItem('gatrix_edges_refresh_interval');
+            if (stored === 'off') return null;
+            const parsed = parseInt(stored || '10', 10);
+            return isNaN(parsed) ? 10 : parsed;
+        } catch {
+            return 10;
+        }
+    });
+
+    // Save refresh interval to localStorage
+    useEffect(() => {
+        try {
+            if (refreshInterval === null) {
+                localStorage.setItem('gatrix_edges_refresh_interval', 'off');
+            } else {
+                localStorage.setItem('gatrix_edges_refresh_interval', refreshInterval.toString());
+            }
+        } catch (e) {
+            console.error('Failed to save refresh interval to localStorage', e);
+        }
+    }, [refreshInterval]);
 
     // JSON Dialog
     const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
@@ -254,9 +281,9 @@ const GatrixEdgesPage: React.FC = () => {
             });
         };
 
-        if (expandedInstances.size > 0) {
+        if (expandedInstances.size > 0 && refreshInterval !== null) {
             pollCacheStatuses();
-            cachePollingRef.current = setInterval(pollCacheStatuses, 30000);
+            cachePollingRef.current = setInterval(pollCacheStatuses, refreshInterval * 1000);
         }
 
         return () => {
@@ -264,7 +291,7 @@ const GatrixEdgesPage: React.FC = () => {
                 clearInterval(cachePollingRef.current);
             }
         };
-    }, [expandedInstances, services, fetchCacheStatus]);
+    }, [expandedInstances, services, fetchCacheStatus, refreshInterval]);
 
     useEffect(() => {
         fetchServices();
@@ -356,7 +383,7 @@ const GatrixEdgesPage: React.FC = () => {
     };
 
     // Render cache summary
-    const renderCacheSummary = (cacheStatus: CacheStatus | undefined) => {
+    const renderCacheSummary = (cacheStatus: CacheStatus | undefined, instance: ServiceInstance) => {
         if (!cacheStatus) {
             return (
                 <Typography variant="body2" color="text.secondary">
@@ -378,36 +405,86 @@ const GatrixEdgesPage: React.FC = () => {
 
         return (
             <Box sx={{ position: 'relative' }}>
-                {loading && (
-                    <LinearProgress
-                        sx={{
-                            position: 'absolute',
-                            top: -12,
-                            left: -4,
-                            right: -4,
-                            height: 2,
-                            borderRadius: 1
-                        }}
-                    />
-                )}
-
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                     <Typography variant="subtitle2" fontWeight="bold">
                         {t('gatrixEdges.cacheStatus')}
                     </Typography>
-                    <Stack direction="row" spacing={0.5}>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <Typography variant="caption" color="text.secondary">
+                                {t('gatrixEdges.refreshInterval')}:
+                            </Typography>
+                            <FormControl size="small" sx={{ minWidth: 60 }}>
+                                <Select
+                                    value={refreshInterval === null ? 'off' : refreshInterval}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setRefreshInterval(val === 'off' ? null : Number(val));
+                                    }}
+                                    displayEmpty
+                                    variant="standard"
+                                    disableUnderline
+                                    sx={{
+                                        fontSize: '0.8rem',
+                                        fontWeight: 'bold',
+                                        bgcolor: theme.palette.action.hover,
+                                        borderRadius: 1,
+                                        px: 1,
+                                        py: 0.25,
+                                        '& .MuiSelect-select': {
+                                            py: 0,
+                                            paddingRight: '24px !important'
+                                        }
+                                    }}
+                                >
+                                    <MenuItem value="off" sx={{ fontSize: '0.8rem' }}>{t('gatrixEdges.refreshOff')}</MenuItem>
+                                    <MenuItem value={5} sx={{ fontSize: '0.8rem' }}>5{t('gatrixEdges.seconds')}</MenuItem>
+                                    <MenuItem value={10} sx={{ fontSize: '0.8rem' }}>10{t('gatrixEdges.seconds')}</MenuItem>
+                                    <MenuItem value={30} sx={{ fontSize: '0.8rem' }}>30{t('gatrixEdges.seconds')}</MenuItem>
+                                    <MenuItem value={60} sx={{ fontSize: '0.8rem' }}>60{t('gatrixEdges.seconds')}</MenuItem>
+                                </Select>
+                            </FormControl>
+
+                            <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    fetchCacheStatus(instance);
+                                }}
+                                disabled={loading}
+                                sx={{ p: 0.5 }}
+                            >
+                                <RefreshIcon
+                                    fontSize="small"
+                                    sx={{
+                                        animation: loading ? 'spin 1s linear infinite' : 'none',
+                                        '@keyframes spin': {
+                                            '0%': {
+                                                transform: 'rotate(0deg)',
+                                            },
+                                            '100%': {
+                                                transform: 'rotate(360deg)',
+                                            },
+                                        },
+                                    }}
+                                />
+                            </IconButton>
+                        </Box>
+
                         {latency !== undefined && (
-                            <Chip label={`${latency}ms`} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.65rem' }} />
+                            <Tooltip title={lastRefreshedAt ? `${t('gatrixEdges.lastRefreshed')}: ${formatDateTimeDetailed(lastRefreshedAt)}` : ''}>
+                                <Chip label={`${latency}ms`} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.65rem', cursor: 'help' }} />
+                            </Tooltip>
                         )}
-                        <Button
-                            size="small"
-                            variant="outlined"
-                            startIcon={<CodeIcon sx={{ fontSize: 14 }} />}
-                            onClick={() => openJsonDialog(cacheStatus, t('gatrixEdges.cacheStatus'))}
-                            sx={{ height: 20, fontSize: '0.65rem', px: 1 }}
-                        >
-                            {t('gatrixEdges.viewJson')}
-                        </Button>
+
+                        <Tooltip title={t('gatrixEdges.viewJson')}>
+                            <IconButton
+                                size="small"
+                                onClick={() => openJsonDialog(cacheStatus, t('gatrixEdges.cacheStatus'))}
+                            >
+                                <CodeIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                        </Tooltip>
                     </Stack>
                 </Box>
 
@@ -418,13 +495,24 @@ const GatrixEdgesPage: React.FC = () => {
                 )}
 
                 {lastRefreshedAt && (
-                    <Box sx={{ mb: 1.5, p: 1, bgcolor: theme.palette.primary.main + '10', borderRadius: 1, border: `1px solid ${theme.palette.primary.main}30` }}>
-                        <Typography variant="caption" color="primary" sx={{ display: 'block', fontWeight: 'bold' }}>
-                            {t('gatrixEdges.lastRefreshed')}: <RelativeTime date={lastRefreshedAt} />
+                    <Box sx={{
+                        mb: 1.5,
+                        p: 1,
+                        bgcolor: theme.palette.primary.main + '10',
+                        borderRadius: 1,
+                        border: `1px solid ${theme.palette.primary.main}30`,
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        alignItems: 'center',
+                    }}>
+                        <Typography variant="caption" color="primary" sx={{ fontWeight: 'bold' }}>
+                            {t('gatrixEdges.latestInvalidation')}: <RelativeTime date={lastRefreshedAt} />
                         </Typography>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
-                            ({new Date(lastRefreshedAt).toLocaleString()})
-                        </Typography>
+                        {cacheStatus.invalidationCount !== undefined && (
+                            <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center' }}>
+                                {t('gatrixEdges.invalidationCount')}: {cacheStatus.invalidationCount}
+                            </Typography>
+                        )}
                     </Box>
                 )}
 
@@ -587,20 +675,8 @@ const GatrixEdgesPage: React.FC = () => {
                         <Typography variant="subtitle2" fontWeight="bold">
                             {t('gatrixEdges.cachingInfo')}
                         </Typography>
-                        <Box sx={{ flexGrow: 1 }} />
-                        <IconButton
-                            size="small"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                fetchCacheStatus(instance);
-                            }}
-                            disabled={cacheStatus?.loading}
-                            sx={{ p: 0.5 }}
-                        >
-                            <RefreshIcon fontSize="small" />
-                        </IconButton>
                     </Box>
-                    {renderCacheSummary(cacheStatus)}
+                    {renderCacheSummary(cacheStatus, instance)}
                 </Box>
             </Box>
         );
@@ -647,7 +723,12 @@ const GatrixEdgesPage: React.FC = () => {
                     {instance.status === 'ready' ? (
                         <Chip label={t('gatrixEdges.connected')} size="small" color="success" sx={{ height: 20, fontSize: '0.65rem' }} />
                     ) : (
-                        <Chip label={instance.status} size="small" sx={{ height: 20, fontSize: '0.65rem' }} />
+                        <Chip
+                            label={instance.status === 'no-response' ? t('gatrixEdges.noResponse') : instance.status}
+                            size="small"
+                            color={instance.status === 'no-response' ? 'error' : 'default'}
+                            sx={{ height: 20, fontSize: '0.65rem' }}
+                        />
                     )}
                     <IconButton size="small">
                         {expandedInstances.has(instance.instanceId) ? (

@@ -99,6 +99,7 @@ function buildCacheResponse(sdk: any): any {
     status: isInitialized ? 'ready' : 'initializing',
     timestamp: new Date().toISOString(),
     lastRefreshedAt: allCached.lastRefreshedAt || null,
+    invalidationCount: allCached.invalidationCount || 0,
     summary,
     detail: filteredDetail,
   };

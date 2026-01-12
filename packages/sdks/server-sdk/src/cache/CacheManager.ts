@@ -51,6 +51,8 @@ export class CacheManager {
   private cachedEnvironmentList: string[] = [];
   // Last cache refresh timestamp
   private lastRefreshedAt: Date | null = null;
+  // Cache invalidation counter
+  private invalidationCount: number = 0;
 
   constructor(
     config: CacheConfig,
@@ -144,6 +146,15 @@ export class CacheManager {
     return () => {
       this.refreshCallbacks = this.refreshCallbacks.filter((cb) => cb !== callback);
     };
+  }
+
+  /**
+   * Manually update the last refreshed timestamp
+   * Used by EventListener when cache is updated via events
+   */
+  updateLastRefreshedAt(): void {
+    this.lastRefreshedAt = new Date();
+    this.invalidationCount++;
   }
 
   /**
@@ -827,6 +838,7 @@ export class CacheManager {
 
       this.logger.info('All caches refreshed successfully', { types: refreshedTypes });
       this.lastRefreshedAt = new Date();
+      this.invalidationCount++;
 
       // Check and emit maintenance state changes
       if (this.features.serviceMaintenance !== false || this.features.gameWorld !== false) {
@@ -945,6 +957,7 @@ export class CacheManager {
 
     return {
       lastRefreshedAt: this.lastRefreshedAt?.toISOString() || null,
+      invalidationCount: this.invalidationCount,
       gameWorlds: mapToObject(this.gameWorldService?.getAllCached()),
       popupNotices: mapToObject(this.popupNoticeService?.getAllCached()),
       surveys: mapToObject(this.surveyService?.getAllCached()),

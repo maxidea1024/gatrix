@@ -215,6 +215,8 @@ export class EventListener {
     if (this.isStandardEvent(event.type)) {
       try {
         await this.handleStandardEvent(event);
+        // Update last refreshed timestamp since we successfully processed an event
+        this.cacheManager.updateLastRefreshedAt();
       } catch (error: any) {
         this.logger.error('Failed to handle standard event', {
           type: event.type,
