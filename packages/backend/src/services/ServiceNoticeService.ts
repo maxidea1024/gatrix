@@ -467,7 +467,8 @@ class ServiceNoticeService {
         data: {
           id: notice.id,
           environment: environment,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          serviceNotice: notice
         }
       });
     } catch (err) {
