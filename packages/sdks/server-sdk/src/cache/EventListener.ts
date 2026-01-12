@@ -545,7 +545,9 @@ export class EventListener {
         if (serviceNoticeData) {
           this.logger.info('Service notice event received, updating cache directly', {
             id: event.data.id,
-            environment: noticeEnvironment
+            environment: noticeEnvironment,
+            isActive: serviceNoticeData.isActive,
+            updatedAt: serviceNoticeData.updatedAt
           });
           this.cacheManager.getServiceNoticeService()?.updateSingleServiceNotice(serviceNoticeData, noticeEnvironment);
         } else {

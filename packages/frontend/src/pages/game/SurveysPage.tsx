@@ -616,15 +616,11 @@ const SurveysPage: React.FC = () => {
                         if (column.id === 'status') {
                           return (
                             <TableCell key={column.id}>
-                              <Tooltip title={survey.isActive ? t('surveys.deactivate') : t('surveys.activate')}>
-                                <Chip
-                                  label={survey.isActive ? t('common.active') : t('common.inactive')}
-                                  color={survey.isActive ? 'success' : 'default'}
-                                  size="small"
-                                  onClick={() => handleToggleActive(survey)}
-                                  sx={{ cursor: 'pointer' }}
-                                />
-                              </Tooltip>
+                              <Chip
+                                label={survey.isActive ? t('common.active') : t('common.inactive')}
+                                color={survey.isActive ? 'success' : 'default'}
+                                size="small"
+                              />
                             </TableCell>
                           );
                         }

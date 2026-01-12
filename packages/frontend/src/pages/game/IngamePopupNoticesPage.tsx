@@ -560,8 +560,6 @@ const IngamePopupNoticesPage: React.FC = () => {
                                 label={notice.isActive ? t('common.active') : t('common.inactive')}
                                 color={notice.isActive ? 'success' : 'default'}
                                 size="small"
-                                onClick={() => handleToggleActive(notice)}
-                                sx={{ cursor: 'pointer' }}
                               />
                             </TableCell>
                           );

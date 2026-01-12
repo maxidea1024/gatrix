@@ -235,13 +235,8 @@ const GatrixEdgesPage: React.FC = () => {
     // Multi-level grouping
     const groupServicesMultiLevel = useCallback((services: ServiceInstance[], levels: GroupingField[]) => {
         if (levels.length === 0) {
-            const flatGroup: EdgeGroup = {
-                id: 'all',
-                name: 'All Instances',
-                instances: services.sort((a, b) => a.instanceId.localeCompare(b.instanceId)),
-            };
-            setGroups([flatGroup]);
-            setExpandedGroups(new Set(['all']));
+            setGroups([]);
+            setExpandedGroups(new Set());
             return;
         }
 
@@ -879,6 +874,105 @@ const GatrixEdgesPage: React.FC = () => {
         );
     };
 
+    // Tree item renderer for flat instances
+    const renderInstanceTreeItem = (instance: ServiceInstance, index: number, total: number) => {
+        const isFirst = index === 0;
+        const isLast = index === total - 1;
+        const isOnly = total === 1;
+
+        // Determine if it's the middle element (for odd total) or near middle
+        const isMiddle = !isFirst && !isLast;
+
+        return (
+            <Box
+                key={instance.instanceId}
+                sx={{
+                    position: 'relative',
+                    px: 1.5, // Increased horizontal padding
+                    pt: 3, // Increased top space for curve
+                    width: 440, // Increased width to match original look
+                    flexShrink: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}
+            >
+                {/* Connector Lines */}
+                {!isOnly && (
+                    <>
+                        {/* First Item: Curve from Right to Down */}
+                        {isFirst && (
+                            <Box sx={{
+                                position: 'absolute',
+                                top: 0,
+                                right: 0,
+                                width: '50%',
+                                height: 24,
+                                borderTop: `2px solid ${theme.palette.divider}`,
+                                borderLeft: `2px solid ${theme.palette.divider}`,
+                                borderTopLeftRadius: 12,
+                            }} />
+                        )}
+
+                        {/* Last Item: Curve from Left to Down */}
+                        {isLast && (
+                            <Box sx={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '50%',
+                                height: 24,
+                                borderTop: `2px solid ${theme.palette.divider}`,
+                                borderRight: `2px solid ${theme.palette.divider}`,
+                                borderTopRightRadius: 12,
+                            }} />
+                        )}
+
+                        {/* Middle Items: T-Shape (Horizontal Bar + Vertical Line) */}
+                        {isMiddle && (
+                            <>
+                                <Box sx={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: 2,
+                                    bgcolor: 'divider',
+                                }} />
+                                <Box sx={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    width: 2,
+                                    height: 24,
+                                    bgcolor: 'divider',
+                                }} />
+                            </>
+                        )}
+                    </>
+                )}
+
+                {/* Single Item: Straight Line */}
+                {isOnly && (
+                    <Box sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: 2,
+                        height: 24,
+                        bgcolor: 'divider',
+                    }} />
+                )}
+
+                <Box sx={{ width: '100%' }}>
+                    {renderInstanceCard(instance)}
+                </Box>
+            </Box>
+        );
+    };
+
     return (
         <Box sx={{ p: 3 }}>
             {/* Header */}
@@ -1017,10 +1111,10 @@ const GatrixEdgesPage: React.FC = () => {
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
-                            // Add padding bottom if there are groups to make space for the line
-                            pb: groups.length > 0 ? 4 : 0,
+                            // Add padding bottom if there are services to make space for the line
+                            pb: services.length > 0 ? 4 : 0,
                             // Draw line using pseudo-element for perfect alignment and overlap
-                            '&::after': groups.length > 0 ? {
+                            '&::after': services.length > 0 ? {
                                 content: '""',
                                 position: 'absolute',
                                 bottom: 0,
@@ -1068,34 +1162,51 @@ const GatrixEdgesPage: React.FC = () => {
                         </Card>
                     </Box>
 
-                    {/* Groups container - Width reduced to 480 as requested */}
-                    <Box sx={{ width: '100%', maxWidth: 480, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        {groups.map((group, index) => (
-                            <React.Fragment key={group.id}>
-                                <Box
-                                    sx={{
-                                        width: '100%',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        gap: 0
-                                    }}
-                                >
-                                    {/* Vertical line between groups (not for first group) */}
-                                    {index > 0 && (
-                                        <Box sx={{
-                                            width: 2,
-                                            height: 16,
-                                            bgcolor: theme.palette.divider,
-                                            flexShrink: 0
-                                        }} />
-                                    )}
-                                    {renderGroup(group, 0)}
-                                </Box>
-                            </React.Fragment>
-                        ))}
+                    {/* Groups container */}
+                    <Box sx={{
+                        width: '100%',
+                        maxWidth: groupingLevels.length === 0 ? '100%' : 480,
+                        display: 'flex',
+                        flexDirection: groupingLevels.length === 0 ? 'row' : 'column',
+                        alignItems: groupingLevels.length === 0 ? 'flex-start' : 'center',
+                        justifyContent: groupingLevels.length === 0 ? 'center' : 'flex-start',
+                        overflowX: groupingLevels.length === 0 ? 'auto' : 'visible'
+                    }}>
+                        {groupingLevels.length === 0 ? (
+                            // Horizontal Tree Layout
+                            <Box sx={{ display: 'flex', gap: 0, pb: 2 }}>
+                                {[...services]
+                                    .sort((a, b) => a.instanceId.localeCompare(b.instanceId))
+                                    .map((service, index, arr) => renderInstanceTreeItem(service, index, arr.length))}
+                            </Box>
+                        ) : (
+                            groups.map((group, index) => (
+                                <React.Fragment key={group.id}>
+                                    <Box
+                                        sx={{
+                                            width: '100%',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            gap: 0
+                                        }}
+                                    >
+                                        {/* Vertical line between groups (not for first group) */}
+                                        {index > 0 && (
+                                            <Box sx={{
+                                                width: 2,
+                                                height: 16,
+                                                bgcolor: theme.palette.divider,
+                                                flexShrink: 0
+                                            }} />
+                                        )}
+                                        {renderGroup(group, 0)}
+                                    </Box>
+                                </React.Fragment>
+                            ))
+                        )}
 
-                        {groups.length === 0 && !initialLoading && (
+                        {services.length === 0 && !initialLoading && (
                             <Box sx={{ p: 4, textAlign: 'center' }}>
                                 <Typography color="text.secondary">
                                     {t('gatrixEdges.noEdges')}

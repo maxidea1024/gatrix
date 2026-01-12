@@ -985,10 +985,9 @@ const StoreProductsPage: React.FC = () => {
                         if (column.id === 'isActive') {
                           return (
                             <TableCell key={column.id}>
-                              <Switch
-                                checked={product.isActive}
-                                onChange={() => handleToggleActive(product)}
-                                disabled={!canManage}
+                              <Chip
+                                label={product.isActive ? t('storeProducts.statsActive') : t('storeProducts.statsInactive')}
+                                color={product.isActive ? 'success' : 'default'}
                                 size="small"
                               />
                             </TableCell>

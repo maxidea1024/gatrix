@@ -26,6 +26,7 @@ import {
   DialogContentText,
   Skeleton,
   Divider,
+  TableSortLabel,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -40,6 +41,7 @@ import {
   ContentCopy as ContentCopyIcon,
   Info as InfoIcon,
   SportsEsports as SportsEsportsIcon,
+  PushPin as PushPinIcon,
 } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -78,6 +80,33 @@ const ServiceNoticesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
+  // Sorting state
+  const [orderBy, setOrderBy] = useState<string>(() => {
+    const saved = localStorage.getItem('serviceNoticesSort');
+    if (saved) {
+      try {
+        const { orderBy } = JSON.parse(saved);
+        return orderBy || '';
+      } catch {
+        return '';
+      }
+    }
+    return '';
+  });
+
+  const [order, setOrder] = useState<'asc' | 'desc'>(() => {
+    const saved = localStorage.getItem('serviceNoticesSort');
+    if (saved) {
+      try {
+        const { order } = JSON.parse(saved);
+        return order || 'desc';
+      } catch {
+        return 'desc';
+      }
+    }
+    return 'desc';
+  });
 
   // Extract filter values with useMemo for stable references
   const isActiveFilter = useMemo(() => {
@@ -131,6 +160,7 @@ const ServiceNoticesPage: React.FC = () => {
   // Default column configuration - title moved to first position
   const defaultColumns: ColumnConfig[] = [
     { id: 'title', labelKey: 'serviceNotices.noticeTitle', visible: true },
+    { id: 'isPinned', labelKey: 'serviceNotices.isPinned', visible: true },
     { id: 'currentlyVisible', labelKey: 'serviceNotices.currentlyVisible', visible: true },
     { id: 'status', labelKey: 'serviceNotices.status', visible: true },
     { id: 'category', labelKey: 'serviceNotices.category', visible: true },
@@ -242,6 +272,12 @@ const ServiceNoticesPage: React.FC = () => {
         filters.platformOperator = platformOperator;
       }
 
+      // Add sort parameters
+      if (orderBy) {
+        filters.sortBy = orderBy;
+        filters.sortOrder = order;
+      }
+
       const result = await serviceNoticeService.getServiceNotices(page + 1, rowsPerPage, filters);
 
       // Validate response
@@ -266,7 +302,7 @@ const ServiceNoticesPage: React.FC = () => {
 
   useEffect(() => {
     loadNotices();
-  }, [page, rowsPerPage, debouncedSearchTerm, isActiveFilterString, currentlyVisibleFilterString, categoryFilterString, platformFilterString]);
+  }, [page, rowsPerPage, debouncedSearchTerm, isActiveFilterString, currentlyVisibleFilterString, categoryFilterString, platformFilterString, orderBy, order]);
 
   // Filter handlers
   const handleFilterAdd = (filter: ActiveFilter) => {
@@ -277,6 +313,18 @@ const ServiceNoticesPage: React.FC = () => {
   const handleFilterRemove = (filterKey: string) => {
     setActiveFilters(activeFilters.filter(f => f.key !== filterKey));
     setPage(0);
+  };
+
+  // Sort handler
+  const handleRequestSort = (property: string) => {
+    const isAsc = orderBy === property && order === 'asc';
+    const newOrder = isAsc ? 'desc' : 'asc';
+    setOrder(newOrder);
+    setOrderBy(property);
+    setPage(0);
+
+    // Save sort preference
+    localStorage.setItem('serviceNoticesSort', JSON.stringify({ orderBy: property, order: newOrder }));
   };
 
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
@@ -609,9 +657,42 @@ const ServiceNoticesPage: React.FC = () => {
                       />
                     </TableCell>
                   )}
-                  {visibleColumns.map((column) => (
-                    <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
-                  ))}
+                  {visibleColumns.map((column) => {
+                    const isSortable = ['title', 'isPinned', 'status', 'category', 'period', 'createdAt', 'updatedAt'].includes(column.id);
+                    const sortProperty = column.id === 'status' ? 'isActive' : column.id === 'period' ? 'startDate' : column.id;
+
+                    return (
+                      <TableCell
+                        key={column.id}
+                        align={column.id === 'isPinned' ? 'center' : 'left'}
+                        sortDirection={orderBy === sortProperty ? order : false}
+                      >
+                        {isSortable ? (
+                          <TableSortLabel
+                            active={orderBy === sortProperty}
+                            direction={orderBy === sortProperty ? order : 'asc'}
+                            onClick={() => handleRequestSort(sortProperty)}
+                          >
+                            {column.id === 'isPinned' ? (
+                              <Tooltip title={t('serviceNotices.isPinned')}>
+                                <PushPinIcon fontSize="small" sx={{ transform: 'rotate(45deg)', verticalAlign: 'middle' }} />
+                              </Tooltip>
+                            ) : (
+                              t(column.labelKey)
+                            )}
+                          </TableSortLabel>
+                        ) : (
+                          column.id === 'isPinned' ? (
+                            <Tooltip title={t('serviceNotices.isPinned')}>
+                              <PushPinIcon fontSize="small" sx={{ transform: 'rotate(45deg)', verticalAlign: 'middle' }} />
+                            </Tooltip>
+                          ) : (
+                            t(column.labelKey)
+                          )
+                        )}
+                      </TableCell>
+                    );
+                  })}
                   {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                 </TableRow>
               </TableHead>
@@ -660,6 +741,20 @@ const ServiceNoticesPage: React.FC = () => {
                         </TableCell>
                       )}
                       {visibleColumns.map((column) => {
+                        if (column.id === 'isPinned') {
+                          return (
+                            <TableCell key={column.id} align="center">
+                              <PushPinIcon
+                                fontSize="small"
+                                color={notice.isPinned ? 'primary' : 'disabled'}
+                                sx={{
+                                  transform: 'rotate(45deg)',
+                                  opacity: notice.isPinned ? 1 : 0.3,
+                                }}
+                              />
+                            </TableCell>
+                          );
+                        }
                         if (column.id === 'status') {
                           return (
                             <TableCell key={column.id}>
@@ -667,8 +762,6 @@ const ServiceNoticesPage: React.FC = () => {
                                 label={notice.isActive ? t('common.active') : t('common.inactive')}
                                 color={notice.isActive ? 'success' : 'default'}
                                 size="small"
-                                onClick={() => handleToggleActive(notice)}
-                                sx={{ cursor: 'pointer' }}
                               />
                             </TableCell>
                           );
@@ -726,25 +819,27 @@ const ServiceNoticesPage: React.FC = () => {
                         if (column.id === 'title') {
                           return (
                             <TableCell key={column.id}>
-                              <Box>
-                                <Typography
-                                  variant="body2"
-                                  sx={{
-                                    fontWeight: 500,
-                                    cursor: 'pointer',
-                                    '&:hover': {
-                                      textDecoration: 'underline',
-                                    }
-                                  }}
-                                  onClick={() => handleEdit(notice)}
-                                >
-                                  {notice.tabTitle || notice.title}
-                                </Typography>
-                                {notice.tabTitle && (
-                                  <Typography variant="caption" color="text.secondary">
-                                    {notice.title}
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Box>
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      fontWeight: 500,
+                                      cursor: 'pointer',
+                                      '&:hover': {
+                                        textDecoration: 'underline',
+                                      }
+                                    }}
+                                    onClick={() => handleEdit(notice)}
+                                  >
+                                    {notice.tabTitle || notice.title}
                                   </Typography>
-                                )}
+                                  {notice.tabTitle && (
+                                    <Typography variant="caption" color="text.secondary">
+                                      {notice.title}
+                                    </Typography>
+                                  )}
+                                </Box>
                               </Box>
                             </TableCell>
                           );

@@ -3639,6 +3639,8 @@
     "noNotices": "没有找到公告",
     "isActive": "启用状态",
     "isActiveHelp": "设置公告的启用状态",
+    "isPinned": "置顶",
+    "isPinnedHelp": "将此公告置顶显示。",
     "category": "类别",
     "categoryHelp": "选择公告的类型",
     "categories": {

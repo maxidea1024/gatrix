@@ -75,6 +75,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
 
   // Form state
   const [isActive, setIsActive] = useState(true);
+  const [isPinned, setIsPinned] = useState(false);
   const [category, setCategory] = useState<string>('notice');
   const [platforms, setPlatforms] = useState<string[]>([]);
   const [platformsInverted, setPlatformsInverted] = useState(false);
@@ -399,6 +400,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   useEffect(() => {
     if (notice) {
       setIsActive(notice.isActive);
+      setIsPinned(notice.isPinned || false);
       setCategory(notice.category);
       setPlatforms(notice.platforms);
       setPlatformsInverted(false);
@@ -436,6 +438,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     } else {
       // Reset form
       setIsActive(true);
+      setIsPinned(false);
       setCategory('notice');
       setPlatforms([]);
       setPlatformsInverted(false);
@@ -477,6 +480,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
 
     const currentData = {
       isActive,
+      isPinned,
       category,
       platforms: [...platforms].sort(),
       channels: channels.length > 0 ? [...channels].sort() : null,
@@ -491,6 +495,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
 
     const originalData = {
       isActive: notice.isActive,
+      isPinned: notice.isPinned || false,
       category: notice.category,
       platforms: [...(notice.platforms || [])].sort(),
       channels: notice.channels ? [...notice.channels].sort() : null,
@@ -504,7 +509,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     };
 
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
-  }, [notice, isActive, category, platforms, channelSubchannels, startDate, endDate, tabTitle, title, content, description]);
+  }, [notice, isActive, isPinned, category, platforms, channelSubchannels, startDate, endDate, tabTitle, title, content, description]);
 
   const handleSubmit = async () => {
     // Validation
@@ -551,6 +556,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
 
       const data: CreateServiceNoticeData | UpdateServiceNoticeData = {
         isActive,
+        isPinned,
         category: category as any,
         platforms,
         channels: channels.length > 0 ? channels : null,
@@ -748,6 +754,22 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
               </Box>
               <Typography variant="caption" color="text.secondary" sx={{ ml: 1.75 }}>
                 {t('serviceNotices.startDateHelp')} / {t('serviceNotices.endDateHelp')}
+              </Typography>
+            </Box>
+
+            {/* Pinned Status */}
+            <Box>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isPinned}
+                    onChange={(e) => setIsPinned(e.target.checked)}
+                  />
+                }
+                label={t('serviceNotices.isPinned')}
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', ml: 4, mt: 0.5 }}>
+                {t('serviceNotices.isPinnedHelp')}
               </Typography>
             </Box>
 
