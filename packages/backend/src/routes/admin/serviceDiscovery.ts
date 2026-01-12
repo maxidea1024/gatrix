@@ -309,6 +309,94 @@ router.post('/:type/:instanceId/health', async (req: Request, res: Response) => 
 });
 
 /**
+ * Get cache status from a service instance
+ * GET /api/v1/admin/services/:type/:instanceId/cache
+ * Proxies request to the service's /internal/cache endpoint
+ */
+router.get('/:type/:instanceId/cache', async (req: Request, res: Response) => {
+  try {
+    const { type, instanceId } = req.params;
+
+    if (!type || !instanceId) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'type and instanceId are required' },
+      });
+    }
+
+    // Get the service instance to find its web port and address
+    const services = await serviceDiscoveryService.getServices(type);
+    const service = services.find(s => s.instanceId === instanceId);
+
+    if (!service) {
+      return res.status(404).json({
+        success: false,
+        error: { message: 'Service not found' },
+      });
+    }
+
+    // Check if service has an API port
+    const webPort = service.ports?.internalApi || service.ports?.externalApi || service.ports?.web || service.ports?.http || service.ports?.api;
+    if (!webPort) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Service does not have an API port' },
+      });
+    }
+
+    // Determine which address to use
+    const address = service.internalAddress || service.externalAddress;
+    const cacheUrl = `http://${address}:${webPort}/internal/cache`;
+
+    logger.info(`Fetching cache status from: ${type}:${instanceId} at ${cacheUrl}`);
+
+    const axios = (await import('axios')).default;
+    const startTime = Date.now();
+
+    try {
+      const response = await axios.get(cacheUrl, {
+        timeout: 5000,
+      });
+      const latency = Date.now() - startTime;
+
+      res.json({
+        success: true,
+        data: {
+          ...response.data,
+          latency,
+          url: cacheUrl,
+        },
+      });
+    } catch (cacheError: any) {
+      const latency = Date.now() - startTime;
+      const status = cacheError.response?.status || 0;
+      const message = cacheError.code === 'ECONNREFUSED'
+        ? 'Connection refused'
+        : cacheError.code === 'ETIMEDOUT' || cacheError.code === 'ECONNABORTED'
+          ? 'Connection timeout'
+          : cacheError.message || 'Unknown error';
+
+      res.json({
+        success: true,
+        data: {
+          status: 'error',
+          error: message,
+          httpStatus: status,
+          latency,
+          url: cacheUrl,
+        },
+      });
+    }
+  } catch (error) {
+    logger.error('Error fetching cache status:', error);
+    res.status(500).json({
+      success: false,
+      error: { message: 'Failed to fetch cache status' },
+    });
+  }
+});
+
+/**
  * Delete a service instance
  * DELETE /api/v1/admin/services/:type/:instanceId
  */

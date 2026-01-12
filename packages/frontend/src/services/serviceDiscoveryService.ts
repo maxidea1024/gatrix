@@ -48,7 +48,7 @@ class ServiceDiscoveryService {
   async getServices(serviceType?: string): Promise<ServiceInstance[]> {
     const params = serviceType ? { serviceType } : {};
     const response = await api.get('/admin/services', { params });
-    return response.data.data;
+    return response.data;
   }
 
   /**
@@ -56,7 +56,7 @@ class ServiceDiscoveryService {
    */
   async getServiceStats(): Promise<ServiceStats> {
     const response = await api.get('/admin/services/stats');
-    return response.data.data;
+    return response.data;
   }
 
   /**
@@ -64,7 +64,7 @@ class ServiceDiscoveryService {
    */
   async getServiceTypes(): Promise<string[]> {
     const response = await api.get('/admin/services/types');
-    return response.data.data;
+    return response.data;
   }
 
   /**
@@ -79,6 +79,23 @@ class ServiceDiscoveryService {
    */
   async cleanupServices(): Promise<{ deletedCount: number; totalCount: number }> {
     const response = await api.post('/admin/services/cleanup');
+    return response.data;
+  }
+
+  /**
+   * Get cache status from a service instance
+   * Calls the service's /internal/cache endpoint via backend proxy
+   */
+  async getCacheStatus(serviceType: string, instanceId: string): Promise<{
+    status: string;
+    timestamp?: string;
+    lastRefreshedAt?: string | null;
+    summary?: Record<string, Record<string, number>>;
+    detail?: Record<string, any>;
+    latency?: number;
+    error?: string;
+  }> {
+    const response = await api.get(`/admin/services/${serviceType}/${instanceId}/cache`);
     return response.data;
   }
 
