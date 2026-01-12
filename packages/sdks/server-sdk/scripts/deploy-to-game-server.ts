@@ -104,16 +104,59 @@ async function main() {
   console.log('\n🔨 Building SDK...');
   run('yarn build');
 
-  // 4. Pack
-  console.log('\n📦 Packing SDK...');
-  run('yarn pack --filename gatrix-server-sdk-' + version + '.tgz');
+  // 4. Prepare @gatrix/shared for bundling (replace symlink with actual files)
+  console.log('\n📦 Preparing @gatrix/shared for bundling...');
+  const sharedNodeModulesPath = path.join(sdkRoot, 'node_modules', '@gatrix', 'shared');
+  const sharedSourcePath = path.resolve(sdkRoot, '..', '..', 'shared');
 
-  // 5. Find the generated tgz file
+  // Remove symlink and copy actual files
+  if (fs.existsSync(sharedNodeModulesPath)) {
+    fs.rmSync(sharedNodeModulesPath, { recursive: true });
+  }
+  fs.mkdirSync(sharedNodeModulesPath, { recursive: true });
+
+  // Copy shared files
+  execSync(`xcopy /E /I /Y "${sharedSourcePath}\\dist" "${sharedNodeModulesPath}\\dist"`, { encoding: 'utf-8' });
+  fs.copyFileSync(path.join(sharedSourcePath, 'package.json'), path.join(sharedNodeModulesPath, 'package.json'));
+  console.log('   ✓ Copied @gatrix/shared to node_modules');
+
+  // 5. Pack (using npm pack since it properly handles bundledDependencies)
+  console.log('\n📦 Packing SDK...');
   const tgzFileName = `gatrix-server-sdk-${version}.tgz`;
+  run(`npm pack --pack-destination .`);
   if (!fs.existsSync(tgzFileName)) {
     console.error(`❌ Pack file not found: ${tgzFileName}`);
     process.exit(1);
   }
+
+  // 5.5. Modify tgz to remove @gatrix/shared from dependencies (already bundled)
+  console.log('\n🔧 Removing @gatrix/shared from dependencies in tgz...');
+  const tempDir = path.join(sdkRoot, '.temp-deploy');
+  if (fs.existsSync(tempDir)) {
+    fs.rmSync(tempDir, { recursive: true });
+  }
+  fs.mkdirSync(tempDir, { recursive: true });
+
+  // Extract tgz
+  execSync(`tar -xzf ${tgzFileName} -C ${tempDir}`, { encoding: 'utf-8' });
+
+  // Modify package.json inside the extracted package
+  const extractedPkgJsonPath = path.join(tempDir, 'package', 'package.json');
+  const sdkPkgJson = JSON.parse(fs.readFileSync(extractedPkgJsonPath, 'utf-8'));
+  if (sdkPkgJson.dependencies && sdkPkgJson.dependencies['@gatrix/shared']) {
+    delete sdkPkgJson.dependencies['@gatrix/shared'];
+    fs.writeFileSync(extractedPkgJsonPath, JSON.stringify(sdkPkgJson, null, 2) + '\n');
+    console.log('   ✓ Removed @gatrix/shared from dependencies');
+  }
+
+  // Re-pack the tgz
+  fs.unlinkSync(tgzFileName);
+  execSync(`tar -czf ${tgzFileName} -C ${tempDir} package`, { encoding: 'utf-8' });
+  fs.rmSync(tempDir, { recursive: true });
+  console.log('   ✓ Re-packed SDK tgz');
+
+  // Note: @gatrix/shared is now a copied directory instead of symlink.
+  // It will be restored to symlink on next 'yarn install' in this folder.
 
   // 6. Check game server path exists
   if (!fs.existsSync(gameServerPath)) {
@@ -127,8 +170,8 @@ async function main() {
     fs.mkdirSync(gameServerLibPath, { recursive: true });
   }
 
-  // 7. Copy to game server
-  console.log(`\n📋 Copying to game server: ${gameServerLibPath}`);
+  // 7. Copy SDK to game server (includes @gatrix/shared via bundledDependencies)
+  console.log(`\n📋 Copying SDK to game server: ${gameServerLibPath}`);
   const destPath = path.join(gameServerLibPath, tgzFileName);
   fs.copyFileSync(tgzFileName, destPath);
   console.log(`   ✓ Copied: ${tgzFileName}`);
@@ -139,13 +182,20 @@ async function main() {
     console.log('\n📝 Updating game server package.json...');
     const gamePackageJson = JSON.parse(fs.readFileSync(gamePackageJsonPath, 'utf-8'));
 
-    const oldDep = gamePackageJson.dependencies?.['gatrix-server-sdk'];
-    const newDep = `file:./lib/${tgzFileName}`;
-
     if (gamePackageJson.dependencies) {
-      gamePackageJson.dependencies['gatrix-server-sdk'] = newDep;
+      // Update gatrix-server-sdk
+      const oldSdkDep = gamePackageJson.dependencies['gatrix-server-sdk'];
+      const newSdkDep = `file:./lib/${tgzFileName}`;
+      gamePackageJson.dependencies['gatrix-server-sdk'] = newSdkDep;
+      console.log(`   ✓ SDK: ${oldSdkDep || '(new)'} → ${newSdkDep}`);
+
+      // Remove @gatrix/shared if exists (now bundled in SDK)
+      if (gamePackageJson.dependencies['@gatrix/shared']) {
+        delete gamePackageJson.dependencies['@gatrix/shared'];
+        console.log('   ✓ Removed @gatrix/shared (now bundled in SDK)');
+      }
+
       fs.writeFileSync(gamePackageJsonPath, JSON.stringify(gamePackageJson, null, 2) + '\n');
-      console.log(`   ✓ Updated: ${oldDep} → ${newDep}`);
     }
   }
 
@@ -154,9 +204,8 @@ async function main() {
   fs.unlinkSync(tgzFileName);
   console.log(`   ✓ Removed: ${tgzFileName}`);
 
-  // 10. Install in game server
-  console.log('\n📥 Installing in game server...');
-  run('yarn install', { cwd: gameServerPath });
+  // 10. Skip auto-install, let user run manually
+  console.log('\n📋 Deployment complete. Run yarn install manually in game server.');
 
   console.log('\n' + '='.repeat(60));
   console.log(`✅ SDK v${version} deployed to game server successfully!`);

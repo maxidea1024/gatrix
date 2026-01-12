@@ -4600,6 +4600,7 @@
     },
     "grouping": {
       "label": "그룹핑",
+      "add": "+ 그룹 추가",
       "none": "없음",
       "service": "서비스",
       "group": "그룹",

@@ -4584,6 +4584,7 @@
     },
     "grouping": {
       "label": "Grouping",
+      "add": "+ Add Group",
       "none": "None",
       "service": "Service",
       "group": "Group",

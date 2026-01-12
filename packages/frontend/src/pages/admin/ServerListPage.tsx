@@ -130,8 +130,11 @@ interface ClusterLink extends SimulationLinkDatum<ClusterNode> {
   target: ClusterNode | string;
 }
 
-// Grouping option type
-type GroupingOption = 'none' | 'service' | 'group' | 'environment' | 'cloudProvider' | 'cloudRegion' | 'cloudZone';
+// Grouping field type for multi-level grouping
+type GroupingField = 'service' | 'group' | 'environment' | 'cloudProvider' | 'cloudRegion' | 'cloudZone';
+
+// Grouping option type (includes 'none' for single-level compatibility)
+type GroupingOption = 'none' | GroupingField;
 
 // ClusterView component with D3 force simulation
 interface ClusterViewProps {
@@ -1922,11 +1925,58 @@ const ServerListPage: React.FC = () => {
   const [bulkHealthCheckRunning, setBulkHealthCheckRunning] = useState(false);
   const [bulkHealthCheckSelected, setBulkHealthCheckSelected] = useState<Set<string>>(new Set());
 
-  // Grouping state (persisted in localStorage)
-  const [groupingBy, setGroupingBy] = useState<GroupingOption>(() => {
-    return (localStorage.getItem('serverListGroupingBy') as GroupingOption) || 'none';
+  // Multi-level grouping state (persisted in localStorage)
+  const [groupingLevels, setGroupingLevels] = useState<GroupingField[]>(() => {
+    try {
+      const saved = localStorage.getItem('serverListGroupingLevels');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed.filter(item => ['service', 'group', 'environment', 'cloudProvider', 'cloudRegion', 'cloudZone'].includes(item));
+        }
+      }
+    } catch (e) {
+      // Fallback to old single grouping if exists
+      const oldGrouping = localStorage.getItem('serverListGroupingBy');
+      if (oldGrouping && oldGrouping !== 'none') {
+        return [oldGrouping as GroupingField];
+      }
+    }
+    return [];
   });
+
+  // Save grouping levels to localStorage
+  useEffect(() => {
+    localStorage.setItem('serverListGroupingLevels', JSON.stringify(groupingLevels));
+  }, [groupingLevels]);
+
+  // Derived groupingBy for backward compatibility with views
+  const groupingBy: GroupingOption = groupingLevels.length > 0 ? groupingLevels[0] : 'none';
+  const setGroupingBy = (option: GroupingOption) => {
+    if (option === 'none') {
+      setGroupingLevels([]);
+    } else {
+      setGroupingLevels([option]);
+    }
+  };
+
   const [groupingMenuAnchor, setGroupingMenuAnchor] = useState<null | HTMLElement>(null);
+
+  // Grouping label helper
+  const getGroupingLabel = (field: GroupingField): string => {
+    switch (field) {
+      case 'service': return t('serverList.grouping.service');
+      case 'group': return t('serverList.grouping.group');
+      case 'environment': return t('serverList.grouping.environment');
+      case 'cloudProvider': return t('serverList.grouping.cloudProvider');
+      case 'cloudRegion': return t('serverList.grouping.cloudRegion');
+      case 'cloudZone': return t('serverList.grouping.cloudZone');
+      default: return field;
+    }
+  };
+
+  // All available grouping fields
+  const allGroupingFields: GroupingField[] = ['service', 'group', 'environment', 'cloudProvider', 'cloudRegion', 'cloudZone'];
 
 
 
@@ -2216,7 +2266,6 @@ const ServerListPage: React.FC = () => {
   // Grouping change handler
   const handleGroupingChange = (option: GroupingOption) => {
     setGroupingBy(option);
-    localStorage.setItem('serverListGroupingBy', option);
     setGroupingMenuAnchor(null);
   };
 
@@ -3270,94 +3319,99 @@ const ServerListPage: React.FC = () => {
                   : 'rgba(0, 0, 0, 0.2)',
               }}
             />
+            {/* Multi-level Grouping UI - Show in all views */}
+            <>
+              <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5, whiteSpace: 'nowrap' }}>
+                {t('serverList.grouping.label')}
+              </Typography>
 
-            {/* Grouping Button - Show in cluster and checkerboard views */}
-            {(viewMode === 'cluster' || viewMode === 'checkerboard') && (
-              <>
-                <Tooltip title={t('serverList.grouping.label')}>
-                  <Button
-                    size="small"
-                    variant={groupingBy !== 'none' ? 'contained' : 'outlined'}
-                    onClick={(e) => setGroupingMenuAnchor(e.currentTarget)}
-                    sx={{
-                      minWidth: 'auto',
-                      px: 1.5,
-                      textTransform: 'none',
-                      ...(groupingBy === 'none' && {
-                        bgcolor: 'background.paper',
-                        borderColor: 'divider',
-                        color: 'text.primary',
-                        '&:hover': {
-                          bgcolor: 'action.hover',
-                        },
-                      }),
-                    }}
-                  >
-                    {groupingBy === 'none'
-                      ? t('serverList.grouping.label')
-                      : t(`serverList.grouping.${groupingBy}`)}
-                  </Button>
-                </Tooltip>
-                <Menu
-                  anchorEl={groupingMenuAnchor}
-                  open={Boolean(groupingMenuAnchor)}
-                  onClose={() => setGroupingMenuAnchor(null)}
-                >
-                  <MenuItem
-                    selected={groupingBy === 'none'}
-                    onClick={() => handleGroupingChange('none')}
-                  >
-                    {t('serverList.grouping.none')}
-                  </MenuItem>
-                  <MenuItem
-                    selected={groupingBy === 'service'}
-                    onClick={() => handleGroupingChange('service')}
-                  >
-                    {t('serverList.grouping.service')}
-                  </MenuItem>
-                  <MenuItem
-                    selected={groupingBy === 'group'}
-                    onClick={() => handleGroupingChange('group')}
-                  >
-                    {t('serverList.grouping.group')}
-                  </MenuItem>
-                  <MenuItem
-                    selected={groupingBy === 'environment'}
-                    onClick={() => handleGroupingChange('environment')}
-                  >
-                    {t('serverList.grouping.environment')}
-                  </MenuItem>
-                  <MenuItem
-                    selected={groupingBy === 'cloudProvider'}
-                    onClick={() => handleGroupingChange('cloudProvider')}
-                  >
-                    {t('serverList.grouping.cloudProvider')}
-                  </MenuItem>
-                  <MenuItem
-                    selected={groupingBy === 'cloudRegion'}
-                    onClick={() => handleGroupingChange('cloudRegion')}
-                  >
-                    {t('serverList.grouping.cloudRegion')}
-                  </MenuItem>
-                  <MenuItem
-                    selected={groupingBy === 'cloudZone'}
-                    onClick={() => handleGroupingChange('cloudZone')}
-                  >
-                    {t('serverList.grouping.cloudZone')}
-                  </MenuItem>
-                </Menu>
-                {/* Divider */}
-                <Box
+              {groupingLevels.map((level, index) => (
+                <Chip
+                  key={index}
+                  label={getGroupingLabel(level)}
+                  onDelete={() => {
+                    const newLevels = [...groupingLevels];
+                    newLevels.splice(index, 1);
+                    setGroupingLevels(newLevels);
+                  }}
+                  size="small"
                   sx={{
-                    width: '1px',
-                    height: '24px',
-                    bgcolor: (theme) => theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.2)'
-                      : 'rgba(0, 0, 0, 0.2)',
+                    height: 24,
+                    fontWeight: 600,
+                    '& .MuiChip-deleteIcon': { fontSize: '1rem' },
                   }}
                 />
-              </>
-            )}
+              ))}
+
+              {groupingLevels.length < allGroupingFields.length && (
+                <>
+                  <Tooltip title={t('serverList.grouping.add')}>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={(e) => setGroupingMenuAnchor(e.currentTarget)}
+                      sx={{
+                        minWidth: 'auto',
+                        px: 1,
+                        py: 0.25,
+                        height: 24,
+                        fontSize: '0.7rem',
+                        textTransform: 'none',
+                        borderStyle: 'dashed',
+                        borderColor: 'divider',
+                        color: 'text.secondary',
+                        '&:hover': {
+                          bgcolor: 'action.hover',
+                          borderStyle: 'solid',
+                        },
+                      }}
+                    >
+                      +
+                    </Button>
+                  </Tooltip>
+                  <Menu
+                    anchorEl={groupingMenuAnchor}
+                    open={Boolean(groupingMenuAnchor)}
+                    onClose={() => setGroupingMenuAnchor(null)}
+                  >
+                    {allGroupingFields
+                      .filter(field => !groupingLevels.includes(field))
+                      .map(field => (
+                        <MenuItem
+                          key={field}
+                          onClick={() => {
+                            setGroupingLevels([...groupingLevels, field]);
+                            setGroupingMenuAnchor(null);
+                          }}
+                        >
+                          {getGroupingLabel(field)}
+                        </MenuItem>
+                      ))}
+                  </Menu>
+                </>
+              )}
+
+              {groupingLevels.length > 0 && (
+                <Button
+                  size="small"
+                  onClick={() => setGroupingLevels([])}
+                  sx={{ minWidth: 'auto', px: 0.75, height: 24, fontSize: '0.65rem', color: 'text.secondary' }}
+                >
+                  {t('common.clear')}
+                </Button>
+              )}
+
+              {/* Divider */}
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '24px',
+                  bgcolor: (theme) => theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.2)'
+                    : 'rgba(0, 0, 0, 0.2)',
+                }}
+              />
+            </>
 
             {/* Pause/Resume Button */}
             <Tooltip title={isPaused ? t('serverList.resumeUpdates') : t('serverList.pauseUpdates')}>

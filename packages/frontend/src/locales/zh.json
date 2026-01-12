@@ -4607,6 +4607,7 @@
     },
     "grouping": {
       "label": "分组",
+      "add": "+ 添加分组",
       "none": "无",
       "service": "服务",
       "group": "组",
