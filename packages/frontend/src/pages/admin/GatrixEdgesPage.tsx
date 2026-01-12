@@ -47,8 +47,8 @@ import serviceDiscoveryService, { ServiceInstance } from '../../services/service
 import { RelativeTime } from '../../components/common/RelativeTime';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 
-// Grouping options
-type GroupingField = 'group' | 'environment' | 'service' | 'cloudProvider' | 'cloudRegion';
+// Grouping options - Cloud-related only
+type GroupingField = 'cloudProvider' | 'cloudRegion';
 
 interface EdgeGroup {
     id: string;
@@ -82,8 +82,23 @@ const GatrixEdgesPage: React.FC = () => {
     const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
     const [expandedInstances, setExpandedInstances] = useState<Set<string>>(new Set());
 
-    // Grouping - support multiple levels
-    const [groupingLevels, setGroupingLevels] = useState<GroupingField[]>(['group']);
+    // Grouping - support multiple levels (cloud-related only)
+    // Load from localStorage or default to empty array
+    const [groupingLevels, setGroupingLevels] = useState<GroupingField[]>(() => {
+        try {
+            const saved = localStorage.getItem('gatrixEdges.groupingLevels');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // Validate that parsed values are valid GroupingField types
+                if (Array.isArray(parsed) && parsed.every(item => ['cloudProvider', 'cloudRegion'].includes(item))) {
+                    return parsed;
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to load grouping levels from localStorage:', e);
+        }
+        return [];
+    });
 
     // Cache status per instance
     const [cacheStatuses, setCacheStatuses] = useState<Map<string, CacheStatus>>(new Map());
@@ -97,9 +112,6 @@ const GatrixEdgesPage: React.FC = () => {
     // Localized grouping options
     const getGroupingLabel = (field: GroupingField) => {
         const labels: Record<GroupingField, string> = {
-            group: t('gatrixEdges.group'),
-            environment: t('gatrixEdges.environment'),
-            service: t('gatrixEdges.service'),
             cloudProvider: t('gatrixEdges.cloudProvider'),
             cloudRegion: t('gatrixEdges.cloudRegion'),
         };
@@ -258,6 +270,15 @@ const GatrixEdgesPage: React.FC = () => {
         fetchServices();
     }, []);
 
+    // Save grouping levels to localStorage whenever they change
+    useEffect(() => {
+        try {
+            localStorage.setItem('gatrixEdges.groupingLevels', JSON.stringify(groupingLevels));
+        } catch (e) {
+            console.warn('Failed to save grouping levels to localStorage:', e);
+        }
+    }, [groupingLevels]);
+
     useEffect(() => {
         if (services.length > 0) {
             groupServicesMultiLevel(services, groupingLevels);
@@ -299,7 +320,7 @@ const GatrixEdgesPage: React.FC = () => {
 
     const addGroupingLevel = () => {
         const usedLevels = new Set(groupingLevels);
-        const available = (['group', 'environment', 'service', 'cloudProvider', 'cloudRegion'] as GroupingField[]).find(o => !usedLevels.has(o));
+        const available = (['cloudProvider', 'cloudRegion'] as GroupingField[]).find(o => !usedLevels.has(o));
         if (available) {
             setGroupingLevels([...groupingLevels, available]);
         }
@@ -616,8 +637,8 @@ const GatrixEdgesPage: React.FC = () => {
                         <Typography variant="body2" fontWeight="bold">
                             {instance.hostname}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary" title={instance.instanceId}>
-                            ID: {instance.instanceId.substring(0, 8)}...
+                        <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                            ID: {instance.instanceId}
                         </Typography>
                     </Box>
                 </Box>
@@ -746,62 +767,121 @@ const GatrixEdgesPage: React.FC = () => {
     return (
         <Box sx={{ p: 3 }}>
             {/* Header */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
-                <Box>
-                    <Typography variant="h4" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 'bold' }}>
-                        <HubIcon />
-                        {t('gatrixEdges.title')}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {t('gatrixEdges.subtitle')}
-                    </Typography>
+            <Box sx={{ mb: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                    <Box>
+                        <Typography variant="h4" sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 'bold', mb: 0.5 }}>
+                            <HubIcon />
+                            {t('gatrixEdges.title')}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            {t('gatrixEdges.subtitle')}
+                        </Typography>
+                    </Box>
+                    <Button
+                        startIcon={isRefreshing ? <CircularProgress size={20} color="inherit" /> : <RefreshIcon />}
+                        variant="contained"
+                        onClick={() => fetchServices(true)}
+                        disabled={initialLoading || isRefreshing}
+                    >
+                        {t('common.refresh')}
+                    </Button>
                 </Box>
-                <Button
-                    startIcon={isRefreshing ? <CircularProgress size={20} color="inherit" /> : <RefreshIcon />}
-                    variant="contained"
-                    onClick={() => fetchServices(true)}
-                    disabled={initialLoading || isRefreshing}
-                >
-                    {t('common.refresh')}
-                </Button>
-            </Box>
 
-            {/* Grouping Controls */}
-            <Card sx={{ mb: 3 }}>
-                <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 'bold' }}>
+                {/* Compact Grouping Controls - Integrated */}
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    py: 1.5,
+                    px: 2,
+                    bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+                    borderRadius: 2,
+                    border: `1px solid ${theme.palette.divider}`
+                }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5, mr: 0.5 }}>
                         {t('gatrixEdges.groupBy')}
                     </Typography>
-                    <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
-                        {groupingLevels.map((level, index) => (
-                            <FormControl key={index} size="small" sx={{ minWidth: 140 }}>
-                                <InputLabel>{t('gatrixEdges.groupingLevel')} {index + 1}</InputLabel>
-                                <Select
-                                    value={level}
-                                    label={`${t('gatrixEdges.groupingLevel')} ${index + 1}`}
-                                    onChange={(e: SelectChangeEvent) => handleGroupingChange(index, e.target.value as GroupingField | '')}
-                                >
-                                    <MenuItem value="">
-                                        <em>{t('gatrixEdges.removeLevel')}</em>
-                                    </MenuItem>
-                                    {(['group', 'environment', 'service', 'cloudProvider', 'cloudRegion'] as GroupingField[])
-                                        .filter(o => !groupingLevels.includes(o) || o === level)
-                                        .map(option => (
-                                            <MenuItem key={option} value={option}>
-                                                {getGroupingLabel(option)}
-                                            </MenuItem>
-                                        ))}
-                                </Select>
-                            </FormControl>
-                        ))}
-                        {groupingLevels.length < 5 && (
-                            <Button variant="outlined" size="small" onClick={addGroupingLevel}>
-                                {t('gatrixEdges.addGroupBy')}
-                            </Button>
-                        )}
-                    </Stack>
-                </CardContent>
-            </Card>
+
+                    {groupingLevels.map((level, index) => (
+                        <Chip
+                            key={index}
+                            label={getGroupingLabel(level)}
+                            onDelete={() => {
+                                const newLevels = [...groupingLevels];
+                                newLevels.splice(index, 1);
+                                setGroupingLevels(newLevels);
+                            }}
+                            size="small"
+                            sx={{
+                                height: 24,
+                                fontSize: '0.75rem',
+                                fontWeight: 600,
+                                bgcolor: theme.palette.primary.main,
+                                color: '#fff',
+                                '&:hover': {
+                                    bgcolor: theme.palette.primary.dark,
+                                },
+                                '& .MuiChip-deleteIcon': {
+                                    color: 'rgba(255,255,255,0.7)',
+                                    fontSize: '16px',
+                                    '&:hover': {
+                                        color: '#fff'
+                                    }
+                                }
+                            }}
+                        />
+                    ))}
+
+                    {groupingLevels.length < 2 && (
+                        <FormControl size="small" sx={{ minWidth: 140 }}>
+                            <Select
+                                value=""
+                                displayEmpty
+                                onChange={(e: SelectChangeEvent) => {
+                                    const value = e.target.value as GroupingField;
+                                    if (value) {
+                                        setGroupingLevels([...groupingLevels, value]);
+                                    }
+                                }}
+                                renderValue={() => (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                                            {t('gatrixEdges.addGroupBy')}
+                                        </Typography>
+                                    </Box>
+                                )}
+                                sx={{
+                                    height: 24,
+                                    fontSize: '0.75rem',
+                                    '& .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: 'transparent',
+                                    },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: 'primary.light',
+                                    },
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: 'primary.main',
+                                        borderWidth: 1
+                                    },
+                                    '& .MuiSelect-select': {
+                                        py: 0.5,
+                                        px: 1
+                                    }
+                                }}
+                            >
+                                {(['cloudProvider', 'cloudRegion'] as GroupingField[])
+                                    .filter(option => !groupingLevels.includes(option))
+                                    .map(option => (
+                                        <MenuItem key={option} value={option}>
+                                            {getGroupingLabel(option)}
+                                        </MenuItem>
+                                    ))}
+                            </Select>
+                        </FormControl>
+                    )}
+                </Box>
+            </Box>
 
             {error && (
                 <Alert severity="error" sx={{ mb: 3 }}>

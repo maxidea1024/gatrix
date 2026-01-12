@@ -5,7 +5,7 @@
   "sidebar.gatrixEdges": "Gatrix Edges",
   "gatrixEdges.title": "Gatrix Edges",
   "gatrixEdges.subtitle": "Monitor the status and cache information of distributed Edge nodes in real-time.",
-  "gatrixEdges.groupBy": "Group By",
+  "gatrixEdges.groupBy": "Grouping",
   "gatrixEdges.groupingLevel": "Level",
   "gatrixEdges.addGroupBy": "+ Add Group By",
   "gatrixEdges.removeLevel": "Remove",

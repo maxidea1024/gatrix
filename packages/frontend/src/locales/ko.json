@@ -5,7 +5,7 @@
   "sidebar.gatrixEdges": "Gatrix Edges",
   "gatrixEdges.title": "Gatrix Edges",
   "gatrixEdges.subtitle": "분산된 Edge 노드들의 상태와 캐시 정보를 실시간으로 확인할 수 있습니다.",
-  "gatrixEdges.groupBy": "그룹핑 기준",
+  "gatrixEdges.groupBy": "그룹핑",
   "gatrixEdges.groupingLevel": "레벨",
   "gatrixEdges.addGroupBy": "+ 그룹 추가",
   "gatrixEdges.removeLevel": "제거",

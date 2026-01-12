@@ -5,7 +5,7 @@
   "sidebar.gatrixEdges": "Gatrix Edges",
   "gatrixEdges.title": "Gatrix Edges",
   "gatrixEdges.subtitle": "实时监控分布式 Edge 节点的状态和缓存信息。",
-  "gatrixEdges.groupBy": "分组方式",
+  "gatrixEdges.groupBy": "分组",
   "gatrixEdges.groupingLevel": "级别",
   "gatrixEdges.addGroupBy": "+ 添加分组",
   "gatrixEdges.removeLevel": "移除",
