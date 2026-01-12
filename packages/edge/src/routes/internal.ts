@@ -8,6 +8,7 @@ const router = Router();
  */
 function buildCacheResponse(sdk: any): any {
   const allCached = sdk.getAllCachedData();
+  const INTERNAL_ENV = 'gatrix-env';
 
   // Build summary with counts per environment
   const summary: Record<string, any> = {};
@@ -16,6 +17,7 @@ function buildCacheResponse(sdk: any): any {
   if (allCached.clientVersions) {
     summary.clientVersions = {};
     for (const [env, versions] of Object.entries(allCached.clientVersions)) {
+      if (env === INTERNAL_ENV) continue;
       summary.clientVersions[env] = (versions as any[]).length;
     }
   }
@@ -24,6 +26,7 @@ function buildCacheResponse(sdk: any): any {
   if (allCached.serviceNotices) {
     summary.serviceNotices = {};
     for (const [env, notices] of Object.entries(allCached.serviceNotices)) {
+      if (env === INTERNAL_ENV) continue;
       summary.serviceNotices[env] = (notices as any[]).length;
     }
   }
@@ -32,6 +35,7 @@ function buildCacheResponse(sdk: any): any {
   if (allCached.banners) {
     summary.banners = {};
     for (const [env, banners] of Object.entries(allCached.banners)) {
+      if (env === INTERNAL_ENV) continue;
       summary.banners[env] = (banners as any[]).length;
     }
   }
@@ -40,6 +44,7 @@ function buildCacheResponse(sdk: any): any {
   if (allCached.storeProducts) {
     summary.storeProducts = {};
     for (const [env, products] of Object.entries(allCached.storeProducts)) {
+      if (env === INTERNAL_ENV) continue;
       summary.storeProducts[env] = (products as any[]).length;
     }
   }
@@ -48,6 +53,7 @@ function buildCacheResponse(sdk: any): any {
   if (allCached.gameWorlds) {
     summary.gameWorlds = {};
     for (const [env, worlds] of Object.entries(allCached.gameWorlds)) {
+      if (env === INTERNAL_ENV) continue;
       summary.gameWorlds[env] = (worlds as any[]).length;
     }
   }
@@ -56,6 +62,7 @@ function buildCacheResponse(sdk: any): any {
   if (allCached.popupNotices) {
     summary.popupNotices = {};
     for (const [env, notices] of Object.entries(allCached.popupNotices)) {
+      if (env === INTERNAL_ENV) continue;
       summary.popupNotices[env] = (notices as any[]).length;
     }
   }
@@ -64,7 +71,24 @@ function buildCacheResponse(sdk: any): any {
   if (allCached.surveys) {
     summary.surveys = {};
     for (const [env, surveyList] of Object.entries(allCached.surveys)) {
+      if (env === INTERNAL_ENV) continue;
       summary.surveys[env] = (surveyList as any[]).length;
+    }
+  }
+
+  // Filter raw detail data to remove internal env
+  const filteredDetail: Record<string, any> = { ...allCached };
+  const envKeyedProps = ['clientVersions', 'serviceNotices', 'banners', 'storeProducts', 'gameWorlds', 'popupNotices', 'surveys'];
+
+  for (const prop of envKeyedProps) {
+    if (filteredDetail[prop]) {
+      const filtered: Record<string, any> = {};
+      for (const [env, data] of Object.entries(filteredDetail[prop])) {
+        if (env !== INTERNAL_ENV) {
+          filtered[env] = data;
+        }
+      }
+      filteredDetail[prop] = filtered;
     }
   }
 
@@ -75,8 +99,9 @@ function buildCacheResponse(sdk: any): any {
     status: isInitialized ? 'ready' : 'initializing',
     timestamp: new Date().toISOString(),
     lastRefreshedAt: allCached.lastRefreshedAt || null,
+    invalidationCount: allCached.invalidationCount || 0,
     summary,
-    detail: allCached,
+    detail: filteredDetail,
   };
 }
 

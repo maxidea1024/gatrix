@@ -165,6 +165,8 @@ Quill.register(VideoBlot, true); // true to suppress overwrite warning
 const Inline = Quill.import('blots/inline') as any;
 
 const TEXT_EFFECT_STYLES: { [key: string]: string } = {
+  // No effect - reset all text styling
+  'none': 'text-shadow: none; -webkit-text-stroke: 0; -webkit-text-fill-color: inherit; background: none; animation: none; display: inline',
   // Shadow effects
   'shadow': 'text-shadow: 2px 2px 4px rgba(0,0,0,0.5)',
   'shadow-light': 'text-shadow: 1px 1px 2px rgba(0,0,0,0.3)',
@@ -210,6 +212,9 @@ const TEXT_EFFECT_STYLES: { [key: string]: string } = {
   'anim-swing': 'animation: ql-swing 1s ease-in-out infinite; display: inline-block; transform-origin: top center',
   'anim-heartbeat': 'animation: ql-heartbeat 1.2s ease-in-out infinite; display: inline-block',
 };
+
+// Get Parchment for creating replacement blots
+const Parchment = Quill.import('parchment') as any;
 
 class TextEffectBlot extends Inline {
   static blotName = 'textEffect';
@@ -2018,7 +2023,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       const editor = quillRef.current.getEditor();
                       const selection = savedSelectionRef.current;
                       if (selection && selection.length > 0) {
-                        // Apply effect using Quill's formatText with custom textEffect format
+                        // Apply effect (including 'none' which resets styling)
                         editor.formatText(selection.index, selection.length, 'textEffect', e.target.value);
                       }
                     }
@@ -2039,7 +2044,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   title={t('richTextEditor.effect', 'Effect')}
                   renderValue={() => t('richTextEditor.effect', 'Effect')}
                 >
-                  <MenuItem value="" disabled><em>{t('richTextEditor.effectNone', 'None')}</em></MenuItem>
+                  <MenuItem value="none"><em>{t('richTextEditor.effectNone', 'None')}</em></MenuItem>
                   {/* Shadow Effects */}
                   <MenuItem value="shadow" sx={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>{t('richTextEditor.effectShadow', 'Shadow')}</MenuItem>
                   <MenuItem value="shadow-light" sx={{ textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}>{t('richTextEditor.effectShadowLight', 'Light Shadow')}</MenuItem>

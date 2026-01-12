@@ -98,6 +98,7 @@ export type ServiceNoticeCategory = 'maintenance' | 'event' | 'notice' | 'promot
 export interface ServiceNotice {
   id: number;
   isActive: boolean;
+  isPinned: boolean;
   category: ServiceNoticeCategory;
   platforms: string[];
   channels?: string[];

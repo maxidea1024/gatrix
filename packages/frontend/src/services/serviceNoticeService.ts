@@ -4,6 +4,7 @@ import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils
 export interface ServiceNotice {
   id: number;
   isActive: boolean;
+  isPinned: boolean;
   category: 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
   platforms: string[];
   channels?: string[];
@@ -20,6 +21,7 @@ export interface ServiceNotice {
 
 export interface CreateServiceNoticeData {
   isActive: boolean;
+  isPinned?: boolean;
   category: 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
   platforms: string[];
   channels?: string[] | null;
@@ -41,6 +43,8 @@ export interface ServiceNoticeFilters {
   platform?: string | string[];
   platformOperator?: 'any_of' | 'include_all';
   search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface ServiceNoticesResponse {
@@ -81,6 +85,12 @@ class ServiceNoticeService {
     }
     if (filters.search) {
       params.search = filters.search;
+    }
+    if (filters.sortBy) {
+      params.sortBy = filters.sortBy;
+    }
+    if (filters.sortOrder) {
+      params.sortOrder = filters.sortOrder;
     }
 
     const response = await api.get('/admin/service-notices', { params });

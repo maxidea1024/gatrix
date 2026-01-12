@@ -174,20 +174,45 @@ export class ServiceNoticeService {
    * @param environment Environment name (required)
    */
   updateSingleServiceNotice(notice: ServiceNotice, environment: string): void {
+    const shouldBeCached = notice.isActive && this.isWithinTimeWindow(notice, new Date());
+
+    if (!shouldBeCached) {
+      this.removeFromCache(notice.id, environment);
+      return;
+    }
+
     const currentItems = this.cachedNoticesByEnv.get(environment) || [];
     const itemId = notice.id;
 
     const existsInCache = currentItems.some(i => i.id === itemId);
 
+    let newItems: ServiceNotice[];
+
     if (existsInCache) {
-      const newItems = currentItems.map(i => i.id === itemId ? notice : i);
-      this.cachedNoticesByEnv.set(environment, newItems);
+      newItems = currentItems.map(i => i.id === itemId ? notice : i);
       this.logger.debug('Single service notice updated in cache', { id: itemId, environment });
     } else {
-      const newItems = [...currentItems, notice];
-      this.cachedNoticesByEnv.set(environment, newItems);
+      newItems = [...currentItems, notice];
       this.logger.debug('Single service notice added to cache', { id: itemId, environment });
     }
+
+    this.cachedNoticesByEnv.set(environment, this.sortNotices(newItems));
+  }
+
+  /**
+   * Sort notices by isPinned (desc) and updatedAt (desc)
+   */
+  private sortNotices(notices: ServiceNotice[]): ServiceNotice[] {
+    return notices.sort((a, b) => {
+      // Sort by isPinned (true first)
+      if (a.isPinned !== b.isPinned) {
+        return a.isPinned ? -1 : 1;
+      }
+      // Then by updatedAt (newest first)
+      const dateA = new Date(a.updatedAt).getTime();
+      const dateB = new Date(b.updatedAt).getTime();
+      return dateB - dateA;
+    });
   }
 
   /**

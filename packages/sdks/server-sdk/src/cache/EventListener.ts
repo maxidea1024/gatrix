@@ -215,6 +215,8 @@ export class EventListener {
     if (this.isStandardEvent(event.type)) {
       try {
         await this.handleStandardEvent(event);
+        // Update last refreshed timestamp since we successfully processed an event
+        this.cacheManager.updateLastRefreshedAt();
       } catch (error: any) {
         this.logger.error('Failed to handle standard event', {
           type: event.type,
@@ -543,7 +545,9 @@ export class EventListener {
         if (serviceNoticeData) {
           this.logger.info('Service notice event received, updating cache directly', {
             id: event.data.id,
-            environment: noticeEnvironment
+            environment: noticeEnvironment,
+            isActive: serviceNoticeData.isActive,
+            updatedAt: serviceNoticeData.updatedAt
           });
           this.cacheManager.getServiceNoticeService()?.updateSingleServiceNotice(serviceNoticeData, noticeEnvironment);
         } else {

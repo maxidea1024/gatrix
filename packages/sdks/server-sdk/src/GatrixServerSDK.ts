@@ -168,6 +168,7 @@ export class GatrixServerSDK {
     };
 
     // Auto-configure Loki from environment variables if enabled
+    /*
     const lokiEnabled = process.env.GATRIX_LOKI_ENABLED === 'true';
     const lokiUrl = process.env.GATRIX_LOKI_URL;
 
@@ -181,6 +182,7 @@ export class GatrixServerSDK {
         }
       };
     }
+    */
 
     // Validate config
     this.validateConfig(configWithDefaults);

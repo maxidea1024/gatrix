@@ -99,6 +99,7 @@ import OpenApiPage from './pages/admin/OpenApiPage';
 import GrafanaDashboardPage from './pages/admin/GrafanaDashboardPage';
 import EventLensProjectsPage from './pages/admin/EventLensProjectsPage';
 import DataManagementPage from './pages/admin/DataManagementPage';
+import GatrixEdgesPage from './pages/admin/GatrixEdgesPage';
 import EnvironmentsPage from './pages/settings/EnvironmentsPage';
 import KeyValuePage from './pages/settings/KeyValuePage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
@@ -441,6 +442,7 @@ const AppContent: React.FC = () => {
                                 <Route path="open-api" element={<OpenApiPage />} />
                                 <Route path="event-lens/projects" element={<EventLensProjectsPage />} />
                                 <Route path="data-management" element={<DataManagementPage />} />
+                                <Route path="gatrix-edges" element={<GatrixEdgesPage />} />
                               </Routes>
                             </EnvironmentAwareLayout>
                           </ProtectedRoute>

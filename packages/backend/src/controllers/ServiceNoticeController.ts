@@ -60,6 +60,8 @@ class ServiceNoticeController {
         subchannel,
         subchannelOperator: req.query.subchannelOperator as 'any_of' | 'include_all' | undefined,
         search: req.query.search as string,
+        sortBy: req.query.sortBy as string,
+        sortOrder: req.query.sortOrder as 'asc' | 'desc' | undefined,
         environment,
       };
 

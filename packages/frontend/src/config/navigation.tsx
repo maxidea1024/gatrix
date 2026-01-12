@@ -103,6 +103,7 @@ export const adminPanelMenuItems: MenuItem[] = [
     text: 'sidebar.serverManagement', icon: <DnsIcon />, adminOnly: true, requiredPermission: [PERMISSIONS.SERVERS_VIEW, PERMISSIONS.SERVERS_MANAGE], children: [
       { text: 'sidebar.serverList', icon: <ServerIcon />, path: '/admin/server-list', adminOnly: true, requiredPermission: [PERMISSIONS.SERVERS_VIEW, PERMISSIONS.SERVERS_MANAGE] },
       { text: 'sidebar.serverLifecycle', icon: <HistoryIcon />, path: '/admin/server-lifecycle', adminOnly: true, requiredPermission: PERMISSIONS.SERVERS_VIEW },
+      { text: 'sidebar.gatrixEdges', icon: <DnsIcon />, path: '/admin/gatrix-edges', adminOnly: true, requiredPermission: PERMISSIONS.SERVERS_VIEW },
     ]
   },
   {

@@ -10,6 +10,7 @@ export interface ServiceNotice {
   id: number;
   environment: string;
   isActive: boolean;
+  isPinned: boolean;
   category: 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
   platforms: string[];
   channels?: string[];
@@ -26,6 +27,7 @@ export interface ServiceNotice {
 
 export interface CreateServiceNoticeData {
   isActive: boolean;
+  isPinned?: boolean;
   category: 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
   platforms: string[];
   channels?: string[] | null;
@@ -42,6 +44,7 @@ export interface UpdateServiceNoticeData extends Partial<CreateServiceNoticeData
 
 export interface ServiceNoticeFilters {
   isActive?: boolean;
+  isPinned?: boolean;
   currentlyVisible?: boolean;
   category?: string;
   platform?: string | string[];
@@ -51,6 +54,8 @@ export interface ServiceNoticeFilters {
   subchannel?: string | string[];
   subchannelOperator?: 'any_of' | 'include_all';
   search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
   environment: string;
 }
 
@@ -77,6 +82,11 @@ class ServiceNoticeService {
     if (filters.isActive !== undefined) {
       whereClauses.push('isActive = ?');
       queryParams.push(filters.isActive);
+    }
+
+    if (filters.isPinned !== undefined) {
+      whereClauses.push('isPinned = ?');
+      queryParams.push(filters.isPinned);
     }
 
     if (filters.currentlyVisible !== undefined) {
@@ -169,9 +179,20 @@ class ServiceNoticeService {
     );
     const total = countResult[0].total;
 
+    // Build ORDER BY clause
+    let orderByClause = 'ORDER BY isPinned DESC, updatedAt DESC';
+    if (filters.sortBy) {
+      // Validate sort column to prevent SQL injection
+      const allowedSortColumns = ['title', 'category', 'isActive', 'isPinned', 'createdAt', 'updatedAt', 'startDate', 'endDate'];
+      if (allowedSortColumns.includes(filters.sortBy)) {
+        const sortOrder = filters.sortOrder === 'asc' ? 'ASC' : 'DESC';
+        orderByClause = `ORDER BY ${filters.sortBy} ${sortOrder}, id DESC`; // Add id for consistent tie-breaking
+      }
+    }
+
     // Get paginated results
     const [rows] = await pool.execute<RowDataPacket[]>(
-      `SELECT * FROM g_service_notices ${whereClause} ORDER BY updatedAt DESC LIMIT ${limit} OFFSET ${offset}`,
+      `SELECT * FROM g_service_notices ${whereClause} ${orderByClause} LIMIT ${limit} OFFSET ${offset}`,
       queryParams
     );
 
@@ -180,6 +201,7 @@ class ServiceNoticeService {
         id: row.id,
         environment: row.environment,
         isActive: Boolean(row.isActive),
+        isPinned: Boolean(row.isPinned),
         category: row.category,
         platforms: typeof row.platforms === 'string' ? JSON.parse(row.platforms) : row.platforms,
         channels: typeof row.channels === 'string' ? JSON.parse(row.channels) : row.channels,
@@ -219,6 +241,7 @@ class ServiceNoticeService {
       id: row.id,
       environment: row.environment,
       isActive: Boolean(row.isActive),
+      isPinned: Boolean(row.isPinned),
       category: row.category,
       platforms: typeof row.platforms === 'string' ? JSON.parse(row.platforms) : row.platforms,
       startDate: row.startDate,
@@ -249,11 +272,12 @@ class ServiceNoticeService {
 
     const [result] = await pool.execute<ResultSetHeader>(
       `INSERT INTO g_service_notices
-      (environment, isActive, category, platforms, channels, subchannels, startDate, endDate, tabTitle, title, content, description)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (environment, isActive, isPinned, category, platforms, channels, subchannels, startDate, endDate, tabTitle, title, content, description)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         environment,
         data.isActive,
+        data.isPinned || false,
         data.category,
         JSON.stringify(data.platforms),
         data.channels ? JSON.stringify(data.channels) : null,
@@ -304,6 +328,11 @@ class ServiceNoticeService {
     if (data.isActive !== undefined) {
       updates.push('isActive = ?');
       values.push(data.isActive);
+    }
+
+    if (data.isPinned !== undefined) {
+      updates.push('isPinned = ?');
+      values.push(data.isPinned);
     }
 
     if (data.category) {
@@ -369,6 +398,14 @@ class ServiceNoticeService {
       throw new Error('Service notice not found');
     }
 
+    logger.info('Updated service notice retrieved from DB', {
+      id: notice.id,
+      isActive: notice.isActive,
+      inputIsActive: data.isActive,
+      updates: updates,
+      environment
+    });
+
     // Invalidate ETag cache and publish SDK Event with full data for cache update
     try {
       // Invalidate ETag cache so SDK fetches fresh data
@@ -383,6 +420,8 @@ class ServiceNoticeService {
           serviceNotice: notice
         }
       });
+
+      logger.info('Service notice update event published', { id: notice.id, isActive: notice.isActive });
     } catch (err) {
       logger.error('Failed to publish service notice event', err);
     }
@@ -467,7 +506,8 @@ class ServiceNoticeService {
         data: {
           id: notice.id,
           environment: environment,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          serviceNotice: notice
         }
       });
     } catch (err) {
