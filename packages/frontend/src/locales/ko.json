@@ -40,6 +40,7 @@
   "gatrixEdges.lastRefreshed": "마지막 갱신",
   "gatrixEdges.latestInvalidation": "최근 무효화",
   "gatrixEdges.invalidationCount": "무효화 횟수",
+  "gatrixEdges.invalidationCountFormat": "{{count}}회 무효화됨",
   "gatrixEdges.viewJson": "JSON 보기",
   "gatrixEdges.appVersion": "애플리케이션 버전",
   "gatrixEdges.sdkVersion": "SDK 버전",

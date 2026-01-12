@@ -29,6 +29,8 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
+    TextField,
+    InputAdornment,
 } from '@mui/material';
 import {
     KeyboardArrowDown,
@@ -40,11 +42,13 @@ import {
     Code as CodeIcon,
     ContentCopy as CopyIcon,
     Close as CloseIcon,
+    Search as SearchIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import Editor from '@monaco-editor/react';
 import serviceDiscoveryService, { ServiceInstance } from '../../services/serviceDiscoveryService';
 import { RelativeTime } from '../../components/common/RelativeTime';
+import { useDebounce } from '../../hooks/useDebounce';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 
@@ -135,6 +139,54 @@ const GatrixEdgesPage: React.FC = () => {
     const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
     const [jsonDialogData, setJsonDialogData] = useState<any>(null);
     const [jsonDialogTitle, setJsonDialogTitle] = useState('');
+
+    // JSON Search State
+    const [jsonSearchQuery, setJsonSearchQuery] = useState('');
+    const debouncedJsonSearchQuery = useDebounce(jsonSearchQuery, 300);
+    const [jsonSearchMatches, setJsonSearchMatches] = useState<any[]>([]);
+    const [jsonSearchIndex, setJsonSearchIndex] = useState(0);
+    const editorRef = useRef<any>(null);
+
+    const handleEditorDidMount = (editor: any) => {
+        editorRef.current = editor;
+    };
+
+    useEffect(() => {
+        if (!editorRef.current) return;
+        const model = editorRef.current.getModel();
+
+        if (!debouncedJsonSearchQuery) {
+            setJsonSearchMatches([]);
+            setJsonSearchIndex(0);
+            return;
+        }
+
+        // Search: case-insensitive
+        const matches = model.findMatches(debouncedJsonSearchQuery, false, false, false, null, true);
+        setJsonSearchMatches(matches);
+        setJsonSearchIndex(0);
+
+        if (matches.length > 0) {
+            editorRef.current.setSelection(matches[0].range);
+            editorRef.current.revealRangeInCenter(matches[0].range);
+        }
+    }, [debouncedJsonSearchQuery]);
+
+    const handleNextMatch = () => {
+        if (jsonSearchMatches.length === 0) return;
+        const next = (jsonSearchIndex + 1) % jsonSearchMatches.length;
+        setJsonSearchIndex(next);
+        editorRef.current.setSelection(jsonSearchMatches[next].range);
+        editorRef.current.revealRangeInCenter(jsonSearchMatches[next].range);
+    };
+
+    const handlePrevMatch = () => {
+        if (jsonSearchMatches.length === 0) return;
+        const prev = (jsonSearchIndex - 1 + jsonSearchMatches.length) % jsonSearchMatches.length;
+        setJsonSearchIndex(prev);
+        editorRef.current.setSelection(jsonSearchMatches[prev].range);
+        editorRef.current.revealRangeInCenter(jsonSearchMatches[prev].range);
+    };
 
     // Localized grouping options
     const getGroupingLabel = (field: GroupingField) => {
@@ -356,6 +408,9 @@ const GatrixEdgesPage: React.FC = () => {
     const openJsonDialog = (data: any, title: string) => {
         setJsonDialogData(data);
         setJsonDialogTitle(title);
+        setJsonSearchQuery('');
+        setJsonSearchMatches([]);
+        setJsonSearchIndex(0);
         setJsonDialogOpen(true);
     };
 
@@ -501,18 +556,18 @@ const GatrixEdgesPage: React.FC = () => {
                         bgcolor: theme.palette.primary.main + '10',
                         borderRadius: 1,
                         border: `1px solid ${theme.palette.primary.main}30`,
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
+                        display: 'flex',
+                        justifyContent: 'center',
                         alignItems: 'center',
                     }}>
                         <Typography variant="caption" color="primary" sx={{ fontWeight: 'bold' }}>
                             {t('gatrixEdges.latestInvalidation')}: <RelativeTime date={lastRefreshedAt} />
+                            {cacheStatus.invalidationCount !== undefined && (
+                                <Box component="span" sx={{ fontWeight: 'normal', opacity: 0.8, ml: 0.5, color: 'text.secondary' }}>
+                                    ({t('gatrixEdges.invalidationCountFormat', { count: cacheStatus.invalidationCount })})
+                                </Box>
+                            )}
                         </Typography>
-                        {cacheStatus.invalidationCount !== undefined && (
-                            <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center' }}>
-                                {t('gatrixEdges.invalidationCount')}: {cacheStatus.invalidationCount}
-                            </Typography>
-                        )}
                     </Box>
                 )}
 
@@ -1099,6 +1154,40 @@ const GatrixEdgesPage: React.FC = () => {
                             {jsonDialogData ? `${(JSON.stringify(jsonDialogData).length / 1024).toFixed(1)} KB` : '—'}
                         </Typography>
                     </Box>
+
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <TextField
+                            size="small"
+                            placeholder="Find..."
+                            value={jsonSearchQuery}
+                            onChange={(e) => setJsonSearchQuery(e.target.value)}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon fontSize="small" sx={{ color: 'text.secondary' }} />
+                                    </InputAdornment>
+                                ),
+                                sx: {
+                                    height: 36,
+                                    width: 220,
+                                    fontSize: '0.875rem',
+                                    bgcolor: theme.palette.background.paper
+                                }
+                            }}
+                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: theme.palette.action.hover, borderRadius: 1, px: 0.5, height: 36, visibility: jsonSearchMatches.length > 0 ? 'visible' : 'hidden' }}>
+                            <Typography variant="caption" sx={{ mx: 0.5, minWidth: 40, textAlign: 'center', fontWeight: 'bold' }}>
+                                {jsonSearchIndex + 1} / {jsonSearchMatches.length}
+                            </Typography>
+                            <Divider orientation="vertical" flexItem sx={{ my: 0.5 }} />
+                            <IconButton size="small" onClick={handlePrevMatch} sx={{ p: 0.5 }}>
+                                <KeyboardArrowUp fontSize="small" />
+                            </IconButton>
+                            <IconButton size="small" onClick={handleNextMatch} sx={{ p: 0.5 }}>
+                                <KeyboardArrowDown fontSize="small" />
+                            </IconButton>
+                        </Box>
+                    </Box>
                 </Box>
 
                 {/* Monaco Editor Content */}
@@ -1113,6 +1202,7 @@ const GatrixEdgesPage: React.FC = () => {
                             language="json"
                             theme={theme.palette.mode === 'dark' ? 'vs-dark' : 'light'}
                             value={JSON.stringify(jsonDialogData, null, 2)}
+                            onMount={handleEditorDidMount}
                             options={{
                                 readOnly: true,
                                 minimap: { enabled: true },

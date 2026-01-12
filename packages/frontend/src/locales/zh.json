@@ -40,6 +40,7 @@
   "gatrixEdges.lastRefreshed": "最后刷新",
   "gatrixEdges.latestInvalidation": "最新无效化",
   "gatrixEdges.invalidationCount": "无效化次数",
+  "gatrixEdges.invalidationCountFormat": "已无效化 {{count}} 次",
   "gatrixEdges.viewJson": "查看 JSON",
   "gatrixEdges.appVersion": "应用版本",
   "gatrixEdges.sdkVersion": "SDK 版本",
