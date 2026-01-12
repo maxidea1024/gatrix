@@ -1376,8 +1376,6 @@ const GameWorldsPage: React.FC = () => {
             label={world.isVisible ? t('common.visible') : t('common.hidden')}
             size="small"
             color={world.isVisible ? 'success' : 'default'}
-            onClick={() => handleToggleVisibility(world.id)}
-            sx={{ cursor: 'pointer' }}
           />
         );
       case 'isMaintenance': {
@@ -1414,8 +1412,6 @@ const GameWorldsPage: React.FC = () => {
             size="small"
             color={maintenanceStatus === 'active' ? 'warning' : maintenanceStatus === 'scheduled' ? 'info' : 'success'}
             icon={maintenanceStatus === 'active' ? <MaintenanceIcon /> : maintenanceStatus === 'scheduled' ? <ScheduleIcon /> : undefined}
-            onClick={() => handleToggleMaintenance(world.id)}
-            sx={{ cursor: 'pointer' }}
           />
         );
 
