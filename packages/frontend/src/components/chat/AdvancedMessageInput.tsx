@@ -81,12 +81,12 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
   // WebSocket 연결 및 채널 준비 완료 시 입력창에 포커스(기존 동작 유지)
   useEffect(() => {
     if (channelId &&
-        textFieldRef.current &&
-        !disabled &&
-        state.isConnected &&
-        currentChannel &&
-        autoFocus &&
-        !isThreadOpen) { // 스레드가 열려있지 않을 때만 자동 포커스
+      textFieldRef.current &&
+      !disabled &&
+      state.isConnected &&
+      currentChannel &&
+      autoFocus &&
+      !isThreadOpen) { // 스레드가 열려있지 않을 때만 자동 포커스
       // WebSocket 연결, 채널 존재, 비활성화 상태가 아닐 때만 포커스
       const timer = setTimeout(() => {
         textFieldRef.current?.focus();
@@ -344,7 +344,7 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
           size="small"
           sx={{
             '& .MuiOutlinedInput-root': {
-              borderRadius: 3,
+              borderRadius: 0,
               '& fieldset': {
                 borderWidth: '1px',
                 borderColor: 'rgba(0, 0, 0, 0.12)',

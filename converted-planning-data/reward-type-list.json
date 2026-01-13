@@ -14,7 +14,7 @@
     "nameKey": "REWARD_TYPE_ITEM",
     "hasTable": true,
     "tableFile": "Item.json",
-    "itemCount": 2905,
+    "itemCount": 2911,
     "descriptionKey": null
   },
   {
@@ -41,7 +41,7 @@
     "nameKey": "REWARD_TYPE_MATE_EQUIP",
     "hasTable": true,
     "tableFile": "CEquip.json",
-    "itemCount": 4025,
+    "itemCount": 4037,
     "descriptionKey": null
   },
   {
@@ -77,7 +77,7 @@
     "nameKey": "REWARD_TYPE_SHIP_SLOT_ITEM",
     "hasTable": true,
     "tableFile": "ShipSlot.json",
-    "itemCount": 8479,
+    "itemCount": 8485,
     "descriptionKey": null
   },
   {
@@ -248,7 +248,7 @@
     "nameKey": "REWARD_TYPE_USER_TITLE",
     "hasTable": true,
     "tableFile": "UserTitle.json",
-    "itemCount": 136,
+    "itemCount": 137,
     "descriptionKey": null
   },
   {

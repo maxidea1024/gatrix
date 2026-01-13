@@ -775,12 +775,10 @@ class StoreProductService {
       }
 
       const dbMap = new Map<number, StoreProduct>();
-      const dbProductKeyMap = new Map<string, StoreProduct>(); // Key: productId:store
       for (const p of dbProducts) {
         if (p.cmsProductId !== null) {
           dbMap.set(p.cmsProductId, p);
         }
-        dbProductKeyMap.set(`${p.productId}:${p.store}`, p);
       }
 
       const toAdd: SyncAddItem[] = [];
@@ -789,8 +787,8 @@ class StoreProductService {
 
       // Check for products to add or update
       for (const [cmsProductId, planningProduct] of planningMap) {
-        // Find DB product by CMS ID or by productId:store combination
-        const dbProduct = dbMap.get(cmsProductId) || dbProductKeyMap.get(`${planningProduct.productCode}:sdo`);
+        // Find DB product by CMS ID only (productCode can be duplicated)
+        const dbProduct = dbMap.get(cmsProductId);
 
         // Get multi-language values from planning data
         const nameKo = planningProduct.name?.ko || '';

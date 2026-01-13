@@ -293,7 +293,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
                 : parseCoordinatesFromText(originalMessage.content);
               if (!coords) return null;
               return (
-                <Box sx={{ mt: 1, mb: 1, maxWidth: 360, width: '100%', borderRadius: '8px', overflow: 'hidden', border: `1px solid ${theme.palette.divider}` }}>
+                <Box sx={{ mt: 1, mb: 1, maxWidth: 360, width: '100%', borderRadius: 0, overflow: 'hidden', border: `1px solid ${theme.palette.divider}` }}>
                   <Box sx={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)' }}>
                     <iframe
                       title="google-maps-embed"
@@ -387,7 +387,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
                         : parseCoordinatesFromText(message.content);
                       if (!coords) return null;
                       return (
-                        <Box sx={{ mt: 1, mb: 1, maxWidth: 360, width: '100%', borderRadius: '8px', overflow: 'hidden', border: `1px solid ${theme.palette.divider}` }}>
+                        <Box sx={{ mt: 1, mb: 1, maxWidth: 360, width: '100%', borderRadius: 0, overflow: 'hidden', border: `1px solid ${theme.palette.divider}` }}>
                           <Box sx={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)' }}>
                             <iframe
                               title="google-maps-embed"
@@ -457,7 +457,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
                               gap: 0.5,
                               px: 1,
                               py: 0.5,
-                              borderRadius: '12px',
+                              borderRadius: 0,
                               backgroundColor: (reactions as any[]).some((r: any) => r.userId === state.user?.id)
                                 ? theme.palette.primary.main + '20'
                                 : (theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)'),
@@ -488,7 +488,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
                     display: 'none',
                     gap: 0.5,
                     backgroundColor: theme.palette.background.paper,
-                    borderRadius: '8px',
+                    borderRadius: 0,
                     border: `1px solid ${theme.palette.divider}`,
                     boxShadow: theme.shadows[2],
                     '.message-container:hover &': { display: 'flex' }
@@ -509,7 +509,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
                         }
                         actions.addReaction(message.id, emoji);
                       }}
-                      sx={{ p: 0.5, borderRadius: '6px', cursor: 'pointer', fontSize: '16px', '&:hover': { backgroundColor: theme.palette.action.hover } }}
+                      sx={{ p: 0.5, borderRadius: 0, cursor: 'pointer', fontSize: '16px', '&:hover': { backgroundColor: theme.palette.action.hover } }}
                     >
                       {emoji}
                     </Box>

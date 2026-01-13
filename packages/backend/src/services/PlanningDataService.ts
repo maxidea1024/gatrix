@@ -152,41 +152,27 @@ export class PlanningDataService {
 
   /**
    * Get reward lookup data (cached in Redis for multi-instance support)
-   * Data is already localized at generation time, so just load the appropriate language file
+   * Data is stored only in Redis cache
    * @param environment Environment name
    * @param lang Language code: 'kr', 'en', 'zh'
    */
   static async getRewardLookup(environment: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<RewardLookupData> {
     try {
-      // Determine cache key and file path based on language
       const baseCacheKey = lang === 'en' ? this.CACHE_KEYS.REWARD_LOOKUP_EN :
         lang === 'zh' ? this.CACHE_KEYS.REWARD_LOOKUP_ZH :
           this.CACHE_KEYS.REWARD_LOOKUP_KR;
       const cacheKey = this.getEnvCacheKey(environment, baseCacheKey);
-      const filePath = this.getFilePath(environment, `reward-lookup-${lang}.json`);
 
-      // Try to get from Redis cache first
+      // Get from Redis cache only
       const cached = await cacheService.get<RewardLookupData>(cacheKey);
       if (cached) {
-        await cacheService.setWithoutTTL(cacheKey, cached);
         logger.debug(`Reward lookup data (${lang}) retrieved from cache`, { environment });
         return cached;
       }
 
-      // If not in cache, read from file
-      const exists = await fs.access(filePath).then(() => true).catch(() => false);
-      if (!exists) {
-        return {};
-      }
-
-      const data = await fs.readFile(filePath, 'utf-8');
-      const parsed = JSON.parse(data);
-
-      // Store in Redis cache for other instances
-      await cacheService.setWithoutTTL(cacheKey, parsed);
-
-      logger.debug(`Reward lookup data (${lang}) loaded from file and cached`, { environment });
-      return parsed;
+      // No data in cache - return empty
+      logger.debug(`Reward lookup data (${lang}) not found in cache`, { environment });
+      return {};
     } catch (error) {
       logger.error('Failed to read reward lookup data', { error, lang, environment });
       throw new GatrixError('Failed to load reward lookup data', 500);
@@ -195,34 +181,23 @@ export class PlanningDataService {
 
   /**
    * Get reward type list (cached in Redis for multi-instance support)
+   * Data is stored only in Redis cache
    * @param environment Environment name
    */
   static async getRewardTypeList(environment: string): Promise<RewardTypeInfo[]> {
     try {
       const cacheKey = this.getEnvCacheKey(environment, this.CACHE_KEYS.REWARD_TYPE_LIST);
-      const filePath = this.getFilePath(environment, 'reward-type-list.json');
 
-      // Try to get from Redis cache first
+      // Get from Redis cache only
       const cached = await cacheService.get<RewardTypeInfo[]>(cacheKey);
       if (cached) {
-        await cacheService.setWithoutTTL(cacheKey, cached);
         logger.debug('Reward type list retrieved from cache', { environment });
         return cached;
       }
 
-      // If not in cache, read from file
-      const exists = await fs.access(filePath).then(() => true).catch(() => false);
-      if (!exists) {
-        return [];
-      }
-
-      const data = await fs.readFile(filePath, 'utf-8');
-      const parsed = JSON.parse(data);
-
-      // Store in Redis cache for other instances
-      await cacheService.setWithoutTTL(cacheKey, parsed);
-
-      return parsed;
+      // No data in cache - return empty
+      logger.debug('Reward type list not found in cache', { environment });
+      return [];
     } catch (error) {
       logger.error('Failed to read reward type list', { error, environment });
       throw new GatrixError('Failed to load reward type list', 500);
@@ -258,34 +233,24 @@ export class PlanningDataService {
 
   /**
    * Get UI list data (nations, towns, villages) - cached in Redis for multi-instance support
+   * Data is stored only in Redis cache
    * @param environment Environment name
    * @param lang Language code: 'kr', 'en', 'zh'
    */
   static async getUIListData(environment: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<any> {
     try {
       const cacheKey = this.getEnvCacheKey(environment, `${this.CACHE_KEYS.UI_LIST_DATA}:${lang}`);
-      const filePath = this.getFilePath(environment, `ui-list-data-${lang}.json`);
 
-      // Try to get from Redis cache first
+      // Get from Redis cache only
       const cached = await cacheService.get<any>(cacheKey);
       if (cached) {
-        await cacheService.setWithoutTTL(cacheKey, cached);
         logger.debug(`UI list data (${lang}) retrieved from cache`, { environment });
         return cached;
       }
 
-      const exists = await fs.access(filePath).then(() => true).catch(() => false);
-      if (!exists) {
-        return { nations: [], towns: [], villages: [] };
-      }
-
-      const data = await fs.readFile(filePath, 'utf-8');
-      const parsed = JSON.parse(data);
-
-      // Store in Redis cache for other instances
-      await cacheService.setWithoutTTL(cacheKey, parsed);
-
-      return parsed;
+      // No data in cache - return empty
+      logger.debug(`UI list data (${lang}) not found in cache`, { environment });
+      return { nations: [], towns: [], villages: [] };
     } catch (error) {
       logger.error('Failed to read UI list data', { error, environment });
       throw new GatrixError('Failed to load UI list data', 500);
@@ -368,34 +333,24 @@ export class PlanningDataService {
 
   /**
    * Get HotTimeBuff lookup data (cached in Redis for multi-instance support)
+   * Data is stored only in Redis cache
    * @param environment Environment name
    * @param lang Language code: 'kr', 'en', 'zh'
    */
   static async getHotTimeBuffLookup(environment: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
     try {
       const cacheKey = this.getEnvCacheKey(environment, `${this.CACHE_KEYS.HOT_TIME_BUFF}:${lang}`);
-      const filePath = this.getFilePath(environment, `hottimebuff-lookup-${lang}.json`);
 
-      // Try to get from Redis cache first
+      // Get from Redis cache only
       const cached = await cacheService.get<Record<string, any>>(cacheKey);
       if (cached) {
-        await cacheService.setWithoutTTL(cacheKey, cached);
         logger.debug(`HotTimeBuff lookup data (${lang}) retrieved from cache`, { environment });
         return cached;
       }
 
-      const exists = await fs.access(filePath).then(() => true).catch(() => false);
-      if (!exists) {
-        return {};
-      }
-
-      const data = await fs.readFile(filePath, 'utf-8');
-      const parsed = JSON.parse(data);
-
-      // Store in Redis cache for other instances
-      await cacheService.setWithoutTTL(cacheKey, parsed);
-
-      return parsed;
+      // No data in cache - return empty
+      logger.debug(`HotTimeBuff lookup data (${lang}) not found in cache`, { environment });
+      return {};
     } catch (error) {
       logger.error('Failed to read HotTimeBuff lookup data', { error, environment });
       throw new GatrixError('Failed to load HotTimeBuff lookup data', 500);
@@ -406,32 +361,24 @@ export class PlanningDataService {
 
   /**
    * Get EventPage lookup data (cached in Redis for multi-instance support)
+   * Data is stored only in Redis cache
    * @param environment Environment name
    * @param lang Language code: 'kr', 'en', 'zh'
    */
   static async getEventPageLookup(environment: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
     try {
       const cacheKey = this.getEnvCacheKey(environment, `${this.CACHE_KEYS.EVENT_PAGE}:${lang}`);
-      const filePath = this.getFilePath(environment, `eventpage-lookup-${lang}.json`);
 
-      // Try to get from Redis cache first
+      // Get from Redis cache only
       const cached = await cacheService.get<Record<string, any>>(cacheKey);
       if (cached) {
-        await cacheService.setWithoutTTL(cacheKey, cached);
         logger.debug(`EventPage lookup data (${lang}) retrieved from cache`, { environment });
         return cached;
       }
 
-      const exists = await fs.access(filePath).then(() => true).catch(() => false);
-      if (!exists) return { totalCount: 0, items: [] };
-
-      const data = await fs.readFile(filePath, 'utf-8');
-      const parsed = JSON.parse(data);
-
-      // Store in Redis cache for other instances
-      await cacheService.setWithoutTTL(cacheKey, parsed);
-
-      return parsed;
+      // No data in cache - return empty
+      logger.debug(`EventPage lookup data (${lang}) not found in cache`, { environment });
+      return { totalCount: 0, items: [] };
     } catch (error) {
       logger.error('Failed to read EventPage lookup data', { error, environment });
       throw new GatrixError('Failed to load EventPage lookup data', 500);
@@ -440,32 +387,24 @@ export class PlanningDataService {
 
   /**
    * Get LiveEvent lookup data (cached in Redis for multi-instance support)
+   * Data is stored only in Redis cache
    * @param environment Environment name
    * @param lang Language code: 'kr', 'en', 'zh'
    */
   static async getLiveEventLookup(environment: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
     try {
       const cacheKey = this.getEnvCacheKey(environment, `${this.CACHE_KEYS.LIVE_EVENT}:${lang}`);
-      const filePath = this.getFilePath(environment, `liveevent-lookup-${lang}.json`);
 
-      // Try to get from Redis cache first
+      // Get from Redis cache only
       const cached = await cacheService.get<Record<string, any>>(cacheKey);
       if (cached) {
-        await cacheService.setWithoutTTL(cacheKey, cached);
         logger.debug(`LiveEvent lookup data (${lang}) retrieved from cache`, { environment });
         return cached;
       }
 
-      const exists = await fs.access(filePath).then(() => true).catch(() => false);
-      if (!exists) return { totalCount: 0, items: [] };
-
-      const data = await fs.readFile(filePath, 'utf-8');
-      const parsed = JSON.parse(data);
-
-      // Store in Redis cache for other instances
-      await cacheService.setWithoutTTL(cacheKey, parsed);
-
-      return parsed;
+      // No data in cache - return empty
+      logger.debug(`LiveEvent lookup data (${lang}) not found in cache`, { environment });
+      return { totalCount: 0, items: [] };
     } catch (error) {
       logger.error('Failed to read LiveEvent lookup data', { error, environment });
       throw new GatrixError('Failed to load LiveEvent lookup data', 500);
@@ -474,32 +413,24 @@ export class PlanningDataService {
 
   /**
    * Get MateRecruitingGroup lookup data (cached in Redis for multi-instance support)
+   * Data is stored only in Redis cache
    * @param environment Environment name
    * @param lang Language code: 'kr', 'en', 'zh'
    */
   static async getMateRecruitingGroupLookup(environment: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
     try {
       const cacheKey = this.getEnvCacheKey(environment, `${this.CACHE_KEYS.MATE_RECRUITING}:${lang}`);
-      const filePath = this.getFilePath(environment, `materecruiting-lookup-${lang}.json`);
 
-      // Try to get from Redis cache first
+      // Get from Redis cache only
       const cached = await cacheService.get<Record<string, any>>(cacheKey);
       if (cached) {
-        await cacheService.setWithoutTTL(cacheKey, cached);
         logger.debug(`MateRecruitingGroup lookup data (${lang}) retrieved from cache`, { environment });
         return cached;
       }
 
-      const exists = await fs.access(filePath).then(() => true).catch(() => false);
-      if (!exists) return { totalCount: 0, items: [] };
-
-      const data = await fs.readFile(filePath, 'utf-8');
-      const parsed = JSON.parse(data);
-
-      // Store in Redis cache for other instances
-      await cacheService.setWithoutTTL(cacheKey, parsed);
-
-      return parsed;
+      // No data in cache - return empty
+      logger.debug(`MateRecruitingGroup lookup data (${lang}) not found in cache`, { environment });
+      return { totalCount: 0, items: [] };
     } catch (error) {
       logger.error('Failed to read MateRecruitingGroup lookup data', { error, environment });
       throw new GatrixError('Failed to load MateRecruitingGroup lookup data', 500);
@@ -508,32 +439,24 @@ export class PlanningDataService {
 
   /**
    * Get OceanNpcAreaSpawner lookup data (cached in Redis for multi-instance support)
+   * Data is stored only in Redis cache
    * @param environment Environment name
    * @param lang Language code: 'kr', 'en', 'zh'
    */
   static async getOceanNpcAreaSpawnerLookup(environment: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
     try {
       const cacheKey = this.getEnvCacheKey(environment, `${this.CACHE_KEYS.OCEAN_NPC_AREA}:${lang}`);
-      const filePath = this.getFilePath(environment, `oceannpcarea-lookup-${lang}.json`);
 
-      // Try to get from Redis cache first
+      // Get from Redis cache only
       const cached = await cacheService.get<Record<string, any>>(cacheKey);
       if (cached) {
-        await cacheService.setWithoutTTL(cacheKey, cached);
         logger.debug(`OceanNpcAreaSpawner lookup data (${lang}) retrieved from cache`, { environment });
         return cached;
       }
 
-      const exists = await fs.access(filePath).then(() => true).catch(() => false);
-      if (!exists) return { totalCount: 0, items: [] };
-
-      const data = await fs.readFile(filePath, 'utf-8');
-      const parsed = JSON.parse(data);
-
-      // Store in Redis cache for other instances
-      await cacheService.setWithoutTTL(cacheKey, parsed);
-
-      return parsed;
+      // No data in cache - return empty
+      logger.debug(`OceanNpcAreaSpawner lookup data (${lang}) not found in cache`, { environment });
+      return { totalCount: 0, items: [] };
     } catch (error) {
       logger.error('Failed to read OceanNpcAreaSpawner lookup data', { error, environment });
       throw new GatrixError('Failed to load OceanNpcAreaSpawner lookup data', 500);
@@ -542,31 +465,23 @@ export class PlanningDataService {
 
   /**
    * Get CashShop lookup data (unified multi-language file)
+   * Data is stored only in Redis cache
    * @param environment Environment name
    */
   static async getCashShopLookup(environment: string): Promise<Record<string, any>> {
     try {
       const cacheKey = this.getEnvCacheKey(environment, this.CACHE_KEYS.CASH_SHOP);
-      const filePath = this.getFilePath(environment, 'cashshop-lookup.json');
 
-      // Try to get from Redis cache first
+      // Get from Redis cache only
       const cached = await cacheService.get<Record<string, any>>(cacheKey);
       if (cached) {
-        await cacheService.setWithoutTTL(cacheKey, cached);
         logger.debug('CashShop lookup data retrieved from cache', { environment });
         return cached;
       }
 
-      const exists = await fs.access(filePath).then(() => true).catch(() => false);
-      if (!exists) return { totalCount: 0, items: [] };
-
-      const data = await fs.readFile(filePath, 'utf-8');
-      const parsed = JSON.parse(data);
-
-      // Store in Redis cache for other instances
-      await cacheService.setWithoutTTL(cacheKey, parsed);
-
-      return parsed;
+      // No data in cache - return empty
+      logger.debug('CashShop lookup data not found in cache', { environment });
+      return { totalCount: 0, items: [] };
     } catch (error) {
       logger.error('Failed to read CashShop lookup data', { error, environment });
       throw new GatrixError('Failed to load CashShop lookup data', 500);
@@ -588,14 +503,11 @@ export class PlanningDataService {
       uploaderName?: string;
       uploadSource?: 'web' | 'cli';
       uploadComment?: string;
+      forceUpload?: boolean;
     }
   ): Promise<{ success: boolean; message: string; filesUploaded: string[]; stats: any; uploadRecord?: any }> {
     try {
       logger.info('Starting planning data upload...', { environment, uploadInfo });
-
-      // Ensure environment-specific data directory exists
-      const envDataPath = this.getEnvironmentDataPath(environment);
-      await fs.mkdir(envDataPath, { recursive: true });
 
       // Expected file names
       const expectedFiles = [
@@ -638,7 +550,8 @@ export class PlanningDataService {
       }
 
       const uploadedFiles: string[] = [];
-      const fileStats: Record<string, { size: number; path: string }> = {};
+      const fileStats: Record<string, { size: number }> = {};
+      const fileParsedData: Record<string, any> = {};
       const fileHashes: Record<string, string> = {};
       const fileContents: Record<string, string> = {};
       const allBuffers: Buffer[] = [];
@@ -674,19 +587,15 @@ export class PlanningDataService {
         const fileHash = crypto.createHash('sha256').update(file.buffer).digest('hex');
         fileHashes[fileName] = fileHash;
         fileContents[fileName] = file.buffer.toString('utf-8');
+        fileParsedData[fileName] = JSON.parse(file.buffer.toString('utf-8'));
         allBuffers.push(file.buffer);
-
-        // Save file to disk (environment-specific path)
-        const filePath = path.join(envDataPath, fileName);
-        await fs.writeFile(filePath, file.buffer);
 
         uploadedFiles.push(fileName);
         fileStats[fileName] = {
           size: file.size,
-          path: filePath,
         };
 
-        logger.info(`File saved: ${fileName}`, { size: file.size, hash: fileHash.substring(0, 8), environment });
+        logger.info(`File processed: ${fileName}`, { size: file.size, hash: fileHash.substring(0, 8), environment });
       }
 
       if (uploadedFiles.length === 0) {
@@ -707,8 +616,8 @@ export class PlanningDataService {
         .orderBy('uploadedAt', 'desc')
         .first();
 
-      // Check if upload hash is the same - skip if no changes
-      if (previousUpload && previousUpload.uploadHash === uploadHash) {
+      // Check if upload hash is the same - skip if no changes (unless forceUpload is true)
+      if (!uploadInfo?.forceUpload && previousUpload && previousUpload.uploadHash === uploadHash) {
         logger.info('Planning data upload skipped - no changes detected', {
           environment,
           uploadHash: uploadHash.substring(0, 16),
@@ -727,6 +636,10 @@ export class PlanningDataService {
             skipped: true,
           },
         };
+      }
+
+      if (uploadInfo?.forceUpload) {
+        logger.info('Force upload enabled - bypassing hash check', { environment });
       }
 
       const changedFiles: string[] = [];
@@ -804,8 +717,8 @@ export class PlanningDataService {
       // Fetch the created record
       const uploadRecord = await db('planningDataUploads').where({ id: uploadRecordId }).first();
 
-      // Cache all uploaded files in Redis (environment-scoped)
-      await this.cacheUploadedFiles(environment, uploadedFiles);
+      // Cache all uploaded files in Redis (environment-scoped) - directly from parsed data
+      await this.cacheUploadedFiles(environment, uploadedFiles, fileParsedData);
 
       logger.info('Planning data uploaded and cached successfully', {
         filesUploaded: uploadedFiles,
@@ -985,8 +898,13 @@ export class PlanningDataService {
    * This ensures all instances have access to the latest data
    * @param environment Environment name
    * @param uploadedFiles List of uploaded file names
+   * @param fileParsedData Map of fileName to parsed JSON data
    */
-  private static async cacheUploadedFiles(environment: string, uploadedFiles: string[]): Promise<void> {
+  private static async cacheUploadedFiles(
+    environment: string,
+    uploadedFiles: string[],
+    fileParsedData: Record<string, any>
+  ): Promise<void> {
     try {
       logger.info('Caching uploaded files in Redis...', { environment });
 
@@ -1017,9 +935,7 @@ export class PlanningDataService {
         'cashshop-lookup.json': this.CACHE_KEYS.CASH_SHOP,
       };
 
-      const envDataPath = this.getEnvironmentDataPath(environment);
-
-      // Cache each file
+      // Cache each file directly from memory
       for (const fileName of uploadedFiles) {
         const baseCacheKey = fileKeyMap[fileName];
         if (!baseCacheKey) {
@@ -1029,9 +945,12 @@ export class PlanningDataService {
 
         // Use environment-scoped cache key
         const cacheKey = this.getEnvCacheKey(environment, baseCacheKey);
-        const filePath = path.join(envDataPath, fileName);
-        const content = await fs.readFile(filePath, 'utf-8');
-        const data = JSON.parse(content);
+        const data = fileParsedData[fileName];
+
+        if (!data) {
+          logger.warn(`No parsed data for file: ${fileName}`);
+          continue;
+        }
 
         // Cache in Redis without TTL (persistent)
         await cacheService.setWithoutTTL(cacheKey, data);
@@ -1048,7 +967,7 @@ export class PlanningDataService {
 
   /**
    * Copy planning data from one environment to another
-   * Copies both files and Redis cache
+   * Copies Redis cache from source to target environment
    * @param sourceEnv Source environment name
    * @param targetEnv Target environment name
    */
@@ -1056,40 +975,45 @@ export class PlanningDataService {
     try {
       logger.info('Copying planning data between environments...', { sourceEnv, targetEnv });
 
-      const sourceDataPath = this.getEnvironmentDataPath(sourceEnv);
-      const targetDataPath = this.getEnvironmentDataPath(targetEnv);
+      // All cache key bases to copy
+      const cacheKeyBases = [
+        this.CACHE_KEYS.REWARD_LOOKUP_KR,
+        this.CACHE_KEYS.REWARD_LOOKUP_EN,
+        this.CACHE_KEYS.REWARD_LOOKUP_ZH,
+        this.CACHE_KEYS.REWARD_TYPE_LIST,
+        `${this.CACHE_KEYS.UI_LIST_DATA}:kr`,
+        `${this.CACHE_KEYS.UI_LIST_DATA}:en`,
+        `${this.CACHE_KEYS.UI_LIST_DATA}:zh`,
+        `${this.CACHE_KEYS.HOT_TIME_BUFF}:kr`,
+        `${this.CACHE_KEYS.HOT_TIME_BUFF}:en`,
+        `${this.CACHE_KEYS.HOT_TIME_BUFF}:zh`,
+        `${this.CACHE_KEYS.EVENT_PAGE}:kr`,
+        `${this.CACHE_KEYS.EVENT_PAGE}:en`,
+        `${this.CACHE_KEYS.EVENT_PAGE}:zh`,
+        `${this.CACHE_KEYS.LIVE_EVENT}:kr`,
+        `${this.CACHE_KEYS.LIVE_EVENT}:en`,
+        `${this.CACHE_KEYS.LIVE_EVENT}:zh`,
+        `${this.CACHE_KEYS.MATE_RECRUITING}:kr`,
+        `${this.CACHE_KEYS.MATE_RECRUITING}:en`,
+        `${this.CACHE_KEYS.MATE_RECRUITING}:zh`,
+        `${this.CACHE_KEYS.OCEAN_NPC_AREA}:kr`,
+        `${this.CACHE_KEYS.OCEAN_NPC_AREA}:en`,
+        `${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`,
+        this.CACHE_KEYS.CASH_SHOP,
+      ];
 
-      // Ensure target directory exists
-      await fs.mkdir(targetDataPath, { recursive: true });
-
-      // Check if source directory exists
-      const sourceExists = await fs.access(sourceDataPath).then(() => true).catch(() => false);
-      if (!sourceExists) {
-        logger.info('Source environment has no planning data to copy', { sourceEnv });
-        return { success: true, filesCopied: 0 };
-      }
-
-      // Get list of files in source directory
-      const files = await fs.readdir(sourceDataPath);
       let filesCopied = 0;
 
-      for (const fileName of files) {
-        if (!fileName.endsWith('.json')) continue;
+      for (const baseCacheKey of cacheKeyBases) {
+        const sourceCacheKey = this.getEnvCacheKey(sourceEnv, baseCacheKey);
+        const targetCacheKey = this.getEnvCacheKey(targetEnv, baseCacheKey);
 
-        const sourceFilePath = path.join(sourceDataPath, fileName);
-        const targetFilePath = path.join(targetDataPath, fileName);
-
-        // Copy file
-        const content = await fs.readFile(sourceFilePath, 'utf-8');
-        await fs.writeFile(targetFilePath, content, 'utf-8');
-        filesCopied++;
-
-        logger.debug(`Copied planning file: ${fileName}`, { sourceEnv, targetEnv });
-      }
-
-      // Cache all copied files in Redis for target environment
-      if (filesCopied > 0) {
-        await this.cacheUploadedFiles(targetEnv, files.filter(f => f.endsWith('.json')));
+        const data = await cacheService.get<any>(sourceCacheKey);
+        if (data) {
+          await cacheService.setWithoutTTL(targetCacheKey, data);
+          filesCopied++;
+          logger.debug(`Copied cache key: ${baseCacheKey}`, { sourceEnv, targetEnv });
+        }
       }
 
       logger.info('Planning data copied successfully', { sourceEnv, targetEnv, filesCopied });

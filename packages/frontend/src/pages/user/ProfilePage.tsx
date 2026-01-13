@@ -282,7 +282,7 @@ const ProfilePage: React.FC = () => {
           sx={{
             height: 120,
             background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-            borderRadius: '12px 12px 0 0',
+            borderRadius: 0,
           }}
         />
         <CardContent sx={{ pt: 0, pb: 3, position: 'relative' }}>
@@ -419,7 +419,7 @@ const ProfilePage: React.FC = () => {
                 {permissions.includes('*') ? (
                   <Box sx={{
                     p: 2,
-                    borderRadius: 1,
+                    borderRadius: 0,
                     bgcolor: alpha(theme.palette.success.main, 0.1),
                     border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`,
                   }}>
@@ -457,7 +457,7 @@ const ProfilePage: React.FC = () => {
                                     sx={{
                                       px: 1,
                                       py: 0.5,
-                                      borderRadius: 0.5,
+                                      borderRadius: 0,
                                       bgcolor: isManage ? alpha(theme.palette.warning.main, 0.15) : alpha(theme.palette.primary.main, 0.1),
                                       color: isManage ? 'warning.dark' : 'primary.main',
                                       fontWeight: 500,
@@ -501,8 +501,8 @@ const ProfilePage: React.FC = () => {
 
               {envLoading ? (
                 <Stack spacing={1}>
-                  <Skeleton variant="rounded" height={32} width="60%" />
-                  <Skeleton variant="rounded" height={32} width="40%" />
+                  <Skeleton variant="rectangular" height={32} width="60%" />
+                  <Skeleton variant="rectangular" height={32} width="40%" />
                 </Stack>
               ) : environmentAccess?.allowAllEnvironments ? (
                 <Chip

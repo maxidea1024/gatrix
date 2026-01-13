@@ -773,7 +773,7 @@ const DashboardPage: React.FC = () => {
           p: { xs: 3, md: 4 },
           mb: 4,
           background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-          borderRadius: 3,
+          borderRadius: 0,
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -904,7 +904,7 @@ const DashboardPage: React.FC = () => {
                         </Box>
                       )}
                       {detail.message && (
-                        <Box sx={{ mt: 1, p: 1.5, bgcolor: 'action.hover', borderRadius: 1 }}>
+                        <Box sx={{ mt: 1, p: 1.5, bgcolor: 'action.hover', borderRadius: 0 }}>
                           <Typography variant="caption" color="text.secondary">
                             {t('dashboard.maintenanceMessage')}
                           </Typography>
@@ -1103,7 +1103,7 @@ const DashboardPage: React.FC = () => {
                                 ml: 1,
                                 px: 0.75,
                                 py: 0.25,
-                                borderRadius: 1,
+                                borderRadius: 0,
                                 bgcolor: `${env.color || theme.palette.primary.main}20`,
                                 color: env.color || theme.palette.primary.main,
                                 fontWeight: 600,
@@ -1173,7 +1173,7 @@ const DashboardPage: React.FC = () => {
                                   display: 'flex',
                                   alignItems: 'stretch',
                                   height: 24,
-                                  borderRadius: 0.5,
+                                  borderRadius: 0,
                                   border: 1,
                                   borderColor: 'divider',
                                   overflow: 'hidden',
@@ -1592,7 +1592,7 @@ const DashboardPage: React.FC = () => {
                                         {formatRelativeTime(event.createdAt, undefined, i18n.language)}
                                       </Typography>
                                       {event.cloudRegion && (
-                                        <Typography variant="caption" sx={{ bgcolor: 'action.selected', px: 0.5, borderRadius: 0.5, fontSize: '0.65rem' }}>
+                                        <Typography variant="caption" sx={{ bgcolor: 'action.selected', px: 0.5, borderRadius: 0, fontSize: '0.65rem' }}>
                                           {event.cloudRegion}
                                         </Typography>
                                       )}

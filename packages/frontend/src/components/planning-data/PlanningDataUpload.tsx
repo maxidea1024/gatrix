@@ -95,6 +95,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
   const [invalidFileName, setInvalidFileName] = useState<string | null>(null);
   const [uploadComment, setUploadComment] = useState('');
   const [showAlreadyUpToDateDialog, setShowAlreadyUpToDateDialog] = useState(false);
+  const [forceUploading, setForceUploading] = useState(false);
 
   // Preview diff state
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
@@ -222,6 +223,51 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
       const errorMessage = error.message || t('planningData.upload.uploadFailed') || 'Upload failed';
       enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
+      setUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  // Force upload - bypasses hash check
+  const handleForceUpload = async () => {
+    setShowAlreadyUpToDateDialog(false);
+
+    try {
+      setForceUploading(true);
+      setUploading(true);
+      setUploadProgress(0);
+
+      // Simulate progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => Math.min(prev + 10, 90));
+      }, 200);
+
+      // Filter files to upload
+      const filesToUploadArray = selectedFiles.filter((file) => filesToUpload.has(file.name));
+      const result = await planningDataService.uploadPlanningData(filesToUploadArray, uploadComment || undefined, true);
+
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+
+      // Localize the success message with file count
+      const localizedMessage = t('planningData.upload.filesUploadedAndCached', {
+        count: result.filesUploaded?.length || filesToUploadArray.length,
+      });
+      enqueueSnackbar(localizedMessage, { variant: 'success' });
+
+      // Trigger refresh
+      if (onUploadSuccess) {
+        onUploadSuccess();
+      }
+      setSelectedFiles([]);
+      setFilesToUpload(new Set());
+      setUploadComment('');
+      setPreviewResult(null);
+    } catch (error: any) {
+      const errorMessage = error.message || t('planningData.upload.uploadFailed') || 'Upload failed';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    } finally {
+      setForceUploading(false);
       setUploading(false);
       setUploadProgress(0);
     }
@@ -499,16 +545,28 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
           <Typography>
             {t('planningData.upload.alreadyUpToDate') || 'The data is already up to date. No changes were detected.'}
           </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+            {t('planningData.upload.forceUploadHint') || 'If you want to re-upload the data anyway, use the Force Upload button.'}
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button
-            variant="contained"
+            variant="outlined"
             onClick={() => {
               setShowAlreadyUpToDateDialog(false);
               if (onClose) onClose();
             }}
           >
-            {t('common.confirm') || 'OK'}
+            {t('common.cancel') || 'Cancel'}
+          </Button>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={handleForceUpload}
+            disabled={forceUploading}
+            startIcon={forceUploading ? <CircularProgress size={16} /> : <CloudUploadIcon />}
+          >
+            {t('planningData.upload.forceUpload') || 'Force Upload'}
           </Button>
         </DialogActions>
       </Dialog>

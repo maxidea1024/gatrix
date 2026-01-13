@@ -190,7 +190,7 @@ const KeyValuePage: React.FC = () => {
               sx={{
                 width: 24,
                 height: 24,
-                borderRadius: 1,
+                borderRadius: 0,
                 bgcolor: item.varValue,
                 border: 1,
                 borderColor: 'divider',

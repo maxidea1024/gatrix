@@ -149,7 +149,7 @@ const MessageWithPreview: React.FC<{ content: string; theme: any }> = ({ content
   return (
     <>
       {coords && (
-        <Box sx={{ mt: 1, mb: 1, maxWidth: 360, width: '100%', borderRadius: '8px', overflow: 'hidden', border: `1px solid ${theme.palette.divider}` }}>
+        <Box sx={{ mt: 1, mb: 1, maxWidth: 360, width: '100%', borderRadius: 0, overflow: 'hidden', border: `1px solid ${theme.palette.divider}` }}>
           <Box sx={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5' }}>
             <iframe
               title="google-maps-embed"
@@ -206,7 +206,7 @@ const MarkdownMessage: React.FC<{ content: string; theme: any }> = ({ content, t
                 sx={{
                   backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f6f8fa',
                   border: `1px solid ${theme.palette.mode === 'dark' ? '#444' : '#e1e4e8'}`,
-                  borderRadius: '6px',
+                  borderRadius: 0,
                   padding: '12px',
                   margin: '8px 0',
                   overflow: 'auto',
@@ -986,7 +986,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                       px: 2,
                       py: 0.5,
                       backgroundColor: colors.inputBackground,
-                      borderRadius: '12px',
+                      borderRadius: 0,
                       color: colors.placeholderText,
                       fontSize: '12px',
                       fontWeight: 500,
@@ -1014,7 +1014,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                   display: 'flex',
                   gap: '12px',
                   padding: '8px 12px',
-                  borderRadius: '8px',
+                  borderRadius: 0,
                   userSelect: 'text', // 메시지 컨테이너에서 텍스트 선택 허용
                   '&:hover': {
                     backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)'
@@ -1121,7 +1121,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                             gap: 0.5,
                             px: 1,
                             py: 0.5,
-                            borderRadius: '12px',
+                            borderRadius: 0,
                             backgroundColor: reactions.some(r => r.userId === state.user?.id)
                               ? theme.palette.primary.main + '20'
                               : colors.inputFieldBackground,
@@ -1181,7 +1181,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                       display: 'none',
                       gap: 0.5,
                       backgroundColor: colors.inputBackground,
-                      borderRadius: '8px',
+                      borderRadius: 0,
                       border: `1px solid ${colors.inputBorder}`,
                       boxShadow: theme.palette.mode === 'dark'
                         ? '0 2px 8px rgba(0,0,0,0.3)'
@@ -1237,7 +1237,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                         onClick={() => actions.addReaction(message.id, emoji)}
                         sx={{
                           p: 0.5,
-                          borderRadius: '6px',
+                          borderRadius: 0,
                           cursor: 'pointer',
                           fontSize: '16px',
                           '&:hover': {
@@ -1285,7 +1285,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                         cursor: 'pointer',
                         px: 1, // 좌우 패딩만 유지
                         py: 0.5, // 상하 패딩 줄임 (1 → 0.5)
-                        borderRadius: '8px',
+                        borderRadius: 0,
                         border: '1px solid transparent', // 기본 상태에서는 투명한 테두리
                         backgroundColor: 'transparent', // 기본 상태에서는 투명한 배경
                         position: 'relative',

@@ -1540,13 +1540,13 @@ const ClientVersionsPage: React.FC = () => {
                       </TableCell>
                     )}
                     <TableCell>
-                      <Skeleton variant="rounded" width={80} height={24} />
+                      <Skeleton variant="rectangular" width={80} height={24} />
                     </TableCell>
                     <TableCell>
-                      <Skeleton variant="rounded" width={60} height={24} />
+                      <Skeleton variant="rectangular" width={60} height={24} />
                     </TableCell>
                     <TableCell>
-                      <Skeleton variant="rounded" width={80} height={24} />
+                      <Skeleton variant="rectangular" width={80} height={24} />
                     </TableCell>
                     <TableCell>
                       <Skeleton variant="text" width="80%" />
@@ -1555,7 +1555,7 @@ const ClientVersionsPage: React.FC = () => {
                       <Skeleton variant="text" width="70%" />
                     </TableCell>
                     <TableCell align="center">
-                      <Skeleton variant="rounded" width={60} height={24} sx={{ mx: 'auto' }} />
+                      <Skeleton variant="rectangular" width={60} height={24} sx={{ mx: 'auto' }} />
                     </TableCell>
                     <TableCell>
                       <Skeleton variant="text" width="70%" />
@@ -1565,8 +1565,8 @@ const ClientVersionsPage: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', gap: 0.5 }}>
-                        <Skeleton variant="rounded" width={60} height={24} />
-                        <Skeleton variant="rounded" width={60} height={24} />
+                        <Skeleton variant="rectangular" width={60} height={24} />
+                        <Skeleton variant="rectangular" width={60} height={24} />
                       </Box>
                     </TableCell>
                     {canManage && (
@@ -1852,7 +1852,7 @@ const ClientVersionsPage: React.FC = () => {
           {/* 점검 관련 필드들 */}
           {bulkStatus === ClientStatus.MAINTENANCE && (
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <Box sx={{ mt: 3, p: 2, border: '1px solid', borderColor: 'warning.light', borderRadius: 1, bgcolor: 'background.default' }}>
+              <Box sx={{ mt: 3, p: 2, border: '1px solid', borderColor: 'warning.light', borderRadius: 0, bgcolor: 'background.default' }}>
                 <Typography variant="subtitle1" gutterBottom sx={{ color: 'warning.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                   <BuildIcon fontSize="small" sx={{ mr: 0.5 }} /> {t('clientVersions.maintenance.title')}
                 </Typography>
@@ -2092,8 +2092,8 @@ const ClientVersionsPage: React.FC = () => {
                 .filter(cv => selectedIds.includes(cv.id))
                 .map(cv => (
                   <Box key={cv.id} sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-                    <Chip label={cv.platform} size="small" color="primary" variant="outlined" sx={{ width: '100%', justifyContent: 'center', borderRadius: '4px' }} />
-                    <Chip label={cv.clientVersion} size="small" color="info" variant="filled" sx={{ width: '100%', justifyContent: 'center', borderRadius: '4px' }} />
+                    <Chip label={cv.platform} size="small" color="primary" variant="outlined" sx={{ width: '100%', justifyContent: 'center', borderRadius: 0 }} />
+                    <Chip label={cv.clientVersion} size="small" color="info" variant="filled" sx={{ width: '100%', justifyContent: 'center', borderRadius: 0 }} />
                   </Box>
                 ))}
             </Box>

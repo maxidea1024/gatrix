@@ -70,7 +70,7 @@ const TypingIndicator: React.FC<TypingIndicatorProps> = ({ users }) => {
         mx: 1,
         mb: 1,
         backgroundColor: 'background.paper',
-        borderRadius: 2,
+        borderRadius: 0,
         border: 1,
         borderColor: 'divider',
         animation: 'fadeIn 0.2s ease-in',

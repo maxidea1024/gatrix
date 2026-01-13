@@ -292,7 +292,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 2,
+          borderRadius: 0,
           minHeight: 500, // 최소 높이를 늘려서 안정화
           maxHeight: 600, // 최대 높이 제한
         }

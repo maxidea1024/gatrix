@@ -87,7 +87,7 @@ const UnauthorizedPage: React.FC = () => {
           </Typography>
 
           {user && (
-            <Box sx={{ mb: 3, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
+            <Box sx={{ mb: 3, p: 2, bgcolor: 'grey.100', borderRadius: 0 }}>
               <Typography variant="body2" color="text.secondary">
                 {t('common.loggedInAs')}: <strong>{user.name}</strong>
               </Typography>
@@ -99,7 +99,7 @@ const UnauthorizedPage: React.FC = () => {
 
           {/* Required Permissions Section */}
           {(requiredPermissions.length > 0 || requiredRole) && (
-            <Box sx={{ mb: 3, p: 2, bgcolor: 'warning.lighter', borderRadius: 1, textAlign: 'left' }}>
+            <Box sx={{ mb: 3, p: 2, bgcolor: 'warning.lighter', borderRadius: 0, textAlign: 'left' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
                 <PermissionIcon sx={{ fontSize: 20, color: 'warning.main' }} />
                 <Typography variant="subtitle2" color="warning.dark">

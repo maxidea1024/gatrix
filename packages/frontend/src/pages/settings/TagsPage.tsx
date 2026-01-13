@@ -288,7 +288,7 @@ const TagsPage: React.FC = () => {
                               width: 32,
                               height: 32,
                               bgcolor: tag.color,
-                              borderRadius: 1,
+                              borderRadius: 0,
                               border: '1px solid',
                               borderColor: 'divider',
                             }}

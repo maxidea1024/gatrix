@@ -582,7 +582,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
           minHeight: '32px',
           border: '1.5px solid',
           borderColor: 'primary.main',
-          borderRadius: '16px',
+          borderRadius: 0,
           bgcolor: 'rgba(25, 118, 210, 0.08)',
         }}
       >
@@ -620,7 +620,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 height: '28px',
                 fontSize: '0.8125rem',
                 bgcolor: 'background.paper',
-                borderRadius: '8px',
+                borderRadius: 0,
               },
               '& .MuiOutlinedInput-notchedOutline': {
                 borderColor: 'rgba(0, 0, 0, 0.12)',
@@ -657,7 +657,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 height: '28px',
                 fontSize: '0.8125rem',
                 bgcolor: 'background.paper',
-                borderRadius: '8px',
+                borderRadius: 0,
               },
               '& .MuiOutlinedInput-notchedOutline': {
                 borderColor: 'rgba(0, 0, 0, 0.12)',
@@ -702,7 +702,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 height: '28px',
                 fontSize: '0.8125rem',
                 bgcolor: 'background.paper',
-                borderRadius: '8px',
+                borderRadius: 0,
                 '& .MuiOutlinedInput-notchedOutline': {
                   borderColor: 'rgba(0, 0, 0, 0.12)',
                 },
@@ -783,7 +783,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 minHeight: '28px',
                 fontSize: '0.8125rem',
                 bgcolor: 'background.paper',
-                borderRadius: '8px',
+                borderRadius: 0,
                 '& .MuiOutlinedInput-notchedOutline': {
                   borderColor: 'rgba(0, 0, 0, 0.12)',
                 },
@@ -904,7 +904,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 minHeight: '28px',
                 fontSize: '0.8125rem',
                 bgcolor: 'background.paper',
-                borderRadius: '8px',
+                borderRadius: 0,
                 '& .MuiOutlinedInput-notchedOutline': {
                   borderColor: 'rgba(0, 0, 0, 0.12)',
                 },

@@ -79,6 +79,9 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         fontWeight: 500,
       },
     },
+    shape: {
+      borderRadius: 0,
+    },
     components: {
       MuiAppBar: {
         styleOverrides: {
@@ -89,17 +92,26 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           },
         },
       },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            borderRadius: 0,
+          },
+        },
+      },
       MuiDrawer: {
         styleOverrides: {
           paper: {
             backgroundColor: mode === 'dark' ? '#1e1e1e' : '#ffffff',
             borderRight: 'none',
+            borderRadius: 0,
           },
         },
       },
       MuiCard: {
         styleOverrides: {
           root: {
+            borderRadius: 0,
             boxShadow: mode === 'dark'
               ? '0px 2px 8px rgba(0, 0, 0, 0.3)'
               : '0px 2px 8px rgba(0, 0, 0, 0.1)',
@@ -110,7 +122,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             textTransform: 'none',
-            borderRadius: 8,
+            borderRadius: 0,
             fontWeight: 500,
           },
         },
@@ -119,7 +131,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             '& .MuiPaginationItem-root': {
-              borderRadius: 8,
+              borderRadius: 0,
               fontWeight: 500,
               '&.Mui-selected': {
                 backgroundColor: mode === 'dark' ? '#6EA8FF' : '#1976d2',
@@ -141,7 +153,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             '& .MuiOutlinedInput-root': {
-              borderRadius: 8,
+              borderRadius: 0,
               backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'inherit',
               '& fieldset': {
                 borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
@@ -215,6 +227,9 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
               WebkitBackdropFilter: 'blur(8px)', // Safari support
             },
           },
+          paper: {
+            borderRadius: 0,
+          },
         },
       },
       MuiModal: {
@@ -247,6 +262,11 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
                 WebkitBackdropFilter: 'none',
               },
             },
+            PaperProps: {
+              style: {
+                borderRadius: 0,
+              },
+            },
           },
         },
       },
@@ -260,12 +280,17 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
               WebkitBackdropFilter: 'none',
             },
           },
+          PaperProps: {
+            style: {
+              borderRadius: 0,
+            },
+          },
         },
       },
       MuiChip: {
         styleOverrides: {
           root: {
-            borderRadius: 4, // Square shape instead of round
+            borderRadius: 0,
           },
         },
       },

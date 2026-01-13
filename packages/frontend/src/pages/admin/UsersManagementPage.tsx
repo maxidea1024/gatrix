@@ -1576,7 +1576,7 @@ const UsersManagementPage: React.FC = () => {
               label={t('users.allEnvironments')}
               color="warning"
               size="small"
-              sx={{ borderRadius: 1 }}
+              sx={{ borderRadius: 0 }}
             />
           );
         }
@@ -1598,7 +1598,7 @@ const UsersManagementPage: React.FC = () => {
                   label={env?.displayName || env?.environmentName || envName}
                   size="small"
                   sx={{
-                    borderRadius: 1,
+                    borderRadius: 0,
                     bgcolor: env?.color || '#666',
                     color: '#fff',
                   }}
@@ -1609,7 +1609,7 @@ const UsersManagementPage: React.FC = () => {
               <Chip
                 label={`+${userEnvIds.length - 3}`}
                 size="small"
-                sx={{ borderRadius: 1 }}
+                sx={{ borderRadius: 0 }}
               />
             )}
           </Box>

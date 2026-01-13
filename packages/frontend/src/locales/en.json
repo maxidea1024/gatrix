@@ -4372,6 +4372,8 @@
       "commentPlaceholder": "Optional comment about this upload",
       "alreadyUpToDate": "The data is already up to date. No changes were detected.",
       "alreadyUpToDateTitle": "Already Up To Date",
+      "forceUpload": "Force Upload",
+      "forceUploadHint": "If you want to re-upload the data anyway, use the Force Upload button.",
       "previewChanges": "Preview Changes",
       "previewChangesTitle": "Preview Changes",
       "previewFailed": "Failed to preview changes",

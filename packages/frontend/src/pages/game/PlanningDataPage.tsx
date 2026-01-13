@@ -991,7 +991,7 @@ const PlanningDataPage: React.FC = () => {
                               gap: 0,
                               border: '1px dashed',
                               borderColor: 'divider',
-                              borderRadius: 1,
+                              borderRadius: 0,
                               overflow: 'hidden',
                             }}>
                               {filteredRewardItems.map((item: any) => {
@@ -1115,7 +1115,7 @@ const PlanningDataPage: React.FC = () => {
                           py: 8,
                           px: 4,
                           bgcolor: 'background.paper',
-                          borderRadius: 2,
+                          borderRadius: 0,
                           border: '1px solid',
                           borderColor: 'divider'
                         }}>
@@ -1261,7 +1261,7 @@ const PlanningDataPage: React.FC = () => {
                               gap: 0,
                               border: '1px dashed',
                               borderColor: 'divider',
-                              borderRadius: 1,
+                              borderRadius: 0,
                               overflow: 'hidden',
                             }}>
                               {filteredItems.map((item: any) => {
@@ -1826,7 +1826,7 @@ const PlanningDataPage: React.FC = () => {
                               gap: 0,
                               border: '1px dashed',
                               borderColor: 'divider',
-                              borderRadius: 1,
+                              borderRadius: 0,
                               overflow: 'hidden',
                             }}>
                               {eventPageData.items.map((item: any) => {
@@ -2012,7 +2012,7 @@ const PlanningDataPage: React.FC = () => {
                               gap: 0,
                               border: '1px dashed',
                               borderColor: 'divider',
-                              borderRadius: 1,
+                              borderRadius: 0,
                               overflow: 'hidden',
                             }}>
                               {liveEventData.items.map((item: any) => {
@@ -2251,7 +2251,7 @@ const PlanningDataPage: React.FC = () => {
                               gap: 0,
                               border: '1px dashed',
                               borderColor: 'divider',
-                              borderRadius: 1,
+                              borderRadius: 0,
                               overflow: 'hidden',
                             }}>
                               {mateRecruitingGroupData.items.map((item: any) => {
@@ -2484,7 +2484,7 @@ const PlanningDataPage: React.FC = () => {
                               gap: 0,
                               border: '1px dashed',
                               borderColor: 'divider',
-                              borderRadius: 1,
+                              borderRadius: 0,
                               overflow: 'hidden',
                             }}>
                               {oceanNpcAreaSpawnerData.items.map((item: any) => {

@@ -57,7 +57,7 @@ const SessionExpiredPage: React.FC = () => {
           elevation={24}
           sx={{
             padding: { xs: 3, sm: 5 },
-            borderRadius: 3,
+            borderRadius: 0,
             textAlign: 'center',
           }}
         >
@@ -110,7 +110,7 @@ const SessionExpiredPage: React.FC = () => {
                 maxWidth: 400,
                 backgroundColor: 'grey.100',
                 padding: 2,
-                borderRadius: 1,
+                borderRadius: 0,
                 borderLeft: 4,
                 borderColor: 'warning.main',
               }}
@@ -128,7 +128,7 @@ const SessionExpiredPage: React.FC = () => {
                 mt: 2,
                 paddingX: 4,
                 paddingY: 1.5,
-                borderRadius: 2,
+                borderRadius: 0,
                 textTransform: 'none',
                 fontSize: '1rem',
                 fontWeight: 600,

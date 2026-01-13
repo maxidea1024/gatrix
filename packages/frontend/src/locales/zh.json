@@ -4395,6 +4395,8 @@
       "commentPlaceholder": "关于此次上传的说明（可选）",
       "alreadyUpToDate": "数据已是最新。没有检测到变更。",
       "alreadyUpToDateTitle": "已是最新状态",
+      "forceUpload": "强制上传",
+      "forceUploadHint": "如果仍要重新上传数据，请使用强制上传按钮。",
       "previewChanges": "预览变更",
       "previewChangesTitle": "预览变更",
       "previewFailed": "预览变更失败",

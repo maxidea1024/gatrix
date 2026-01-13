@@ -4388,6 +4388,8 @@
       "commentPlaceholder": "이번 업로드에 대한 설명을 입력하세요 (선택사항)",
       "alreadyUpToDate": "이미 최신 데이터입니다. 변경된 내용이 없습니다.",
       "alreadyUpToDateTitle": "이미 최신 상태",
+      "forceUpload": "강제 업로드",
+      "forceUploadHint": "그래도 데이터를 다시 업로드하려면 강제 업로드 버튼을 사용하세요.",
       "previewChanges": "변경사항 미리보기",
       "previewChangesTitle": "변경사항 미리보기",
       "previewFailed": "변경사항 확인에 실패했습니다",

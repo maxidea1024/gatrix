@@ -260,8 +260,11 @@ class PlanningDataService {
 
   /**
    * Upload planning data files (drag & drop)
+   * @param files - Files to upload
+   * @param comment - Optional upload comment
+   * @param forceUpload - Force upload even if data hasn't changed
    */
-  async uploadPlanningData(files: File[], comment?: string): Promise<{ success: boolean; message: string; filesUploaded: string[]; stats: any; uploadRecord?: UploadRecord }> {
+  async uploadPlanningData(files: File[], comment?: string, forceUpload?: boolean): Promise<{ success: boolean; message: string; filesUploaded: string[]; stats: any; uploadRecord?: UploadRecord }> {
     const formData = new FormData();
 
     // Add each file to FormData
@@ -272,6 +275,11 @@ class PlanningDataService {
     // Add optional comment
     if (comment) {
       formData.append('comment', comment);
+    }
+
+    // Add force upload flag
+    if (forceUpload) {
+      formData.append('forceUpload', 'true');
     }
 
     const response = await api.post('/admin/planning-data/upload', formData, {

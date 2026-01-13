@@ -224,7 +224,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                         backgroundColor: isSelected
                           ? (theme) => theme.palette.mode === 'dark' ? 'rgba(144, 202, 249, 0.16)' : 'rgba(25, 118, 210, 0.08)'
                           : 'transparent',
-                        borderRadius: '8px',
+                        borderRadius: 0,
                         '&:hover': {
                           backgroundColor: isSelected
                             ? (theme) => theme.palette.mode === 'dark' ? 'rgba(144, 202, 249, 0.24)' : 'rgba(25, 118, 210, 0.12)'
@@ -322,7 +322,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                         fontSize: '1.5rem',
                         color: 'inherit',
                         backgroundColor: 'transparent',
-                        borderRadius: '8px',
+                        borderRadius: 0,
                         '&:hover': {
                           backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
                           transform: 'scale(1.2)'

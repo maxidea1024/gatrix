@@ -1984,7 +1984,7 @@ const ApiTokensPage: React.FC = () => {
               overflowY: 'auto',
               border: '1px solid',
               borderColor: 'divider',
-              borderRadius: 1,
+              borderRadius: 0,
               p: 1
             }}>
               {tokens
@@ -1994,7 +1994,7 @@ const ApiTokensPage: React.FC = () => {
                     p: 1.5,
                     mb: 1,
                     bgcolor: 'action.hover',
-                    borderRadius: 1,
+                    borderRadius: 0,
                     '&:last-child': { mb: 0 }
                   }}>
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
@@ -2018,7 +2018,7 @@ const ApiTokensPage: React.FC = () => {
               mb: 2,
               p: 1,
               bgcolor: 'action.hover',
-              borderRadius: 1,
+              borderRadius: 0,
               fontFamily: 'monospace',
               fontWeight: 600
             }}>
@@ -2101,7 +2101,7 @@ const ApiTokensPage: React.FC = () => {
               mb: 3,
               p: 3,
               bgcolor: 'background.paper',
-              borderRadius: 2,
+              borderRadius: 0,
               border: '1px solid',
               borderColor: 'divider',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
@@ -2189,7 +2189,7 @@ const ApiTokensPage: React.FC = () => {
             <Box sx={{
               p: 2,
               bgcolor: 'action.hover',
-              borderRadius: 1,
+              borderRadius: 0,
               border: '1px solid',
               borderColor: 'divider'
             }}>
@@ -2204,7 +2204,7 @@ const ApiTokensPage: React.FC = () => {
                 gap: 1,
                 p: 1.5,
                 bgcolor: 'background.default',
-                borderRadius: 1,
+                borderRadius: 0,
                 border: '1px solid',
                 borderColor: 'divider'
               }}>

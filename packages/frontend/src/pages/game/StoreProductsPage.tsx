@@ -766,7 +766,7 @@ const StoreProductsPage: React.FC = () => {
                         alignItems: 'center',
                         gap: 0,
                         ml: 1,
-                        borderRadius: 1,
+                        borderRadius: 0,
                         bgcolor: 'background.paper',
                         border: 1,
                         borderColor: 'divider',

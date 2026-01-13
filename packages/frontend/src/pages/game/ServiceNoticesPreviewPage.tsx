@@ -653,14 +653,14 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                   '& code': {
                     backgroundColor: 'rgba(0, 0, 0, 0.05)',
                     padding: '0.2em 0.4em',
-                    borderRadius: '3px',
+                    borderRadius: 0,
                     fontFamily: 'Monaco, Courier New, monospace',
                     fontSize: '0.9em',
                   },
                   '& pre': {
                     backgroundColor: 'rgba(0, 0, 0, 0.05)',
                     padding: '1em',
-                    borderRadius: '4px',
+                    borderRadius: 0,
                     overflow: 'auto',
                     margin: '0.75em 0',
                   },
@@ -703,7 +703,7 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                   },
                   // Page background wrapper
                   '& .page-background': {
-                    borderRadius: '4px',
+                    borderRadius: 0,
                   },
                   // Animation keyframes - defined inline via @keyframes in global styles
                   '@keyframes ql-blink': {

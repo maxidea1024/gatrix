@@ -165,18 +165,18 @@ const ChannelList: React.FC<ChannelListProps> = ({
         addSuffix: true,
         locale: getDateLocale(),
       });
-      
-      const content = channel.lastMessage.content.length > 30 
+
+      const content = channel.lastMessage.content.length > 30
         ? `${channel.lastMessage.content.substring(0, 30)}...`
         : channel.lastMessage.content;
-      
+
       return `${channel.lastMessage.user.username}: ${content} • ${timeAgo}`;
     }
-    
+
     if (channel.description) {
       return channel.description;
     }
-    
+
     return '';
   };
 
@@ -240,7 +240,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
                       px: 1, // 좌우 패딩 설정
                       mx: 1.5, // 좌우 여백 늘림
                       my: 0.25, // 위아래 마진 추가로 간격 조정
-                      borderRadius: 1, // 슬랙 스타일 라운드
+                      borderRadius: 0, // 슬랙 스타일 라운드
                       '&.Mui-selected': {
                         backgroundColor: (theme) =>
                           theme.palette.mode === 'dark'
@@ -253,92 +253,92 @@ const ChannelList: React.FC<ChannelListProps> = ({
                               ? 'rgba(255, 255, 255, 0.12)'
                               : 'rgba(0, 0, 0, 0.12)', // 라이트 테마 호버도 더 어둡게 (0.08 → 0.12)
                         },
-                      '& .MuiListItemIcon-root': {
-                        color: 'inherit',
+                        '& .MuiListItemIcon-root': {
+                          color: 'inherit',
+                        },
+                        '& .MuiListItemText-secondary': {
+                          color: 'text.secondary',
+                        },
                       },
-                      '& .MuiListItemText-secondary': {
-                        color: 'text.secondary',
+                      '&:hover': {
+                        backgroundColor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.04)'
+                            : 'rgba(0, 0, 0, 0.04)', // 라이트 테마 일반 호버도 더 어둡게 (0.02 → 0.04)
+                        borderRadius: 0, // 호버 시에도 라운드 유지
                       },
-                    },
-                    '&:hover': {
-                      backgroundColor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.04)'
-                          : 'rgba(0, 0, 0, 0.04)', // 라이트 테마 일반 호버도 더 어둡게 (0.02 → 0.04)
-                      borderRadius: 1, // 호버 시에도 라운드 유지
-                    },
-                  }}
-                >
-                  <ListItemIcon sx={{ minWidth: 40 }}>
-                    {channel.type === 'direct' ? (
-                      <Avatar sx={{ width: 24, height: 24, fontSize: '0.75rem' }}>
-                        {channel.name.charAt(0).toUpperCase()}
-                      </Avatar>
-                    ) : (
-                      getChannelIcon(channel)
-                    )}
-                  </ListItemIcon>
-                  
-                  <ListItemText
-                    primary={
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontWeight: 500 }}>
-                          {channel.name}
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      {channel.type === 'direct' ? (
+                        <Avatar sx={{ width: 24, height: 24, fontSize: '0.75rem' }}>
+                          {channel.name.charAt(0).toUpperCase()}
+                        </Avatar>
+                      ) : (
+                        getChannelIcon(channel)
+                      )}
+                    </ListItemIcon>
+
+                    <ListItemText
+                      primary={
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontWeight: 500 }}>
+                            {channel.name}
+                          </span>
+                          {channel.type === 'private' && (
+                            <Chip
+                              label={t('chat.private')}
+                              size="small"
+                              variant="outlined"
+                              sx={{ height: 16, fontSize: '0.6rem' }}
+                            />
+                          )}
                         </span>
-                        {channel.type === 'private' && (
+                      }
+                      secondary={getChannelSubtitle(channel)}
+                      primaryTypographyProps={{
+                        variant: 'body2',
+                        noWrap: true,
+                      }}
+                      secondaryTypographyProps={{
+                        variant: 'caption',
+                        noWrap: true,
+                      }}
+                    />
+
+                    <ListItemSecondaryAction>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        {channel.unreadCount > 0 && state.currentChannelId !== channel.id && (
                           <Chip
-                            label={t('chat.private')}
+                            label={channel.unreadCount > 99 ? '99+' : channel.unreadCount}
                             size="small"
-                            variant="outlined"
-                            sx={{ height: 16, fontSize: '0.6rem' }}
+                            color="error"
+                            sx={{
+                              height: 18,
+                              fontSize: '0.65rem',
+                              fontWeight: 'bold',
+                              '& .MuiChip-label': {
+                                px: 0.75,
+                              },
+                            }}
                           />
                         )}
-                      </span>
-                    }
-                    secondary={getChannelSubtitle(channel)}
-                    primaryTypographyProps={{
-                      variant: 'body2',
-                      noWrap: true,
-                    }}
-                    secondaryTypographyProps={{
-                      variant: 'caption',
-                      noWrap: true,
-                    }}
-                  />
-                  
-                  <ListItemSecondaryAction>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      {channel.unreadCount > 0 && state.currentChannelId !== channel.id && (
-                        <Chip
-                          label={channel.unreadCount > 99 ? '99+' : channel.unreadCount}
+
+                        <IconButton
                           size="small"
-                          color="error"
+                          onClick={(e) => handleChannelMenu(e, channel)}
                           sx={{
-                            height: 18,
-                            fontSize: '0.65rem',
-                            fontWeight: 'bold',
-                            '& .MuiChip-label': {
-                              px: 0.75,
-                            },
+                            opacity: 0.7,
+                            '&:hover': { opacity: 1 },
                           }}
-                        />
-                      )}
-                      
-                      <IconButton
-                        size="small"
-                        onClick={(e) => handleChannelMenu(e, channel)}
-                        sx={{ 
-                          opacity: 0.7,
-                          '&:hover': { opacity: 1 },
-                        }}
-                      >
-                        <MoreIcon fontSize="small" />
-                      </IconButton>
-                    </Box>
-                  </ListItemSecondaryAction>
-                </ListItemButton>
-              </ListItem>
-            );
+                        >
+                          <MoreIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    </ListItemSecondaryAction>
+                  </ListItemButton>
+                </ListItem>
+              );
             })}
           </List>
         )}
@@ -362,7 +362,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
           <SettingsIcon sx={{ mr: 1 }} />
           {t('chat.channelSettings')}
         </MenuItem>
-        
+
         {selectedChannel?.type !== 'direct' && (
           <MenuItem onClick={handleLeaveChannel} sx={{ color: 'error.main' }}>
             <LeaveIcon sx={{ mr: 1 }} />

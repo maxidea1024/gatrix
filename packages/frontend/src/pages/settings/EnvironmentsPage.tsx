@@ -640,7 +640,7 @@ const EnvironmentsPage: React.FC = () => {
             </FormControl>
 
             {/* Change Request Settings for New Environment */}
-            <Box sx={{ mt: 1, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+            <Box sx={{ mt: 1, p: 2, bgcolor: 'background.default', borderRadius: 0 }}>
               <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
                 {t('environments.changeRequestSettings')}
               </Typography>
@@ -893,7 +893,7 @@ const EnvironmentsPage: React.FC = () => {
           </Box>
 
           {/* Change Request Settings */}
-          <Box sx={{ mt: 3, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+          <Box sx={{ mt: 3, p: 2, bgcolor: 'background.default', borderRadius: 0 }}>
             <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
               {t('environments.changeRequestSettings')}
             </Typography>
@@ -929,7 +929,7 @@ const EnvironmentsPage: React.FC = () => {
 
           {/* Lock Settings - only show when CR is enabled */}
           {editEnv.requiresApproval && (
-            <Box sx={{ mt: 2, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+            <Box sx={{ mt: 2, p: 2, bgcolor: 'background.default', borderRadius: 0 }}>
               <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
                 {t('environments.lockSettings')}
               </Typography>

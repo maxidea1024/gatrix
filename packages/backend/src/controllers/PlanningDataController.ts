@@ -199,11 +199,13 @@ export class PlanningDataController {
   static uploadPlanningData = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const environment = getEnvironment(req);
     const uploadComment = req.body?.comment || req.query?.comment;
+    const forceUpload = req.body?.forceUpload === 'true' || req.body?.forceUpload === true;
 
     logger.info('Planning data upload requested', {
       userId: req.user?.userId,
       filesCount: req.files ? Object.keys(req.files).length : 0,
       environment,
+      forceUpload,
     });
 
     // Determine upload source and uploader info
@@ -214,6 +216,7 @@ export class PlanningDataController {
       uploaderName: uploaderNameOverride || req.user?.name || req.user?.email || (req as any).apiToken?.tokenName || 'Unknown',
       uploadSource: (isCliUpload ? 'cli' : 'web') as 'web' | 'cli',
       uploadComment: uploadComment as string | undefined,
+      forceUpload,
     };
 
     const result = await PlanningDataService.uploadPlanningData(environment, req.files as any, uploadInfo);

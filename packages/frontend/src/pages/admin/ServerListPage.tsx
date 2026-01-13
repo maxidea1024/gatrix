@@ -1733,7 +1733,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(({
             alignItems: 'center',
             px: 1.5,
             py: 0.5,
-            borderRadius: '6px',
+            borderRadius: 0,
             bgcolor: depth === 0 ? 'primary.main' : 'action.selected',
             color: depth === 0 ? 'primary.contrastText' : 'text.primary',
             boxShadow: depth === 0 ? '0 3px 8px rgba(0,0,0,0.12)' : 'none',

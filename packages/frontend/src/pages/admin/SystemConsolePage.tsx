@@ -1165,7 +1165,7 @@ const SystemConsolePage: React.FC = () => {
             fontSize: '0.875rem',
             py: 1,
             px: 2,
-            borderRadius: 1,
+            borderRadius: 0,
             mx: 0.5,
             '&:hover': {
               backgroundColor: th.palette.mode === 'dark'
@@ -1186,7 +1186,7 @@ const SystemConsolePage: React.FC = () => {
             fontSize: '0.875rem',
             py: 1,
             px: 2,
-            borderRadius: 1,
+            borderRadius: 0,
             mx: 0.5,
             '&:hover': {
               backgroundColor: th.palette.mode === 'dark'

@@ -200,7 +200,7 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
           height: typeof height === 'number' ? `${height}px` : height,
           border: '1px solid',
           borderColor: error ? theme.palette.error.main : theme.palette.divider,
-          borderRadius: '4px',
+          borderRadius: 0,
           fontSize: '14px',
           backgroundColor: isDark ? '#1e1e1e' : '#ffffff',
           outline: 'none !important',
@@ -268,7 +268,7 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
           backgroundColor: isDark ? '#252526' : '#f5f5f5',
           color: isDark ? '#d4d4d4' : '#333333',
           border: `1px solid ${isDark ? '#454545' : '#c8c8c8'}`,
-          borderRadius: '4px',
+          borderRadius: 0,
         },
         '.cm-tooltip-lint': {
           backgroundColor: isDark ? '#252526' : '#f5f5f5',

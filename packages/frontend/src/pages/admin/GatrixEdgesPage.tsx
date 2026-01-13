@@ -502,7 +502,7 @@ const GatrixEdgesPage: React.FC = () => {
                                         fontSize: '0.8rem',
                                         fontWeight: 'bold',
                                         bgcolor: theme.palette.action.hover,
-                                        borderRadius: 1,
+                                        borderRadius: 0,
                                         px: 1,
                                         py: 0.25,
                                         '& .MuiSelect-select': {
@@ -587,7 +587,7 @@ const GatrixEdgesPage: React.FC = () => {
                         mb: 1.5,
                         p: 1,
                         bgcolor: theme.palette.primary.main + '10',
-                        borderRadius: 1,
+                        borderRadius: 0,
                         border: `1px solid ${theme.palette.primary.main}30`,
                         display: 'flex',
                         justifyContent: 'center',
@@ -610,7 +610,7 @@ const GatrixEdgesPage: React.FC = () => {
                         overflowX: 'auto',
                         mt: 1,
                         border: `1px solid ${theme.palette.divider}`,
-                        borderRadius: 1,
+                        borderRadius: 0,
                         bgcolor: theme.palette.background.paper
                     }}>
                         <Table size="small" sx={{
@@ -726,7 +726,7 @@ const GatrixEdgesPage: React.FC = () => {
                                     label={`${name}: ${port}`}
                                     size="small"
                                     variant="outlined"
-                                    sx={{ fontFamily: 'monospace', fontSize: '0.75rem', borderRadius: 1 }}
+                                    sx={{ fontFamily: 'monospace', fontSize: '0.75rem', borderRadius: 0 }}
                                 />
                             ))}
                         </Box>
@@ -759,7 +759,7 @@ const GatrixEdgesPage: React.FC = () => {
                 <Divider sx={{ my: 3 }} />
 
                 {/* Cache Status Section - Moved below Basic Info */}
-                <Box sx={{ p: 1.5, bgcolor: theme.palette.background.paper, borderRadius: 1, border: `1px solid ${theme.palette.divider}` }}>
+                <Box sx={{ p: 1.5, bgcolor: theme.palette.background.paper, borderRadius: 0, border: `1px solid ${theme.palette.divider}` }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
                         <CachedIcon fontSize="small" color="primary" />
                         <Typography variant="subtitle2" fontWeight="bold">
@@ -1045,7 +1045,7 @@ const GatrixEdgesPage: React.FC = () => {
                     py: 1.5,
                     px: 2,
                     bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
-                    borderRadius: 2,
+                    borderRadius: 0,
                     border: `1px solid ${theme.palette.divider}`
                 }}>
                     <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5, mr: 0.5 }}>
@@ -1187,7 +1187,7 @@ const GatrixEdgesPage: React.FC = () => {
                                             width: 48,
                                             height: 48,
                                             bgcolor: 'primary.main',
-                                            borderRadius: 1,
+                                            borderRadius: 0,
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -1265,7 +1265,7 @@ const GatrixEdgesPage: React.FC = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        borderRadius: 3,
+                        borderRadius: 0,
                         minHeight: '70vh',
                         maxHeight: '90vh',
                         bgcolor: theme.palette.background.paper,
@@ -1288,7 +1288,7 @@ const GatrixEdgesPage: React.FC = () => {
                     <Box sx={{
                         width: 40,
                         height: 40,
-                        borderRadius: 2,
+                        borderRadius: 0,
                         bgcolor: theme.palette.primary.main,
                         display: 'flex',
                         alignItems: 'center',
@@ -1326,7 +1326,7 @@ const GatrixEdgesPage: React.FC = () => {
                                 }
                             }}
                         />
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: theme.palette.action.hover, borderRadius: 1, px: 0.5, height: 36, visibility: jsonSearchMatches.length > 0 ? 'visible' : 'hidden' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: theme.palette.action.hover, borderRadius: 0, px: 0.5, height: 36, visibility: jsonSearchMatches.length > 0 ? 'visible' : 'hidden' }}>
                             <Typography variant="caption" sx={{ mx: 0.5, minWidth: 40, textAlign: 'center', fontWeight: 'bold' }}>
                                 {jsonSearchIndex + 1} / {jsonSearchMatches.length}
                             </Typography>
@@ -1395,7 +1395,7 @@ const GatrixEdgesPage: React.FC = () => {
                             startIcon={<CopyIcon />}
                             onClick={handleCopyJson}
                             sx={{
-                                borderRadius: 1.5,
+                                borderRadius: 0,
                                 textTransform: 'none'
                             }}
                         >
@@ -1405,7 +1405,7 @@ const GatrixEdgesPage: React.FC = () => {
                             variant="contained"
                             onClick={() => setJsonDialogOpen(false)}
                             sx={{
-                                borderRadius: 1.5,
+                                borderRadius: 0,
                                 textTransform: 'none'
                             }}
                         >
