@@ -36,6 +36,7 @@
       "discoveryGroup": "number",
       "dispatchGroup": "number",
       "regionId": "number",
+      "landExpVal": "number",
       "landCulture": "number",
       "landGrade": "number",
       "landRewardType": [
@@ -52,6 +53,7 @@
           "IsDuplicated": 1
         }
       ],
+      "landExpVal": 1,
       "landCulture": 1,
       "landGrade": 1,
       "landRewardType": [
@@ -182,6 +184,7 @@
       "discoveryGroup": 77600000,
       "dispatchGroup": 1101,
       "regionId": 12000000,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -217,6 +220,7 @@
       "discoveryGroup": 77600001,
       "dispatchGroup": 1102,
       "regionId": 12001000,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -252,6 +256,7 @@
       "discoveryGroup": 77600002,
       "dispatchGroup": 1103,
       "regionId": 12000200,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -288,6 +293,7 @@
       "discoveryGroup": 77600003,
       "dispatchGroup": 1104,
       "regionId": 12000400,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -323,6 +329,7 @@
       "discoveryGroup": 77600004,
       "dispatchGroup": 1104,
       "regionId": 12000400,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -358,6 +365,7 @@
       "discoveryGroup": 77600005,
       "dispatchGroup": 1105,
       "regionId": 12000500,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -393,6 +401,7 @@
       "discoveryGroup": 77600006,
       "dispatchGroup": 2801,
       "regionId": 12001503,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -428,6 +437,7 @@
       "discoveryGroup": 77600147,
       "dispatchGroup": 2301,
       "regionId": 12001504,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -463,6 +473,7 @@
       "discoveryGroup": 77600007,
       "dispatchGroup": 1106,
       "regionId": 12000700,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -498,6 +509,7 @@
       "discoveryGroup": 77600008,
       "dispatchGroup": 2301,
       "regionId": 12001500,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -533,6 +545,7 @@
       "discoveryGroup": 77600009,
       "dispatchGroup": 1107,
       "regionId": 12001200,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -568,6 +581,7 @@
       "discoveryGroup": 77600010,
       "dispatchGroup": 1107,
       "regionId": 12001200,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -602,6 +616,7 @@
       "trainingMode": 77705007,
       "discoveryGroup": 77600173,
       "regionId": 12001200,
+      "landExpVal": 50,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -636,6 +651,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600174,
       "regionId": 12001200,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -671,6 +687,7 @@
       "discoveryGroup": 77600084,
       "dispatchGroup": 2201,
       "regionId": 12001500,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -706,6 +723,7 @@
       "discoveryGroup": 77600012,
       "dispatchGroup": 1104,
       "regionId": 12000400,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -741,6 +759,7 @@
       "discoveryGroup": 77600013,
       "dispatchGroup": 1116,
       "regionId": 12000700,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -776,6 +795,7 @@
       "discoveryGroup": 77600014,
       "dispatchGroup": 1101,
       "regionId": 12000000,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -811,6 +831,7 @@
       "discoveryGroup": 77600015,
       "dispatchGroup": 1108,
       "regionId": 12001600,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -846,6 +867,7 @@
       "discoveryGroup": 77600016,
       "dispatchGroup": 1201,
       "regionId": 12000900,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -881,6 +903,7 @@
       "discoveryGroup": 77600017,
       "dispatchGroup": 1301,
       "regionId": 12000900,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -916,6 +939,7 @@
       "discoveryGroup": 77600018,
       "dispatchGroup": 1301,
       "regionId": 12000900,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -951,6 +975,7 @@
       "discoveryGroup": 77600019,
       "dispatchGroup": 1401,
       "regionId": 12001800,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -986,6 +1011,7 @@
       "discoveryGroup": 77600020,
       "dispatchGroup": 1401,
       "regionId": 12001800,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -1021,6 +1047,7 @@
       "discoveryGroup": 77600021,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -1056,6 +1083,7 @@
       "discoveryGroup": 77600021,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -1091,6 +1119,7 @@
       "discoveryGroup": 77600021,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -1126,6 +1155,7 @@
       "discoveryGroup": 77600022,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -1161,6 +1191,7 @@
       "discoveryGroup": 77600022,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -1196,6 +1227,7 @@
       "discoveryGroup": 77600023,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -1231,6 +1263,7 @@
       "discoveryGroup": 77600023,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -1266,6 +1299,7 @@
       "discoveryGroup": 77600023,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -1302,6 +1336,7 @@
       "discoveryGroup": 77600024,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -1338,6 +1373,7 @@
       "discoveryGroup": 77600024,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -1374,6 +1410,7 @@
       "discoveryGroup": 77600024,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -1410,6 +1447,7 @@
       "discoveryGroup": 77600024,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -1445,6 +1483,7 @@
       "discoveryGroup": 77600025,
       "dispatchGroup": 1402,
       "regionId": 12001600,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -1480,6 +1519,7 @@
       "discoveryGroup": 77600026,
       "dispatchGroup": 2101,
       "regionId": 12000301,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -1515,6 +1555,7 @@
       "discoveryGroup": 77600027,
       "dispatchGroup": 1801,
       "regionId": 12000301,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -1550,6 +1591,7 @@
       "discoveryGroup": 77600027,
       "dispatchGroup": 1801,
       "regionId": 12000301,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -1585,6 +1627,7 @@
       "discoveryGroup": 77600028,
       "dispatchGroup": 1801,
       "regionId": 12000301,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -1620,6 +1663,7 @@
       "discoveryGroup": 77600029,
       "dispatchGroup": 1802,
       "regionId": 12000302,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -1655,6 +1699,7 @@
       "discoveryGroup": 77600029,
       "dispatchGroup": 1802,
       "regionId": 12000302,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -1690,6 +1735,7 @@
       "discoveryGroup": 77600029,
       "dispatchGroup": 1802,
       "regionId": 12000302,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -1725,6 +1771,7 @@
       "discoveryGroup": 77600029,
       "dispatchGroup": 1802,
       "regionId": 12000302,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -1760,6 +1807,7 @@
       "discoveryGroup": 77600029,
       "dispatchGroup": 1802,
       "regionId": 12000302,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -1795,6 +1843,7 @@
       "discoveryGroup": 77600029,
       "dispatchGroup": 1802,
       "regionId": 12000302,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -1830,6 +1879,7 @@
       "discoveryGroup": 77600029,
       "dispatchGroup": 1802,
       "regionId": 12000302,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -1865,6 +1915,7 @@
       "discoveryGroup": 77600030,
       "dispatchGroup": 2102,
       "regionId": 12000300,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -1900,6 +1951,7 @@
       "discoveryGroup": 77600030,
       "dispatchGroup": 2102,
       "regionId": 12000300,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -1935,6 +1987,7 @@
       "discoveryGroup": 77600030,
       "dispatchGroup": 2102,
       "regionId": 12000300,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -1970,6 +2023,7 @@
       "discoveryGroup": 77600030,
       "dispatchGroup": 2102,
       "regionId": 12000300,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -2005,6 +2059,7 @@
       "discoveryGroup": 77600031,
       "dispatchGroup": 2102,
       "regionId": 12000300,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -2040,6 +2095,7 @@
       "discoveryGroup": 77600031,
       "dispatchGroup": 2102,
       "regionId": 12000300,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -2075,6 +2131,7 @@
       "discoveryGroup": 77600032,
       "dispatchGroup": 1802,
       "regionId": 12000302,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -2110,6 +2167,7 @@
       "discoveryGroup": 77600032,
       "dispatchGroup": 1802,
       "regionId": 12000302,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -2145,6 +2203,7 @@
       "discoveryGroup": 77600033,
       "dispatchGroup": 1803,
       "regionId": 12000800,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -2180,6 +2239,7 @@
       "discoveryGroup": 77600033,
       "dispatchGroup": 1803,
       "regionId": 12000800,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -2215,6 +2275,7 @@
       "discoveryGroup": 77600033,
       "dispatchGroup": 1803,
       "regionId": 12000800,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -2250,6 +2311,7 @@
       "discoveryGroup": 77600034,
       "dispatchGroup": 1701,
       "regionId": 12000800,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -2285,6 +2347,7 @@
       "discoveryGroup": 77600034,
       "dispatchGroup": 1701,
       "regionId": 12000800,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -2320,6 +2383,7 @@
       "discoveryGroup": 77600034,
       "dispatchGroup": 1701,
       "regionId": 12000800,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -2355,6 +2419,7 @@
       "discoveryGroup": 77600035,
       "dispatchGroup": 1803,
       "regionId": 12000800,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -2390,6 +2455,7 @@
       "discoveryGroup": 77600036,
       "dispatchGroup": 1803,
       "regionId": 12000800,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -2425,6 +2491,7 @@
       "discoveryGroup": 77600037,
       "dispatchGroup": 1601,
       "regionId": 12000100,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -2459,6 +2526,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600037,
       "regionId": 12000100,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -2494,6 +2562,7 @@
       "discoveryGroup": 77600037,
       "dispatchGroup": 1601,
       "regionId": 12000100,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -2529,6 +2598,7 @@
       "discoveryGroup": 77600037,
       "dispatchGroup": 1601,
       "regionId": 12000100,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -2564,6 +2634,7 @@
       "discoveryGroup": 77600037,
       "dispatchGroup": 1601,
       "regionId": 12000100,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -2599,6 +2670,7 @@
       "discoveryGroup": 77600037,
       "dispatchGroup": 1601,
       "regionId": 12000100,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -2634,6 +2706,7 @@
       "discoveryGroup": 77600037,
       "dispatchGroup": 1601,
       "regionId": 12000100,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -2669,6 +2742,7 @@
       "discoveryGroup": 77600038,
       "dispatchGroup": 1602,
       "regionId": 12002000,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -2704,6 +2778,7 @@
       "discoveryGroup": 77600038,
       "dispatchGroup": 1602,
       "regionId": 12002000,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -2739,6 +2814,7 @@
       "discoveryGroup": 77600039,
       "dispatchGroup": 1502,
       "regionId": 12001100,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -2774,6 +2850,7 @@
       "discoveryGroup": 77600039,
       "dispatchGroup": 1502,
       "regionId": 12001100,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -2809,6 +2886,7 @@
       "discoveryGroup": 77600039,
       "dispatchGroup": 1502,
       "regionId": 12001100,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -2844,6 +2922,7 @@
       "discoveryGroup": 77600040,
       "dispatchGroup": 1512,
       "regionId": 12001100,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -2879,6 +2958,7 @@
       "discoveryGroup": 77600040,
       "dispatchGroup": 1512,
       "regionId": 12001100,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -2914,6 +2994,7 @@
       "discoveryGroup": 77600040,
       "dispatchGroup": 1512,
       "regionId": 12001100,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -2949,6 +3030,7 @@
       "discoveryGroup": 77600040,
       "dispatchGroup": 1512,
       "regionId": 12001100,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -2984,6 +3066,7 @@
       "discoveryGroup": 77600041,
       "dispatchGroup": 1503,
       "regionId": 12002000,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -3019,6 +3102,7 @@
       "discoveryGroup": 77600041,
       "dispatchGroup": 1503,
       "regionId": 12002000,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -3054,6 +3138,7 @@
       "discoveryGroup": 77600041,
       "dispatchGroup": 1503,
       "regionId": 12002000,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -3088,6 +3173,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600169,
       "regionId": 12002000,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 21,
       "landRewardType": [
@@ -3123,6 +3209,7 @@
       "discoveryGroup": 77600042,
       "dispatchGroup": 1602,
       "regionId": 12002000,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -3158,6 +3245,7 @@
       "discoveryGroup": 77600042,
       "dispatchGroup": 1602,
       "regionId": 12002000,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -3193,6 +3281,7 @@
       "discoveryGroup": 77600042,
       "dispatchGroup": 1602,
       "regionId": 12002000,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -3228,6 +3317,7 @@
       "discoveryGroup": 77600042,
       "dispatchGroup": 1602,
       "regionId": 12002000,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -3263,6 +3353,7 @@
       "discoveryGroup": 77600043,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3298,6 +3389,7 @@
       "discoveryGroup": 77600043,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3333,6 +3425,7 @@
       "discoveryGroup": 77600043,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3368,6 +3461,7 @@
       "discoveryGroup": 77600043,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3403,6 +3497,7 @@
       "discoveryGroup": 77600043,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3438,6 +3533,7 @@
       "discoveryGroup": 77600043,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3473,6 +3569,7 @@
       "discoveryGroup": 77600043,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3508,6 +3605,7 @@
       "discoveryGroup": 77600044,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3543,6 +3641,7 @@
       "discoveryGroup": 77600044,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3578,6 +3677,7 @@
       "discoveryGroup": 77600044,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3613,6 +3713,7 @@
       "discoveryGroup": 77600044,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3648,6 +3749,7 @@
       "discoveryGroup": 77600045,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3683,6 +3785,7 @@
       "discoveryGroup": 77600045,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3718,6 +3821,7 @@
       "discoveryGroup": 77600045,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3753,6 +3857,7 @@
       "discoveryGroup": 77600045,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3788,6 +3893,7 @@
       "discoveryGroup": 77600045,
       "dispatchGroup": 1702,
       "regionId": 12001400,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -3824,6 +3930,7 @@
       "discoveryGroup": 77600046,
       "dispatchGroup": 1804,
       "regionId": 12001400,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -3859,6 +3966,7 @@
       "discoveryGroup": 77600047,
       "dispatchGroup": 1802,
       "regionId": 12000302,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -3893,6 +4001,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600048,
       "regionId": 12001504,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -3928,6 +4037,7 @@
       "discoveryGroup": 77600049,
       "dispatchGroup": 1203,
       "regionId": 12001300,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -3963,6 +4073,7 @@
       "discoveryGroup": 77600050,
       "dispatchGroup": 1203,
       "regionId": 12001900,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -3998,6 +4109,7 @@
       "discoveryGroup": 77600051,
       "dispatchGroup": 1213,
       "regionId": 12001900,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -4009,16 +4121,16 @@
     "71430515": {
       "id": 71430515,
       "name": "미시시피강 상류 부근",
-      "lvForTool": 20,
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
-      "consumeItemId": 23710215,
+      "consumeItemId": 23700024,
       "advInitDay": 2,
       "advMaxDay": 4,
       "maxUseAdvItem": 5,
-      "combatVal": 410,
-      "gatheringVal": 410,
-      "observationVal": 410,
+      "combatVal": 103,
+      "gatheringVal": 103,
+      "observationVal": 103,
       "climateLandFeature": 77000008,
       "randLandFeature": [
         {
@@ -4032,8 +4144,9 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600171,
       "regionId": 12001900,
+      "landExpVal": 55,
       "landCulture": 2,
-      "landGrade": 22,
+      "landGrade": 1006,
       "landRewardType": [
         0,
         1,
@@ -4067,6 +4180,7 @@
       "discoveryGroup": 77600051,
       "dispatchGroup": 1213,
       "regionId": 12001900,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -4102,6 +4216,7 @@
       "discoveryGroup": 77600052,
       "dispatchGroup": 1901,
       "regionId": 12001300,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -4137,6 +4252,7 @@
       "discoveryGroup": 77600053,
       "dispatchGroup": 1902,
       "regionId": 12001300,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -4172,6 +4288,7 @@
       "discoveryGroup": 77600054,
       "dispatchGroup": 1203,
       "regionId": 12001900,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -4207,6 +4324,7 @@
       "discoveryGroup": 77600055,
       "dispatchGroup": 1213,
       "regionId": 12001900,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -4242,6 +4360,7 @@
       "discoveryGroup": 77600056,
       "dispatchGroup": 1213,
       "regionId": 12001900,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -4277,6 +4396,7 @@
       "discoveryGroup": 77600057,
       "dispatchGroup": 1504,
       "regionId": 12000600,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -4312,6 +4432,7 @@
       "discoveryGroup": 77600058,
       "dispatchGroup": 1603,
       "regionId": 12000600,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -4347,6 +4468,7 @@
       "discoveryGroup": 77600059,
       "dispatchGroup": 1703,
       "regionId": 12000600,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -4382,6 +4504,7 @@
       "discoveryGroup": 77600060,
       "dispatchGroup": 1603,
       "regionId": 12000600,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -4417,6 +4540,7 @@
       "discoveryGroup": 77600061,
       "dispatchGroup": 1603,
       "regionId": 12000600,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -4452,6 +4576,7 @@
       "discoveryGroup": 77600062,
       "dispatchGroup": 1203,
       "regionId": 12001900,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -4487,6 +4612,7 @@
       "discoveryGroup": 77600063,
       "dispatchGroup": 1203,
       "regionId": 12001900,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -4522,6 +4648,7 @@
       "discoveryGroup": 77600064,
       "dispatchGroup": 2001,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -4557,6 +4684,7 @@
       "discoveryGroup": 77600064,
       "dispatchGroup": 2001,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -4592,6 +4720,7 @@
       "discoveryGroup": 77600064,
       "dispatchGroup": 2001,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -4627,6 +4756,7 @@
       "discoveryGroup": 77600064,
       "dispatchGroup": 2001,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -4662,6 +4792,7 @@
       "discoveryGroup": 77600065,
       "dispatchGroup": 1903,
       "regionId": 12001700,
+      "landExpVal": 50,
       "landCulture": 2,
       "landGrade": 9,
       "landRewardType": [
@@ -4697,6 +4828,7 @@
       "discoveryGroup": 77600065,
       "dispatchGroup": 1903,
       "regionId": 12001700,
+      "landExpVal": 50,
       "landCulture": 2,
       "landGrade": 9,
       "landRewardType": [
@@ -4732,6 +4864,7 @@
       "discoveryGroup": 77600065,
       "dispatchGroup": 1903,
       "regionId": 12001700,
+      "landExpVal": 50,
       "landCulture": 2,
       "landGrade": 9,
       "landRewardType": [
@@ -4767,6 +4900,7 @@
       "discoveryGroup": 77600065,
       "dispatchGroup": 1903,
       "regionId": 12001700,
+      "landExpVal": 50,
       "landCulture": 2,
       "landGrade": 9,
       "landRewardType": [
@@ -4802,6 +4936,7 @@
       "discoveryGroup": 77600065,
       "dispatchGroup": 1903,
       "regionId": 12001700,
+      "landExpVal": 50,
       "landCulture": 2,
       "landGrade": 9,
       "landRewardType": [
@@ -4837,6 +4972,7 @@
       "discoveryGroup": 77600066,
       "dispatchGroup": 1903,
       "regionId": 12001700,
+      "landExpVal": 50,
       "landCulture": 2,
       "landGrade": 9,
       "landRewardType": [
@@ -4872,6 +5008,7 @@
       "discoveryGroup": 77600066,
       "dispatchGroup": 1903,
       "regionId": 12001700,
+      "landExpVal": 50,
       "landCulture": 2,
       "landGrade": 9,
       "landRewardType": [
@@ -4907,6 +5044,7 @@
       "discoveryGroup": 77600066,
       "dispatchGroup": 1903,
       "regionId": 12001700,
+      "landExpVal": 50,
       "landCulture": 2,
       "landGrade": 9,
       "landRewardType": [
@@ -4942,6 +5080,7 @@
       "discoveryGroup": 77600066,
       "dispatchGroup": 1903,
       "regionId": 12001700,
+      "landExpVal": 50,
       "landCulture": 2,
       "landGrade": 9,
       "landRewardType": [
@@ -4977,6 +5116,7 @@
       "discoveryGroup": 77600066,
       "dispatchGroup": 1903,
       "regionId": 12001700,
+      "landExpVal": 50,
       "landCulture": 2,
       "landGrade": 9,
       "landRewardType": [
@@ -5012,6 +5152,7 @@
       "discoveryGroup": 77600067,
       "dispatchGroup": 2002,
       "regionId": 12002000,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5047,6 +5188,7 @@
       "discoveryGroup": 77600067,
       "dispatchGroup": 2002,
       "regionId": 12002000,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5082,6 +5224,7 @@
       "discoveryGroup": 77600067,
       "dispatchGroup": 2002,
       "regionId": 12002000,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5117,6 +5260,7 @@
       "discoveryGroup": 77600067,
       "dispatchGroup": 2002,
       "regionId": 12002000,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5152,6 +5296,7 @@
       "discoveryGroup": 77600067,
       "dispatchGroup": 2002,
       "regionId": 12002000,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5186,6 +5331,7 @@
       "trainingMode": 77705006,
       "discoveryGroup": 77600068,
       "regionId": 12001400,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -5220,6 +5366,7 @@
       "trainingMode": 77705006,
       "discoveryGroup": 77600068,
       "regionId": 12001400,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -5254,6 +5401,7 @@
       "trainingMode": 77705006,
       "discoveryGroup": 77600068,
       "regionId": 12001400,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -5288,6 +5436,7 @@
       "trainingMode": 77705006,
       "discoveryGroup": 77600068,
       "regionId": 12001400,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -5322,6 +5471,7 @@
       "trainingMode": 77705006,
       "discoveryGroup": 77600068,
       "regionId": 12001400,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -5357,6 +5507,7 @@
       "discoveryGroup": 77600069,
       "dispatchGroup": 2001,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5392,6 +5543,7 @@
       "discoveryGroup": 77600069,
       "dispatchGroup": 2001,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5427,6 +5579,7 @@
       "discoveryGroup": 77600069,
       "dispatchGroup": 2001,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5462,6 +5615,7 @@
       "discoveryGroup": 77600070,
       "dispatchGroup": 2401,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5497,6 +5651,7 @@
       "discoveryGroup": 77600070,
       "dispatchGroup": 2401,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5532,6 +5687,7 @@
       "discoveryGroup": 77600070,
       "dispatchGroup": 2401,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5567,6 +5723,7 @@
       "discoveryGroup": 77600070,
       "dispatchGroup": 2401,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5602,6 +5759,7 @@
       "discoveryGroup": 77600070,
       "dispatchGroup": 2401,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5637,6 +5795,7 @@
       "discoveryGroup": 77600070,
       "dispatchGroup": 2401,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5672,6 +5831,7 @@
       "discoveryGroup": 77600070,
       "dispatchGroup": 2401,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5707,6 +5867,7 @@
       "discoveryGroup": 77600070,
       "dispatchGroup": 2401,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5742,6 +5903,7 @@
       "discoveryGroup": 77600071,
       "dispatchGroup": 2401,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5777,6 +5939,7 @@
       "discoveryGroup": 77600071,
       "dispatchGroup": 2401,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5812,6 +5975,7 @@
       "discoveryGroup": 77600071,
       "dispatchGroup": 2401,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5847,6 +6011,7 @@
       "discoveryGroup": 77600071,
       "dispatchGroup": 2401,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5882,6 +6047,7 @@
       "discoveryGroup": 77600071,
       "dispatchGroup": 2401,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5917,6 +6083,7 @@
       "discoveryGroup": 77600072,
       "dispatchGroup": 2501,
       "regionId": 12010100,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5951,6 +6118,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600073,
       "regionId": 12001503,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -5985,6 +6153,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600166,
       "regionId": 12001504,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6019,6 +6188,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600163,
       "regionId": 12001504,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6053,6 +6223,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600164,
       "regionId": 12001504,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6087,6 +6258,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600165,
       "regionId": 12001504,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6121,6 +6293,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600075,
       "regionId": 12001505,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6155,6 +6328,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600167,
       "regionId": 12001504,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6190,6 +6364,7 @@
       "discoveryGroup": 77600076,
       "dispatchGroup": 1604,
       "regionId": 12001300,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -6224,6 +6399,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600077,
       "regionId": 12001503,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6258,6 +6434,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600078,
       "regionId": 12011000,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6292,6 +6469,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600078,
       "regionId": 12010400,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6326,6 +6504,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600078,
       "regionId": 12011200,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6360,6 +6539,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600078,
       "regionId": 12010300,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6395,6 +6575,7 @@
       "discoveryGroup": 77600082,
       "dispatchGroup": 1704,
       "regionId": 12001300,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -6430,6 +6611,7 @@
       "discoveryGroup": 77600083,
       "dispatchGroup": 1605,
       "regionId": 12001500,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -6465,6 +6647,7 @@
       "discoveryGroup": 77600011,
       "dispatchGroup": 1605,
       "regionId": 12001500,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -6500,6 +6683,7 @@
       "discoveryGroup": 77600140,
       "dispatchGroup": 1606,
       "regionId": 12011400,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -6535,6 +6719,7 @@
       "discoveryGroup": 77600141,
       "dispatchGroup": 1605,
       "regionId": 12001500,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -6568,6 +6753,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600148,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6601,6 +6787,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600149,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6633,6 +6820,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600150,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6665,6 +6853,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600151,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6697,6 +6886,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600152,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6729,6 +6919,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600153,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6761,6 +6952,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600154,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6793,6 +6985,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600155,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6825,6 +7018,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600156,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6857,6 +7051,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600157,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6889,6 +7084,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600158,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6923,6 +7119,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600140,
       "dispatchGroup": 2601,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -6934,16 +7131,16 @@
     "71449015": {
       "id": 71449015,
       "name": "버뮤다섬",
-      "lvForTool": 17,
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
-      "consumeItemId": 23700067,
+      "consumeItemId": 23700024,
       "advInitDay": 2,
       "advMaxDay": 4,
       "maxUseAdvItem": 5,
-      "combatVal": 312,
-      "gatheringVal": 312,
-      "observationVal": 312,
+      "combatVal": 103,
+      "gatheringVal": 103,
+      "observationVal": 103,
       "climateLandFeature": 77025011,
       "randLandFeature": [
         {
@@ -6957,8 +7154,9 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600159,
       "dispatchGroup": 2701,
+      "landExpVal": 55,
       "landCulture": 2,
-      "landGrade": 17,
+      "landGrade": 1006,
       "landRewardType": [
         0,
         1,
@@ -6990,8 +7188,9 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600160,
+      "landExpVal": 55,
       "landCulture": 2,
-      "landGrade": 17,
+      "landGrade": 1007,
       "landRewardType": [
         0,
         1,
@@ -7023,8 +7222,9 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600161,
+      "landExpVal": 55,
       "landCulture": 2,
-      "landGrade": 17,
+      "landGrade": 1007,
       "landRewardType": [
         0,
         1,
@@ -7056,8 +7256,9 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600162,
+      "landExpVal": 55,
       "landCulture": 2,
-      "landGrade": 18,
+      "landGrade": 1007,
       "landRewardType": [
         0,
         1,
@@ -7090,6 +7291,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600014,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -7124,6 +7326,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600003,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -7158,6 +7361,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705002,
       "discoveryGroup": 77600020,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -7192,6 +7396,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600004,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -7226,6 +7431,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600015,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -7260,6 +7466,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600041,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -7294,6 +7501,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600002,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -7328,6 +7536,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705005,
       "discoveryGroup": 77600082,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -7362,6 +7571,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705004,
       "discoveryGroup": 77600013,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -7396,6 +7606,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600039,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -7430,6 +7641,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600015,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -7464,6 +7676,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600002,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -7498,6 +7711,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600026,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -7532,6 +7746,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600041,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -7566,6 +7781,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600063,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -7600,6 +7816,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600026,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -7634,6 +7851,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600006,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -7668,6 +7886,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600040,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -7702,6 +7921,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600063,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -7736,6 +7956,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705002,
       "discoveryGroup": 77600020,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -7770,6 +7991,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705004,
       "discoveryGroup": 77600042,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -7804,6 +8026,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705002,
       "discoveryGroup": 77600020,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -7838,6 +8061,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600063,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -7872,6 +8096,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600009,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -7906,6 +8131,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705002,
       "discoveryGroup": 77600025,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -7940,6 +8166,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705006,
       "discoveryGroup": 77600033,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -7974,6 +8201,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600001,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -8008,6 +8236,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600015,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -8042,6 +8271,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705004,
       "discoveryGroup": 77600083,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -8076,6 +8306,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600070,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -8110,6 +8341,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705005,
       "discoveryGroup": 77600007,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -8144,6 +8376,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600012,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -8178,6 +8411,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705006,
       "discoveryGroup": 77600062,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -8212,6 +8446,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600002,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -8246,6 +8481,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705004,
       "discoveryGroup": 77600054,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -8280,6 +8516,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600004,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -8314,6 +8551,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600000,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -8348,6 +8586,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600023,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -8382,6 +8621,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600077,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -8416,6 +8656,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600077,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -8450,6 +8691,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600077,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -8484,6 +8726,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600077,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -8518,6 +8761,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600073,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -8552,6 +8796,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600073,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -8586,6 +8831,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600073,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -8620,6 +8866,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600002,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -8654,6 +8901,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705002,
       "discoveryGroup": 77600025,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -8688,6 +8936,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600003,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -8722,8 +8971,9 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600160,
+      "landExpVal": 55,
       "landCulture": 2,
-      "landGrade": 17,
+      "landGrade": 1007,
       "landRewardType": [
         0,
         1,
@@ -8756,8 +9006,9 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600161,
+      "landExpVal": 55,
       "landCulture": 2,
-      "landGrade": 17,
+      "landGrade": 1007,
       "landRewardType": [
         0,
         1,
@@ -8790,8 +9041,9 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600161,
+      "landExpVal": 55,
       "landCulture": 2,
-      "landGrade": 17,
+      "landGrade": 1007,
       "landRewardType": [
         0,
         1,
@@ -8824,8 +9076,9 @@
       "gatherMode": 77700002,
       "trainingMode": 77705008,
       "discoveryGroup": 77600161,
+      "landExpVal": 55,
       "landCulture": 2,
-      "landGrade": 17,
+      "landGrade": 1007,
       "landRewardType": [
         0,
         1,
@@ -8858,6 +9111,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600004,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -8892,6 +9146,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600057,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -8926,8 +9181,79 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600063,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
+      "landRewardType": [
+        0,
+        1,
+        2
+      ]
+    },
+    "71450061": {
+      "id": 71450061,
+      "name": "런던 부근",
+      "desc": "##다나 칼로스 시나리오",
+      "lvForTool": 1,
+      "inheritLandFeature": 71404000,
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700017,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 15,
+      "gatheringVal": 15,
+      "observationVal": 15,
+      "randLandFeature": [
+        {
+          "Id": 77100010,
+          "Amount": 0,
+          "IsDuplicated": false
+        }
+      ],
+      "exploreMode": 77700001,
+      "gatherMode": 77700002,
+      "trainingMode": 77701102,
+      "discoveryGroup": 77600009,
+      "landExpVal": 20,
+      "landCulture": 0,
+      "landGrade": 2,
+      "landRewardType": [
+        0,
+        1,
+        2
+      ]
+    },
+    "71450062": {
+      "id": 71450062,
+      "name": "런던 부근",
+      "desc": "##다나 칼로스 시나리오",
+      "lvForTool": 1,
+      "inheritLandFeature": 71404000,
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700017,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 15,
+      "gatheringVal": 15,
+      "observationVal": 15,
+      "randLandFeature": [
+        {
+          "Id": 77100010,
+          "Amount": 0,
+          "IsDuplicated": false
+        }
+      ],
+      "exploreMode": 77700001,
+      "gatherMode": 77700002,
+      "trainingMode": 77701102,
+      "discoveryGroup": 77600009,
+      "landExpVal": 20,
+      "landCulture": 0,
+      "landGrade": 2,
       "landRewardType": [
         0,
         1,
@@ -8960,6 +9286,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705002,
       "discoveryGroup": 77600025,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -8994,6 +9321,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705004,
       "discoveryGroup": 77600083,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -9028,6 +9356,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705004,
       "discoveryGroup": 77600060,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -9062,6 +9391,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600041,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -9096,6 +9426,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705005,
       "discoveryGroup": 77600043,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -9130,6 +9461,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705006,
       "discoveryGroup": 77600036,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -9164,6 +9496,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705007,
       "discoveryGroup": 77600066,
+      "landExpVal": 50,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -9198,6 +9531,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705004,
       "discoveryGroup": 77600051,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -9232,6 +9566,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705002,
       "discoveryGroup": 77600025,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -9266,6 +9601,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705002,
       "discoveryGroup": 77600019,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -9300,6 +9636,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705005,
       "discoveryGroup": 77600007,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -9334,6 +9671,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600000,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -9368,6 +9706,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705002,
       "discoveryGroup": 77600018,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -9402,6 +9741,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705005,
       "discoveryGroup": 77600044,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -9436,6 +9776,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705005,
       "discoveryGroup": 77600044,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -9470,6 +9811,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600040,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -9504,6 +9846,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600009,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -9538,6 +9881,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600005,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -9572,6 +9916,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600004,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -9606,6 +9951,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600003,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -9640,6 +9986,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600015,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -9674,6 +10021,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600003,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -9708,6 +10056,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705002,
       "discoveryGroup": 77600025,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -9742,6 +10091,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600040,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -9776,6 +10126,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705005,
       "discoveryGroup": 77600082,
+      "landExpVal": 40,
       "landCulture": 2,
       "landGrade": 1005,
       "landRewardType": [
@@ -9810,6 +10161,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600023,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -9844,6 +10196,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600003,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -9878,6 +10231,7 @@
       "gatherMode": 77700002,
       "trainingMode": 77705003,
       "discoveryGroup": 77600040,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -9912,8 +10266,79 @@
       "gatherMode": 77700002,
       "trainingMode": 77705001,
       "discoveryGroup": 77600056,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
+      "landRewardType": [
+        0,
+        1,
+        2
+      ]
+    },
+    "71460031": {
+      "id": 71460031,
+      "name": "런던 부근",
+      "desc": "##다나 칼로스",
+      "lvForTool": 1,
+      "inheritLandFeature": 71404000,
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700017,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 15,
+      "gatheringVal": 15,
+      "observationVal": 15,
+      "randLandFeature": [
+        {
+          "Id": 77100010,
+          "Amount": 0,
+          "IsDuplicated": false
+        }
+      ],
+      "exploreMode": 77700001,
+      "gatherMode": 77700002,
+      "trainingMode": 77701102,
+      "discoveryGroup": 77600009,
+      "landExpVal": 20,
+      "landCulture": 2,
+      "landGrade": 1002,
+      "landRewardType": [
+        0,
+        1,
+        2
+      ]
+    },
+    "71460032": {
+      "id": 71460032,
+      "name": "런던 부근",
+      "desc": "##다나 칼로스",
+      "lvForTool": 1,
+      "inheritLandFeature": 71404000,
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700017,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 15,
+      "gatheringVal": 15,
+      "observationVal": 15,
+      "randLandFeature": [
+        {
+          "Id": 77100010,
+          "Amount": 0,
+          "IsDuplicated": false
+        }
+      ],
+      "exploreMode": 77700001,
+      "gatherMode": 77700002,
+      "trainingMode": 77701102,
+      "discoveryGroup": 77600009,
+      "landExpVal": 20,
+      "landCulture": 2,
+      "landGrade": 1002,
       "landRewardType": [
         0,
         1,
@@ -9947,6 +10372,7 @@
       "discoveryGroup": 77600006,
       "dispatchGroup": 2801,
       "regionId": 12001503,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -9982,6 +10408,7 @@
       "discoveryGroup": 77600011,
       "dispatchGroup": 1605,
       "regionId": 12001500,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -10017,6 +10444,7 @@
       "discoveryGroup": 77600076,
       "dispatchGroup": 1604,
       "regionId": 12001300,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -10052,6 +10480,7 @@
       "discoveryGroup": 77600054,
       "dispatchGroup": 1203,
       "regionId": 12001900,
+      "landExpVal": 20,
       "landCulture": 2,
       "landGrade": 1001,
       "landRewardType": [
@@ -10087,6 +10516,7 @@
       "discoveryGroup": 77600061,
       "dispatchGroup": 1603,
       "regionId": 12000600,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -10122,6 +10552,7 @@
       "discoveryGroup": 77600052,
       "dispatchGroup": 1901,
       "regionId": 12001300,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -10157,6 +10588,7 @@
       "discoveryGroup": 77600027,
       "dispatchGroup": 1801,
       "regionId": 12000301,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -10192,6 +10624,7 @@
       "discoveryGroup": 77600033,
       "dispatchGroup": 1803,
       "regionId": 12000800,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -10227,6 +10660,7 @@
       "discoveryGroup": 77600042,
       "dispatchGroup": 1602,
       "regionId": 12002000,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -10262,6 +10696,7 @@
       "discoveryGroup": 77600042,
       "dispatchGroup": 1602,
       "regionId": 12002000,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -10297,8 +10732,9 @@
       "discoveryGroup": 77600066,
       "dispatchGroup": 1903,
       "regionId": 12001700,
+      "landExpVal": 50,
       "landCulture": 2,
-      "landGrade": 9,
+      "landGrade": 1007,
       "landRewardType": [
         0,
         1,
@@ -10332,6 +10768,7 @@
       "discoveryGroup": 77600023,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -10367,8 +10804,9 @@
       "discoveryGroup": 77600037,
       "dispatchGroup": 1601,
       "regionId": 12000100,
+      "landExpVal": 35,
       "landCulture": 1,
-      "landGrade": 6,
+      "landGrade": 1004,
       "landRewardType": [
         0,
         1,
@@ -10402,6 +10840,7 @@
       "discoveryGroup": 77600067,
       "dispatchGroup": 2002,
       "regionId": 12002000,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -10437,6 +10876,7 @@
       "discoveryGroup": 77600072,
       "dispatchGroup": 2501,
       "regionId": 12010100,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -10471,6 +10911,7 @@
       "trainingMode": 77705008,
       "discoveryGroup": 77600140,
       "dispatchGroup": 2601,
+      "landExpVal": 55,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -10506,6 +10947,7 @@
       "discoveryGroup": 77600035,
       "dispatchGroup": 1803,
       "regionId": 12000800,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -10541,6 +10983,7 @@
       "discoveryGroup": 77600065,
       "dispatchGroup": 1903,
       "regionId": 12001700,
+      "landExpVal": 50,
       "landCulture": 2,
       "landGrade": 1007,
       "landRewardType": [
@@ -10576,6 +11019,7 @@
       "discoveryGroup": 77600036,
       "dispatchGroup": 1803,
       "regionId": 12000800,
+      "landExpVal": 45,
       "landCulture": 2,
       "landGrade": 1006,
       "landRewardType": [
@@ -10611,8 +11055,9 @@
       "discoveryGroup": 77600070,
       "dispatchGroup": 2401,
       "regionId": 12001700,
+      "landExpVal": 55,
       "landCulture": 2,
-      "landGrade": 22,
+      "landGrade": 1007,
       "landRewardType": [
         0,
         1,
@@ -10646,6 +11091,7 @@
       "discoveryGroup": 77600024,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 30,
       "landCulture": 2,
       "landGrade": 1003,
       "landRewardType": [
@@ -10681,6 +11127,7 @@
       "discoveryGroup": 77600024,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 25,
       "landCulture": 2,
       "landGrade": 1002,
       "landRewardType": [
@@ -10716,6 +11163,7 @@
       "discoveryGroup": 77600024,
       "dispatchGroup": 1501,
       "regionId": 12001800,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [
@@ -10751,8 +11199,9 @@
       "discoveryGroup": 77600008,
       "dispatchGroup": 2301,
       "regionId": 12001500,
+      "landExpVal": 55,
       "landCulture": 2,
-      "landGrade": 13,
+      "landGrade": 1007,
       "landRewardType": [
         0,
         1,
@@ -10786,6 +11235,7 @@
       "discoveryGroup": 77600083,
       "dispatchGroup": 1605,
       "regionId": 12001500,
+      "landExpVal": 35,
       "landCulture": 2,
       "landGrade": 1004,
       "landRewardType": [

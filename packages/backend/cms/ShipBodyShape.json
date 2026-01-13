@@ -6154,6 +6154,22 @@
         "9": 46600010
       },
       "wakePlayer": 47600017
+    },
+    "45000357": {
+      "id": 45000357,
+      "meshName": "SK_Ship_Avatar_CN_PAvilionBoat_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000325,
+        "1": 46700009,
+        "3": 46500064
+      },
+      "wakePlayer": 47600016
     }
   }
 }

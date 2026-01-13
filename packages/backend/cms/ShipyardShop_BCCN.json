@@ -35300,6 +35300,708 @@
           "Count": 7
         }
       ]
+    },
+    "40920080": {
+      "id": 40920080,
+      "group": 1002,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610009,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920081": {
+      "id": 40920081,
+      "group": 1002,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610018,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920082": {
+      "id": 40920082,
+      "group": 1002,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610036,
+      "pointId": 100001,
+      "pointVal": 2400
+    },
+    "40920083": {
+      "id": 40920083,
+      "group": 1012,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610009,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920084": {
+      "id": 40920084,
+      "group": 1012,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610018,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920085": {
+      "id": 40920085,
+      "group": 1012,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610036,
+      "pointId": 100001,
+      "pointVal": 2400
+    },
+    "40920086": {
+      "id": 40920086,
+      "group": 1022,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610009,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920087": {
+      "id": 40920087,
+      "group": 1022,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610018,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920088": {
+      "id": 40920088,
+      "group": 1022,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610036,
+      "pointId": 100001,
+      "pointVal": 2400
+    },
+    "40920089": {
+      "id": 40920089,
+      "group": 1032,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610009,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920090": {
+      "id": 40920090,
+      "group": 1032,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610018,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920091": {
+      "id": 40920091,
+      "group": 1032,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610036,
+      "pointId": 100001,
+      "pointVal": 2400
+    },
+    "40920092": {
+      "id": 40920092,
+      "group": 1042,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610009,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920093": {
+      "id": 40920093,
+      "group": 1042,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610018,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920094": {
+      "id": 40920094,
+      "group": 1042,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610036,
+      "pointId": 100001,
+      "pointVal": 2400
+    },
+    "40920095": {
+      "id": 40920095,
+      "group": 1052,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610009,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920096": {
+      "id": 40920096,
+      "group": 1052,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610018,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920097": {
+      "id": 40920097,
+      "group": 1052,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610036,
+      "pointId": 100001,
+      "pointVal": 2400
+    },
+    "40920098": {
+      "id": 40920098,
+      "group": 1062,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610009,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920099": {
+      "id": 40920099,
+      "group": 1062,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610018,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920100": {
+      "id": 40920100,
+      "group": 1062,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610036,
+      "pointId": 100001,
+      "pointVal": 2400
+    },
+    "40920101": {
+      "id": 40920101,
+      "group": 1072,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610009,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920102": {
+      "id": 40920102,
+      "group": 1072,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610018,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920103": {
+      "id": 40920103,
+      "group": 1072,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610036,
+      "pointId": 100001,
+      "pointVal": 2400
+    },
+    "40920104": {
+      "id": 40920104,
+      "group": 1082,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610009,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920105": {
+      "id": 40920105,
+      "group": 1082,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610018,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920106": {
+      "id": 40920106,
+      "group": 1082,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610036,
+      "pointId": 100001,
+      "pointVal": 2400
+    },
+    "40920107": {
+      "id": 40920107,
+      "group": 1092,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610009,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920108": {
+      "id": 40920108,
+      "group": 1092,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610018,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920109": {
+      "id": 40920109,
+      "group": 1092,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610036,
+      "pointId": 100001,
+      "pointVal": 2400
+    },
+    "40920110": {
+      "id": 40920110,
+      "group": 1100,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610009,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920111": {
+      "id": 40920111,
+      "group": 1100,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610018,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920112": {
+      "id": 40920112,
+      "group": 1100,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610036,
+      "pointId": 100001,
+      "pointVal": 2400
+    },
+    "40920113": {
+      "id": 40920113,
+      "group": 1102,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610009,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920114": {
+      "id": 40920114,
+      "group": 1102,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610018,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920115": {
+      "id": 40920115,
+      "group": 1102,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610036,
+      "pointId": 100001,
+      "pointVal": 2400
+    },
+    "40920116": {
+      "id": 40920116,
+      "group": 2500,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610009,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920117": {
+      "id": 40920117,
+      "group": 2500,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610018,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920118": {
+      "id": 40920118,
+      "group": 2500,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610036,
+      "pointId": 100001,
+      "pointVal": 2400
+    },
+    "40920119": {
+      "id": 40920119,
+      "group": 1001,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920120": {
+      "id": 40920120,
+      "group": 1051,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920121": {
+      "id": 40920121,
+      "group": 1092,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920122": {
+      "id": 40920122,
+      "group": 1042,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920123": {
+      "id": 40920123,
+      "group": 1102,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920124": {
+      "id": 40920124,
+      "group": 1012,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920125": {
+      "id": 40920125,
+      "group": 1071,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920126": {
+      "id": 40920126,
+      "group": 1032,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920127": {
+      "id": 40920127,
+      "group": 1022,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920128": {
+      "id": 40920128,
+      "group": 1011,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920129": {
+      "id": 40920129,
+      "group": 1052,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920130": {
+      "id": 40920130,
+      "group": 1031,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920131": {
+      "id": 40920131,
+      "group": 1082,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920132": {
+      "id": 40920132,
+      "group": 1002,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920133": {
+      "id": 40920133,
+      "group": 1061,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920134": {
+      "id": 40920134,
+      "group": 1021,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920135": {
+      "id": 40920135,
+      "group": 1091,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920136": {
+      "id": 40920136,
+      "group": 1081,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920137": {
+      "id": 40920137,
+      "group": 1072,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920138": {
+      "id": 40920138,
+      "group": 1101,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920139": {
+      "id": 40920139,
+      "group": 1062,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920140": {
+      "id": 40920140,
+      "group": 1100,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920141": {
+      "id": 40920141,
+      "group": 2500,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23610000,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920142": {
+      "id": 40920142,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405001,
+      "pointId": 100001,
+      "pointVal": 200
+    },
+    "40920143": {
+      "id": 40920143,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405002,
+      "pointId": 100001,
+      "pointVal": 200
+    },
+    "40920144": {
+      "id": 40920144,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405003,
+      "pointId": 100001,
+      "pointVal": 200
+    },
+    "40920145": {
+      "id": 40920145,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405007,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920146": {
+      "id": 40920146,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405012,
+      "pointId": 100001,
+      "pointVal": 2600
+    },
+    "40920147": {
+      "id": 40920147,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405011,
+      "pointId": 100001,
+      "pointVal": 2600
+    },
+    "40920148": {
+      "id": 40920148,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405017,
+      "pointId": 100001,
+      "pointVal": 2600
+    },
+    "40920149": {
+      "id": 40920149,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405013,
+      "pointId": 100001,
+      "pointVal": 6800
+    },
+    "40920150": {
+      "id": 40920150,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405019,
+      "pointId": 100001,
+      "pointVal": 6800
+    },
+    "40920151": {
+      "id": 40920151,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405069,
+      "pointId": 100001,
+      "pointVal": 6800
+    },
+    "40920152": {
+      "id": 40920152,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405005,
+      "pointId": 100001,
+      "pointVal": 200
+    },
+    "40920153": {
+      "id": 40920153,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405004,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920154": {
+      "id": 40920154,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405027,
+      "pointId": 100001,
+      "pointVal": 2600
+    },
+    "40920155": {
+      "id": 40920155,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405006,
+      "pointId": 100001,
+      "pointVal": 6800
+    },
+    "40920156": {
+      "id": 40920156,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405008,
+      "pointId": 100001,
+      "pointVal": 1200
+    },
+    "40920157": {
+      "id": 40920157,
+      "group": 31000,
+      "shipyardShopSaleType": 1,
+      "shipyardShopType": 2,
+      "shopProductId": 23405009,
+      "pointId": 100001,
+      "pointVal": 1200
     }
   }
 }

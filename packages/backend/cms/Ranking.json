@@ -166,7 +166,8 @@
       "rankTargetType": 17,
       "rankPeriodType": 2,
       "rankTarget": 1,
-      "desc": "일주일간 기록한 1회 최고 순이익의 순위"
+      "desc": "일주일간 기록한 1회 최고 순이익의 순위",
+      "getUserTitle": 1400005
     }
   }
 }

@@ -1401,6 +1401,10 @@
       "name": "OceanWreckresurrectionPointValue",
       "value": 20
     },
+    "OceanWreckresurrectionGiveFoodRate": {
+      "name": "OceanWreckresurrectionGiveFoodRate",
+      "value": 500
+    },
     "WreckLossShipDurabilityValue": {
       "name": "WreckLossShipDurabilityValue",
       "value": 100
@@ -4411,7 +4415,7 @@
     },
     "MaxShipSize": {
       "name": "MaxShipSize",
-      "value": 6
+      "value": 5
     },
     "CostItemSearchSea": {
       "name": "CostItemSearchSea",
@@ -7403,7 +7407,7 @@
     },
     "MarketPlaceRegistrationFeeDucatPer": {
       "name": "MarketPlaceRegistrationFeeDucatPer",
-      "value": 0.2
+      "value": 200
     },
     "MarketPlaceRegistrationTimeSec": {
       "name": "MarketPlaceRegistrationTimeSec",
@@ -7492,6 +7496,18 @@
     "IndicatorOpenQuestNodeIndex": {
       "name": "IndicatorOpenQuestNodeIndex",
       "value": 0
+    },
+    "MenuAnimationUnskippableTime": {
+      "name": "MenuAnimationUnskippableTime",
+      "value": 200
+    },
+    "MenuPopupAutoCloseTime": {
+      "name": "MenuPopupAutoCloseTime",
+      "value": 1000
+    },
+    "TradeTabInfoRefrashCoolTime": {
+      "name": "TradeTabInfoRefrashCoolTime",
+      "value": 5
     }
   }
 }

@@ -8143,11 +8143,11 @@
           "Text": "대유행"
         },
         {
-          "NodeIdx": 16,
+          "NodeIdx": 15,
           "Text": "전투"
         },
         {
-          "NodeIdx": 20,
+          "NodeIdx": 19,
           "Text": "투자"
         },
         {
@@ -8155,43 +8155,43 @@
           "Text": "그의 정체"
         },
         {
-          "NodeIdx": 38,
+          "NodeIdx": 40,
           "Text": "재회"
         },
         {
-          "NodeIdx": 58,
+          "NodeIdx": 60,
           "Text": "추격"
         },
         {
-          "NodeIdx": 65,
+          "NodeIdx": 67,
           "Text": "일전"
         },
         {
-          "NodeIdx": 76,
+          "NodeIdx": 78,
           "Text": "프레스터 존 왕국으로"
         },
         {
-          "NodeIdx": 103,
+          "NodeIdx": 105,
           "Text": "전설의 지팡이"
         },
         {
-          "NodeIdx": 116,
+          "NodeIdx": 118,
           "Text": "다시 만난 그녀"
         },
         {
-          "NodeIdx": 122,
+          "NodeIdx": 124,
           "Text": "희소식"
         },
         {
-          "NodeIdx": 126,
+          "NodeIdx": 128,
           "Text": "황금의 나라"
         },
         {
-          "NodeIdx": 142,
+          "NodeIdx": 144,
           "Text": "신대륙으로"
         },
         {
-          "NodeIdx": 145,
+          "NodeIdx": 147,
           "Text": "최후의 일전"
         }
       ],
@@ -8210,7 +8210,6 @@
         83035014,
         83035015,
         83035016,
-        83510002,
         83035017,
         83035018,
         83035019,
@@ -8222,10 +8221,13 @@
         83035026,
         83035131,
         83035027,
+        83035132,
         83035028,
         83035029,
         83510002,
         83035030,
+        83035007,
+        83035130,
         83035031,
         83035032,
         83035033,
@@ -80210,7 +80212,7 @@
       "name": "향수병",
       "desc": "황진화 선단 양충은 오랜 기행에 지쳐 그만 향수병에 걸리고 만다.\n황진화와 헨리 블랙번은 양충의 향수병을 치료하려고 고심한다.",
       "localBitflag": 0,
-      "category": 9,
+      "category": 3,
       "jobType": 2,
       "useRecommendCondFilter": false,
       "useCurTownCondFilter": false,
@@ -80231,7 +80233,7 @@
       "name": "맛있는 자오쯔",
       "desc": "황진화 일행은 리스본에서 명의 명절 음식인 자오쯔를 판다는 소식을 접한다.",
       "localBitflag": 0,
-      "category": 9,
+      "category": 3,
       "jobType": 2,
       "useRecommendCondFilter": false,
       "useCurTownCondFilter": false,
@@ -80258,7 +80260,7 @@
       "name": "거대한 타",
       "desc": "황진화 일행은 은방울꽃 상단이 타고 온 선박의 부러진 타를 수리하고자 유럽으로 향한다.",
       "localBitflag": 0,
-      "category": 9,
+      "category": 3,
       "jobType": 3,
       "useRecommendCondFilter": false,
       "useCurTownCondFilter": false,
@@ -80286,7 +80288,7 @@
       "name": "우리의 고향",
       "desc": "황진화 일행은 춘절을 태평광륜에서 보내기로 한다.\n다만 그들을 도와준 어느 여기사가 자꾸 마음에 걸린다.",
       "localBitflag": 0,
-      "category": 9,
+      "category": 3,
       "jobType": 2,
       "useRecommendCondFilter": false,
       "useCurTownCondFilter": false,
@@ -89615,7 +89617,7 @@
         {
           "Id": 81000039,
           "Target": 82000035,
-          "Count": 45
+          "Count": 47
         }
       ],
       "reward": 95950014,
@@ -89649,7 +89651,7 @@
         {
           "Id": 81000039,
           "Target": 82000035,
-          "Count": 57
+          "Count": 59
         }
       ],
       "reward": 95950015,
@@ -89698,7 +89700,7 @@
         {
           "Id": 81000039,
           "Target": 82000035,
-          "Count": 68
+          "Count": 70
         }
       ],
       "reward": 95950016,
@@ -89735,7 +89737,7 @@
         {
           "Id": 81000039,
           "Target": 82000035,
-          "Count": 125
+          "Count": 127
         }
       ],
       "reward": 95950027,
@@ -89798,6 +89800,38 @@
         83990623,
         83990624,
         83990625
+      ]
+    },
+    "82996339": {
+      "id": 82996339,
+      "name": "(CN)도망친 해적 체포@도망친 해적 체포",
+      "desc": "(CN)세우타에서 악명을 떨치던 해적이 세비야 여관에서 목격되었다는 정보를 입수했습니다.\n체포한다면 크게 사례하겠습니다.@세우타에서 악명을 떨치던 해적이 세비야 여관에서 목격되었다는 정보를 입수했습니다.\n체포한다면 크게 사례하겠습니다.",
+      "localBitflag": 219,
+      "category": 3,
+      "jobType": 3,
+      "uniqueGroup": 96337,
+      "useRecommendCondFilter": false,
+      "useCurTownCondFilter": false,
+      "recommendedLv": 1,
+      "minCompanyLv": 1,
+      "maxCompanyLv": 255,
+      "isRoyalTitle": false,
+      "contentsTerms": [
+        {
+          "Id": 81000040,
+          "Target": 21200001,
+          "Count": 1
+        },
+        {
+          "Id": 81000039,
+          "Target": 82000035,
+          "Count": 24
+        }
+      ],
+      "reward": 94000065,
+      "isDropByReturn": false,
+      "nodes": [
+        83990642
       ]
     },
     "82999001": {

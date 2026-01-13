@@ -2444,6 +2444,24 @@
       "faceAccType": 1,
       "color1_eye": 10265990,
       "backAnim": true
+    },
+    "30000270": {
+      "id": 30000270,
+      "skeleton": "SkinsF",
+      "atlas": "SkinsF0005",
+      "skin": "2",
+      "faceAccType": 1,
+      "color1_eye": 8705010,
+      "backAnim": true
+    },
+    "30000271": {
+      "id": 30000271,
+      "skeleton": "SkinsF",
+      "atlas": "SkinsF0005",
+      "skin": "3",
+      "faceAccType": 1,
+      "color1_eye": 14277081,
+      "backAnim": true
     }
   }
 }

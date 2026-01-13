@@ -38428,7 +38428,7 @@
     "3002888": {
       "id": 3002888,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22123001,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38436,7 +38436,7 @@
     "3002889": {
       "id": 3002889,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22123003,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38444,7 +38444,7 @@
     "3002890": {
       "id": 3002890,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22123004,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38452,7 +38452,7 @@
     "3002891": {
       "id": 3002891,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22123005,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38460,7 +38460,7 @@
     "3002892": {
       "id": 3002892,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22123006,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38468,7 +38468,7 @@
     "3002893": {
       "id": 3002893,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22123007,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38476,7 +38476,7 @@
     "3002894": {
       "id": 3002894,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22123009,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38484,7 +38484,7 @@
     "3002895": {
       "id": 3002895,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22123010,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38492,7 +38492,7 @@
     "3002896": {
       "id": 3002896,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22133001,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38500,7 +38500,7 @@
     "3002897": {
       "id": 3002897,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22133003,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38508,7 +38508,7 @@
     "3002898": {
       "id": 3002898,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22133004,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38516,7 +38516,7 @@
     "3002899": {
       "id": 3002899,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22133005,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38524,7 +38524,7 @@
     "3002900": {
       "id": 3002900,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22133006,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38532,7 +38532,7 @@
     "3002901": {
       "id": 3002901,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22133007,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38540,7 +38540,7 @@
     "3002902": {
       "id": 3002902,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22133008,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38548,7 +38548,7 @@
     "3002903": {
       "id": 3002903,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22133010,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38556,7 +38556,7 @@
     "3002904": {
       "id": 3002904,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22133012,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38564,7 +38564,7 @@
     "3002905": {
       "id": 3002905,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22133013,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38572,7 +38572,7 @@
     "3002906": {
       "id": 3002906,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22133014,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38580,7 +38580,7 @@
     "3002907": {
       "id": 3002907,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22133015,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38588,7 +38588,7 @@
     "3002908": {
       "id": 3002908,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22133018,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38596,7 +38596,7 @@
     "3002909": {
       "id": 3002909,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22133019,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38604,7 +38604,7 @@
     "3002910": {
       "id": 3002910,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22133020,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38612,7 +38612,7 @@
     "3002911": {
       "id": 3002911,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143002,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38620,7 +38620,7 @@
     "3002912": {
       "id": 3002912,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143003,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38628,7 +38628,7 @@
     "3002913": {
       "id": 3002913,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143004,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38636,7 +38636,7 @@
     "3002914": {
       "id": 3002914,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143005,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38644,7 +38644,7 @@
     "3002915": {
       "id": 3002915,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143006,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38652,7 +38652,7 @@
     "3002916": {
       "id": 3002916,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143007,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38660,7 +38660,7 @@
     "3002917": {
       "id": 3002917,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143008,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38668,7 +38668,7 @@
     "3002918": {
       "id": 3002918,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143009,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38676,7 +38676,7 @@
     "3002919": {
       "id": 3002919,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143011,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38684,7 +38684,7 @@
     "3002920": {
       "id": 3002920,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143012,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38692,7 +38692,7 @@
     "3002921": {
       "id": 3002921,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143013,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38700,7 +38700,7 @@
     "3002922": {
       "id": 3002922,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143015,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38708,7 +38708,7 @@
     "3002923": {
       "id": 3002923,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143016,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38716,7 +38716,7 @@
     "3002924": {
       "id": 3002924,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143017,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38724,7 +38724,7 @@
     "3002925": {
       "id": 3002925,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143018,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38732,7 +38732,7 @@
     "3002926": {
       "id": 3002926,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22143020,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38740,7 +38740,7 @@
     "3002927": {
       "id": 3002927,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22212023,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38748,7 +38748,7 @@
     "3002928": {
       "id": 3002928,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22212024,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38756,7 +38756,7 @@
     "3002929": {
       "id": 3002929,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22212026,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38764,7 +38764,7 @@
     "3002930": {
       "id": 3002930,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22223001,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38772,7 +38772,7 @@
     "3002931": {
       "id": 3002931,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22223002,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38780,7 +38780,7 @@
     "3002932": {
       "id": 3002932,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22223003,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38788,7 +38788,7 @@
     "3002933": {
       "id": 3002933,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22223004,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38796,7 +38796,7 @@
     "3002934": {
       "id": 3002934,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22223007,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38804,7 +38804,7 @@
     "3002935": {
       "id": 3002935,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22223009,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38812,7 +38812,7 @@
     "3002936": {
       "id": 3002936,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22223013,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38820,7 +38820,7 @@
     "3002937": {
       "id": 3002937,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22223014,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38828,7 +38828,7 @@
     "3002938": {
       "id": 3002938,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22223015,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38836,7 +38836,7 @@
     "3002939": {
       "id": 3002939,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22223016,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38844,7 +38844,7 @@
     "3002940": {
       "id": 3002940,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22223017,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38852,7 +38852,7 @@
     "3002941": {
       "id": 3002941,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22223018,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38860,7 +38860,7 @@
     "3002942": {
       "id": 3002942,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233001,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38868,7 +38868,7 @@
     "3002943": {
       "id": 3002943,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233002,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38876,7 +38876,7 @@
     "3002944": {
       "id": 3002944,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233003,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38884,7 +38884,7 @@
     "3002945": {
       "id": 3002945,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233004,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38892,7 +38892,7 @@
     "3002946": {
       "id": 3002946,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233005,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38900,7 +38900,7 @@
     "3002947": {
       "id": 3002947,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233007,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38908,7 +38908,7 @@
     "3002948": {
       "id": 3002948,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233008,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38916,7 +38916,7 @@
     "3002949": {
       "id": 3002949,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233011,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38924,7 +38924,7 @@
     "3002950": {
       "id": 3002950,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233013,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38932,7 +38932,7 @@
     "3002951": {
       "id": 3002951,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233014,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38940,7 +38940,7 @@
     "3002952": {
       "id": 3002952,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233015,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38948,7 +38948,7 @@
     "3002953": {
       "id": 3002953,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233016,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38956,7 +38956,7 @@
     "3002954": {
       "id": 3002954,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233017,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38964,7 +38964,7 @@
     "3002955": {
       "id": 3002955,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233018,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38972,7 +38972,7 @@
     "3002956": {
       "id": 3002956,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233023,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38980,7 +38980,7 @@
     "3002957": {
       "id": 3002957,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233027,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38988,7 +38988,7 @@
     "3002958": {
       "id": 3002958,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233029,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -38996,7 +38996,7 @@
     "3002959": {
       "id": 3002959,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233030,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39004,7 +39004,7 @@
     "3002960": {
       "id": 3002960,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233031,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39012,7 +39012,7 @@
     "3002961": {
       "id": 3002961,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233032,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39020,7 +39020,7 @@
     "3002962": {
       "id": 3002962,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233033,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39028,7 +39028,7 @@
     "3002963": {
       "id": 3002963,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233035,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39036,7 +39036,7 @@
     "3002964": {
       "id": 3002964,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233036,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39044,7 +39044,7 @@
     "3002965": {
       "id": 3002965,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233037,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39052,7 +39052,7 @@
     "3002966": {
       "id": 3002966,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233038,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39060,7 +39060,7 @@
     "3002967": {
       "id": 3002967,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233039,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39068,7 +39068,7 @@
     "3002968": {
       "id": 3002968,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22233040,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39076,7 +39076,7 @@
     "3002969": {
       "id": 3002969,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243001,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39084,7 +39084,7 @@
     "3002970": {
       "id": 3002970,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243002,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39092,7 +39092,7 @@
     "3002971": {
       "id": 3002971,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243003,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39100,7 +39100,7 @@
     "3002972": {
       "id": 3002972,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243004,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39108,7 +39108,7 @@
     "3002973": {
       "id": 3002973,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243005,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39116,7 +39116,7 @@
     "3002974": {
       "id": 3002974,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243007,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39124,7 +39124,7 @@
     "3002975": {
       "id": 3002975,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243009,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39132,7 +39132,7 @@
     "3002976": {
       "id": 3002976,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243013,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39140,7 +39140,7 @@
     "3002977": {
       "id": 3002977,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243014,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39148,7 +39148,7 @@
     "3002978": {
       "id": 3002978,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243015,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39156,7 +39156,7 @@
     "3002979": {
       "id": 3002979,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243016,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39164,7 +39164,7 @@
     "3002980": {
       "id": 3002980,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243017,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39172,7 +39172,7 @@
     "3002981": {
       "id": 3002981,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243019,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39180,7 +39180,7 @@
     "3002982": {
       "id": 3002982,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243020,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39188,7 +39188,7 @@
     "3002983": {
       "id": 3002983,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243021,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39196,7 +39196,7 @@
     "3002984": {
       "id": 3002984,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243022,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39204,7 +39204,7 @@
     "3002985": {
       "id": 3002985,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243023,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39212,7 +39212,7 @@
     "3002986": {
       "id": 3002986,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243025,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39220,7 +39220,7 @@
     "3002987": {
       "id": 3002987,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243026,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39228,7 +39228,7 @@
     "3002988": {
       "id": 3002988,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243027,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39236,7 +39236,7 @@
     "3002989": {
       "id": 3002989,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243028,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39244,7 +39244,7 @@
     "3002990": {
       "id": 3002990,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243029,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39252,7 +39252,7 @@
     "3002991": {
       "id": 3002991,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243031,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39260,7 +39260,7 @@
     "3002992": {
       "id": 3002992,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243032,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39268,7 +39268,7 @@
     "3002993": {
       "id": 3002993,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243033,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39276,7 +39276,7 @@
     "3002994": {
       "id": 3002994,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243034,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39284,7 +39284,7 @@
     "3002995": {
       "id": 3002995,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243035,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39292,7 +39292,7 @@
     "3002996": {
       "id": 3002996,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243036,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39300,7 +39300,7 @@
     "3002997": {
       "id": 3002997,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22243037,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39308,7 +39308,7 @@
     "3002998": {
       "id": 3002998,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22253004,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39316,7 +39316,7 @@
     "3002999": {
       "id": 3002999,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22253005,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39324,7 +39324,7 @@
     "3003000": {
       "id": 3003000,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22253007,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39332,7 +39332,7 @@
     "3003001": {
       "id": 3003001,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22253008,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39340,7 +39340,7 @@
     "3003002": {
       "id": 3003002,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22253011,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39348,7 +39348,7 @@
     "3003003": {
       "id": 3003003,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22253015,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39356,7 +39356,7 @@
     "3003004": {
       "id": 3003004,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22253021,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39364,7 +39364,7 @@
     "3003005": {
       "id": 3003005,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22253023,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39372,7 +39372,7 @@
     "3003006": {
       "id": 3003006,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22253025,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39380,7 +39380,7 @@
     "3003007": {
       "id": 3003007,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22253029,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39388,7 +39388,7 @@
     "3003008": {
       "id": 3003008,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22253031,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39396,7 +39396,7 @@
     "3003009": {
       "id": 3003009,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22253033,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39404,7 +39404,7 @@
     "3003010": {
       "id": 3003010,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22253037,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39412,7 +39412,7 @@
     "3003011": {
       "id": 3003011,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22253039,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39420,7 +39420,7 @@
     "3003012": {
       "id": 3003012,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22253041,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39428,7 +39428,7 @@
     "3003013": {
       "id": 3003013,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22254007,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39436,7 +39436,7 @@
     "3003014": {
       "id": 3003014,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22323001,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39444,7 +39444,7 @@
     "3003015": {
       "id": 3003015,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22323003,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39452,7 +39452,7 @@
     "3003016": {
       "id": 3003016,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22323005,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39460,7 +39460,7 @@
     "3003017": {
       "id": 3003017,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22323007,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39468,7 +39468,7 @@
     "3003018": {
       "id": 3003018,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22323009,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39476,7 +39476,7 @@
     "3003019": {
       "id": 3003019,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22323013,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39484,7 +39484,7 @@
     "3003020": {
       "id": 3003020,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22323015,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39492,7 +39492,7 @@
     "3003021": {
       "id": 3003021,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22323017,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39500,7 +39500,7 @@
     "3003022": {
       "id": 3003022,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333001,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39508,7 +39508,7 @@
     "3003023": {
       "id": 3003023,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333003,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39516,7 +39516,7 @@
     "3003024": {
       "id": 3003024,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333005,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39524,7 +39524,7 @@
     "3003025": {
       "id": 3003025,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333007,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39532,7 +39532,7 @@
     "3003026": {
       "id": 3003026,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333011,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39540,7 +39540,7 @@
     "3003027": {
       "id": 3003027,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333013,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39548,7 +39548,7 @@
     "3003028": {
       "id": 3003028,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333015,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39556,7 +39556,7 @@
     "3003029": {
       "id": 3003029,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333017,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39564,7 +39564,7 @@
     "3003030": {
       "id": 3003030,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333023,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39572,7 +39572,7 @@
     "3003031": {
       "id": 3003031,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333027,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39580,7 +39580,7 @@
     "3003032": {
       "id": 3003032,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333029,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39588,7 +39588,7 @@
     "3003033": {
       "id": 3003033,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333031,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39596,7 +39596,7 @@
     "3003034": {
       "id": 3003034,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333032,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39604,7 +39604,7 @@
     "3003035": {
       "id": 3003035,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333033,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39612,7 +39612,7 @@
     "3003036": {
       "id": 3003036,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333035,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39620,7 +39620,7 @@
     "3003037": {
       "id": 3003037,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333036,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39628,7 +39628,7 @@
     "3003038": {
       "id": 3003038,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333037,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39636,7 +39636,7 @@
     "3003039": {
       "id": 3003039,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22333039,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39644,7 +39644,7 @@
     "3003040": {
       "id": 3003040,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343001,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39652,7 +39652,7 @@
     "3003041": {
       "id": 3003041,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343003,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39660,7 +39660,7 @@
     "3003042": {
       "id": 3003042,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343004,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39668,15 +39668,15 @@
     "3003043": {
       "id": 3003043,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
-      "choiceBoxId": 70100439,
+      "rewardType": 5,
+      "choiceBoxId": 22343005,
       "choiceBoxQuantity": 1,
       "autoMax": false
     },
     "3003044": {
       "id": 3003044,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343007,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39684,7 +39684,7 @@
     "3003045": {
       "id": 3003045,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343009,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39692,7 +39692,7 @@
     "3003046": {
       "id": 3003046,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343013,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39700,7 +39700,7 @@
     "3003047": {
       "id": 3003047,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343014,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39708,7 +39708,7 @@
     "3003048": {
       "id": 3003048,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343015,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39716,7 +39716,7 @@
     "3003049": {
       "id": 3003049,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343017,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39724,7 +39724,7 @@
     "3003050": {
       "id": 3003050,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343019,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39732,7 +39732,7 @@
     "3003051": {
       "id": 3003051,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343021,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39740,7 +39740,7 @@
     "3003052": {
       "id": 3003052,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343023,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39748,7 +39748,7 @@
     "3003053": {
       "id": 3003053,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343025,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39756,7 +39756,7 @@
     "3003054": {
       "id": 3003054,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343027,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39764,7 +39764,7 @@
     "3003055": {
       "id": 3003055,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343029,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39772,7 +39772,7 @@
     "3003056": {
       "id": 3003056,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343031,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39780,7 +39780,7 @@
     "3003057": {
       "id": 3003057,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343033,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39788,7 +39788,7 @@
     "3003058": {
       "id": 3003058,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343035,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39796,7 +39796,7 @@
     "3003059": {
       "id": 3003059,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343036,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39804,7 +39804,7 @@
     "3003060": {
       "id": 3003060,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22343037,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39812,7 +39812,7 @@
     "3003061": {
       "id": 3003061,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22423004,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39820,7 +39820,7 @@
     "3003062": {
       "id": 3003062,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22423007,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39828,7 +39828,7 @@
     "3003063": {
       "id": 3003063,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22423008,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39836,7 +39836,7 @@
     "3003064": {
       "id": 3003064,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22433001,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39844,7 +39844,7 @@
     "3003065": {
       "id": 3003065,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22433002,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39852,7 +39852,7 @@
     "3003066": {
       "id": 3003066,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22443001,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39860,7 +39860,7 @@
     "3003067": {
       "id": 3003067,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22443003,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39868,7 +39868,7 @@
     "3003068": {
       "id": 3003068,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22443005,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39876,7 +39876,7 @@
     "3003069": {
       "id": 3003069,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22443007,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39884,7 +39884,7 @@
     "3003070": {
       "id": 3003070,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22443008,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39892,7 +39892,7 @@
     "3003071": {
       "id": 3003071,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22443009,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39900,7 +39900,7 @@
     "3003072": {
       "id": 3003072,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22443010,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39908,7 +39908,7 @@
     "3003073": {
       "id": 3003073,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22443011,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39916,7 +39916,7 @@
     "3003074": {
       "id": 3003074,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22443012,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39924,7 +39924,7 @@
     "3003075": {
       "id": 3003075,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22443013,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39932,7 +39932,7 @@
     "3003076": {
       "id": 3003076,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22443014,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39940,7 +39940,7 @@
     "3003077": {
       "id": 3003077,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22443015,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39948,7 +39948,7 @@
     "3003078": {
       "id": 3003078,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22443016,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39956,7 +39956,7 @@
     "3003079": {
       "id": 3003079,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22443018,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39964,7 +39964,7 @@
     "3003080": {
       "id": 3003080,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22513001,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39972,7 +39972,7 @@
     "3003081": {
       "id": 3003081,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22513005,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39980,7 +39980,7 @@
     "3003082": {
       "id": 3003082,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22513007,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39988,7 +39988,7 @@
     "3003083": {
       "id": 3003083,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22513015,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -39996,7 +39996,7 @@
     "3003084": {
       "id": 3003084,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22513017,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40004,7 +40004,7 @@
     "3003085": {
       "id": 3003085,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22513019,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40012,7 +40012,7 @@
     "3003086": {
       "id": 3003086,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22513021,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40020,7 +40020,7 @@
     "3003087": {
       "id": 3003087,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613002,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40028,7 +40028,7 @@
     "3003088": {
       "id": 3003088,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613003,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40036,7 +40036,7 @@
     "3003089": {
       "id": 3003089,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613004,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40044,7 +40044,7 @@
     "3003090": {
       "id": 3003090,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613005,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40052,7 +40052,7 @@
     "3003091": {
       "id": 3003091,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613006,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40060,7 +40060,7 @@
     "3003092": {
       "id": 3003092,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613007,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40068,7 +40068,7 @@
     "3003093": {
       "id": 3003093,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613008,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40076,7 +40076,7 @@
     "3003094": {
       "id": 3003094,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613010,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40084,7 +40084,7 @@
     "3003095": {
       "id": 3003095,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613011,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40092,7 +40092,7 @@
     "3003096": {
       "id": 3003096,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613012,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40100,7 +40100,7 @@
     "3003097": {
       "id": 3003097,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613013,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40108,7 +40108,7 @@
     "3003098": {
       "id": 3003098,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613014,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40116,7 +40116,7 @@
     "3003099": {
       "id": 3003099,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613016,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40124,7 +40124,7 @@
     "3003100": {
       "id": 3003100,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613017,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40132,7 +40132,7 @@
     "3003101": {
       "id": 3003101,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613018,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40140,7 +40140,7 @@
     "3003102": {
       "id": 3003102,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613021,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40148,7 +40148,7 @@
     "3003103": {
       "id": 3003103,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613022,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40156,7 +40156,7 @@
     "3003104": {
       "id": 3003104,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613023,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40164,7 +40164,7 @@
     "3003105": {
       "id": 3003105,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613024,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40172,7 +40172,7 @@
     "3003106": {
       "id": 3003106,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613025,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40180,7 +40180,7 @@
     "3003107": {
       "id": 3003107,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613026,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40188,7 +40188,7 @@
     "3003108": {
       "id": 3003108,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613028,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40196,7 +40196,7 @@
     "3003109": {
       "id": 3003109,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613029,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40204,7 +40204,7 @@
     "3003110": {
       "id": 3003110,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613030,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40212,7 +40212,7 @@
     "3003111": {
       "id": 3003111,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613031,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40220,7 +40220,7 @@
     "3003112": {
       "id": 3003112,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613032,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40228,7 +40228,7 @@
     "3003113": {
       "id": 3003113,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613033,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40236,7 +40236,7 @@
     "3003114": {
       "id": 3003114,
       "choiceBoxGroup": 100182,
-      "rewardType": 7,
+      "rewardType": 5,
       "choiceBoxId": 22613035,
       "choiceBoxQuantity": 1,
       "autoMax": false
@@ -40631,6 +40631,54 @@
       "rewardType": 2,
       "choiceBoxId": 23610039,
       "choiceBoxQuantity": 4,
+      "autoMax": false
+    },
+    "3003177": {
+      "id": 3003177,
+      "choiceBoxGroup": 100189,
+      "rewardType": 2,
+      "choiceBoxId": 23347003,
+      "choiceBoxQuantity": 10,
+      "autoMax": false
+    },
+    "3003178": {
+      "id": 3003178,
+      "choiceBoxGroup": 100189,
+      "rewardType": 2,
+      "choiceBoxId": 23347002,
+      "choiceBoxQuantity": 2,
+      "autoMax": false
+    },
+    "3003179": {
+      "id": 3003179,
+      "choiceBoxGroup": 100189,
+      "rewardType": 2,
+      "choiceBoxId": 23347001,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003180": {
+      "id": 3003180,
+      "choiceBoxGroup": 100190,
+      "rewardType": 2,
+      "choiceBoxId": 23347007,
+      "choiceBoxQuantity": 10,
+      "autoMax": false
+    },
+    "3003181": {
+      "id": 3003181,
+      "choiceBoxGroup": 100190,
+      "rewardType": 2,
+      "choiceBoxId": 23347006,
+      "choiceBoxQuantity": 2,
+      "autoMax": false
+    },
+    "3003182": {
+      "id": 3003182,
+      "choiceBoxGroup": 100190,
+      "rewardType": 2,
+      "choiceBoxId": 23347005,
+      "choiceBoxQuantity": 1,
       "autoMax": false
     }
   }

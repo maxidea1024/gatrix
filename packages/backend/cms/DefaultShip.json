@@ -48,11 +48,11 @@
     "1": {
       "id": 1,
       "mateId": 21200001,
-      "shipId": 70000001,
+      "shipId": 70000007,
       "fleetIndex": 1,
       "formationIndex": 1,
       "captinId": 21200001,
-      "defaultSailor": 22
+      "defaultSailor": 33
     },
     "2": {
       "id": 2,

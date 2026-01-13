@@ -2430,6 +2430,19 @@
       "color2": 16777215,
       "color3": 16777215,
       "backAnim": true
+    },
+    "161400551": {
+      "id": 161400551,
+      "skeleton": "FaceAccSkins",
+      "atlas": "FaceAccSkins0001",
+      "skin": "168",
+      "skeleton2": "FaceAccSkinsB",
+      "atlas2": "FaceAccBSkins0001",
+      "skin2": "168",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
     }
   }
 }

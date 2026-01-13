@@ -57724,14 +57724,13 @@
     },
     "83035007": {
       "id": 83035007,
-      "name": "첫 교역",
+      "name": "그의 정체",
       "script": "Joan_CN_02_02.json",
       "blockScriptByMateCondition": false,
       "needMateId": [
         21200001
       ],
       "questGoalId": [
-        89900116,
         89035008
       ]
     },
@@ -57837,12 +57836,13 @@
       "id": 83035016,
       "name": "대유행",
       "script": "Joan_CN_03_06.json",
+      "energy": 50,
       "blockScriptByMateCondition": false,
       "needMateId": [
         21200001
       ],
       "questGoalId": [
-        89035017
+        89100006
       ]
     },
     "83035017": {
@@ -57998,7 +57998,7 @@
     "83035029": {
       "id": 83035029,
       "name": "투자",
-      "summary": "해적 소탕과 투자에 대한 공으로, 조안은 왕궁에서 기사 작위를 받는다.",
+      "summary": "해적 소탕과 투자에 대한 공으로, 조안은 왕궁에서 왕실 항해사로 임명된다.",
       "script": "Joan_CN_05_06.json",
       "blockScriptByMateCondition": false,
       "needMateId": [
@@ -59262,7 +59262,7 @@
     },
     "83035130": {
       "id": 83035130,
-      "name": "첫 교역",
+      "name": "그의 정체",
       "summary": "조안은 도밍고의 도움으로 선상 낚시를 배운다.",
       "script": "Joan_CN_02_02_01.json",
       "blockScriptByMateCondition": false,
@@ -59270,7 +59270,6 @@
         21200001
       ],
       "questGoalId": [
-        89900116,
         89035131
       ]
     },
@@ -59284,6 +59283,18 @@
       ],
       "questGoalId": [
         89035075
+      ]
+    },
+    "83035132": {
+      "id": 83035132,
+      "name": "투자",
+      "script": "Joan_CN_05_04_01.json",
+      "blockScriptByMateCondition": false,
+      "needMateId": [
+        21200001
+      ],
+      "questGoalId": [
+        89035132
       ]
     },
     "83500001": {
@@ -105895,7 +105906,7 @@
         89990101
       ],
       "nodeJumpIdx": [
-        20
+        19
       ]
     },
     "83990252": {
@@ -107885,6 +107896,17 @@
       ],
       "questGoalId": [
         89900262
+      ]
+    },
+    "83990642": {
+      "id": 83990642,
+      "script": "Joan_Tutorial_CN_01_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200001
+      ],
+      "questGoalId": [
+        89900263
       ]
     },
     "83991001": {

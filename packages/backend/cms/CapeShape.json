@@ -3101,6 +3101,16 @@
       "color2": 16777215,
       "color3": 16777215,
       "backAnim": true
+    },
+    "35000181": {
+      "id": 35000181,
+      "skeleton": "FCape05Skins",
+      "atlas": "FCape05Skins0001",
+      "skin": "9",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
     }
   }
 }

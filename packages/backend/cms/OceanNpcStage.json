@@ -1538,6 +1538,15 @@
       ],
       "questId": 82700192
     },
+    "15501118": {
+      "id": 15501118,
+      "battleMapId": 64360154,
+      "climateId": 13100052,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002
+    },
     "15600001": {
       "id": 15600001,
       "battleMapId": 64490003,

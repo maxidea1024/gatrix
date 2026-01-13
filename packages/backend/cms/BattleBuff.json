@@ -14330,6 +14330,34 @@
         "증가"
       ]
     },
+    "65550083": {
+      "id": 65550083,
+      "name": "함대 속도 증가",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 99,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 1,
+      "stackCancelType": 1,
+      "stackMaxNum": 1,
+      "groupNo": 50084,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1099,
+          "Val": 12
+        }
+      ],
+      "markerIcon": "icon_skill_adventureOrder_01_Sprite",
+      "desc": "{0}|hpp(이,가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 기동력",
+        "12",
+        "증가"
+      ]
+    },
     "65551000": {
       "id": 65551000,
       "name": "공격력 증가",
@@ -63380,6 +63408,42 @@
       "descFormatTexts": [
         "모든 추가 공격력",
         "10%",
+        "증가"
+      ]
+    },
+    "65991014": {
+      "id": 65991014,
+      "name": "특별한 사탕 효과",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 99,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 0,
+      "stackCancelType": 0,
+      "stackMaxNum": 1,
+      "groupNo": 90185,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 60
+        },
+        {
+          "Id": 1038,
+          "Val": 60
+        },
+        {
+          "Id": 1053,
+          "Val": 60
+        }
+      ],
+      "markerIcon": "Icon_CEquip_22476005_C_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "모든 추가 공격력",
+        "6%",
         "증가"
       ]
     },

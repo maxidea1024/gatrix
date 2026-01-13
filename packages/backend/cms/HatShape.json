@@ -6004,6 +6004,16 @@
       "color2": 16777215,
       "backAnim": true,
       "attachMethod": 3
+    },
+    "33000554": {
+      "id": 33000554,
+      "skeleton": "AttachtoHairSkins",
+      "atlas": "AttachtoHairSkins0005",
+      "skin": "25",
+      "color1": 16777215,
+      "color2": 16777215,
+      "backAnim": true,
+      "attachMethod": 1
     }
   }
 }

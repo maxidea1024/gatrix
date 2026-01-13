@@ -41,6 +41,10 @@
       "questId6": "number",
       "recruitingPoint": "number",
       "recruitingPointValue": "number",
+      "recruitingPointDiscountBaseValue": "number",
+      "recruitingPointDiscountTagText": "text",
+      "recruitingPointDiscountStartDate": "string",
+      "recruitingPointDiscountEndDate": "string",
       "contentsTerms": [
         {
           "Id": "number",
@@ -80,6 +84,7 @@
       "startRoyalTitelId": 1,
       "recruitingPoint": 1,
       "recruitingPointValue": 1,
+      "recruitingPointDiscountBaseValue": 1,
       "isHideNotHired": 1,
       "listOrder": 1
     },
@@ -327,6 +332,7 @@
       "questId6": 82000001,
       "recruitingPoint": 100001,
       "recruitingPointValue": 100000000,
+      "recruitingPointDiscountBaseValue": 100000000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -380,6 +386,7 @@
       "questId6": 82000002,
       "recruitingPoint": 100001,
       "recruitingPointValue": 100000000,
+      "recruitingPointDiscountBaseValue": 100000000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -433,6 +440,7 @@
       "questId6": 82000003,
       "recruitingPoint": 100001,
       "recruitingPointValue": 100000000,
+      "recruitingPointDiscountBaseValue": 100000000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -484,6 +492,7 @@
       "questId6": 82000004,
       "recruitingPoint": 100001,
       "recruitingPointValue": 100000000,
+      "recruitingPointDiscountBaseValue": 100000000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -534,6 +543,7 @@
       "questId6": 82000005,
       "recruitingPoint": 100001,
       "recruitingPointValue": 100000000,
+      "recruitingPointDiscountBaseValue": 100000000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -572,6 +582,7 @@
       "questId6": 82000006,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -610,6 +621,7 @@
       "questId6": 82000007,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -649,6 +661,7 @@
       "questId6": 82000008,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -687,6 +700,7 @@
       "questId6": 82000009,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -725,6 +739,7 @@
       "questId6": 82000010,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -763,6 +778,7 @@
       "questId6": 82000011,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -801,6 +817,7 @@
       "questId6": 82000012,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -839,6 +856,7 @@
       "questId6": 82000013,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -877,6 +895,7 @@
       "questId6": 82000014,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -915,6 +934,7 @@
       "questId6": 82000015,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -946,6 +966,7 @@
       "isBasicAdmiral": false,
       "recruitingPoint": 100004,
       "recruitingPointValue": 99999,
+      "recruitingPointDiscountBaseValue": 99999,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -984,6 +1005,7 @@
       "questId6": 82000017,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1022,6 +1044,7 @@
       "questId6": 82000018,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1060,6 +1083,7 @@
       "questId6": 82000019,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1098,6 +1122,7 @@
       "questId6": 82000020,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1129,6 +1154,7 @@
       "isBasicAdmiral": false,
       "recruitingPoint": 100004,
       "recruitingPointValue": 99999,
+      "recruitingPointDiscountBaseValue": 99999,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1167,6 +1193,7 @@
       "questId6": 82000022,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1197,6 +1224,7 @@
       "isBasicAdmiral": false,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1235,6 +1263,7 @@
       "questId6": 82000024,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1273,6 +1302,7 @@
       "questId6": 82000025,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1303,6 +1333,7 @@
       "isBasicAdmiral": false,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1333,6 +1364,7 @@
       "isBasicAdmiral": false,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1371,6 +1403,7 @@
       "questId6": 82000028,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1409,6 +1442,7 @@
       "questId6": 82000029,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1449,6 +1483,7 @@
       "questId6": 82000030,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1487,6 +1522,7 @@
       "questId6": 82000031,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1525,6 +1561,7 @@
       "questId6": 82000032,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1563,6 +1600,7 @@
       "questId6": 82000033,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1601,6 +1639,7 @@
       "questId6": 82000034,
       "recruitingPoint": 100004,
       "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1632,6 +1671,7 @@
       "isBasicAdmiral": false,
       "recruitingPoint": 100004,
       "recruitingPointValue": 99999,
+      "recruitingPointDiscountBaseValue": 99999,
       "contentsTerms": [
         {
           "Id": 81000001,
@@ -1645,6 +1685,45 @@
       ],
       "isHideNotHired": true,
       "listOrder": 10002
+    },
+    "20000036": {
+      "id": 20000036,
+      "mateId": 21200037,
+      "startTownId": 11000091,
+      "defaultTowns": [
+        70412088
+      ],
+      "admiralGroupId": 20899000,
+      "defaultSailor": 21390501,
+      "startOpenFOWTileIds": [
+        1818,
+        1817
+      ],
+      "startRoyalTitelId": 21700000,
+      "isBasicAdmiral": false,
+      "questId0": 82000036,
+      "questId1": 82000036,
+      "questId2": 82000036,
+      "questId3": 82000036,
+      "questId4": 82000036,
+      "questId5": 82000036,
+      "questId6": 82000036,
+      "recruitingPoint": 100004,
+      "recruitingPointValue": 5000,
+      "recruitingPointDiscountBaseValue": 5000,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 25
+        }
+      ],
+      "orders": [
+        {
+          "AdmiralLv": 1
+        }
+      ],
+      "isHideNotHired": false,
+      "listOrder": 132
     },
     "20000037": {
       "id": 20000037,
@@ -1669,6 +1748,7 @@
       "questId6": 82000037,
       "recruitingPoint": 100004,
       "recruitingPointValue": 99999,
+      "recruitingPointDiscountBaseValue": 99999,
       "contentsTerms": [
         {
           "Id": 81000001,

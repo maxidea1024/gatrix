@@ -8523,6 +8523,17 @@
           "DuckingAsset": "nop"
         }
       ]
+    },
+    "96000943": {
+      "id": 96000943,
+      "name": "SE_황진화_폭풍우_Loop",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010347,
+          "DuckingAsset": "nop"
+        }
+      ]
     }
   }
 }

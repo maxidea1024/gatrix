@@ -393,7 +393,7 @@
       "shipBuildGroup": 1001,
       "shipyardShopGroup": [
         1000,
-        30001,
+        31000,
         2001,
         40001
       ],
@@ -498,7 +498,7 @@
       "shipBuildGroup": 1002,
       "shipyardShopGroup": [
         1000,
-        30002,
+        31000,
         2002,
         40002
       ],
@@ -603,7 +603,7 @@
       "shipBuildGroup": 1003,
       "shipyardShopGroup": [
         1001,
-        30003,
+        31000,
         2003
       ],
       "shopGroup": [
@@ -707,7 +707,7 @@
       "shipBuildGroup": 1004,
       "shipyardShopGroup": [
         1001,
-        30004,
+        31000,
         2004
       ],
       "shopGroup": [
@@ -814,7 +814,7 @@
       "shipBuildGroup": 5,
       "shipyardShopGroup": [
         1051,
-        30005,
+        31000,
         2005
       ],
       "shopGroup": [
@@ -918,7 +918,7 @@
       "shipBuildGroup": 6,
       "shipyardShopGroup": [
         1092,
-        30006
+        31000
       ],
       "shopGroup": [
         1092,
@@ -1017,7 +1017,7 @@
       "shipBuildGroup": 7,
       "shipyardShopGroup": [
         1042,
-        30007
+        31000
       ],
       "shopGroup": [
         1042,
@@ -1115,7 +1115,7 @@
       "shipBuildGroup": 1008,
       "shipyardShopGroup": [
         1102,
-        30008,
+        31000,
         40008
       ],
       "shopGroup": [
@@ -1214,7 +1214,7 @@
       "shipBuildGroup": 1009,
       "shipyardShopGroup": [
         1012,
-        30009
+        31000
       ],
       "shopGroup": [
         1012,
@@ -1311,7 +1311,7 @@
       "shipBuildGroup": 10,
       "shipyardShopGroup": [
         1071,
-        30010,
+        31000,
         2010
       ],
       "shopGroup": [
@@ -1413,7 +1413,7 @@
       "shipBuildGroup": 11,
       "shipyardShopGroup": [
         1012,
-        30011
+        31000
       ],
       "shopGroup": [
         1012,
@@ -1512,7 +1512,7 @@
       "shipBuildGroup": 1012,
       "shipyardShopGroup": [
         1102,
-        30012,
+        31000,
         40012
       ],
       "shopGroup": [
@@ -1612,7 +1612,7 @@
       "shipBuildGroup": 13,
       "shipyardShopGroup": [
         1032,
-        30013
+        31000
       ],
       "shopGroup": [
         1032,
@@ -1710,7 +1710,7 @@
       "shipBuildGroup": 1014,
       "shipyardShopGroup": [
         1000,
-        30014,
+        31000,
         2014
       ],
       "shopGroup": [
@@ -1817,7 +1817,7 @@
       "shipBuildGroup": 1015,
       "shipyardShopGroup": [
         1001,
-        30015,
+        31000,
         2015,
         40015
       ],
@@ -1921,7 +1921,7 @@
       "shipBuildGroup": 16,
       "shipyardShopGroup": [
         1102,
-        30016
+        31000
       ],
       "shopGroup": [
         1102,
@@ -2024,7 +2024,7 @@
       "shipBuildGroup": 1017,
       "shipyardShopGroup": [
         1022,
-        30017
+        31000
       ],
       "shopGroup": [
         1022,
@@ -2125,7 +2125,7 @@
       "shipBuildGroup": 18,
       "shipyardShopGroup": [
         1042,
-        30018
+        31000
       ],
       "shopGroup": [
         1042,
@@ -2223,7 +2223,7 @@
       "shipBuildGroup": 19,
       "shipyardShopGroup": [
         1060,
-        30019,
+        31000,
         2019
       ],
       "shopGroup": [
@@ -2327,7 +2327,7 @@
       "shipBuildGroup": 1020,
       "shipyardShopGroup": [
         1012,
-        30020,
+        31000,
         40020
       ],
       "shopGroup": [
@@ -2426,7 +2426,7 @@
       "shipBuildGroup": 1021,
       "shipyardShopGroup": [
         1011,
-        30021,
+        31000,
         2021,
         40021
       ],
@@ -2530,7 +2530,7 @@
       "shipBuildGroup": 1022,
       "shipyardShopGroup": [
         1012,
-        30022
+        31000
       ],
       "shopGroup": [
         1012,
@@ -2627,7 +2627,7 @@
       "shipBuildGroup": 23,
       "shipyardShopGroup": [
         1022,
-        30023
+        31000
       ],
       "shopGroup": [
         1022,
@@ -2725,7 +2725,7 @@
       "shipBuildGroup": 24,
       "shipyardShopGroup": [
         1032,
-        30024
+        31000
       ],
       "shopGroup": [
         1032,
@@ -2824,7 +2824,7 @@
       "shipBuildGroup": 25,
       "shipyardShopGroup": [
         1052,
-        30025
+        31000
       ],
       "shopGroup": [
         1052,
@@ -2922,7 +2922,7 @@
       "shipBuildGroup": 26,
       "shipyardShopGroup": [
         1012,
-        30026
+        31000
       ],
       "shopGroup": [
         1012,
@@ -3020,7 +3020,7 @@
       "shipBuildGroup": 27,
       "shipyardShopGroup": [
         1042,
-        30027
+        31000
       ],
       "shopGroup": [
         1042,
@@ -3118,7 +3118,7 @@
       "shipBuildGroup": 1028,
       "shipyardShopGroup": [
         1001,
-        30028,
+        31000,
         2028
       ],
       "shopGroup": [
@@ -3224,7 +3224,7 @@
       "shipBuildGroup": 1029,
       "shipyardShopGroup": [
         1022,
-        30029
+        31000
       ],
       "shopGroup": [
         1022,
@@ -3323,7 +3323,7 @@
       "shipBuildGroup": 1030,
       "shipyardShopGroup": [
         1010,
-        30030,
+        31000,
         2030,
         40030
       ],
@@ -3426,7 +3426,7 @@
       "shipBuildGroup": 31,
       "shipyardShopGroup": [
         1042,
-        30031
+        31000
       ],
       "shopGroup": [
         1042,
@@ -3530,7 +3530,7 @@
       "shipBuildGroup": 32,
       "shipyardShopGroup": [
         1031,
-        30032,
+        31000,
         2032
       ],
       "shopGroup": [
@@ -3634,7 +3634,8 @@
       "malariaHazard": 0,
       "shipBuildGroup": 33,
       "shipyardShopGroup": [
-        1082
+        1082,
+        31000
       ],
       "shopGroup": [
         1082,
@@ -3730,7 +3731,7 @@
       "shipBuildGroup": 1034,
       "shipyardShopGroup": [
         1011,
-        30034,
+        31000,
         2034
       ],
       "shopGroup": [
@@ -3835,7 +3836,7 @@
       "shipBuildGroup": 1035,
       "shipyardShopGroup": [
         1012,
-        30035
+        31000
       ],
       "shopGroup": [
         1012,
@@ -3933,7 +3934,7 @@
       "shipBuildGroup": 36,
       "shipyardShopGroup": [
         1090,
-        30036,
+        31000,
         2036
       ],
       "shopGroup": [
@@ -4037,7 +4038,7 @@
       "shipBuildGroup": 37,
       "shipyardShopGroup": [
         1102,
-        30037
+        31000
       ],
       "shopGroup": [
         1102,
@@ -4135,7 +4136,7 @@
       "shipBuildGroup": 38,
       "shipyardShopGroup": [
         1042,
-        30038
+        31000
       ],
       "shopGroup": [
         1042,
@@ -4233,7 +4234,7 @@
       "shipBuildGroup": 1039,
       "shipyardShopGroup": [
         1002,
-        30039
+        31000
       ],
       "shopGroup": [
         1002,
@@ -4329,7 +4330,7 @@
       "shipBuildGroup": 1040,
       "shipyardShopGroup": [
         1092,
-        30040
+        31000
       ],
       "shopGroup": [
         1092,
@@ -4428,7 +4429,7 @@
       "shipBuildGroup": 1041,
       "shipyardShopGroup": [
         1102,
-        30041
+        31000
       ],
       "shopGroup": [
         1102,
@@ -4526,7 +4527,7 @@
       "shipBuildGroup": 1042,
       "shipyardShopGroup": [
         1000,
-        30042,
+        31000,
         2042
       ],
       "shopGroup": [
@@ -4632,7 +4633,7 @@
       "shipBuildGroup": 43,
       "shipyardShopGroup": [
         1022,
-        30043
+        31000
       ],
       "shopGroup": [
         1022,
@@ -4730,7 +4731,7 @@
       "shipBuildGroup": 44,
       "shipyardShopGroup": [
         1052,
-        30044
+        31000
       ],
       "shopGroup": [
         1052,
@@ -4828,7 +4829,7 @@
       "shipBuildGroup": 45,
       "shipyardShopGroup": [
         1042,
-        30045
+        31000
       ],
       "shopGroup": [
         1042,
@@ -4927,7 +4928,7 @@
       "shipBuildGroup": 46,
       "shipyardShopGroup": [
         1061,
-        30046,
+        31000,
         2046
       ],
       "shopGroup": [
@@ -5029,7 +5030,7 @@
       "shipBuildGroup": 1047,
       "shipyardShopGroup": [
         1001,
-        30047,
+        31000,
         2047
       ],
       "shopGroup": [
@@ -5133,7 +5134,7 @@
       "shipBuildGroup": 48,
       "shipyardShopGroup": [
         1040,
-        30048,
+        31000,
         2048
       ],
       "shopGroup": [
@@ -5238,7 +5239,7 @@
       "shipBuildGroup": 49,
       "shipyardShopGroup": [
         1032,
-        30049
+        31000
       ],
       "shopGroup": [
         1032,
@@ -5336,7 +5337,7 @@
       "shipBuildGroup": 1050,
       "shipyardShopGroup": [
         1092,
-        30050
+        31000
       ],
       "shopGroup": [
         1092,
@@ -5439,7 +5440,7 @@
       "shipBuildGroup": 51,
       "shipyardShopGroup": [
         1032,
-        30051
+        31000
       ],
       "shopGroup": [
         1032,
@@ -5538,7 +5539,7 @@
       "shipBuildGroup": 52,
       "shipyardShopGroup": [
         1031,
-        30052,
+        31000,
         2052
       ],
       "shopGroup": [
@@ -5643,7 +5644,7 @@
       "shipBuildGroup": 53,
       "shipyardShopGroup": [
         1032,
-        30053
+        31000
       ],
       "shopGroup": [
         1032,
@@ -5746,7 +5747,7 @@
       "shipBuildGroup": 1054,
       "shipyardShopGroup": [
         1002,
-        30054
+        31000
       ],
       "shopGroup": [
         1002,
@@ -5851,7 +5852,7 @@
       "shipBuildGroup": 55,
       "shipyardShopGroup": [
         1021,
-        30055,
+        31000,
         2055
       ],
       "shopGroup": [
@@ -5955,7 +5956,7 @@
       "shipBuildGroup": 1056,
       "shipyardShopGroup": [
         1001,
-        30056,
+        31000,
         2056
       ],
       "shopGroup": [
@@ -6060,7 +6061,7 @@
       "shipBuildGroup": 1057,
       "shipyardShopGroup": [
         1032,
-        30057,
+        31000,
         40057
       ],
       "shopGroup": [
@@ -6164,7 +6165,7 @@
       "shipBuildGroup": 58,
       "shipyardShopGroup": [
         1021,
-        30058,
+        31000,
         2058
       ],
       "shopGroup": [
@@ -6269,7 +6270,7 @@
       "shipBuildGroup": 59,
       "shipyardShopGroup": [
         1102,
-        30059
+        31000
       ],
       "shopGroup": [
         1102,
@@ -6372,7 +6373,7 @@
       "shipBuildGroup": 60,
       "shipyardShopGroup": [
         1042,
-        30060
+        31000
       ],
       "shopGroup": [
         1042,
@@ -6470,7 +6471,7 @@
       "shipBuildGroup": 61,
       "shipyardShopGroup": [
         1042,
-        30061
+        31000
       ],
       "shopGroup": [
         1042,
@@ -6574,7 +6575,7 @@
       "shipBuildGroup": 1062,
       "shipyardShopGroup": [
         1001,
-        30062,
+        31000,
         2062
       ],
       "shopGroup": [
@@ -6678,7 +6679,7 @@
       "shipBuildGroup": 63,
       "shipyardShopGroup": [
         1092,
-        30063
+        31000
       ],
       "shopGroup": [
         1092,
@@ -6776,7 +6777,7 @@
       "shipBuildGroup": 64,
       "shipyardShopGroup": [
         1042,
-        30064
+        31000
       ],
       "shopGroup": [
         1042,
@@ -6874,7 +6875,7 @@
       "shipBuildGroup": 65,
       "shipyardShopGroup": [
         1102,
-        30065
+        31000
       ],
       "shopGroup": [
         1102,
@@ -6972,7 +6973,7 @@
       "shipBuildGroup": 66,
       "shipyardShopGroup": [
         1032,
-        30066
+        31000
       ],
       "shopGroup": [
         1032,
@@ -7071,7 +7072,7 @@
       "shipBuildGroup": 1067,
       "shipyardShopGroup": [
         1000,
-        30067,
+        31000,
         2067
       ],
       "shopGroup": [
@@ -7177,7 +7178,7 @@
       "shipBuildGroup": 1068,
       "shipyardShopGroup": [
         1091,
-        30068,
+        31000,
         2068
       ],
       "shopGroup": [
@@ -7282,7 +7283,7 @@
       "shipBuildGroup": 1069,
       "shipyardShopGroup": [
         1012,
-        30069,
+        31000,
         40069
       ],
       "shopGroup": [
@@ -7382,7 +7383,7 @@
       "shipBuildGroup": 1070,
       "shipyardShopGroup": [
         1021,
-        30070,
+        31000,
         2070
       ],
       "shopGroup": [
@@ -7489,7 +7490,7 @@
       "shipBuildGroup": 1071,
       "shipyardShopGroup": [
         1022,
-        30071
+        31000
       ],
       "shopGroup": [
         1022,
@@ -7590,7 +7591,7 @@
       "shipBuildGroup": 72,
       "shipyardShopGroup": [
         1032,
-        30072
+        31000
       ],
       "shopGroup": [
         1032,
@@ -7689,7 +7690,7 @@
       "shipBuildGroup": 1073,
       "shipyardShopGroup": [
         1001,
-        30073,
+        31000,
         2073
       ],
       "shopGroup": [
@@ -7791,7 +7792,7 @@
       "shipBuildGroup": 1074,
       "shipyardShopGroup": [
         1092,
-        30074
+        31000
       ],
       "shopGroup": [
         1092,
@@ -7889,7 +7890,7 @@
       "shipBuildGroup": 75,
       "shipyardShopGroup": [
         1081,
-        2075
+        31000
       ],
       "shopGroup": [
         1081,
@@ -7990,7 +7991,7 @@
       "shipBuildGroup": 76,
       "shipyardShopGroup": [
         1092,
-        30076
+        31000
       ],
       "shopGroup": [
         1092,
@@ -8089,7 +8090,7 @@
       "shipBuildGroup": 77,
       "shipyardShopGroup": [
         1060,
-        30077,
+        31000,
         2077
       ],
       "shopGroup": [
@@ -8191,7 +8192,7 @@
       "shipBuildGroup": 1078,
       "shipyardShopGroup": [
         1011,
-        30078,
+        31000,
         2078,
         40078
       ],
@@ -8295,7 +8296,7 @@
       "shipBuildGroup": 79,
       "shipyardShopGroup": [
         1042,
-        30079
+        31000
       ],
       "shopGroup": [
         1042,
@@ -8394,7 +8395,7 @@
       "shipBuildGroup": 1080,
       "shipyardShopGroup": [
         1011,
-        30080,
+        31000,
         2080
       ],
       "shopGroup": [
@@ -8496,7 +8497,7 @@
       "shipBuildGroup": 1081,
       "shipyardShopGroup": [
         1032,
-        30081
+        31000
       ],
       "shopGroup": [
         1032,
@@ -8594,7 +8595,7 @@
       "shipBuildGroup": 1082,
       "shipyardShopGroup": [
         1012,
-        30082
+        31000
       ],
       "shopGroup": [
         1012,
@@ -8698,7 +8699,7 @@
       "shipBuildGroup": 83,
       "shipyardShopGroup": [
         1042,
-        30083
+        31000
       ],
       "shopGroup": [
         1042,
@@ -8796,7 +8797,7 @@
       "shipBuildGroup": 1084,
       "shipyardShopGroup": [
         1002,
-        30084
+        31000
       ],
       "shopGroup": [
         1002,
@@ -8902,7 +8903,7 @@
       "shipBuildGroup": 85,
       "shipyardShopGroup": [
         1072,
-        30085
+        31000
       ],
       "shopGroup": [
         1072,
@@ -8998,7 +8999,7 @@
       "shipBuildGroup": 1086,
       "shipyardShopGroup": [
         1101,
-        30086,
+        31000,
         2086
       ],
       "shopGroup": [
@@ -9102,7 +9103,7 @@
       "shipBuildGroup": 1087,
       "shipyardShopGroup": [
         1102,
-        30087
+        31000
       ],
       "shopGroup": [
         1102,
@@ -9206,7 +9207,7 @@
       "shipBuildGroup": 1088,
       "shipyardShopGroup": [
         1102,
-        30088,
+        31000,
         40088
       ],
       "shopGroup": [
@@ -9306,7 +9307,7 @@
       "shipBuildGroup": 1089,
       "shipyardShopGroup": [
         1002,
-        30089
+        31000
       ],
       "shopGroup": [
         1002,
@@ -9410,7 +9411,7 @@
       "shipBuildGroup": 90,
       "shipyardShopGroup": [
         1032,
-        30090
+        31000
       ],
       "shopGroup": [
         1032,
@@ -9509,7 +9510,7 @@
       "shipBuildGroup": 1091,
       "shipyardShopGroup": [
         1010,
-        30091,
+        31000,
         2091,
         40091
       ],
@@ -9615,7 +9616,7 @@
       "shipBuildGroup": 92,
       "shipyardShopGroup": [
         1092,
-        30092
+        31000
       ],
       "shopGroup": [
         1092,
@@ -9713,7 +9714,7 @@
       "shipBuildGroup": 1093,
       "shipyardShopGroup": [
         1022,
-        30093
+        31000
       ],
       "shopGroup": [
         1022,
@@ -9812,7 +9813,7 @@
       "shipBuildGroup": 1094,
       "shipyardShopGroup": [
         1021,
-        30094,
+        31000,
         2094,
         40094
       ],
@@ -9916,7 +9917,7 @@
       "shipBuildGroup": 1095,
       "shipyardShopGroup": [
         1031,
-        30095,
+        31000,
         2095
       ],
       "shopGroup": [
@@ -10020,7 +10021,7 @@
       "shipBuildGroup": 96,
       "shipyardShopGroup": [
         1022,
-        30096
+        31000
       ],
       "shopGroup": [
         1022,
@@ -10123,7 +10124,7 @@
       "shipBuildGroup": 97,
       "shipyardShopGroup": [
         1031,
-        30097,
+        31000,
         2097
       ],
       "shopGroup": [
@@ -10227,7 +10228,7 @@
       "shipBuildGroup": 98,
       "shipyardShopGroup": [
         1042,
-        30098
+        31000
       ],
       "shopGroup": [
         1042,
@@ -10330,7 +10331,7 @@
       "shipBuildGroup": 99,
       "shipyardShopGroup": [
         1021,
-        30099,
+        31000,
         2099
       ],
       "shopGroup": [
@@ -10434,7 +10435,7 @@
       "shipBuildGroup": 1100,
       "shipyardShopGroup": [
         1011,
-        30100,
+        31000,
         2100
       ],
       "shopGroup": [
@@ -10538,7 +10539,7 @@
       "shipBuildGroup": 1101,
       "shipyardShopGroup": [
         1001,
-        30101,
+        31000,
         2101
       ],
       "shopGroup": [
@@ -10644,7 +10645,7 @@
       "shipBuildGroup": 102,
       "shipyardShopGroup": [
         1022,
-        30102
+        31000
       ],
       "shopGroup": [
         1022,
@@ -10742,7 +10743,7 @@
       "shipBuildGroup": 1103,
       "shipyardShopGroup": [
         1032,
-        30103,
+        31000,
         40103
       ],
       "shopGroup": [
@@ -10841,7 +10842,7 @@
       "shipBuildGroup": 104,
       "shipyardShopGroup": [
         1052,
-        30104
+        31000
       ],
       "shopGroup": [
         1052,
@@ -10939,7 +10940,7 @@
       "shipBuildGroup": 105,
       "shipyardShopGroup": [
         1021,
-        30105,
+        31000,
         2105
       ],
       "shopGroup": [
@@ -11043,7 +11044,7 @@
       "shipBuildGroup": 1106,
       "shipyardShopGroup": [
         1032,
-        30106
+        31000
       ],
       "shopGroup": [
         1032,
@@ -11141,7 +11142,7 @@
       "shipBuildGroup": 107,
       "shipyardShopGroup": [
         1012,
-        30107
+        31000
       ],
       "shopGroup": [
         1012,
@@ -11239,7 +11240,7 @@
       "shipBuildGroup": 1108,
       "shipyardShopGroup": [
         1031,
-        30108,
+        31000,
         2108,
         40108
       ],
@@ -11344,7 +11345,7 @@
       "shipBuildGroup": 1109,
       "shipyardShopGroup": [
         1002,
-        30109
+        31000
       ],
       "shopGroup": [
         1002,
@@ -11445,7 +11446,7 @@
       "shipBuildGroup": 110,
       "shipyardShopGroup": [
         1042,
-        30110
+        31000
       ],
       "shopGroup": [
         1042,
@@ -11543,7 +11544,7 @@
       "shipBuildGroup": 111,
       "shipyardShopGroup": [
         1092,
-        30111
+        31000
       ],
       "shopGroup": [
         1092,
@@ -11641,7 +11642,7 @@
       "shipBuildGroup": 1112,
       "shipyardShopGroup": [
         1000,
-        30112,
+        31000,
         2112
       ],
       "shopGroup": [
@@ -11746,7 +11747,7 @@
       "shipBuildGroup": 1113,
       "shipyardShopGroup": [
         1002,
-        30113,
+        31000,
         40113
       ],
       "shopGroup": [
@@ -11847,7 +11848,7 @@
       "shipBuildGroup": 114,
       "shipyardShopGroup": [
         1062,
-        30114
+        31000
       ],
       "shopGroup": [
         1062,
@@ -11945,7 +11946,7 @@
       "shipBuildGroup": 1115,
       "shipyardShopGroup": [
         1020,
-        30115,
+        31000,
         2115
       ],
       "shopGroup": [
@@ -12052,7 +12053,7 @@
       "shipBuildGroup": 1116,
       "shipyardShopGroup": [
         1021,
-        30116,
+        31000,
         2116,
         40116
       ],
@@ -12158,7 +12159,7 @@
       "shipBuildGroup": 117,
       "shipyardShopGroup": [
         1042,
-        30117
+        31000
       ],
       "shopGroup": [
         1042,
@@ -12256,7 +12257,7 @@
       "shipBuildGroup": 1118,
       "shipyardShopGroup": [
         1010,
-        30118,
+        31000,
         2118,
         40118
       ],
@@ -12359,7 +12360,7 @@
       "shipBuildGroup": 1119,
       "shipyardShopGroup": [
         1011,
-        30119,
+        31000,
         2119
       ],
       "shopGroup": [
@@ -12462,7 +12463,7 @@
       "shipBuildGroup": 1120,
       "shipyardShopGroup": [
         1022,
-        30120
+        31000
       ],
       "shopGroup": [
         1022,
@@ -12568,7 +12569,7 @@
       "shipBuildGroup": 121,
       "shipyardShopGroup": [
         1102,
-        30121
+        31000
       ],
       "shopGroup": [
         1102,
@@ -12666,7 +12667,7 @@
       "shipBuildGroup": 122,
       "shipyardShopGroup": [
         1070,
-        30122,
+        31000,
         2122
       ],
       "shopGroup": [
@@ -12768,7 +12769,7 @@
       "shipBuildGroup": 1123,
       "shipyardShopGroup": [
         1011,
-        30123,
+        31000,
         2123
       ],
       "shopGroup": [
@@ -12870,7 +12871,7 @@
       "shipBuildGroup": 1124,
       "shipyardShopGroup": [
         1022,
-        30124,
+        31000,
         40124
       ],
       "shopGroup": [
@@ -12970,7 +12971,7 @@
       "shipBuildGroup": 1125,
       "shipyardShopGroup": [
         1011,
-        30125,
+        31000,
         2125
       ],
       "shopGroup": [
@@ -13075,7 +13076,7 @@
       "shipBuildGroup": 126,
       "shipyardShopGroup": [
         1042,
-        30126
+        31000
       ],
       "shopGroup": [
         1042,
@@ -13178,7 +13179,7 @@
       "shipBuildGroup": 127,
       "shipyardShopGroup": [
         1092,
-        30127
+        31000
       ],
       "shopGroup": [
         1092,
@@ -13276,7 +13277,7 @@
       "shipBuildGroup": 128,
       "shipyardShopGroup": [
         1062,
-        30128
+        31000
       ],
       "shopGroup": [
         1062,
@@ -13372,7 +13373,7 @@
       "shipBuildGroup": 1129,
       "shipyardShopGroup": [
         1102,
-        30129
+        31000
       ],
       "shopGroup": [
         1102,
@@ -13470,7 +13471,7 @@
       "shipBuildGroup": 1130,
       "shipyardShopGroup": [
         1020,
-        30130,
+        31000,
         2130,
         40130
       ],
@@ -13575,7 +13576,7 @@
       "shipBuildGroup": 1131,
       "shipyardShopGroup": [
         1002,
-        30131
+        31000
       ],
       "shopGroup": [
         1002,
@@ -13675,7 +13676,7 @@
       "shipBuildGroup": 1132,
       "shipyardShopGroup": [
         1101,
-        30132,
+        31000,
         2132
       ],
       "shopGroup": [
@@ -13780,7 +13781,7 @@
       "shipBuildGroup": 133,
       "shipyardShopGroup": [
         1041,
-        30133,
+        31000,
         2133
       ],
       "shopGroup": [
@@ -13884,7 +13885,7 @@
       "shipBuildGroup": 134,
       "shipyardShopGroup": [
         1031,
-        30134,
+        31000,
         2134
       ],
       "shopGroup": [
@@ -13988,7 +13989,7 @@
       "shipBuildGroup": 135,
       "shipyardShopGroup": [
         1060,
-        30135,
+        31000,
         2135
       ],
       "shopGroup": [
@@ -14090,7 +14091,7 @@
       "shipBuildGroup": 1136,
       "shipyardShopGroup": [
         1000,
-        30136,
+        31000,
         2136,
         40136
       ],
@@ -14198,7 +14199,7 @@
       "shipBuildGroup": 137,
       "shipyardShopGroup": [
         1021,
-        30137,
+        31000,
         2137
       ],
       "shopGroup": [
@@ -14302,7 +14303,7 @@
       "shipBuildGroup": 138,
       "shipyardShopGroup": [
         1060,
-        30138,
+        31000,
         2138
       ],
       "shopGroup": [
@@ -14404,7 +14405,7 @@
       "shipBuildGroup": 139,
       "shipyardShopGroup": [
         1042,
-        30139
+        31000
       ],
       "shopGroup": [
         1042,
@@ -14508,7 +14509,7 @@
       "shipBuildGroup": 140,
       "shipyardShopGroup": [
         1061,
-        30140,
+        31000,
         2140
       ],
       "shopGroup": [
@@ -14610,7 +14611,7 @@
       "shipBuildGroup": 1141,
       "shipyardShopGroup": [
         1102,
-        30141
+        31000
       ],
       "shopGroup": [
         1102,
@@ -14713,7 +14714,7 @@
       "shipBuildGroup": 1142,
       "shipyardShopGroup": [
         1102,
-        30142
+        31000
       ],
       "shopGroup": [
         1102,
@@ -14812,7 +14813,7 @@
       "shipBuildGroup": 143,
       "shipyardShopGroup": [
         1032,
-        30143
+        31000
       ],
       "shopGroup": [
         1032,
@@ -14910,7 +14911,7 @@
       "shipBuildGroup": 1144,
       "shipyardShopGroup": [
         1032,
-        30144
+        31000
       ],
       "shopGroup": [
         1032,
@@ -15009,7 +15010,7 @@
       "shipBuildGroup": 1145,
       "shipyardShopGroup": [
         1022,
-        30145
+        31000
       ],
       "shopGroup": [
         1022,
@@ -15106,7 +15107,7 @@
       "shipBuildGroup": 146,
       "shipyardShopGroup": [
         1102,
-        30146
+        31000
       ],
       "shopGroup": [
         1102,
@@ -15204,7 +15205,7 @@
       "shipBuildGroup": 1147,
       "shipyardShopGroup": [
         1021,
-        30147,
+        31000,
         2147,
         40147
       ],
@@ -15311,7 +15312,7 @@
       "shipBuildGroup": 148,
       "shipyardShopGroup": [
         1042,
-        30148
+        31000
       ],
       "shopGroup": [
         1042,
@@ -15409,7 +15410,7 @@
       "shipBuildGroup": 149,
       "shipyardShopGroup": [
         1022,
-        30149
+        31000
       ],
       "shopGroup": [
         1022,
@@ -15508,7 +15509,7 @@
       "shipBuildGroup": 1150,
       "shipyardShopGroup": [
         1022,
-        30150
+        31000
       ],
       "shopGroup": [
         1022,
@@ -15607,7 +15608,7 @@
       "shipBuildGroup": 1151,
       "shipyardShopGroup": [
         1001,
-        30151,
+        31000,
         2151
       ],
       "shopGroup": [
@@ -15710,7 +15711,7 @@
       "shipBuildGroup": 1152,
       "shipyardShopGroup": [
         1002,
-        30152,
+        31000,
         40152
       ],
       "shopGroup": [
@@ -15812,7 +15813,7 @@
       "shipBuildGroup": 1153,
       "shipyardShopGroup": [
         1002,
-        30153
+        31000
       ],
       "shopGroup": [
         1002,
@@ -15918,7 +15919,7 @@
       "shipBuildGroup": 154,
       "shipyardShopGroup": [
         1050,
-        30154,
+        31000,
         2154
       ],
       "shopGroup": [
@@ -16022,7 +16023,7 @@
       "shipBuildGroup": 155,
       "shipyardShopGroup": [
         1052,
-        30155
+        31000
       ],
       "shopGroup": [
         1052,
@@ -16126,7 +16127,7 @@
       "shipBuildGroup": 156,
       "shipyardShopGroup": [
         1031,
-        30156,
+        31000,
         2156
       ],
       "shopGroup": [
@@ -16230,7 +16231,7 @@
       "shipBuildGroup": 157,
       "shipyardShopGroup": [
         1032,
-        30157
+        31000
       ],
       "shopGroup": [
         1032,
@@ -16329,7 +16330,7 @@
       "shipBuildGroup": 158,
       "shipyardShopGroup": [
         1052,
-        30158
+        31000
       ],
       "shopGroup": [
         1052,
@@ -16427,7 +16428,7 @@
       "shipBuildGroup": 1159,
       "shipyardShopGroup": [
         1012,
-        30159
+        31000
       ],
       "shopGroup": [
         1012,
@@ -16530,7 +16531,7 @@
       "shipBuildGroup": 1160,
       "shipyardShopGroup": [
         1010,
-        30160,
+        31000,
         2160
       ],
       "shopGroup": [
@@ -16635,7 +16636,7 @@
       "shipBuildGroup": 161,
       "shipyardShopGroup": [
         1092,
-        30161
+        31000
       ],
       "shopGroup": [
         1092,
@@ -16738,7 +16739,7 @@
       "shipBuildGroup": 162,
       "shipyardShopGroup": [
         1042,
-        30162
+        31000
       ],
       "shopGroup": [
         1042,
@@ -16841,7 +16842,7 @@
       "shipBuildGroup": 163,
       "shipyardShopGroup": [
         1042,
-        30163
+        31000
       ],
       "shopGroup": [
         1042,
@@ -16939,7 +16940,7 @@
       "shipBuildGroup": 164,
       "shipyardShopGroup": [
         1032,
-        30164
+        31000
       ],
       "shopGroup": [
         1032,
@@ -17037,7 +17038,7 @@
       "shipBuildGroup": 1165,
       "shipyardShopGroup": [
         1022,
-        30165
+        31000
       ],
       "shopGroup": [
         1022,
@@ -17136,7 +17137,7 @@
       "shipBuildGroup": 166,
       "shipyardShopGroup": [
         1032,
-        30166
+        31000
       ],
       "shopGroup": [
         1032,
@@ -17239,7 +17240,7 @@
       "shipBuildGroup": 167,
       "shipyardShopGroup": [
         1042,
-        30167
+        31000
       ],
       "shopGroup": [
         1042,
@@ -17337,7 +17338,7 @@
       "shipBuildGroup": 168,
       "shipyardShopGroup": [
         1092,
-        30168
+        31000
       ],
       "shopGroup": [
         1092,
@@ -17435,7 +17436,7 @@
       "shipBuildGroup": 1169,
       "shipyardShopGroup": [
         1021,
-        30169,
+        31000,
         2169
       ],
       "shopGroup": [
@@ -17541,7 +17542,7 @@
       "shipBuildGroup": 1170,
       "shipyardShopGroup": [
         1022,
-        30170
+        31000
       ],
       "shopGroup": [
         1022,
@@ -17639,7 +17640,7 @@
       "shipBuildGroup": 1171,
       "shipyardShopGroup": [
         1091,
-        30171,
+        31000,
         2171
       ],
       "shopGroup": [
@@ -17744,7 +17745,7 @@
       "shipBuildGroup": 1172,
       "shipyardShopGroup": [
         1002,
-        30172
+        31000
       ],
       "shopGroup": [
         1002,
@@ -17844,7 +17845,7 @@
       "shipBuildGroup": 1173,
       "shipyardShopGroup": [
         1022,
-        30173
+        31000
       ],
       "shopGroup": [
         1022,
@@ -17944,7 +17945,7 @@
       "shipBuildGroup": 174,
       "shipyardShopGroup": [
         1012,
-        30174
+        31000
       ],
       "shopGroup": [
         1012,
@@ -18042,7 +18043,7 @@
       "shipBuildGroup": 175,
       "shipyardShopGroup": [
         1030,
-        30175,
+        31000,
         2175
       ],
       "shopGroup": [
@@ -18146,7 +18147,7 @@
       "shipBuildGroup": 176,
       "shipyardShopGroup": [
         1092,
-        30176
+        31000
       ],
       "shopGroup": [
         1092,
@@ -18244,7 +18245,7 @@
       "shipBuildGroup": 1177,
       "shipyardShopGroup": [
         1002,
-        30177
+        31000
       ],
       "shopGroup": [
         1002,
@@ -18346,7 +18347,7 @@
       "shipBuildGroup": 1178,
       "shipyardShopGroup": [
         1022,
-        30178
+        31000
       ],
       "shopGroup": [
         1022,
@@ -18446,7 +18447,7 @@
       "shipBuildGroup": 179,
       "shipyardShopGroup": [
         1042,
-        30179
+        31000
       ],
       "shopGroup": [
         1042,
@@ -18549,7 +18550,7 @@
       "shipBuildGroup": 180,
       "shipyardShopGroup": [
         1042,
-        30180
+        31000
       ],
       "shopGroup": [
         1042,
@@ -18652,7 +18653,7 @@
       "shipBuildGroup": 1181,
       "shipyardShopGroup": [
         1002,
-        30181
+        31000
       ],
       "shopGroup": [
         1002,
@@ -18750,7 +18751,7 @@
       "shipBuildGroup": 182,
       "shipyardShopGroup": [
         1042,
-        30182
+        31000
       ],
       "shopGroup": [
         1042,
@@ -18853,7 +18854,7 @@
       "shipBuildGroup": 183,
       "shipyardShopGroup": [
         1102,
-        30183
+        31000
       ],
       "shopGroup": [
         1102,
@@ -18952,7 +18953,7 @@
       "shipBuildGroup": 184,
       "shipyardShopGroup": [
         1012,
-        30184
+        31000
       ],
       "shopGroup": [
         1012,
@@ -19050,7 +19051,7 @@
       "shipBuildGroup": 1185,
       "shipyardShopGroup": [
         1101,
-        30185,
+        31000,
         2185
       ],
       "shopGroup": [
@@ -19155,7 +19156,7 @@
       "shipBuildGroup": 186,
       "shipyardShopGroup": [
         1102,
-        30186
+        31000
       ],
       "shopGroup": [
         1102,
@@ -19252,7 +19253,8 @@
       "malariaHazard": 0,
       "shipBuildGroup": 187,
       "shipyardShopGroup": [
-        1082
+        1082,
+        31000
       ],
       "shopGroup": [
         1082,
@@ -19348,7 +19350,7 @@
       "shipBuildGroup": 188,
       "shipyardShopGroup": [
         1052,
-        30188
+        31000
       ],
       "shopGroup": [
         1052,
@@ -19446,7 +19448,7 @@
       "shipBuildGroup": 1189,
       "shipyardShopGroup": [
         1011,
-        30189,
+        31000,
         2189
       ],
       "shopGroup": [
@@ -19548,7 +19550,7 @@
       "shipBuildGroup": 1190,
       "shipyardShopGroup": [
         1001,
-        30190,
+        31000,
         2190
       ],
       "shopGroup": [
@@ -19654,7 +19656,7 @@
       "shipBuildGroup": 191,
       "shipyardShopGroup": [
         1042,
-        30191
+        31000
       ],
       "shopGroup": [
         1042,
@@ -19752,7 +19754,7 @@
       "shipBuildGroup": 192,
       "shipyardShopGroup": [
         1042,
-        30192
+        31000
       ],
       "shopGroup": [
         1042,
@@ -19850,7 +19852,7 @@
       "shipBuildGroup": 1193,
       "shipyardShopGroup": [
         1102,
-        30193
+        31000
       ],
       "shopGroup": [
         1102,
@@ -19948,7 +19950,7 @@
       "shipBuildGroup": 194,
       "shipyardShopGroup": [
         1042,
-        30194
+        31000
       ],
       "shopGroup": [
         1042,
@@ -20046,7 +20048,7 @@
       "shipBuildGroup": 195,
       "shipyardShopGroup": [
         1080,
-        2195
+        31000
       ],
       "shopGroup": [
         1080,
@@ -20147,7 +20149,7 @@
       "shipBuildGroup": 1196,
       "shipyardShopGroup": [
         1010,
-        30196,
+        31000,
         2196
       ],
       "shopGroup": [
@@ -20249,7 +20251,7 @@
       "shipBuildGroup": 197,
       "shipyardShopGroup": [
         1060,
-        30197,
+        31000,
         2197
       ],
       "shopGroup": [
@@ -20351,7 +20353,7 @@
       "shipBuildGroup": 1198,
       "shipyardShopGroup": [
         1012,
-        30198
+        31000
       ],
       "shopGroup": [
         1012,
@@ -20447,7 +20449,7 @@
       "shipBuildGroup": 199,
       "shipyardShopGroup": [
         1021,
-        30199,
+        31000,
         2199
       ],
       "shopGroup": [
@@ -20551,7 +20553,7 @@
       "shipBuildGroup": 200,
       "shipyardShopGroup": [
         1042,
-        30200
+        31000
       ],
       "shopGroup": [
         1042,
@@ -20654,7 +20656,7 @@
       "shipBuildGroup": 201,
       "shipyardShopGroup": [
         1042,
-        30201
+        31000
       ],
       "shopGroup": [
         1042,
@@ -20752,7 +20754,7 @@
       "shipBuildGroup": 202,
       "shipyardShopGroup": [
         1042,
-        30202
+        31000
       ],
       "shopGroup": [
         1042,
@@ -20850,7 +20852,7 @@
       "shipBuildGroup": 1203,
       "shipyardShopGroup": [
         1002,
-        30203
+        31000
       ],
       "shopGroup": [
         1002,
@@ -20945,7 +20947,8 @@
       "malariaHazard": 0,
       "shipBuildGroup": 204,
       "shipyardShopGroup": [
-        1082
+        1082,
+        31000
       ],
       "shopGroup": [
         1082,
@@ -21046,7 +21049,7 @@
       "shipBuildGroup": 205,
       "shipyardShopGroup": [
         1042,
-        30205
+        31000
       ],
       "shopGroup": [
         1042,
@@ -21149,7 +21152,7 @@
       "shipBuildGroup": 206,
       "shipyardShopGroup": [
         1042,
-        30206
+        31000
       ],
       "shopGroup": [
         1042,
@@ -21252,7 +21255,7 @@
       "shipBuildGroup": 207,
       "shipyardShopGroup": [
         1072,
-        30207
+        31000
       ],
       "shopGroup": [
         1072,
@@ -21348,7 +21351,7 @@
       "shipBuildGroup": 208,
       "shipyardShopGroup": [
         1021,
-        30208,
+        31000,
         2208
       ],
       "shopGroup": [
@@ -21452,7 +21455,7 @@
       "shipBuildGroup": 209,
       "shipyardShopGroup": [
         1012,
-        30209
+        31000
       ],
       "shopGroup": [
         1012,
@@ -21557,7 +21560,8 @@
       "malariaHazard": 0,
       "shipBuildGroup": 210,
       "shipyardShopGroup": [
-        1082
+        1082,
+        31000
       ],
       "shopGroup": [
         1082,
@@ -21660,7 +21664,7 @@
       "shipBuildGroup": 1211,
       "shipyardShopGroup": [
         1022,
-        30211
+        31000
       ],
       "shopGroup": [
         1022,
@@ -21759,7 +21763,7 @@
       "shipBuildGroup": 212,
       "shipyardShopGroup": [
         1012,
-        30212
+        31000
       ],
       "shopGroup": [
         1012,
@@ -21862,7 +21866,7 @@
       "shipBuildGroup": 213,
       "shipyardShopGroup": [
         1012,
-        30213
+        31000
       ],
       "shopGroup": [
         1012,
@@ -21960,7 +21964,7 @@
       "shipBuildGroup": 214,
       "shipyardShopGroup": [
         1102,
-        30214
+        31000
       ],
       "shopGroup": [
         1102,
@@ -22063,7 +22067,7 @@
       "shipBuildGroup": 215,
       "shipyardShopGroup": [
         1102,
-        30215
+        31000
       ],
       "shopGroup": [
         1102,
@@ -22161,7 +22165,7 @@
       "shipBuildGroup": 216,
       "shipyardShopGroup": [
         1012,
-        30216
+        31000
       ],
       "shopGroup": [
         1012,
@@ -22260,7 +22264,7 @@
       "shipBuildGroup": 217,
       "shipyardShopGroup": [
         1042,
-        30217
+        31000
       ],
       "shopGroup": [
         1042,
@@ -22358,7 +22362,7 @@
       "shipBuildGroup": 218,
       "shipyardShopGroup": [
         1070,
-        30218,
+        31000,
         2218
       ],
       "shopGroup": [
@@ -22455,7 +22459,7 @@
       "shipBuildGroup": 1219,
       "shipyardShopGroup": [
         2501,
-        30039
+        31000
       ],
       "shopGroup": [
         2002,
@@ -22551,7 +22555,7 @@
       "shipBuildGroup": 220,
       "shipyardShopGroup": [
         1092,
-        30092
+        31000
       ],
       "shopGroup": [
         1092,
@@ -22649,7 +22653,7 @@
       "shipBuildGroup": 221,
       "shipyardShopGroup": [
         1030,
-        31030,
+        31000,
         2530
       ],
       "shopGroup": [
@@ -22754,7 +22758,7 @@
       "shipBuildGroup": 222,
       "shipyardShopGroup": [
         1022,
-        31022
+        31000
       ],
       "shopGroup": [
         1022,

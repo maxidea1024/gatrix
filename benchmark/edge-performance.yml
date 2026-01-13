@@ -1,0 +1,35 @@
+config:
+  target: "http://localhost:3400"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 50
+      name: Warm up phase
+    - duration: 120
+      arrivalRate: 50
+      name: Sustained load phase
+    - duration: 60
+      arrivalRate: 50
+      rampTo: 100
+      name: Stress phase
+  defaults:
+    headers:
+      x-application-name: "benchmark-test"
+      x-api-token: "gatrix-unsecured-edge-api-token"
+      x-platform: "pc"
+  variables:
+    environment: "development"
+
+scenarios:
+  - name: "Edge API Flow"
+    flow:
+      - get:
+          url: "/api/v1/client/{{ environment }}/client-version?platform=pc"
+      - get:
+          url: "/api/v1/client/{{ environment }}/game-worlds"
+      - get:
+          url: "/api/v1/client/{{ environment }}/banners"
+      - get:
+          url: "/api/v1/client/{{ environment }}/service-notices"
+      - get:
+          url: "/api/v1/client/{{ environment }}/ingame-popup-notices"

@@ -2,7 +2,7 @@
   ":MainMenu": {
     ":type": {
       "id": "key",
-      "name": "string",
+      "name": "text",
       "isNotYetDev": "number",
       "contentsTerms": [
         {
@@ -10,7 +10,16 @@
           "Target": "number",
           "Count": "number"
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        }
+      ],
+      "unlockTitle": "text",
+      "unlockDesc": "text"
     },
     ":required": {
       "name": 1,
@@ -21,10 +30,20 @@
         {
           "Id": 81000000
         }
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000000
+        }
       ]
     },
     ":max": {
       "contentsTerms": [
+        {
+          "Id": 81999999
+        }
+      ],
+      "viewMenuContentsTerms": [
         {
           "Id": 81999999
         }
@@ -33,6 +52,13 @@
     ":enum": {},
     ":links": {
       "contentsTerms": [
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        }
+      ],
+      "viewMenuContentsTerms": [
         {
           "Id": [
             "ContentsTerms"
@@ -51,7 +77,9 @@
           "Id": 81000001,
           "Count": 0
         }
-      ]
+      ],
+      "unlockTitle": "선박 해금",
+      "unlockDesc": "선박 및 선실 배치를 확인하고 수정할 수 있습니다."
     },
     "38420001": {
       "id": 38420001,
@@ -62,7 +90,9 @@
           "Id": 81000001,
           "Count": 0
         }
-      ]
+      ],
+      "unlockTitle": "함대 해금",
+      "unlockDesc": "함대를 편성하고, 함대 정보를 확인할 수 있습니다."
     },
     "38420002": {
       "id": 38420002,
@@ -70,10 +100,20 @@
       "isNotYetDev": 0,
       "contentsTerms": [
         {
-          "Id": 81000001,
-          "Count": 0
+          "Id": 81000039,
+          "Target": 82000035,
+          "Count": 1
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000039,
+          "Target": 82000035,
+          "Count": 1
+        }
+      ],
+      "unlockTitle": "발주 해금",
+      "unlockDesc": "건조 중인 선박을 확인할 수 있습니다."
     },
     "38420003": {
       "id": 38420003,
@@ -84,7 +124,9 @@
           "Id": 81000001,
           "Count": 0
         }
-      ]
+      ],
+      "unlockTitle": "창고 해금",
+      "unlockDesc": "내가 보유한 물품을 확인하고 사용할 수 있습니다."
     },
     "38420004": {
       "id": 38420004,
@@ -93,9 +135,11 @@
       "contentsTerms": [
         {
           "Id": 81000001,
-          "Count": 0
+          "Count": 25
         }
-      ]
+      ],
+      "unlockTitle": "배치 해금",
+      "unlockDesc": "나의 맞춤형 배치를 등록하거나 불러올 수 있습니다."
     },
     "38420005": {
       "id": 38420005,
@@ -106,7 +150,9 @@
           "Id": 81000001,
           "Count": 0
         }
-      ]
+      ],
+      "unlockTitle": "동료 해금",
+      "unlockDesc": "항해사의 정보를 확인하고, 성장시킬 수 있습니다."
     },
     "38420006": {
       "id": 38420006,
@@ -117,7 +163,9 @@
           "Id": 81000001,
           "Count": 0
         }
-      ]
+      ],
+      "unlockTitle": "제독 해금",
+      "unlockDesc": "제독의 정보를 확인할 수 있습니다."
     },
     "38420007": {
       "id": 38420007,
@@ -126,9 +174,17 @@
       "contentsTerms": [
         {
           "Id": 81000001,
-          "Count": 0
+          "Count": 10
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 10
+        }
+      ],
+      "unlockTitle": "국가 해금",
+      "unlockDesc": "(CN)국가의 정보를 확인할 수 있습니다.@국가의 정보를 확인할 수 있습니다."
     },
     "38420008": {
       "id": 38420008,
@@ -139,7 +195,9 @@
           "Id": 81000001,
           "Count": 0
         }
-      ]
+      ],
+      "unlockTitle": "연대기 해금",
+      "unlockDesc": "현재 진행 중인 연대기의 정보를 확인하고, 연대기 보상을 받을 수 있습니다."
     },
     "38420009": {
       "id": 38420009,
@@ -147,10 +205,20 @@
       "isNotYetDev": 0,
       "contentsTerms": [
         {
-          "Id": 81000001,
-          "Count": 0
+          "Id": 81000039,
+          "Target": 82000035,
+          "Count": 24
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000039,
+          "Target": 82000035,
+          "Count": 24
+        }
+      ],
+      "unlockTitle": "임무 해금",
+      "unlockDesc": "의뢰, 과제, 업적을 확인하고 완료 시 보상을 받을 수 있습니다."
     },
     "38420010": {
       "id": 38420010,
@@ -158,10 +226,20 @@
       "isNotYetDev": 0,
       "contentsTerms": [
         {
-          "Id": 81000001,
-          "Count": 5
+          "Id": 81000039,
+          "Target": 82000035,
+          "Count": 27
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000039,
+          "Target": 82000035,
+          "Count": 27
+        }
+      ],
+      "unlockTitle": "도전 해금",
+      "unlockDesc": "(CN)도전 전투를 이용할 수 있습니다.@도전 전투를 이용할 수 있습니다."
     },
     "38420011": {
       "id": 38420011,
@@ -169,10 +247,20 @@
       "isNotYetDev": 0,
       "contentsTerms": [
         {
-          "Id": 81000001,
-          "Count": 0
+          "Id": 81000039,
+          "Target": 82000035,
+          "Count": 1
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000039,
+          "Target": 82000035,
+          "Count": 1
+        }
+      ],
+      "unlockTitle": "도감 해금",
+      "unlockDesc": "발견물 도감과 모험 수첩, 선박 설계도 정보를 확인할 수 있습니다."
     },
     "38420012": {
       "id": 38420012,
@@ -181,9 +269,17 @@
       "contentsTerms": [
         {
           "Id": 81000001,
-          "Count": 0
+          "Count": 7
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 7
+        }
+      ],
+      "unlockTitle": "수집 해금",
+      "unlockDesc": "항해사나 물품을 수집하여 영구 효과를 얻을 수 있습니다."
     },
     "38420013": {
       "id": 38420013,
@@ -194,7 +290,15 @@
           "Id": 81000001,
           "Count": 25
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 25
+        }
+      ],
+      "unlockTitle": "대전 해금",
+      "unlockDesc": "다른 제독님과 전투를 진행하여 순위를 겨룰 수 있습니다."
     },
     "38420014": {
       "id": 38420014,
@@ -205,7 +309,15 @@
           "Id": 81000001,
           "Count": 20
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 20
+        }
+      ],
+      "unlockTitle": "거래소 해금",
+      "unlockDesc": "다른 제독님과 물품을 거래할 수 있습니다."
     },
     "38420015": {
       "id": 38420015,
@@ -214,9 +326,17 @@
       "contentsTerms": [
         {
           "Id": 81000001,
-          "Count": 0
+          "Count": 15
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 15
+        }
+      ],
+      "unlockTitle": "상회 해금",
+      "unlockDesc": "상회에 가입하여 상회 활동을 할 수 있습니다."
     },
     "38420016": {
       "id": 38420016,
@@ -225,9 +345,16 @@
       "contentsTerms": [
         {
           "Id": 81000001,
-          "Count": 0
+          "Count": 99
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 99
+        }
+      ],
+      "unlockTitle": "사제 해금"
     },
     "38420017": {
       "id": 38420017,
@@ -238,7 +365,15 @@
           "Id": 81000001,
           "Count": 99
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 99
+        }
+      ],
+      "unlockTitle": "토벌 해금",
+      "unlockDesc": "강력한 적을 토벌할 수 있습니다. 토벌을 통해 전용 보상을 얻을 수 있습니다."
     },
     "38420018": {
       "id": 38420018,
@@ -247,9 +382,17 @@
       "contentsTerms": [
         {
           "Id": 81000001,
-          "Count": 0
+          "Count": 5
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 5
+        }
+      ],
+      "unlockTitle": "친구 해금",
+      "unlockDesc": "친구를 등록하여 행동력 선물을 주고받을 수 있습니다."
     },
     "38420019": {
       "id": 38420019,
@@ -260,18 +403,28 @@
           "Id": 81000001,
           "Count": 0
         }
-      ]
+      ],
+      "unlockTitle": "순위 해금",
+      "unlockDesc": "다른 제독님과 여러 분야에서 순위를 겨룰 수 있습니다."
     },
     "38420020": {
       "id": 38420020,
       "name": "파견",
-      "isNotYetDev": 0,
+      "isNotYetDev": 2,
       "contentsTerms": [
         {
           "Id": 81000001,
-          "Count": 15
+          "Count": 99
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 99
+        }
+      ],
+      "unlockTitle": "파견 해금",
+      "unlockDesc": "1함대 외 함대를 개방하고, 파견을 보내 보상을 얻을 수 있습니다."
     },
     "38420021": {
       "id": 38420021,
@@ -282,7 +435,15 @@
           "Id": 81000001,
           "Count": 25
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 20
+        }
+      ],
+      "unlockTitle": "생산 해금",
+      "unlockDesc": "생산 레시피를 통해 물품을 생산할 수 있습니다."
     },
     "38420022": {
       "id": 38420022,
@@ -293,7 +454,9 @@
           "Id": 81000001,
           "Count": 0
         }
-      ]
+      ],
+      "unlockTitle": "고객센터 해금",
+      "unlockDesc": "고객센터를 이용할 수 있습니다."
     },
     "38420023": {
       "id": 38420023,
@@ -302,9 +465,17 @@
       "contentsTerms": [
         {
           "Id": 81000001,
-          "Count": 0
+          "Count": 99
         }
-      ]
+      ],
+      "viewMenuContentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 99
+        }
+      ],
+      "unlockTitle": "경매장 해금",
+      "unlockDesc": "경매장을 통해 희귀한 물품을 얻을 수 있습니다"
     }
   }
 }

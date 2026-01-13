@@ -17967,7 +17967,7 @@
         {
           "potential": false,
           "job": 1,
-          "id": 75230460,
+          "id": 75230690,
           "needLv": 70,
           "needAwaken": 3,
           "learnPointId": 100001,
@@ -18444,7 +18444,7 @@
         {
           "potential": false,
           "job": 1,
-          "id": 75230460,
+          "id": 75209940,
           "needLv": 70,
           "needAwaken": 3,
           "learnPointId": 100001,
@@ -32729,8 +32729,8 @@
         },
         {
           "potential": false,
-          "job": 1,
-          "id": 75299343,
+          "job": 3,
+          "id": 67301660,
           "needLv": 70,
           "needAwaken": 3,
           "learnPointId": 100001,
@@ -32742,7 +32742,7 @@
         {
           "potential": false,
           "job": 3,
-          "id": 67300101,
+          "id": 67300100,
           "needLv": 70,
           "needAwaken": 3,
           "learnPointId": 100001,

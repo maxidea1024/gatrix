@@ -173,6 +173,27 @@
         38096034
       ]
     },
+    "1400005": {
+      "id": 1400005,
+      "localBitFlag": 27,
+      "category": 2,
+      "period": {
+        "Type": 1
+      },
+      "sortingOrder": 5,
+      "name": "실속의 제왕",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "1FE000",
+        "MiddleSideDeco": "WT_UserTitle_Trade_Sprite"
+      },
+      "notReverseSideDeco": false,
+      "flavorText": "얼마를 벌었는지보다 중요한 것은 순이익이 얼마나 남았느냐입니다.",
+      "hintText": "주간 거래 순이익 1위",
+      "worldBuffId": [
+        38096092
+      ]
+    },
     "1401000": {
       "id": 1401000,
       "localBitFlag": 0,

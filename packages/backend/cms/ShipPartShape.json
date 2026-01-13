@@ -2653,6 +2653,13 @@
       "assetType": 1,
       "detailMode": 1
     },
+    "46000325": {
+      "id": 46000325,
+      "partType": 1,
+      "assetName": "SK_Ship_Avatar_CN_PAvilionBoat_Sail",
+      "assetType": 1,
+      "detailMode": 1
+    },
     "46100001": {
       "id": 46100001,
       "partType": 2,
@@ -5523,6 +5530,13 @@
       "id": 46500063,
       "partType": 6,
       "assetName": "SK_Ship_GoldenBucentaur_Paddle",
+      "assetType": 1,
+      "detailMode": 1
+    },
+    "46500064": {
+      "id": 46500064,
+      "partType": 6,
+      "assetName": "SK_Ship_Avatar_CN_PAvilionBoat_Paddle",
       "assetType": 1,
       "detailMode": 1
     },

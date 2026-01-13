@@ -12757,7 +12757,7 @@
     "1150300": {
       "id": 1150300,
       "name": "영국의 고위 간부 Ⅰ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 50375,
       "step": 1,
       "collectionType": 0,
@@ -12791,7 +12791,7 @@
     "1150301": {
       "id": 1150301,
       "name": "영국의 고위 간부 Ⅱ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 50376,
       "step": 1,
       "collectionType": 0,
@@ -12825,7 +12825,7 @@
     "1150302": {
       "id": 1150302,
       "name": "영국의 고위 간부 Ⅲ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 50377,
       "step": 1,
       "collectionType": 0,
@@ -12859,7 +12859,7 @@
     "1150303": {
       "id": 1150303,
       "name": "영국의 고위 간부 Ⅳ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 50378,
       "step": 1,
       "collectionType": 0,
@@ -12893,7 +12893,7 @@
     "1151300": {
       "id": 1151300,
       "name": "영국의 고위 간부 Ⅴ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 50379,
       "step": 1,
       "collectionType": 0,
@@ -20147,7 +20147,7 @@
     "1150480": {
       "id": 1150480,
       "name": "황금향의 꿈 Ⅰ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 50600,
       "step": 1,
       "collectionType": 0,
@@ -20185,7 +20185,7 @@
     "1150481": {
       "id": 1150481,
       "name": "황금향의 꿈 Ⅱ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 50601,
       "step": 1,
       "collectionType": 0,
@@ -20223,7 +20223,7 @@
     "1150482": {
       "id": 1150482,
       "name": "황금향의 꿈 Ⅲ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 50602,
       "step": 1,
       "collectionType": 0,
@@ -20261,7 +20261,7 @@
     "1150483": {
       "id": 1150483,
       "name": "황금향의 꿈 Ⅳ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 50603,
       "step": 1,
       "collectionType": 0,
@@ -20299,7 +20299,7 @@
     "1151480": {
       "id": 1151480,
       "name": "황금향의 꿈 Ⅴ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 50604,
       "step": 1,
       "collectionType": 0,
@@ -23229,6 +23229,366 @@
           "Type": 0,
           "Id": 1041,
           "Value": 1
+        }
+      ]
+    },
+    "1160054": {
+      "id": 1160054,
+      "name": "영국의 고위 간부 Ⅰ",
+      "localBitFlag": 192,
+      "order": 50375,
+      "step": 1,
+      "collectionType": 0,
+      "collectionGrade": 0,
+      "collectionItems": [
+        {
+          "Id": 21300145,
+          "Val": 0
+        },
+        {
+          "Id": 21300211,
+          "Val": 0
+        },
+        {
+          "Id": 21300216,
+          "Val": 0
+        },
+        {
+          "Id": 21300281,
+          "Val": 0
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 5
+        }
+      ]
+    },
+    "1160055": {
+      "id": 1160055,
+      "name": "영국의 고위 간부 Ⅱ",
+      "localBitFlag": 192,
+      "order": 50376,
+      "step": 1,
+      "collectionType": 0,
+      "collectionGrade": 1,
+      "collectionItems": [
+        {
+          "Id": 21300145,
+          "Val": 1
+        },
+        {
+          "Id": 21300211,
+          "Val": 1
+        },
+        {
+          "Id": 21300216,
+          "Val": 1
+        },
+        {
+          "Id": 21300281,
+          "Val": 1
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 5
+        }
+      ]
+    },
+    "1160056": {
+      "id": 1160056,
+      "name": "영국의 고위 간부 Ⅲ",
+      "localBitFlag": 192,
+      "order": 50377,
+      "step": 1,
+      "collectionType": 0,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 21300145,
+          "Val": 2
+        },
+        {
+          "Id": 21300211,
+          "Val": 2
+        },
+        {
+          "Id": 21300216,
+          "Val": 2
+        },
+        {
+          "Id": 21300281,
+          "Val": 2
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 5
+        }
+      ]
+    },
+    "1160057": {
+      "id": 1160057,
+      "name": "영국의 고위 간부 Ⅳ",
+      "localBitFlag": 192,
+      "order": 50378,
+      "step": 1,
+      "collectionType": 0,
+      "collectionGrade": 3,
+      "collectionItems": [
+        {
+          "Id": 21300145,
+          "Val": 3
+        },
+        {
+          "Id": 21300211,
+          "Val": 3
+        },
+        {
+          "Id": 21300216,
+          "Val": 3
+        },
+        {
+          "Id": 21300281,
+          "Val": 3
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 5
+        }
+      ]
+    },
+    "1160058": {
+      "id": 1160058,
+      "name": "영국의 고위 간부 Ⅴ",
+      "localBitFlag": 192,
+      "order": 50379,
+      "step": 1,
+      "collectionType": 0,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 21300145,
+          "Val": 4
+        },
+        {
+          "Id": 21300211,
+          "Val": 4
+        },
+        {
+          "Id": 21300216,
+          "Val": 4
+        },
+        {
+          "Id": 21300281,
+          "Val": 4
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 5
+        }
+      ]
+    },
+    "1160059": {
+      "id": 1160059,
+      "name": "황금향의 꿈 Ⅰ",
+      "localBitFlag": 192,
+      "order": 50600,
+      "step": 1,
+      "collectionType": 0,
+      "collectionGrade": 0,
+      "collectionItems": [
+        {
+          "Id": 21300193,
+          "Val": 0
+        },
+        {
+          "Id": 21300180,
+          "Val": 0
+        },
+        {
+          "Id": 21300235,
+          "Val": 0
+        },
+        {
+          "Id": 21300385,
+          "Val": 0
+        },
+        {
+          "Id": 21300337,
+          "Val": 0
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 5
+        }
+      ]
+    },
+    "1160060": {
+      "id": 1160060,
+      "name": "황금향의 꿈 Ⅱ",
+      "localBitFlag": 192,
+      "order": 50601,
+      "step": 1,
+      "collectionType": 0,
+      "collectionGrade": 1,
+      "collectionItems": [
+        {
+          "Id": 21300193,
+          "Val": 1
+        },
+        {
+          "Id": 21300180,
+          "Val": 1
+        },
+        {
+          "Id": 21300235,
+          "Val": 1
+        },
+        {
+          "Id": 21300385,
+          "Val": 1
+        },
+        {
+          "Id": 21300337,
+          "Val": 1
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 5
+        }
+      ]
+    },
+    "1160061": {
+      "id": 1160061,
+      "name": "황금향의 꿈 Ⅲ",
+      "localBitFlag": 192,
+      "order": 50602,
+      "step": 1,
+      "collectionType": 0,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 21300193,
+          "Val": 2
+        },
+        {
+          "Id": 21300180,
+          "Val": 2
+        },
+        {
+          "Id": 21300235,
+          "Val": 2
+        },
+        {
+          "Id": 21300385,
+          "Val": 2
+        },
+        {
+          "Id": 21300337,
+          "Val": 2
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 5
+        }
+      ]
+    },
+    "1160062": {
+      "id": 1160062,
+      "name": "황금향의 꿈 Ⅳ",
+      "localBitFlag": 192,
+      "order": 50603,
+      "step": 1,
+      "collectionType": 0,
+      "collectionGrade": 3,
+      "collectionItems": [
+        {
+          "Id": 21300193,
+          "Val": 3
+        },
+        {
+          "Id": 21300180,
+          "Val": 3
+        },
+        {
+          "Id": 21300235,
+          "Val": 3
+        },
+        {
+          "Id": 21300385,
+          "Val": 3
+        },
+        {
+          "Id": 21300337,
+          "Val": 3
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 5
+        }
+      ]
+    },
+    "1160063": {
+      "id": 1160063,
+      "name": "황금향의 꿈 Ⅴ",
+      "localBitFlag": 192,
+      "order": 50604,
+      "step": 1,
+      "collectionType": 0,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 21300193,
+          "Val": 4
+        },
+        {
+          "Id": 21300180,
+          "Val": 4
+        },
+        {
+          "Id": 21300235,
+          "Val": 4
+        },
+        {
+          "Id": 21300385,
+          "Val": 4
+        },
+        {
+          "Id": 21300337,
+          "Val": 4
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 5
         }
       ]
     },
@@ -47923,7 +48283,7 @@
     "1175220": {
       "id": 1175220,
       "name": "가지각색 Ⅰ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 54220,
       "step": 1,
       "collectionType": 3,
@@ -47949,7 +48309,7 @@
     "1175221": {
       "id": 1175221,
       "name": "가지각색 Ⅱ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 54220,
       "step": 2,
       "collectionType": 3,
@@ -47975,7 +48335,7 @@
     "1175222": {
       "id": 1175222,
       "name": "가지각색 Ⅲ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 54220,
       "step": 3,
       "collectionType": 3,
@@ -48001,7 +48361,7 @@
     "1175223": {
       "id": 1175223,
       "name": "가지각색 Ⅳ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 54220,
       "step": 4,
       "collectionType": 3,
@@ -48027,7 +48387,7 @@
     "1175224": {
       "id": 1175224,
       "name": "가지각색 Ⅴ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 54220,
       "step": 5,
       "collectionType": 3,
@@ -48763,7 +49123,7 @@
     "1175085": {
       "id": 1175085,
       "name": "조금 더 강하게 Ⅰ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 54085,
       "step": 1,
       "collectionType": 3,
@@ -48793,7 +49153,7 @@
     "1175086": {
       "id": 1175086,
       "name": "조금 더 강하게 Ⅱ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 54085,
       "step": 2,
       "collectionType": 3,
@@ -48823,7 +49183,7 @@
     "1175087": {
       "id": 1175087,
       "name": "조금 더 강하게 Ⅲ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 54085,
       "step": 3,
       "collectionType": 3,
@@ -48853,7 +49213,7 @@
     "1175088": {
       "id": 1175088,
       "name": "조금 더 강하게 Ⅳ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 54085,
       "step": 4,
       "collectionType": 3,
@@ -48883,7 +49243,7 @@
     "1175089": {
       "id": 1175089,
       "name": "조금 더 강하게 Ⅴ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 54085,
       "step": 5,
       "collectionType": 3,
@@ -55620,6 +55980,846 @@
         }
       ]
     },
+    "1175370": {
+      "id": 1175370,
+      "name": "거함의 시대 Ⅰ",
+      "localBitFlag": 27,
+      "order": 54375,
+      "step": 1,
+      "collectionType": 3,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70000120,
+          "Val": 1
+        },
+        {
+          "Id": 70000096,
+          "Val": 1
+        },
+        {
+          "Id": 70000115,
+          "Val": 1
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311101,
+          "Value": 10
+        }
+      ]
+    },
+    "1175371": {
+      "id": 1175371,
+      "name": "거함의 시대 Ⅱ",
+      "localBitFlag": 27,
+      "order": 54375,
+      "step": 2,
+      "collectionType": 3,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70000120,
+          "Val": 3
+        },
+        {
+          "Id": 70000096,
+          "Val": 3
+        },
+        {
+          "Id": 70000115,
+          "Val": 3
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1059,
+          "Value": 5
+        }
+      ]
+    },
+    "1175372": {
+      "id": 1175372,
+      "name": "거함의 시대 Ⅲ",
+      "localBitFlag": 27,
+      "order": 54375,
+      "step": 3,
+      "collectionType": 3,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70000120,
+          "Val": 5
+        },
+        {
+          "Id": 70000096,
+          "Val": 5
+        },
+        {
+          "Id": 70000115,
+          "Val": 5
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1110,
+          "Value": 10
+        }
+      ]
+    },
+    "1175373": {
+      "id": 1175373,
+      "name": "거함의 시대 Ⅳ",
+      "localBitFlag": 27,
+      "order": 54375,
+      "step": 4,
+      "collectionType": 3,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70000120,
+          "Val": 7
+        },
+        {
+          "Id": 70000096,
+          "Val": 7
+        },
+        {
+          "Id": 70000115,
+          "Val": 7
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312165,
+          "Value": 5
+        }
+      ]
+    },
+    "1175374": {
+      "id": 1175374,
+      "name": "거함의 시대 Ⅴ",
+      "localBitFlag": 27,
+      "order": 54375,
+      "step": 5,
+      "collectionType": 3,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70000120,
+          "Val": 10
+        },
+        {
+          "Id": 70000096,
+          "Val": 10
+        },
+        {
+          "Id": 70000115,
+          "Val": 10
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 9,
+          "Value": 1
+        }
+      ]
+    },
+    "1175375": {
+      "id": 1175375,
+      "name": "대양을 누비며 Ⅰ",
+      "localBitFlag": 27,
+      "order": 54380,
+      "step": 1,
+      "collectionType": 3,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70000181,
+          "Val": 1
+        },
+        {
+          "Id": 70000126,
+          "Val": 1
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311018,
+          "Value": 10
+        }
+      ]
+    },
+    "1175376": {
+      "id": 1175376,
+      "name": "대양을 누비며 Ⅱ",
+      "localBitFlag": 27,
+      "order": 54380,
+      "step": 2,
+      "collectionType": 3,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70000181,
+          "Val": 3
+        },
+        {
+          "Id": 70000126,
+          "Val": 3
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1056,
+          "Value": 5
+        }
+      ]
+    },
+    "1175377": {
+      "id": 1175377,
+      "name": "대양을 누비며 Ⅲ",
+      "localBitFlag": 27,
+      "order": 54380,
+      "step": 3,
+      "collectionType": 3,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70000181,
+          "Val": 5
+        },
+        {
+          "Id": 70000126,
+          "Val": 5
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300550,
+          "Value": 5
+        }
+      ]
+    },
+    "1175378": {
+      "id": 1175378,
+      "name": "대양을 누비며 Ⅳ",
+      "localBitFlag": 27,
+      "order": 54380,
+      "step": 4,
+      "collectionType": 3,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70000181,
+          "Val": 7
+        },
+        {
+          "Id": 70000126,
+          "Val": 7
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1109,
+          "Value": 10
+        }
+      ]
+    },
+    "1175379": {
+      "id": 1175379,
+      "name": "대양을 누비며 Ⅴ",
+      "localBitFlag": 27,
+      "order": 54380,
+      "step": 5,
+      "collectionType": 3,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70000181,
+          "Val": 10
+        },
+        {
+          "Id": 70000126,
+          "Val": 10
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312154,
+          "Value": 5
+        }
+      ]
+    },
+    "1175380": {
+      "id": 1175380,
+      "name": "가지각색 Ⅰ",
+      "localBitFlag": 192,
+      "order": 54220,
+      "step": 1,
+      "collectionType": 3,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70000088,
+          "Val": 1
+        },
+        {
+          "Id": 70000122,
+          "Val": 1
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1031,
+          "Value": 10
+        }
+      ]
+    },
+    "1175381": {
+      "id": 1175381,
+      "name": "가지각색 Ⅱ",
+      "localBitFlag": 192,
+      "order": 54220,
+      "step": 2,
+      "collectionType": 3,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70000088,
+          "Val": 3
+        },
+        {
+          "Id": 70000122,
+          "Val": 3
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1046,
+          "Value": 10
+        }
+      ]
+    },
+    "1175382": {
+      "id": 1175382,
+      "name": "가지각색 Ⅲ",
+      "localBitFlag": 192,
+      "order": 54220,
+      "step": 3,
+      "collectionType": 3,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70000088,
+          "Val": 5
+        },
+        {
+          "Id": 70000122,
+          "Val": 5
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300600,
+          "Value": 5
+        }
+      ]
+    },
+    "1175383": {
+      "id": 1175383,
+      "name": "가지각색 Ⅳ",
+      "localBitFlag": 192,
+      "order": 54220,
+      "step": 4,
+      "collectionType": 3,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70000088,
+          "Val": 10
+        },
+        {
+          "Id": 70000122,
+          "Val": 10
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311102,
+          "Value": 10
+        }
+      ]
+    },
+    "1175384": {
+      "id": 1175384,
+      "name": "가지각색 Ⅴ",
+      "localBitFlag": 192,
+      "order": 54220,
+      "step": 5,
+      "collectionType": 3,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70000088,
+          "Val": 20
+        },
+        {
+          "Id": 70000122,
+          "Val": 20
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 5
+        }
+      ]
+    },
+    "1175385": {
+      "id": 1175385,
+      "name": "조금 더 강하게 Ⅰ",
+      "localBitFlag": 192,
+      "order": 54085,
+      "step": 1,
+      "collectionType": 3,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70000036,
+          "Val": 1
+        },
+        {
+          "Id": 70000072,
+          "Val": 1
+        },
+        {
+          "Id": 70000087,
+          "Val": 1
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1041,
+          "Value": 10
+        }
+      ]
+    },
+    "1175386": {
+      "id": 1175386,
+      "name": "조금 더 강하게 Ⅱ",
+      "localBitFlag": 192,
+      "order": 54085,
+      "step": 2,
+      "collectionType": 3,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70000036,
+          "Val": 3
+        },
+        {
+          "Id": 70000072,
+          "Val": 3
+        },
+        {
+          "Id": 70000087,
+          "Val": 3
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1026,
+          "Value": 10
+        }
+      ]
+    },
+    "1175387": {
+      "id": 1175387,
+      "name": "조금 더 강하게 Ⅲ",
+      "localBitFlag": 192,
+      "order": 54085,
+      "step": 3,
+      "collectionType": 3,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70000036,
+          "Val": 5
+        },
+        {
+          "Id": 70000072,
+          "Val": 5
+        },
+        {
+          "Id": 70000087,
+          "Val": 5
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1078,
+          "Value": 1
+        }
+      ]
+    },
+    "1175388": {
+      "id": 1175388,
+      "name": "조금 더 강하게 Ⅳ",
+      "localBitFlag": 192,
+      "order": 54085,
+      "step": 4,
+      "collectionType": 3,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70000036,
+          "Val": 10
+        },
+        {
+          "Id": 70000072,
+          "Val": 10
+        },
+        {
+          "Id": 70000087,
+          "Val": 10
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 5
+        }
+      ]
+    },
+    "1175389": {
+      "id": 1175389,
+      "name": "조금 더 강하게 Ⅴ",
+      "localBitFlag": 192,
+      "order": 54085,
+      "step": 5,
+      "collectionType": 3,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70000036,
+          "Val": 20
+        },
+        {
+          "Id": 70000072,
+          "Val": 20
+        },
+        {
+          "Id": 70000087,
+          "Val": 20
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 9,
+          "Value": 1
+        }
+      ]
+    },
+    "1175390": {
+      "id": 1175390,
+      "name": "분노의 형상 Ⅰ",
+      "localBitFlag": 0,
+      "order": 54250,
+      "step": 1,
+      "collectionType": 3,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70000044,
+          "Val": 1
+        },
+        {
+          "Id": 70000047,
+          "Val": 1
+        },
+        {
+          "Id": 70000094,
+          "Val": 1
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311121,
+          "Value": 10
+        }
+      ]
+    },
+    "1175391": {
+      "id": 1175391,
+      "name": "분노의 형상 Ⅱ",
+      "localBitFlag": 0,
+      "order": 54250,
+      "step": 2,
+      "collectionType": 3,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70000044,
+          "Val": 3
+        },
+        {
+          "Id": 70000047,
+          "Val": 3
+        },
+        {
+          "Id": 70000094,
+          "Val": 3
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1041,
+          "Value": 10
+        }
+      ]
+    },
+    "1175392": {
+      "id": 1175392,
+      "name": "분노의 형상 Ⅲ",
+      "localBitFlag": 0,
+      "order": 54250,
+      "step": 3,
+      "collectionType": 3,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70000044,
+          "Val": 5
+        },
+        {
+          "Id": 70000047,
+          "Val": 5
+        },
+        {
+          "Id": 70000094,
+          "Val": 5
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300570,
+          "Value": 5
+        }
+      ]
+    },
+    "1175393": {
+      "id": 1175393,
+      "name": "분노의 형상 Ⅳ",
+      "localBitFlag": 0,
+      "order": 54250,
+      "step": 4,
+      "collectionType": 3,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70000044,
+          "Val": 7
+        },
+        {
+          "Id": 70000047,
+          "Val": 7
+        },
+        {
+          "Id": 70000094,
+          "Val": 7
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1031,
+          "Value": 10
+        }
+      ]
+    },
+    "1175394": {
+      "id": 1175394,
+      "name": "분노의 형상 Ⅴ",
+      "localBitFlag": 0,
+      "order": 54250,
+      "step": 5,
+      "collectionType": 3,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70000044,
+          "Val": 10
+        },
+        {
+          "Id": 70000047,
+          "Val": 10
+        },
+        {
+          "Id": 70000094,
+          "Val": 10
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 5
+        }
+      ]
+    },
+    "1175395": {
+      "id": 1175395,
+      "name": "높은 명성 Ⅰ",
+      "localBitFlag": 0,
+      "order": 54360,
+      "step": 1,
+      "collectionType": 3,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70000158,
+          "Val": 1
+        },
+        {
+          "Id": 70000065,
+          "Val": 1
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311102,
+          "Value": 10
+        }
+      ]
+    },
+    "1175396": {
+      "id": 1175396,
+      "name": "높은 명성 Ⅱ",
+      "localBitFlag": 0,
+      "order": 54360,
+      "step": 2,
+      "collectionType": 3,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70000158,
+          "Val": 3
+        },
+        {
+          "Id": 70000065,
+          "Val": 3
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 10
+        }
+      ]
+    },
+    "1175397": {
+      "id": 1175397,
+      "name": "높은 명성 Ⅲ",
+      "localBitFlag": 0,
+      "order": 54360,
+      "step": 3,
+      "collectionType": 3,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70000158,
+          "Val": 5
+        },
+        {
+          "Id": 70000065,
+          "Val": 5
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300530,
+          "Value": 5
+        }
+      ]
+    },
+    "1175398": {
+      "id": 1175398,
+      "name": "높은 명성 Ⅳ",
+      "localBitFlag": 0,
+      "order": 54360,
+      "step": 4,
+      "collectionType": 3,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70000158,
+          "Val": 7
+        },
+        {
+          "Id": 70000065,
+          "Val": 7
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1040,
+          "Value": 10
+        }
+      ]
+    },
+    "1175399": {
+      "id": 1175399,
+      "name": "높은 명성 Ⅴ",
+      "localBitFlag": 0,
+      "order": 54360,
+      "step": 5,
+      "collectionType": 3,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70000158,
+          "Val": 10
+        },
+        {
+          "Id": 70000065,
+          "Val": 10
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300710,
+          "Value": 5
+        }
+      ]
+    },
     "1180000": {
       "id": 1180000,
       "name": "첫 걸음 Ⅰ",
@@ -57063,7 +58263,7 @@
     "1180048": {
       "id": 1180048,
       "name": "더 많은 격렬함 Ⅰ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 56080,
       "step": 1,
       "collectionType": 4,
@@ -57089,7 +58289,7 @@
     "1180049": {
       "id": 1180049,
       "name": "더 많은 격렬함 Ⅱ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 56080,
       "step": 2,
       "collectionType": 4,
@@ -57115,7 +58315,7 @@
     "1180050": {
       "id": 1180050,
       "name": "더 많은 격렬함 Ⅲ",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 56080,
       "step": 3,
       "collectionType": 4,
@@ -59853,6 +61053,498 @@
           "Type": 0,
           "Id": 1027,
           "Value": 9
+        }
+      ]
+    },
+    "1180150": {
+      "id": 1180150,
+      "name": "기술과 지식 Ⅰ",
+      "localBitFlag": 27,
+      "order": 56250,
+      "step": 1,
+      "collectionType": 4,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70200120,
+          "Val": 5
+        },
+        {
+          "Id": 70200096,
+          "Val": 5
+        },
+        {
+          "Id": 70200115,
+          "Val": 5
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311016,
+          "Value": 9
+        }
+      ]
+    },
+    "1180151": {
+      "id": 1180151,
+      "name": "기술과 지식 Ⅱ",
+      "localBitFlag": 27,
+      "order": 56250,
+      "step": 2,
+      "collectionType": 4,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70200120,
+          "Val": 10
+        },
+        {
+          "Id": 70200096,
+          "Val": 10
+        },
+        {
+          "Id": 70200115,
+          "Val": 10
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300410,
+          "Value": 8
+        }
+      ]
+    },
+    "1180152": {
+      "id": 1180152,
+      "name": "기술과 지식 Ⅲ",
+      "localBitFlag": 27,
+      "order": 56250,
+      "step": 3,
+      "collectionType": 4,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70200120,
+          "Val": 20
+        },
+        {
+          "Id": 70200096,
+          "Val": 20
+        },
+        {
+          "Id": 70200115,
+          "Val": 20
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312129,
+          "Value": -5
+        }
+      ]
+    },
+    "1180153": {
+      "id": 1180153,
+      "name": "놀라운 함선 Ⅰ",
+      "localBitFlag": 27,
+      "order": 56255,
+      "step": 1,
+      "collectionType": 4,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70200181,
+          "Val": 5
+        },
+        {
+          "Id": 70200126,
+          "Val": 5
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311017,
+          "Value": 9
+        }
+      ]
+    },
+    "1180154": {
+      "id": 1180154,
+      "name": "놀라운 함선 Ⅱ",
+      "localBitFlag": 27,
+      "order": 56255,
+      "step": 2,
+      "collectionType": 4,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70200181,
+          "Val": 10
+        },
+        {
+          "Id": 70200126,
+          "Val": 10
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300420,
+          "Value": 8
+        }
+      ]
+    },
+    "1180155": {
+      "id": 1180155,
+      "name": "놀라운 함선 Ⅲ",
+      "localBitFlag": 27,
+      "order": 56255,
+      "step": 3,
+      "collectionType": 4,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70200181,
+          "Val": 20
+        },
+        {
+          "Id": 70200126,
+          "Val": 20
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 108,
+          "Value": 1
+        }
+      ]
+    },
+    "1180156": {
+      "id": 1180156,
+      "name": "더 많은 격렬함 Ⅰ",
+      "localBitFlag": 192,
+      "order": 56080,
+      "step": 1,
+      "collectionType": 4,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70200033,
+          "Val": 5
+        },
+        {
+          "Id": 70200042,
+          "Val": 5
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311027,
+          "Value": 5
+        }
+      ]
+    },
+    "1180157": {
+      "id": 1180157,
+      "name": "더 많은 격렬함 Ⅱ",
+      "localBitFlag": 192,
+      "order": 56080,
+      "step": 2,
+      "collectionType": 4,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70200033,
+          "Val": 10
+        },
+        {
+          "Id": 70200042,
+          "Val": 10
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 5
+        }
+      ]
+    },
+    "1180158": {
+      "id": 1180158,
+      "name": "더 많은 격렬함 Ⅲ",
+      "localBitFlag": 192,
+      "order": 56080,
+      "step": 3,
+      "collectionType": 4,
+      "collectionGrade": 2,
+      "collectionItems": [
+        {
+          "Id": 70200033,
+          "Val": 20
+        },
+        {
+          "Id": 70200042,
+          "Val": 20
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300670,
+          "Value": 6
+        }
+      ]
+    },
+    "1180159": {
+      "id": 1180159,
+      "name": "제법...큰 선박 Ⅰ",
+      "localBitFlag": 0,
+      "order": 56115,
+      "step": 1,
+      "collectionType": 4,
+      "collectionGrade": 3,
+      "collectionItems": [
+        {
+          "Id": 70200053,
+          "Val": 5
+        },
+        {
+          "Id": 70200092,
+          "Val": 5
+        },
+        {
+          "Id": 70200104,
+          "Val": 5
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311003,
+          "Value": 7
+        }
+      ]
+    },
+    "1180160": {
+      "id": 1180160,
+      "name": "제법...큰 선박 Ⅱ",
+      "localBitFlag": 0,
+      "order": 56115,
+      "step": 2,
+      "collectionType": 4,
+      "collectionGrade": 3,
+      "collectionItems": [
+        {
+          "Id": 70200053,
+          "Val": 10
+        },
+        {
+          "Id": 70200092,
+          "Val": 10
+        },
+        {
+          "Id": 70200104,
+          "Val": 10
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 6
+        }
+      ]
+    },
+    "1180161": {
+      "id": 1180161,
+      "name": "제법...큰 선박 Ⅲ",
+      "localBitFlag": 0,
+      "order": 56115,
+      "step": 3,
+      "collectionType": 4,
+      "collectionGrade": 3,
+      "collectionItems": [
+        {
+          "Id": 70200053,
+          "Val": 20
+        },
+        {
+          "Id": 70200092,
+          "Val": 20
+        },
+        {
+          "Id": 70200104,
+          "Val": 20
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312060,
+          "Value": 6
+        }
+      ]
+    },
+    "1180162": {
+      "id": 1180162,
+      "name": "이상향 Ⅰ",
+      "localBitFlag": 0,
+      "order": 56175,
+      "step": 1,
+      "collectionType": 4,
+      "collectionGrade": 3,
+      "collectionItems": [
+        {
+          "Id": 70200048,
+          "Val": 5
+        },
+        {
+          "Id": 70200106,
+          "Val": 5
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311026,
+          "Value": 7
+        }
+      ]
+    },
+    "1180163": {
+      "id": 1180163,
+      "name": "이상향 Ⅱ",
+      "localBitFlag": 0,
+      "order": 56175,
+      "step": 2,
+      "collectionType": 4,
+      "collectionGrade": 3,
+      "collectionItems": [
+        {
+          "Id": 70200048,
+          "Val": 10
+        },
+        {
+          "Id": 70200106,
+          "Val": 10
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 6
+        }
+      ]
+    },
+    "1180164": {
+      "id": 1180164,
+      "name": "이상향 Ⅲ",
+      "localBitFlag": 0,
+      "order": 56175,
+      "step": 3,
+      "collectionType": 4,
+      "collectionGrade": 3,
+      "collectionItems": [
+        {
+          "Id": 70200048,
+          "Val": 20
+        },
+        {
+          "Id": 70200106,
+          "Val": 20
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 109,
+          "Value": 1
+        }
+      ]
+    },
+    "1180165": {
+      "id": 1180165,
+      "name": "진혼탑 Ⅰ",
+      "localBitFlag": 0,
+      "order": 56235,
+      "step": 1,
+      "collectionType": 4,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70200158,
+          "Val": 5
+        },
+        {
+          "Id": 70200065,
+          "Val": 5
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311008,
+          "Value": 9
+        }
+      ]
+    },
+    "1180166": {
+      "id": 1180166,
+      "name": "진혼탑 Ⅱ",
+      "localBitFlag": 0,
+      "order": 56235,
+      "step": 2,
+      "collectionType": 4,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70200158,
+          "Val": 10
+        },
+        {
+          "Id": 70200065,
+          "Val": 10
+        }
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 7
+        }
+      ]
+    },
+    "1180167": {
+      "id": 1180167,
+      "name": "진혼탑 Ⅲ",
+      "localBitFlag": 0,
+      "order": 56235,
+      "step": 3,
+      "collectionType": 4,
+      "collectionGrade": 4,
+      "collectionItems": [
+        {
+          "Id": 70200158,
+          "Val": 20
+        },
+        {
+          "Id": 70200065,
+          "Val": 20
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 109,
+          "Value": 1
         }
       ]
     }

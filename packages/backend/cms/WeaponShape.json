@@ -4398,7 +4398,7 @@
       "skeleton": "date_masamune",
       "atlas": "date_masamune",
       "skin": "3",
-      "color1": 15333119,
+      "color1": 15332863,
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 1
@@ -4408,7 +4408,7 @@
       "skeleton": "SwordSkins",
       "atlas": "SwordSkins0002",
       "skin": "8",
-      "color1": 15333119,
+      "color1": 15332863,
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 7
@@ -4418,7 +4418,7 @@
       "skeleton": "SwordSkins",
       "atlas": "SwordSkins0002",
       "skin": "9",
-      "color1": 15333119,
+      "color1": 15332863,
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 7
@@ -4428,10 +4428,50 @@
       "skeleton": "date_masamune",
       "atlas": "date_masamune",
       "skin": "4",
-      "color1": 15333119,
+      "color1": 15332863,
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 1
+    },
+    "34000393": {
+      "id": 34000393,
+      "skeleton": "PistolSkins",
+      "atlas": "PistolSkins0002",
+      "skin": "4",
+      "color1": 15332863,
+      "color2": 16777215,
+      "color3": 16777215,
+      "weaponType": 4
+    },
+    "34000394": {
+      "id": 34000394,
+      "skeleton": "RifleSkins",
+      "atlas": "RifleSkins0002",
+      "skin": "5",
+      "color1": 15332863,
+      "color2": 16777215,
+      "color3": 16777215,
+      "weaponType": 5
+    },
+    "34000395": {
+      "id": 34000395,
+      "skeleton": "SwordSkins",
+      "atlas": "SwordSkins0002",
+      "skin": "10",
+      "color1": 15332863,
+      "color2": 16777215,
+      "color3": 16777215,
+      "weaponType": 7
+    },
+    "34000396": {
+      "id": 34000396,
+      "skeleton": "PistolSkins",
+      "atlas": "PistolSkins0002",
+      "skin": "5",
+      "color1": 15332863,
+      "color2": 16777215,
+      "color3": 16777215,
+      "weaponType": 4
     }
   }
 }

@@ -7512,6 +7512,15 @@
       "soundId": [
         98001867
       ]
+    },
+    "97010347": {
+      "id": 97010347,
+      "playType": 1,
+      "classAsset": "SC_Effect",
+      "loopingCount": 0,
+      "soundId": [
+        98001870
+      ]
     }
   }
 }

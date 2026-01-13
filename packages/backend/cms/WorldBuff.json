@@ -17143,6 +17143,124 @@
         }
       ]
     },
+    "38001132": {
+      "id": 38001132,
+      "name": "초심자 관세 혜택",
+      "modeBitFlag": 59,
+      "hudEffectGroupId": 20,
+      "jobType": 0,
+      "buffTargetType": 2,
+      "groupNo": 38001132,
+      "groupOrder": 1,
+      "maxStack": 1,
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75300110,
+          "Value": -400
+        }
+      ],
+      "buffTargetMode": 2,
+      "buffIcon": 2,
+      "iconFrame": 0,
+      "image": "icon_Effect_trade_81_Sprite",
+      "saveToDb": false,
+      "hidden": false,
+      "visibleToOthers": true,
+      "useDesc": false,
+      "desc": "{0}|hpp(이,가) {1}% 감소합니다.\n이 효과는 선단 LV {2}까지만 지원됩니다.",
+      "descFormats": [
+        {
+          "Type": 1,
+          "Text": "관세율"
+        },
+        {
+          "Type": 2,
+          "Val": 40
+        },
+        {
+          "Type": 2,
+          "Val": 10
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        }
+      ]
+    },
+    "38001133": {
+      "id": 38001133,
+      "name": "초심자 관세 혜택",
+      "modeBitFlag": 59,
+      "hudEffectGroupId": 20,
+      "jobType": 0,
+      "buffTargetType": 2,
+      "groupNo": 38001133,
+      "groupOrder": 1,
+      "maxStack": 1,
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75300110,
+          "Value": -200
+        }
+      ],
+      "buffTargetMode": 2,
+      "buffIcon": 2,
+      "iconFrame": 0,
+      "image": "icon_Effect_trade_81_Sprite",
+      "saveToDb": false,
+      "hidden": false,
+      "visibleToOthers": true,
+      "useDesc": false,
+      "desc": "{0}|hpp(이,가) {1}% 감소합니다.\n이 효과는 선단 LV {2}까지만 지원됩니다.",
+      "descFormats": [
+        {
+          "Type": 1,
+          "Text": "관세율"
+        },
+        {
+          "Type": 2,
+          "Val": 20
+        },
+        {
+          "Type": 2,
+          "Val": 20
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        }
+      ]
+    },
     "38001200": {
       "id": 38001200,
       "name": "복귀 선단 함대 속도 증가",
@@ -31969,11 +32087,14 @@
       "modeBitFlag": 63,
       "hudEffectGroupId": 220,
       "jobType": 0,
-      "buffTargetType": 1,
-      "duration": 3600,
+      "buffTargetType": 2,
+      "duration": 604800,
       "groupNo": 38020023,
       "groupOrder": 1,
       "maxStack": 1,
+      "battleBuffId": [
+        65991014
+      ],
       "statEffect": [
         {
           "Type": 0,
@@ -31989,6 +32110,11 @@
           "Type": 0,
           "Id": 3149,
           "Value": 2
+        },
+        {
+          "Type": 1,
+          "Id": 75312096,
+          "Value": 10
         }
       ],
       "buffTargetMode": 1,
@@ -31999,7 +32125,7 @@
       "hidden": false,
       "visibleToOthers": true,
       "useDesc": true,
-      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "desc": "{0}|hpp(이,가) {1} 증가하고, {2}|hpp(이,가) {3}% 증가합니다.\n{4}|hpp(이,가) {5}% 증가합니다.",
       "descFormats": [
         {
           "Type": 1,
@@ -32010,16 +32136,20 @@
           "Val": 2
         },
         {
-          "Type": 0
+          "Type": 1,
+          "Text": "협상 발생 확률"
         },
         {
-          "Type": 0
+          "Type": 2,
+          "Val": 1
         },
         {
-          "Type": 0
+          "Type": 1,
+          "Text": "백병, 포격, 충파 추가 공격력"
         },
         {
-          "Type": 0
+          "Type": 2,
+          "Val": 6
         },
         {
           "Type": 0
@@ -48920,6 +49050,661 @@
         }
       ]
     },
+    "38095454": {
+      "id": 38095454,
+      "name": "육지 수련 입장 횟수 증가",
+      "modeBitFlag": 63,
+      "hudEffectGroupId": 40,
+      "jobType": 0,
+      "buffTargetType": 2,
+      "groupNo": 38095454,
+      "groupOrder": 1,
+      "maxStack": 1,
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312074,
+          "Value": 2
+        }
+      ],
+      "buffTargetMode": 3,
+      "buffIcon": 3,
+      "iconFrame": 0,
+      "image": "icon_shopEffect_adventure_15_Sprite",
+      "saveToDb": true,
+      "hidden": false,
+      "visibleToOthers": true,
+      "useDesc": true,
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormats": [
+        {
+          "Type": 1,
+          "Text": "일일 수련 가능 횟수"
+        },
+        {
+          "Type": 2,
+          "Val": 2
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        }
+      ],
+      "uiText": "기능 상품 효과"
+    },
+    "38095455": {
+      "id": 38095455,
+      "name": "암시장 상시 입장",
+      "modeBitFlag": 63,
+      "hudEffectGroupId": 40,
+      "jobType": 0,
+      "buffTargetType": 2,
+      "groupNo": 38095455,
+      "groupOrder": 1,
+      "maxStack": 1,
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312122,
+          "Value": 1
+        }
+      ],
+      "buffTargetMode": 2,
+      "buffIcon": 2,
+      "iconFrame": 0,
+      "image": "WT_CashShop_ShopPassBuff_Sprite",
+      "saveToDb": true,
+      "hidden": false,
+      "visibleToOthers": true,
+      "useDesc": true,
+      "desc": "암시장에 상시 입장할 수 있습니다.",
+      "descFormats": [
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        }
+      ],
+      "uiText": "기능 상품 효과"
+    },
+    "38095456": {
+      "id": 38095456,
+      "name": "자동 보급 횟수 증가",
+      "modeBitFlag": 63,
+      "hudEffectGroupId": 40,
+      "jobType": 0,
+      "buffTargetType": 2,
+      "groupNo": 38095456,
+      "groupOrder": 1,
+      "maxStack": 1,
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312123,
+          "Value": 40
+        }
+      ],
+      "buffTargetMode": 1,
+      "buffIcon": 1,
+      "iconFrame": 0,
+      "image": "icon_characterEffect_adventure_89_Sprite",
+      "saveToDb": true,
+      "hidden": false,
+      "visibleToOthers": true,
+      "useDesc": true,
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormats": [
+        {
+          "Type": 1,
+          "Text": "자동 보급 횟수"
+        },
+        {
+          "Type": 2,
+          "Val": 40
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        }
+      ],
+      "uiText": "기능 상품 효과"
+    },
+    "38095457": {
+      "id": 38095457,
+      "name": "무료 무르기 횟수 증가",
+      "modeBitFlag": 63,
+      "hudEffectGroupId": 40,
+      "jobType": 0,
+      "buffTargetType": 2,
+      "groupNo": 38095457,
+      "groupOrder": 1,
+      "maxStack": 1,
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312002,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75312097,
+          "Value": 50
+        }
+      ],
+      "buffTargetMode": 3,
+      "buffIcon": 1,
+      "iconFrame": 0,
+      "image": "icon_shopEffect_battle_1_Sprite",
+      "saveToDb": true,
+      "hidden": false,
+      "visibleToOthers": true,
+      "useDesc": true,
+      "desc": "{0}|hpp(이,가) {1}회 증가합니다.",
+      "descFormats": [
+        {
+          "Type": 1,
+          "Text": "무료 무르기 횟수"
+        },
+        {
+          "Type": 2,
+          "Val": 50
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        }
+      ],
+      "uiText": "기능 상품 효과"
+    },
+    "38095458": {
+      "id": 38095458,
+      "name": "시세 정보 확인 범위 증가",
+      "modeBitFlag": 63,
+      "hudEffectGroupId": 40,
+      "jobType": 0,
+      "buffTargetType": 2,
+      "groupNo": 38095458,
+      "groupOrder": 1,
+      "maxStack": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 2007,
+          "Value": 50000
+        }
+      ],
+      "buffTargetMode": 1,
+      "buffIcon": 1,
+      "iconFrame": 0,
+      "image": "icon_characterEffect_adventure_87_Sprite",
+      "saveToDb": true,
+      "hidden": false,
+      "visibleToOthers": true,
+      "useDesc": false,
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormats": [
+        {
+          "Type": 1,
+          "Text": "시세 정보 확인 범위"
+        },
+        {
+          "Type": 2,
+          "Val": 1000
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        }
+      ],
+      "uiText": "기능 상품 효과"
+    },
+    "38095459": {
+      "id": 38095459,
+      "name": "함대 속도 증가",
+      "modeBitFlag": 63,
+      "hudEffectGroupId": 40,
+      "jobType": 0,
+      "buffTargetType": 2,
+      "groupNo": 38095459,
+      "groupOrder": 1,
+      "maxStack": 1,
+      "battleBuffId": [
+        65550074
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75310013,
+          "Value": 1
+        }
+      ],
+      "buffTargetMode": 1,
+      "buffIcon": 1,
+      "iconFrame": 0,
+      "image": "icon_characterEffect_adventure_19_Sprite",
+      "saveToDb": true,
+      "hidden": false,
+      "visibleToOthers": true,
+      "useDesc": true,
+      "desc": "{0}|hpp(이,가) {1}노트 증가합니다.",
+      "descFormats": [
+        {
+          "Type": 1,
+          "Text": "함대 속도"
+        },
+        {
+          "Type": 2,
+          "Val": 3
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        }
+      ],
+      "uiText": "기능 상품 효과"
+    },
+    "38095460": {
+      "id": 38095460,
+      "name": "모든 경험치 추가 획득",
+      "modeBitFlag": 63,
+      "hudEffectGroupId": 40,
+      "jobType": 0,
+      "buffTargetType": 1,
+      "groupNo": 38095460,
+      "groupOrder": 1,
+      "maxStack": 1,
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312120,
+          "Value": 50
+        }
+      ],
+      "buffTargetMode": 1,
+      "buffIcon": 1,
+      "iconFrame": 0,
+      "image": "icon_common_exp_boost_Sprite",
+      "saveToDb": true,
+      "hidden": false,
+      "visibleToOthers": true,
+      "useDesc": false,
+      "desc": "{0}|hpp(이,가) {1}% 증가합니다.",
+      "descFormats": [
+        {
+          "Type": 1,
+          "Text": "선단과 항해사가 획득하는 전투, 교역, 모험 경험치"
+        },
+        {
+          "Type": 2,
+          "Val": 5
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        }
+      ]
+    },
+    "38095461": {
+      "id": 38095461,
+      "name": "전투 쾌속 횟수 증가",
+      "modeBitFlag": 63,
+      "hudEffectGroupId": 40,
+      "jobType": 0,
+      "buffTargetType": 2,
+      "groupNo": 38095461,
+      "groupOrder": 1,
+      "maxStack": 1,
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312003,
+          "Value": 50
+        }
+      ],
+      "buffTargetMode": 3,
+      "buffIcon": 1,
+      "iconFrame": 0,
+      "image": "icon_shopEffect_battle_6_Sprite",
+      "saveToDb": true,
+      "hidden": false,
+      "visibleToOthers": true,
+      "useDesc": true,
+      "desc": "{0}|hpp(이,가) {1}회 증가합니다.",
+      "descFormats": [
+        {
+          "Type": 1,
+          "Text": "무료 쾌속 횟수"
+        },
+        {
+          "Type": 2,
+          "Val": 50
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        }
+      ],
+      "uiText": "기능 상품 효과"
+    },
+    "38095462": {
+      "id": 38095462,
+      "name": "교역품 판매 가격 할증",
+      "modeBitFlag": 59,
+      "hudEffectGroupId": 40,
+      "jobType": 0,
+      "buffTargetType": 2,
+      "groupNo": 38095462,
+      "groupOrder": 1,
+      "maxStack": 1,
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312094,
+          "Value": 10
+        }
+      ],
+      "buffTargetMode": 2,
+      "buffIcon": 2,
+      "iconFrame": 0,
+      "image": "icon_characterEffect_adventure_50_Sprite",
+      "saveToDb": true,
+      "hidden": false,
+      "visibleToOthers": true,
+      "useDesc": false,
+      "desc": "{0}|hpp(이,가) {1}% 증가합니다.",
+      "descFormats": [
+        {
+          "Type": 1,
+          "Text": "판매 가격 할증"
+        },
+        {
+          "Type": 2,
+          "Val": 1
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        }
+      ]
+    },
+    "38095463": {
+      "id": 38095463,
+      "name": "육지 탐험 쾌속 횟수 증가",
+      "modeBitFlag": 63,
+      "hudEffectGroupId": 40,
+      "jobType": 0,
+      "buffTargetType": 2,
+      "groupNo": 38095463,
+      "groupOrder": 1,
+      "maxStack": 1,
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312105,
+          "Value": 100
+        }
+      ],
+      "buffTargetMode": 3,
+      "buffIcon": 3,
+      "iconFrame": 0,
+      "image": "icon_shopEffect_adventure_13_Sprite",
+      "saveToDb": true,
+      "hidden": false,
+      "visibleToOthers": true,
+      "useDesc": false,
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormats": [
+        {
+          "Type": 1,
+          "Text": "육지 탐험 쾌속 횟수"
+        },
+        {
+          "Type": 2,
+          "Val": 100
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        }
+      ],
+      "uiText": "기능 상품 효과"
+    },
+    "38095464": {
+      "id": 38095464,
+      "name": "함대 속도 증가",
+      "modeBitFlag": 59,
+      "hudEffectGroupId": 40,
+      "jobType": 0,
+      "buffTargetType": 2,
+      "groupNo": 38095464,
+      "groupOrder": 1,
+      "maxStack": 1,
+      "battleBuffId": [
+        65550083
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75310013,
+          "Value": 1
+        }
+      ],
+      "buffTargetMode": 1,
+      "buffIcon": 1,
+      "iconFrame": 0,
+      "image": "icon_characterEffect_adventure_19_Sprite",
+      "saveToDb": true,
+      "hidden": false,
+      "visibleToOthers": true,
+      "useDesc": false,
+      "desc": "{0}|hpp(이,가) {1}노트 증가합니다.",
+      "descFormats": [
+        {
+          "Type": 1,
+          "Text": "함대 속도"
+        },
+        {
+          "Type": 2,
+          "Val": 1
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        }
+      ]
+    },
     "38096000": {
       "id": 38096000,
       "name": "양날의 검",
@@ -54770,6 +55555,69 @@
         {
           "Type": 2,
           "Val": 3
+        },
+        {
+          "Type": 0
+        }
+      ]
+    },
+    "38096092": {
+      "id": 38096092,
+      "name": "실속의 제왕",
+      "modeBitFlag": 63,
+      "hudEffectGroupId": 95,
+      "jobType": 0,
+      "buffTargetType": 2,
+      "groupNo": 38096092,
+      "groupOrder": 1,
+      "maxStack": 1,
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312094,
+          "Value": 45
+        },
+        {
+          "Type": 1,
+          "Id": 75312144,
+          "Value": 45
+        }
+      ],
+      "buffTargetMode": 3,
+      "buffIcon": 3,
+      "iconFrame": 0,
+      "image": "Icon_UserTitle_Ranking_001_Sprite",
+      "saveToDb": false,
+      "hidden": false,
+      "visibleToOthers": true,
+      "useDesc": true,
+      "desc": "판매 가격 할증이 {0}% 증가하고, 교역품 구매 수량이 {1}% 증가합니다.",
+      "descFormats": [
+        {
+          "Type": 2,
+          "Val": 4.5
+        },
+        {
+          "Type": 2,
+          "Val": 4.5
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
+        },
+        {
+          "Type": 0
         },
         {
           "Type": 0

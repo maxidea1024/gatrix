@@ -5004,6 +5004,11 @@
       "id": 98001867,
       "isUseLocal": false,
       "assetName0": "S_Eff_Season5_Start"
+    },
+      "98001870": {
+      "id": 98001870,
+      "isUseLocal": false,
+      "assetName0": "S_Eff_Huang_Tornado"
     }
   }
 }

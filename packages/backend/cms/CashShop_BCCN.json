@@ -21,7 +21,9 @@
       "chinaPrice": "number",
       "productLocalBitflag": "bit",
       "productCodeSdo": "string",
+      "productCodeWegame": "string",
       "consecutiveProductCodeSdo": "string",
+      "consecutiveProductCodeWegame": "string",
       "salePointType": "number",
       "salePointId": "number",
       "salePointVal": "number",
@@ -894,7 +896,7 @@
       "salePointType": 1,
       "salePointId": 100006,
       "salePointVal": 1000,
-      "saleEndDate": "2026/04/06/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700109,
       "HotSpotResetType": 0,
@@ -921,6 +923,7 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700002,
@@ -955,6 +958,7 @@
       "chinaPrice": 68,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.68",
+      "productCodeWegame": "68",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700003,
@@ -983,6 +987,7 @@
       "chinaPrice": 198,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.198",
+      "productCodeWegame": "198",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700004,
@@ -1011,6 +1016,7 @@
       "chinaPrice": 328,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.328",
+      "productCodeWegame": "328",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700005,
@@ -1039,6 +1045,7 @@
       "chinaPrice": 648,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.648",
+      "productCodeWegame": "648",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700006,
@@ -1073,6 +1080,7 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -1109,6 +1117,7 @@
       "chinaPrice": 68,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.68",
+      "productCodeWegame": "68",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -1145,6 +1154,7 @@
       "chinaPrice": 198,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.198",
+      "productCodeWegame": "198",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -1181,6 +1191,7 @@
       "chinaPrice": 328,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.328",
+      "productCodeWegame": "328",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -1217,6 +1228,7 @@
       "chinaPrice": 648,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.648",
+      "productCodeWegame": "648",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -1250,10 +1262,10 @@
       "isTermsCheckHideDisplay": true,
       "isSaleReturnUser": false,
       "shopCase": 1,
-      "productOrder": 31000,
-      "productSize": 1,
-      "productCategory": 3,
-      "subProductCategory": 109,
+      "productOrder": 60002,
+      "productSize": 2,
+      "productCategory": 5,
+      "subProductCategory": 601,
       "productType": 2,
       "saleType": 1,
       "productLocalBitflag": 192,
@@ -1298,10 +1310,10 @@
       "isTermsCheckHideDisplay": true,
       "isSaleReturnUser": false,
       "shopCase": 1,
-      "productOrder": 31001,
-      "productSize": 1,
-      "productCategory": 3,
-      "subProductCategory": 109,
+      "productOrder": 60003,
+      "productSize": 2,
+      "productCategory": 5,
+      "subProductCategory": 601,
       "productType": 2,
       "saleType": 1,
       "productLocalBitflag": 192,
@@ -1346,10 +1358,10 @@
       "isTermsCheckHideDisplay": true,
       "isSaleReturnUser": false,
       "shopCase": 1,
-      "productOrder": 31002,
-      "productSize": 1,
-      "productCategory": 3,
-      "subProductCategory": 109,
+      "productOrder": 60004,
+      "productSize": 2,
+      "productCategory": 5,
+      "subProductCategory": 601,
       "productType": 1,
       "saleType": 1,
       "productLocalBitflag": 192,
@@ -1408,7 +1420,7 @@
     },
     "10504005": {
       "id": 10504005,
-      "productName": "염료&원단 상자",
+      "productName": "염료 선택 교환권",
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
@@ -1427,9 +1439,9 @@
       "salePointVal": 100,
       "mileageBonusPer": 200,
       "isEndDateMake": false,
-      "productRewardFixedId": 95700013,
+      "productRewardFixedId": 95700376,
       "HotSpotResetType": 0,
-      "productDesc": "염료&원단 상자를 제공합니다.",
+      "productDesc": "염료 선택 교환권을 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 0
@@ -1486,6 +1498,35 @@
       "productRewardFixedId": 95700015,
       "HotSpotResetType": 0,
       "productDesc": "특수 교본을 제공합니다.",
+      "viewSchedule": false,
+      "recommendationOrderHiddenView": true,
+      "percentageType": 0
+    },
+    "10504008": {
+      "id": 10504008,
+      "productName": "원단 선택 교환권",
+      "isSoldOutMake": false,
+      "isToBuy": true,
+      "isRefund": true,
+      "isTermsCheckHideDisplay": true,
+      "isSaleReturnUser": false,
+      "shopCase": 1,
+      "productOrder": 47001,
+      "productSize": 1,
+      "productCategory": 3,
+      "subProductCategory": 108,
+      "productType": 1,
+      "saleType": 1,
+      "productLocalBitflag": 192,
+      "salePointType": 1,
+      "salePointId": 100004,
+      "salePointVal": 100,
+      "mileageBonusPer": 200,
+      "saleStartDate": "2025/12/26/00:00:00",
+      "isEndDateMake": false,
+      "productRewardFixedId": 95700377,
+      "HotSpotResetType": 0,
+      "productDesc": "원단 선택 교환권을 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 0
@@ -1560,7 +1601,7 @@
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 30000,
-      "productSize": 1,
+      "productSize": 2,
       "productCategory": 5,
       "subProductCategory": 601,
       "productType": 2,
@@ -1586,7 +1627,7 @@
           "IsDaily": false
         }
       ],
-      "productIcon": "WT_CN_BuffPkg001_Sprite",
+      "productIcon": "WT_CashShop_Product197_Sprite",
       "productDesc": "1시간 동안 경험치 획득량이 대폭 증가합니다.",
       "bannerType": 1,
       "eventName": "##",
@@ -1607,15 +1648,17 @@
       "isTermsCheckHideDisplay": true,
       "isSaleReturnUser": false,
       "shopCase": 1,
-      "productOrder": 60000,
+      "productOrder": 30001,
       "productSize": 2,
       "productCategory": 5,
       "subProductCategory": 601,
       "productType": 2,
-      "saleType": 1,
-      "chinaPrice": 30,
+      "saleType": 3,
+      "saleTypeVal": 1,
+      "chinaPrice": 12,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.30",
+      "productCodeSdo": "com.uwocn.12",
+      "productCodeWegame": "12",
       "salePointType": 2,
       "isEndDateMake": false,
       "durationDays": 7,
@@ -1624,46 +1667,104 @@
       "buffGroupName": "항해의 가호",
       "buffGroupLevel": 1,
       "productWorldBuffId": [
-        38042904,
-        38042905,
-        38042906,
-        38042907,
-        38042908,
-        38042909
+        38095454,
+        38095455,
+        38095456,
+        38095457,
+        38095458
       ],
       "productWorldBuff": [
         {
-          "Id": 38042904,
+          "Id": 38095454,
           "IsDaily": false
         },
         {
-          "Id": 38042905,
+          "Id": 38095455,
           "IsDaily": false
         },
         {
-          "Id": 38042906,
+          "Id": 38095456,
           "IsDaily": false
         },
         {
-          "Id": 38042907,
+          "Id": 38095457,
           "IsDaily": false
         },
         {
-          "Id": 38042908,
-          "IsDaily": false
-        },
-        {
-          "Id": 38042909,
+          "Id": 38095458,
           "IsDaily": false
         }
       ],
-      "productIcon": "WT_CashShop_Product197_Sprite",
+      "productIcon": "WT_CN_BuffPkg003_Sprite",
       "productDesc": "7일간 게임에 유용한 각종 효과를 제공합니다.",
       "bannerType": 1,
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9996,
       "eventImage": "WT_CN_RecommandedBanner004_Sprite",
+      "viewSchedule": false,
+      "recommendationOrderHiddenView": true,
+      "percentageType": 0
+    },
+    "10504303": {
+      "id": 10504303,
+      "productName": "성장의 가호({0}일)",
+      "productNameFormatText": "7",
+      "isSoldOutMake": false,
+      "isToBuy": false,
+      "isRefund": false,
+      "isTermsCheckHideDisplay": true,
+      "isSaleReturnUser": false,
+      "shopCase": 1,
+      "productOrder": 30002,
+      "productSize": 2,
+      "productCategory": 5,
+      "subProductCategory": 601,
+      "productType": 2,
+      "saleType": 3,
+      "saleTypeVal": 1,
+      "chinaPrice": 18,
+      "productLocalBitflag": 192,
+      "productCodeSdo": "com.uwocn.18",
+      "productCodeWegame": "18",
+      "salePointType": 2,
+      "isEndDateMake": false,
+      "durationDays": 7,
+      "HotSpotResetType": 0,
+      "buffGroup": 11,
+      "buffGroupName": "성장의 가호",
+      "buffGroupLevel": 1,
+      "productWorldBuffId": [
+        38095459,
+        38095460,
+        38095461,
+        38095462,
+        38095463
+      ],
+      "productWorldBuff": [
+        {
+          "Id": 38095459,
+          "IsDaily": false
+        },
+        {
+          "Id": 38095460,
+          "IsDaily": false
+        },
+        {
+          "Id": 38095461,
+          "IsDaily": false
+        },
+        {
+          "Id": 38095462,
+          "IsDaily": false
+        },
+        {
+          "Id": 38095463,
+          "IsDaily": false
+        }
+      ],
+      "productIcon": "WT_CN_BuffPkg004_Sprite",
+      "productDesc": "7일간 게임에 유용한 각종 효과를 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 0
@@ -1679,16 +1780,17 @@
       "shopCase": 1,
       "productOrder": 70000,
       "productSize": 2,
-      "productCategory": 13,
-      "subProductCategory": 1301,
+      "productCategory": 3,
+      "subProductCategory": 110,
       "productType": 1,
       "saleType": 5,
       "saleTypeVal": 1,
       "chinaPrice": 68,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.68",
+      "productCodeWegame": "68",
       "salePointType": 2,
-      "saleEndDate": "2026/02/25/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700048,
       "HotSpotResetType": 0,
@@ -1709,20 +1811,21 @@
       "shopCase": 1,
       "productOrder": 70001,
       "productSize": 2,
-      "productCategory": 13,
-      "subProductCategory": 1301,
+      "productCategory": 3,
+      "subProductCategory": 110,
       "productType": 1,
       "saleType": 5,
       "saleTypeVal": 1,
       "chinaPrice": 68,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.68",
+      "productCodeWegame": "68",
       "salePointType": 2,
-      "saleEndDate": "2026/02/25/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700049,
       "HotSpotResetType": 0,
-      "productIcon": "WT_CashShop_Product316_Sprite",
+      "productIcon": "WT_CashShop_Product46_Sprite",
       "productDesc": "선박 외형을 제공합니다. 선박 외형은 기함에만 장착 가능하며 장착 위치 별로 한 종류만 적용할 수 있습니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
@@ -1747,18 +1850,13 @@
       "saleTypeVal": 1,
       "chinaPrice": 6,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.6",
+      "productCodeSdo": "com.uwocn.06",
+      "productCodeWegame": "6",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000001,
           "Count": 10
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000001,
-          "Count": 15
         }
       ],
       "endPopupCount": 1,
@@ -1797,9 +1895,10 @@
       "productType": 10,
       "saleType": 5,
       "saleTypeVal": 1,
-      "chinaPrice": 6,
+      "chinaPrice": 12,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.6",
+      "productCodeSdo": "com.uwocn.12",
+      "productCodeWegame": "12",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -1807,14 +1906,7 @@
           "Count": 15
         }
       ],
-      "endContentsTerms": [
-        {
-          "Id": 81000001,
-          "Count": 20
-        }
-      ],
       "endPopupCount": 1,
-      "saleEndDate": "2026/01/23/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700019,
       "durationHours": 3,
@@ -1831,7 +1923,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19996,
       "percentageType": 2,
-      "percentageValue": 333
+      "percentageValue": 2500
     },
     "10505003": {
       "id": 10505003,
@@ -1853,17 +1945,12 @@
       "chinaPrice": 18,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.18",
+      "productCodeWegame": "18",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000001,
           "Count": 20
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000001,
-          "Count": 25
         }
       ],
       "endPopupCount": 1,
@@ -1902,9 +1989,10 @@
       "productType": 10,
       "saleType": 5,
       "saleTypeVal": 1,
-      "chinaPrice": 12,
+      "chinaPrice": 30,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.12",
+      "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -1912,14 +2000,7 @@
           "Count": 25
         }
       ],
-      "endContentsTerms": [
-        {
-          "Id": 81000001,
-          "Count": 30
-        }
-      ],
       "endPopupCount": 1,
-      "saleEndDate": "2026/01/23/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700021,
       "durationHours": 3,
@@ -1936,7 +2017,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19994,
       "percentageType": 2,
-      "percentageValue": 333
+      "percentageValue": 2000
     },
     "10505005": {
       "id": 10505005,
@@ -1958,17 +2039,12 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000001,
           "Count": 30
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000001,
-          "Count": 35
         }
       ],
       "endPopupCount": 1,
@@ -2007,9 +2083,10 @@
       "productType": 10,
       "saleType": 5,
       "saleTypeVal": 1,
-      "chinaPrice": 18,
+      "chinaPrice": 30,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.18",
+      "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -2017,14 +2094,7 @@
           "Count": 35
         }
       ],
-      "endContentsTerms": [
-        {
-          "Id": 81000001,
-          "Count": 40
-        }
-      ],
       "endPopupCount": 1,
-      "saleEndDate": "2026/01/23/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700023,
       "durationHours": 3,
@@ -2041,7 +2111,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19992,
       "percentageType": 2,
-      "percentageValue": 277
+      "percentageValue": 2500
     },
     "10505007": {
       "id": 10505007,
@@ -2063,17 +2133,12 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000001,
           "Count": 40
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000001,
-          "Count": 45
         }
       ],
       "endPopupCount": 1,
@@ -2111,9 +2176,10 @@
       "productType": 10,
       "saleType": 5,
       "saleTypeVal": 1,
-      "chinaPrice": 18,
+      "chinaPrice": 30,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.18",
+      "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -2121,14 +2187,7 @@
           "Count": 45
         }
       ],
-      "endContentsTerms": [
-        {
-          "Id": 81000001,
-          "Count": 50
-        }
-      ],
       "endPopupCount": 1,
-      "saleEndDate": "2026/01/23/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700025,
       "durationHours": 3,
@@ -2145,7 +2204,7 @@
       "recommendationLevelMax": 99,
       "recommendationOrder1": 19990,
       "percentageType": 2,
-      "percentageValue": 361
+      "percentageValue": 3250
     },
     "10505009": {
       "id": 10505009,
@@ -2167,17 +2226,12 @@
       "chinaPrice": 98,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.98",
+      "productCodeWegame": "98",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000001,
           "Count": 50
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000001,
-          "Count": 55
         }
       ],
       "endPopupCount": 1,
@@ -2219,17 +2273,12 @@
       "chinaPrice": 98,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.98",
+      "productCodeWegame": "98",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000001,
           "Count": 55
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000001,
-          "Count": 60
         }
       ],
       "endPopupCount": 1,
@@ -2271,17 +2320,12 @@
       "chinaPrice": 98,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.98",
+      "productCodeWegame": "98",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000001,
           "Count": 60
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000001,
-          "Count": 65
         }
       ],
       "endPopupCount": 1,
@@ -2323,17 +2367,12 @@
       "chinaPrice": 98,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.98",
+      "productCodeWegame": "98",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000001,
           "Count": 65
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000001,
-          "Count": 70
         }
       ],
       "endPopupCount": 1,
@@ -2375,17 +2414,12 @@
       "chinaPrice": 98,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.98",
+      "productCodeWegame": "98",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000001,
           "Count": 70
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000001,
-          "Count": 75
         }
       ],
       "endPopupCount": 1,
@@ -2427,19 +2461,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 1,
           "Count": 5
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 1,
-          "Count": 6
         }
       ],
       "endPopupCount": 1,
@@ -2478,19 +2506,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 2,
           "Count": 5
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 2,
-          "Count": 6
         }
       ],
       "endPopupCount": 1,
@@ -2529,19 +2551,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 1,
           "Count": 6
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 1,
-          "Count": 7
         }
       ],
       "endPopupCount": 1,
@@ -2580,19 +2596,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 2,
           "Count": 6
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 2,
-          "Count": 7
         }
       ],
       "endPopupCount": 1,
@@ -2631,19 +2641,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 1,
           "Count": 7
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 1,
-          "Count": 8
         }
       ],
       "endPopupCount": 1,
@@ -2682,19 +2686,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 2,
           "Count": 7
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 2,
-          "Count": 8
         }
       ],
       "endPopupCount": 1,
@@ -2733,19 +2731,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 1,
           "Count": 8
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 1,
-          "Count": 9
         }
       ],
       "endPopupCount": 1,
@@ -2784,19 +2776,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 2,
           "Count": 8
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 2,
-          "Count": 9
         }
       ],
       "endPopupCount": 1,
@@ -2835,19 +2821,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 1,
           "Count": 9
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 1,
-          "Count": 10
         }
       ],
       "endPopupCount": 1,
@@ -2886,19 +2866,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 2,
           "Count": 9
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 2,
-          "Count": 10
         }
       ],
       "endPopupCount": 1,
@@ -2937,19 +2911,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 1,
           "Count": 10
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 1,
-          "Count": 11
         }
       ],
       "endPopupCount": 1,
@@ -2988,19 +2956,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 2,
           "Count": 10
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 2,
-          "Count": 11
         }
       ],
       "endPopupCount": 1,
@@ -3039,19 +3001,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 1,
           "Count": 11
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 1,
-          "Count": 12
         }
       ],
       "endPopupCount": 1,
@@ -3090,19 +3046,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 2,
           "Count": 11
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 2,
-          "Count": 12
         }
       ],
       "endPopupCount": 1,
@@ -3141,19 +3091,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 1,
           "Count": 12
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 1,
-          "Count": 13
         }
       ],
       "endPopupCount": 1,
@@ -3192,19 +3136,13 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000050,
           "Target": 2,
           "Count": 12
-        }
-      ],
-      "endContentsTerms": [
-        {
-          "Id": 81000050,
-          "Target": 2,
-          "Count": 13
         }
       ],
       "endPopupCount": 1,
@@ -3241,15 +3179,17 @@
       "saleTypeVal": 1,
       "chinaPrice": 6,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.6",
+      "productCodeSdo": "com.uwocn.06",
+      "productCodeWegame": "6",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000039,
-          "Target": 24,
-          "Count": 1
+          "Target": 82000035,
+          "Count": 27
         }
       ],
+      "endPopupCount": 1,
       "isEndDateMake": false,
       "productRewardFixedId": 95700047,
       "HotSpotResetType": 0,
@@ -3286,12 +3226,13 @@
       "chinaPrice": 18,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.18",
+      "productCodeWegame": "18",
       "salePointType": 2,
       "contentsTerms": [
         {
           "Id": 81000039,
-          "Target": 79,
-          "Count": 1
+          "Target": 82000035,
+          "Count": 88
         }
       ],
       "isEndDateMake": false,
@@ -3301,10 +3242,15 @@
       "buffGroupName": "긴 모험의 출발",
       "buffGroupLevel": 1,
       "productWorldBuffId": [
+        38095464,
         38042910,
         38042911
       ],
       "productWorldBuff": [
+        {
+          "Id": 38095464,
+          "IsDaily": false
+        },
         {
           "Id": 38042910,
           "IsDaily": false
@@ -3333,7 +3279,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 90000,
@@ -3346,8 +3292,9 @@
       "chinaPrice": 128,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.128",
+      "productCodeWegame": "128",
       "salePointType": 2,
-      "saleEndDate": "2026/04/06/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700050,
       "HotSpotResetType": 0,
@@ -3369,7 +3316,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 90001,
@@ -3384,7 +3331,7 @@
       "salePointId": 100001,
       "salePointVal": 0,
       "previousId": 10506001,
-      "saleEndDate": "2026/04/06/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700051,
       "HotSpotResetType": 0,
@@ -3401,7 +3348,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 90002,
@@ -3414,9 +3361,10 @@
       "chinaPrice": 198,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.198",
+      "productCodeWegame": "198",
       "salePointType": 2,
       "previousId": 10506002,
-      "saleEndDate": "2026/04/06/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700052,
       "HotSpotResetType": 0,
@@ -3433,7 +3381,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 90003,
@@ -3446,8 +3394,10 @@
       "chinaPrice": 128,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.128",
+      "productCodeWegame": "128",
       "salePointType": 2,
-      "saleEndDate": "2026/01/02/00:00:00",
+      "saleStartDate": "2026/01/22/00:00:00",
+      "saleEndDate": "2026/01/29/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700053,
       "HotSpotResetType": 0,
@@ -3469,7 +3419,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 90004,
@@ -3484,7 +3434,8 @@
       "salePointId": 100001,
       "salePointVal": 0,
       "previousId": 10506004,
-      "saleEndDate": "2026/01/02/00:00:00",
+      "saleStartDate": "2026/01/22/00:00:00",
+      "saleEndDate": "2026/01/29/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700054,
       "HotSpotResetType": 0,
@@ -3501,7 +3452,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 90005,
@@ -3514,9 +3465,11 @@
       "chinaPrice": 198,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.198",
+      "productCodeWegame": "198",
       "salePointType": 2,
       "previousId": 10506005,
-      "saleEndDate": "2026/01/02/00:00:00",
+      "saleStartDate": "2026/01/22/00:00:00",
+      "saleEndDate": "2026/01/29/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700055,
       "HotSpotResetType": 0,
@@ -3533,7 +3486,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 90006,
@@ -3546,9 +3499,10 @@
       "chinaPrice": 128,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.128",
+      "productCodeWegame": "128",
       "salePointType": 2,
-      "saleStartDate": "2025/12/31/00:00:00",
-      "saleEndDate": "2026/01/07/00:00:00",
+      "saleStartDate": "2026/01/29/00:00:00",
+      "saleEndDate": "2026/02/04/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700056,
       "HotSpotResetType": 0,
@@ -3570,7 +3524,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 90007,
@@ -3585,8 +3539,8 @@
       "salePointId": 100001,
       "salePointVal": 0,
       "previousId": 10506007,
-      "saleStartDate": "2025/12/31/00:00:00",
-      "saleEndDate": "2026/01/07/00:00:00",
+      "saleStartDate": "2026/01/29/00:00:00",
+      "saleEndDate": "2026/02/04/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700057,
       "HotSpotResetType": 0,
@@ -3603,7 +3557,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 90008,
@@ -3616,10 +3570,11 @@
       "chinaPrice": 198,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.198",
+      "productCodeWegame": "198",
       "salePointType": 2,
       "previousId": 10506008,
-      "saleStartDate": "2025/12/31/00:00:00",
-      "saleEndDate": "2026/01/07/00:00:00",
+      "saleStartDate": "2026/01/29/00:00:00",
+      "saleEndDate": "2026/02/04/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700058,
       "HotSpotResetType": 0,
@@ -3636,7 +3591,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 90009,
@@ -3649,9 +3604,10 @@
       "chinaPrice": 128,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.128",
+      "productCodeWegame": "128",
       "salePointType": 2,
-      "saleStartDate": "2026/01/07/00:00:00",
-      "saleEndDate": "2026/01/14/00:00:00",
+      "saleStartDate": "2026/02/04/00:00:00",
+      "saleEndDate": "2026/02/11/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700059,
       "HotSpotResetType": 0,
@@ -3673,7 +3629,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 90010,
@@ -3688,8 +3644,8 @@
       "salePointId": 100001,
       "salePointVal": 0,
       "previousId": 10506010,
-      "saleStartDate": "2026/01/07/00:00:00",
-      "saleEndDate": "2026/01/14/00:00:00",
+      "saleStartDate": "2026/02/04/00:00:00",
+      "saleEndDate": "2026/02/11/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700060,
       "HotSpotResetType": 0,
@@ -3706,7 +3662,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 90011,
@@ -3719,10 +3675,11 @@
       "chinaPrice": 198,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.198",
+      "productCodeWegame": "198",
       "salePointType": 2,
       "previousId": 10506011,
-      "saleStartDate": "2026/01/07/00:00:00",
-      "saleEndDate": "2026/01/14/00:00:00",
+      "saleStartDate": "2026/02/04/00:00:00",
+      "saleEndDate": "2026/02/11/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700061,
       "HotSpotResetType": 0,
@@ -3739,7 +3696,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 90012,
@@ -3752,9 +3709,10 @@
       "chinaPrice": 128,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.128",
+      "productCodeWegame": "128",
       "salePointType": 2,
-      "saleStartDate": "2026/01/14/00:00:00",
-      "saleEndDate": "2026/01/21/00:00:00",
+      "saleStartDate": "2026/02/11/00:00:00",
+      "saleEndDate": "2026/02/18/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700062,
       "HotSpotResetType": 0,
@@ -3776,7 +3734,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 90013,
@@ -3791,8 +3749,8 @@
       "salePointId": 100001,
       "salePointVal": 0,
       "previousId": 10506013,
-      "saleStartDate": "2026/01/14/00:00:00",
-      "saleEndDate": "2026/01/21/00:00:00",
+      "saleStartDate": "2026/02/11/00:00:00",
+      "saleEndDate": "2026/02/18/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700063,
       "HotSpotResetType": 0,
@@ -3809,7 +3767,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 90014,
@@ -3822,10 +3780,11 @@
       "chinaPrice": 198,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.198",
+      "productCodeWegame": "198",
       "salePointType": 2,
       "previousId": 10506014,
-      "saleStartDate": "2026/01/14/00:00:00",
-      "saleEndDate": "2026/01/21/00:00:00",
+      "saleStartDate": "2026/02/11/00:00:00",
+      "saleEndDate": "2026/02/18/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700064,
       "HotSpotResetType": 0,
@@ -3854,6 +3813,7 @@
       "chinaPrice": 12,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.12",
+      "productCodeWegame": "12",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700065,
@@ -3884,6 +3844,7 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700066,
@@ -3914,6 +3875,7 @@
       "chinaPrice": 128,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.128",
+      "productCodeWegame": "128",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700067,
@@ -3943,7 +3905,8 @@
       "saleTypeVal": 1,
       "chinaPrice": 6,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.6",
+      "productCodeSdo": "com.uwocn.06",
+      "productCodeWegame": "6",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700068,
@@ -3974,6 +3937,7 @@
       "chinaPrice": 18,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.18",
+      "productCodeWegame": "18",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700069,
@@ -4004,6 +3968,7 @@
       "chinaPrice": 68,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.68",
+      "productCodeWegame": "68",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700070,
@@ -4034,7 +3999,8 @@
       "saleTypeVal": 1,
       "chinaPrice": 6,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.6",
+      "productCodeSdo": "com.uwocn.06",
+      "productCodeWegame": "6",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700071,
@@ -4067,6 +4033,7 @@
       "chinaPrice": 18,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.18",
+      "productCodeWegame": "18",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700072,
@@ -4099,13 +4066,14 @@
       "chinaPrice": 128,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.128",
+      "productCodeWegame": "128",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700073,
       "durationHours": 250,
       "HotSpotResetType": 0,
       "productIcon": "WT_CN_Goods012_Sprite",
-      "productDesc": "250시간 분량의 가속권을 제공합니다.",
+      "productDesc": "240시간 분량의 가속권을 제공합니다.",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
@@ -4129,7 +4097,8 @@
       "saleTypeVal": 1,
       "chinaPrice": 6,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.6",
+      "productCodeSdo": "com.uwocn.06",
+      "productCodeWegame": "6",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700074,
@@ -4160,6 +4129,7 @@
       "chinaPrice": 12,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.12",
+      "productCodeWegame": "12",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700075,
@@ -4190,6 +4160,7 @@
       "chinaPrice": 128,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.128",
+      "productCodeWegame": "128",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700076,
@@ -4220,6 +4191,7 @@
       "chinaPrice": 12,
       "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.12",
+      "productCodeWegame": "12",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700077,
@@ -4249,6 +4221,7 @@
       "chinaPrice": 128,
       "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.128",
+      "productCodeWegame": "128",
       "salePointType": 2,
       "isEndDateMake": false,
       "productRewardFixedId": 95700078,
@@ -4266,7 +4239,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 91000,
@@ -4278,7 +4251,8 @@
       "saleTypeVal": 1,
       "chinaPrice": 6,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.6",
+      "productCodeSdo": "com.uwocn.06",
+      "productCodeWegame": "6",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -4286,7 +4260,7 @@
           "Count": 15
         }
       ],
-      "saleEndDate": "2026/07/29/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700079,
       "HotSpotResetType": 0,
@@ -4306,7 +4280,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 91001,
@@ -4321,7 +4295,13 @@
       "salePointId": 100001,
       "salePointVal": 0,
       "previousId": 10510001,
-      "saleEndDate": "2026/07/29/00:00:00",
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 15
+        }
+      ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700080,
       "HotSpotResetType": 0,
@@ -4341,7 +4321,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 91002,
@@ -4354,9 +4334,16 @@
       "chinaPrice": 12,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.12",
+      "productCodeWegame": "12",
       "salePointType": 2,
       "previousId": 10510002,
-      "saleEndDate": "2026/07/29/00:00:00",
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 15
+        }
+      ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700081,
       "HotSpotResetType": 0,
@@ -4376,7 +4363,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 91003,
@@ -4391,7 +4378,13 @@
       "salePointId": 100001,
       "salePointVal": 0,
       "previousId": 10510003,
-      "saleEndDate": "2026/07/29/00:00:00",
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 15
+        }
+      ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700082,
       "HotSpotResetType": 0,
@@ -4411,7 +4404,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 91004,
@@ -4424,9 +4417,16 @@
       "chinaPrice": 18,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.18",
+      "productCodeWegame": "18",
       "salePointType": 2,
       "previousId": 10510004,
-      "saleEndDate": "2026/07/29/00:00:00",
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 15
+        }
+      ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700083,
       "HotSpotResetType": 0,
@@ -4446,7 +4446,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 91005,
@@ -4461,7 +4461,13 @@
       "salePointId": 100001,
       "salePointVal": 0,
       "previousId": 10510005,
-      "saleEndDate": "2026/07/29/00:00:00",
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 15
+        }
+      ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700084,
       "HotSpotResetType": 0,
@@ -4481,7 +4487,7 @@
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
-      "isTermsCheckHideDisplay": true,
+      "isTermsCheckHideDisplay": false,
       "isSaleReturnUser": false,
       "shopCase": 1,
       "productOrder": 91006,
@@ -4494,9 +4500,16 @@
       "chinaPrice": 68,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.68",
+      "productCodeWegame": "68",
       "salePointType": 2,
       "previousId": 10510006,
-      "saleEndDate": "2026/07/29/00:00:00",
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 15
+        }
+      ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700085,
       "HotSpotResetType": 0,
@@ -4530,7 +4543,8 @@
       "saleTypeVal": 1,
       "chinaPrice": 6,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.6",
+      "productCodeSdo": "com.uwocn.06",
+      "productCodeWegame": "6",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -4538,7 +4552,7 @@
           "Count": 15
         }
       ],
-      "saleEndDate": "2026/07/29/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
       "productIcon": "WT_CN_Goods018_Sprite",
@@ -4566,6 +4580,7 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -4573,7 +4588,7 @@
           "Count": 15
         }
       ],
-      "saleEndDate": "2026/07/29/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
       "productIcon": "WT_CN_Goods019_Sprite",
@@ -4601,6 +4616,7 @@
       "chinaPrice": 68,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.68",
+      "productCodeWegame": "68",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -4608,7 +4624,7 @@
           "Count": 15
         }
       ],
-      "saleEndDate": "2026/07/29/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
       "productIcon": "WT_CN_Goods020_Sprite",
@@ -4636,7 +4652,8 @@
       "saleTypeVal": 1,
       "chinaPrice": 6,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.6",
+      "productCodeSdo": "com.uwocn.06",
+      "productCodeWegame": "6",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -4644,12 +4661,13 @@
           "Count": 10
         }
       ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331469,
       "productIcon": "WT_CashShop_Pass_Lvup01_Sprite",
       "productDesc": "레벨업 패스 1 전용 추가 보상을 획득할 자격을 부여합니다.",
-      "bannerType": 1,
+      "bannerType": 2,
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9989,
@@ -4680,6 +4698,7 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -4687,12 +4706,13 @@
           "Count": 20
         }
       ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331470,
       "productIcon": "WT_CashShop_Pass_Lvup02_Sprite",
       "productDesc": "레벨업 패스 2 전용 추가 보상을 획득할 자격을 부여합니다.",
-      "bannerType": 1,
+      "bannerType": 2,
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9988,
@@ -4723,6 +4743,7 @@
       "chinaPrice": 68,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.68",
+      "productCodeWegame": "68",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -4730,12 +4751,13 @@
           "Count": 30
         }
       ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331471,
       "productIcon": "WT_CashShop_Pass_Lvup03_Sprite",
       "productDesc": "레벨업 패스 3 전용 추가 보상을 획득할 자격을 부여합니다.",
-      "bannerType": 1,
+      "bannerType": 2,
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9987,
@@ -4766,6 +4788,7 @@
       "chinaPrice": 128,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.128",
+      "productCodeWegame": "128",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -4773,12 +4796,13 @@
           "Count": 40
         }
       ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331472,
       "productIcon": "WT_CashShop_Pass_Lvup04_Sprite",
       "productDesc": "레벨업 패스 4 전용 추가 보상을 획득할 자격을 부여합니다.",
-      "bannerType": 1,
+      "bannerType": 2,
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9986,
@@ -4809,6 +4833,7 @@
       "chinaPrice": 198,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.198",
+      "productCodeWegame": "198",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -4816,12 +4841,13 @@
           "Count": 50
         }
       ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331473,
       "productIcon": "WT_CashShop_Pass_Lvup05_Sprite",
       "productDesc": "레벨업 패스 5 전용 추가 보상을 획득할 자격을 부여합니다.",
-      "bannerType": 1,
+      "bannerType": 2,
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9985,
@@ -4852,6 +4878,7 @@
       "chinaPrice": 328,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.328",
+      "productCodeWegame": "328",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -4859,12 +4886,13 @@
           "Count": 60
         }
       ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331474,
       "productIcon": "WT_CashShop_Pass_Lvup06_Sprite",
       "productDesc": "레벨업 패스 6 전용 추가 보상을 획득할 자격을 부여합니다.",
-      "bannerType": 1,
+      "bannerType": 2,
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9984,
@@ -4895,6 +4923,7 @@
       "chinaPrice": 328,
       "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.328",
+      "productCodeWegame": "328",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -4902,12 +4931,13 @@
           "Count": 70
         }
       ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331475,
       "productIcon": "WT_CashShop_Pass_Lvup06_Sprite",
       "productDesc": "레벨업 패스 7 전용 추가 보상을 획득할 자격을 부여합니다.",
-      "bannerType": 1,
+      "bannerType": 2,
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9983,
@@ -4938,6 +4968,7 @@
       "chinaPrice": 328,
       "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.328",
+      "productCodeWegame": "328",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -4945,12 +4976,13 @@
           "Count": 80
         }
       ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331476,
       "productIcon": "WT_CashShop_Pass_Lvup06_Sprite",
       "productDesc": "레벨업 패스 8 전용 추가 보상을 획득할 자격을 부여합니다.",
-      "bannerType": 1,
+      "bannerType": 2,
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9982,
@@ -4981,6 +5013,7 @@
       "chinaPrice": 328,
       "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.328",
+      "productCodeWegame": "328",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -4988,12 +5021,13 @@
           "Count": 90
         }
       ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331477,
       "productIcon": "WT_CashShop_Pass_Lvup06_Sprite",
       "productDesc": "레벨업 패스 9 전용 추가 보상을 획득할 자격을 부여합니다.",
-      "bannerType": 1,
+      "bannerType": 2,
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9981,
@@ -5024,6 +5058,7 @@
       "chinaPrice": 328,
       "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.328",
+      "productCodeWegame": "328",
       "salePointType": 2,
       "contentsTerms": [
         {
@@ -5031,12 +5066,13 @@
           "Count": 100
         }
       ],
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331478,
       "productIcon": "WT_CashShop_Pass_Lvup06_Sprite",
       "productDesc": "레벨업 패스 10 전용 추가 보상을 획득할 자격을 부여합니다.",
-      "bannerType": 1,
+      "bannerType": 2,
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9980,
@@ -5067,8 +5103,9 @@
       "chinaPrice": 98,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.98",
+      "productCodeWegame": "98",
       "salePointType": 2,
-      "saleEndDate": "2026/01/23/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
       "eventPageId": 99331479,
@@ -5086,7 +5123,7 @@
       "recommendationOrder1": 19982,
       "passGroup": 1,
       "percentageType": 2,
-      "percentageValue": 2058
+      "percentageValue": 1803
     },
     "10511102": {
       "id": 10511102,
@@ -5108,9 +5145,10 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "previousId": 10511101,
-      "saleEndDate": "2026/01/23/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
       "buffGroup": 7,
@@ -5153,7 +5191,7 @@
     },
     "10511201": {
       "id": 10511201,
-      "productName": "CBT 항해사 패스",
+      "productName": "CBT 패스",
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": false,
@@ -5170,8 +5208,9 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
-      "saleEndDate": "2026/01/26/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
       "eventPageId": 99331480,
@@ -5181,7 +5220,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9978,
-      "eventImage": "WT_CN_RecommandedBanner022_Sprite",
+      "eventImage": "WT_CN_RecommandedBanner023_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationLevelMin": 1,
@@ -5189,11 +5228,11 @@
       "recommendationOrder1": 19980,
       "passGroup": 2,
       "percentageType": 2,
-      "percentageValue": 2009
+      "percentageValue": 1566
     },
     "10511202": {
       "id": 10511202,
-      "productName": "CBT 항해사 프리미엄 패스",
+      "productName": "CBT 프리미엄 패스",
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": false,
@@ -5210,9 +5249,10 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "previousId": 10511201,
-      "saleEndDate": "2026/01/26/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
       "buffGroup": 8,
@@ -5250,7 +5290,7 @@
     },
     "10511203": {
       "id": 10511203,
-      "productName": "CBT 고급 항해사 패스",
+      "productName": "CBT 고급 패스",
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": false,
@@ -5267,8 +5307,9 @@
       "chinaPrice": 68,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.68",
+      "productCodeWegame": "68",
       "salePointType": 2,
-      "saleEndDate": "2026/01/26/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
       "eventPageId": 99331481,
@@ -5278,7 +5319,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9977,
-      "eventImage": "WT_CN_RecommandedBanner023_Sprite",
+      "eventImage": "WT_CN_RecommandedBanner022_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationLevelMin": 1,
@@ -5286,11 +5327,11 @@
       "recommendationOrder1": 19978,
       "passGroup": 3,
       "percentageType": 2,
-      "percentageValue": 2011
+      "percentageValue": 1830
     },
     "10511204": {
       "id": 10511204,
-      "productName": "CBT 고급 항해사 프리미엄 패스",
+      "productName": "CBT 고급 프리미엄 패스",
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": false,
@@ -5307,9 +5348,10 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "previousId": 10511203,
-      "saleEndDate": "2026/01/26/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
       "buffGroup": 9,
@@ -5365,8 +5407,9 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
-      "saleEndDate": "2026/01/09/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
       "eventPageId": 99331482,
@@ -5402,9 +5445,10 @@
       "chinaPrice": 30,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
       "previousId": 10511301,
-      "saleEndDate": "2026/01/09/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "HotSpotResetType": 0,
       "buffGroup": 10,
@@ -5446,11 +5490,12 @@
       "productType": 1,
       "saleType": 5,
       "saleTypeVal": 1,
-      "chinaPrice": 328,
+      "chinaPrice": 128,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.328",
+      "productCodeSdo": "com.uwocn.128",
+      "productCodeWegame": "128",
       "salePointType": 2,
-      "saleEndDate": "2026/01/09/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700086,
       "HotSpotResetType": 0,
@@ -5464,77 +5509,11 @@
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
-      "percentageValue": 250
+      "percentageValue": 183
     },
     "10512002": {
       "id": 10512002,
       "productName": "특전. 공용 계약서 패키지",
-      "isSoldOutMake": false,
-      "isToBuy": true,
-      "isRefund": true,
-      "isTermsCheckHideDisplay": true,
-      "isSaleReturnUser": false,
-      "shopCase": 1,
-      "productOrder": 180001,
-      "productSize": 2,
-      "productCategory": 3,
-      "subProductCategory": 103,
-      "productType": 1,
-      "saleType": 5,
-      "saleTypeVal": 1,
-      "chinaPrice": 328,
-      "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.328",
-      "salePointType": 2,
-      "saleEndDate": "2026/01/09/00:00:00",
-      "isEndDateMake": true,
-      "productRewardFixedId": 95700087,
-      "HotSpotResetType": 0,
-      "productIcon": "WT_CN_EventPkg0102_Sprite",
-      "productDesc": "항해사 공용 계약서를 제공합니다.",
-      "eventName": "##",
-      "eventDesc": "##",
-      "viewSchedule": false,
-      "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 251
-    },
-    "10512003": {
-      "id": 10512003,
-      "productName": "특전. 장비 선택 패키지",
-      "isSoldOutMake": false,
-      "isToBuy": true,
-      "isRefund": true,
-      "isTermsCheckHideDisplay": true,
-      "isSaleReturnUser": false,
-      "shopCase": 1,
-      "productOrder": 180002,
-      "productSize": 2,
-      "productCategory": 3,
-      "subProductCategory": 103,
-      "productType": 1,
-      "saleType": 5,
-      "saleTypeVal": 1,
-      "chinaPrice": 68,
-      "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.68",
-      "salePointType": 2,
-      "saleEndDate": "2026/01/09/00:00:00",
-      "isEndDateMake": true,
-      "productRewardFixedId": 95700088,
-      "HotSpotResetType": 0,
-      "productIcon": "WT_CN_NewbiPkg003_Sprite",
-      "productDesc": "B등급 장비 선택 상자를 제공합니다.",
-      "eventName": "##",
-      "eventDesc": "##",
-      "viewSchedule": false,
-      "recommendationOrderHiddenView": true,
-      "percentageType": 2,
-      "percentageValue": 250
-    },
-    "10512004": {
-      "id": 10512004,
-      "productName": "특전. 부품 선택 패키지",
       "isSoldOutMake": false,
       "isToBuy": true,
       "isRefund": true,
@@ -5548,22 +5527,91 @@
       "productType": 1,
       "saleType": 5,
       "saleTypeVal": 1,
-      "chinaPrice": 68,
+      "chinaPrice": 648,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.68",
+      "productCodeSdo": "com.uwocn.648",
+      "productCodeWegame": "648",
       "salePointType": 2,
-      "saleEndDate": "2026/01/09/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
-      "productRewardFixedId": 95700089,
+      "productRewardFixedId": 95700087,
       "HotSpotResetType": 0,
-      "productIcon": "WT_CN_NewbiPkg004_Sprite",
-      "productDesc": "B등급 부품 선택 상자를 제공합니다.",
+      "productIcon": "WT_CN_EventPkg0102_Sprite",
+      "productDesc": "항해사 공용 계약서를 제공합니다.",
       "eventName": "##",
       "eventDesc": "##",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
-      "percentageValue": 250
+      "percentageValue": 173
+    },
+    "10512003": {
+      "id": 10512003,
+      "productName": "특전. 장비 패키지",
+      "isSoldOutMake": false,
+      "isToBuy": true,
+      "isRefund": true,
+      "isTermsCheckHideDisplay": true,
+      "isSaleReturnUser": false,
+      "shopCase": 1,
+      "productOrder": 180001,
+      "productSize": 2,
+      "productCategory": 3,
+      "subProductCategory": 103,
+      "productType": 1,
+      "saleType": 5,
+      "saleTypeVal": 1,
+      "chinaPrice": 128,
+      "productLocalBitflag": 192,
+      "productCodeSdo": "com.uwocn.128",
+      "productCodeWegame": "128",
+      "salePointType": 2,
+      "saleEndDate": "2026/02/05/00:00:00",
+      "isEndDateMake": true,
+      "productRewardFixedId": 95700088,
+      "HotSpotResetType": 0,
+      "productIcon": "WT_CN_NewbiPkg003_Sprite",
+      "productDesc": "초보자에게 특화된 장비 12종을 제공합니다.",
+      "eventName": "##",
+      "eventDesc": "##",
+      "viewSchedule": false,
+      "recommendationOrderHiddenView": true,
+      "percentageType": 2,
+      "percentageValue": 210
+    },
+    "10512004": {
+      "id": 10512004,
+      "productName": "특전. 부품 패키지",
+      "isSoldOutMake": false,
+      "isToBuy": true,
+      "isRefund": true,
+      "isTermsCheckHideDisplay": true,
+      "isSaleReturnUser": false,
+      "shopCase": 1,
+      "productOrder": 180002,
+      "productSize": 2,
+      "productCategory": 3,
+      "subProductCategory": 103,
+      "productType": 1,
+      "saleType": 5,
+      "saleTypeVal": 1,
+      "chinaPrice": 128,
+      "productLocalBitflag": 192,
+      "productCodeSdo": "com.uwocn.128",
+      "productCodeWegame": "128",
+      "salePointType": 2,
+      "saleEndDate": "2026/02/05/00:00:00",
+      "isEndDateMake": true,
+      "productRewardFixedId": 95700089,
+      "HotSpotResetType": 0,
+      "productIcon": "WT_CN_NewbiPkg004_Sprite",
+      "productDesc": "초보자에게 특화된 부품 6종을 제공합니다.",
+      "eventName": "##",
+      "eventDesc": "##",
+      "viewSchedule": false,
+      "recommendationOrderHiddenView": true,
+      "percentageType": 2,
+      "percentageValue": 210
     },
     "10512005": {
       "id": 10512005,
@@ -5584,9 +5632,10 @@
       "saleTypeVal": 1,
       "chinaPrice": 6,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.6",
+      "productCodeSdo": "com.uwocn.06",
+      "productCodeWegame": "6",
       "salePointType": 2,
-      "saleEndDate": "2026/01/09/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700090,
       "HotSpotResetType": 0,
@@ -5596,7 +5645,8 @@
       "eventDesc": "##",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 1666
     },
     "10512006": {
       "id": 10512006,
@@ -5618,10 +5668,10 @@
       "productLocalBitflag": 192,
       "salePointType": 1,
       "salePointId": 100004,
-      "salePointVal": 1000,
+      "salePointVal": 1250,
       "mileageBonusPer": 200,
       "previousId": 10512005,
-      "saleEndDate": "2026/01/09/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700091,
       "HotSpotResetType": 0,
@@ -5631,7 +5681,8 @@
       "eventDesc": "##",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 160
     },
     "10512007": {
       "id": 10512007,
@@ -5653,9 +5704,10 @@
       "chinaPrice": 18,
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.18",
+      "productCodeWegame": "18",
       "salePointType": 2,
       "previousId": 10512006,
-      "saleEndDate": "2026/01/09/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700092,
       "HotSpotResetType": 0,
@@ -5665,7 +5717,8 @@
       "eventDesc": "##",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 341
     },
     "10512008": {
       "id": 10512008,
@@ -5690,7 +5743,7 @@
       "salePointVal": 2000,
       "mileageBonusPer": 200,
       "previousId": 10512007,
-      "saleEndDate": "2026/01/09/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700093,
       "HotSpotResetType": 0,
@@ -5700,7 +5753,8 @@
       "eventDesc": "##",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 165
     },
     "10512009": {
       "id": 10512009,
@@ -5719,12 +5773,13 @@
       "productType": 1,
       "saleType": 5,
       "saleTypeVal": 1,
-      "chinaPrice": 30,
+      "chinaPrice": 68,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.30",
+      "productCodeSdo": "com.uwocn.68",
+      "productCodeWegame": "68",
       "salePointType": 2,
       "previousId": 10512008,
-      "saleEndDate": "2026/01/09/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700094,
       "HotSpotResetType": 0,
@@ -5737,7 +5792,8 @@
       "eventImage": "WT_CN_RecommandedBanner025_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 455
     },
     "10512010": {
       "id": 10512010,
@@ -5755,11 +5811,12 @@
       "productType": 1,
       "saleType": 5,
       "saleTypeVal": 1,
-      "chinaPrice": 12,
+      "chinaPrice": 98,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.12",
+      "productCodeSdo": "com.uwocn.98",
+      "productCodeWegame": "98",
       "salePointType": 2,
-      "saleEndDate": "2026/01/09/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700095,
       "HotSpotResetType": 0,
@@ -5771,7 +5828,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29981,
       "percentageType": 2,
-      "percentageValue": 166
+      "percentageValue": 244
     },
     "10512011": {
       "id": 10512011,
@@ -5789,11 +5846,12 @@
       "productType": 1,
       "saleType": 5,
       "saleTypeVal": 1,
-      "chinaPrice": 12,
+      "chinaPrice": 98,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.12",
+      "productCodeSdo": "com.uwocn.98",
+      "productCodeWegame": "98",
       "salePointType": 2,
-      "saleEndDate": "2026/01/09/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700096,
       "HotSpotResetType": 0,
@@ -5805,7 +5863,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29980,
       "percentageType": 2,
-      "percentageValue": 166
+      "percentageValue": 244
     },
     "10512012": {
       "id": 10512012,
@@ -5823,11 +5881,12 @@
       "productType": 1,
       "saleType": 5,
       "saleTypeVal": 1,
-      "chinaPrice": 12,
+      "chinaPrice": 98,
       "productLocalBitflag": 192,
-      "productCodeSdo": "com.uwocn.12",
+      "productCodeSdo": "com.uwocn.98",
+      "productCodeWegame": "98",
       "salePointType": 2,
-      "saleEndDate": "2026/01/09/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700097,
       "HotSpotResetType": 0,
@@ -5839,7 +5898,7 @@
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29979,
       "percentageType": 2,
-      "percentageValue": 166
+      "percentageValue": 244
     },
     "10512013": {
       "id": 10512013,
@@ -5858,10 +5917,11 @@
       "saleType": 5,
       "saleTypeVal": 1,
       "chinaPrice": 648,
-      "productLocalBitflag": 192,
+      "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.648",
+      "productCodeWegame": "648",
       "salePointType": 2,
-      "saleEndDate": "2026/01/09/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700098,
       "HotSpotResetType": 0,
@@ -5871,7 +5931,8 @@
       "eventDesc": "##",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 111
     },
     "10512014": {
       "id": 10512014,
@@ -5890,10 +5951,11 @@
       "saleType": 5,
       "saleTypeVal": 1,
       "chinaPrice": 648,
-      "productLocalBitflag": 192,
+      "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.648",
+      "productCodeWegame": "648",
       "salePointType": 2,
-      "saleEndDate": "2026/01/09/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700099,
       "HotSpotResetType": 0,
@@ -5903,7 +5965,8 @@
       "eventDesc": "##",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 111
     },
     "10512015": {
       "id": 10512015,
@@ -5922,10 +5985,11 @@
       "saleType": 5,
       "saleTypeVal": 1,
       "chinaPrice": 648,
-      "productLocalBitflag": 192,
+      "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.648",
+      "productCodeWegame": "648",
       "salePointType": 2,
-      "saleEndDate": "2026/01/09/00:00:00",
+      "saleEndDate": "2026/02/05/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700100,
       "HotSpotResetType": 0,
@@ -5938,7 +6002,8 @@
       "eventImage": "WT_CN_RecommandedBanner026_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
-      "percentageType": 0
+      "percentageType": 2,
+      "percentageValue": 111
     },
     "10512034": {
       "id": 10512034,
@@ -5952,16 +6017,15 @@
       "productOrder": 210006,
       "productSize": 2,
       "productCategory": 3,
-      "subProductCategory": 104,
+      "subProductCategory": 102,
       "productType": 1,
       "saleType": 5,
       "saleTypeVal": 1,
       "chinaPrice": 30,
-      "productLocalBitflag": 192,
+      "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.30",
+      "productCodeWegame": "30",
       "salePointType": 2,
-      "saleStartDate": "2026/01/01/00:00:00",
-      "saleEndDate": "2026/01/08/00:00:00",
       "isEndDateMake": true,
       "productRewardFixedId": 95700101,
       "HotSpotResetType": 0,

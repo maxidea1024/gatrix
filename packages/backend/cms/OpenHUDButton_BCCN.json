@@ -1,0 +1,122 @@
+{
+  ":OpenHUDButton": {
+    ":type": {
+      "id": "key",
+      "contentsTerms": [
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        }
+      ]
+    },
+    ":required": {},
+    ":min": {
+      "contentsTerms": [
+        {
+          "Id": 81000000
+        }
+      ]
+    },
+    ":max": {
+      "contentsTerms": [
+        {
+          "Id": 81999999
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "contentsTerms": [
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        }
+      ]
+    }
+  },
+  "OpenHUDButton": {
+    "1": {
+      "id": 1,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 99
+        }
+      ]
+    },
+    "2": {
+      "id": 2,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 0
+        }
+      ]
+    },
+    "3": {
+      "id": 3,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 0
+        }
+      ]
+    },
+    "4": {
+      "id": 4,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 99
+        }
+      ]
+    },
+    "5": {
+      "id": 5,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 0
+        }
+      ]
+    },
+    "6": {
+      "id": 6,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 0
+        }
+      ]
+    },
+    "7": {
+      "id": 7,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 0
+        }
+      ]
+    },
+    "8": {
+      "id": 8,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 0
+        }
+      ]
+    },
+    "9": {
+      "id": 9,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 25
+        }
+      ]
+    }
+  }
+}

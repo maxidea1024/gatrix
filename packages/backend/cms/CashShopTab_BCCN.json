@@ -30,7 +30,7 @@
   "CashShopTab": {
     "101": {
       "id": 101,
-      "sortOrder": 1,
+      "sortOrder": 4,
       "productCategory": 3,
       "productSize": 1,
       "name": "특별",
@@ -39,7 +39,7 @@
     },
     "102": {
       "id": 102,
-      "sortOrder": 2,
+      "sortOrder": 1,
       "productCategory": 3,
       "productSize": 1,
       "name": "이벤트",
@@ -48,7 +48,7 @@
     },
     "103": {
       "id": 103,
-      "sortOrder": 3,
+      "sortOrder": 2,
       "productCategory": 3,
       "productSize": 1,
       "name": "특전",
@@ -58,7 +58,7 @@
     },
     "104": {
       "id": 104,
-      "sortOrder": 4,
+      "sortOrder": 3,
       "productCategory": 3,
       "productSize": 1,
       "name": "특화",
@@ -210,10 +210,10 @@
       "productEntryType": 1,
       "useEventButton": false
     },
-    "1301": {
-      "id": 1301,
-      "sortOrder": 1,
-      "productCategory": 13,
+    "110": {
+      "id": 110,
+      "sortOrder": 10,
+      "productCategory": 3,
       "productSize": 1,
       "name": "선박 외형",
       "productEntryType": 2,

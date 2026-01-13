@@ -12449,6 +12449,13 @@
       "questId": 82996338,
       "ratio": 1000000,
       "isMustAppear": true
+    },
+    "84001915": {
+      "id": 84001915,
+      "group": 11000094,
+      "questId": 82996339,
+      "ratio": 1000000,
+      "isMustAppear": true
     }
   }
 }

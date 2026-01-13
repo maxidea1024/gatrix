@@ -409,7 +409,7 @@
       "name": "화방선",
       "camouflageOrder": 400,
       "localBitflag": 192,
-      "shipBodyShapeId": 45000152,
+      "shipBodyShapeId": 45000357,
       "shipSize": 3,
       "shipcamouflageIcon": "WT_Ship_CN_PavilionBoat_Sprite",
       "waterSplash": "P_Ship_Move_WaterSplash_W_Gally_M",

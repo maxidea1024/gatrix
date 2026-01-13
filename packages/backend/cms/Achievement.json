@@ -19067,6 +19067,30 @@
       "reward": 94011001,
       "category": 1
     },
+    "80006838": {
+      "id": 80006838,
+      "name": "{0}의 단골 선단",
+      "localBitFlag": 0,
+      "order": 594,
+      "step": 1,
+      "achievementType": 0,
+      "jobType": 1,
+      "isStackBeforeOpen": true,
+      "isHidden": false,
+      "achievementTermsId": 87000012,
+      "achievementTarget": [
+        11000225
+      ],
+      "achievementCount": 5,
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "reward": 94011001,
+      "category": 1
+    },
     "80007331": {
       "id": 80007331,
       "name": "시장을 읽는 눈",
@@ -35480,6 +35504,80 @@
       "reward": 94011003,
       "category": 4
     },
+    "80009126": {
+      "id": 80009126,
+      "name": "{0} 발전의 일등공신",
+      "localBitFlag": 0,
+      "order": 920,
+      "step": 1,
+      "achievementType": 0,
+      "jobType": 2,
+      "isStackBeforeOpen": true,
+      "isHidden": false,
+      "achievementTermsId": 87000016,
+      "achievementTarget": [
+        11000225
+      ],
+      "achievementCount": 5,
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "reward": 94011001,
+      "category": 4
+    },
+    "80009127": {
+      "id": 80009127,
+      "name": "{0} 발전의 일등공신",
+      "localBitFlag": 0,
+      "order": 920,
+      "step": 2,
+      "achievementType": 0,
+      "jobType": 2,
+      "previousId": 80009126,
+      "isStackBeforeOpen": true,
+      "isHidden": false,
+      "achievementTermsId": 87000016,
+      "achievementTarget": [
+        11000225
+      ],
+      "achievementCount": 10,
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "reward": 94011002,
+      "category": 4
+    },
+    "80009128": {
+      "id": 80009128,
+      "name": "{0} 발전의 일등공신",
+      "localBitFlag": 0,
+      "order": 920,
+      "step": 3,
+      "achievementType": 0,
+      "jobType": 2,
+      "previousId": 80009127,
+      "isStackBeforeOpen": true,
+      "isHidden": false,
+      "achievementTermsId": 87000016,
+      "achievementTarget": [
+        11000225
+      ],
+      "achievementCount": 30,
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "reward": 94011003,
+      "category": 4
+    },
     "80009611": {
       "id": 80009611,
       "name": "투자계의 큰손",
@@ -40790,6 +40888,30 @@
       "reward": 94011001,
       "category": 4
     },
+    "80010841": {
+      "id": 80010841,
+      "name": "{0}의 귀빈",
+      "localBitFlag": 0,
+      "order": 1245,
+      "step": 1,
+      "achievementType": 0,
+      "jobType": 2,
+      "isStackBeforeOpen": true,
+      "isHidden": false,
+      "achievementTermsId": 87000019,
+      "achievementTarget": [
+        11000225
+      ],
+      "achievementCount": 10000000,
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "reward": 94011001,
+      "category": 4
+    },
     "80011336": {
       "id": 80011336,
       "name": "아낌없이 주는 나무",
@@ -41717,7 +41839,7 @@
     "80014004": {
       "id": 80014004,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2028,
       "step": 1,
       "achievementType": 0,
@@ -42053,7 +42175,7 @@
     "80014018": {
       "id": 80014018,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2042,
       "step": 1,
       "achievementType": 0,
@@ -42485,7 +42607,7 @@
     "80014036": {
       "id": 80014036,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2060,
       "step": 1,
       "achievementType": 0,
@@ -42629,7 +42751,7 @@
     "80014042": {
       "id": 80014042,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2066,
       "step": 1,
       "achievementType": 0,
@@ -42917,7 +43039,7 @@
     "80014054": {
       "id": 80014054,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2078,
       "step": 1,
       "achievementType": 0,
@@ -43901,7 +44023,7 @@
     "80014095": {
       "id": 80014095,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2119,
       "step": 1,
       "achievementType": 0,
@@ -44021,7 +44143,7 @@
     "80014100": {
       "id": 80014100,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2124,
       "step": 1,
       "achievementType": 0,
@@ -45197,7 +45319,7 @@
     "80014149": {
       "id": 80014149,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2173,
       "step": 1,
       "achievementType": 0,
@@ -45653,7 +45775,7 @@
     "80014168": {
       "id": 80014168,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2192,
       "step": 1,
       "achievementType": 0,
@@ -46229,7 +46351,7 @@
     "80014192": {
       "id": 80014192,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2216,
       "step": 1,
       "achievementType": 0,
@@ -47597,7 +47719,7 @@
     "80014249": {
       "id": 80014249,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2273,
       "step": 1,
       "achievementType": 0,
@@ -49469,7 +49591,7 @@
     "80014327": {
       "id": 80014327,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2351,
       "step": 1,
       "achievementType": 0,
@@ -50141,7 +50263,7 @@
     "80014355": {
       "id": 80014355,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2379,
       "step": 1,
       "achievementType": 0,
@@ -50237,7 +50359,7 @@
     "80014359": {
       "id": 80014359,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2383,
       "step": 1,
       "achievementType": 0,
@@ -50429,7 +50551,7 @@
     "80014367": {
       "id": 80014367,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2391,
       "step": 1,
       "achievementType": 0,
@@ -50453,7 +50575,7 @@
     "80014368": {
       "id": 80014368,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2392,
       "step": 1,
       "achievementType": 0,
@@ -50837,7 +50959,7 @@
     "80014384": {
       "id": 80014384,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2408,
       "step": 1,
       "achievementType": 0,
@@ -50861,7 +50983,7 @@
     "80014385": {
       "id": 80014385,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2409,
       "step": 1,
       "achievementType": 0,
@@ -51317,7 +51439,7 @@
     "80014404": {
       "id": 80014404,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2428,
       "step": 1,
       "achievementType": 0,
@@ -51821,7 +51943,7 @@
     "80014425": {
       "id": 80014425,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2449,
       "step": 1,
       "achievementType": 0,
@@ -55259,7 +55381,7 @@
     "80014569": {
       "id": 80014569,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2580,
       "step": 1,
       "achievementType": 0,
@@ -55859,7 +55981,7 @@
     "80015584": {
       "id": 80015584,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5000,
       "step": 1,
       "achievementType": 0,
@@ -56315,7 +56437,7 @@
     "80015603": {
       "id": 80015603,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5019,
       "step": 1,
       "achievementType": 0,
@@ -56723,7 +56845,7 @@
     "80015620": {
       "id": 80015620,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5036,
       "step": 1,
       "achievementType": 0,
@@ -57155,7 +57277,7 @@
     "80015638": {
       "id": 80015638,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5054,
       "step": 1,
       "achievementType": 0,
@@ -57203,7 +57325,7 @@
     "80015640": {
       "id": 80015640,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5056,
       "step": 1,
       "achievementType": 0,
@@ -57275,7 +57397,7 @@
     "80015643": {
       "id": 80015643,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5059,
       "step": 1,
       "achievementType": 0,
@@ -58691,7 +58813,7 @@
     "80015702": {
       "id": 80015702,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5118,
       "step": 1,
       "achievementType": 0,
@@ -60347,7 +60469,7 @@
     "80015774": {
       "id": 80015774,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5186,
       "step": 1,
       "achievementType": 0,
@@ -63803,7 +63925,7 @@
     "80015918": {
       "id": 80015918,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5217,
       "step": 1,
       "achievementType": 0,
@@ -135751,7 +135873,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        16
+        15
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135773,7 +135895,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        16
+        15
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135794,7 +135916,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        20
+        19
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135816,7 +135938,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        20
+        19
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135880,7 +136002,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        38
+        40
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135902,7 +136024,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        38
+        40
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135923,7 +136045,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        58
+        60
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135945,7 +136067,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        58
+        60
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135966,7 +136088,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        65
+        67
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135988,7 +136110,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        65
+        67
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136009,7 +136131,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        76
+        78
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136031,7 +136153,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        76
+        78
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136052,7 +136174,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        103
+        105
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136074,7 +136196,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        103
+        105
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136095,7 +136217,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        116
+        118
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136117,7 +136239,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        116
+        118
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136138,7 +136260,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        122
+        124
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136160,7 +136282,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        122
+        124
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136181,7 +136303,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        126
+        128
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136203,7 +136325,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        126
+        128
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136224,7 +136346,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        142
+        144
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136246,7 +136368,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        142
+        144
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136267,7 +136389,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        145
+        147
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136289,7 +136411,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        145
+        147
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136310,7 +136432,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        148
+        150
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136332,7 +136454,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        148
+        150
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,

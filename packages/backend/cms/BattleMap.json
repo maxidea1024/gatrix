@@ -22990,6 +22990,53 @@
       "setBaseAnchor": false,
       "battleMapLayerId": 69260153
     },
+    "64360154": {
+      "id": 64360154,
+      "name": "중국 조안 첫 전투 튜토리얼",
+      "levelName": "PVE_Bay_01",
+      "tileMapName": "PVE_Bay_01_CN_Joan",
+      "isReflectTopdown": false,
+      "bDriftByCurrent": false,
+      "bgm": 96000023,
+      "maxTurn": 20,
+      "BattleTurnBoostId": 66200002,
+      "weatherChangeTurn": 3,
+      "weatherChangeRate": 300,
+      "weatherStartType": 0,
+      "windChangeTurn": 3,
+      "windChangeRate": 300,
+      "windStartType": 0,
+      "windStartSpeed": 0,
+      "windStartDirection": 0,
+      "windRandDirectionMax": 1,
+      "windRandSpeedMax": 5,
+      "waveChangeTurn": 3,
+      "waveChangeRate": 300,
+      "wave": [
+        "PVE_Bay_01",
+        "PVE_Bay_02",
+        "PVE_Bay_03"
+      ],
+      "waveProb": [
+        100,
+        10,
+        10
+      ],
+      "currentChangeTurn": 3,
+      "currentChangeRate": 300,
+      "current": [
+        "PVE_Bay_01",
+        "PVE_Bay_02",
+        "PVE_Bay_03"
+      ],
+      "currentProb": [
+        100,
+        10,
+        10
+      ],
+      "setBaseAnchor": false,
+      "battleMapLayerId": 69200100
+    },
     "64370001": {
       "id": 64370001,
       "name": "도전_전투 학습1",

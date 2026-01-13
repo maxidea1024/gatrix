@@ -69328,6 +69328,21 @@
         }
       ]
     },
+    "61500475": {
+      "id": 61500475,
+      "name": "수습 해적단_조안_CN1",
+      "shapeId": 15400009,
+      "ship": [
+        {
+          "TemplateId": 62502489,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62502490,
+          "isCapture": false
+        }
+      ]
+    },
     "61700001": {
       "id": 61700001,
       "name": "추석 이벤트_LV5_1",

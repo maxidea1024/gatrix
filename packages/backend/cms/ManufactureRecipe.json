@@ -1301,7 +1301,7 @@
       "id": 100130016,
       "name": "수제 육포",
       "desc": "수제 육포를 만드는 방법입니다.",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "manufactureRecipeGrade": 3,
       "manufactureType": 1,
       "manufactureLv": 5,
@@ -2423,7 +2423,7 @@
       "id": 100130032,
       "name": "특제 스튜",
       "desc": "특제 스튜를 만드는 방법입니다.",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "manufactureRecipeGrade": 3,
       "manufactureType": 1,
       "manufactureLv": 10,
@@ -4218,7 +4218,7 @@
       "id": 100130057,
       "name": "놋쇠",
       "desc": "놋쇠를 만드는 방법입니다.",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "manufactureRecipeGrade": 2,
       "manufactureType": 2,
       "manufactureLv": 2,
@@ -4429,7 +4429,7 @@
       "id": 100130060,
       "name": "바보의 금",
       "desc": "황철석을 찾는 방법입니다. 수정도 찾을 수 있습니다.",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "manufactureRecipeGrade": 1,
       "manufactureType": 2,
       "manufactureLv": 3,
@@ -4558,7 +4558,7 @@
       "id": 100130062,
       "name": "도가니",
       "desc": "도가니를 만드는 방법입니다.",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "manufactureRecipeGrade": 1,
       "manufactureType": 2,
       "manufactureLv": 4,
@@ -5017,7 +5017,7 @@
       "id": 100130069,
       "name": "은",
       "desc": "은을 만드는 방법입니다.",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "manufactureRecipeGrade": 1,
       "manufactureType": 2,
       "manufactureLv": 5,
@@ -5419,7 +5419,7 @@
       "id": 100130075,
       "name": "사금",
       "desc": "사금을 찾는 방법입니다.",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "manufactureRecipeGrade": 3,
       "manufactureType": 2,
       "manufactureLv": 6,
@@ -10227,7 +10227,7 @@
       "id": 100130144,
       "name": "양손검",
       "desc": "양손검을 만드는 방법입니다",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "manufactureRecipeGrade": 3,
       "manufactureType": 2,
       "manufactureLv": 10,
@@ -11448,6 +11448,897 @@
       "defaultGreatSuccessRate": 100,
       "mateAdditionalRate": 10,
       "statConvertValue": 4500
+    },
+    "100130223": {
+      "id": 100130223,
+      "name": "도가니",
+      "desc": "도가니를 만드는 방법입니다",
+      "localBitFlag": 192,
+      "manufactureRecipeGrade": 1,
+      "manufactureType": 2,
+      "manufactureLv": 4,
+      "recipeCategory": 1,
+      "manufactureGroupId": 100140052,
+      "subIngredient": [
+        {
+          "Type": 1,
+          "Target": 24000187,
+          "Quantity": 300
+        },
+        {
+          "Type": 0,
+          "Target": 23520030,
+          "Quantity": 10
+        }
+      ],
+      "workingMateSpecialStat": {
+        "Type": 1,
+        "Val": 2730
+      },
+      "workingMate": [
+        {
+          "AwakenLv": 0,
+          "JobId": 21400001
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21400001
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21400001
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21400015
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21400015
+        }
+      ],
+      "normalRewardFixedId": 94020336,
+      "normalRewardIsCashMarket": false,
+      "criticalRewardFixedId": 94020337,
+      "criticalRewardIsCashMarket": true,
+      "manufactureExp": 56,
+      "manufactureTime": 5,
+      "costEnergy": 2,
+      "costManufacturePoint": 188,
+      "costPoint": {
+        "Type": 100001,
+        "Value": 718000
+      },
+      "manufactureTextGroup": 100150010,
+      "defaultFailRate": 0,
+      "defaultSuccessRate": 9500,
+      "defaultGreatSuccessRate": 500,
+      "mateAdditionalRate": 10,
+      "statConvertValue": 1500
+    },
+    "100130224": {
+      "id": 100130224,
+      "name": "고급 강철",
+      "desc": "고급 강철을 만드는 방법입니다",
+      "localBitFlag": 0,
+      "manufactureRecipeGrade": 4,
+      "manufactureType": 2,
+      "manufactureLv": 15,
+      "recipeCategory": 0,
+      "manufactureGroupId": 100140052,
+      "subIngredient": [
+        {
+          "Type": 1,
+          "Target": 24000159,
+          "Quantity": 300
+        },
+        {
+          "Type": 0,
+          "Target": 23520031,
+          "Quantity": 5
+        },
+        {
+          "Type": 0,
+          "Target": 23520047,
+          "Quantity": 5
+        },
+        {
+          "Type": 0,
+          "Target": 23520033,
+          "Quantity": 5
+        }
+      ],
+      "workingMateSpecialStat": {
+        "Type": 1,
+        "Val": 15330
+      },
+      "workingMate": [
+        {
+          "AwakenLv": 3,
+          "JobId": 21400001
+        },
+        {
+          "AwakenLv": 2,
+          "JobId": 21400001
+        },
+        {
+          "AwakenLv": 1,
+          "JobId": 21400001
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401004
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401004
+        }
+      ],
+      "normalRewardFixedId": 94020338,
+      "normalRewardIsCashMarket": false,
+      "criticalRewardFixedId": 94020339,
+      "criticalRewardIsCashMarket": false,
+      "manufactureExp": 1169,
+      "manufactureTime": 0,
+      "costEnergy": 4,
+      "costManufacturePoint": 1533,
+      "costPoint": {
+        "Type": 100001,
+        "Value": 630000
+      },
+      "manufactureTextGroup": 100150007,
+      "defaultFailRate": 0,
+      "defaultSuccessRate": 9900,
+      "defaultGreatSuccessRate": 100,
+      "mateAdditionalRate": 10,
+      "statConvertValue": 4800
+    },
+    "100130225": {
+      "id": 100130225,
+      "name": "양손검",
+      "desc": "양손검을 만드는 방법입니다",
+      "localBitFlag": 192,
+      "manufactureRecipeGrade": 3,
+      "manufactureType": 2,
+      "manufactureLv": 10,
+      "recipeCategory": 0,
+      "manufactureGroupId": 100140017,
+      "subIngredient": [
+        {
+          "Type": 1,
+          "Target": 24000159,
+          "Quantity": 50
+        },
+        {
+          "Type": 1,
+          "Target": 24000173,
+          "Quantity": 50
+        },
+        {
+          "Type": 0,
+          "Target": 23520033,
+          "Quantity": 3
+        },
+        {
+          "Type": 0,
+          "Target": 23520030,
+          "Quantity": 10
+        }
+      ],
+      "workingMateSpecialStat": {
+        "Type": 4,
+        "Val": 6300
+      },
+      "workingMate": [
+        {
+          "AwakenLv": 1,
+          "JobId": 21400009
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21400009
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21400009
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21400008
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21400008
+        }
+      ],
+      "normalRewardFixedId": 94020340,
+      "normalRewardIsCashMarket": false,
+      "criticalRewardFixedId": 94020341,
+      "criticalRewardIsCashMarket": false,
+      "manufactureExp": 209,
+      "manufactureTime": 5,
+      "costEnergy": 1,
+      "costManufacturePoint": 383,
+      "costPoint": {
+        "Type": 100001,
+        "Value": 79000
+      },
+      "manufactureTextGroup": 100150009,
+      "defaultFailRate": 0,
+      "defaultSuccessRate": 9800,
+      "defaultGreatSuccessRate": 200,
+      "mateAdditionalRate": 10,
+      "statConvertValue": 3300
+    },
+    "100130226": {
+      "id": 100130226,
+      "name": "은",
+      "desc": "은을 만드는 방법입니다",
+      "localBitFlag": 192,
+      "manufactureRecipeGrade": 1,
+      "manufactureType": 2,
+      "manufactureLv": 5,
+      "recipeCategory": 0,
+      "manufactureGroupId": 100140016,
+      "subIngredient": [
+        {
+          "Type": 0,
+          "Target": 23520015,
+          "Quantity": 300
+        },
+        {
+          "Type": 0,
+          "Target": 23520033,
+          "Quantity": 5
+        },
+        {
+          "Type": 0,
+          "Target": 23520030,
+          "Quantity": 10
+        }
+      ],
+      "workingMateSpecialStat": {
+        "Type": 1,
+        "Val": 4130
+      },
+      "workingMate": [
+        {
+          "AwakenLv": 0,
+          "JobId": 21400003
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21400003
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21400003
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401011
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401011
+        }
+      ],
+      "normalRewardFixedId": 94020342,
+      "normalRewardIsCashMarket": false,
+      "criticalRewardFixedId": 94020343,
+      "criticalRewardIsCashMarket": false,
+      "manufactureExp": 106,
+      "manufactureTime": 0,
+      "costEnergy": 2,
+      "costManufacturePoint": 353,
+      "costPoint": {
+        "Type": 100001,
+        "Value": 330000
+      },
+      "manufactureTextGroup": 100150007,
+      "defaultFailRate": 0,
+      "defaultSuccessRate": 9500,
+      "defaultGreatSuccessRate": 500,
+      "mateAdditionalRate": 10,
+      "statConvertValue": 1800
+    },
+    "100130227": {
+      "id": 100130227,
+      "name": "특제 스튜",
+      "desc": "특제 스튜를 만드는 방법입니다",
+      "localBitFlag": 192,
+      "manufactureRecipeGrade": 3,
+      "manufactureType": 1,
+      "manufactureLv": 10,
+      "recipeCategory": 1,
+      "manufactureGroupId": 100140005,
+      "subIngredient": [
+        {
+          "Type": 1,
+          "Target": 24000028,
+          "Quantity": 300
+        },
+        {
+          "Type": 1,
+          "Target": 24000000,
+          "Quantity": 300
+        },
+        {
+          "Type": 1,
+          "Target": 24000081,
+          "Quantity": 50
+        }
+      ],
+      "workingMateSpecialStat": {
+        "Type": 3,
+        "Val": 6650
+      },
+      "workingMate": [
+        {
+          "AwakenLv": 1,
+          "JobId": 21400010
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21400010
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21400010
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21400012
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21400012
+        }
+      ],
+      "normalRewardFixedId": 94020344,
+      "normalRewardIsCashMarket": true,
+      "criticalRewardFixedId": 94020345,
+      "criticalRewardIsCashMarket": true,
+      "manufactureExp": 323,
+      "manufactureTime": 10,
+      "costEnergy": 2,
+      "costManufacturePoint": 612,
+      "costPoint": {
+        "Type": 100001,
+        "Value": 2010000
+      },
+      "manufactureTextGroup": 100150004,
+      "defaultFailRate": 0,
+      "defaultSuccessRate": 9800,
+      "defaultGreatSuccessRate": 200,
+      "mateAdditionalRate": 10,
+      "statConvertValue": 3300
+    },
+    "100130228": {
+      "id": 100130228,
+      "name": "비법 양념",
+      "desc": "비법 양념을 만드는 방법입니다",
+      "localBitFlag": 192,
+      "manufactureRecipeGrade": 1,
+      "manufactureType": 1,
+      "manufactureLv": 3,
+      "recipeCategory": 1,
+      "manufactureGroupId": 100140005,
+      "subIngredient": [
+        {
+          "Type": 1,
+          "Target": 24000067,
+          "Quantity": 50
+        },
+        {
+          "Type": 1,
+          "Target": 24000316,
+          "Quantity": 25
+        },
+        {
+          "Type": 1,
+          "Target": 24000291,
+          "Quantity": 25
+        }
+      ],
+      "workingMateSpecialStat": {
+        "Type": 8,
+        "Val": 4060
+      },
+      "workingMate": [
+        {
+          "AwakenLv": 0,
+          "JobId": 21401012
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401012
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401012
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401014
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401014
+        }
+      ],
+      "normalRewardFixedId": 94020346,
+      "normalRewardIsCashMarket": false,
+      "criticalRewardFixedId": 94020347,
+      "criticalRewardIsCashMarket": false,
+      "manufactureExp": 60,
+      "manufactureTime": 5,
+      "costEnergy": 2,
+      "costManufacturePoint": 282,
+      "costPoint": {
+        "Type": 100001,
+        "Value": 200000
+      },
+      "manufactureTextGroup": 100150001,
+      "defaultFailRate": 0,
+      "defaultSuccessRate": 9500,
+      "defaultGreatSuccessRate": 500,
+      "mateAdditionalRate": 10,
+      "statConvertValue": 1200
+    },
+    "100130229": {
+      "id": 100130229,
+      "name": "수제 육포",
+      "desc": "수제 육포를 만드는 방법입니다",
+      "localBitFlag": 192,
+      "manufactureRecipeGrade": 3,
+      "manufactureType": 1,
+      "manufactureLv": 5,
+      "recipeCategory": 1,
+      "manufactureGroupId": 100140005,
+      "subIngredient": [
+        {
+          "Type": 1,
+          "Target": 24000669,
+          "Quantity": 100
+        },
+        {
+          "Type": 0,
+          "Target": 23520062,
+          "Quantity": 10
+        }
+      ],
+      "workingMateSpecialStat": {
+        "Type": 12,
+        "Val": 6790
+      },
+      "workingMate": [
+        {
+          "AwakenLv": 1,
+          "JobId": 21402013
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402013
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402013
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402015
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402015
+        }
+      ],
+      "normalRewardFixedId": 94020348,
+      "normalRewardIsCashMarket": false,
+      "criticalRewardFixedId": 94020349,
+      "criticalRewardIsCashMarket": false,
+      "manufactureExp": 199,
+      "manufactureTime": 5,
+      "costEnergy": 4,
+      "costManufacturePoint": 733,
+      "costPoint": {
+        "Type": 100001,
+        "Value": 7623000
+      },
+      "manufactureTextGroup": 100150001,
+      "defaultFailRate": 0,
+      "defaultSuccessRate": 9800,
+      "defaultGreatSuccessRate": 200,
+      "mateAdditionalRate": 10,
+      "statConvertValue": 1800
+    },
+    "100130230": {
+      "id": 100130230,
+      "name": "궁중 떡볶이",
+      "desc": "궁중 떡볶이를 만드는 방법입니다",
+      "localBitFlag": 0,
+      "manufactureRecipeGrade": 3,
+      "manufactureType": 1,
+      "manufactureLv": 12,
+      "recipeCategory": 1,
+      "manufactureGroupId": 100140003,
+      "subIngredient": [
+        {
+          "Type": 1,
+          "Target": 24000667,
+          "Quantity": 150
+        },
+        {
+          "Type": 0,
+          "Target": 23520062,
+          "Quantity": 20
+        },
+        {
+          "Type": 1,
+          "Target": 24000673,
+          "Quantity": 50
+        },
+        {
+          "Type": 1,
+          "Target": 24000028,
+          "Quantity": 50
+        }
+      ],
+      "workingMateSpecialStat": {
+        "Type": 12,
+        "Val": 8540
+      },
+      "workingMate": [
+        {
+          "AwakenLv": 1,
+          "JobId": 21402013
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402013
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402013
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402013
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402013
+        }
+      ],
+      "normalRewardFixedId": 94020350,
+      "normalRewardIsCashMarket": false,
+      "criticalRewardFixedId": 94020351,
+      "criticalRewardIsCashMarket": false,
+      "manufactureExp": 3504,
+      "manufactureTime": 20,
+      "costEnergy": 6,
+      "costManufacturePoint": 5837,
+      "costPoint": {
+        "Type": 100001,
+        "Value": 15135000
+      },
+      "manufactureTextGroup": 100150001,
+      "defaultFailRate": 0,
+      "defaultSuccessRate": 9800,
+      "defaultGreatSuccessRate": 200,
+      "mateAdditionalRate": 10,
+      "statConvertValue": 3900
+    },
+    "100130232": {
+      "id": 100130232,
+      "name": "바보의 금",
+      "desc": "바보의 금을 만드는 방법입니다",
+      "localBitFlag": 192,
+      "manufactureRecipeGrade": 1,
+      "manufactureType": 2,
+      "manufactureLv": 3,
+      "recipeCategory": 0,
+      "manufactureGroupId": 100140053,
+      "subIngredient": [
+        {
+          "Type": 0,
+          "Target": 23520015,
+          "Quantity": 100
+        }
+      ],
+      "workingMateSpecialStat": {
+        "Type": 10,
+        "Val": 4270
+      },
+      "workingMate": [
+        {
+          "AwakenLv": 0,
+          "JobId": 21402007
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402007
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402007
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401011
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401011
+        }
+      ],
+      "normalRewardFixedId": 94020352,
+      "normalRewardIsCashMarket": false,
+      "criticalRewardFixedId": 94020356,
+      "criticalRewardIsCashMarket": false,
+      "manufactureExp": 49,
+      "manufactureTime": 0,
+      "costEnergy": 1,
+      "costManufacturePoint": 200,
+      "costPoint": {
+        "Type": 100001,
+        "Value": 1909000
+      },
+      "manufactureTextGroup": 100150000,
+      "defaultFailRate": 0,
+      "defaultSuccessRate": 9500,
+      "defaultGreatSuccessRate": 500,
+      "mateAdditionalRate": 10,
+      "statConvertValue": 1200
+    },
+    "100130233": {
+      "id": 100130233,
+      "name": "사금",
+      "desc": "사금을 만드는 방법입니다",
+      "localBitFlag": 192,
+      "manufactureRecipeGrade": 3,
+      "manufactureType": 2,
+      "manufactureLv": 6,
+      "recipeCategory": 0,
+      "manufactureGroupId": 100140053,
+      "subIngredient": [
+        {
+          "Type": 0,
+          "Target": 23520015,
+          "Quantity": 100
+        }
+      ],
+      "workingMateSpecialStat": {
+        "Type": 10,
+        "Val": 7210
+      },
+      "workingMate": [
+        {
+          "AwakenLv": 1,
+          "JobId": 21402007
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402007
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402007
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401011
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401011
+        }
+      ],
+      "normalRewardFixedId": 94020353,
+      "normalRewardIsCashMarket": false,
+      "criticalRewardFixedId": 94020357,
+      "criticalRewardIsCashMarket": false,
+      "manufactureExp": 172,
+      "manufactureTime": 0,
+      "costEnergy": 2,
+      "costManufacturePoint": 518,
+      "costPoint": {
+        "Type": 100001,
+        "Value": 1904000
+      },
+      "manufactureTextGroup": 100150000,
+      "defaultFailRate": 0,
+      "defaultSuccessRate": 9800,
+      "defaultGreatSuccessRate": 200,
+      "mateAdditionalRate": 10,
+      "statConvertValue": 2100
+    },
+    "100130234": {
+      "id": 100130234,
+      "name": "은 광석",
+      "desc": "은 광석을 만드는 방법입니다",
+      "localBitFlag": 0,
+      "manufactureRecipeGrade": 3,
+      "manufactureType": 2,
+      "manufactureLv": 12,
+      "recipeCategory": 0,
+      "manufactureGroupId": 100140053,
+      "subIngredient": [
+        {
+          "Type": 0,
+          "Target": 23520015,
+          "Quantity": 100
+        }
+      ],
+      "workingMateSpecialStat": {
+        "Type": 10,
+        "Val": 8190
+      },
+      "workingMate": [
+        {
+          "AwakenLv": 1,
+          "JobId": 21402007
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402007
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402007
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401007
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401007
+        }
+      ],
+      "normalRewardFixedId": 94020354,
+      "normalRewardIsCashMarket": false,
+      "criticalRewardFixedId": 94020358,
+      "criticalRewardIsCashMarket": false,
+      "manufactureExp": 413,
+      "manufactureTime": 0,
+      "costEnergy": 2,
+      "costManufacturePoint": 659,
+      "costPoint": {
+        "Type": 100001,
+        "Value": 250000
+      },
+      "manufactureTextGroup": 100150000,
+      "defaultFailRate": 0,
+      "defaultSuccessRate": 9800,
+      "defaultGreatSuccessRate": 200,
+      "mateAdditionalRate": 10,
+      "statConvertValue": 3900
+    },
+    "100130235": {
+      "id": 100130235,
+      "name": "금 광석",
+      "desc": "금 광석을 만드는 방법입니다",
+      "localBitFlag": 0,
+      "manufactureRecipeGrade": 4,
+      "manufactureType": 2,
+      "manufactureLv": 14,
+      "recipeCategory": 0,
+      "manufactureGroupId": 100140053,
+      "subIngredient": [
+        {
+          "Type": 0,
+          "Target": 23520015,
+          "Quantity": 150
+        }
+      ],
+      "workingMateSpecialStat": {
+        "Type": 10,
+        "Val": 22750
+      },
+      "workingMate": [
+        {
+          "AwakenLv": 3,
+          "JobId": 21402007
+        },
+        {
+          "AwakenLv": 2,
+          "JobId": 21402007
+        },
+        {
+          "AwakenLv": 1,
+          "JobId": 21402007
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401007
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21401007
+        }
+      ],
+      "normalRewardFixedId": 94020355,
+      "normalRewardIsCashMarket": false,
+      "criticalRewardFixedId": 94020359,
+      "criticalRewardIsCashMarket": false,
+      "manufactureExp": 1183,
+      "manufactureTime": 0,
+      "costEnergy": 4,
+      "costManufacturePoint": 1666,
+      "costPoint": {
+        "Type": 100001,
+        "Value": 110000
+      },
+      "manufactureTextGroup": 100150000,
+      "defaultFailRate": 0,
+      "defaultSuccessRate": 9900,
+      "defaultGreatSuccessRate": 100,
+      "mateAdditionalRate": 10,
+      "statConvertValue": 4500
+    },
+    "100130236": {
+      "id": 100130236,
+      "name": "구리 광석",
+      "desc": "구리 광석을 만드는 방법입니다",
+      "localBitFlag": 192,
+      "manufactureRecipeGrade": 1,
+      "manufactureType": 2,
+      "manufactureLv": 2,
+      "recipeCategory": 0,
+      "manufactureGroupId": 100140014,
+      "subIngredient": [
+        {
+          "Type": 0,
+          "Target": 23520015,
+          "Quantity": 100
+        }
+      ],
+      "workingMateSpecialStat": {
+        "Type": 12,
+        "Val": 3290
+      },
+      "workingMate": [
+        {
+          "AwakenLv": 0,
+          "JobId": 21401007
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402013
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402014
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402014
+        },
+        {
+          "AwakenLv": 0,
+          "JobId": 21402015
+        }
+      ],
+      "normalRewardFixedId": 94020360,
+      "normalRewardIsCashMarket": false,
+      "criticalRewardFixedId": 94020361,
+      "criticalRewardIsCashMarket": false,
+      "manufactureExp": 29,
+      "manufactureTime": 5,
+      "costEnergy": 1,
+      "costManufacturePoint": 100,
+      "costPoint": {
+        "Type": 100001,
+        "Value": 290000
+      },
+      "manufactureTextGroup": 100150000,
+      "defaultFailRate": 0,
+      "defaultSuccessRate": 9500,
+      "defaultGreatSuccessRate": 500,
+      "mateAdditionalRate": 10,
+      "statConvertValue": 900
     },
     "100138004": {
       "id": 100138004,
