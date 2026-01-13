@@ -3594,23 +3594,510 @@ const ServerListPage: React.FC = () => {
 
       {/* List View */}
       {(services.length > 0 || !isLoading) && viewMode === 'list' && (() => {
-        // First-level grouping for list view
-        const groupServices = () => {
-          if (groupingLevels.length === 0) {
-            return [{ key: '__all__', name: '', services: displayServices }];
-          }
-          const field = groupingLevels[0];
+        // Multi-level group structure for ListView
+        interface ListGroup {
+          id: string;
+          name: string;
+          level: number;
+          fieldName: GroupingField;
+          instances: ServiceInstance[];
+          children?: ListGroup[];
+        }
+
+        // Build multi-level groups recursively
+        const buildListGroups = (items: ServiceInstance[], levels: GroupingField[], currentLevel: number = 0): ListGroup[] => {
+          if (levels.length === 0 || currentLevel >= levels.length) return [];
+          const currentField = levels[currentLevel];
+          const hasMoreLevels = currentLevel + 1 < levels.length;
           const groupMap = new Map<string, ServiceInstance[]>();
-          displayServices.forEach(service => {
-            const value = service.labels[field] || 'Unknown';
+          items.forEach(service => {
+            const value = service.labels[currentField] || 'Unknown';
             if (!groupMap.has(value)) groupMap.set(value, []);
             groupMap.get(value)!.push(service);
           });
           return Array.from(groupMap.entries())
             .sort(([a], [b]) => a.localeCompare(b))
-            .map(([key, services]) => ({ key, name: key === 'Unknown' ? `(${getGroupingLabel(field)} N/A)` : key, services }));
+            .map(([name, instances]) => ({
+              id: levels.slice(0, currentLevel + 1).join('-') + '-' + name,
+              name: name === 'Unknown' ? `(${getGroupingLabel(currentField)} N/A)` : name,
+              level: currentLevel,
+              fieldName: currentField,
+              instances: hasMoreLevels ? [] : instances,
+              children: hasMoreLevels ? buildListGroups(instances, levels, currentLevel + 1) : undefined,
+            }));
         };
-        const groups = groupServices();
+
+        // Collect all instances from a group recursively
+        const collectListInstances = (group: ListGroup): ServiceInstance[] => {
+          if (group.children && group.children.length > 0) return group.children.flatMap(collectListInstances);
+          return group.instances;
+        };
+
+        // Render service row
+        const renderServiceRow = (service: ServiceInstance) => {
+          const serviceKey = `${service.labels.service}-${service.instanceId}`;
+          const updatedStatus = updatedServiceIds.get(serviceKey);
+          const isUpdated = updatedStatus !== undefined;
+          const isNew = newServiceIds.has(serviceKey);
+          const highlightStatus = updatedStatus || service.status;
+          return (
+            <TableRow
+              key={serviceKey}
+              hover
+              sx={{
+                bgcolor: isUpdated
+                  ? (theme) => getHighlightColor(highlightStatus, theme)
+                  : (theme) => getStatusBgColor(service.status, theme),
+                animation: isNew
+                  ? 'appearEffect 0.5s ease-out'
+                  : isUpdated
+                    ? `flashEffect-${highlightStatus} 2s ease-out`
+                    : 'none',
+                '@keyframes appearEffect': {
+                  '0%': { opacity: 0, transform: 'scale(0.95)' },
+                  '100%': { opacity: 1, transform: 'scale(1)' },
+                },
+                [`@keyframes flashEffect-${highlightStatus}`]: {
+                  '0%': {
+                    bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme),
+                  },
+                  '100%': {
+                    bgcolor: (theme) => getStatusBgColor(service.status, theme),
+                  },
+                },
+              }}
+            >
+              {columns.filter(col => col.visible).map((column) => {
+                switch (column.id) {
+                  case 'instanceId':
+                    return (
+                      <TableCell key={column.id}>
+                        <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
+                          {service.instanceId}
+                        </Typography>
+                      </TableCell>
+                    );
+                  case 'service':
+                    return (
+                      <TableCell key={column.id}>
+                        {getTypeChip(service.labels.service)}
+                      </TableCell>
+                    );
+                  case 'group':
+                    return (
+                      <TableCell key={column.id}>
+                        {service.labels.group ? (
+                          <Chip
+                            label={service.labels.group}
+                            size="small"
+                            variant="outlined"
+                            color="primary"
+                            sx={{ fontWeight: 600, borderRadius: 1 }}
+                          />
+                        ) : (
+                          <Typography variant="caption" color="text.disabled">-</Typography>
+                        )}
+                      </TableCell>
+                    );
+                  case 'environment':
+                    return (
+                      <TableCell key={column.id}>
+                        {service.labels.environment ? (
+                          <Chip
+                            label={service.labels.environment}
+                            size="small"
+                            variant="outlined"
+                            color="secondary"
+                            sx={{ fontWeight: 600, borderRadius: 1 }}
+                          />
+                        ) : (
+                          <Typography variant="caption" color="text.disabled">-</Typography>
+                        )}
+                      </TableCell>
+                    );
+                  case 'cloudProvider':
+                    return (
+                      <TableCell key={column.id}>
+                        {service.labels.cloudProvider ? (
+                          <Chip
+                            label={service.labels.cloudProvider}
+                            size="small"
+                            variant="outlined"
+                            color="info"
+                            sx={{ fontWeight: 600, borderRadius: 1 }}
+                          />
+                        ) : (
+                          <Typography variant="caption" color="text.disabled">-</Typography>
+                        )}
+                      </TableCell>
+                    );
+                  case 'cloudRegion':
+                    return (
+                      <TableCell key={column.id}>
+                        {service.labels.cloudRegion ? (
+                          <Chip
+                            label={service.labels.cloudRegion}
+                            size="small"
+                            variant="outlined"
+                            color="info"
+                            sx={{ fontWeight: 600, borderRadius: 1 }}
+                          />
+                        ) : (
+                          <Typography variant="caption" color="text.disabled">-</Typography>
+                        )}
+                      </TableCell>
+                    );
+                  case 'cloudZone':
+                    return (
+                      <TableCell key={column.id}>
+                        {service.labels.cloudZone ? (
+                          <Chip
+                            label={service.labels.cloudZone}
+                            size="small"
+                            variant="outlined"
+                            color="info"
+                            sx={{ fontWeight: 600, borderRadius: 1 }}
+                          />
+                        ) : (
+                          <Typography variant="caption" color="text.disabled">-</Typography>
+                        )}
+                      </TableCell>
+                    );
+                  case 'labels':
+                    return (
+                      <TableCell key={column.id}>
+                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                          {Object.entries(service.labels)
+                            .filter(([key]) => key !== 'service' && key !== 'group' && key !== 'environment' && key !== 'cloudProvider' && key !== 'cloudRegion' && key !== 'cloudZone')
+                            .map(([key, value]) => (
+                              <Chip
+                                key={`${service.instanceId}-${key}`}
+                                label={`${key}=${value}`}
+                                size="small"
+                                variant="outlined"
+                                sx={{ fontSize: '0.7rem', height: '22px', borderRadius: 1 }}
+                              />
+                            ))}
+                        </Box>
+                      </TableCell>
+                    );
+                  case 'hostname':
+                    return (
+                      <TableCell key={column.id}>
+                        <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
+                          {service.hostname}
+                        </Typography>
+                      </TableCell>
+                    );
+                  case 'externalAddress':
+                    return (
+                      <TableCell key={column.id}>
+                        <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
+                          {service.externalAddress}
+                        </Typography>
+                      </TableCell>
+                    );
+                  case 'internalAddress':
+                    return (
+                      <TableCell key={column.id}>
+                        <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
+                          {service.internalAddress}
+                        </Typography>
+                      </TableCell>
+                    );
+                  case 'ports':
+                    const portEntries = Object.entries(service.ports || {});
+                    return (
+                      <TableCell key={column.id}>
+                        {portEntries.length > 0 && (
+                          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                            {portEntries.map(([name, port]) => (
+                              <Chip
+                                key={`${service.instanceId}-${name}`}
+                                label={`${name}:${port}`}
+                                size="small"
+                                sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.875rem', height: '24px', borderRadius: 1 }}
+                              />
+                            ))}
+                          </Box>
+                        )}
+                      </TableCell>
+                    );
+                  case 'status':
+                    // Only show heartbeat icon for initializing/ready status
+                    const showHeartbeatIcon = service.status === 'initializing' || service.status === 'ready';
+                    return (
+                      <TableCell key={column.id}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          {getStatusBadge(service.status)}
+                          {showHeartbeatIcon && (
+                            <Box
+                              sx={{
+                                width: 26,
+                                height: 26,
+                                borderRadius: '50%',
+                                border: 1,
+                                borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                bgcolor: 'background.paper',
+                              }}
+                            >
+                              <FavoriteIcon
+                                sx={{
+                                  fontSize: 14,
+                                  color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
+                                  opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
+                                  animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
+                                  '@keyframes heartbeat': {
+                                    '0%': { transform: 'scale(1)' },
+                                    '25%': { transform: 'scale(1.3)' },
+                                    '50%': { transform: 'scale(1)' },
+                                    '75%': { transform: 'scale(1.2)' },
+                                    '100%': { transform: 'scale(1)' },
+                                  },
+                                }}
+                              />
+                            </Box>
+                          )}
+                        </Box>
+                      </TableCell>
+                    );
+                  case 'stats':
+                    return (
+                      <TableCell key={column.id}>
+                        {service.stats && Object.keys(service.stats).length > 0 && (
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                            {Object.entries(service.stats).map(([key, value]) => (
+                              <Typography key={`${service.instanceId}-${key}`} variant="caption" color="text.secondary">
+                                {key}: {typeof value === 'number' ? value.toFixed(2) : String(value)}
+                              </Typography>
+                            ))}
+                          </Box>
+                        )}
+                      </TableCell>
+                    );
+                  case 'meta':
+                    return (
+                      <TableCell key={column.id}>
+                        {service.meta && Object.keys(service.meta).length > 0 && (
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                            {Object.entries(service.meta).map(([key, value]) => (
+                              <Typography key={key} variant="caption" color="text.secondary">
+                                {key}: {String(value)}
+                              </Typography>
+                            ))}
+                          </Box>
+                        )}
+                      </TableCell>
+                    );
+                  case 'createdAt':
+                    return (
+                      <TableCell key={column.id}>
+                        <RelativeTime date={service.createdAt} showSeconds />
+                      </TableCell>
+                    );
+                  case 'updatedAt':
+                    const updatedAtServiceKey = `${service.labels.service}-${service.instanceId}`;
+                    const updatedAtProgress = listViewPingProgress.get(updatedAtServiceKey) || 0;
+                    const updatedAtProgressColor = updatedAtProgress >= 1
+                      ? 'error'
+                      : updatedAtProgress >= 0.7
+                        ? 'warning'
+                        : 'success';
+                    return (
+                      <TableCell key={column.id}>
+                        <Box
+                          sx={{
+                            position: 'relative',
+                            width: 100,
+                            height: 20,
+                            border: 1,
+                            borderColor: 'divider',
+                            borderRadius: 1,
+                            bgcolor: 'action.hover',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          <LinearProgress
+                            variant="determinate"
+                            value={updatedAtProgress * 100}
+                            color={updatedAtProgressColor}
+                            sx={{
+                              height: 18,
+                              bgcolor: 'transparent',
+                              '& .MuiLinearProgress-bar': {
+                                borderRadius: 0,
+                                opacity: updatedAtProgress < 0.01 ? 0 : 1,
+                              },
+                            }}
+                          />
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <RelativeTime
+                              date={service.updatedAt}
+                              showSeconds
+                              showTooltip={false}
+                              variant="caption"
+                              sx={{
+                                fontWeight: 500,
+                                fontSize: 11,
+                                color: 'text.primary',
+                                textShadow: '0 0 2px rgba(255,255,255,0.8)',
+                              }}
+                            />
+                          </Box>
+                        </Box>
+                      </TableCell>
+                    );
+                  case 'actions':
+                    const actionsServiceKey = `${service.labels.service}-${service.instanceId}`;
+                    const actionsHealthStatus = healthCheckStatus.get(actionsServiceKey);
+                    return (
+                      <TableCell key={column.id} align="center">
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                          {hasWebPort(service) && (
+                            actionsHealthStatus?.cooldown && actionsHealthStatus.result ? (
+                              // Show result: ms or X
+                              <Box
+                                sx={{
+                                  minWidth: 44,
+                                  height: 24,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  borderRadius: 1,
+                                  bgcolor: actionsHealthStatus.result.healthy ? 'success.main' : 'error.main',
+                                  color: 'white',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 600,
+                                  px: 0.75,
+                                  animation: actionsHealthStatus.fading ? 'wiggleFade 0.5s ease-out forwards' : 'none',
+                                  '@keyframes wiggleFade': {
+                                    '0%': { opacity: 1, transform: 'scale(1)' },
+                                    '20%': { transform: 'scale(1.1) rotate(-3deg)' },
+                                    '40%': { transform: 'scale(0.9) rotate(3deg)' },
+                                    '60%': { transform: 'scale(1.05) rotate(-2deg)' },
+                                    '80%': { opacity: 0.5, transform: 'scale(0.95) rotate(1deg)' },
+                                    '100%': { opacity: 0, transform: 'scale(0.8)' },
+                                  },
+                                }}
+                              >
+                                {actionsHealthStatus.result.healthy
+                                  ? `${actionsHealthStatus.result.latency}ms`
+                                  : '✕'}
+                              </Box>
+                            ) : (
+                              // Show button (rounded style like view mode buttons)
+                              <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleHealthCheck(service);
+                                  }}
+                                  disabled={actionsHealthStatus?.loading}
+                                  sx={{
+                                    width: 28,
+                                    height: 28,
+                                    bgcolor: 'background.paper',
+                                    border: 1,
+                                    borderColor: 'divider',
+                                    '&:hover': {
+                                      bgcolor: 'action.hover',
+                                    },
+                                  }}
+                                >
+                                  {actionsHealthStatus?.loading ? (
+                                    <CircularProgress size={14} />
+                                  ) : (
+                                    <TouchAppIcon fontSize="small" />
+                                  )}
+                                </IconButton>
+                              </Tooltip>
+                            )
+                          )}
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setContextMenu({
+                                mouseX: e.currentTarget.getBoundingClientRect().left,
+                                mouseY: e.currentTarget.getBoundingClientRect().bottom,
+                                service,
+                              });
+                            }}
+                            sx={{
+                              width: 28,
+                              height: 28,
+                              bgcolor: 'background.paper',
+                              border: 1,
+                              borderColor: 'divider',
+                              '&:hover': {
+                                bgcolor: 'action.hover',
+                              },
+                            }}
+                          >
+                            <MoreVertIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                    );
+                  default:
+                    return null;
+                }
+              })}
+            </TableRow>
+          );
+        };
+
+        // Render group rows recursively
+        const renderGroupRows = (group: ListGroup): React.ReactNode[] => {
+          const allInstances = collectListInstances(group);
+          const rows: React.ReactNode[] = [];
+
+          // Group header row
+          rows.push(
+            <TableRow key={`group-${group.id}`} sx={{ bgcolor: (theme) => alpha(theme.palette.action.hover, 0.5 + group.level * 0.15) }}>
+              <TableCell colSpan={visibleColumns.length} sx={{ py: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pl: group.level * 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'stretch', height: 24, borderRadius: 1, border: 1, borderColor: 'divider', overflow: 'hidden' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', px: 0.75, fontSize: '0.65rem', fontWeight: 600, color: 'text.secondary', bgcolor: 'background.paper', textTransform: 'uppercase' }}>
+                      {getGroupingLabel(group.fieldName)}
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', px: 1, fontSize: '0.8rem', fontWeight: 700, color: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100], bgcolor: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[200] : theme.palette.grey[700] }}>
+                      {group.name}
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 24, px: 0.75, fontSize: '0.75rem', fontWeight: 700, color: 'primary.contrastText', bgcolor: 'primary.main' }}>
+                      {allInstances.length}
+                    </Box>
+                  </Box>
+                </Box>
+              </TableCell>
+            </TableRow>
+          );
+
+          // Render children or service rows
+          if (group.children && group.children.length > 0) {
+            group.children.forEach(child => rows.push(...renderGroupRows(child)));
+          } else {
+            group.instances.forEach(service => rows.push(renderServiceRow(service)));
+          }
+          return rows;
+        };
+
+        const groups = groupingLevels.length > 0 ? buildListGroups(displayServices, groupingLevels) : [];
         const visibleColumns = columns.filter(col => col.visible);
 
         return (
@@ -3645,458 +4132,12 @@ const ServerListPage: React.FC = () => {
                         </Typography>
                       </TableCell>
                     </TableRow>
+                  ) : groupingLevels.length > 0 ? (
+                    // Multi-level grouped view
+                    groups.flatMap(group => renderGroupRows(group))
                   ) : (
-                    groups.flatMap(group => [
-                      // Group header row (only if grouping is active)
-                      ...(group.name ? [
-                        <TableRow key={`group-${group.key}`} sx={{ bgcolor: 'action.hover' }}>
-                          <TableCell colSpan={visibleColumns.length} sx={{ py: 1 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                              <Box sx={{ display: 'flex', alignItems: 'stretch', height: 24, borderRadius: 1, border: 1, borderColor: 'divider', overflow: 'hidden' }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', px: 0.75, fontSize: '0.65rem', fontWeight: 600, color: 'text.secondary', bgcolor: 'background.paper', textTransform: 'uppercase' }}>
-                                  {getGroupingLabel(groupingLevels[0])}
-                                </Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center', px: 1, fontSize: '0.8rem', fontWeight: 700, color: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100], bgcolor: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[200] : theme.palette.grey[700] }}>
-                                  {group.name}
-                                </Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 24, px: 0.75, fontSize: '0.75rem', fontWeight: 700, color: 'primary.contrastText', bgcolor: 'primary.main' }}>
-                                  {group.services.length}
-                                </Box>
-                              </Box>
-                            </Box>
-                          </TableCell>
-                        </TableRow>
-                      ] : []),
-                      // Service rows for this group
-                      ...group.services.map((service) => {
-                        const serviceKey = `${service.labels.service}-${service.instanceId}`;
-                        const updatedStatus = updatedServiceIds.get(serviceKey);
-                        const isUpdated = updatedStatus !== undefined;
-                        const isNew = newServiceIds.has(serviceKey);
-                        // Use service.status for highlight color (current status)
-                        const highlightStatus = updatedStatus || service.status;
-                        return (
-                          <TableRow
-                            key={serviceKey}
-                            hover
-                            sx={{
-                              bgcolor: isUpdated
-                                ? (theme) => getHighlightColor(highlightStatus, theme)
-                                : (theme) => getStatusBgColor(service.status, theme),
-                              animation: isNew
-                                ? 'appearEffect 0.5s ease-out'
-                                : isUpdated
-                                  ? `flashEffect-${highlightStatus} 2s ease-out`
-                                  : 'none',
-                              '@keyframes appearEffect': {
-                                '0%': { opacity: 0, transform: 'scale(0.95)' },
-                                '100%': { opacity: 1, transform: 'scale(1)' },
-                              },
-                              [`@keyframes flashEffect-${highlightStatus}`]: {
-                                '0%': {
-                                  bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme),
-                                },
-                                '100%': {
-                                  bgcolor: (theme) => getStatusBgColor(service.status, theme),
-                                },
-                              },
-                            }}
-                          >
-                            {columns.filter(col => col.visible).map((column) => {
-                              switch (column.id) {
-                                case 'instanceId':
-                                  return (
-                                    <TableCell key={column.id}>
-                                      <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
-                                        {service.instanceId}
-                                      </Typography>
-                                    </TableCell>
-                                  );
-                                case 'service':
-                                  return (
-                                    <TableCell key={column.id}>
-                                      {getTypeChip(service.labels.service)}
-                                    </TableCell>
-                                  );
-                                case 'group':
-                                  return (
-                                    <TableCell key={column.id}>
-                                      {service.labels.group ? (
-                                        <Chip
-                                          label={service.labels.group}
-                                          size="small"
-                                          variant="outlined"
-                                          color="primary"
-                                          sx={{ fontWeight: 600, borderRadius: 1 }}
-                                        />
-                                      ) : (
-                                        <Typography variant="caption" color="text.disabled">-</Typography>
-                                      )}
-                                    </TableCell>
-                                  );
-                                case 'environment':
-                                  return (
-                                    <TableCell key={column.id}>
-                                      {service.labels.environment ? (
-                                        <Chip
-                                          label={service.labels.environment}
-                                          size="small"
-                                          variant="outlined"
-                                          color="secondary"
-                                          sx={{ fontWeight: 600, borderRadius: 1 }}
-                                        />
-                                      ) : (
-                                        <Typography variant="caption" color="text.disabled">-</Typography>
-                                      )}
-                                    </TableCell>
-                                  );
-                                case 'cloudProvider':
-                                  return (
-                                    <TableCell key={column.id}>
-                                      {service.labels.cloudProvider ? (
-                                        <Chip
-                                          label={service.labels.cloudProvider}
-                                          size="small"
-                                          variant="outlined"
-                                          color="info"
-                                          sx={{ fontWeight: 600, borderRadius: 1 }}
-                                        />
-                                      ) : (
-                                        <Typography variant="caption" color="text.disabled">-</Typography>
-                                      )}
-                                    </TableCell>
-                                  );
-                                case 'cloudRegion':
-                                  return (
-                                    <TableCell key={column.id}>
-                                      {service.labels.cloudRegion ? (
-                                        <Chip
-                                          label={service.labels.cloudRegion}
-                                          size="small"
-                                          variant="outlined"
-                                          color="info"
-                                          sx={{ fontWeight: 600, borderRadius: 1 }}
-                                        />
-                                      ) : (
-                                        <Typography variant="caption" color="text.disabled">-</Typography>
-                                      )}
-                                    </TableCell>
-                                  );
-                                case 'cloudZone':
-                                  return (
-                                    <TableCell key={column.id}>
-                                      {service.labels.cloudZone ? (
-                                        <Chip
-                                          label={service.labels.cloudZone}
-                                          size="small"
-                                          variant="outlined"
-                                          color="info"
-                                          sx={{ fontWeight: 600, borderRadius: 1 }}
-                                        />
-                                      ) : (
-                                        <Typography variant="caption" color="text.disabled">-</Typography>
-                                      )}
-                                    </TableCell>
-                                  );
-                                case 'labels':
-                                  return (
-                                    <TableCell key={column.id}>
-                                      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                        {Object.entries(service.labels)
-                                          .filter(([key]) => key !== 'service' && key !== 'group' && key !== 'environment' && key !== 'cloudProvider' && key !== 'cloudRegion' && key !== 'cloudZone')
-                                          .map(([key, value]) => (
-                                            <Chip
-                                              key={`${service.instanceId}-${key}`}
-                                              label={`${key}=${value}`}
-                                              size="small"
-                                              variant="outlined"
-                                              sx={{ fontSize: '0.7rem', height: '22px', borderRadius: 1 }}
-                                            />
-                                          ))}
-                                      </Box>
-                                    </TableCell>
-                                  );
-                                case 'hostname':
-                                  return (
-                                    <TableCell key={column.id}>
-                                      <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
-                                        {service.hostname}
-                                      </Typography>
-                                    </TableCell>
-                                  );
-                                case 'externalAddress':
-                                  return (
-                                    <TableCell key={column.id}>
-                                      <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
-                                        {service.externalAddress}
-                                      </Typography>
-                                    </TableCell>
-                                  );
-                                case 'internalAddress':
-                                  return (
-                                    <TableCell key={column.id}>
-                                      <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
-                                        {service.internalAddress}
-                                      </Typography>
-                                    </TableCell>
-                                  );
-                                case 'ports':
-                                  const portEntries = Object.entries(service.ports || {});
-                                  return (
-                                    <TableCell key={column.id}>
-                                      {portEntries.length > 0 && (
-                                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                          {portEntries.map(([name, port]) => (
-                                            <Chip
-                                              key={`${service.instanceId}-${name}`}
-                                              label={`${name}:${port}`}
-                                              size="small"
-                                              sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.875rem', height: '24px', borderRadius: 1 }}
-                                            />
-                                          ))}
-                                        </Box>
-                                      )}
-                                    </TableCell>
-                                  );
-                                case 'status':
-                                  // Only show heartbeat icon for initializing/ready status
-                                  const showHeartbeatIcon = service.status === 'initializing' || service.status === 'ready';
-                                  return (
-                                    <TableCell key={column.id}>
-                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        {getStatusBadge(service.status)}
-                                        {showHeartbeatIcon && (
-                                          <Box
-                                            sx={{
-                                              width: 26,
-                                              height: 26,
-                                              borderRadius: '50%',
-                                              border: 1,
-                                              borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
-                                              display: 'flex',
-                                              alignItems: 'center',
-                                              justifyContent: 'center',
-                                              bgcolor: 'background.paper',
-                                            }}
-                                          >
-                                            <FavoriteIcon
-                                              sx={{
-                                                fontSize: 14,
-                                                color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
-                                                opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
-                                                animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
-                                                '@keyframes heartbeat': {
-                                                  '0%': { transform: 'scale(1)' },
-                                                  '25%': { transform: 'scale(1.3)' },
-                                                  '50%': { transform: 'scale(1)' },
-                                                  '75%': { transform: 'scale(1.2)' },
-                                                  '100%': { transform: 'scale(1)' },
-                                                },
-                                              }}
-                                            />
-                                          </Box>
-                                        )}
-                                      </Box>
-                                    </TableCell>
-                                  );
-                                case 'stats':
-                                  return (
-                                    <TableCell key={column.id}>
-                                      {service.stats && Object.keys(service.stats).length > 0 && (
-                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                          {Object.entries(service.stats).map(([key, value]) => (
-                                            <Typography key={`${service.instanceId}-${key}`} variant="caption" color="text.secondary">
-                                              {key}: {typeof value === 'number' ? value.toFixed(2) : String(value)}
-                                            </Typography>
-                                          ))}
-                                        </Box>
-                                      )}
-                                    </TableCell>
-                                  );
-                                case 'meta':
-                                  return (
-                                    <TableCell key={column.id}>
-                                      {service.meta && Object.keys(service.meta).length > 0 && (
-                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                          {Object.entries(service.meta).map(([key, value]) => (
-                                            <Typography key={key} variant="caption" color="text.secondary">
-                                              {key}: {String(value)}
-                                            </Typography>
-                                          ))}
-                                        </Box>
-                                      )}
-                                    </TableCell>
-                                  );
-                                case 'createdAt':
-                                  return (
-                                    <TableCell key={column.id}>
-                                      <RelativeTime date={service.createdAt} showSeconds />
-                                    </TableCell>
-                                  );
-                                case 'updatedAt':
-                                  const updatedAtServiceKey = `${service.labels.service}-${service.instanceId}`;
-                                  const updatedAtProgress = listViewPingProgress.get(updatedAtServiceKey) || 0;
-                                  const updatedAtProgressColor = updatedAtProgress >= 1
-                                    ? 'error'
-                                    : updatedAtProgress >= 0.7
-                                      ? 'warning'
-                                      : 'success';
-                                  return (
-                                    <TableCell key={column.id}>
-                                      <Box
-                                        sx={{
-                                          position: 'relative',
-                                          width: 100,
-                                          height: 20,
-                                          border: 1,
-                                          borderColor: 'divider',
-                                          borderRadius: 1,
-                                          bgcolor: 'action.hover',
-                                          overflow: 'hidden'
-                                        }}
-                                      >
-                                        <LinearProgress
-                                          variant="determinate"
-                                          value={updatedAtProgress * 100}
-                                          color={updatedAtProgressColor}
-                                          sx={{
-                                            height: 18,
-                                            bgcolor: 'transparent',
-                                            '& .MuiLinearProgress-bar': {
-                                              borderRadius: 0,
-                                              opacity: updatedAtProgress < 0.01 ? 0 : 1,
-                                            },
-                                          }}
-                                        />
-                                        <Box
-                                          sx={{
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            bottom: 0,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                          }}
-                                        >
-                                          <RelativeTime
-                                            date={service.updatedAt}
-                                            showSeconds
-                                            showTooltip={false}
-                                            variant="caption"
-                                            sx={{
-                                              fontWeight: 500,
-                                              fontSize: 11,
-                                              color: 'text.primary',
-                                              textShadow: '0 0 2px rgba(255,255,255,0.8)',
-                                            }}
-                                          />
-                                        </Box>
-                                      </Box>
-                                    </TableCell>
-                                  );
-                                case 'actions':
-                                  const actionsServiceKey = `${service.labels.service}-${service.instanceId}`;
-                                  const actionsHealthStatus = healthCheckStatus.get(actionsServiceKey);
-                                  return (
-                                    <TableCell key={column.id} align="center">
-                                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
-                                        {hasWebPort(service) && (
-                                          actionsHealthStatus?.cooldown && actionsHealthStatus.result ? (
-                                            // Show result: ms or X
-                                            <Box
-                                              sx={{
-                                                minWidth: 44,
-                                                height: 24,
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                borderRadius: 1,
-                                                bgcolor: actionsHealthStatus.result.healthy ? 'success.main' : 'error.main',
-                                                color: 'white',
-                                                fontSize: '0.75rem',
-                                                fontWeight: 600,
-                                                px: 0.75,
-                                                animation: actionsHealthStatus.fading ? 'wiggleFade 0.5s ease-out forwards' : 'none',
-                                                '@keyframes wiggleFade': {
-                                                  '0%': { opacity: 1, transform: 'scale(1)' },
-                                                  '20%': { transform: 'scale(1.1) rotate(-3deg)' },
-                                                  '40%': { transform: 'scale(0.9) rotate(3deg)' },
-                                                  '60%': { transform: 'scale(1.05) rotate(-2deg)' },
-                                                  '80%': { opacity: 0.5, transform: 'scale(0.95) rotate(1deg)' },
-                                                  '100%': { opacity: 0, transform: 'scale(0.8)' },
-                                                },
-                                              }}
-                                            >
-                                              {actionsHealthStatus.result.healthy
-                                                ? `${actionsHealthStatus.result.latency}ms`
-                                                : '✕'}
-                                            </Box>
-                                          ) : (
-                                            // Show button (rounded style like view mode buttons)
-                                            <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
-                                              <IconButton
-                                                size="small"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  handleHealthCheck(service);
-                                                }}
-                                                disabled={actionsHealthStatus?.loading}
-                                                sx={{
-                                                  width: 28,
-                                                  height: 28,
-                                                  bgcolor: 'background.paper',
-                                                  border: 1,
-                                                  borderColor: 'divider',
-                                                  '&:hover': {
-                                                    bgcolor: 'action.hover',
-                                                  },
-                                                }}
-                                              >
-                                                {actionsHealthStatus?.loading ? (
-                                                  <CircularProgress size={14} />
-                                                ) : (
-                                                  <TouchAppIcon fontSize="small" />
-                                                )}
-                                              </IconButton>
-                                            </Tooltip>
-                                          )
-                                        )}
-                                        <IconButton
-                                          size="small"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setContextMenu({
-                                              mouseX: e.currentTarget.getBoundingClientRect().left,
-                                              mouseY: e.currentTarget.getBoundingClientRect().bottom,
-                                              service,
-                                            });
-                                          }}
-                                          sx={{
-                                            width: 28,
-                                            height: 28,
-                                            bgcolor: 'background.paper',
-                                            border: 1,
-                                            borderColor: 'divider',
-                                            '&:hover': {
-                                              bgcolor: 'action.hover',
-                                            },
-                                          }}
-                                        >
-                                          <MoreVertIcon fontSize="small" />
-                                        </IconButton>
-                                      </Box>
-                                    </TableCell>
-                                  );
-                                default:
-                                  return null;
-                              }
-                            })}
-                          </TableRow>
-                        );
-                      })
-                    ])
+                    // Ungrouped view
+                    displayServices.map(service => renderServiceRow(service))
                   )}
                 </TableBody>
               </Table>
@@ -4379,388 +4420,438 @@ const ServerListPage: React.FC = () => {
 
       {/* Card View - Uniform detailed cards in grid layout */}
       {(services.length > 0 || !isLoading) && viewMode === 'card' && (() => {
-        // First-level grouping for card view
-        const groupServices = () => {
-          if (groupingLevels.length === 0) {
-            return [{ key: '__all__', name: '', services: gridDisplayServices }];
-          }
-          const field = groupingLevels[0];
+        // Multi-level group structure for CardView
+        interface CardGroup {
+          id: string;
+          name: string;
+          level: number;
+          fieldName: GroupingField;
+          instances: ServiceInstance[];
+          children?: CardGroup[];
+        }
+
+        // Build multi-level groups recursively
+        const buildCardGroups = (items: ServiceInstance[], levels: GroupingField[], currentLevel: number = 0): CardGroup[] => {
+          if (levels.length === 0 || currentLevel >= levels.length) return [];
+          const currentField = levels[currentLevel];
+          const hasMoreLevels = currentLevel + 1 < levels.length;
           const groupMap = new Map<string, ServiceInstance[]>();
-          gridDisplayServices.forEach(service => {
-            const value = service.labels[field] || 'Unknown';
+          items.forEach(service => {
+            const value = service.labels[currentField] || 'Unknown';
             if (!groupMap.has(value)) groupMap.set(value, []);
             groupMap.get(value)!.push(service);
           });
           return Array.from(groupMap.entries())
             .sort(([a], [b]) => a.localeCompare(b))
-            .map(([key, services]) => ({ key, name: key === 'Unknown' ? `(${getGroupingLabel(field)} N/A)` : key, services }));
+            .map(([name, instances]) => ({
+              id: levels.slice(0, currentLevel + 1).join('-') + '-' + name,
+              name: name === 'Unknown' ? `(${getGroupingLabel(currentField)} N/A)` : name,
+              level: currentLevel,
+              fieldName: currentField,
+              instances: hasMoreLevels ? [] : instances,
+              children: hasMoreLevels ? buildCardGroups(instances, levels, currentLevel + 1) : undefined,
+            }));
         };
-        const groups = groupServices();
 
-        return (
-          <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {groups.map(group => {
-              const colCount = 3;
-              const itemCount = group.services.length;
-              const emptyCount = itemCount > 0 ? (colCount - (itemCount % colCount)) % colCount : 0;
+        // Collect all instances from a group recursively
+        const collectCardInstances = (group: CardGroup): ServiceInstance[] => {
+          if (group.children && group.children.length > 0) return group.children.flatMap(collectCardInstances);
+          return group.instances;
+        };
 
-              return (
-                <Box key={group.key}>
-                  {group.name && (
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5, gap: 1.5, pb: 1, borderBottom: 1, borderColor: 'divider' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'stretch', height: 28, borderRadius: 1, border: 1, borderColor: 'divider', overflow: 'hidden' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', px: 1, fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary', bgcolor: 'action.hover', textTransform: 'uppercase' }}>
-                          {getGroupingLabel(groupingLevels[0])}
-                        </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', px: 1.5, fontSize: '0.85rem', fontWeight: 700, color: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100], bgcolor: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[200] : theme.palette.grey[700] }}>
-                          {group.name}
-                        </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 28, px: 1, fontSize: '0.8rem', fontWeight: 700, color: 'primary.contrastText', bgcolor: 'primary.main' }}>
-                          {group.services.length}
-                        </Box>
-                      </Box>
-                    </Box>
-                  )}
-                  <Box sx={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: 1.5,
-                    '@media (max-width: 1200px)': { gridTemplateColumns: 'repeat(2, 1fr)' },
-                    '@media (max-width: 768px)': { gridTemplateColumns: '1fr' },
-                  }}>
-                    {group.services.length === 0 ? (
-                      <Card sx={{ gridColumn: '1 / -1' }}>
-                        <CardContent sx={{ py: 4, textAlign: 'center' }}>
-                          <Typography variant="body2" color="text.secondary">
-                            {t('serverList.noData')}
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    ) : (
+        // Render a single service card
+        const renderServiceCard = (service: ServiceInstance) => {
+          const serviceKey = `${service.labels.service}-${service.instanceId}`;
+          const updatedStatus = updatedServiceIds.get(serviceKey);
+          const isUpdated = updatedStatus !== undefined;
+          const isNew = newServiceIds.has(serviceKey);
+          const highlightStatus = updatedStatus || service.status;
+          const customLabels = Object.entries(service.labels).filter(([key]) => key !== 'service' && key !== 'group' && key !== 'environment' && key !== 'region');
+          const ports = Object.entries(service.ports || {});
+
+          return (
+            <Card
+              key={serviceKey}
+              sx={{
+                minHeight: 300,
+                display: 'flex',
+                flexDirection: 'column',
+                transition: 'all 0.15s ease-in-out',
+                '&:hover': { boxShadow: 3 },
+                bgcolor: isUpdated
+                  ? (theme) => getHighlightColor(highlightStatus, theme)
+                  : (theme) => getStatusBgColor(service.status, theme) || 'background.paper',
+                animation: isNew
+                  ? 'appearEffect 0.5s ease-out'
+                  : isUpdated
+                    ? `flashEffect-${highlightStatus} 2s ease-out`
+                    : 'none',
+                '@keyframes appearEffect': {
+                  '0%': { opacity: 0, transform: 'scale(0.9)' },
+                  '100%': { opacity: 1, transform: 'scale(1)' },
+                },
+                [`@keyframes flashEffect-${highlightStatus}`]: {
+                  '0%': { bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme) },
+                  '100%': { bgcolor: (theme) => getStatusBgColor(service.status, theme) || 'background.paper' },
+                },
+              }}
+            >
+              <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                {/* Header: Type + Group + Status */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
+                    {getTypeChip(service.labels.service)}
+                    {service.labels.group && (
+                      <Chip
+                        label={service.labels.group}
+                        size="small"
+                        variant="outlined"
+                        color="primary"
+                        sx={{ fontWeight: 600, height: 20, fontSize: '0.7rem', borderRadius: 1 }}
+                      />
+                    )}
+                    {service.labels.environment && (
+                      <Chip
+                        label={service.labels.environment}
+                        size="small"
+                        variant="outlined"
+                        color="secondary"
+                        sx={{ fontWeight: 600, height: 20, fontSize: '0.7rem', borderRadius: 1 }}
+                      />
+                    )}
+                    {service.labels.region && (
+                      <Chip
+                        label={service.labels.region}
+                        size="small"
+                        variant="outlined"
+                        color="info"
+                        sx={{ fontWeight: 600, height: 20, fontSize: '0.7rem', borderRadius: 1 }}
+                      />
+                    )}
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {getStatusBadge(service.status)}
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        setContextMenu({
+                          mouseX: e.currentTarget.getBoundingClientRect().left,
+                          mouseY: e.currentTarget.getBoundingClientRect().bottom,
+                          service,
+                        });
+                      }}
+                      sx={{ p: 0.25 }}
+                    >
+                      <MoreVertIcon fontSize="small" />
+                    </IconButton>
+                    {/* Only show heartbeat icon for initializing/ready status */}
+                    {(service.status === 'initializing' || service.status === 'ready') && (
                       <>
-                        {group.services.map((service) => {
-                          const serviceKey = `${service.labels.service}-${service.instanceId}`;
-                          const updatedStatus = updatedServiceIds.get(serviceKey);
-                          const isUpdated = updatedStatus !== undefined;
-                          const isNew = newServiceIds.has(serviceKey);
-                          const highlightStatus = updatedStatus || service.status;
-                          const customLabels = Object.entries(service.labels).filter(([key]) => key !== 'service' && key !== 'group' && key !== 'environment' && key !== 'region');
-                          const ports = Object.entries(service.ports || {});
-
-                          return (
-                            <Card
-                              key={serviceKey}
-                              sx={{
-                                minHeight: 300,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                transition: 'all 0.15s ease-in-out',
-                                '&:hover': { boxShadow: 3 },
-                                bgcolor: isUpdated
-                                  ? (theme) => getHighlightColor(highlightStatus, theme)
-                                  : (theme) => getStatusBgColor(service.status, theme) || 'background.paper',
-                                animation: isNew
-                                  ? 'appearEffect 0.5s ease-out'
-                                  : isUpdated
-                                    ? `flashEffect-${highlightStatus} 2s ease-out`
-                                    : 'none',
-                                '@keyframes appearEffect': {
-                                  '0%': { opacity: 0, transform: 'scale(0.9)' },
-                                  '100%': { opacity: 1, transform: 'scale(1)' },
-                                },
-                                [`@keyframes flashEffect-${highlightStatus}`]: {
-                                  '0%': { bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme) },
-                                  '100%': { bgcolor: (theme) => getStatusBgColor(service.status, theme) || 'background.paper' },
-                                },
-                              }}
-                            >
-                              <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                {/* Header: Type + Group + Status */}
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
-                                    {getTypeChip(service.labels.service)}
-                                    {service.labels.group && (
-                                      <Chip
-                                        label={service.labels.group}
-                                        size="small"
-                                        variant="outlined"
-                                        color="primary"
-                                        sx={{ fontWeight: 600, height: 20, fontSize: '0.7rem', borderRadius: 1 }}
-                                      />
-                                    )}
-                                    {service.labels.environment && (
-                                      <Chip
-                                        label={service.labels.environment}
-                                        size="small"
-                                        variant="outlined"
-                                        color="secondary"
-                                        sx={{ fontWeight: 600, height: 20, fontSize: '0.7rem', borderRadius: 1 }}
-                                      />
-                                    )}
-                                    {service.labels.region && (
-                                      <Chip
-                                        label={service.labels.region}
-                                        size="small"
-                                        variant="outlined"
-                                        color="info"
-                                        sx={{ fontWeight: 600, height: 20, fontSize: '0.7rem', borderRadius: 1 }}
-                                      />
-                                    )}
-                                  </Box>
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    {getStatusBadge(service.status)}
-                                    <IconButton
-                                      size="small"
-                                      onClick={(e) => {
-                                        setContextMenu({
-                                          mouseX: e.currentTarget.getBoundingClientRect().left,
-                                          mouseY: e.currentTarget.getBoundingClientRect().bottom,
-                                          service,
-                                        });
-                                      }}
-                                      sx={{ p: 0.25 }}
-                                    >
-                                      <MoreVertIcon fontSize="small" />
-                                    </IconButton>
-                                    {/* Only show heartbeat icon for initializing/ready status */}
-                                    {(service.status === 'initializing' || service.status === 'ready') && (
-                                      <>
-                                        <Box
-                                          sx={{
-                                            width: 26,
-                                            height: 26,
-                                            borderRadius: '50%',
-                                            border: 1,
-                                            borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            bgcolor: 'background.paper',
-                                          }}
-                                        >
-                                          <FavoriteIcon
-                                            sx={{
-                                              fontSize: 14,
-                                              color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
-                                              opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
-                                              animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
-                                              '@keyframes heartbeat': {
-                                                '0%': { transform: 'scale(1)' },
-                                                '25%': { transform: 'scale(1.3)' },
-                                                '50%': { transform: 'scale(1)' },
-                                                '75%': { transform: 'scale(1.2)' },
-                                                '100%': { transform: 'scale(1)' },
-                                              },
-                                            }}
-                                          />
-                                        </Box>
-                                        {/* Move health check button here */}
-                                        {hasWebPort(service) && (() => {
-                                          const cardHealthStatus = healthCheckStatus.get(serviceKey);
-                                          return cardHealthStatus?.cooldown && cardHealthStatus.result ? (
-                                            <Box
-                                              sx={{
-                                                minWidth: 44,
-                                                height: 22,
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                borderRadius: 1,
-                                                bgcolor: cardHealthStatus.result.healthy ? 'success.main' : 'error.main',
-                                                color: 'white',
-                                                fontSize: '0.7rem',
-                                                fontWeight: 600,
-                                                px: 0.75,
-                                                animation: cardHealthStatus.fading ? 'wiggleFade 0.5s ease-out forwards' : 'none',
-                                              }}
-                                            >
-                                              {cardHealthStatus.result.healthy ? `${cardHealthStatus.result.latency}ms` : '✕'}
-                                            </Box>
-                                          ) : (
-                                            <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
-                                              <IconButton
-                                                size="small"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  handleHealthCheck(service);
-                                                }}
-                                                disabled={cardHealthStatus?.loading}
-                                                sx={{
-                                                  width: 24,
-                                                  height: 24,
-                                                  p: 0,
-                                                  bgcolor: 'background.paper',
-                                                  border: 1,
-                                                  borderColor: 'divider',
-                                                  '&:hover': { bgcolor: 'action.hover' },
-                                                }}
-                                              >
-                                                {cardHealthStatus?.loading ? (
-                                                  <SearchIcon sx={{
-                                                    fontSize: 16,
-                                                    animation: 'searchingAnimXSmall 2s ease-in-out infinite',
-                                                    '@keyframes searchingAnimXSmall': {
-                                                      '0%': { transform: 'translate(0, 0) rotate(0deg)' },
-                                                      '25%': { transform: 'translate(1px, -1px) rotate(10deg)' },
-                                                      '50%': { transform: 'translate(-1px, 1px) rotate(-10deg)' },
-                                                      '100%': { transform: 'translate(0, 0) rotate(0deg)' },
-                                                    },
-                                                  }} />
-                                                ) : (
-                                                  <TouchAppIcon sx={{ fontSize: 16 }} />
-                                                )}
-                                              </IconButton>
-                                            </Tooltip>
-                                          );
-                                        })()}
-                                      </>
-                                    )}
-                                  </Box>
-                                </Box>
-
-                                {/* Hostname */}
-                                <Typography
-                                  variant="body2"
-                                  sx={{ fontFamily: '"D2Coding", monospace', fontWeight: 600 }}
-                                >
-                                  {service.hostname}
-                                </Typography>
-
-                                {/* Instance ID */}
-                                <Typography
-                                  variant="body2"
-                                  color="text.disabled"
-                                  sx={{ fontFamily: '"D2Coding", monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                                >
-                                  {service.instanceId}
-                                </Typography>
-
-                                {/* Info Grid */}
-                                <Box sx={{
-                                  mt: 1,
-                                  display: 'grid',
-                                  gridTemplateColumns: 'auto 1fr',
-                                  gap: 0.25,
-                                  '& .label': { color: 'text.secondary', fontSize: '0.875rem', minWidth: 55 },
-                                  '& .value': { fontFamily: '"D2Coding", monospace', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
-                                }}>
-                                  <Typography className="label">External</Typography>
-                                  <Typography className="value">{service.externalAddress}</Typography>
-                                  <Typography className="label">Internal</Typography>
-                                  <Typography className="value">{service.internalAddress}</Typography>
-                                </Box>
-
-                                {/* Ports - Compact inline chips */}
-                                {ports.length > 0 && (
-                                  <Box sx={{
-                                    mt: 0.5,
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    gap: 0.5,
-                                  }}>
-                                    {ports.map(([name, port]) => (
-                                      <Chip
-                                        key={`${service.instanceId}-port-${name}`}
-                                        label={`${name}:${port}`}
-                                        size="small"
-                                        variant="outlined"
-                                        sx={{
-                                          height: 24,
-                                          fontSize: '0.8rem',
-                                          fontFamily: '"D2Coding", monospace',
-                                          borderRadius: 1,
-                                          '& .MuiChip-label': { px: 1 },
-                                        }}
-                                      />
-                                    ))}
-                                  </Box>
-                                )}
-
-                                {/* Custom labels */}
-                                {customLabels.length > 0 && (
-                                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.5 }}>
-                                    {customLabels.map(([key, value]) => (
-                                      <Chip
-                                        key={`${service.instanceId}-${key}`}
-                                        label={`${key}=${value}`}
-                                        size="small"
-                                        variant="outlined"
-                                        sx={{ fontSize: '0.8rem', height: 24, fontFamily: '"D2Coding", monospace', borderRadius: 1 }}
-                                      />
-                                    ))}
-                                  </Box>
-                                )}
-
-                                {/* Spacer */}
-                                <Box sx={{ flex: 1 }} />
-
-                                {/* Stats */}
-                                {service.stats && Object.keys(service.stats).length > 0 && (
-                                  <Box sx={{
-                                    mt: 1,
-                                    p: 0.75,
-                                    bgcolor: 'action.hover',
-                                    borderRadius: 1,
-                                    display: 'flex',
-                                    gap: 2,
-                                    flexWrap: 'wrap',
-                                    justifyContent: 'center',
-                                  }}>
-                                    {Object.entries(service.stats).map(([key, value]) => (
-                                      <Box key={`${service.instanceId}-${key}`} sx={{ textAlign: 'center' }}>
-                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.6rem' }}>
-                                          {key}
-                                        </Typography>
-                                        <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.8rem' }}>
-                                          {typeof value === 'number' ? value.toFixed(1) : String(value)}
-                                        </Typography>
-                                      </Box>
-                                    ))}
-                                  </Box>
-                                )}
-
-
-
-                                {/* Footer: Health + Updated time removed as redundant */}
-                              </CardContent>
-                            </Card>
-                          );
-                        })}
-                        {/* Empty placeholder cards */}
-                        {Array.from({ length: emptyCount }).map((_, idx) => (
-                          <Card
-                            key={`empty-card-${idx}`}
-                            variant="outlined"
+                        <Box
+                          sx={{
+                            width: 26,
+                            height: 26,
+                            borderRadius: '50%',
+                            border: 1,
+                            borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            bgcolor: 'background.paper',
+                          }}
+                        >
+                          <FavoriteIcon
                             sx={{
-                              minHeight: 300,
-                              borderStyle: 'dashed',
-                              borderColor: 'divider',
-                              bgcolor: (theme) => theme.palette.mode === 'dark'
-                                ? 'rgba(0, 0, 0, 0.2)'
-                                : 'rgba(0, 0, 0, 0.04)',
+                              fontSize: 14,
+                              color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
+                              opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
+                              animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
+                              '@keyframes heartbeat': {
+                                '0%': { transform: 'scale(1)' },
+                                '25%': { transform: 'scale(1.3)' },
+                                '50%': { transform: 'scale(1)' },
+                                '75%': { transform: 'scale(1.2)' },
+                                '100%': { transform: 'scale(1)' },
+                              },
                             }}
                           />
-                        ))}
+                        </Box>
+                        {/* Move health check button here */}
+                        {hasWebPort(service) && (() => {
+                          const cardHealthStatus = healthCheckStatus.get(serviceKey);
+                          return cardHealthStatus?.cooldown && cardHealthStatus.result ? (
+                            <Box
+                              sx={{
+                                minWidth: 44,
+                                height: 22,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: 1,
+                                bgcolor: cardHealthStatus.result.healthy ? 'success.main' : 'error.main',
+                                color: 'white',
+                                fontSize: '0.7rem',
+                                fontWeight: 600,
+                                px: 0.75,
+                                animation: cardHealthStatus.fading ? 'wiggleFade 0.5s ease-out forwards' : 'none',
+                              }}
+                            >
+                              {cardHealthStatus.result.healthy ? `${cardHealthStatus.result.latency}ms` : '✕'}
+                            </Box>
+                          ) : (
+                            <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
+                              <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleHealthCheck(service);
+                                }}
+                                disabled={cardHealthStatus?.loading}
+                                sx={{
+                                  width: 24,
+                                  height: 24,
+                                  p: 0,
+                                  bgcolor: 'background.paper',
+                                  border: 1,
+                                  borderColor: 'divider',
+                                  '&:hover': { bgcolor: 'action.hover' },
+                                }}
+                              >
+                                {cardHealthStatus?.loading ? (
+                                  <SearchIcon sx={{
+                                    fontSize: 16,
+                                    animation: 'searchingAnimXSmall 2s ease-in-out infinite',
+                                    '@keyframes searchingAnimXSmall': {
+                                      '0%': { transform: 'translate(0, 0) rotate(0deg)' },
+                                      '25%': { transform: 'translate(1px, -1px) rotate(10deg)' },
+                                      '50%': { transform: 'translate(-1px, 1px) rotate(-10deg)' },
+                                      '100%': { transform: 'translate(0, 0) rotate(0deg)' },
+                                    },
+                                  }} />
+                                ) : (
+                                  <TouchAppIcon sx={{ fontSize: 16 }} />
+                                )}
+                              </IconButton>
+                            </Tooltip>
+                          );
+                        })()}
                       </>
                     )}
                   </Box>
                 </Box>
-              );
-            })}
+
+                {/* Hostname */}
+                <Typography
+                  variant="body2"
+                  sx={{ fontFamily: '"D2Coding", monospace', fontWeight: 600 }}
+                >
+                  {service.hostname}
+                </Typography>
+
+                {/* Instance ID */}
+                <Typography
+                  variant="body2"
+                  color="text.disabled"
+                  sx={{ fontFamily: '"D2Coding", monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                >
+                  {service.instanceId}
+                </Typography>
+
+                {/* Info Grid */}
+                <Box sx={{
+                  mt: 1,
+                  display: 'grid',
+                  gridTemplateColumns: 'auto 1fr',
+                  gap: 0.25,
+                  '& .label': { color: 'text.secondary', fontSize: '0.875rem', minWidth: 55 },
+                  '& .value': { fontFamily: '"D2Coding", monospace', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+                }}>
+                  <Typography className="label">External</Typography>
+                  <Typography className="value">{service.externalAddress}</Typography>
+                  <Typography className="label">Internal</Typography>
+                  <Typography className="value">{service.internalAddress}</Typography>
+                </Box>
+
+                {/* Ports - Compact inline chips */}
+                {ports.length > 0 && (
+                  <Box sx={{
+                    mt: 0.5,
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 0.5,
+                  }}>
+                    {ports.map(([name, port]) => (
+                      <Chip
+                        key={`${service.instanceId}-port-${name}`}
+                        label={`${name}:${port}`}
+                        size="small"
+                        variant="outlined"
+                        sx={{
+                          height: 24,
+                          fontSize: '0.8rem',
+                          fontFamily: '"D2Coding", monospace',
+                          borderRadius: 1,
+                          '& .MuiChip-label': { px: 1 },
+                        }}
+                      />
+                    ))}
+                  </Box>
+                )}
+
+                {/* Custom labels */}
+                {customLabels.length > 0 && (
+                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.5 }}>
+                    {customLabels.map(([key, value]) => (
+                      <Chip
+                        key={`${service.instanceId}-${key}`}
+                        label={`${key}=${value}`}
+                        size="small"
+                        variant="outlined"
+                        sx={{ fontSize: '0.8rem', height: 24, fontFamily: '"D2Coding", monospace', borderRadius: 1 }}
+                      />
+                    ))}
+                  </Box>
+                )}
+
+                {/* Spacer */}
+                <Box sx={{ flex: 1 }} />
+
+                {/* Stats */}
+                {service.stats && Object.keys(service.stats).length > 0 && (
+                  <Box sx={{
+                    mt: 1,
+                    p: 0.75,
+                    bgcolor: 'action.hover',
+                    borderRadius: 1,
+                    display: 'flex',
+                    gap: 2,
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
+                  }}>
+                    {Object.entries(service.stats).map(([key, value]) => (
+                      <Box key={`${service.instanceId}-${key}`} sx={{ textAlign: 'center' }}>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.6rem' }}>
+                          {key}
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.8rem' }}>
+                          {typeof value === 'number' ? value.toFixed(1) : String(value)}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+
+
+
+                {/* Footer: Health + Updated time removed as redundant */}
+              </CardContent>
+            </Card>
+          );
+        };
+
+        // Render group recursively
+        const renderCardGroup = (group: CardGroup): React.ReactNode => {
+          const allInstances = collectCardInstances(group);
+          const hasChildren = group.children && group.children.length > 0;
+
+          return (
+            <Box key={group.id} sx={{ mb: group.level === 0 ? 3 : 2, ml: group.level * 2 }}>
+              {/* Group Header */}
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                mb: 1.5,
+                gap: 1.5,
+                pb: 1,
+                borderBottom: 1,
+                borderColor: 'divider',
+                bgcolor: (theme) => alpha(theme.palette.action.hover, 0.3 + group.level * 0.1),
+                borderRadius: 1,
+                p: 1,
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'stretch', height: 28, borderRadius: 1, border: 1, borderColor: 'divider', overflow: 'hidden' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', px: 1, fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary', bgcolor: 'background.paper', textTransform: 'uppercase' }}>
+                    {getGroupingLabel(group.fieldName)}
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', px: 1.5, fontSize: '0.85rem', fontWeight: 700, color: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100], bgcolor: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[200] : theme.palette.grey[700] }}>
+                    {group.name}
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 28, px: 1, fontSize: '0.8rem', fontWeight: 700, color: 'primary.contrastText', bgcolor: 'primary.main' }}>
+                    {allInstances.length}
+                  </Box>
+                </Box>
+              </Box>
+
+              {/* Render children or cards */}
+              {hasChildren ? (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {group.children!.map(child => renderCardGroup(child))}
+                </Box>
+              ) : (
+                <Box sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: 1.5,
+                  '@media (max-width: 1200px)': { gridTemplateColumns: 'repeat(2, 1fr)' },
+                  '@media (max-width: 768px)': { gridTemplateColumns: '1fr' },
+                }}>
+                  {group.instances.map(service => renderServiceCard(service))}
+                </Box>
+              )}
+            </Box>
+          );
+        };
+
+        const groups = groupingLevels.length > 0 ? buildCardGroups(gridDisplayServices, groupingLevels) : [];
+
+        // No grouping - render flat grid
+        if (groupingLevels.length === 0) {
+          return (
+            <Box sx={{
+              flex: 1,
+              minHeight: 0,
+              overflow: 'auto',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: 1.5,
+              '@media (max-width: 1200px)': { gridTemplateColumns: 'repeat(2, 1fr)' },
+              '@media (max-width: 768px)': { gridTemplateColumns: '1fr' },
+            }}>
+              {gridDisplayServices.length === 0 ? (
+                <Card sx={{ gridColumn: '1 / -1' }}>
+                  <CardContent sx={{ py: 4, textAlign: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('serverList.noData')}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              ) : (
+                gridDisplayServices.map(service => renderServiceCard(service))
+              )}
+            </Box>
+          );
+        }
+
+        // With grouping - render grouped view
+        return (
+          <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {groups.map(group => renderCardGroup(group))}
           </Box>
         );
       })()}
 
       {/* Cluster View - Force-directed grape cluster visualization */}
-      {(services.length > 0 || !isLoading) && viewMode === 'cluster' && (
-        <ClusterView
-          services={gridDisplayServices}
-          heartbeatIds={heartbeatIds}
-          t={t}
-          groupingLevels={groupingLevels}
-          onContextMenu={handleContextMenu}
-        />
-      )}
+      {
+        (services.length > 0 || !isLoading) && viewMode === 'cluster' && (
+          <ClusterView
+            services={gridDisplayServices}
+            heartbeatIds={heartbeatIds}
+            t={t}
+            groupingLevels={groupingLevels}
+            onContextMenu={handleContextMenu}
+          />
+        )
+      }
 
       {/* Column Settings Popover */}
       <Popover
@@ -5223,7 +5314,7 @@ const ServerListPage: React.FC = () => {
           </MenuItem>
         )}
       </Menu>
-    </Box>
+    </Box >
   );
 };
 
