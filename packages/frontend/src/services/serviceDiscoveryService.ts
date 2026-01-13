@@ -83,7 +83,24 @@ class ServiceDiscoveryService {
   }
 
   /**
-   * Get cache status from a service instance
+   * Get cache status summary from a service instance
+   * Calls the service's /internal/cache/summary endpoint via backend proxy
+   */
+  async getCacheSummary(serviceType: string, instanceId: string): Promise<{
+    status: string;
+    timestamp?: string;
+    lastRefreshedAt?: string | null;
+    invalidationCount?: number;
+    summary?: Record<string, Record<string, number>>;
+    latency?: number;
+    error?: string;
+  }> {
+    const response = await api.get(`/admin/services/${serviceType}/${instanceId}/cache/summary`);
+    return response.data;
+  }
+
+  /**
+   * Get cache status from a service instance (full data)
    * Calls the service's /internal/cache endpoint via backend proxy
    */
   async getCacheStatus(serviceType: string, instanceId: string): Promise<{

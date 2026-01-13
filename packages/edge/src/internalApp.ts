@@ -1,4 +1,5 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
+import healthRoutes from './routes/health';
 import internalRoutes from './routes/internal';
 import logger from './config/logger';
 import { sdkManager } from './services/sdkManager';
@@ -30,6 +31,9 @@ internalApp.use((req: Request, res: Response, next: NextFunction) => {
     }
     next();
 });
+
+// Health check routes
+internalApp.use('/health', healthRoutes);
 
 // Mount internal routes at /internal
 internalApp.use('/internal', internalRoutes);

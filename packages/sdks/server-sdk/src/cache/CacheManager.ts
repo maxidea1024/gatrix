@@ -398,6 +398,7 @@ export class CacheManager {
 
       // Record initial load timestamp
       this.lastRefreshedAt = new Date();
+      this.invalidationCount++;
 
       this.logger.info('SDK cache initialized', {
         enabledFeatures: featureTypes,

@@ -139,6 +139,7 @@ const GatrixEdgesPage: React.FC = () => {
     const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
     const [jsonDialogData, setJsonDialogData] = useState<any>(null);
     const [jsonDialogTitle, setJsonDialogTitle] = useState('');
+    const [fullJsonLoading, setFullJsonLoading] = useState<string | null>(null);
 
     // JSON Search State
     const [jsonSearchQuery, setJsonSearchQuery] = useState('');
@@ -221,6 +222,16 @@ const GatrixEdgesPage: React.FC = () => {
 
             setServices(edgeServices);
             groupServicesMultiLevel(edgeServices, groupingLevels);
+
+            // If it's a manual refresh and we have expanded instances, refresh their cache status too
+            if (isRefresh && expandedInstances.size > 0) {
+                expandedInstances.forEach(instanceId => {
+                    const instance = edgeServices.find(s => s.instanceId === instanceId);
+                    if (instance) {
+                        fetchCacheStatus(instance);
+                    }
+                });
+            }
         } catch (err: any) {
             setError(err.message || 'Failed to fetch services');
         } finally {
@@ -285,7 +296,7 @@ const GatrixEdgesPage: React.FC = () => {
         setExpandedGroups(allGroupIds);
     }, [t]);
 
-    // Fetch cache status for an instance
+    // Fetch cache status summary for an instance
     const fetchCacheStatus = useCallback(async (instance: ServiceInstance) => {
         const key = instance.instanceId;
         setCacheStatuses(prev => {
@@ -297,7 +308,7 @@ const GatrixEdgesPage: React.FC = () => {
 
         try {
             const serviceType = instance.labels.service;
-            const result = await serviceDiscoveryService.getCacheStatus(serviceType, instance.instanceId);
+            const result = await serviceDiscoveryService.getCacheSummary(serviceType, instance.instanceId);
             setCacheStatuses(prev => {
                 const next = new Map(prev);
                 next.set(key, { ...result, loading: false });
@@ -312,6 +323,19 @@ const GatrixEdgesPage: React.FC = () => {
             });
         }
     }, []);
+
+    const handleViewFullJson = async (instance: ServiceInstance) => {
+        setFullJsonLoading(instance.instanceId);
+        try {
+            const serviceType = instance.labels.service;
+            const result = await serviceDiscoveryService.getCacheStatus(serviceType, instance.instanceId);
+            openJsonDialog(result, t('gatrixEdges.cacheStatus'));
+        } catch (err: any) {
+            console.error('Failed to fetch full cache status:', err);
+        } finally {
+            setFullJsonLoading(null);
+        }
+    };
 
     // Poll cache status for expanded instances
     useEffect(() => {
@@ -495,30 +519,34 @@ const GatrixEdgesPage: React.FC = () => {
                                 </Select>
                             </FormControl>
 
-                            <IconButton
-                                size="small"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    fetchCacheStatus(instance);
-                                }}
-                                disabled={loading}
-                                sx={{ p: 0.5 }}
-                            >
-                                <RefreshIcon
-                                    fontSize="small"
-                                    sx={{
-                                        animation: loading ? 'spin 1s linear infinite' : 'none',
-                                        '@keyframes spin': {
-                                            '0%': {
-                                                transform: 'rotate(0deg)',
-                                            },
-                                            '100%': {
-                                                transform: 'rotate(360deg)',
-                                            },
-                                        },
-                                    }}
-                                />
-                            </IconButton>
+                            <Tooltip title={t('common.refresh')} leaveDelay={0}>
+                                <span>
+                                    <IconButton
+                                        size="small"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            fetchCacheStatus(instance);
+                                        }}
+                                        disabled={loading}
+                                        sx={{ p: 0.5 }}
+                                    >
+                                        <RefreshIcon
+                                            fontSize="small"
+                                            sx={{
+                                                animation: loading ? 'spin 1s linear infinite' : 'none',
+                                                '@keyframes spin': {
+                                                    '0%': {
+                                                        transform: 'rotate(0deg)',
+                                                    },
+                                                    '100%': {
+                                                        transform: 'rotate(360deg)',
+                                                    },
+                                                },
+                                            }}
+                                        />
+                                    </IconButton>
+                                </span>
+                            </Tooltip>
                         </Box>
 
                         {latency !== undefined && (
@@ -527,13 +555,23 @@ const GatrixEdgesPage: React.FC = () => {
                             </Tooltip>
                         )}
 
-                        <Tooltip title={t('gatrixEdges.viewJson')}>
-                            <IconButton
-                                size="small"
-                                onClick={() => openJsonDialog(cacheStatus, t('gatrixEdges.cacheStatus'))}
-                            >
-                                <CodeIcon sx={{ fontSize: 16 }} />
-                            </IconButton>
+                        <Tooltip title={t('gatrixEdges.viewJson')} leaveDelay={0}>
+                            <span>
+                                <IconButton
+                                    size="small"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleViewFullJson(instance);
+                                    }}
+                                    disabled={fullJsonLoading === instance.instanceId}
+                                >
+                                    {fullJsonLoading === instance.instanceId ? (
+                                        <CircularProgress size={16} color="inherit" />
+                                    ) : (
+                                        <CodeIcon sx={{ fontSize: 16 }} />
+                                    )}
+                                </IconButton>
+                            </span>
                         </Tooltip>
                     </Stack>
                 </Box>
@@ -627,9 +665,11 @@ const GatrixEdgesPage: React.FC = () => {
                     <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
                         {t('gatrixEdges.basicInfo')}
                     </Typography>
-                    <IconButton size="small" onClick={() => openJsonDialog(instance, t('gatrixEdges.basicInfo'))}>
-                        <CodeIcon sx={{ fontSize: 16 }} />
-                    </IconButton>
+                    <Tooltip title={t('gatrixEdges.viewJson')} leaveDelay={0}>
+                        <IconButton size="small" onClick={() => openJsonDialog(instance, t('gatrixEdges.basicInfo'))}>
+                            <CodeIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                    </Tooltip>
                 </Box>
                 <Table size="small" sx={{ mb: 2 }}>
                     <TableBody>

@@ -17,14 +17,7 @@ const convertBitToBoolean = (obj: any): any => {
   // mysql2 returns DATETIME as Date interpreted as local time, but DB stores UTC
   // So we extract local time components and format them as UTC
   if (obj instanceof Date) {
-    const year = obj.getFullYear();
-    const month = String(obj.getMonth() + 1).padStart(2, '0');
-    const day = String(obj.getDate()).padStart(2, '0');
-    const hours = String(obj.getHours()).padStart(2, '0');
-    const minutes = String(obj.getMinutes()).padStart(2, '0');
-    const seconds = String(obj.getSeconds()).padStart(2, '0');
-    const ms = String(obj.getMilliseconds()).padStart(3, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${ms}Z`;
+    return obj.toISOString();
   }
 
   // Skip Buffer objects
@@ -48,14 +41,7 @@ const convertBitToBoolean = (obj: any): any => {
         converted[key] = value;
       } else if (value instanceof Date) {
         // Convert Date to UTC ISO string
-        const year = value.getFullYear();
-        const month = String(value.getMonth() + 1).padStart(2, '0');
-        const day = String(value.getDate()).padStart(2, '0');
-        const hours = String(value.getHours()).padStart(2, '0');
-        const minutes = String(value.getMinutes()).padStart(2, '0');
-        const seconds = String(value.getSeconds()).padStart(2, '0');
-        const ms = String(value.getMilliseconds()).padStart(3, '0');
-        converted[key] = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${ms}Z`;
+        converted[key] = value.toISOString();
       } else if (typeof value === 'object') {
         converted[key] = convertBitToBoolean(value);
       } else {
@@ -77,6 +63,7 @@ const knexConfig = {
     password: config.database.password,
     database: config.database.name,
     charset: 'utf8mb4',
+    timezone: 'Z',
   },
   debug: config.database.debug, // .env의 DB_DEBUG 설정으로 제어
   pool: {

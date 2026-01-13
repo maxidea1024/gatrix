@@ -6,15 +6,16 @@ import {
   Menu,
   MenuItem,
   TextField,
-  Select,
   FormControl,
   InputLabel,
   Stack,
   IconButton,
   Paper,
+  Select,
   Checkbox,
   ListItemText,
   Tooltip,
+  SelectChangeEvent,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -734,7 +735,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 setSelectOpen(true);
                 setSearchText('');
               }}
-              onClose={(event, reason) => {
+              onClose={() => {
                 setSelectOpen(false);
                 setSearchText('');
 
@@ -750,7 +751,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 // Always exit editing mode when Select closes
                 setEditingFilter(null);
               }}
-              onChange={(e) => {
+              onChange={(e: SelectChangeEvent<any>) => {
                 onFilterChange(filter.key, e.target.value);
               }}
               autoFocus
@@ -855,7 +856,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 setSelectOpen(true);
                 setSearchText('');
               }}
-              onClose={(event, reason) => {
+              onClose={() => {
                 setSelectOpen(false);
                 setSearchText('');
 
@@ -871,7 +872,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 // Always exit editing mode when Select closes
                 setEditingFilter(null);
               }}
-              onChange={(e) => {
+              onChange={(e: SelectChangeEvent<any>) => {
                 onFilterChange(filter.key, e.target.value);
               }}
               autoFocus

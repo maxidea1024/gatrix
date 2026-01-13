@@ -4578,6 +4578,9 @@
       "failed": "서버 상태 확인 실패: {{error}}",
       "error": "상태 확인을 수행할 수 없습니다"
     },
+    "sort": {
+      "label": "정렬"
+    },
     "table": {
       "instanceId": "인스턴스 ID",
       "service": "서비스",
@@ -4600,7 +4603,7 @@
     },
     "grouping": {
       "label": "그룹핑",
-      "add": "+ 그룹 추가",
+      "add": "그룹 추가",
       "none": "없음",
       "service": "서비스",
       "group": "그룹",

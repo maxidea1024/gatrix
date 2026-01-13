@@ -123,15 +123,7 @@ export function convertFromMySQLDateTime(mysqlDateTime: string | Date | null | u
         logger.warn(`Invalid Date object: ${mysqlDateTime}`);
         return null;
       }
-      // Get the local time components and treat them as UTC
-      const year = mysqlDateTime.getFullYear();
-      const month = String(mysqlDateTime.getMonth() + 1).padStart(2, '0');
-      const day = String(mysqlDateTime.getDate()).padStart(2, '0');
-      const hours = String(mysqlDateTime.getHours()).padStart(2, '0');
-      const minutes = String(mysqlDateTime.getMinutes()).padStart(2, '0');
-      const seconds = String(mysqlDateTime.getSeconds()).padStart(2, '0');
-      const ms = String(mysqlDateTime.getMilliseconds()).padStart(3, '0');
-      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${ms}Z`;
+      return mysqlDateTime.toISOString();
     }
 
     // MySQL DATETIME은 UTC로 저장되어 있으므로 'Z'를 추가하여 UTC임을 명시

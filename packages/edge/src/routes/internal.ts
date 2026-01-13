@@ -1,12 +1,33 @@
 import { Router, Request, Response } from 'express';
 import { sdkManager } from '../services/sdkManager';
+import { tokenMirrorService } from '../services/tokenMirrorService';
 
 const router = Router();
 
 /**
+ * Health status endpoint
+ * GET /internal/health
+ */
+router.get('/health', (req: Request, res: Response) => {
+  const sdk = sdkManager.getSDK();
+  const isSdkReady = sdk !== null;
+  const isTokenMirrorReady = tokenMirrorService.isInitialized();
+  const isReady = isSdkReady && isTokenMirrorReady;
+
+  res.status(isReady ? 200 : 503).json({
+    status: isReady ? 'healthy' : 'initializing',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0',
+    sdk: isSdkReady ? 'ready' : 'initializing',
+    tokenMirror: isTokenMirrorReady ? 'ready' : 'initializing',
+    tokenCount: tokenMirrorService.getTokenCount(),
+  });
+});
+
+/**
  * Build cache status response
  */
-function buildCacheResponse(sdk: any): any {
+function buildCacheResponse(sdk: any, includeDetail: boolean = true): any {
   const allCached = sdk.getAllCachedData();
   const INTERNAL_ENV = 'gatrix-env';
 
@@ -76,37 +97,61 @@ function buildCacheResponse(sdk: any): any {
     }
   }
 
-  // Filter raw detail data to remove internal env
-  const filteredDetail: Record<string, any> = { ...allCached };
-  const envKeyedProps = ['clientVersions', 'serviceNotices', 'banners', 'storeProducts', 'gameWorlds', 'popupNotices', 'surveys'];
-
-  for (const prop of envKeyedProps) {
-    if (filteredDetail[prop]) {
-      const filtered: Record<string, any> = {};
-      for (const [env, data] of Object.entries(filteredDetail[prop])) {
-        if (env !== INTERNAL_ENV) {
-          filtered[env] = data;
-        }
-      }
-      filteredDetail[prop] = filtered;
-    }
-  }
-
   // Check if SDK is actually initialized for status reporting
   const isInitialized = typeof sdk.isInitialized === 'function' && sdk.isInitialized();
 
-  return {
+  const response: any = {
     status: isInitialized ? 'ready' : 'initializing',
     timestamp: new Date().toISOString(),
     lastRefreshedAt: allCached.lastRefreshedAt || null,
     invalidationCount: allCached.invalidationCount || 0,
     summary,
-    detail: filteredDetail,
   };
+
+  if (includeDetail) {
+    // Filter raw detail data to remove internal env
+    const filteredDetail: Record<string, any> = { ...allCached };
+    const envKeyedProps = ['clientVersions', 'serviceNotices', 'banners', 'storeProducts', 'gameWorlds', 'popupNotices', 'surveys'];
+
+    for (const prop of envKeyedProps) {
+      if (filteredDetail[prop]) {
+        const filtered: Record<string, any> = {};
+        for (const [env, data] of Object.entries(filteredDetail[prop])) {
+          if (env !== INTERNAL_ENV) {
+            filtered[env] = data;
+          }
+        }
+        filteredDetail[prop] = filtered;
+      }
+    }
+    response.detail = filteredDetail;
+  }
+
+  return response;
 }
 
 /**
- * Cache status endpoint (for debugging)
+ * Cache summary endpoint (lightweight)
+ * GET /internal/cache/summary
+ */
+router.get('/cache/summary', (req: Request, res: Response) => {
+  const sdk = sdkManager.getSDK();
+
+  if (!sdk) {
+    res.status(503).json({
+      status: 'not_ready',
+      message: 'SDK not initialized',
+      timestamp: new Date().toISOString(),
+    });
+    return;
+  }
+
+  const response = buildCacheResponse(sdk, false);
+  res.json(response);
+});
+
+/**
+ * Cache status endpoint (for debugging, full data)
  * GET /internal/cache
  */
 router.get('/cache', (req: Request, res: Response) => {
@@ -121,7 +166,7 @@ router.get('/cache', (req: Request, res: Response) => {
     return;
   }
 
-  const response = buildCacheResponse(sdk);
+  const response = buildCacheResponse(sdk, true);
   res.json(response);
 });
 

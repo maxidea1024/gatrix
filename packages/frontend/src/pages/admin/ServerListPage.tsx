@@ -14,6 +14,7 @@ import {
   TableCell,
   TableBody,
   Chip,
+  Divider,
   TextField,
   InputAdornment,
   CircularProgress,
@@ -30,7 +31,6 @@ import {
   Checkbox,
   Button,
   ClickAwayListener,
-  TableSortLabel,
   alpha,
   Dialog,
   DialogTitle,
@@ -41,6 +41,8 @@ import {
   MenuItem,
   ListItemIcon,
   Paper,
+  Select,
+  useTheme,
 } from '@mui/material';
 import {
   Dns as DnsIcon,
@@ -72,6 +74,11 @@ import {
   OpenInNew as OpenInNewIcon,
   Info as InfoIcon,
   MoreVert as MoreVertIcon,
+  ArrowUpward as ArrowUpwardIcon,
+  ArrowDownward as ArrowDownwardIcon,
+  Add as AddIcon,
+  MonitorHeart as MonitorHeartIcon,
+  Terminal as TerminalIcon,
 } from '@mui/icons-material';
 import {
   DndContext,
@@ -1697,91 +1704,66 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(({
     const hasChildren = group.children && group.children.length > 0;
 
     return (
-      <Paper
-        key={group.id}
-        elevation={0}
-        sx={{
-          width: '100%',
-          boxSizing: 'border-box',
-          mb: depth === 0 ? 3 : 2,
-          ml: depth * 2,
-          p: 2,
-          bgcolor: (theme) => alpha(theme.palette.background.paper, 0.4 - depth * 0.1),
-          borderRadius: 2,
-          borderLeft: depth > 0 ? 3 : 0,
-          borderColor: 'primary.main',
-          backdropFilter: 'blur(8px)',
-          boxShadow: (theme) => theme.palette.mode === 'dark'
-            ? '0 4px 20px rgba(0,0,0,0.4)'
-            : '0 4px 20px rgba(0,0,0,0.05)',
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5, gap: 1.5, pb: 1, borderBottom: 1, borderColor: 'divider' }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'stretch',
-              height: 28,
-              borderRadius: 1,
-              border: 1,
-              borderColor: 'divider',
-              overflow: 'hidden',
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                px: 1,
-                fontSize: '0.7rem',
-                fontWeight: 600,
-                color: 'text.secondary',
-                bgcolor: 'action.hover',
-                textTransform: 'uppercase',
-              }}
-            >
+      <Box key={group.id} sx={{ mb: depth === 0 ? 4 : 3, ml: depth * 2 }}>
+        {/* Modern Unified Group Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          mb: 1.5,
+          gap: 1.5,
+          pb: 1,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          position: 'relative'
+        }}>
+          {/* visual level bar */}
+          {depth > 0 && (
+            <Box sx={{
+              width: 3,
+              height: 24,
+              bgcolor: 'primary.main',
+              mr: 0.5,
+              opacity: 0.5,
+              borderRadius: 1
+            }} />
+          )}
+
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            px: 1.5,
+            py: 0.5,
+            borderRadius: '6px',
+            bgcolor: depth === 0 ? 'primary.main' : 'action.selected',
+            color: depth === 0 ? 'primary.contrastText' : 'text.primary',
+            boxShadow: depth === 0 ? '0 3px 8px rgba(0,0,0,0.12)' : 'none',
+            border: depth === 0 ? 'none' : '1px solid',
+            borderColor: 'divider'
+          }}>
+            <Typography variant="caption" sx={{ fontWeight: 800, mr: 1, opacity: 0.7, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               {getGroupingLabel(group.fieldName)}
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                px: 1.5,
-                fontSize: '0.85rem',
-                fontWeight: 700,
-                color: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100],
-                bgcolor: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[200] : theme.palette.grey[700],
-              }}
-            >
+            </Typography>
+            <Typography variant="body2" sx={{ fontWeight: 700 }}>
               {group.name}
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minWidth: 28,
-                px: 1,
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                color: 'primary.contrastText',
-                bgcolor: 'primary.main',
-              }}
-            >
-              {allInstances.length}
-            </Box>
+            </Typography>
+            <Typography variant="caption" sx={{ ml: 1, fontWeight: 800, opacity: 0.6 }}>
+              ({allInstances.length})
+            </Typography>
           </Box>
           <Box sx={{ flex: 1 }} />
           <StatusStatsDisplay services={allInstances} t={t} />
         </Box>
-        {hasChildren ? (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            {group.children!.map((child) => renderGroup(child, depth + 1))}
-          </Box>
-        ) : (
-          renderItemsGrid(group.instances, group.id)
-        )}
-      </Paper>
+
+        <Box sx={{ mt: 1 }}>
+          {hasChildren ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {group.children!.map((child) => renderGroup(child, depth + 1))}
+            </Box>
+          ) : (
+            renderItemsGrid(group.instances, group.id)
+          )}
+        </Box>
+      </Box>
     );
   };
 
@@ -1952,10 +1934,6 @@ const ServerListPage: React.FC = () => {
   // Track heartbeat for pulse animation
   const [heartbeatIds, setHeartbeatIds] = useState<Set<string>>(new Set());
 
-  // Track last heartbeat time for ping progress bar (for list view only)
-  const [listViewLastHeartbeatTime, setListViewLastHeartbeatTime] = useState<Map<string, number>>(new Map());
-  const [listViewPingProgress, setListViewPingProgress] = useState<Map<string, number>>(new Map());
-
   // Cleanup confirmation dialog
   const [cleanupDialogOpen, setCleanupDialogOpen] = useState(false);
 
@@ -2040,36 +2018,7 @@ const ServerListPage: React.FC = () => {
 
 
 
-  // Update ping progress every 100ms (for list view + grid/card view)
-  useEffect(() => {
-    // Only run interval when NOT in cluster view mode to avoid performance issues in simulation
-    if (viewMode === 'cluster') return;
 
-    const interval = setInterval(() => {
-      const now = Date.now();
-      setListViewPingProgress(() => {
-        const next = new Map<string, number>();
-        services.forEach((service) => {
-          const serviceKey = `${service.labels.service}-${service.instanceId}`;
-          const lastTime = listViewLastHeartbeatTime.get(serviceKey);
-          if (lastTime) {
-            const elapsed = (now - lastTime) / 1000; // seconds
-            const progress = Math.min(elapsed / HEARTBEAT_TTL_SECONDS, 1);
-            next.set(serviceKey, progress);
-          } else {
-            // If no heartbeat yet, calculate from updatedAt
-            const updatedTime = new Date(service.updatedAt).getTime();
-            const elapsed = (now - updatedTime) / 1000;
-            const progress = Math.min(elapsed / HEARTBEAT_TTL_SECONDS, 1);
-            next.set(serviceKey, progress);
-          }
-        });
-        return next;
-      });
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, [viewMode, services, listViewLastHeartbeatTime]);
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
@@ -2094,6 +2043,7 @@ const ServerListPage: React.FC = () => {
   ];
 
   // Column configuration state (persisted in localStorage)
+  const [currentTime, setCurrentTime] = useState(Date.now());
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
     const saved = localStorage.getItem('serverListColumns');
     if (saved) {
@@ -2116,6 +2066,15 @@ const ServerListPage: React.FC = () => {
     }
     return defaultColumns;
   });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (!isPaused) {
+        setCurrentTime(Date.now());
+      }
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [isPaused]);
 
   // Column settings popover state
   const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
@@ -2237,9 +2196,6 @@ const ServerListPage: React.FC = () => {
                       return newSet;
                     });
                   }, 600); // Short pulse duration
-
-                  // Reset ping progress bar on heartbeat (for list view)
-                  setListViewLastHeartbeatTime((prev) => new Map(prev).set(serviceKey, Date.now()));
 
                   const newServices = [...prev];
                   newServices[index] = event.data;
@@ -3074,13 +3030,12 @@ const ServerListPage: React.FC = () => {
 
     const config = statusConfig[status];
     if (!config) {
-      // Fallback for unknown status
       return (
         <Chip
           label={status}
           color="default"
           size="small"
-          sx={{ fontWeight: 600, borderRadius: 1 }}
+          sx={{ fontWeight: 600, borderRadius: 0 }}
         />
       );
     }
@@ -3092,10 +3047,61 @@ const ServerListPage: React.FC = () => {
           label={config.label}
           color={config.color}
           size="small"
-          sx={{ fontWeight: 600, borderRadius: 1 }}
+          sx={{ fontWeight: 600, borderRadius: 0 }}
         />
       </Tooltip>
     );
+  };
+
+  const renderHeartbeatIcon = (service: ServiceInstance, size = 26, iconSize = 14) => {
+    const serviceKey = `${service.labels.service}-${service.instanceId}`;
+    const isActive = heartbeatIds.has(serviceKey);
+
+    return (service.status === 'initializing' || service.status === 'ready') && (
+      <Box
+        sx={{
+          width: size,
+          height: size,
+          borderRadius: '50% !important',
+          border: '1px solid',
+          borderColor: isActive ? 'error.main' : 'divider',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          bgcolor: 'background.paper',
+          flexShrink: 0,
+        }}
+      >
+        <FavoriteIcon
+          sx={{
+            fontSize: iconSize,
+            color: isActive ? 'error.main' : 'action.disabled',
+            opacity: isActive ? 1 : 0.3,
+            animation: isActive ? 'heartbeat 0.6s ease-in-out infinite' : 'none',
+            '@keyframes heartbeat': {
+              '0%': { transform: 'scale(1)' },
+              '25%': { transform: 'scale(1.3)' },
+              '50%': { transform: 'scale(1)' },
+              '75%': { transform: 'scale(1.2)' },
+              '100%': { transform: 'scale(1)' },
+            },
+          }}
+        />
+      </Box>
+    );
+  };
+
+  const getStatusLabelText = (status: ServiceStatus) => {
+    switch (status) {
+      case 'ready': return t('serverList.status.ready');
+      case 'error': return t('serverList.status.error');
+      case 'initializing': return t('serverList.status.initializing');
+      case 'shutting_down': return t('serverList.status.shuttingDown');
+      case 'terminated': return t('serverList.status.terminated');
+      case 'no-response': return t('serverList.status.noResponse');
+      case 'busy': return t('serverList.status.busy');
+      default: return status;
+    }
   };
 
   // Type chip component
@@ -3105,7 +3111,7 @@ const ServerListPage: React.FC = () => {
         label={type}
         size="small"
         variant="outlined"
-        sx={{ fontWeight: 600, borderRadius: 1 }}
+        sx={{ fontWeight: 600, borderRadius: 0 }}
       />
     );
   };
@@ -3195,392 +3201,209 @@ const ServerListPage: React.FC = () => {
       {/* Search and Filters */}
       <Card sx={{ mb: 3, flexShrink: 0 }}>
         <CardContent>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            {/* Search */}
-            <TextField
-              placeholder={t('serverList.searchPlaceholder')}
-              size="small"
-              sx={{
-                minWidth: 280,
-                flexGrow: 1,
-                maxWidth: 320,
-                '& .MuiOutlinedInput-root': {
-                  height: '40px',
-                  borderRadius: '20px',
-                  bgcolor: 'background.paper',
-                  transition: 'all 0.2s ease-in-out',
-                  '& fieldset': {
-                    borderColor: 'divider',
-                  },
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                    '& fieldset': {
-                      borderColor: 'primary.light',
-                    }
-                  },
-                  '&.Mui-focused': {
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {/* Row 1: Search & Filtering */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <TextField
+                placeholder={t('serverList.searchPlaceholder')}
+                size="small"
+                sx={{
+                  flex: 1,
+                  minWidth: 280,
+                  maxWidth: 400,
+                  '& .MuiOutlinedInput-root': {
                     bgcolor: 'background.paper',
-                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                    '& fieldset': {
-                      borderColor: 'primary.main',
-                      borderWidth: '1px',
-                    }
+                    borderRadius: 0,
+                    '&:hover fieldset': { borderColor: 'primary.main' },
                   }
-                },
-                '& .MuiInputBase-input': {
-                  fontSize: '0.875rem',
-                }
-              }}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            {/* Dynamic Filter Bar */}
-            <DynamicFilterBar
-              availableFilters={availableFilterDefinitions}
-              activeFilters={activeFilters}
-              onFilterAdd={handleFilterAdd}
-              onFilterRemove={handleFilterRemove}
-              onFilterChange={handleFilterChange}
-            />
-
-            {/* Column Settings Button - Only show in list view */}
-            {viewMode === 'list' && (
-              <Tooltip title={t('serverList.columnSettings')}>
-                <IconButton
-                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                  sx={{
-                    bgcolor: 'background.paper',
-                    border: 1,
-                    borderColor: 'divider',
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                    },
-                  }}
-                >
-                  <ViewColumnIcon />
-                </IconButton>
-              </Tooltip>
-            )}
-
-            {/* Status Counters - wrapped in a box like StoreProducts */}
-            <StatusStatsDisplay services={filteredServices} t={t} />
-
-            {/* Spacer to push right-side buttons to the right */}
-            <Box sx={{ flexGrow: 1 }} />
-
-            {/* Divider */}
-            <Box
-              sx={{
-                width: '1px',
-                height: '24px',
-                bgcolor: (theme) => theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.2)'
-                  : 'rgba(0, 0, 0, 0.2)',
-              }}
-            />
-
-            {/* View Mode Buttons */}
-            <Tooltip title={t('serverList.viewMode.list')}>
-              <IconButton
-                onClick={() => handleViewModeChange('list')}
-                sx={{
-                  bgcolor: viewMode === 'list' ? 'primary.main' : 'background.paper',
-                  color: viewMode === 'list' ? 'primary.contrastText' : 'text.primary',
-                  border: 1,
-                  borderColor: viewMode === 'list' ? 'primary.main' : 'divider',
-                  '&:hover': {
-                    bgcolor: viewMode === 'list' ? 'primary.dark' : 'action.hover',
-                  },
                 }}
-              >
-                <ViewListIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t('serverList.viewMode.grid')}>
-              <IconButton
-                onClick={() => handleViewModeChange('grid')}
-                sx={{
-                  bgcolor: viewMode === 'grid' ? 'primary.main' : 'background.paper',
-                  color: viewMode === 'grid' ? 'primary.contrastText' : 'text.primary',
-                  border: 1,
-                  borderColor: viewMode === 'grid' ? 'primary.main' : 'divider',
-                  '&:hover': {
-                    bgcolor: viewMode === 'grid' ? 'primary.dark' : 'action.hover',
-                  },
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                    </InputAdornment>
+                  ),
                 }}
-              >
-                <ViewModuleIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t('serverList.viewMode.card')}>
-              <IconButton
-                onClick={() => handleViewModeChange('card')}
-                sx={{
-                  bgcolor: viewMode === 'card' ? 'primary.main' : 'background.paper',
-                  color: viewMode === 'card' ? 'primary.contrastText' : 'text.primary',
-                  border: 1,
-                  borderColor: viewMode === 'card' ? 'primary.main' : 'divider',
-                  '&:hover': {
-                    bgcolor: viewMode === 'card' ? 'primary.dark' : 'action.hover',
-                  },
-                }}
-              >
-                <ViewComfyIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t('serverList.viewMode.cluster')}>
-              <IconButton
-                onClick={() => handleViewModeChange('cluster')}
-                sx={{
-                  bgcolor: viewMode === 'cluster' ? 'primary.main' : 'background.paper',
-                  color: viewMode === 'cluster' ? 'primary.contrastText' : 'text.primary',
-                  border: 1,
-                  borderColor: viewMode === 'cluster' ? 'primary.main' : 'divider',
-                  '&:hover': {
-                    bgcolor: viewMode === 'cluster' ? 'primary.dark' : 'action.hover',
-                  },
-                }}
-              >
-                <BubbleChartIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t('serverList.viewMode.checkerboard')}>
-              <IconButton
-                onClick={() => handleViewModeChange('checkerboard')}
-                sx={{
-                  bgcolor: viewMode === 'checkerboard' ? 'primary.main' : 'background.paper',
-                  color: viewMode === 'checkerboard' ? 'primary.contrastText' : 'text.primary',
-                  border: 1,
-                  borderColor: viewMode === 'checkerboard' ? 'primary.main' : 'divider',
-                  '&:hover': {
-                    bgcolor: viewMode === 'checkerboard' ? 'primary.dark' : 'action.hover',
-                  },
-                }}
-              >
-                <AppsIcon />
-              </IconButton>
-            </Tooltip>
+              />
 
-            {/* Divider */}
-            <Box
-              sx={{
-                width: '1px',
-                height: '24px',
-                bgcolor: (theme) => theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.2)'
-                  : 'rgba(0, 0, 0, 0.2)',
-              }}
-            />
-            {/* Multi-level Grouping UI - Show in all views */}
-            <>
-              <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5, whiteSpace: 'nowrap' }}>
-                {t('serverList.grouping.label')}
-              </Typography>
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleFilterChange}
+              />
+            </Box>
 
-              {groupingLevels.map((level, index) => (
-                <Chip
-                  key={index}
-                  label={getGroupingLabel(level)}
-                  onDelete={() => {
-                    const newLevels = [...groupingLevels];
-                    newLevels.splice(index, 1);
-                    setGroupingLevels(newLevels);
-                  }}
+            {/* Row 2: Config Bar (Sort, Group, Columns, View Mode, Actions) */}
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              p: 1,
+              bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+              border: '1px solid',
+              borderColor: 'divider',
+              flexWrap: 'wrap'
+            }}>
+              {/* Sorting */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
+                  {t('serverList.sort.label') || 'Sort'}
+                </Typography>
+                <Select
                   size="small"
-                  sx={{
-                    height: 24,
-                    fontWeight: 600,
-                    '& .MuiChip-deleteIcon': { fontSize: '1rem' },
-                  }}
-                />
-              ))}
+                  value={sortBy}
+                  onChange={(e) => handleSort(e.target.value as string)}
+                  sx={{ height: 28, fontSize: '0.75rem', borderRadius: 0, bgcolor: 'background.paper', minWidth: 120 }}
+                >
+                  {columns.filter(c => c.id !== 'actions').map(col => (
+                    <MenuItem key={col.id} value={col.id} sx={{ fontSize: '0.75rem' }}>{t(col.labelKey)}</MenuItem>
+                  ))}
+                </Select>
+                <Tooltip title={t('common.sort')}>
+                  <IconButton size="small" onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')} sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 0 }}>
+                    {sortOrder === 'asc' ? <ArrowUpwardIcon fontSize="small" /> : <ArrowDownwardIcon fontSize="small" />}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={t('common.columnSettings')}>
+                  <IconButton size="small" onClick={(e) => setColumnSettingsAnchor(e.currentTarget)} sx={{ height: 28, width: 28, border: '1px solid', borderColor: 'divider', borderRadius: 0, bgcolor: 'background.paper' }}>
+                    <ViewColumnIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
 
-              {groupingLevels.length < allGroupingFields.length && (
-                <>
-                  <Tooltip title={t('serverList.grouping.add')}>
+              <Divider orientation="vertical" flexItem />
+
+              {/* Grouping Controls */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
+                  {t('serverList.grouping.label')}
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                  {groupingLevels.map((level, index) => (
+                    <Chip
+                      key={index}
+                      label={getGroupingLabel(level)}
+                      onDelete={() => {
+                        const newLevels = [...groupingLevels];
+                        newLevels.splice(index, 1);
+                        setGroupingLevels(newLevels);
+                      }}
+                      size="small"
+                      sx={{ height: 24, borderRadius: 0, fontWeight: 700, bgcolor: 'primary.main', color: 'primary.contrastText' }}
+                    />
+                  ))}
+                  {groupingLevels.length < allGroupingFields.length && (
                     <Button
                       size="small"
                       variant="outlined"
                       onClick={(e) => setGroupingMenuAnchor(e.currentTarget)}
+                      sx={{ height: 24, minWidth: 'auto', px: 1, fontSize: '0.65rem', borderStyle: 'dashed', borderRadius: 0 }}
+                      startIcon={<AddIcon sx={{ fontSize: 14 }} />}
+                    >
+                      {t('serverList.grouping.add')}
+                    </Button>
+                  )}
+                  {groupingLevels.length > 0 && (
+                    <Button
+                      size="small"
+                      onClick={() => setGroupingLevels([])}
+                      sx={{ minWidth: 'auto', px: 0.75, height: 24, fontSize: '0.65rem', color: 'text.secondary', textTransform: 'none' }}
+                    >
+                      {t('common.clear')}
+                    </Button>
+                  )}
+                </Box>
+              </Box>
+
+              <Divider orientation="vertical" flexItem />
+
+              {/* View Mode */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Box sx={{ display: 'flex', border: '1px solid', borderColor: 'divider' }}>
+                  {[
+                    { mode: 'list', icon: <ViewListIcon fontSize="small" /> },
+                    { mode: 'grid', icon: <ViewModuleIcon fontSize="small" /> },
+                    { mode: 'card', icon: <ViewComfyIcon fontSize="small" /> },
+                    { mode: 'checkerboard', icon: <AppsIcon fontSize="small" /> },
+                    { mode: 'cluster', icon: <BubbleChartIcon fontSize="small" /> }
+                  ].map((item) => (
+                    <Tooltip key={item.mode} title={t(`serverList.viewMode.${item.mode}`)}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleViewModeChange(item.mode as any)}
+                        sx={{
+                          borderRadius: 0,
+                          bgcolor: viewMode === item.mode ? 'primary.main' : 'background.paper',
+                          color: viewMode === item.mode ? 'primary.contrastText' : 'inherit',
+                          '&:hover': { bgcolor: viewMode === item.mode ? 'primary.dark' : 'action.hover' }
+                        }}
+                      >
+                        {item.icon}
+                      </IconButton>
+                    </Tooltip>
+                  ))}
+                </Box>
+              </Box>
+
+              <Divider orientation="vertical" flexItem />
+
+              {/* Real-time Actions (Pause, Cleanup, HealthCheck) */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Tooltip title={isPaused ? t('serverList.resumeUpdates') : t('serverList.pauseUpdates')}>
+                  <Badge badgeContent={pendingUpdates.length} color="warning" invisible={!isPaused || pendingUpdates.length === 0}>
+                    <IconButton
+                      size="small"
+                      onClick={handleTogglePause}
                       sx={{
-                        minWidth: 'auto',
-                        px: 1,
-                        py: 0.25,
-                        height: 24,
-                        fontSize: '0.7rem',
-                        textTransform: 'none',
-                        borderStyle: 'dashed',
-                        borderColor: 'divider',
-                        color: 'text.secondary',
-                        '&:hover': {
-                          bgcolor: 'action.hover',
-                          borderStyle: 'solid',
-                        },
+                        height: 28,
+                        width: 28,
+                        borderRadius: 0,
+                        bgcolor: isPaused ? 'warning.main' : 'background.paper',
+                        color: isPaused ? 'warning.contrastText' : 'inherit',
+                        border: '1px solid',
+                        borderColor: isPaused ? 'warning.main' : 'divider',
+                        '&:hover': { bgcolor: isPaused ? 'warning.dark' : 'action.hover' }
                       }}
                     >
-                      +
-                    </Button>
-                  </Tooltip>
-                  <Menu
-                    anchorEl={groupingMenuAnchor}
-                    open={Boolean(groupingMenuAnchor)}
-                    onClose={() => setGroupingMenuAnchor(null)}
-                  >
-                    {allGroupingFields
-                      .filter(field => !groupingLevels.includes(field))
-                      .map(field => (
-                        <MenuItem
-                          key={field}
-                          onClick={() => {
-                            setGroupingLevels([...groupingLevels, field]);
-                            setGroupingMenuAnchor(null);
-                          }}
-                        >
-                          {getGroupingLabel(field)}
-                        </MenuItem>
-                      ))}
-                  </Menu>
-                </>
-              )}
+                      {isPaused ? <PlayArrowIcon fontSize="small" /> : <PauseIcon fontSize="small" />}
+                    </IconButton>
+                  </Badge>
+                </Tooltip>
 
-              {groupingLevels.length > 0 && (
-                <Button
-                  size="small"
-                  onClick={() => setGroupingLevels([])}
-                  sx={{ minWidth: 'auto', px: 0.75, height: 24, fontSize: '0.65rem', color: 'text.secondary' }}
-                >
-                  {t('common.clear')}
-                </Button>
-              )}
+                <Tooltip title={t('serverList.cleanup')}>
+                  <span>
+                    <IconButton
+                      size="small"
+                      onClick={handleCleanupClick}
+                      disabled={inactiveCount === 0}
+                      sx={{ height: 28, width: 28, borderRadius: 0, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}
+                    >
+                      <CleaningServicesIcon fontSize="small" />
+                    </IconButton>
+                  </span>
+                </Tooltip>
 
-              {/* Divider */}
-              <Box
-                sx={{
-                  width: '1px',
-                  height: '24px',
-                  bgcolor: (theme) => theme.palette.mode === 'dark'
-                    ? 'rgba(255, 255, 255, 0.2)'
-                    : 'rgba(0, 0, 0, 0.2)',
-                }}
-              />
-            </>
+                <Tooltip title={t('serverList.bulkHealthCheck')}>
+                  <span>
+                    <IconButton
+                      size="small"
+                      onClick={handleBulkHealthCheckOpen}
+                      disabled={services.filter(s => s.status === 'ready' || s.status === 'initializing').length === 0}
+                      sx={{ height: 28, width: 28, borderRadius: 0, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}
+                    >
+                      <MonitorHeartIcon fontSize="small" />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </Box>
 
-            {/* Pause/Resume Button */}
-            <Tooltip title={isPaused ? t('serverList.resumeUpdates') : t('serverList.pauseUpdates')}>
-              <Badge badgeContent={pendingUpdates.length} color="warning" invisible={!isPaused || pendingUpdates.length === 0}>
-                <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-                  {/* Rotating ring animation when real-time is active */}
-                  {!isPaused && (
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        top: -4,
-                        left: -4,
-                        right: -4,
-                        bottom: -4,
-                        borderRadius: '50%',
-                        border: '2px solid transparent',
-                        borderTopColor: 'primary.main',
-                        borderRightColor: 'primary.main',
-                        animation: 'spin 1.5s linear infinite',
-                        '@keyframes spin': {
-                          '0%': {
-                            transform: 'rotate(0deg)',
-                          },
-                          '100%': {
-                            transform: 'rotate(360deg)',
-                          },
-                        },
-                      }}
-                    />
-                  )}
-                  <IconButton
-                    onClick={handleTogglePause}
-                    sx={{
-                      bgcolor: isPaused ? 'warning.main' : 'background.paper',
-                      color: isPaused ? 'warning.contrastText' : 'text.primary',
-                      border: 1,
-                      borderColor: isPaused ? 'warning.main' : 'divider',
-                      '&:hover': {
-                        bgcolor: isPaused ? 'warning.dark' : 'action.hover',
-                      },
-                    }}
-                  >
-                    {isPaused ? <PlayArrowIcon /> : <PauseIcon />}
-                  </IconButton>
-                </Box>
-              </Badge>
-            </Tooltip>
-
-            {/* Divider */}
-            <Box
-              sx={{
-                width: '1px',
-                height: '24px',
-                bgcolor: (theme) => theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.2)'
-                  : 'rgba(0, 0, 0, 0.2)',
-              }}
-            />
-
-            {/* Cleanup Button */}
-            <Tooltip title={inactiveCount === 0 ? t('serverList.noInactiveServers') : t('serverList.cleanup')}>
-              <span>
-                <IconButton
-                  onClick={handleCleanupClick}
-                  disabled={inactiveCount === 0}
-                  sx={{
-                    bgcolor: 'background.paper',
-                    border: 1,
-                    borderColor: 'divider',
-                    '&:hover': {
-                      bgcolor: inactiveCount === 0 ? 'background.paper' : 'action.hover',
-                    },
-                  }}
-                >
-                  <CleaningServicesIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
-
-            {/* Divider before Bulk Health Check */}
-            <Box
-              sx={{
-                width: '1px',
-                height: '24px',
-                bgcolor: (theme) => theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.2)'
-                  : 'rgba(0, 0, 0, 0.2)',
-              }}
-            />
-
-            {/* Bulk Health Check Button */}
-            <Tooltip title={t('serverList.bulkHealthCheck')}>
-              <span>
-                <IconButton
-                  onClick={handleBulkHealthCheckOpen}
-                  disabled={services.filter(s => s.status === 'ready' || s.status === 'initializing').length === 0}
-                  sx={{
-                    bgcolor: 'background.paper',
-                    border: 1,
-                    borderColor: 'divider',
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                    },
-                  }}
-                >
-                  <NetworkCheckIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
+              <Box sx={{ flexGrow: 1 }} />
+              <StatusStatsDisplay services={filteredServices} t={t} />
+            </Box>
           </Box>
         </CardContent>
       </Card>
@@ -3594,7 +3417,8 @@ const ServerListPage: React.FC = () => {
 
       {/* List View */}
       {(services.length > 0 || !isLoading) && viewMode === 'list' && (() => {
-        // Multi-level group structure for ListView
+        const theme = useTheme();
+
         interface ListGroup {
           id: string;
           name: string;
@@ -3604,7 +3428,6 @@ const ServerListPage: React.FC = () => {
           children?: ListGroup[];
         }
 
-        // Build multi-level groups recursively
         const buildListGroups = (items: ServiceInstance[], levels: GroupingField[], currentLevel: number = 0): ListGroup[] => {
           if (levels.length === 0 || currentLevel >= levels.length) return [];
           const currentField = levels[currentLevel];
@@ -3627,164 +3450,102 @@ const ServerListPage: React.FC = () => {
             }));
         };
 
-        // Collect all instances from a group recursively
         const collectListInstances = (group: ListGroup): ServiceInstance[] => {
           if (group.children && group.children.length > 0) return group.children.flatMap(collectListInstances);
           return group.instances;
         };
 
-        // Render service row
-        const renderServiceRow = (service: ServiceInstance) => {
+        const renderServiceRow = (service: ServiceInstance, depth: number) => {
           const serviceKey = `${service.labels.service}-${service.instanceId}`;
           const updatedStatus = updatedServiceIds.get(serviceKey);
           const isUpdated = updatedStatus !== undefined;
-          const isNew = newServiceIds.has(serviceKey);
           const highlightStatus = updatedStatus || service.status;
+          const visibleColumns = columns.filter(col => col.visible);
+
           return (
             <TableRow
               key={serviceKey}
               hover
+              onContextMenu={(e) => handleContextMenu(e, service)}
               sx={{
                 bgcolor: isUpdated
-                  ? (theme) => getHighlightColor(highlightStatus, theme)
-                  : (theme) => getStatusBgColor(service.status, theme),
-                animation: isNew
-                  ? 'appearEffect 0.5s ease-out'
-                  : isUpdated
-                    ? `flashEffect-${highlightStatus} 2s ease-out`
-                    : 'none',
-                '@keyframes appearEffect': {
-                  '0%': { opacity: 0, transform: 'scale(0.95)' },
-                  '100%': { opacity: 1, transform: 'scale(1)' },
-                },
-                [`@keyframes flashEffect-${highlightStatus}`]: {
-                  '0%': {
-                    bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme),
-                  },
-                  '100%': {
-                    bgcolor: (theme) => getStatusBgColor(service.status, theme),
-                  },
-                },
+                  ? (t) => getHighlightColor(highlightStatus, t)
+                  : (t) => getStatusBgColor(service.status, t),
+                transition: 'background-color 0.2s ease',
               }}
             >
-              {columns.filter(col => col.visible).map((column) => {
+              {visibleColumns.map((column) => {
                 switch (column.id) {
                   case 'instanceId':
                     return (
-                      <TableCell key={column.id}>
-                        <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
-                          {service.instanceId}
-                        </Typography>
+                      <TableCell key={column.id} sx={{ pl: (depth * 4) + 2 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+                          {depth > 0 && (
+                            <Box sx={{
+                              position: 'absolute',
+                              left: -16,
+                              width: 12,
+                              height: 12,
+                              borderLeft: '2px solid',
+                              borderBottom: '2px solid',
+                              borderColor: 'primary.main',
+                              opacity: 0.5,
+                              borderRadius: '0 0 0 4px',
+                              top: 'calc(50% - 8px)'
+                            }} />
+                          )}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace', fontWeight: 700 }}>
+                              {service.instanceId}
+                            </Typography>
+                          </Box>
+                        </Box>
                       </TableCell>
                     );
                   case 'service':
-                    return (
-                      <TableCell key={column.id}>
-                        {getTypeChip(service.labels.service)}
-                      </TableCell>
-                    );
+                    return <TableCell key={column.id}>{getTypeChip(service.labels.service)}</TableCell>;
                   case 'group':
                     return (
                       <TableCell key={column.id}>
                         {service.labels.group ? (
-                          <Chip
-                            label={service.labels.group}
-                            size="small"
-                            variant="outlined"
-                            color="primary"
-                            sx={{ fontWeight: 600, borderRadius: 1 }}
-                          />
-                        ) : (
-                          <Typography variant="caption" color="text.disabled">-</Typography>
-                        )}
+                          <Chip label={service.labels.group} size="small" variant="outlined" color="primary" sx={{ fontWeight: 600, borderRadius: 0 }} />
+                        ) : '-'}
                       </TableCell>
                     );
                   case 'environment':
                     return (
                       <TableCell key={column.id}>
                         {service.labels.environment ? (
-                          <Chip
-                            label={service.labels.environment}
-                            size="small"
-                            variant="outlined"
-                            color="secondary"
-                            sx={{ fontWeight: 600, borderRadius: 1 }}
-                          />
-                        ) : (
-                          <Typography variant="caption" color="text.disabled">-</Typography>
-                        )}
+                          <Chip label={service.labels.environment} size="small" variant="outlined" color="secondary" sx={{ fontWeight: 600, borderRadius: 0 }} />
+                        ) : '-'}
                       </TableCell>
                     );
-                  case 'cloudProvider':
+                  case 'status':
                     return (
                       <TableCell key={column.id}>
-                        {service.labels.cloudProvider ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          {renderHeartbeatIcon(service, 20, 10)}
                           <Chip
-                            label={service.labels.cloudProvider}
+                            label={getStatusLabelText(service.status).toUpperCase()}
                             size="small"
-                            variant="outlined"
-                            color="info"
-                            sx={{ fontWeight: 600, borderRadius: 1 }}
+                            sx={{
+                              height: 20,
+                              fontSize: '0.65rem',
+                              fontWeight: 900,
+                              borderRadius: 0,
+                              bgcolor: alpha(getStatusColor(service.status), 0.1),
+                              color: getStatusColor(service.status),
+                              border: '1px solid',
+                              borderColor: alpha(getStatusColor(service.status), 0.2)
+                            }}
                           />
-                        ) : (
-                          <Typography variant="caption" color="text.disabled">-</Typography>
-                        )}
-                      </TableCell>
-                    );
-                  case 'cloudRegion':
-                    return (
-                      <TableCell key={column.id}>
-                        {service.labels.cloudRegion ? (
-                          <Chip
-                            label={service.labels.cloudRegion}
-                            size="small"
-                            variant="outlined"
-                            color="info"
-                            sx={{ fontWeight: 600, borderRadius: 1 }}
-                          />
-                        ) : (
-                          <Typography variant="caption" color="text.disabled">-</Typography>
-                        )}
-                      </TableCell>
-                    );
-                  case 'cloudZone':
-                    return (
-                      <TableCell key={column.id}>
-                        {service.labels.cloudZone ? (
-                          <Chip
-                            label={service.labels.cloudZone}
-                            size="small"
-                            variant="outlined"
-                            color="info"
-                            sx={{ fontWeight: 600, borderRadius: 1 }}
-                          />
-                        ) : (
-                          <Typography variant="caption" color="text.disabled">-</Typography>
-                        )}
-                      </TableCell>
-                    );
-                  case 'labels':
-                    return (
-                      <TableCell key={column.id}>
-                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                          {Object.entries(service.labels)
-                            .filter(([key]) => key !== 'service' && key !== 'group' && key !== 'environment' && key !== 'cloudProvider' && key !== 'cloudRegion' && key !== 'cloudZone')
-                            .map(([key, value]) => (
-                              <Chip
-                                key={`${service.instanceId}-${key}`}
-                                label={`${key}=${value}`}
-                                size="small"
-                                variant="outlined"
-                                sx={{ fontSize: '0.7rem', height: '22px', borderRadius: 1 }}
-                              />
-                            ))}
                         </Box>
                       </TableCell>
                     );
                   case 'hostname':
                     return (
                       <TableCell key={column.id}>
-                        <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
+                        <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.75rem' }}>
                           {service.hostname}
                         </Typography>
                       </TableCell>
@@ -3792,7 +3553,7 @@ const ServerListPage: React.FC = () => {
                   case 'externalAddress':
                     return (
                       <TableCell key={column.id}>
-                        <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
+                        <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.75rem', opacity: 0.8 }}>
                           {service.externalAddress}
                         </Typography>
                       </TableCell>
@@ -3800,7 +3561,7 @@ const ServerListPage: React.FC = () => {
                   case 'internalAddress':
                     return (
                       <TableCell key={column.id}>
-                        <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
+                        <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.75rem', opacity: 0.8 }}>
                           {service.internalAddress}
                         </Typography>
                       </TableCell>
@@ -3809,58 +3570,15 @@ const ServerListPage: React.FC = () => {
                     const portEntries = Object.entries(service.ports || {});
                     return (
                       <TableCell key={column.id}>
-                        {portEntries.length > 0 && (
-                          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                            {portEntries.map(([name, port]) => (
-                              <Chip
-                                key={`${service.instanceId}-${name}`}
-                                label={`${name}:${port}`}
-                                size="small"
-                                sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.875rem', height: '24px', borderRadius: 1 }}
-                              />
-                            ))}
-                          </Box>
-                        )}
-                      </TableCell>
-                    );
-                  case 'status':
-                    // Only show heartbeat icon for initializing/ready status
-                    const showHeartbeatIcon = service.status === 'initializing' || service.status === 'ready';
-                    return (
-                      <TableCell key={column.id}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          {getStatusBadge(service.status)}
-                          {showHeartbeatIcon && (
-                            <Box
-                              sx={{
-                                width: 26,
-                                height: 26,
-                                borderRadius: '50%',
-                                border: 1,
-                                borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                bgcolor: 'background.paper',
-                              }}
-                            >
-                              <FavoriteIcon
-                                sx={{
-                                  fontSize: 14,
-                                  color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
-                                  opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
-                                  animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
-                                  '@keyframes heartbeat': {
-                                    '0%': { transform: 'scale(1)' },
-                                    '25%': { transform: 'scale(1.3)' },
-                                    '50%': { transform: 'scale(1)' },
-                                    '75%': { transform: 'scale(1.2)' },
-                                    '100%': { transform: 'scale(1)' },
-                                  },
-                                }}
-                              />
-                            </Box>
-                          )}
+                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                          {portEntries.map(([name, port]) => (
+                            <Chip
+                              key={`${service.instanceId}-${name}`}
+                              label={`${name}:${port}`}
+                              size="small"
+                              sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.7rem', height: '22px', borderRadius: 0 }}
+                            />
+                          ))}
                         </Box>
                       </TableCell>
                     );
@@ -3868,10 +3586,10 @@ const ServerListPage: React.FC = () => {
                     return (
                       <TableCell key={column.id}>
                         {service.stats && Object.keys(service.stats).length > 0 && (
-                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                            {Object.entries(service.stats).map(([key, value]) => (
-                              <Typography key={`${service.instanceId}-${key}`} variant="caption" color="text.secondary">
-                                {key}: {typeof value === 'number' ? value.toFixed(2) : String(value)}
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+                            {Object.entries(service.stats).map(([k, v]) => (
+                              <Typography key={k} variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary', fontFamily: '"D2Coding", monospace' }}>
+                                {k}: {typeof v === 'number' ? v.toFixed(2) : String(v)}
                               </Typography>
                             ))}
                           </Box>
@@ -3882,10 +3600,10 @@ const ServerListPage: React.FC = () => {
                     return (
                       <TableCell key={column.id}>
                         {service.meta && Object.keys(service.meta).length > 0 && (
-                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                            {Object.entries(service.meta).map(([key, value]) => (
-                              <Typography key={key} variant="caption" color="text.secondary">
-                                {key}: {String(value)}
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+                            {Object.entries(service.meta).map(([k, v]) => (
+                              <Typography key={k} variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
+                                {k}: {String(v)}
                               </Typography>
                             ))}
                           </Box>
@@ -3899,158 +3617,97 @@ const ServerListPage: React.FC = () => {
                       </TableCell>
                     );
                   case 'updatedAt':
-                    const updatedAtServiceKey = `${service.labels.service}-${service.instanceId}`;
-                    const updatedAtProgress = listViewPingProgress.get(updatedAtServiceKey) || 0;
-                    const updatedAtProgressColor = updatedAtProgress >= 1
-                      ? 'error'
-                      : updatedAtProgress >= 0.7
-                        ? 'warning'
-                        : 'success';
                     return (
                       <TableCell key={column.id}>
-                        <Box
-                          sx={{
-                            position: 'relative',
-                            width: 100,
-                            height: 20,
-                            border: 1,
-                            borderColor: 'divider',
-                            borderRadius: 1,
-                            bgcolor: 'action.hover',
-                            overflow: 'hidden'
-                          }}
-                        >
-                          <LinearProgress
-                            variant="determinate"
-                            value={updatedAtProgress * 100}
-                            color={updatedAtProgressColor}
-                            sx={{
-                              height: 18,
-                              bgcolor: 'transparent',
-                              '& .MuiLinearProgress-bar': {
-                                borderRadius: 0,
-                                opacity: updatedAtProgress < 0.01 ? 0 : 1,
-                              },
-                            }}
-                          />
-                          <Box
-                            sx={{
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                            }}
-                          >
-                            <RelativeTime
-                              date={service.updatedAt}
-                              showSeconds
-                              showTooltip={false}
-                              variant="caption"
-                              sx={{
-                                fontWeight: 500,
-                                fontSize: 11,
-                                color: 'text.primary',
-                                textShadow: '0 0 2px rgba(255,255,255,0.8)',
-                              }}
-                            />
-                          </Box>
+                        <Box sx={{
+                          width: '100%',
+                          minWidth: 100,
+                          height: 20,
+                          bgcolor: 'action.hover',
+                          position: 'relative',
+                          overflow: 'hidden',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          borderRadius: 0
+                        }}>
+                          {(() => {
+                            const lastUpdate = new Date(service.updatedAt).getTime();
+                            const diff = Math.max(0, currentTime - lastUpdate);
+                            const ttlMs = HEARTBEAT_TTL_SECONDS * 1000;
+                            const progress = Math.max(0, Math.min(100, (1 - diff / ttlMs) * 100));
+                            const color = progress > 50 ? 'success.main' : progress > 20 ? 'warning.main' : 'error.main';
+
+                            return (
+                              <>
+                                <Box sx={{
+                                  position: 'absolute',
+                                  left: 0,
+                                  top: 0,
+                                  bottom: 0,
+                                  width: `${progress}%`,
+                                  bgcolor: alpha(color === 'success.main' ? '#4caf50' : color === 'warning.main' ? '#ff9800' : '#f44336', 0.15),
+                                  transition: 'width 1s linear'
+                                }} />
+                                <Typography variant="caption" sx={{ zIndex: 1, fontWeight: 700, fontSize: '0.65rem', color: 'text.secondary' }}>
+                                  <RelativeTime date={service.updatedAt} showSeconds baseTime={currentTime} />
+                                </Typography>
+                              </>
+                            );
+                          })()}
                         </Box>
                       </TableCell>
                     );
+                  case 'labels':
+                    return (
+                      <TableCell key={column.id}>
+                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                          {Object.entries(service.labels).map(([k, v]) => (
+                            <Chip key={k} label={`${k}=${v}`} size="small" variant="outlined" sx={{ fontSize: '0.65rem', height: 18 }} />
+                          ))}
+                        </Box>
+                      </TableCell>
+                    );
+                  case 'cloudProvider':
+                    return <TableCell key={column.id}>{service.labels.cloudProvider || '-'}</TableCell>;
+                  case 'cloudRegion':
+                    return <TableCell key={column.id}>{service.labels.cloudRegion || '-'}</TableCell>;
+                  case 'cloudZone':
+                    return <TableCell key={column.id}>{service.labels.cloudZone || '-'}</TableCell>;
                   case 'actions':
-                    const actionsServiceKey = `${service.labels.service}-${service.instanceId}`;
-                    const actionsHealthStatus = healthCheckStatus.get(actionsServiceKey);
+                    const rowHealthStatus = healthCheckStatus.get(serviceKey);
                     return (
                       <TableCell key={column.id} align="center">
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
-                          {hasWebPort(service) && (
-                            actionsHealthStatus?.cooldown && actionsHealthStatus.result ? (
-                              // Show result: ms or X
-                              <Box
-                                sx={{
-                                  minWidth: 44,
-                                  height: 24,
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  borderRadius: 1,
-                                  bgcolor: actionsHealthStatus.result.healthy ? 'success.main' : 'error.main',
-                                  color: 'white',
-                                  fontSize: '0.75rem',
-                                  fontWeight: 600,
-                                  px: 0.75,
-                                  animation: actionsHealthStatus.fading ? 'wiggleFade 0.5s ease-out forwards' : 'none',
-                                  '@keyframes wiggleFade': {
-                                    '0%': { opacity: 1, transform: 'scale(1)' },
-                                    '20%': { transform: 'scale(1.1) rotate(-3deg)' },
-                                    '40%': { transform: 'scale(0.9) rotate(3deg)' },
-                                    '60%': { transform: 'scale(1.05) rotate(-2deg)' },
-                                    '80%': { opacity: 0.5, transform: 'scale(0.95) rotate(1deg)' },
-                                    '100%': { opacity: 0, transform: 'scale(0.8)' },
-                                  },
-                                }}
-                              >
-                                {actionsHealthStatus.result.healthy
-                                  ? `${actionsHealthStatus.result.latency}ms`
-                                  : '✕'}
-                              </Box>
-                            ) : (
-                              // Show button (rounded style like view mode buttons)
-                              <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
-                                <IconButton
-                                  size="small"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleHealthCheck(service);
-                                  }}
-                                  disabled={actionsHealthStatus?.loading}
-                                  sx={{
-                                    width: 28,
-                                    height: 28,
-                                    bgcolor: 'background.paper',
-                                    border: 1,
-                                    borderColor: 'divider',
-                                    '&:hover': {
-                                      bgcolor: 'action.hover',
-                                    },
-                                  }}
-                                >
-                                  {actionsHealthStatus?.loading ? (
-                                    <CircularProgress size={14} />
-                                  ) : (
-                                    <TouchAppIcon fontSize="small" />
-                                  )}
-                                </IconButton>
-                              </Tooltip>
-                            )
-                          )}
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setContextMenu({
-                                mouseX: e.currentTarget.getBoundingClientRect().left,
-                                mouseY: e.currentTarget.getBoundingClientRect().bottom,
-                                service,
-                              });
-                            }}
-                            sx={{
-                              width: 28,
-                              height: 28,
-                              bgcolor: 'background.paper',
-                              border: 1,
-                              borderColor: 'divider',
-                              '&:hover': {
-                                bgcolor: 'action.hover',
-                              },
-                            }}
-                          >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+                          <IconButton size="small" onClick={(e) => handleContextMenu(e, service)}>
                             <MoreVertIcon fontSize="small" />
                           </IconButton>
+                          {rowHealthStatus?.loading && (
+                            <CircularProgress size={16} />
+                          )}
+                          {rowHealthStatus?.cooldown && rowHealthStatus.result && (
+                            <Tooltip title={rowHealthStatus.result.healthy ? 'Healthy' : rowHealthStatus.result.error || 'Unknown error'} arrow>
+                              <Chip
+                                label={rowHealthStatus.result.healthy ? `${rowHealthStatus.result.latency}ms` : 'ERR'}
+                                size="small"
+                                sx={{
+                                  height: 20,
+                                  fontSize: '0.65rem',
+                                  fontWeight: 800,
+                                  borderRadius: 0,
+                                  bgcolor: rowHealthStatus.result.healthy ? 'success.main' : 'error.main',
+                                  color: 'white',
+                                  animation: rowHealthStatus.fading ? 'fadeOut 0.5s ease-out forwards' : 'none',
+                                  '@keyframes fadeOut': {
+                                    from: { opacity: 1 },
+                                    to: { opacity: 0 }
+                                  }
+                                }}
+                              />
+                            </Tooltip>
+                          )}
                         </Box>
                       </TableCell>
                     );
@@ -4062,82 +3719,77 @@ const ServerListPage: React.FC = () => {
           );
         };
 
-        // Render group rows recursively
         const renderGroupRows = (group: ListGroup): React.ReactNode[] => {
           const allInstances = collectListInstances(group);
           const rows: React.ReactNode[] = [];
+          const visibleColumns = columns.filter(col => col.visible);
 
-          // Group header row
           rows.push(
-            <TableRow key={`group-${group.id}`} sx={{ bgcolor: (theme) => alpha(theme.palette.action.hover, 0.5 + group.level * 0.15) }}>
-              <TableCell colSpan={visibleColumns.length} sx={{ py: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pl: group.level * 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'stretch', height: 24, borderRadius: 1, border: 1, borderColor: 'divider', overflow: 'hidden' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', px: 0.75, fontSize: '0.65rem', fontWeight: 600, color: 'text.secondary', bgcolor: 'background.paper', textTransform: 'uppercase' }}>
-                      {getGroupingLabel(group.fieldName)}
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', px: 1, fontSize: '0.8rem', fontWeight: 700, color: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100], bgcolor: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[200] : theme.palette.grey[700] }}>
-                      {group.name}
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 24, px: 0.75, fontSize: '0.75rem', fontWeight: 700, color: 'primary.contrastText', bgcolor: 'primary.main' }}>
-                      {allInstances.length}
-                    </Box>
-                  </Box>
+            <TableRow key={`group-${group.id}`} sx={{ bgcolor: alpha(theme.palette.primary.main, 0.05) }}>
+              <TableCell colSpan={visibleColumns.length} sx={{ py: 1, borderBottom: '2px solid', borderColor: 'primary.main' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pl: group.level * 4 }}>
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: 'primary.main', textTransform: 'uppercase' }}>
+                    {getGroupingLabel(group.fieldName)}
+                  </Typography>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>{group.name}</Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 700, opacity: 0.6 }}>({allInstances.length})</Typography>
                 </Box>
               </TableCell>
             </TableRow>
           );
 
-          // Render children or service rows
+          if (!group.children || group.children.length === 0) {
+            rows.push(
+              <TableRow key={`group-cols-${group.id}`} sx={{ bgcolor: 'background.paper' }}>
+                {visibleColumns.map(col => (
+                  <TableCell key={`col-${group.id}-${col.id}`} sx={{ py: 0.5, fontSize: '0.65rem', fontWeight: 600, color: 'text.disabled', textTransform: 'uppercase', bgcolor: 'background.paper' }}>
+                    {t(col.labelKey)}
+                  </TableCell>
+                ))}
+              </TableRow>
+            );
+          }
+
           if (group.children && group.children.length > 0) {
             group.children.forEach(child => rows.push(...renderGroupRows(child)));
           } else {
-            group.instances.forEach(service => rows.push(renderServiceRow(service)));
+            group.instances.forEach(service => rows.push(renderServiceRow(service, group.level + 1)));
+            rows.push(<TableRow key={`spacer-${group.id}`} sx={{ height: 16 }}><TableCell colSpan={visibleColumns.length} sx={{ border: 'none' }} /></TableRow>);
           }
           return rows;
         };
 
-        const groups = groupingLevels.length > 0 ? buildListGroups(displayServices, groupingLevels) : [];
-        const visibleColumns = columns.filter(col => col.visible);
+        const listGroups = groupingLevels.length > 0 ? buildListGroups(displayServices, groupingLevels) : [];
+        const visibleColumnsHeader = columns.filter(col => col.visible);
 
         return (
-          <Card sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+          <Card sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden', borderRadius: 0 }}>
             <TableContainer sx={{ flex: 1, overflow: 'auto' }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    {visibleColumns.map((column) => (
-                      <TableCell key={column.id} align={column.id === 'actions' ? 'center' : 'left'}>
-                        {column.id !== 'ports' && column.id !== 'stats' && column.id !== 'meta' && column.id !== 'labels' && column.id !== 'actions' ? (
-                          <TableSortLabel
-                            active={sortBy === column.id}
-                            direction={sortBy === column.id ? sortOrder : 'asc'}
-                            onClick={() => handleSort(column.id)}
-                          >
-                            {t(column.labelKey)}
-                          </TableSortLabel>
-                        ) : (
-                          t(column.labelKey)
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
+              <Table stickyHeader size="small">
+                {groupingLevels.length === 0 && (
+                  <TableHead>
+                    <TableRow>
+                      {visibleColumnsHeader.map((column) => (
+                        <TableCell key={column.id} sx={{ fontWeight: 600, bgcolor: 'background.paper', borderBottom: '2px solid', borderColor: 'divider' }}>
+                          {t(column.labelKey)}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                )}
                 <TableBody>
                   {displayServices.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={visibleColumns.length} align="center">
+                      <TableCell colSpan={visibleColumnsHeader.length} align="center">
                         <Typography variant="body2" color="text.secondary" sx={{ py: 4 }}>
                           {t('serverList.noData')}
                         </Typography>
                       </TableCell>
                     </TableRow>
                   ) : groupingLevels.length > 0 ? (
-                    // Multi-level grouped view
-                    groups.flatMap(group => renderGroupRows(group))
+                    listGroups.flatMap(group => renderGroupRows(group))
                   ) : (
-                    // Ungrouped view
-                    displayServices.map(service => renderServiceRow(service))
+                    displayServices.map(service => renderServiceRow(service, 0))
                   )}
                 </TableBody>
               </Table>
@@ -4147,356 +3799,326 @@ const ServerListPage: React.FC = () => {
       })()}
 
       {/* Grid View - Compact uniform tiles */}
-      {(services.length > 0 || !isLoading) && viewMode === 'grid' && (() => {
-        const colCount = 5; // 5 columns
-        const itemCount = gridDisplayServices.length;
-        const emptyCount = itemCount > 0 ? (colCount - (itemCount % colCount)) % colCount : 0;
+      {/* Grid View - Rectangular detailed cards */}
+      {
+        (services.length > 0 || !isLoading) && viewMode === 'grid' && (() => {
+          interface GridGroup {
+            id: string;
+            name: string;
+            level: number;
+            fieldName: GroupingField;
+            instances: ServiceInstance[];
+            children?: GridGroup[];
+          }
 
-        return (
-          <Box sx={{
-            flex: 1,
-            minHeight: 0,
-            overflow: 'auto',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(5, 1fr)',
-            gap: 0.5,
-            alignContent: 'start',
-            '@media (max-width: 1400px)': { gridTemplateColumns: 'repeat(4, 1fr)' },
-            '@media (max-width: 1100px)': { gridTemplateColumns: 'repeat(3, 1fr)' },
-            '@media (max-width: 800px)': { gridTemplateColumns: 'repeat(2, 1fr)' },
-            '@media (max-width: 500px)': { gridTemplateColumns: '1fr' },
-          }}>
-            {gridDisplayServices.length === 0 ? (
-              <Card sx={{ gridColumn: '1 / -1' }}>
-                <CardContent sx={{ py: 4, textAlign: 'center' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('serverList.noData')}
-                  </Typography>
-                </CardContent>
-              </Card>
-            ) : (
-              <>
-                {gridDisplayServices.map((service) => {
-                  const serviceKey = `${service.labels.service}-${service.instanceId}`;
-                  const updatedStatus = updatedServiceIds.get(serviceKey);
-                  const isUpdated = updatedStatus !== undefined;
-                  const isNew = newServiceIds.has(serviceKey);
-                  const highlightStatus = updatedStatus || service.status;
-                  const ports = Object.entries(service.ports || {});
-                  return (
-                    <Card
-                      key={serviceKey}
+          const buildGridGroups = (items: ServiceInstance[], levels: GroupingField[], currentLevel: number = 0): GridGroup[] => {
+            if (levels.length === 0 || currentLevel >= levels.length) return [];
+            const currentField = levels[currentLevel];
+            const hasMoreLevels = currentLevel + 1 < levels.length;
+            const groupMap = new Map<string, ServiceInstance[]>();
+            items.forEach(service => {
+              const value = service.labels[currentField] || 'Unknown';
+              if (!groupMap.has(value)) groupMap.set(value, []);
+              groupMap.get(value)!.push(service);
+            });
+            return Array.from(groupMap.entries())
+              .sort(([a], [b]) => a.localeCompare(b))
+              .map(([name, instances]) => ({
+                id: `grid-${levels.slice(0, currentLevel + 1).join('-')}-${name}`,
+                name: name === 'Unknown' ? `(${getGroupingLabel(currentField)} N/A)` : name,
+                level: currentLevel,
+                fieldName: currentField,
+                instances: hasMoreLevels ? [] : instances,
+                children: hasMoreLevels ? buildGridGroups(instances, levels, currentLevel + 1) : undefined,
+              }));
+          };
+
+          const collectGridInstances = (group: GridGroup): ServiceInstance[] => {
+            if (group.children && group.children.length > 0) return group.children.flatMap(collectGridInstances);
+            return group.instances;
+          };
+
+          const renderDetailedGridCard = (service: ServiceInstance) => {
+            const serviceKey = `${service.labels.service}-${service.instanceId}`;
+            const updatedStatus = updatedServiceIds.get(serviceKey);
+            const isUpdated = updatedStatus !== undefined;
+            const ports = Object.entries(service.ports || {});
+
+            return (
+              <Box
+                key={serviceKey}
+                onContextMenu={(e) => handleContextMenu(e, service)}
+                sx={{
+                  p: 1.5,
+                  borderRadius: 0, // NO ROUNDED CORNERS
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  bgcolor: 'background.paper', // MONOCHROMATIC
+                  transition: 'all 0.1s ease-in-out',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    boxShadow: (theme) => theme.shadows[4],
+                    zIndex: 1,
+                  }
+                }}
+              >
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                    {getTypeChip(service.labels.service)}
+                    <Chip
+                      label={getStatusLabelText(service.status).toUpperCase()}
+                      size="small"
                       sx={{
-                        height: 175,
-                        cursor: 'default',
-                        transition: 'all 0.15s ease-in-out',
-                        bgcolor: isUpdated
-                          ? (theme) => getHighlightColor(highlightStatus, theme)
-                          : (theme) => getStatusBgColor(service.status, theme) || 'background.paper',
-                        animation: isNew
-                          ? 'appearEffect 0.5s ease-out'
-                          : isUpdated
-                            ? `flashEffect-${highlightStatus} 2s ease-out`
-                            : 'none',
-                        '@keyframes appearEffect': {
-                          '0%': { opacity: 0, transform: 'scale(0.9)' },
-                          '100%': { opacity: 1, transform: 'scale(1)' },
-                        },
-                        [`@keyframes flashEffect-${highlightStatus}`]: {
-                          '0%': { bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme) },
-                          '100%': { bgcolor: (theme) => getStatusBgColor(service.status, theme) || 'background.paper' },
-                        },
-                        '&:hover': {
-                          boxShadow: 2,
-                        },
+                        height: 18,
+                        fontSize: '0.6rem',
+                        fontWeight: 900,
+                        borderRadius: 0,
+                        bgcolor: alpha(getStatusColor(service.status), 0.1),
+                        color: getStatusColor(service.status),
+                        border: '1px solid',
+                        borderColor: alpha(getStatusColor(service.status), 0.2)
                       }}
-                    >
-                      <CardContent sx={{ p: 1, '&:last-child': { pb: 1 }, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                        {/* Header: Type + Status */}
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', mb: 0.5, gap: 0.5 }}>
-                          <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-                            {getTypeChip(service.labels.service)}
-                            {service.labels.environment && (
-                              <Chip
-                                label={service.labels.environment}
-                                size="small"
-                                variant="outlined"
-                                color="secondary"
-                                sx={{ fontWeight: 600, height: 18, fontSize: '0.6rem', borderRadius: 0.5 }}
-                              />
-                            )}
-                            {service.labels.region && (
-                              <Chip
-                                label={service.labels.region}
-                                size="small"
-                                variant="outlined"
-                                color="info"
-                                sx={{ fontWeight: 600, height: 18, fontSize: '0.6rem', borderRadius: 0.5 }}
-                              />
-                            )}
-                          </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            {getStatusBadge(service.status)}
-                            <IconButton
+                    />
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    {renderHeartbeatIcon(service, 20, 10)}
+                    {hasWebPort(service) && (() => {
+                      const gridHealthStatus = healthCheckStatus.get(serviceKey);
+                      if (gridHealthStatus?.loading) return <CircularProgress size={12} />;
+                      if (gridHealthStatus?.cooldown && gridHealthStatus.result) {
+                        return (
+                          <Tooltip title={gridHealthStatus.result.healthy ? 'Healthy' : gridHealthStatus.result.error || 'Unknown error'} arrow>
+                            <Chip
+                              label={gridHealthStatus.result.healthy ? `${gridHealthStatus.result.latency}ms` : 'ERR'}
                               size="small"
-                              onClick={(e) => {
-                                setContextMenu({
-                                  mouseX: e.currentTarget.getBoundingClientRect().left,
-                                  mouseY: e.currentTarget.getBoundingClientRect().bottom,
-                                  service,
-                                });
+                              sx={{
+                                height: 18,
+                                fontSize: '0.6rem',
+                                fontWeight: 900,
+                                borderRadius: 0,
+                                bgcolor: gridHealthStatus.result.healthy ? 'success.main' : 'error.main',
+                                color: 'white',
+                                animation: gridHealthStatus.fading ? 'fadeOut 0.5s ease-out forwards' : 'none',
                               }}
-                              sx={{ p: 0.25 }}
-                            >
-                              <MoreVertIcon sx={{ fontSize: 16 }} />
-                            </IconButton>
-                            {/* Only show heartbeat icon for initializing/ready status */}
-                            {(service.status === 'initializing' || service.status === 'ready') && (
-                              <>
-                                <Box
-                                  sx={{
-                                    width: 20,
-                                    height: 20,
-                                    borderRadius: '50%',
-                                    border: 1,
-                                    borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    bgcolor: 'background.paper',
-                                  }}
-                                >
-                                  <FavoriteIcon
-                                    sx={{
-                                      fontSize: 12,
-                                      color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
-                                      opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
-                                      animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
-                                      '@keyframes heartbeat': {
-                                        '0%': { transform: 'scale(1)' },
-                                        '25%': { transform: 'scale(1.3)' },
-                                        '50%': { transform: 'scale(1)' },
-                                        '75%': { transform: 'scale(1.2)' },
-                                        '100%': { transform: 'scale(1)' },
-                                      },
-                                    }}
-                                  />
-                                </Box>
-                                {/* Move health check button here */}
-                                {hasWebPort(service) && (() => {
-                                  const gridHealthStatus = healthCheckStatus.get(serviceKey);
-                                  return gridHealthStatus?.cooldown && gridHealthStatus.result ? (
-                                    <Box
-                                      sx={{
-                                        minWidth: 36,
-                                        height: 18,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        borderRadius: 0.5,
-                                        bgcolor: gridHealthStatus.result.healthy ? 'success.main' : 'error.main',
-                                        color: 'white',
-                                        fontSize: '0.65rem',
-                                        fontWeight: 600,
-                                        px: 0.5,
-                                        animation: gridHealthStatus.fading ? 'wiggleFade 0.5s ease-out forwards' : 'none',
-                                      }}
-                                    >
-                                      {gridHealthStatus.result.healthy ? `${gridHealthStatus.result.latency}ms` : '✕'}
-                                    </Box>
-                                  ) : (
-                                    <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
-                                      <IconButton
-                                        size="small"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleHealthCheck(service);
-                                        }}
-                                        disabled={gridHealthStatus?.loading}
-                                        sx={{
-                                          width: 20,
-                                          height: 20,
-                                          p: 0,
-                                          bgcolor: 'background.paper',
-                                          border: 1,
-                                          borderColor: 'divider',
-                                          '&:hover': { bgcolor: 'action.hover' },
-                                        }}
-                                      >
-                                        {gridHealthStatus?.loading ? (
-                                          <SearchIcon sx={{
-                                            fontSize: 14,
-                                            animation: 'searchingAnimXSmall 2s ease-in-out infinite',
-                                            '@keyframes searchingAnimXSmall': {
-                                              '0%': { transform: 'translate(0, 0) rotate(0deg)' },
-                                              '25%': { transform: 'translate(1px, -1px) rotate(10deg)' },
-                                              '50%': { transform: 'translate(-1px, 1px) rotate(-10deg)' },
-                                              '100%': { transform: 'translate(0, 0) rotate(0deg)' },
-                                            },
-                                          }} />
-                                        ) : (
-                                          <TouchAppIcon sx={{ fontSize: 14 }} />
-                                        )}
-                                      </IconButton>
-                                    </Tooltip>
-                                  );
-                                })()}
-                              </>
-                            )}
-                          </Box>
-                        </Box>
-                        {/* Hostname */}
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontFamily: '"D2Coding", monospace',
-                            fontWeight: 600,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
+                            />
+                          </Tooltip>
+                        );
+                      }
+                      return (
+                        <IconButton
+                          size="small"
+                          onClick={(e) => { e.stopPropagation(); handleHealthCheck(service); }}
+                          sx={{ p: 0, width: 14, height: 14 }}
                         >
-                          {service.hostname}
-                        </Typography>
-                        {/* Group label if exists */}
-                        {service.labels.group && (
-                          <Typography variant="caption" color="primary.main" sx={{ fontWeight: 600 }}>
-                            {service.labels.group}
-                          </Typography>
-                        )}
-                        {/* Spacer */}
-                        <Box sx={{ flex: 1 }} />
-                        {/* Footer: IP + Ports */}
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace', color: 'text.secondary' }}>
-                              {service.externalAddress}
-                            </Typography>
-                          </Box>
-                          {ports.length > 0 && (
-                            <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace', color: 'text.disabled', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {ports.map(([n, p]) => `${n}:${p}`).join(' ')}
-                            </Typography>
-                          )}
-                        </Box>
+                          <TouchAppIcon sx={{ fontSize: 10, opacity: 0.6 }} />
+                        </IconButton>
+                      );
+                    })()}
+                    <IconButton size="small" onClick={(e) => handleContextMenu(e, service)} sx={{ p: 0 }}>
+                      <MoreVertIcon sx={{ fontSize: 16 }} />
+                    </IconButton>
+                  </Box>
+                </Box>
 
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-                {/* Empty placeholder cards */}
+                <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {service.instanceId}
+                </Typography>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>{service.hostname}</Typography>
+                  <Typography variant="caption" sx={{ fontFamily: '"D2Coding", monospace', opacity: 0.7 }}>{service.externalAddress}</Typography>
+                </Box>
+
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 'auto', pt: 0.5, borderTop: '1px dashed', borderColor: 'divider' }}>
+                  {ports.map(([n, p]) => (
+                    <Typography key={n} variant="caption" sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.6rem', color: 'text.secondary' }}>
+                      {n}:{p}
+                    </Typography>
+                  ))}
+                </Box>
+              </Box>
+            );
+          };
+
+          const renderGridGroupRecursive = (group: GridGroup): React.ReactNode => {
+            const allInstances = collectGridInstances(group);
+            const hasChildren = group.children && group.children.length > 0;
+            const colCount = 5;
+            const emptyCount = allInstances.length > 0 ? (colCount - (allInstances.length % colCount)) % colCount : 0;
+
+            return (
+              <Box key={group.id} sx={{ mb: 4 }}>
+                {/* Simple Group Header */}
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  mb: 1.5,
+                  gap: 1,
+                  pl: group.level * 2,
+                  borderLeft: group.level > 0 ? '2px solid' : 'none',
+                  borderColor: 'primary.main'
+                }}>
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
+                    {getGroupingLabel(group.fieldName)}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 800 }}>{group.name}</Typography>
+                  <Typography variant="caption" sx={{ color: 'text.disabled' }}>({allInstances.length})</Typography>
+                </Box>
+
+                {hasChildren ? (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {group.children!.map(child => renderGridGroupRecursive(child))}
+                  </Box>
+                ) : (
+                  <Box sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(5, 1fr)',
+                    gap: 1,
+                    '@media (max-width: 1600px)': { gridTemplateColumns: 'repeat(4, 1fr)' },
+                    '@media (max-width: 1200px)': { gridTemplateColumns: 'repeat(3, 1fr)' },
+                    '@media (max-width: 900px)': { gridTemplateColumns: 'repeat(2, 1fr)' },
+                    '@media (max-width: 600px)': { gridTemplateColumns: '1fr' },
+                  }}>
+                    {group.instances.map(service => renderDetailedGridCard(service))}
+                    {/* Restore Empty Placeholders */}
+                    {Array.from({ length: emptyCount }).map((_, idx) => (
+                      <Box key={`empty-${group.id}-${idx}`} sx={{ border: '1px dashed', borderColor: 'divider', height: '100%', minHeight: 120, opacity: 0.3 }} />
+                    ))}
+                  </Box>
+                )}
+              </Box>
+            );
+          };
+
+          const groups = groupingLevels.length > 0 ? buildGridGroups(gridDisplayServices, groupingLevels) : [];
+
+          if (groupingLevels.length === 0) {
+            const colCount = 5;
+            const emptyCount = gridDisplayServices.length > 0 ? (colCount - (gridDisplayServices.length % colCount)) % colCount : 0;
+            return (
+              <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 1, alignContent: 'start' }}>
+                {gridDisplayServices.map(service => renderDetailedGridCard(service))}
                 {Array.from({ length: emptyCount }).map((_, idx) => (
-                  <Card
-                    key={`empty-${idx}`}
-                    variant="outlined"
-                    sx={{
-                      height: 175,
-                      borderStyle: 'dashed',
-                      borderColor: 'divider',
-                      bgcolor: (theme) => theme.palette.mode === 'dark'
-                        ? 'rgba(0, 0, 0, 0.2)'
-                        : 'rgba(0, 0, 0, 0.04)',
-                    }}
-                  />
+                  <Box key={`empty-flatTarget-${idx}`} sx={{ border: '1px dashed', borderColor: 'divider', height: '100%', minHeight: 120, opacity: 0.3 }} />
                 ))}
-              </>
-            )}
-          </Box>
-        );
-      })()}
-
-      {/* Checkerboard View - High density status grid */}
-      {(services.length > 0 || !isLoading) && viewMode === 'checkerboard' && (
-        <CheckerboardView
-          services={gridDisplayServices}
-          updatedServiceIds={updatedServiceIds}
-          heartbeatIds={heartbeatIds}
-          groupingLevels={groupingLevels}
-          getGroupingLabel={getGroupingLabel}
-          t={t}
-          onContextMenu={handleContextMenu}
-        />
-      )}
-
-      {/* Card View - Uniform detailed cards in grid layout */}
-      {(services.length > 0 || !isLoading) && viewMode === 'card' && (() => {
-        // Multi-level group structure for CardView
-        interface CardGroup {
-          id: string;
-          name: string;
-          level: number;
-          fieldName: GroupingField;
-          instances: ServiceInstance[];
-          children?: CardGroup[];
-        }
-
-        // Build multi-level groups recursively
-        const buildCardGroups = (items: ServiceInstance[], levels: GroupingField[], currentLevel: number = 0): CardGroup[] => {
-          if (levels.length === 0 || currentLevel >= levels.length) return [];
-          const currentField = levels[currentLevel];
-          const hasMoreLevels = currentLevel + 1 < levels.length;
-          const groupMap = new Map<string, ServiceInstance[]>();
-          items.forEach(service => {
-            const value = service.labels[currentField] || 'Unknown';
-            if (!groupMap.has(value)) groupMap.set(value, []);
-            groupMap.get(value)!.push(service);
-          });
-          return Array.from(groupMap.entries())
-            .sort(([a], [b]) => a.localeCompare(b))
-            .map(([name, instances]) => ({
-              id: levels.slice(0, currentLevel + 1).join('-') + '-' + name,
-              name: name === 'Unknown' ? `(${getGroupingLabel(currentField)} N/A)` : name,
-              level: currentLevel,
-              fieldName: currentField,
-              instances: hasMoreLevels ? [] : instances,
-              children: hasMoreLevels ? buildCardGroups(instances, levels, currentLevel + 1) : undefined,
-            }));
-        };
-
-        // Collect all instances from a group recursively
-        const collectCardInstances = (group: CardGroup): ServiceInstance[] => {
-          if (group.children && group.children.length > 0) return group.children.flatMap(collectCardInstances);
-          return group.instances;
-        };
-
-        // Render a single service card
-        const renderServiceCard = (service: ServiceInstance) => {
-          const serviceKey = `${service.labels.service}-${service.instanceId}`;
-          const updatedStatus = updatedServiceIds.get(serviceKey);
-          const isUpdated = updatedStatus !== undefined;
-          const isNew = newServiceIds.has(serviceKey);
-          const highlightStatus = updatedStatus || service.status;
-          const customLabels = Object.entries(service.labels).filter(([key]) => key !== 'service' && key !== 'group' && key !== 'environment' && key !== 'region');
-          const ports = Object.entries(service.ports || {});
+              </Box>
+            );
+          }
 
           return (
-            <Card
-              key={serviceKey}
-              sx={{
-                minHeight: 300,
-                display: 'flex',
-                flexDirection: 'column',
-                transition: 'all 0.15s ease-in-out',
-                '&:hover': { boxShadow: 3 },
-                bgcolor: isUpdated
-                  ? (theme) => getHighlightColor(highlightStatus, theme)
-                  : (theme) => getStatusBgColor(service.status, theme) || 'background.paper',
-                animation: isNew
-                  ? 'appearEffect 0.5s ease-out'
-                  : isUpdated
-                    ? `flashEffect-${highlightStatus} 2s ease-out`
-                    : 'none',
-                '@keyframes appearEffect': {
-                  '0%': { opacity: 0, transform: 'scale(0.9)' },
-                  '100%': { opacity: 1, transform: 'scale(1)' },
-                },
-                [`@keyframes flashEffect-${highlightStatus}`]: {
-                  '0%': { bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme) },
-                  '100%': { bgcolor: (theme) => getStatusBgColor(service.status, theme) || 'background.paper' },
-                },
-              }}
-            >
-              <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+              {groups.map(group => renderGridGroupRecursive(group))}
+            </Box>
+          );
+        })()
+      }
+
+      {/* Checkerboard View - High density status grid */}
+      {
+        (services.length > 0 || !isLoading) && viewMode === 'checkerboard' && (
+          <CheckerboardView
+            services={gridDisplayServices}
+            updatedServiceIds={updatedServiceIds}
+            heartbeatIds={heartbeatIds}
+            groupingLevels={groupingLevels}
+            getGroupingLabel={getGroupingLabel}
+            t={t}
+            onContextMenu={handleContextMenu}
+          />
+        )
+      }
+
+      {/* Card View - Uniform detailed cards in grid layout */}
+      {
+        (services.length > 0 || !isLoading) && viewMode === 'card' && (() => {
+          // Multi-level group structure for CardView
+          interface CardGroup {
+            id: string;
+            name: string;
+            level: number;
+            fieldName: GroupingField;
+            instances: ServiceInstance[];
+            children?: CardGroup[];
+          }
+
+          // Build multi-level groups recursively
+          const buildCardGroups = (items: ServiceInstance[], levels: GroupingField[], currentLevel: number = 0): CardGroup[] => {
+            if (levels.length === 0 || currentLevel >= levels.length) return [];
+            const currentField = levels[currentLevel];
+            const hasMoreLevels = currentLevel + 1 < levels.length;
+            const groupMap = new Map<string, ServiceInstance[]>();
+            items.forEach(service => {
+              const value = service.labels[currentField] || 'Unknown';
+              if (!groupMap.has(value)) groupMap.set(value, []);
+              groupMap.get(value)!.push(service);
+            });
+            return Array.from(groupMap.entries())
+              .sort(([a], [b]) => a.localeCompare(b))
+              .map(([name, instances]) => ({
+                id: levels.slice(0, currentLevel + 1).join('-') + '-' + name,
+                name: name === 'Unknown' ? `(${getGroupingLabel(currentField)} N/A)` : name,
+                level: currentLevel,
+                fieldName: currentField,
+                instances: hasMoreLevels ? [] : instances,
+                children: hasMoreLevels ? buildCardGroups(instances, levels, currentLevel + 1) : undefined,
+              }));
+          };
+
+          // Collect all instances from a group recursively
+          const collectCardInstances = (group: CardGroup): ServiceInstance[] => {
+            if (group.children && group.children.length > 0) return group.children.flatMap(collectCardInstances);
+            return group.instances;
+          };
+
+          // Render a single service card
+          const renderServiceCard = (service: ServiceInstance) => {
+            const serviceKey = `${service.labels.service}-${service.instanceId}`;
+            const updatedStatus = updatedServiceIds.get(serviceKey);
+            const isUpdated = updatedStatus !== undefined;
+            const isNew = newServiceIds.has(serviceKey);
+            const highlightStatus = updatedStatus || service.status;
+            const customLabels = Object.entries(service.labels).filter(([key]) => key !== 'service' && key !== 'group' && key !== 'environment' && key !== 'region');
+            const ports = Object.entries(service.ports || {});
+
+            return (
+              <Box
+                key={serviceKey}
+                onContextMenu={(e) => handleContextMenu(e, service)}
+                sx={{
+                  minHeight: 300,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  padding: 1.5,
+                  borderRadius: 0,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  bgcolor: isUpdated
+                    ? (theme) => getHighlightColor(highlightStatus, theme)
+                    : (theme) => getStatusBgColor(service.status, theme) || 'background.paper',
+                  transition: 'all 0.1s ease-in-out',
+                  animation: isNew
+                    ? 'appearEffect 0.5s ease-out'
+                    : isUpdated
+                      ? `flashEffect-${highlightStatus} 2s ease-out`
+                      : 'none',
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    boxShadow: (theme) => theme.shadows[4],
+                    zIndex: 1,
+                  },
+                  '@keyframes appearEffect': {
+                    '0%': { opacity: 0, transform: 'scale(0.9)' },
+                    '100%': { opacity: 1, transform: 'scale(1)' },
+                  },
+                  [`@keyframes flashEffect-${highlightStatus}`]: {
+                    '0%': { bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme) },
+                    '100%': { bgcolor: (theme) => getStatusBgColor(service.status, theme) || 'background.paper' },
+                  },
+                }}
+              >
                 {/* Header: Type + Group + Status */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                   <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -4530,7 +4152,60 @@ const ServerListPage: React.FC = () => {
                     )}
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    {getStatusBadge(service.status)}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {getStatusBadge(service.status)}
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      {/* Only show heartbeat icon for initializing/ready status */}
+                      {renderHeartbeatIcon(service, 26, 14)}
+                      {/* Move health check button here */}
+                      {hasWebPort(service) && (() => {
+                        const cardHealthStatus = healthCheckStatus.get(serviceKey);
+                        if (cardHealthStatus?.loading) return <CircularProgress size={16} />;
+                        if (cardHealthStatus?.cooldown && cardHealthStatus.result) {
+                          return (
+                            <Tooltip title={cardHealthStatus.result.healthy ? 'Healthy' : cardHealthStatus.result.error || 'Unknown error'} arrow>
+                              <Chip
+                                label={cardHealthStatus.result.healthy ? `${cardHealthStatus.result.latency} ms` : '✕'}
+                                size="small"
+                                sx={{
+                                  height: 22,
+                                  fontSize: '0.7rem',
+                                  fontWeight: 800,
+                                  borderRadius: 0,
+                                  bgcolor: cardHealthStatus.result.healthy ? 'success.main' : 'error.main',
+                                  color: 'white',
+                                  animation: cardHealthStatus.fading ? 'wiggleFade 0.5s ease-out forwards' : 'none',
+                                }}
+                              />
+                            </Tooltip>
+                          );
+                        }
+                        return (
+                          <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleHealthCheck(service);
+                              }}
+                              sx={{
+                                width: 24,
+                                height: 24,
+                                p: 0,
+                                bgcolor: 'background.paper',
+                                border: 1,
+                                borderColor: 'divider',
+                                '&:hover': { bgcolor: 'action.hover' },
+                              }}
+                            >
+                              <TouchAppIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                          </Tooltip>
+                        );
+                      })()}
+                    </Box>
+
                     <IconButton
                       size="small"
                       onClick={(e) => {
@@ -4544,99 +4219,6 @@ const ServerListPage: React.FC = () => {
                     >
                       <MoreVertIcon fontSize="small" />
                     </IconButton>
-                    {/* Only show heartbeat icon for initializing/ready status */}
-                    {(service.status === 'initializing' || service.status === 'ready') && (
-                      <>
-                        <Box
-                          sx={{
-                            width: 26,
-                            height: 26,
-                            borderRadius: '50%',
-                            border: 1,
-                            borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            bgcolor: 'background.paper',
-                          }}
-                        >
-                          <FavoriteIcon
-                            sx={{
-                              fontSize: 14,
-                              color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
-                              opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
-                              animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
-                              '@keyframes heartbeat': {
-                                '0%': { transform: 'scale(1)' },
-                                '25%': { transform: 'scale(1.3)' },
-                                '50%': { transform: 'scale(1)' },
-                                '75%': { transform: 'scale(1.2)' },
-                                '100%': { transform: 'scale(1)' },
-                              },
-                            }}
-                          />
-                        </Box>
-                        {/* Move health check button here */}
-                        {hasWebPort(service) && (() => {
-                          const cardHealthStatus = healthCheckStatus.get(serviceKey);
-                          return cardHealthStatus?.cooldown && cardHealthStatus.result ? (
-                            <Box
-                              sx={{
-                                minWidth: 44,
-                                height: 22,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRadius: 1,
-                                bgcolor: cardHealthStatus.result.healthy ? 'success.main' : 'error.main',
-                                color: 'white',
-                                fontSize: '0.7rem',
-                                fontWeight: 600,
-                                px: 0.75,
-                                animation: cardHealthStatus.fading ? 'wiggleFade 0.5s ease-out forwards' : 'none',
-                              }}
-                            >
-                              {cardHealthStatus.result.healthy ? `${cardHealthStatus.result.latency}ms` : '✕'}
-                            </Box>
-                          ) : (
-                            <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
-                              <IconButton
-                                size="small"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleHealthCheck(service);
-                                }}
-                                disabled={cardHealthStatus?.loading}
-                                sx={{
-                                  width: 24,
-                                  height: 24,
-                                  p: 0,
-                                  bgcolor: 'background.paper',
-                                  border: 1,
-                                  borderColor: 'divider',
-                                  '&:hover': { bgcolor: 'action.hover' },
-                                }}
-                              >
-                                {cardHealthStatus?.loading ? (
-                                  <SearchIcon sx={{
-                                    fontSize: 16,
-                                    animation: 'searchingAnimXSmall 2s ease-in-out infinite',
-                                    '@keyframes searchingAnimXSmall': {
-                                      '0%': { transform: 'translate(0, 0) rotate(0deg)' },
-                                      '25%': { transform: 'translate(1px, -1px) rotate(10deg)' },
-                                      '50%': { transform: 'translate(-1px, 1px) rotate(-10deg)' },
-                                      '100%': { transform: 'translate(0, 0) rotate(0deg)' },
-                                    },
-                                  }} />
-                                ) : (
-                                  <TouchAppIcon sx={{ fontSize: 16 }} />
-                                )}
-                              </IconButton>
-                            </Tooltip>
-                          );
-                        })()}
-                      </>
-                    )}
                   </Box>
                 </Box>
 
@@ -4673,172 +4255,204 @@ const ServerListPage: React.FC = () => {
                 </Box>
 
                 {/* Ports - Compact inline chips */}
-                {ports.length > 0 && (
-                  <Box sx={{
-                    mt: 0.5,
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: 0.5,
-                  }}>
-                    {ports.map(([name, port]) => (
-                      <Chip
-                        key={`${service.instanceId}-port-${name}`}
-                        label={`${name}:${port}`}
-                        size="small"
-                        variant="outlined"
-                        sx={{
-                          height: 24,
-                          fontSize: '0.8rem',
-                          fontFamily: '"D2Coding", monospace',
-                          borderRadius: 1,
-                          '& .MuiChip-label': { px: 1 },
-                        }}
-                      />
-                    ))}
-                  </Box>
-                )}
+                {
+                  ports.length > 0 && (
+                    <Box sx={{
+                      mt: 0.5,
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 0.5,
+                    }}>
+                      {ports.map(([name, port]) => (
+                        <Chip
+                          key={`${service.instanceId}-port-${name}`}
+                          label={`${name}:${port}`}
+                          size="small"
+                          variant="outlined"
+                          sx={{
+                            height: 24,
+                            fontSize: '0.8rem',
+                            fontFamily: '"D2Coding", monospace',
+                            borderRadius: 0,
+                            '& .MuiChip-label': { px: 1 },
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  )
+                }
 
                 {/* Custom labels */}
-                {customLabels.length > 0 && (
-                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.5 }}>
-                    {customLabels.map(([key, value]) => (
-                      <Chip
-                        key={`${service.instanceId}-${key}`}
-                        label={`${key}=${value}`}
-                        size="small"
-                        variant="outlined"
-                        sx={{ fontSize: '0.8rem', height: 24, fontFamily: '"D2Coding", monospace', borderRadius: 1 }}
-                      />
-                    ))}
-                  </Box>
-                )}
+                {
+                  customLabels.length > 0 && (
+                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.5 }}>
+                      {customLabels.map(([key, value]) => (
+                        <Chip
+                          key={`${service.instanceId}-${key}`}
+                          label={`${key}=${value}`}
+                          size="small"
+                          variant="outlined"
+                          sx={{ fontSize: '0.8rem', height: 24, fontFamily: '"D2Coding", monospace', borderRadius: 0 }}
+                        />
+                      ))}
+                    </Box>
+                  )
+                }
 
                 {/* Spacer */}
                 <Box sx={{ flex: 1 }} />
 
                 {/* Stats */}
-                {service.stats && Object.keys(service.stats).length > 0 && (
-                  <Box sx={{
-                    mt: 1,
-                    p: 0.75,
-                    bgcolor: 'action.hover',
-                    borderRadius: 1,
-                    display: 'flex',
-                    gap: 2,
-                    flexWrap: 'wrap',
-                    justifyContent: 'center',
-                  }}>
-                    {Object.entries(service.stats).map(([key, value]) => (
-                      <Box key={`${service.instanceId}-${key}`} sx={{ textAlign: 'center' }}>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.6rem' }}>
-                          {key}
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.8rem' }}>
-                          {typeof value === 'number' ? value.toFixed(1) : String(value)}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-
-
+                {
+                  service.stats && Object.keys(service.stats).length > 0 && (
+                    <Box sx={{
+                      mt: 1,
+                      p: 0.75,
+                      bgcolor: 'action.hover',
+                      borderRadius: 0,
+                      display: 'flex',
+                      gap: 2,
+                      flexWrap: 'wrap',
+                      justifyContent: 'center',
+                    }}>
+                      {Object.entries(service.stats).map(([key, value]) => (
+                        <Box key={`${service.instanceId}-${key}`} sx={{ textAlign: 'center' }}>
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.6rem' }}>
+                            {key}
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.8rem' }}>
+                            {typeof value === 'number' ? value.toFixed(1) : String(value)}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  )
+                }
 
                 {/* Footer: Health + Updated time removed as redundant */}
-              </CardContent>
-            </Card>
-          );
-        };
+              </Box >
+            );
+          };
 
-        // Render group recursively
-        const renderCardGroup = (group: CardGroup): React.ReactNode => {
-          const allInstances = collectCardInstances(group);
-          const hasChildren = group.children && group.children.length > 0;
+          // Render group recursively
+          const renderCardGroup = (group: CardGroup): React.ReactNode => {
+            const allInstances = collectCardInstances(group);
+            const hasChildren = group.children && group.children.length > 0;
 
-          return (
-            <Box key={group.id} sx={{ mb: group.level === 0 ? 3 : 2, ml: group.level * 2 }}>
-              {/* Group Header */}
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                mb: 1.5,
-                gap: 1.5,
-                pb: 1,
-                borderBottom: 1,
-                borderColor: 'divider',
-                bgcolor: (theme) => alpha(theme.palette.action.hover, 0.3 + group.level * 0.1),
-                borderRadius: 1,
-                p: 1,
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'stretch', height: 28, borderRadius: 1, border: 1, borderColor: 'divider', overflow: 'hidden' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', px: 1, fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary', bgcolor: 'background.paper', textTransform: 'uppercase' }}>
-                    {getGroupingLabel(group.fieldName)}
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', px: 1.5, fontSize: '0.85rem', fontWeight: 700, color: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100], bgcolor: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[200] : theme.palette.grey[700] }}>
-                    {group.name}
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 28, px: 1, fontSize: '0.8rem', fontWeight: 700, color: 'primary.contrastText', bgcolor: 'primary.main' }}>
-                    {allInstances.length}
-                  </Box>
-                </Box>
-              </Box>
-
-              {/* Render children or cards */}
-              {hasChildren ? (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  {group.children!.map(child => renderCardGroup(child))}
-                </Box>
-              ) : (
+            return (
+              <Box key={group.id} sx={{ mb: group.level === 0 ? 4 : 3, ml: group.level * 2 }}>
+                {/* Premium Group Header */}
                 <Box sx={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  mb: 2.5,
                   gap: 1.5,
-                  '@media (max-width: 1200px)': { gridTemplateColumns: 'repeat(2, 1fr)' },
-                  '@media (max-width: 768px)': { gridTemplateColumns: '1fr' },
+                  pb: 1,
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                  position: 'relative'
                 }}>
-                  {group.instances.map(service => renderServiceCard(service))}
-                </Box>
-              )}
-            </Box>
-          );
-        };
+                  {/* Visual Level indicator line */}
+                  {group.level > 0 && (
+                    <Box sx={{ width: 3, height: 28, bgcolor: 'primary.main', mr: 0.5, opacity: 0.4, borderRadius: 0 }} />
+                  )}
 
-        const groups = groupingLevels.length > 0 ? buildCardGroups(gridDisplayServices, groupingLevels) : [];
-
-        // No grouping - render flat grid
-        if (groupingLevels.length === 0) {
-          return (
-            <Box sx={{
-              flex: 1,
-              minHeight: 0,
-              overflow: 'auto',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 1.5,
-              '@media (max-width: 1200px)': { gridTemplateColumns: 'repeat(2, 1fr)' },
-              '@media (max-width: 768px)': { gridTemplateColumns: '1fr' },
-            }}>
-              {gridDisplayServices.length === 0 ? (
-                <Card sx={{ gridColumn: '1 / -1' }}>
-                  <CardContent sx={{ py: 4, textAlign: 'center' }}>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('serverList.noData')}
+                  <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    px: 2,
+                    py: 0.75,
+                    borderRadius: 0,
+                    bgcolor: group.level === 0 ? 'primary.main' : 'action.selected',
+                    color: group.level === 0 ? 'primary.contrastText' : 'text.primary',
+                    boxShadow: group.level === 0 ? (theme) => `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}` : 'none',
+                    border: group.level === 0 ? 'none' : '1px solid',
+                    borderColor: 'divider',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      transform: group.level === 0 ? 'translateY(-1px)' : 'none',
+                      boxShadow: group.level === 0 ? (theme) => `0 6px 16px ${alpha(theme.palette.primary.main, 0.3)}` : 'none',
+                    }
+                  }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, mr: 1.5, opacity: 0.7, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                      {getGroupingLabel(group.fieldName)}
                     </Typography>
-                  </CardContent>
-                </Card>
-              ) : (
-                gridDisplayServices.map(service => renderServiceCard(service))
-              )}
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, fontSize: '1rem' }}>
+                      {group.name}
+                    </Typography>
+                    <Box sx={{
+                      ml: 1.5,
+                      px: 1,
+                      py: 0.25,
+                      borderRadius: 0,
+                      bgcolor: (theme) => group.level === 0 ? alpha(theme.palette.common.white, 0.2) : alpha(theme.palette.primary.main, 0.1),
+                      color: group.level === 0 ? 'inherit' : 'primary.main',
+                      fontSize: '0.75rem',
+                      fontWeight: 800
+                    }}>
+                      {allInstances.length}
+                    </Box>
+                  </Box>
+                </Box>
+
+                {/* Render children or cards */}
+                {hasChildren ? (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    {group.children!.map(child => renderCardGroup(child))}
+                  </Box>
+                ) : (
+                  <Box sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: 2,
+                    '@media (max-width: 1400px)': { gridTemplateColumns: 'repeat(2, 1fr)' },
+                    '@media (max-width: 900px)': { gridTemplateColumns: '1fr' },
+                  }}>
+                    {group.instances.map(service => renderServiceCard(service))}
+                  </Box>
+                )}
+              </Box>
+            );
+          };
+
+          const groups = groupingLevels.length > 0 ? buildCardGroups(gridDisplayServices, groupingLevels) : [];
+
+          // No grouping - render flat grid
+          if (groupingLevels.length === 0) {
+            return (
+              <Box sx={{
+                flex: 1,
+                minHeight: 0,
+                overflow: 'auto',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: 1.5,
+                '@media (max-width: 1200px)': { gridTemplateColumns: 'repeat(2, 1fr)' },
+                '@media (max-width: 768px)': { gridTemplateColumns: '1fr' },
+              }}>
+                {gridDisplayServices.length === 0 ? (
+                  <Card sx={{ gridColumn: '1 / -1' }}>
+                    <CardContent sx={{ py: 4, textAlign: 'center' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        {t('serverList.noData')}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  gridDisplayServices.map(service => renderServiceCard(service))
+                )}
+              </Box>
+            );
+          }
+
+          // With grouping - render grouped view
+          return (
+            <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {groups.map(group => renderCardGroup(group))}
             </Box>
           );
-        }
-
-        // With grouping - render grouped view
-        return (
-          <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {groups.map(group => renderCardGroup(group))}
-          </Box>
-        );
-      })()}
+        })()
+      }
 
       {/* Cluster View - Force-directed grape cluster visualization */}
       {
@@ -5313,6 +4927,24 @@ const ServerListPage: React.FC = () => {
             {t('serverList.contextMenu.healthCheck')}
           </MenuItem>
         )}
+      </Menu>
+
+      {/* Grouping Level Menu */}
+      <Menu
+        anchorEl={groupingMenuAnchor}
+        open={Boolean(groupingMenuAnchor)}
+        onClose={() => setGroupingMenuAnchor(null)}
+      >
+        {allGroupingFields
+          .filter(field => !groupingLevels.includes(field))
+          .map(field => (
+            <MenuItem key={field} onClick={() => {
+              setGroupingLevels([...groupingLevels, field]);
+              setGroupingMenuAnchor(null);
+            }}>
+              {getGroupingLabel(field)}
+            </MenuItem>
+          ))}
       </Menu>
     </Box >
   );

@@ -172,6 +172,8 @@ export const formatTime = (date: string | Date | null | undefined): string => {
 interface FormatRelativeTimeOptions {
   /** 초단위 표시 여부 (기본: false, true이면 "5초 전" 형태로 표시) */
   showSeconds?: boolean;
+  /** 기준 시간 (기본: 현재 시간) */
+  baseTime?: string | Date | number;
 }
 
 /**
@@ -197,8 +199,8 @@ export const formatRelativeTime = (
     if (!d) return '-';
 
     // If showSeconds option is enabled, calculate seconds for recent times
+    const now = options?.baseTime ? dayjs(options.baseTime) : dayjs();
     if (options?.showSeconds) {
-      const now = dayjs();
       const diffSeconds = now.diff(d, 'second');
 
       // Less than 60 seconds: show exact seconds
@@ -208,7 +210,7 @@ export const formatRelativeTime = (
       }
     }
 
-    return d.fromNow();
+    return d.from(now);
   } catch (error) {
     return '-';
   }

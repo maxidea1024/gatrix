@@ -798,7 +798,7 @@ export class PlanningDataService {
         uploadComment: uploadInfo?.uploadComment || null,
         changedFiles: JSON.stringify(changedFiles),
         fileDiffs: JSON.stringify(fileDiffs),
-        uploadedAt: new Date(),
+        uploadedAt: db.raw('UTC_TIMESTAMP()'),
       });
 
       // Fetch the created record

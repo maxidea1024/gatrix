@@ -24,6 +24,8 @@ interface RelativeTimeProps {
   updateInterval?: number;
   /** Show seconds for recent times (default: false) */
   showSeconds?: boolean;
+  /** Base time for calculation (default: Date.now()) */
+  baseTime?: number;
 }
 
 /**
@@ -57,9 +59,10 @@ const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
   sx,
   updateInterval,
   showSeconds = false,
+  baseTime,
 }) => {
   const { t, i18n } = useTranslation();
-  const [relativeText, setRelativeText] = useState(() => formatRelativeTime(date, { showSeconds }, i18n.language));
+  const [relativeText, setRelativeText] = useState(() => formatRelativeTime(date, { showSeconds, baseTime }, i18n.language));
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Memoize the parsed date to avoid recalculating
@@ -70,9 +73,9 @@ const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
 
   // Update the relative time text only if it actually changed
   const updateRelativeTime = useCallback(() => {
-    const newText = formatRelativeTime(date, { showSeconds }, i18n.language);
+    const newText = formatRelativeTime(date, { showSeconds, baseTime }, i18n.language);
     setRelativeText(prev => prev === newText ? prev : newText);
-  }, [date, showSeconds, i18n.language]);
+  }, [date, showSeconds, baseTime, i18n.language]);
 
   useEffect(() => {
     // Initial update
