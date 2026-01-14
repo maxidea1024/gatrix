@@ -186,3 +186,44 @@ foreach ($serviceName in $servicesToBuild.Keys) {
 }
 
 Write-Host "`nDone." -ForegroundColor Cyan
+
+# Save build history
+$historyFile = Join-Path $PSScriptRoot ".build-history.json"
+$gitHash = git rev-parse --short HEAD 2>$null
+if ([string]::IsNullOrEmpty($gitHash)) { $gitHash = "unknown" }
+$gitBranch = git rev-parse --abbrev-ref HEAD 2>$null
+if ([string]::IsNullOrEmpty($gitBranch)) { $gitBranch = "unknown" }
+
+$buildRecord = @{
+    timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+    tag       = $Tag
+    latest    = $TagLatest
+    pushed    = $Push
+    services  = @($servicesToBuild.Keys)
+    gitHash   = $gitHash
+    gitBranch = $gitBranch
+    registry  = "$Registry/$Namespace"
+}
+
+# Load existing history or create new array
+$history = @()
+if (Test-Path $historyFile) {
+    try {
+        $existingContent = Get-Content $historyFile -Raw -ErrorAction SilentlyContinue
+        if ($existingContent) {
+            $history = $existingContent | ConvertFrom-Json
+            if ($history -isnot [System.Array]) {
+                $history = @($history)
+            }
+        }
+    }
+    catch {
+        $history = @()
+    }
+}
+
+# Add new record and save
+$history += $buildRecord
+$history | ConvertTo-Json -Depth 10 | Set-Content $historyFile -Encoding UTF8
+
+Write-Host "`nBuild history saved to: $historyFile" -ForegroundColor Gray

@@ -203,3 +203,44 @@ done
 
 echo ""
 log_success "Done."
+
+# Save build history
+HISTORY_FILE="$SCRIPT_DIR/.build-history.json"
+GIT_HASH=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+SERVICES_LIST=$(printf '"%s",' "${!SERVICES_TO_BUILD[@]}" | sed 's/,$//')
+
+# Create new record
+NEW_RECORD=$(cat <<EOF
+{
+  "timestamp": "$TIMESTAMP",
+  "tag": "$TAG",
+  "latest": $TAG_LATEST,
+  "pushed": $PUSH,
+  "services": [$SERVICES_LIST],
+  "gitHash": "$GIT_HASH",
+  "gitBranch": "$GIT_BRANCH",
+  "registry": "$REGISTRY/$NAMESPACE"
+}
+EOF
+)
+
+# Append to existing history or create new
+if [ -f "$HISTORY_FILE" ]; then
+    # Read existing content and append new record
+    EXISTING=$(cat "$HISTORY_FILE")
+    # Remove trailing ] and add new record
+    echo "$EXISTING" | sed '$ s/]$/,/' > "$HISTORY_FILE.tmp"
+    echo "$NEW_RECORD" >> "$HISTORY_FILE.tmp"
+    echo "]" >> "$HISTORY_FILE.tmp"
+    mv "$HISTORY_FILE.tmp" "$HISTORY_FILE"
+else
+    # Create new array with single record
+    echo "[" > "$HISTORY_FILE"
+    echo "$NEW_RECORD" >> "$HISTORY_FILE"
+    echo "]" >> "$HISTORY_FILE"
+fi
+
+echo ""
+echo -e "${BLUE}Build history saved to: $HISTORY_FILE${NC}"
