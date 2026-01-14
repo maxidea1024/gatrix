@@ -20,9 +20,10 @@ NC='\033[0m'
 
 # Default values
 DATE_SUFFIX=$(date +"%Y%m%d")
-OUTPUT_FILE="gatrix-deploy-${DATE_SUFFIX}.tgz"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$SCRIPT_DIR"
+ARTIFACTS_DIR="$ROOT_DIR/artifacts"
+OUTPUT_FILE="$ARTIFACTS_DIR/gatrix-deploy-${DATE_SUFFIX}.tgz"
 
 log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
@@ -125,15 +126,17 @@ done
 
 
 # Create the package
+mkdir -p "$ARTIFACTS_DIR"
 log_info "Creating package: $OUTPUT_FILE"
 cd "$TEMP_DIR"
-tar -czf "$ROOT_DIR/$OUTPUT_FILE" gatrix-deploy
+tar -czf "$OUTPUT_FILE" gatrix-deploy
 
 echo ""
 log_success "Package created: $OUTPUT_FILE"
 echo ""
 log_info "Package contents:"
-tar -tzf "$ROOT_DIR/$OUTPUT_FILE" | head -20
+tar -tzf "$OUTPUT_FILE" | head -20
+echo "..."
 echo "..."
 
 # Deploy to game/gatrix folder

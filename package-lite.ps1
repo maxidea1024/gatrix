@@ -15,9 +15,10 @@ $ErrorActionPreference = "Stop"
 
 # Default values
 $DateSuffix = Get-Date -Format "yyyyMMdd"
-$OutputFile = "gatrix-deploy-$DateSuffix.tgz"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RootDir = $ScriptDir
+$ArtifactsDir = Join-Path $RootDir "artifacts"
+$OutputFile = Join-Path $ArtifactsDir "gatrix-deploy-$DateSuffix.tgz"
 
 function Show-Help {
     Write-Host "Gatrix Deploy Package Script"
@@ -119,10 +120,11 @@ try {
     }
 
     # Create the package using tar
+    New-Item -ItemType Directory -Path $ArtifactsDir -Force | Out-Null
     Write-Host "[INFO] Creating package: $OutputFile" -ForegroundColor Blue
     Push-Location $TempDir
     try {
-        tar -czf (Join-Path $RootDir $OutputFile) "gatrix-deploy"
+        tar -czf $OutputFile "gatrix-deploy"
     }
     finally {
         Pop-Location
@@ -132,7 +134,7 @@ try {
     Write-Host "[SUCCESS] Package created: $OutputFile" -ForegroundColor Green
     Write-Host ""
     Write-Host "[INFO] Package contents:" -ForegroundColor Blue
-    tar -tzf (Join-Path $RootDir $OutputFile) | Select-Object -First 20
+    tar -tzf $OutputFile | Select-Object -First 20
     Write-Host "..."
 
     # Deploy to game/gatrix folder
