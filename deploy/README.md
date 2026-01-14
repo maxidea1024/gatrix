@@ -336,6 +336,8 @@ Repository 'uwocn/uwocn' not found or has no images yet.
 | `status.ps1/.sh` | Show stack status |
 | `login-registry.ps1/.sh` | Registry login |
 | `list-images.ps1/.sh` | List registry images |
+| `update-lite.sh` | Update docker-compose.lite.yml deployment |
+| `package-lite.sh` | Create deployment package (tgz) |
 | `registry.env` | Registry credentials |
 | `.env.example` | Environment template |
 | `docker-stack.yml` | Swarm stack definition |

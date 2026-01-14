@@ -1,5 +1,0 @@
-yarn workspace v1.22.22
-yarn run v1.22.22
-$ eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
-info Visit https://yarnpkg.com/en/docs/cli/workspace for documentation about this command.

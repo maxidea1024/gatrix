@@ -1,0 +1,148 @@
+#!/bin/bash
+#
+# Gatrix Deploy Package Script
+#
+# Creates a tgz package containing all files needed for deployment.
+#
+# Usage:
+#   ./package.sh [options]
+#
+# Options:
+#   -o, --output <file>       Output file name (default: gatrix-deploy.tgz)
+#   -h, --help                Show help
+
+set -e
+
+# Colors
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+# Default values
+DATE_SUFFIX=$(date +"%Y%m%d")
+OUTPUT_FILE="gatrix-deploy-${DATE_SUFFIX}.tgz"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$SCRIPT_DIR"
+
+log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
+log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
+
+show_help() {
+    echo "Gatrix Deploy Package Script"
+    echo ""
+    echo "Usage: ./package.sh [options]"
+    echo ""
+    echo "Options:"
+    echo "  -o, --output <file>       Output file name (default: gatrix-deploy.tgz)"
+    echo "  -h, --help                Show help"
+    echo ""
+    echo "Included files:"
+    echo "  - deploy/*                Deploy scripts"
+    echo "  - docker-compose.lite.yml Lite compose file"
+    echo "  - .env*.example           Environment templates"
+    echo "  - setup-env.*             Environment setup scripts"
+    echo "  - update-lite.sh          Lite update script"
+    exit 0
+}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -o|--output)
+            OUTPUT_FILE="$2"
+            shift 2
+            ;;
+        -h|--help)
+            show_help
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
+
+echo "========================================"
+echo "   Gatrix Deploy Package"
+echo "========================================"
+echo ""
+
+cd "$ROOT_DIR"
+
+# Create temp directory for packaging
+TEMP_DIR=$(mktemp -d)
+PACKAGE_DIR="$TEMP_DIR/gatrix-deploy"
+mkdir -p "$PACKAGE_DIR"
+
+log_info "Collecting files..."
+
+# Copy deploy folder (excluding history and env files with secrets)
+mkdir -p "$PACKAGE_DIR/deploy"
+cp -r deploy/*.sh "$PACKAGE_DIR/deploy/" 2>/dev/null || true
+cp -r deploy/*.ps1 "$PACKAGE_DIR/deploy/" 2>/dev/null || true
+cp -r deploy/README*.md "$PACKAGE_DIR/deploy/" 2>/dev/null || true
+cp deploy/.env.example "$PACKAGE_DIR/deploy/" 2>/dev/null || true
+
+# Copy docker-compose.lite.yml
+if [ -f "docker-compose.lite.yml" ]; then
+    cp docker-compose.lite.yml "$PACKAGE_DIR/"
+    log_info "  + docker-compose.lite.yml"
+fi
+
+# Copy .env examples from root
+for f in .env*.example; do
+    if [ -f "$f" ]; then
+        cp "$f" "$PACKAGE_DIR/"
+        log_info "  + $f"
+    fi
+done
+
+# Copy setup-env scripts from root
+for f in setup-env*; do
+    if [ -f "$f" ]; then
+        cp "$f" "$PACKAGE_DIR/"
+        chmod +x "$PACKAGE_DIR/$f"
+        log_info "  + $f"
+    fi
+done
+
+# Copy update-lite.sh from root
+if [ -f "update-lite.sh" ]; then
+    cp update-lite.sh "$PACKAGE_DIR/"
+    chmod +x "$PACKAGE_DIR/update-lite.sh"
+    log_info "  + update-lite.sh"
+fi
+
+# Create the package
+log_info "Creating package: $OUTPUT_FILE"
+cd "$TEMP_DIR"
+tar -czf "$ROOT_DIR/$OUTPUT_FILE" gatrix-deploy
+
+echo ""
+log_success "Package created: $OUTPUT_FILE"
+echo ""
+log_info "Package contents:"
+tar -tzf "$ROOT_DIR/$OUTPUT_FILE" | head -20
+echo "..."
+
+# Deploy to game/gatrix folder
+GAME_GATRIX_DIR="$ROOT_DIR/../game/gatrix"
+if [ -d "$ROOT_DIR/../game" ]; then
+    echo ""
+    log_info "Deploying to $GAME_GATRIX_DIR..."
+    
+    # Clean existing folder
+    rm -rf "$GAME_GATRIX_DIR"
+    mkdir -p "$GAME_GATRIX_DIR"
+    
+    # Copy package contents
+    cp -r "$PACKAGE_DIR"/* "$GAME_GATRIX_DIR/"
+    
+    log_success "Deployed to $GAME_GATRIX_DIR"
+fi
+
+# Cleanup temp
+rm -rf "$TEMP_DIR"
+
+echo ""
+log_info "To extract manually: tar -xzf $OUTPUT_FILE"
