@@ -4591,6 +4591,9 @@
       "failed": "服务器健康检查失败: {{error}}",
       "error": "无法执行健康检查"
     },
+    "sort": {
+      "label": "排序"
+    },
     "table": {
       "instanceId": "实例ID",
       "service": "服务",

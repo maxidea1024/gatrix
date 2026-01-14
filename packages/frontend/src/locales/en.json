@@ -4568,6 +4568,9 @@
       "failed": "Server health check failed: {{error}}",
       "error": "Failed to perform health check"
     },
+    "sort": {
+      "label": "Sort"
+    },
     "table": {
       "instanceId": "Instance ID",
       "service": "Service",
