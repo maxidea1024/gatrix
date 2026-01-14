@@ -1,12 +1,42 @@
-﻿{
-    "timestamp":  "2026-01-14T03:09:18Z",
-    "services":  [
-                     "frontend"
-                 ],
-    "latest":  true,
-    "gitHash":  "fd7221b3",
-    "registry":  "uwocn.tencentcloudcr.com/uwocn",
-    "gitBranch":  "main",
-    "tag":  "v0.0.1",
-    "pushed":  false
-}
+﻿[
+    {
+        "timestamp":  "2026-01-14T03:09:18Z",
+        "services":  [
+                         "frontend"
+                     ],
+        "latest":  true,
+        "gitHash":  "fd7221b3",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.0.1",
+        "pushed":  false
+    },
+    {
+        "timestamp":  "2026-01-14T04:04:55Z",
+        "services":  [
+                         "chat-server",
+                         "backend",
+                         "frontend",
+                         "edge",
+                         "event-lens"
+                     ],
+        "latest":  true,
+        "gitHash":  "618bc73a",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.0.1",
+        "pushed":  false
+    },
+    {
+        "timestamp":  "2026-01-14T04:58:12Z",
+        "services":  [
+                         "event-lens"
+                     ],
+        "latest":  true,
+        "gitHash":  "618bc73a",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.0.1",
+        "pushed":  true
+    }
+]

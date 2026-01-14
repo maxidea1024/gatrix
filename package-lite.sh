@@ -90,6 +90,47 @@ if [ -f "docker-compose.lite.yml" ]; then
     log_info "  + docker-compose.lite.yml"
 fi
 
+# Copy docker config folders required by docker-compose.lite.yml
+if [ -d "docker" ]; then
+    mkdir -p "$PACKAGE_DIR/docker"
+    # Loki config
+    if [ -d "docker/loki" ]; then
+        cp -r docker/loki "$PACKAGE_DIR/docker/"
+        log_info "  + docker/loki/"
+    fi
+    # Fluent-bit config
+    if [ -d "docker/fluent-bit" ]; then
+        cp -r docker/fluent-bit "$PACKAGE_DIR/docker/"
+        log_info "  + docker/fluent-bit/"
+    fi
+    # Prometheus config
+    if [ -d "docker/prometheus" ]; then
+        cp -r docker/prometheus "$PACKAGE_DIR/docker/"
+        log_info "  + docker/prometheus/"
+    fi
+    # Grafana config
+    if [ -d "docker/grafana" ]; then
+        cp -r docker/grafana "$PACKAGE_DIR/docker/"
+        log_info "  + docker/grafana/"
+    fi
+    # MySQL init scripts
+    if [ -d "docker/mysql" ]; then
+        cp -r docker/mysql "$PACKAGE_DIR/docker/"
+        log_info "  + docker/mysql/"
+    fi
+    # Redis config
+    if [ -d "docker/redis" ]; then
+        cp -r docker/redis "$PACKAGE_DIR/docker/"
+        log_info "  + docker/redis/"
+    fi
+    # Nginx SSL (create empty if not exists)
+    mkdir -p "$PACKAGE_DIR/docker/nginx/ssl"
+    if [ -d "docker/nginx" ]; then
+        cp -r docker/nginx "$PACKAGE_DIR/docker/" 2>/dev/null || true
+        log_info "  + docker/nginx/"
+    fi
+fi
+
 # Copy .env examples from root
 for f in .env*.example; do
     if [ -f "$f" ]; then

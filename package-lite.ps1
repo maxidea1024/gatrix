@@ -95,6 +95,23 @@ try {
         Write-Host "  + docker-compose.lite.yml" -ForegroundColor Gray
     }
 
+    # Copy docker config folders required by docker-compose.lite.yml
+    if (Test-Path "docker") {
+        $dockerDirs = @("loki", "fluent-bit", "prometheus", "grafana", "mysql", "redis", "nginx")
+        foreach ($dir in $dockerDirs) {
+            $srcPath = Join-Path "docker" $dir
+            if (Test-Path $srcPath) {
+                $destPath = Join-Path $PackageDir "docker"
+                New-Item -ItemType Directory -Path $destPath -Force | Out-Null
+                Copy-Item -Recurse -Path $srcPath -Destination $destPath
+                Write-Host "  + docker/$dir/" -ForegroundColor Gray
+            }
+        }
+        # Ensure nginx/ssl exists
+        $sslPath = Join-Path $PackageDir "docker/nginx/ssl"
+        New-Item -ItemType Directory -Path $sslPath -Force | Out-Null
+    }
+
     # Copy .env examples from root
     Get-ChildItem -Path "." -Filter ".env*.example" | ForEach-Object {
         Copy-Item $_.FullName -Destination $PackageDir
