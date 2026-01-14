@@ -48,6 +48,10 @@ RUN yarn workspace @gatrix/chat-server build
 FROM base AS runner
 WORKDIR /app
 
+# App version (passed via --build-arg)
+ARG APP_VERSION=0.0.0
+ENV APP_VERSION=$APP_VERSION
+
 ENV NODE_ENV=production
 
 # Use Tencent npm mirror for faster downloads in China

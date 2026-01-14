@@ -4378,7 +4378,8 @@
       "previewChangesTitle": "Preview Changes",
       "previewFailed": "Failed to preview changes",
       "noChangesDetected": "No changes detected. The data is already up to date.",
-      "filesChanged": "files changed"
+      "filesChanged": "files changed",
+      "conversionNote": "Data is filtered based on country code during conversion."
     },
     "tabs": {
       "rewardTypes": "Reward Types",
@@ -4412,6 +4413,9 @@
       "dataBuild": "Data Build (Excel → JSON Conversion)",
       "dataBuildDesc": "Convert client CMS data to JSON format.",
       "clientDataWarning": "You must use CLIENT CMS data, NOT server data!",
+      "countryCodeNote": "Country Code Filtering:",
+      "binaryCodeDesc": "CMS file suffix (default: cn → uses CashShop_BCCN.json)",
+      "countryCodeDesc": "Filtering mask (default: 6=CHINA, 0=KOREA, 2=GLOBAL)",
       "cliUpload": "Remote Upload via CLI",
       "cliUploadDesc": "Upload converted data to the remote server.",
       "curlUpload": "Upload via curl",

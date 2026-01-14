@@ -4401,7 +4401,8 @@
       "previewChangesTitle": "预览变更",
       "previewFailed": "预览变更失败",
       "noChangesDetected": "没有检测到变更。数据已是最新。",
-      "filesChanged": "个文件变更"
+      "filesChanged": "个文件变更",
+      "conversionNote": "数据在转换时根据国家代码进行过滤。"
     },
     "tabs": {
       "rewardTypes": "奖励类型",
@@ -4435,6 +4436,9 @@
       "dataBuild": "数据构建 (Excel → JSON 转换)",
       "dataBuildDesc": "将客户端CMS数据转换为JSON格式。",
       "clientDataWarning": "必须使用客户端CMS数据，不是服务器数据！",
+      "countryCodeNote": "国家代码过滤:",
+      "binaryCodeDesc": "CMS文件后缀 (默认: cn → 使用 CashShop_BCCN.json)",
+      "countryCodeDesc": "过滤掩码 (默认: 6=中国, 0=韩国, 2=全球)",
       "cliUpload": "通过CLI远程上传",
       "cliUploadDesc": "将转换后的数据上传到远程服务器.",
       "curlUpload": "通过curl上传",

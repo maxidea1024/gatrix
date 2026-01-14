@@ -105,6 +105,10 @@ EXPOSE 3400
 # Metrics port (internal only - should not be exposed externally)
 EXPOSE 9400
 
+# App version (passed via --build-arg)
+ARG APP_VERSION=0.0.0
+ENV APP_VERSION=$APP_VERSION
+
 ENV NODE_ENV=production
 ENV EDGE_PORT=3400
 ENV EDGE_METRICS_PORT=9400

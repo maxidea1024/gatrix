@@ -26,6 +26,8 @@ interface ConvertOptions {
   input: string;
   output: string;
   verbose: boolean;
+  binaryCode: string;
+  countryCode: number;
 }
 
 class PlanningDataConverter {
@@ -39,7 +41,7 @@ class PlanningDataConverter {
   private log(message: string, level: 'info' | 'warn' | 'error' | 'success' = 'info') {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}]`;
-    
+
     switch (level) {
       case 'info':
         console.log(`${prefix} ℹ️  ${message}`);
@@ -94,8 +96,8 @@ class PlanningDataConverter {
 
       this.log('Running adminToolDataBuilder...');
 
-      // Always build all data - no options needed
-      const command = `node "${builderPath}" --cms-dir "${this.options.input}" --output-dir "${this.options.output}"`;
+      // Build with binaryCode and countryCode options
+      const command = `node "${builderPath}" --cms-dir "${this.options.input}" --output-dir "${this.options.output}" --binary-code ${this.options.binaryCode} --country-code ${this.options.countryCode}`;
 
       if (this.options.verbose) {
         this.log(`Command: ${command}`);
@@ -193,6 +195,8 @@ function parseArgs(): ConvertOptions {
     input: path.join(backendRoot, 'cms'),
     output: path.join(backendRoot, 'data', 'planning'),
     verbose: false,
+    binaryCode: 'cn',
+    countryCode: 6,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -205,6 +209,12 @@ function parseArgs(): ConvertOptions {
         break;
       case '--verbose':
         options.verbose = true;
+        break;
+      case '--binary-code':
+        options.binaryCode = args[++i];
+        break;
+      case '--country-code':
+        options.countryCode = parseInt(args[++i], 10);
         break;
       case '--help':
         printHelp();
@@ -225,14 +235,21 @@ Usage:
   yarn planning-data:convert [options]
 
 Options:
-  --input <path>      CMS 폴더 경로 (기본값: packages/backend/cms)
-  --output <path>     출력 폴더 경로 (기본값: packages/backend/data/planning)
-  --verbose           상세 로그 출력
-  --help              도움말 표시
+  --input <path>        CMS 폴더 경로 (기본값: packages/backend/cms)
+  --output <path>       출력 폴더 경로 (기본값: packages/backend/data/planning)
+  --binary-code <code>  바이너리 코드 (기본값: cn)
+                        CMS 파일 접미사 결정 (예: cn -> CashShop_BCCN.json)
+  --country-code <num>  국가 코드 (기본값: 6)
+                        localBitFlag 필터링용. 0=KOREA, 2=GLOBAL, 6=CHINA
+  --verbose             상세 로그 출력
+  --help                도움말 표시
 
 Examples:
-  # 기본 변환 (모든 데이터)
+  # 기본 변환 (중국 설정)
   yarn planning-data:convert
+
+  # 한국 설정으로 변환
+  yarn planning-data:convert --binary-code kr --country-code 0
 
   # 커스텀 경로 지정
   yarn planning-data:convert --input ./cms --output ./output

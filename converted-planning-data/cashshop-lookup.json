@@ -1,5 +1,5 @@
 {
-  "totalCount": 108,
+  "totalCount": 98,
   "items": [
     {
       "id": 10503001,
@@ -1208,42 +1208,6 @@
       "saleType": 4
     },
     {
-      "id": 10507013,
-      "name": {
-        "ko": "주간 경험치 영약 패키지",
-        "en": "주간 경험치 영약 패키지",
-        "zh": "每周经验值灵药礼包"
-      },
-      "description": {
-        "ko": "항해사 경험치 영약을 제공합니다.",
-        "en": "항해사 경험치 영약을 제공합니다.",
-        "zh": "提供航海士经验值灵药。"
-      },
-      "productCode": "com.uwocn.12",
-      "price": 12,
-      "productCategory": 3,
-      "productType": 1,
-      "saleType": 3
-    },
-    {
-      "id": 10507014,
-      "name": {
-        "ko": "월간 경험치 영약 패키지",
-        "en": "월간 경험치 영약 패키지",
-        "zh": "每月经验值灵药礼包"
-      },
-      "description": {
-        "ko": "항해사 경험치 영약을 제공합니다.",
-        "en": "항해사 경험치 영약을 제공합니다.",
-        "zh": "提供航海士经验值灵药。"
-      },
-      "productCode": "com.uwocn.128",
-      "price": 128,
-      "productCategory": 3,
-      "productType": 1,
-      "saleType": 4
-    },
-    {
       "id": 10510001,
       "name": {
         "ko": "신규 항해 패키지1",
@@ -1470,78 +1434,6 @@
         "ko": "레벨업 패스 6 전용 추가 보상을 획득할 자격을 부여합니다.",
         "en": "레벨업 패스 6 전용 추가 보상을 획득할 자격을 부여합니다.",
         "zh": "解锁领取等级成长通行证 6 的专属额外奖励资格。"
-      },
-      "productCode": "com.uwocn.328",
-      "price": 328,
-      "productCategory": 10,
-      "productType": 8,
-      "saleType": 5
-    },
-    {
-      "id": 10511007,
-      "name": {
-        "ko": "레벨업 패스 7",
-        "en": "레벨업 패스 7",
-        "zh": "等级成长通行证 7"
-      },
-      "description": {
-        "ko": "레벨업 패스 7 전용 추가 보상을 획득할 자격을 부여합니다.",
-        "en": "레벨업 패스 7 전용 추가 보상을 획득할 자격을 부여합니다.",
-        "zh": "解锁领取等级成长通行证 7 的专属额外奖励资格。"
-      },
-      "productCode": "com.uwocn.328",
-      "price": 328,
-      "productCategory": 10,
-      "productType": 8,
-      "saleType": 5
-    },
-    {
-      "id": 10511008,
-      "name": {
-        "ko": "레벨업 패스 8",
-        "en": "레벨업 패스 8",
-        "zh": "等级成长通行证 8"
-      },
-      "description": {
-        "ko": "레벨업 패스 8 전용 추가 보상을 획득할 자격을 부여합니다.",
-        "en": "레벨업 패스 8 전용 추가 보상을 획득할 자격을 부여합니다.",
-        "zh": "解锁领取等级成长通行证 8 的专属额外奖励资格。"
-      },
-      "productCode": "com.uwocn.328",
-      "price": 328,
-      "productCategory": 10,
-      "productType": 8,
-      "saleType": 5
-    },
-    {
-      "id": 10511009,
-      "name": {
-        "ko": "레벨업 패스 9",
-        "en": "레벨업 패스 9",
-        "zh": "等级成长通行证 9"
-      },
-      "description": {
-        "ko": "레벨업 패스 9 전용 추가 보상을 획득할 자격을 부여합니다.",
-        "en": "레벨업 패스 9 전용 추가 보상을 획득할 자격을 부여합니다.",
-        "zh": "解锁领取等级成长通行证 9 的专属额外奖励资格。"
-      },
-      "productCode": "com.uwocn.328",
-      "price": 328,
-      "productCategory": 10,
-      "productType": 8,
-      "saleType": 5
-    },
-    {
-      "id": 10511010,
-      "name": {
-        "ko": "레벨업 패스 10",
-        "en": "레벨업 패스 10",
-        "zh": "等级成长通行证 10"
-      },
-      "description": {
-        "ko": "레벨업 패스 10 전용 추가 보상을 획득할 자격을 부여합니다.",
-        "en": "레벨업 패스 10 전용 추가 보상을 획득할 자격을 부여합니다.",
-        "zh": "解锁领取等级成长通行证 10 的专属额外奖励资格。"
       },
       "productCode": "com.uwocn.328",
       "price": 328,
@@ -1869,78 +1761,6 @@
       },
       "productCode": "com.uwocn.98",
       "price": 98,
-      "productCategory": 3,
-      "productType": 1,
-      "saleType": 5
-    },
-    {
-      "id": 10512013,
-      "name": {
-        "ko": "교역 깃발 패키지",
-        "en": "교역 깃발 패키지",
-        "zh": "交易旗帜礼包"
-      },
-      "description": {
-        "ko": "교역 초보자 깃발과 [[BigR]]을 제공합니다.",
-        "en": "교역 초보자 깃발과 [[BigR]]을 제공합니다.",
-        "zh": "提供贸易新手旗帜和 [[BigR]]。"
-      },
-      "productCode": "com.uwocn.648",
-      "price": 648,
-      "productCategory": 3,
-      "productType": 1,
-      "saleType": 5
-    },
-    {
-      "id": 10512014,
-      "name": {
-        "ko": "전투 깃발 패키지",
-        "en": "전투 깃발 패키지",
-        "zh": "战斗旗帜礼包"
-      },
-      "description": {
-        "ko": "전투 초보자 깃발과 [[BigR]]을 제공합니다.",
-        "en": "전투 초보자 깃발과 [[BigR]]을 제공합니다.",
-        "zh": "提供战斗新手旗帜和 [[BigR]]。"
-      },
-      "productCode": "com.uwocn.648",
-      "price": 648,
-      "productCategory": 3,
-      "productType": 1,
-      "saleType": 5
-    },
-    {
-      "id": 10512015,
-      "name": {
-        "ko": "모험 깃발 패키지",
-        "en": "모험 깃발 패키지",
-        "zh": "冒险旗帜礼包"
-      },
-      "description": {
-        "ko": "모험 초보자 깃발과 [[BigR]]을 제공합니다.",
-        "en": "모험 초보자 깃발과 [[BigR]]을 제공합니다.",
-        "zh": "提供冒险初心者旗帜与 [[BigR]]。"
-      },
-      "productCode": "com.uwocn.648",
-      "price": 648,
-      "productCategory": 3,
-      "productType": 1,
-      "saleType": 5
-    },
-    {
-      "id": 10512034,
-      "name": {
-        "ko": "신년 폭죽 패키지",
-        "en": "신년 폭죽 패키지",
-        "zh": "新年爆竹礼包"
-      },
-      "description": {
-        "ko": "선박 외형을 제공합니다. 선박 외형은 기함에만 장착 가능하며 장착 위치 별로 한 종류만 적용할 수 있습니다.",
-        "en": "선박 외형을 제공합니다. 선박 외형은 기함에만 장착 가능하며 장착 위치 별로 한 종류만 적용할 수 있습니다.",
-        "zh": "提供船只外观。船只外观仅可装备在旗舰上，每个外观位置仅能装备一种。"
-      },
-      "productCode": "com.uwocn.30",
-      "price": 30,
       "productCategory": 3,
       "productType": 1,
       "saleType": 5

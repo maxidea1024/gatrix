@@ -116,7 +116,11 @@ export const PlanningDataGuideContent: React.FC<PlanningDataGuideContentProps> =
     };
     const backendUrl = getBackendUrl();
 
-    const convertCommand = 'yarn planning-data:convert --input=./cms --output=./converted-planning-data';
+    const convertCommand = `# Default: China (binaryCode=cn, countryCode=6)
+yarn planning-data:convert --input=./cms --output=./converted-planning-data
+
+# Korea example (binaryCode=kr, countryCode=0)
+yarn planning-data:convert --input=./cms --output=./converted-planning-data --binary-code=kr --country-code=0`;
     const uploadCommand = `yarn upload-planning-data \\
   --api-url=${backendUrl} \\
   --env=qa \\
@@ -173,6 +177,19 @@ curl -X POST ${backendUrl}/api/v1/server/qa/planning-data/upload \\
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2, pl: 2 }}>
                 {t('planningData.uploadGuide.dataBuildDesc')}
             </Typography>
+            <Alert severity="info" sx={{ mb: 2, textAlign: 'left' }}>
+                <Typography variant="body2" component="div">
+                    <strong>{t('planningData.uploadGuide.countryCodeNote') || 'Country Code Filtering:'}</strong>
+                    <Box component="ul" sx={{ m: 0, pl: 2 }}>
+                        <li>
+                            <code>--binary-code</code>: {t('planningData.uploadGuide.binaryCodeDesc') || 'CMS file suffix (default: cn → uses CashShop_BCCN.json)'}
+                        </li>
+                        <li>
+                            <code>--country-code</code>: {t('planningData.uploadGuide.countryCodeDesc') || 'Filtering mask (default: 6=CHINA, 0=KOREA, 2=GLOBAL)'}
+                        </li>
+                    </Box>
+                </Typography>
+            </Alert>
             <Alert severity="warning" sx={{ mb: 2, textAlign: 'left' }}>
                 {t('planningData.uploadGuide.clientDataWarning')}
             </Alert>
@@ -213,6 +230,7 @@ const PlanningDataGuideDrawer: React.FC<PlanningDataGuideDrawerProps> = ({ open,
             title={t('planningData.uploadGuide.title')}
             subtitle={t('planningData.uploadGuide.subtitle')}
             defaultWidth={550}
+            storageKey="planning-data-guide-drawer-width"
         >
             <Box sx={{ p: 3, height: '100%', overflow: 'auto' }}>
                 <PlanningDataGuideContent variant="drawer" />

@@ -110,7 +110,7 @@ foreach ($serviceName in $servicesToBuild.Keys) {
     # Execute Docker Build
     Push-Location $rootDir
     try {
-        docker build -f $dockerfile -t $imageName .
+        docker build -f $dockerfile -t $imageName --build-arg APP_VERSION=$Tag .
         if ($LASTEXITCODE -ne 0) { throw "Docker build failed for $serviceName" }
         
         Write-Host "[$serviceName] Build success." -ForegroundColor Green

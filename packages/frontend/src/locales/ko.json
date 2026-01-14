@@ -4394,7 +4394,8 @@
       "previewChangesTitle": "변경사항 미리보기",
       "previewFailed": "변경사항 확인에 실패했습니다",
       "noChangesDetected": "변경사항이 없습니다. 이미 최신 상태입니다.",
-      "filesChanged": "개 파일 변경됨"
+      "filesChanged": "개 파일 변경됨",
+      "conversionNote": "기획데이터는 변환 시 국가 코드에 따라 필터링됩니다."
     },
     "tabs": {
       "rewardTypes": "보상 타입 목록",
@@ -4428,6 +4429,9 @@
       "dataBuild": "데이터 빌드 (Excel → JSON 변환)",
       "dataBuildDesc": "클라이언트용 CMS 데이터를 JSON 형식으로 변환합니다.",
       "clientDataWarning": "반드시 클라이언트용 CMS 데이터를 사용해야 합니다. 서버용 데이터가 아닙니다!",
+      "countryCodeNote": "국가 코드 필터링:",
+      "binaryCodeDesc": "CMS 파일 접미사 (기본값: cn → CashShop_BCCN.json 사용)",
+      "countryCodeDesc": "필터링 마스크 (기본값: 6=중국, 0=한국, 2=글로벌)",
       "cliUpload": "CLI를 통한 원격 업로드",
       "cliUploadDesc": "변환된 데이터를 원격 서버로 업로드합니다.",
       "curlUpload": "curl을 통한 업로드",

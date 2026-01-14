@@ -343,6 +343,16 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
             {t('planningData.upload.title') || 'Upload Planning Data'}
           </Typography>
 
+          {/* Info about data conversion settings */}
+          <Alert severity="info" icon={<InfoIcon />} sx={{ mb: 2 }}>
+            <Typography variant="body2" component="div">
+              {t('planningData.upload.conversionNote') || 'Data is filtered based on country code during conversion.'}
+              <Box component="span" sx={{ fontFamily: 'monospace', ml: 1 }}>
+                (binaryCode=cn, countryCode=6)
+              </Box>
+            </Typography>
+          </Alert>
+
           {/* Drag & Drop Area */}
           <Box
             ref={dragOverRef}

@@ -306,6 +306,77 @@ const DESC_FORMAT_TYPE = {
 };
 
 // ============================================================================
+// Country Code Filtering Helpers
+// ============================================================================
+
+/**
+ * Check if an item is filtered out by country code.
+ * Returns true if the item should be EXCLUDED (filtered out).
+ * 
+ * @param {number|undefined|null} localBitFlag - The localBitFlag value from CMS
+ * @param {string} fieldName - Name of the field (for debugging, defaults to 'localBitFlag')
+ * @returns {boolean} - true if item should be filtered OUT, false if it should be included
+ */
+function isFilteredByCountryCode(localBitFlag, fieldName = 'localBitFlag') {
+  // If localBitFlag is undefined or null, include the item
+  if (localBitFlag === undefined || localBitFlag === null) {
+    return false; // Not filtered, include it
+  }
+  // Get country code mask from global settings (default to CHINA = 6)
+  const countryCodeMask = global.COUNTRY_CODE_MASK || (1 << 6);
+  // If the bit is NOT set, filter it out
+  return (localBitFlag & countryCodeMask) === 0;
+}
+
+/**
+ * Check if an item is available for the current country code.
+ * Returns true if the item should be INCLUDED.
+ * 
+ * @param {number|undefined|null} localBitFlag - The localBitFlag value from CMS
+ * @returns {boolean} - true if item should be included, false if it should be filtered out
+ */
+function isAvailableForCountryCode(localBitFlag) {
+  return !isFilteredByCountryCode(localBitFlag);
+}
+
+/**
+ * Resolve CMS file path with optional binaryCode suffix.
+ * If binaryCode is set and the _BC{XX}.json file exists, use it.
+ * Otherwise, fall back to the base file.
+ * 
+ * @param {string} cmsDir - CMS directory path
+ * @param {string} tableName - Base table name without extension (e.g., 'CashShop')
+ * @returns {{path: string, usedFile: string, hasBinaryVariant: boolean}} - Resolved path info
+ */
+function resolveCmsFilePath(cmsDir, tableName) {
+  const binaryCode = global.BINARY_CODE;
+  const baseFileName = `${tableName}.json`;
+  const basePath = path.join(cmsDir, baseFileName);
+
+  // If binaryCode is set, try the variant first
+  if (binaryCode && binaryCode.trim()) {
+    const variantFileName = `${tableName}_BC${binaryCode.toUpperCase()}.json`;
+    const variantPath = path.join(cmsDir, variantFileName);
+
+    if (fs.existsSync(variantPath)) {
+      return {
+        path: variantPath,
+        usedFile: variantFileName,
+        hasBinaryVariant: true
+      };
+    }
+    console.log(`   ⚠️  ${variantFileName} not found, falling back to ${baseFileName}`);
+  }
+
+  // Fall back to base file
+  return {
+    path: basePath,
+    usedFile: baseFileName,
+    hasBinaryVariant: false
+  };
+}
+
+// ============================================================================
 // Utility Functions
 // ============================================================================
 
@@ -2832,17 +2903,20 @@ function convertLocalizationTable(inputPath, outputPath) {
 // ============================================================================
 
 function buildHotTimeBuffLookup(cmsDir, outputDir, loctab = {}) {
-  const hotTimeBuffPath = path.join(cmsDir, 'HotTimeBuff.json');
-  const worldBuffPath = path.join(cmsDir, 'WorldBuff.json');
+  // Resolve file paths (with binaryCode variant support)
+  const hotTimeBuffInfo = resolveCmsFilePath(cmsDir, 'HotTimeBuff');
+  const worldBuffInfo = resolveCmsFilePath(cmsDir, 'WorldBuff');
 
   try {
-    if (!fs.existsSync(hotTimeBuffPath)) {
-      console.log('   ⚠️  HotTimeBuff.json not found, skipping...');
+    if (!fs.existsSync(hotTimeBuffInfo.path)) {
+      console.log(`   ⚠️  ${hotTimeBuffInfo.usedFile} not found, skipping...`);
       return null;
     }
 
-    const hotTimeBuffData = loadJson5File(hotTimeBuffPath);
-    const worldBuffData = loadJson5File(worldBuffPath);
+    console.log(`   📁 Using ${hotTimeBuffInfo.usedFile}`);
+
+    const hotTimeBuffData = loadJson5File(hotTimeBuffInfo.path);
+    const worldBuffData = fs.existsSync(worldBuffInfo.path) ? loadJson5File(worldBuffInfo.path) : null;
 
     if (!hotTimeBuffData || !hotTimeBuffData.HotTimeBuff) {
       return null;
@@ -2858,9 +2932,9 @@ function buildHotTimeBuffLookup(cmsDir, outputDir, loctab = {}) {
       });
     }
 
-    // Convert HotTimeBuff data
+    // Convert HotTimeBuff data (filter by localBitflag)
     const items = Object.values(hotTimeBuffData.HotTimeBuff)
-      .filter(item => item && item.id)
+      .filter(item => item && item.id && !isFilteredByCountryCode(item.localBitflag))
       .map((item) => {
         const startDateISO = item.startDate ? new Date(item.startDate).toISOString() : null;
         const endDateISO = item.endDate ? new Date(item.endDate).toISOString() : null;
@@ -2897,16 +2971,18 @@ function buildHotTimeBuffLookup(cmsDir, outputDir, loctab = {}) {
 }
 
 function buildEventPageLookup(cmsDir, outputDir, loctab = {}) {
-  const eventPagePath = path.join(cmsDir, 'EventPage.json');
-
+  // Resolve file path (with binaryCode variant support)
+  const eventPageInfo = resolveCmsFilePath(cmsDir, 'EventPage');
 
   try {
-    if (!fs.existsSync(eventPagePath)) {
-      console.log('   ⚠️  EventPage.json not found, skipping...');
+    if (!fs.existsSync(eventPageInfo.path)) {
+      console.log(`   ⚠️  ${eventPageInfo.usedFile} not found, skipping...`);
       return null;
     }
 
-    const eventPageData = loadJson5File(eventPagePath);
+    console.log(`   📁 Using ${eventPageInfo.usedFile}`);
+
+    const eventPageData = loadJson5File(eventPageInfo.path);
     if (!eventPageData || !eventPageData.EventPage) {
       return null;
     }
@@ -2921,8 +2997,9 @@ function buildEventPageLookup(cmsDir, outputDir, loctab = {}) {
       4: 'Special',
     };
 
+    // Filter by localBitflag for current country code
     const items = Object.values(eventPageData.EventPage)
-      .filter(item => item && item.id)
+      .filter(item => item && item.id && !isFilteredByCountryCode(item.localBitflag))
       .map((item) => {
 
 
@@ -2986,24 +3063,27 @@ function buildEventPageLookup(cmsDir, outputDir, loctab = {}) {
 }
 
 function buildLiveEventLookup(cmsDir, outputDir, loctab = {}) {
-  const liveEventPath = path.join(cmsDir, 'LiveEvent.json');
-
+  // Resolve file path (with binaryCode variant support)
+  const liveEventInfo = resolveCmsFilePath(cmsDir, 'LiveEvent');
 
   try {
-    if (!fs.existsSync(liveEventPath)) {
-      console.log('   ⚠️  LiveEvent.json not found, skipping...');
+    if (!fs.existsSync(liveEventInfo.path)) {
+      console.log(`   ⚠️  ${liveEventInfo.usedFile} not found, skipping...`);
       return null;
     }
 
-    const liveEventData = loadJson5File(liveEventPath);
+    console.log(`   📁 Using ${liveEventInfo.usedFile}`);
+
+    const liveEventData = loadJson5File(liveEventInfo.path);
     if (!liveEventData || !liveEventData.LiveEvent) {
       return null;
     }
 
 
 
+    // Filter by localBitflag for current country code
     const items = Object.values(liveEventData.LiveEvent)
-      .filter(item => item && item.id)
+      .filter(item => item && item.id && !isFilteredByCountryCode(item.localBitflag))
       .map((item) => {
 
         // Prepare KR fields only; CN will be computed via loctab during conversion
@@ -3043,32 +3123,35 @@ function buildLiveEventLookup(cmsDir, outputDir, loctab = {}) {
  * Uses MateTemplate.json and Town.json to resolve group names
  */
 function buildMateRecruitingGroupLookup(cmsDir, outputDir, loctab = {}) {
-  const mateRecruitingGroupPath = path.join(cmsDir, 'MateRecruitingGroup.json');
-  const mateTemplateFilePath = path.join(cmsDir, 'MateTemplate.json');
-  const mateFilePath = path.join(cmsDir, 'Mate.json');
-  const characterFilePath = path.join(cmsDir, 'Character.json');
-  const townFilePath = path.join(cmsDir, 'Town.json');
+  // Resolve file paths (with binaryCode variant support)
+  const mrgInfo = resolveCmsFilePath(cmsDir, 'MateRecruitingGroup');
+  const mateTemplateInfo = resolveCmsFilePath(cmsDir, 'MateTemplate');
+  const mateInfo = resolveCmsFilePath(cmsDir, 'Mate');
+  const characterInfo = resolveCmsFilePath(cmsDir, 'Character');
+  const townInfo = resolveCmsFilePath(cmsDir, 'Town');
 
   try {
-    if (!fs.existsSync(mateRecruitingGroupPath)) {
-      console.log('   ⚠️  MateRecruitingGroup.json not found, skipping...');
+    if (!fs.existsSync(mrgInfo.path)) {
+      console.log(`   ⚠️  ${mrgInfo.usedFile} not found, skipping...`);
       return null;
     }
 
-    if (!fs.existsSync(mateTemplateFilePath) || !fs.existsSync(townFilePath)) {
-      console.log('   ⚠️  MateTemplate.json or Town.json not found, skipping...');
+    if (!fs.existsSync(mateTemplateInfo.path) || !fs.existsSync(townInfo.path)) {
+      console.log(`   ⚠️  ${mateTemplateInfo.usedFile} or ${townInfo.usedFile} not found, skipping...`);
       return null;
     }
 
-    if (!fs.existsSync(mateFilePath) || !fs.existsSync(characterFilePath)) {
-      console.log('   ⚠️  Mate.json or Character.json not found, falling back to tokenized name translation...');
+    if (!fs.existsSync(mateInfo.path) || !fs.existsSync(characterInfo.path)) {
+      console.log(`   ⚠️  ${mateInfo.usedFile} or ${characterInfo.usedFile} not found, falling back to tokenized name translation...`);
     }
 
-    const mateRecruitingGroupData = loadJson5File(mateRecruitingGroupPath);
-    const mateTemplateData = loadJson5File(mateTemplateFilePath);
-    const mateData = fs.existsSync(mateFilePath) ? loadJson5File(mateFilePath) : null;
-    const characterData = fs.existsSync(characterFilePath) ? loadJson5File(characterFilePath) : null;
-    const townData = loadJson5File(townFilePath);
+    console.log(`   📁 Using ${mrgInfo.usedFile}, ${mateInfo.usedFile}`);
+
+    const mateRecruitingGroupData = loadJson5File(mrgInfo.path);
+    const mateTemplateData = loadJson5File(mateTemplateInfo.path);
+    const mateData = fs.existsSync(mateInfo.path) ? loadJson5File(mateInfo.path) : null;
+    const characterData = fs.existsSync(characterInfo.path) ? loadJson5File(characterInfo.path) : null;
+    const townData = loadJson5File(townInfo.path);
 
     if (!mateRecruitingGroupData || !mateRecruitingGroupData.MateRecruitingGroup) {
       return null;
@@ -3078,7 +3161,9 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir, loctab = {}) {
     // loctab is already loaded and passed as parameter
 
     // Create a map of mateId to mate names (all languages)
+    // Also store localBitFlag from Mate table for filtering
     const mateNameMap = {};
+    const mateLocalBitFlagMap = {}; // Store Mate's localBitFlag for filtering
     const mateTemplates = mateTemplateData.MateTemplate || {};
     const matesTable = (mateData && mateData.Mate) ? mateData.Mate : {};
     const characterTable = (characterData && characterData.Character) ? characterData.Character : {};
@@ -3086,8 +3171,15 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir, loctab = {}) {
       if (mate && mate.mateId && mate.name) {
         const cleanKr = removeCommentFromName(mate.name);
 
-        // Try to resolve Character from Mate -> Character
+        // Get mate's localBitFlag from Mate table
         const mateRow = matesTable[mate.mateId];
+
+        // Store localBitFlag for filtering later
+        if (mateRow) {
+          mateLocalBitFlagMap[mate.mateId] = mateRow.localBitFlag;
+        }
+
+        // Try to resolve Character from Mate -> Character
         const character = mateRow && mateRow.characterId ? characterTable[mateRow.characterId] : null;
 
         let nameCn = '';
@@ -3131,9 +3223,14 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir, loctab = {}) {
       }
     });
 
-    // Convert MateRecruitingGroup data
+    // Convert MateRecruitingGroup data (filter by Mate's localBitFlag)
     const items = Object.values(mateRecruitingGroupData.MateRecruitingGroup)
-      .filter(item => item && item.id)
+      .filter(item => {
+        if (!item || !item.id) return false;
+        // Filter by Mate's localBitFlag
+        const mateLocalBitFlag = mateLocalBitFlagMap[item.mateId];
+        return !isFilteredByCountryCode(mateLocalBitFlag);
+      })
       .map((item) => {
         // Check if mate exists in template
         const mateExists = !!mateNameMap[item.mateId];
@@ -3246,22 +3343,25 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir, loctab = {}) {
  * Uses OceanNpc.json to resolve NPC names with localization
  */
 function buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir, loctab = {}) {
-  const oceanNpcAreaSpawnerPath = path.join(cmsDir, 'OceanNpcAreaSpawner.json');
-  const oceanNpcFilePath = path.join(cmsDir, 'OceanNpc.json');
+  // Resolve file paths (with binaryCode variant support)
+  const spawnerInfo = resolveCmsFilePath(cmsDir, 'OceanNpcAreaSpawner');
+  const oceanNpcInfo = resolveCmsFilePath(cmsDir, 'OceanNpc');
 
   try {
-    if (!fs.existsSync(oceanNpcAreaSpawnerPath)) {
-      console.log('   ⚠️  OceanNpcAreaSpawner.json not found, skipping...');
+    if (!fs.existsSync(spawnerInfo.path)) {
+      console.log(`   ⚠️  ${spawnerInfo.usedFile} not found, skipping...`);
       return null;
     }
 
-    if (!fs.existsSync(oceanNpcFilePath)) {
-      console.log('   ⚠️  OceanNpc.json not found, skipping...');
+    if (!fs.existsSync(oceanNpcInfo.path)) {
+      console.log(`   ⚠️  ${oceanNpcInfo.usedFile} not found, skipping...`);
       return null;
     }
 
-    const oceanNpcAreaSpawnerData = loadJson5File(oceanNpcAreaSpawnerPath);
-    const oceanNpcData = loadJson5File(oceanNpcFilePath);
+    console.log(`   📁 Using ${spawnerInfo.usedFile}, ${oceanNpcInfo.usedFile}`);
+
+    const oceanNpcAreaSpawnerData = loadJson5File(spawnerInfo.path);
+    const oceanNpcData = loadJson5File(oceanNpcInfo.path);
 
     if (!oceanNpcAreaSpawnerData || !oceanNpcAreaSpawnerData.OceanNpcAreaSpawner) {
       return null;
@@ -3283,9 +3383,9 @@ function buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir, loctab = {}) {
       }
     });
 
-    // Convert OceanNpcAreaSpawner data
+    // Convert OceanNpcAreaSpawner data (filter by localBitFlag)
     const items = Object.values(oceanNpcAreaSpawnerData.OceanNpcAreaSpawner)
-      .filter(item => item && item.id)
+      .filter(item => item && item.id && !isFilteredByCountryCode(item.localBitFlag))
       .map((item) => {
         const npcExists = !!oceanNpcNameMap[item.oceanNpcId];
         const npcNames = oceanNpcNameMap[item.oceanNpcId] || {
@@ -3333,7 +3433,8 @@ function buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir, loctab = {}) {
 }
 
 /**
- * Build CashShop lookup from CashShop_BCCN.json
+ * Build CashShop lookup from CashShop or CashShop_BC{XX}.json
+ * Uses global.BINARY_CODE to determine the file suffix (e.g., cn -> CashShop_BCCN.json)
  * Only includes valid products (with chinaPrice and productCodeSdo)
  * Creates a single unified file with multi-language support
  */
@@ -3341,18 +3442,32 @@ function buildCashShopLookup(cmsDir, outputDir, loctab = {}) {
   console.log('💰 Building CashShop lookup...');
 
   try {
-    // Load CashShop_BCCN.json
-    const cashShopPath = path.join(cmsDir, 'CashShop_BCCN.json');
-    if (!fs.existsSync(cashShopPath)) {
-      console.log('   ⚠️  CashShop_BCCN.json not found, skipping...');
+    // Resolve file path (uses binaryCode variant if available)
+    const fileInfo = resolveCmsFilePath(cmsDir, 'CashShop');
+    if (!fs.existsSync(fileInfo.path)) {
+      console.log(`   ⚠️  ${fileInfo.usedFile} not found, skipping...`);
       return null;
     }
+    console.log(`   📁 Using ${fileInfo.usedFile}`);
 
-    const cashShopData = loadJson5File(cashShopPath);
+    const cashShopData = loadJson5File(fileInfo.path);
     if (!cashShopData || !cashShopData.CashShop) {
       console.log('   ⚠️  Invalid CashShop data');
       return null;
     }
+
+    // countryCode for filtering - use global settings
+    const countryCodeMask = global.COUNTRY_CODE_MASK || (1 << 6); // default to CHINA
+
+    // Helper function to check if item passes country filter
+    const isAvailableForCountry = (item) => {
+      // If productLocalBitflag is undefined or null, include the item
+      if (item.productLocalBitflag === undefined || item.productLocalBitflag === null) {
+        return true;
+      }
+      // Check if the country bit is set
+      return (item.productLocalBitflag & countryCodeMask) !== 0;
+    };
 
     // Format product name: replace ALL {0} occurrences with formatText
     const formatProductName = (productName, formatText, loctab) => {
@@ -3365,6 +3480,8 @@ function buildCashShopLookup(cmsDir, outputDir, loctab = {}) {
     const items = Object.entries(cashShopData.CashShop)
       .filter(([key, item]) => {
         if (!item || !item.id || key.startsWith(':')) return false;
+        // Filter by countryCode
+        if (!isAvailableForCountry(item)) return false;
         // Only valid products with chinaPrice and productCodeSdo
         return item.chinaPrice && item.productCodeSdo;
       })
@@ -3453,6 +3570,13 @@ function main() {
   let cmsDir = DEFAULT_CMS_DIR;
   let outputDir = DEFAULT_OUTPUT_DIR;
 
+  // Country/Binary code settings for filtering
+  // binaryCode: determines which CMS file suffix to use (e.g., _BCCN for cn)
+  // countryCode: determines the bit position for localBitFlag filtering
+  // COUNTRY_CODE values: 0=KOREA, 1=KOREA_NON_PK, 2=GLOBAL, 3=GLOBAL_NON_PK, 4=CHINA???, 5=CHINA_NON_PK???, 6=CHINA
+  let binaryCode = 'cn';
+  let countryCode = 6;
+
   // Parse options
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -3465,12 +3589,17 @@ Usage:
   node adminToolDataBuilder.js [options]
 
 Options:
-  --cms-dir <path>   CMS directory path (default: ../../../cms)
-  --output-dir <path> Output directory path (default: current directory)
-  --help, -h         Show this help message
+  --cms-dir <path>      CMS directory path (default: ../../../cms)
+  --output-dir <path>   Output directory path (default: current directory)
+  --binary-code <code>  Binary code suffix for CMS files (default: cn)
+                        e.g., 'cn' uses CashShop_BCCN.json
+  --country-code <num>  Country code for localBitFlag filtering (default: 6)
+                        0=KOREA, 2=GLOBAL, 6=CHINA
+  --help, -h            Show this help message
 
 Examples:
   node adminToolDataBuilder.js
+  node adminToolDataBuilder.js --binary-code cn --country-code 6
   node adminToolDataBuilder.js --cms-dir /path/to/cms
       `);
       process.exit(0);
@@ -3478,9 +3607,22 @@ Examples:
       cmsDir = args[++i];
     } else if (arg === '--output-dir') {
       outputDir = args[++i];
+    } else if (arg === '--binary-code') {
+      binaryCode = args[++i];
+    } else if (arg === '--country-code') {
+      countryCode = parseInt(args[++i], 10);
     }
     // All other options are ignored - always build everything
   }
+
+  // Store global settings for use by builder functions
+  global.COUNTRY_CODE = countryCode;
+  global.BINARY_CODE = binaryCode;
+  global.COUNTRY_CODE_MASK = 1 << countryCode;
+
+  console.log(`\n📋 Build Settings:`);
+  console.log(`   Binary Code: ${binaryCode} (CMS file suffix: _BC${binaryCode.toUpperCase()})`);
+  console.log(`   Country Code: ${countryCode} (bit mask: ${global.COUNTRY_CODE_MASK})\n`);
 
   console.log('\n╔════════════════════════════════════════════════════════════════╗');
   console.log('║         Admin Tool Data Builder                                ║');

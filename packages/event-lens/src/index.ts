@@ -44,12 +44,15 @@ async function start() {
 
     // Register Event-Lens service to Service Discovery via SDK
     try {
-      let serverVersion = '0.0.0';
-      try {
-        const packageJson = require('../package.json');
-        serverVersion = packageJson.version || '0.0.0';
-      } catch (err) {
-        logger.warn('Failed to load package.json version, using default 0.0.0');
+      // Use APP_VERSION env var (set via Docker build-arg) or fallback to package.json
+      let serverVersion = process.env.APP_VERSION || '0.0.0';
+      if (serverVersion === '0.0.0') {
+        try {
+          const packageJson = require('../package.json');
+          serverVersion = packageJson.version || '0.0.0';
+        } catch (err) {
+          logger.warn('Failed to load package.json version, using default 0.0.0');
+        }
       }
       const backendUrl = process.env.GATRIX_URL || 'http://localhost:55000';
       const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';

@@ -155,7 +155,7 @@ for SERVICE_NAME in "${!SERVICES_TO_BUILD[@]}"; do
     # Build
     (
         cd "$ROOT_DIR"
-        if docker build -f "$DOCKERFILE" -t "$IMAGE_NAME" .; then
+        if docker build -f "$DOCKERFILE" -t "$IMAGE_NAME" --build-arg APP_VERSION="$TAG" .; then
             log_success "[$SERVICE_NAME] Build success."
             
             if [ "$PUSH" = true ]; then
