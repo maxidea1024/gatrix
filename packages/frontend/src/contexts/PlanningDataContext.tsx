@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import planningDataService, { RewardTypeInfo, RewardLookupData } from '../services/planningDataService';
+import { useEnvironment } from './EnvironmentContext';
 
 interface PlanningDataContextType {
   rewardTypes: RewardTypeInfo[];
@@ -26,19 +27,20 @@ interface PlanningDataProviderProps {
 
 export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({ children }) => {
   const { i18n } = useTranslation();
+  const { currentEnvironmentId } = useEnvironment();
   const [rewardTypes, setRewardTypes] = useState<RewardTypeInfo[]>([]);
   const [rewardLookup, setRewardLookup] = useState<RewardLookupData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
 
-  // Load planning data on mount and when language changes
+  // Load planning data on mount and when language or environment changes
   useEffect(() => {
-    // Only load if we haven't loaded yet or language changed
-    if (!hasLoaded || rewardTypes.length === 0) {
+    // Only load if environment is selected and we haven't loaded yet or language changed
+    if (currentEnvironmentId && (!hasLoaded || rewardTypes.length === 0)) {
       loadPlanningData();
     }
-  }, [i18n.language]);
+  }, [i18n.language, currentEnvironmentId]);
 
   // Listen for planning data updates via custom event (dispatched by SSE handler)
   useEffect(() => {
