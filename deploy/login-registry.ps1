@@ -3,7 +3,7 @@
 # Gatrix Registry Login Script
 #
 # Usage:
-#   ./login_registry.ps1
+#   ./login-registry.ps1
 #
 # Description:
 #   Logs in to the Docker registry using credentials from registry.env

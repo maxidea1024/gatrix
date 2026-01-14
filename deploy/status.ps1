@@ -126,13 +126,13 @@ function Show-HealthStatus {
         if ($null -eq $runningCount) { $runningCount = 0 }
 
         if ($runningCount -eq $replicas -and $replicas -gt 0) {
-            Write-Host "  ✓ $service ($runningCount/$replicas)" -ForegroundColor Green
+            Write-Host "  ??$service ($runningCount/$replicas)" -ForegroundColor Green
         }
         elseif ($runningCount -gt 0) {
-            Write-Host "  ○ $service ($runningCount/$replicas)" -ForegroundColor Yellow
+            Write-Host "  ??$service ($runningCount/$replicas)" -ForegroundColor Yellow
         }
         else {
-            Write-Host "  ✗ $service ($runningCount/$replicas)" -ForegroundColor Red
+            Write-Host "  ??$service ($runningCount/$replicas)" -ForegroundColor Red
         }
     }
 }

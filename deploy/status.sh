@@ -132,11 +132,11 @@ show_health() {
         local running=$(docker service ps "$service" --filter "desired-state=running" --format "{{.ID}}" | wc -l)
         
         if [ "$running" -eq "$replicas" ] 2>/dev/null; then
-            echo -e "  ${GREEN}✓${NC} $service ($running/$replicas)"
+            echo -e "  ${GREEN}??{NC} $service ($running/$replicas)"
         elif [ "$running" -gt 0 ] 2>/dev/null; then
-            echo -e "  ${YELLOW}○${NC} $service ($running/$replicas)"
+            echo -e "  ${YELLOW}??{NC} $service ($running/$replicas)"
         else
-            echo -e "  ${RED}✗${NC} $service ($running/$replicas)"
+            echo -e "  ${RED}??{NC} $service ($running/$replicas)"
         fi
     done
 }

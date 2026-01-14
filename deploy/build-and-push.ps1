@@ -3,7 +3,7 @@
 # Gatrix Build and Push Script
 #
 # Usage:
-#   ./build_and_push.ps1 [options]
+#   ./build-and-push.ps1 [options]
 #
 # Options:
 #   -t, --tag <tag>           Image tag (default: latest)
@@ -24,7 +24,7 @@ $TargetServices = @()
 function Show-Help {
     Write-Host "Gatrix Build and Push Script"
     Write-Host ""
-    Write-Host "Usage: ./build_and_push.ps1 [options]"
+    Write-Host "Usage: ./build-and-push.ps1 [options]"
     Write-Host ""
     Write-Host "Options:"
     Write-Host "  -t, --tag <tag>           Image tag (default: latest)"
@@ -34,9 +34,9 @@ function Show-Help {
     Write-Host "  -h, --help                Show help"
     Write-Host ""
     Write-Host "Examples:"
-    Write-Host "  ./build_and_push.ps1 -t v1.0.0 -l -p"
-    Write-Host "  ./build_and_push.ps1 --tag v1.0.0 --latest --push"
-    Write-Host "  ./build_and_push.ps1 --service backend --service frontend --push"
+    Write-Host "  ./build-and-push.ps1 -t v1.0.0 -l -p"
+    Write-Host "  ./build-and-push.ps1 --tag v1.0.0 --latest --push"
+    Write-Host "  ./build-and-push.ps1 --service backend --service frontend --push"
     exit 0
 }
 
@@ -107,7 +107,7 @@ else {
 
 # Root directory of the project (parent of 'deploy')
 $rootDir = Resolve-Path "$PSScriptRoot\.."
-$loginScript = Join-Path $PSScriptRoot "login_registry.ps1"
+$loginScript = Join-Path $PSScriptRoot "login-registry.ps1"
 
 Write-Host "Gatrix Build & Push" -ForegroundColor Cyan
 Write-Host "Root Directory: $rootDir"

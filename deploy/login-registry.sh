@@ -9,7 +9,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # Login to registry
-login_registry() {
+login-registry() {
     echo -e "${BLUE}[INFO]${NC} Logging in to $REGISTRY_HOST..."
     if echo "$REGISTRY_PASS" | docker login "$REGISTRY_HOST" --username "$REGISTRY_USER" --password-stdin; then
         echo -e "${GREEN}[SUCCESS]${NC} Login Succeeded"
@@ -21,5 +21,5 @@ login_registry() {
 
 # Run if executed directly (not sourced)
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    login_registry
+    login-registry
 fi

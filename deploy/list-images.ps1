@@ -3,7 +3,7 @@
 # Gatrix List Images Script
 #
 # Usage:
-#   ./list_images.ps1
+#   ./list-images.ps1
 #
 # Description:
 #   Queries the registry API to list all available tags for Gatrix services.

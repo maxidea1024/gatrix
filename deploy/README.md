@@ -48,7 +48,7 @@ Contains environment variables for the stack (database, JWT secrets, etc.). Copy
 
 ## Build & Push
 
-### `build_and_push.ps1` / `build_and_push.sh`
+### `build-and-push.ps1` / `build-and-push.sh`
 
 Builds Docker images and optionally pushes them to the registry.
 
@@ -68,24 +68,24 @@ Builds Docker images and optionally pushes them to the registry.
 
 ```bash
 # Build all services, tag as "latest"
-./build_and_push.ps1
-./build_and_push.sh
+./build-and-push.ps1
+./build-and-push.sh
 
 # Build and push all services with a specific version tag
-./build_and_push.ps1 -t v1.2.0 -p
-./build_and_push.sh --tag v1.2.0 --push
+./build-and-push.ps1 -t v1.2.0 -p
+./build-and-push.sh --tag v1.2.0 --push
 
 # Build with version tag AND also tag as latest
-./build_and_push.ps1 -t v1.2.0 -l -p
-./build_and_push.sh --tag v1.2.0 --latest --push
+./build-and-push.ps1 -t v1.2.0 -l -p
+./build-and-push.sh --tag v1.2.0 --latest --push
 
 # Build only backend
-./build_and_push.ps1 -s backend
-./build_and_push.sh --service backend
+./build-and-push.ps1 -s backend
+./build-and-push.sh --service backend
 
 # Build backend and frontend, then push
-./build_and_push.ps1 -s backend -s frontend -p
-./build_and_push.sh --service backend --service frontend --push
+./build-and-push.ps1 -s backend -s frontend -p
+./build-and-push.sh --service backend --service frontend --push
 ```
 
 ---
@@ -266,25 +266,25 @@ Shows status of the deployed stack.
 
 ## Registry Scripts
 
-### `login_registry.ps1` / `login_registry.sh`
+### `login-registry.ps1` / `login-registry.sh`
 
 Logs into the Tencent Cloud Registry using credentials from `registry.env`.
 
 ```bash
-./login_registry.ps1
-./login_registry.sh
+./login-registry.ps1
+./login-registry.sh
 # Output: Login Succeeded
 ```
 
 ---
 
-### `list_images.ps1` / `list_images.sh`
+### `list-images.ps1` / `list-images.sh`
 
 Lists all image tags in the registry namespace.
 
 ```bash
-./list_images.ps1
-./list_images.sh
+./list-images.ps1
+./list-images.sh
 # Output: Tags found:
 #   backend-latest
 #   backend-v1.0.0
@@ -310,7 +310,7 @@ Repository 'uwocn/uwocn' not found or has no images yet.
 ### "Repository not found" When Listing Images
 
 - This is normal if no images have been pushed yet.
-- Push an image first using `./build_and_push.ps1 -p`
+- Push an image first using `./build-and-push.ps1 -p`
 
 ### Build Fails with "Docker build failed"
 
@@ -328,14 +328,14 @@ Repository 'uwocn/uwocn' not found or has no images yet.
 
 | File | Purpose |
 |------|---------|
-| `build_and_push.ps1/.sh` | Build and push Docker images |
+| `build-and-push.ps1/.sh` | Build and push Docker images |
 | `deploy.ps1/.sh` | Deploy to Docker Swarm |
 | `update.ps1/.sh` | Rolling update |
 | `rollback.ps1/.sh` | Rollback services |
 | `scale.ps1/.sh` | Scale replicas |
 | `status.ps1/.sh` | Show stack status |
-| `login_registry.ps1/.sh` | Registry login |
-| `list_images.ps1/.sh` | List registry images |
+| `login-registry.ps1/.sh` | Registry login |
+| `list-images.ps1/.sh` | List registry images |
 | `registry.env` | Registry credentials |
 | `.env.example` | Environment template |
 | `docker-stack.yml` | Swarm stack definition |

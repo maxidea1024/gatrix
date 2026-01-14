@@ -156,7 +156,7 @@ create_secrets() {
 }
 
 # Login to registry
-source "$(dirname "${BASH_SOURCE[0]}")/login_registry.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/login-registry.sh"
 
 # Pull images
 pull_images() {
@@ -250,7 +250,7 @@ main() {
         create_secrets
     fi
 
-    login_registry
+    login-registry
     pull_images
     deploy_stack
     wait_for_services

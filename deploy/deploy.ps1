@@ -159,7 +159,7 @@ if ($Init) {
 }
 
 # Login Registry
-$loginScript = Join-Path $PSScriptRoot "login_registry.ps1"
+$loginScript = Join-Path $PSScriptRoot "login-registry.ps1"
 if (Test-Path $loginScript) {
     & $loginScript
 }

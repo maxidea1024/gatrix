@@ -3,7 +3,7 @@
 # Gatrix Build and Push Script
 #
 # Usage:
-#   ./build_and_push.sh [options]
+#   ./build-and-push.sh [options]
 #
 # Options:
 #   -t, --tag <tag>           Image tag (default: latest)
@@ -29,7 +29,7 @@ REGISTRY="uwocn.tencentcloudcr.com"
 NAMESPACE="uwocn"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
-LOGIN_SCRIPT="$SCRIPT_DIR/login_registry.sh"
+LOGIN_SCRIPT="$SCRIPT_DIR/login-registry.sh"
 
 # Available services
 declare -A ALL_SERVICES
@@ -66,7 +66,7 @@ while [[ $# -gt 0 ]]; do
         -h|--help)
             echo "Gatrix Build and Push Script"
             echo ""
-            echo "Usage: ./build_and_push.sh [options]"
+            echo "Usage: ./build-and-push.sh [options]"
             echo ""
             echo "Options:"
             echo "  -t, --tag <tag>           Image tag (default: latest)"
@@ -76,8 +76,8 @@ while [[ $# -gt 0 ]]; do
             echo "  -h, --help                Show help"
             echo ""
             echo "Example:"
-            echo "  ./build_and_push.sh -t v1.0.0 -l -p"
-            echo "  ./build_and_push.sh --service backend --service frontend --push"
+            echo "  ./build-and-push.sh -t v1.0.0 -l -p"
+            echo "  ./build-and-push.sh --service backend --service frontend --push"
             exit 0
             ;;
         *)
@@ -139,8 +139,8 @@ if [ "$PUSH" = true ]; then
     if [ -f "$LOGIN_SCRIPT" ]; then
         log_info "Calling registry login script..."
         source "$LOGIN_SCRIPT"
-        if type login_registry &>/dev/null; then
-             login_registry
+        if type login-registry &>/dev/null; then
+             login-registry
         fi
     else
         log_warn "Login script not found at $LOGIN_SCRIPT. Assuming already logged in."
