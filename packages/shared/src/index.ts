@@ -3,4 +3,4 @@
  */
 
 // Error handling
-export * from './errors';
+export * from './errors/index.js';
