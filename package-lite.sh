@@ -106,12 +106,23 @@ for f in setup-env*; do
     fi
 done
 
-# Copy update-lite.sh from root
-if [ -f "update-lite.sh" ]; then
-    cp update-lite.sh "$PACKAGE_DIR/"
-    chmod +x "$PACKAGE_DIR/update-lite.sh"
-    log_info "  + update-lite.sh"
-fi
+# Copy update-lite scripts from root
+for f in update-lite.*; do
+    if [ -f "$f" ]; then
+        cp "$f" "$PACKAGE_DIR/"
+        chmod +x "$PACKAGE_DIR/$f" 2>/dev/null || true
+        log_info "  + $f"
+    fi
+done
+
+# Copy QUICKSTART docs
+for f in QUICKSTART*.md; do
+    if [ -f "$f" ]; then
+        cp "$f" "$PACKAGE_DIR/"
+        log_info "  + $f"
+    fi
+done
+
 
 # Create the package
 log_info "Creating package: $OUTPUT_FILE"

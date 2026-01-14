@@ -97,20 +97,32 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Check if docker is available
+# Check if docker is available and determine if sudo is needed
+DOCKER_CMD="docker"
 check_docker() {
     if ! command -v docker &> /dev/null; then
         log_error "Docker is not installed"
         exit 1
     fi
+    
+    # Check if we need sudo for docker
+    if ! docker info > /dev/null 2>&1; then
+        if sudo docker info > /dev/null 2>&1; then
+            DOCKER_CMD="sudo docker"
+            log_info "Using sudo for docker commands"
+        else
+            log_error "Cannot connect to Docker daemon. Is Docker running?"
+            exit 1
+        fi
+    fi
 }
 
 # Check if swarm is initialized
 check_swarm() {
-    if ! docker info --format '{{.Swarm.LocalNodeState}}' | grep -q "active"; then
+    if ! $DOCKER_CMD info --format '{{.Swarm.LocalNodeState}}' | grep -q "active"; then
         if [ "$INIT_MODE" = true ]; then
             log_info "Initializing Docker Swarm..."
-            docker swarm init
+            $DOCKER_CMD swarm init
         else
             log_error "Docker Swarm is not initialized. Run with --init flag or run 'docker swarm init'"
             exit 1
@@ -146,10 +158,10 @@ create_secrets() {
     
     for secret_pair in "${secrets[@]}"; do
         IFS=':' read -r name value <<< "$secret_pair"
-        if docker secret inspect "$name" &> /dev/null; then
+        if $DOCKER_CMD secret inspect "$name" &> /dev/null; then
             log_warn "Secret '$name' already exists, skipping..."
         else
-            echo -n "$value" | docker secret create "$name" -
+            echo -n "$value" | $DOCKER_CMD secret create "$name" -
             log_success "Created secret: $name"
         fi
     done
@@ -166,9 +178,9 @@ pull_images() {
 
     for service in "${services[@]}"; do
         log_info "Pulling uwocn.tencentcloudcr.com/uwocn/gatrix-${service}:${VERSION}"
-        docker pull "uwocn.tencentcloudcr.com/uwocn/gatrix-${service}:${VERSION}" || {
+        $DOCKER_CMD pull "uwocn.tencentcloudcr.com/uwocn/gatrix-${service}:${VERSION}" || {
             log_warn "Failed to pull gatrix-${service}:${VERSION}, trying latest..."
-            docker pull "uwocn.tencentcloudcr.com/uwocn/gatrix-${service}:latest"
+            $DOCKER_CMD pull "uwocn.tencentcloudcr.com/uwocn/gatrix-${service}:latest"
         }
     done
 }
@@ -183,7 +195,7 @@ deploy_stack() {
         log_info "Performing rolling update..."
     fi
 
-    docker stack deploy \
+    $DOCKER_CMD stack deploy \
         -c docker-stack.yml \
         --with-registry-auth \
         "$STACK_NAME"
@@ -199,13 +211,13 @@ wait_for_services() {
     local elapsed=0
 
     while [ $elapsed -lt $timeout ]; do
-        local replicas=$(docker stack services "$STACK_NAME" --format '{{.Replicas}}' | grep -v "0/")
-        local total=$(docker stack services "$STACK_NAME" --format '{{.Replicas}}' | wc -l)
-        local ready=$(docker stack services "$STACK_NAME" --format '{{.Replicas}}' | grep -E "^[0-9]+/\1$" | wc -l)
+        local replicas=$($DOCKER_CMD stack services "$STACK_NAME" --format '{{.Replicas}}' | grep -v "0/")
+        local total=$($DOCKER_CMD stack services "$STACK_NAME" --format '{{.Replicas}}' | wc -l)
+        local ready=$($DOCKER_CMD stack services "$STACK_NAME" --format '{{.Replicas}}' | grep -E "^[0-9]+/\1$" | wc -l)
 
         log_info "Services ready: checking... (${elapsed}s / ${timeout}s)"
 
-        if docker stack services "$STACK_NAME" --format '{{.Replicas}}' | grep -qv "0/"; then
+        if $DOCKER_CMD stack services "$STACK_NAME" --format '{{.Replicas}}' | grep -qv "0/"; then
             sleep 10
             elapsed=$((elapsed + 10))
         else
@@ -221,7 +233,7 @@ wait_for_services() {
 prune_images() {
     if [ "$PRUNE_MODE" = true ]; then
         log_info "Pruning unused images..."
-        docker image prune -f
+        $DOCKER_CMD image prune -f
     fi
 }
 
@@ -229,10 +241,10 @@ prune_images() {
 show_status() {
     echo ""
     log_info "Stack Status:"
-    docker stack services "$STACK_NAME"
+    $DOCKER_CMD stack services "$STACK_NAME"
     echo ""
     log_info "Service Replicas:"
-    docker stack ps "$STACK_NAME" --filter "desired-state=running"
+    $DOCKER_CMD stack ps "$STACK_NAME" --filter "desired-state=running"
 }
 
 # Main

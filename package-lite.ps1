@@ -112,6 +112,12 @@ try {
         Write-Host "  + $($_.Name)" -ForegroundColor Gray
     }
 
+    # Copy QUICKSTART docs
+    Get-ChildItem -Path "." -Filter "QUICKSTART*.md" | ForEach-Object {
+        Copy-Item $_.FullName -Destination $PackageDir
+        Write-Host "  + $($_.Name)" -ForegroundColor Gray
+    }
+
     # Create the package using tar
     Write-Host "[INFO] Creating package: $OutputFile" -ForegroundColor Blue
     Push-Location $TempDir
