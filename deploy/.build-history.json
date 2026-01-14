@@ -1,0 +1,12 @@
+﻿{
+    "timestamp":  "2026-01-14T03:09:18Z",
+    "services":  [
+                     "frontend"
+                 ],
+    "latest":  true,
+    "gitHash":  "fd7221b3",
+    "registry":  "uwocn.tencentcloudcr.com/uwocn",
+    "gitBranch":  "main",
+    "tag":  "v0.0.1",
+    "pushed":  false
+}
