@@ -227,3 +227,17 @@ $history += $buildRecord
 $history | ConvertTo-Json -Depth 10 | Set-Content $historyFile -Encoding UTF8
 
 Write-Host "`nBuild history saved to: $historyFile" -ForegroundColor Gray
+
+# Show pushed images if push was enabled
+if ($Push) {
+    Write-Host "`n========================================" -ForegroundColor Cyan
+    Write-Host "   Pushed Images" -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
+    foreach ($serviceName in $servicesToBuild.Keys) {
+        Write-Host "  $Registry/$Namespace/gatrix-$serviceName`:$Tag" -ForegroundColor Green
+        if ($TagLatest -and $Tag -ne "latest") {
+            Write-Host "  $Registry/$Namespace/gatrix-$serviceName`:latest" -ForegroundColor Green
+        }
+    }
+    Write-Host ""
+}

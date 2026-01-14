@@ -4,17 +4,16 @@
     "license": "UNLICENSED",
     "description": "Shared types, constants, and utilities for Gatrix packages",
     "main": "./dist/index.js",
+    "module": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
         ".": {
-            "import": "./dist/index.js",
-            "require": "./dist/index.js",
-            "types": "./dist/index.d.ts"
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
         },
         "./errors": {
-            "import": "./dist/errors/index.js",
-            "require": "./dist/errors/index.js",
-            "types": "./dist/errors/index.d.ts"
+            "types": "./dist/errors/index.d.ts",
+            "default": "./dist/errors/index.js"
         }
     },
     "files": [

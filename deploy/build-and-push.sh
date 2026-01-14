@@ -244,3 +244,18 @@ fi
 
 echo ""
 echo -e "${BLUE}Build history saved to: $HISTORY_FILE${NC}"
+
+# Show pushed images if push was enabled
+if [ "$PUSH" = true ]; then
+    echo ""
+    echo -e "${BLUE}========================================${NC}"
+    echo -e "${BLUE}   Pushed Images${NC}"
+    echo -e "${BLUE}========================================${NC}"
+    for SERVICE_NAME in "${!SERVICES_TO_BUILD[@]}"; do
+        echo -e "  ${GREEN}$REGISTRY/$NAMESPACE/gatrix-$SERVICE_NAME:$TAG${NC}"
+        if [ "$TAG_LATEST" = true ] && [ "$TAG" != "latest" ]; then
+            echo -e "  ${GREEN}$REGISTRY/$NAMESPACE/gatrix-$SERVICE_NAME:latest${NC}"
+        fi
+    done
+    echo ""
+fi
