@@ -8,6 +8,7 @@
 # Options:
 #   -t, --tag <tag>           Image tag (default: latest)
 #   -p, --push                Push images to registry
+#   -l, --latest              Also tag and push as "latest"
 #   -s, --service <name>      Service to build (can be used multiple times)
 #   -h, --help                Show help
 
@@ -23,6 +24,7 @@ NC='\033[0m'
 # Default values
 TAG="latest"
 PUSH=false
+TAG_LATEST=false
 REGISTRY="uwocn.tencentcloudcr.com"
 NAMESPACE="uwocn"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -53,6 +55,10 @@ while [[ $# -gt 0 ]]; do
             PUSH=true
             shift
             ;;
+        -l|--latest)
+            TAG_LATEST=true
+            shift
+            ;;
         -s|--service)
             TARGET_SERVICES+=("$2")
             shift 2
@@ -65,10 +71,12 @@ while [[ $# -gt 0 ]]; do
             echo "Options:"
             echo "  -t, --tag <tag>           Image tag (default: latest)"
             echo "  -p, --push                Push images to registry"
+            echo "  -l, --latest              Also tag and push as 'latest'"
             echo "  -s, --service <name>      Service to build (repeatable)"
             echo "  -h, --help                Show help"
             echo ""
             echo "Example:"
+            echo "  ./build_and_push.sh -t v1.0.0 -l -p"
             echo "  ./build_and_push.sh --service backend --service frontend --push"
             exit 0
             ;;
@@ -155,16 +163,35 @@ for SERVICE_NAME in "${!SERVICES_TO_BUILD[@]}"; do
     # Build
     (
         cd "$ROOT_DIR"
+        LATEST_IMAGE_NAME="$REGISTRY/$NAMESPACE/gatrix-$SERVICE_NAME:latest"
+        
         if docker build -f "$DOCKERFILE" -t "$IMAGE_NAME" --build-arg APP_VERSION="$TAG" .; then
+            # Tag as latest if requested
+            if [ "$TAG_LATEST" = true ] && [ "$TAG" != "latest" ]; then
+                log_info "[$SERVICE_NAME] Tagging as latest..."
+                docker tag "$IMAGE_NAME" "$LATEST_IMAGE_NAME"
+            fi
+            
             log_success "[$SERVICE_NAME] Build success."
             
             if [ "$PUSH" = true ]; then
-                log_info "[$SERVICE_NAME] Pushing to registry..."
+                log_info "[$SERVICE_NAME] Pushing $TAG to registry..."
                 if docker push "$IMAGE_NAME"; then
-                    log_success "[$SERVICE_NAME] Push success."
+                    log_success "[$SERVICE_NAME] Push $TAG success."
                 else
-                    log_error "[$SERVICE_NAME] Push failed."
+                    log_error "[$SERVICE_NAME] Push $TAG failed."
                     exit 1
+                fi
+                
+                # Push latest tag if requested
+                if [ "$TAG_LATEST" = true ] && [ "$TAG" != "latest" ]; then
+                    log_info "[$SERVICE_NAME] Pushing latest to registry..."
+                    if docker push "$LATEST_IMAGE_NAME"; then
+                        log_success "[$SERVICE_NAME] Push latest success."
+                    else
+                        log_error "[$SERVICE_NAME] Push latest failed."
+                        exit 1
+                    fi
                 fi
             fi
         else

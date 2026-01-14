@@ -12,6 +12,9 @@
 .PARAMETER Push
     If specified, pushes the images to the registry.
 
+.PARAMETER Latest
+    If specified, also tags and pushes images as "latest".
+
 .PARAMETER Service
     Optional. The specific service(s) to build (e.g., "backend", "frontend").
     If omitted, all services are built.
@@ -21,8 +24,8 @@
     Builds all images locally with tag "v1.0.0".
 
 .EXAMPLE
-    .\build_and_push.ps1 -Service backend -Tag "dev"
-    Builds only the backend image.
+    .\build_and_push.ps1 -Tag "v1.0.0" -Latest -Push
+    Builds, tags as v1.0.0 and latest, and pushes both.
 
 .EXAMPLE
     .\build_and_push.ps1 -Service backend,frontend -Tag "prod" -Push
@@ -32,6 +35,7 @@
 param(
     [string]$Tag = "latest",
     [switch]$Push = $false,
+    [switch]$Latest = $false,
     [string[]]$Service = @()
 )
 
@@ -110,16 +114,32 @@ foreach ($serviceName in $servicesToBuild.Keys) {
     # Execute Docker Build
     Push-Location $rootDir
     try {
+        # Build with version tag
         docker build -f $dockerfile -t $imageName --build-arg APP_VERSION=$Tag .
         if ($LASTEXITCODE -ne 0) { throw "Docker build failed for $serviceName" }
+        
+        # Also tag as latest if requested
+        $latestImageName = "$Registry/$Namespace/gatrix-$serviceName`:latest"
+        if ($Latest -and $Tag -ne "latest") {
+            Write-Host "[$serviceName] Tagging as latest..."
+            docker tag $imageName $latestImageName
+        }
         
         Write-Host "[$serviceName] Build success." -ForegroundColor Green
         
         if ($Push) {
-            Write-Host "[$serviceName] Pushing to registry..."
+            Write-Host "[$serviceName] Pushing $Tag to registry..."
             docker push $imageName
             if ($LASTEXITCODE -ne 0) { throw "Docker push failed for $serviceName" }
-            Write-Host "[$serviceName] Push success." -ForegroundColor Green
+            Write-Host "[$serviceName] Push $Tag success." -ForegroundColor Green
+            
+            # Push latest tag if requested
+            if ($Latest -and $Tag -ne "latest") {
+                Write-Host "[$serviceName] Pushing latest to registry..."
+                docker push $latestImageName
+                if ($LASTEXITCODE -ne 0) { throw "Docker push latest failed for $serviceName" }
+                Write-Host "[$serviceName] Push latest success." -ForegroundColor Green
+            }
         }
     }
     catch {
