@@ -117,13 +117,24 @@ export function convertFromMySQLDateTime(mysqlDateTime: string | Date | null | u
 
   try {
     // If already a Date object, mysql2 returns it interpreted as local time
-    // but the value in DB is actually UTC, so we need to treat the local time components as UTC
+    // but the value in DB is actually UTC, so we need to extract the local time components
+    // and treat them as UTC
     if (mysqlDateTime instanceof Date) {
       if (isNaN(mysqlDateTime.getTime())) {
         logger.warn(`Invalid Date object: ${mysqlDateTime}`);
         return null;
       }
-      return mysqlDateTime.toISOString();
+      // mysql2 interprets the UTC value from DB as local time
+      // So we need to get the local components and create a UTC date from them
+      const year = mysqlDateTime.getFullYear();
+      const month = String(mysqlDateTime.getMonth() + 1).padStart(2, '0');
+      const day = String(mysqlDateTime.getDate()).padStart(2, '0');
+      const hours = String(mysqlDateTime.getHours()).padStart(2, '0');
+      const minutes = String(mysqlDateTime.getMinutes()).padStart(2, '0');
+      const seconds = String(mysqlDateTime.getSeconds()).padStart(2, '0');
+
+      // Create ISO string treating local components as UTC
+      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000Z`;
     }
 
     // MySQL DATETIME은 UTC로 저장되어 있으므로 'Z'를 추가하여 UTC임을 명시
