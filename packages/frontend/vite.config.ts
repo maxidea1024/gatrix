@@ -51,6 +51,9 @@ const frontendRoot = path.resolve(__dirname).replace(/\\/g, '/');
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  define: {
+    __APP_VERSION__: JSON.stringify(process.env.VITE_APP_VERSION || '0.0.0'),
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

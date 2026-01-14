@@ -57,6 +57,7 @@ import InvalidInvitePage from './pages/auth/InvalidInvitePage';
 import DashboardPage from './pages/common/DashboardPage';
 import NotFoundPage from './pages/common/NotFoundPage';
 import UnauthorizedPage from './pages/common/UnauthorizedPage';
+import LandingPage from './pages/LandingPage';
 
 // Pages - User
 import ProfilePage from './pages/user/ProfilePage';
@@ -134,7 +135,15 @@ const ConditionalLandingPage: React.FC = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Always redirect to login page for unauthenticated users
+  // Check if user has visited before
+  const hasVisitedBefore = localStorage.getItem('hasVisitedBefore') === 'true';
+
+  // Show landing page for first-time visitors
+  if (!hasVisitedBefore) {
+    return <LandingPage />;
+  }
+
+  // Redirect to login page for returning visitors
   return <Navigate to="/login" replace />;
 };
 

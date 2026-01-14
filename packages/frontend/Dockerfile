@@ -25,6 +25,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# App version from build-arg
+ARG APP_VERSION=0.0.0
+ENV VITE_APP_VERSION=$APP_VERSION
+
 # Build the frontend
 ENV NODE_ENV=production
 # Increase Node.js heap size for build process to prevent out of memory errors
