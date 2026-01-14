@@ -1,191 +1,341 @@
-# Gatrix Docker Swarm 배포
+# Gatrix 배포 스크립트
 
-Docker Swarm을 사용한 프로덕션 배포 구성입니다.
+이 디렉토리에는 Gatrix 애플리케이션 스택을 빌드, 배포 및 관리하기 위한 스크립트가 포함되어 있습니다.
 
-## 주요 기능
+모든 스크립트는 PowerShell과 Bash 간의 일관성을 위해 **리눅스 스타일 인자**(예: `-t`, `--tag`)를 지원합니다.
 
-- **롤링 업데이트**: 무중단 배포 및 실패 시 자동 롤백
-- **서비스 스케일링**: 트래픽에 따른 서비스 확장/축소
-- **롤백**: 이전 버전으로 즉시 복원
-- **헬스 체크**: 자동 컨테이너 상태 모니터링
-- **시크릿 관리**: 민감한 데이터 보안 저장
-- **로드 밸런싱**: 내장 서비스 메시 및 부하 분산
+---
+
+## 목차
+
+1. [사전 요구사항](#사전-요구사항)
+2. [설정](#설정)
+3. [빌드 및 푸시](#빌드-및-푸시)
+4. [배포](#배포)
+5. [운영](#운영)
+6. [레지스트리 스크립트](#레지스트리-스크립트)
+7. [문제 해결](#문제-해결)
+
+---
 
 ## 사전 요구사항
 
-- Docker 20.10+
-- Docker Swarm 초기화
-- Tencent Cloud Registry 접근 권한
+- **Docker Desktop** (또는 Docker Engine) 설치 및 실행 중
+- **Docker Swarm** 초기화 (배포 스크립트용)
+- **PowerShell 5+** (Windows) 또는 **Bash** (Linux/macOS)
+- Tencent Cloud Registry 접근 권한 (`registry.env`에 인증 정보)
 
-## 빠른 시작
+---
 
-### 1. Swarm 클러스터 초기화
+## 설정
+
+### `registry.env`
+
+레지스트리 인증 정보 (버전 관리에 커밋하지 마세요):
 
 ```bash
-# 매니저 노드에서 실행
-docker swarm init
-
-# 워커 노드 추가 (선택사항)
-docker swarm join-token worker
-# 생성된 명령어를 워커 노드에서 실행
+REGISTRY_HOST=uwocn.tencentcloudcr.com
+REGISTRY_USER=<사용자명>
+REGISTRY_PASS=<비밀번호 또는 토큰>
+REGISTRY_NAMESPACE=uwocn/uwocn
 ```
 
-### 2. 환경 구성
+### `.env` / `.env.example`
+
+스택용 환경 변수 (데이터베이스, JWT 시크릿 등). `.env.example`을 `.env`로 복사하고 값을 입력하세요.
+
+---
+
+## 빌드 및 푸시
+
+### `build-and-push.ps1` / `build-and-push.sh`
+
+Docker 이미지를 빌드하고 선택적으로 레지스트리에 푸시합니다.
+
+**옵션:**
+
+| 옵션 | 설명 |
+|------|------|
+| `-t, --tag <tag>` | 이미지 태그 (기본값: `latest`) |
+| `-p, --push` | 빌드 후 레지스트리에 푸시 |
+| `-l, --latest` | `latest` 태그도 함께 추가 및 푸시 |
+| `-s, --service <name>` | 특정 서비스만 빌드 (반복 가능) |
+| `-h, --help` | 도움말 표시 |
+
+**사용 가능한 서비스:** `backend`, `frontend`, `edge`, `chat-server`, `event-lens`
+
+**예시:**
 
 ```bash
-cd deploy
-cp .env.example .env
-# 프로덕션 값으로 수정
-vim .env
+# 모든 서비스 빌드, "latest" 태그
+./build-and-push.ps1
+./build-and-push.sh
+
+# 특정 버전 태그로 모든 서비스 빌드 및 푸시
+./build-and-push.ps1 -t v1.2.0 -p
+./build-and-push.sh --tag v1.2.0 --push
+
+# 버전 태그와 함께 latest 태그도 추가
+./build-and-push.ps1 -t v1.2.0 -l -p
+./build-and-push.sh --tag v1.2.0 --latest --push
+
+# backend만 빌드
+./build-and-push.ps1 -s backend
+./build-and-push.sh --service backend
+
+# backend와 frontend 빌드 후 푸시
+./build-and-push.ps1 -s backend -s frontend -p
+./build-and-push.sh --service backend --service frontend --push
 ```
 
-### 3. 초기 배포
+---
+
+## 배포
+
+### `deploy.ps1` / `deploy.sh`
+
+Docker Swarm에 Gatrix 스택을 배포합니다.
+
+**옵션:**
+
+| 옵션 | 설명 |
+|------|------|
+| `-v, --version <version>` | 배포할 버전 (기본값: `latest`) |
+| `-e, --env-file <file>` | 환경 파일 경로 (기본값: `.env`) |
+| `-n, --stack <name>` | 스택 이름 (기본값: `gatrix`) |
+| `-i, --init` | Swarm 초기화 및 시크릿 생성 |
+| `-u, --update` | 롤링 업데이트 수행 |
+| `--prune` | 배포 후 사용하지 않는 이미지 제거 |
+| `-h, --help` | 도움말 표시 |
+
+**예시:**
 
 ```bash
-# 시크릿 생성과 함께 배포
-./deploy.sh --init --version 1.0.0
+# 최초 배포 (Swarm 초기화 + 시크릿)
+./deploy.ps1 -v v1.0.0 -i
+./deploy.sh --version v1.0.0 --init
+
+# 롤링 업데이트로 배포
+./deploy.ps1 -v v1.1.0 -u
+./deploy.sh --version v1.1.0 --update
+
+# 배포 후 오래된 이미지 정리
+./deploy.ps1 -v v1.2.0 --prune
+./deploy.sh --version v1.2.0 --prune
 ```
 
-## 스크립트 참조
+---
 
-| 스크립트 | 설명 |
-|----------|------|
-| `deploy.sh` | 전체 스택 배포 또는 업데이트 |
-| `update.sh` | 특정 서비스 롤링 업데이트 |
-| `rollback.sh` | 이전 버전으로 롤백 |
-| `scale.sh` | 서비스 스케일 조정 |
-| `status.sh` | 스택 및 서비스 상태 확인 |
+## 운영
 
-## 배포 워크플로우
+### `update.ps1` / `update.sh`
 
-### 신규 배포
+실행 중인 서비스에 롤링 업데이트를 수행합니다.
+
+**옵션:**
+
+| 옵션 | 설명 |
+|------|------|
+| `-v, --version <version>` | 대상 버전 (필수) |
+| `-s, --service <name>` | 특정 서비스만 업데이트 |
+| `-a, --all` | 모든 애플리케이션 서비스 업데이트 |
+| `-f, --force` | 동일 이미지도 강제 업데이트 |
+| `-n, --stack <name>` | 스택 이름 (기본값: `gatrix`) |
+| `-h, --help` | 도움말 표시 |
+
+**예시:**
 
 ```bash
-./deploy.sh --init --version 1.0.0
+# 모든 서비스를 v1.2.0으로 업데이트
+./update.ps1 -v v1.2.0 -a
+./update.sh --version v1.2.0 --all
+
+# backend만 업데이트
+./update.ps1 -v v1.2.0 -s backend
+./update.sh --version v1.2.0 --service backend
+
+# 동일 이미지도 강제 재배포
+./update.ps1 -v v1.2.0 -s backend -f
+./update.sh --version v1.2.0 --service backend --force
 ```
 
-### 롤링 업데이트
+---
+
+### `rollback.ps1` / `rollback.sh`
+
+서비스를 이전 버전으로 롤백합니다.
+
+**옵션:**
+
+| 옵션 | 설명 |
+|------|------|
+| `-s, --service <name>` | 특정 서비스 롤백 |
+| `-a, --all` | 모든 애플리케이션 서비스 롤백 |
+| `-n, --stack <name>` | 스택 이름 (기본값: `gatrix`) |
+| `-h, --help` | 도움말 표시 |
+
+**예시:**
 
 ```bash
-# 모든 서비스를 새 버전으로 업데이트
-./update.sh --version 1.1.0 --all
-
-# 특정 서비스만 업데이트
-./update.sh --version 1.1.0 --service backend
-```
-
-### 롤백
-
-```bash
-# 특정 서비스 롤백
+# backend 서비스 롤백
+./rollback.ps1 -s backend
 ./rollback.sh --service backend
 
 # 모든 서비스 롤백
+./rollback.ps1 -a
 ./rollback.sh --all
 ```
 
-### 스케일링
+---
+
+### `scale.ps1` / `scale.sh`
+
+서비스 레플리카 수를 조절합니다.
+
+**옵션:**
+
+| 옵션 | 설명 |
+|------|------|
+| `-s, --service <name>` | 스케일할 서비스 |
+| `-r, --replicas <n>` | 레플리카 수 |
+| `--preset <name>` | 프리셋 사용: `minimal`, `standard`, `high` |
+| `--status` | 현재 스케일 상태 표시 |
+| `-n, --stack <name>` | 스택 이름 (기본값: `gatrix`) |
+| `-h, --help` | 도움말 표시 |
+
+**프리셋:**
+
+- `minimal`: 각 서비스 1개 레플리카
+- `standard`: 각 서비스 2개 레플리카 (권장)
+- `high`: 각 서비스 4개 레플리카 (고트래픽)
+
+**예시:**
 
 ```bash
-# 특정 서비스 스케일 조정
+# backend를 4개 레플리카로 스케일
+./scale.ps1 -s backend -r 4
 ./scale.sh --service backend --replicas 4
 
-# 프리셋 사용
-./scale.sh --preset minimal    # 각 서비스 1개 레플리카
-./scale.sh --preset standard   # 주요 서비스 2개 레플리카
-./scale.sh --preset high       # 고트래픽용 4개 이상 레플리카
+# 고트래픽 프리셋 적용
+./scale.ps1 --preset high
+./scale.sh --preset high
 
-# 현재 스케일 상태 확인
+# 현재 상태 확인
+./scale.ps1 --status
 ./scale.sh --status
 ```
 
-### 상태 모니터링
+---
+
+### `status.ps1` / `status.sh`
+
+배포된 스택의 상태를 표시합니다.
+
+**옵션:**
+
+| 옵션 | 설명 |
+|------|------|
+| `-s, --services` | 서비스 목록만 표시 |
+| `-t, --tasks` | 실행 중인 태스크만 표시 |
+| `-l, --logs <service>` | 서비스 로그 스트리밍 |
+| `--health` | 헬스 체크 상태 표시 |
+| `-n, --stack <name>` | 스택 이름 (기본값: `gatrix`) |
+| `-h, --help` | 도움말 표시 |
+
+**예시:**
 
 ```bash
-# 전체 상태 확인
+# 전체 상태 표시
+./status.ps1
 ./status.sh
 
-# 서비스 목록 확인
+# 서비스만 표시
+./status.ps1 -s
 ./status.sh --services
 
-# 실행 중인 태스크 확인
-./status.sh --tasks
-
-# 헬스 상태 확인
-./status.sh --health
-
-# 로그 스트리밍
+# backend 로그 스트리밍
+./status.ps1 -l backend
 ./status.sh --logs backend
+
+# 헬스 상태 표시
+./status.ps1 --health
+./status.sh --health
 ```
 
-## 스케일링 프리셋
+---
 
-| 프리셋 | backend | frontend | event-lens | chat-server | edge |
-|--------|---------|----------|------------|-------------|------|
-| minimal | 1 | 1 | 1 | 1 | 1 |
-| standard | 2 | 2 | 1 | 2 | 2 |
-| high | 4 | 4 | 2 | 4 | 4 |
+## 레지스트리 스크립트
 
-## 업데이트 설정
+### `login-registry.ps1` / `login-registry.sh`
 
-기본 롤링 업데이트 설정:
-- `parallelism: 1` - 한 번에 하나의 컨테이너 업데이트
-- `delay: 10s` - 업데이트 간 대기 시간
-- `failure_action: rollback` - 실패 시 자동 롤백
-- `monitor: 30s` - 업데이트 후 모니터링 기간
-- `order: start-first` - 기존 컨테이너 중지 전 새 컨테이너 시작
+`registry.env`의 인증 정보를 사용하여 Tencent Cloud Registry에 로그인합니다.
 
-## 시크릿 관리
-
-`--init` 배포 시 생성되는 시크릿:
-
-| 시크릿 | 설명 |
-|--------|------|
-| `db_root_password` | MySQL root 비밀번호 |
-| `db_password` | 애플리케이션 DB 비밀번호 |
-| `jwt_secret` | JWT 서명 키 |
-| `jwt_refresh_secret` | JWT 리프레시 토큰 키 |
-| `session_secret` | 세션 암호화 키 |
-| `api_secret` | 내부 API 인증 |
-| `edge_api_token` | Edge 서버 API 토큰 |
-| `grafana_password` | Grafana 관리자 비밀번호 |
-
-시크릿 업데이트:
 ```bash
-# 기존 시크릿 삭제 (사용 중인 서비스 먼저 제거 필요)
-docker secret rm jwt_secret
-
-# 새 시크릿 생성
-echo -n "new-secret-value" | docker secret create jwt_secret -
-
-# 관련 서비스 재배포
-./deploy.sh --version 1.0.0
+./login-registry.ps1
+./login-registry.sh
+# 출력: Login Succeeded
 ```
 
-## 네트워크 아키텍처
+---
 
-- `gatrix-internal`: 내부 오버레이 네트워크 (격리됨)
-- `gatrix-public`: 외부 접근용 오버레이 네트워크
+### `list-images.ps1` / `list-images.sh`
+
+레지스트리 네임스페이스의 모든 이미지 태그를 나열합니다.
+
+```bash
+./list-images.ps1
+./list-images.sh
+# 출력: Tags found:
+#   backend-latest
+#   backend-v1.0.0
+#   frontend-latest
+#   ...
+```
+
+리포지토리가 비어있으면:
+```
+Repository 'uwocn/uwocn' not found or has no images yet.
+```
+
+---
 
 ## 문제 해결
 
-### 서비스 로그 확인
-```bash
-docker service logs gatrix_backend --follow --tail 100
-```
+### "Login Failed" 오류
 
-### 태스크 상태 확인
-```bash
-docker service ps gatrix_backend --no-trunc
-```
+- `registry.env`에 유효한 인증 정보가 있는지 확인하세요.
+- `REGISTRY_HOST`가 올바른지 확인하세요.
+- 수동으로 로그인 시도: `docker login uwocn.tencentcloudcr.com`
 
-### 서비스 강제 업데이트
-```bash
-docker service update --force gatrix_backend
-```
+### 이미지 목록 조회 시 "Repository not found"
 
-### 스택 제거
-```bash
-docker stack rm gatrix
-```
+- 아직 이미지가 푸시되지 않은 경우 정상입니다.
+- 먼저 `./build-and-push.ps1 -p`로 이미지를 푸시하세요.
 
+### "Docker build failed" 빌드 실패
+
+- Docker가 실행 중인지 확인하세요.
+- `packages/<service>/Dockerfile` 문법을 확인하세요.
+- `docker build`를 직접 실행하여 자세한 오류를 확인하세요.
+
+### Swarm 초기화되지 않음
+
+- `docker swarm init`을 실행하거나 `deploy.ps1`에서 `--init` 플래그를 사용하세요.
+
+---
+
+## 파일 참조
+
+| 파일 | 용도 |
+|------|------|
+| `build-and-push.ps1/.sh` | Docker 이미지 빌드 및 푸시 |
+| `deploy.ps1/.sh` | Docker Swarm 배포 |
+| `update.ps1/.sh` | 롤링 업데이트 |
+| `rollback.ps1/.sh` | 서비스 롤백 |
+| `scale.ps1/.sh` | 레플리카 스케일 |
+| `status.ps1/.sh` | 스택 상태 표시 |
+| `login-registry.ps1/.sh` | 레지스트리 로그인 |
+| `list-images.ps1/.sh` | 레지스트리 이미지 목록 |
+| `registry.env` | 레지스트리 인증 정보 |
+| `.env.example` | 환경 설정 템플릿 |
+| `docker-stack.yml` | Swarm 스택 정의 |

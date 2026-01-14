@@ -1,191 +1,341 @@
-# Gatrix Docker Swarm 部署
+# Gatrix 部署脚本
 
-使用 Docker Swarm 进行生产环境部署配置。
+本目录包含用于构建、部署和管理 Gatrix 应用程序栈的脚本。
 
-## 主要功能
+所有脚本都支持 **Linux 风格参数**（如 `-t`、`--tag`），以确保 PowerShell 和 Bash 之间的一致性。
 
-- **滚动更新**: 零停机部署，失败时自动回滚
-- **服务扩缩容**: 根据流量调整服务规模
-- **回滚**: 即时恢复到之前版本
-- **健康检查**: 自动容器状态监控
-- **密钥管理**: 敏感数据安全存储
-- **负载均衡**: 内置服务网格和负载分发
+---
+
+## 目录
+
+1. [前置要求](#前置要求)
+2. [配置](#配置)
+3. [构建与推送](#构建与推送)
+4. [部署](#部署)
+5. [运维](#运维)
+6. [镜像仓库脚本](#镜像仓库脚本)
+7. [故障排除](#故障排除)
+
+---
 
 ## 前置要求
 
-- Docker 20.10+
-- Docker Swarm 已初始化
-- Tencent Cloud Registry 访问权限
+- 已安装并运行 **Docker Desktop**（或 Docker Engine）
+- 已初始化 **Docker Swarm**（用于部署脚本）
+- **PowerShell 5+**（Windows）或 **Bash**（Linux/macOS）
+- 腾讯云容器镜像服务访问权限（凭证在 `registry.env` 中）
 
-## 快速开始
+---
 
-### 1. 初始化 Swarm 集群
+## 配置
 
-```bash
-# 在管理节点执行
-docker swarm init
+### `registry.env`
 
-# 添加工作节点（可选）
-docker swarm join-token worker
-# 在工作节点执行生成的命令
-```
-
-### 2. 配置环境
+镜像仓库凭证（请勿提交到版本控制）：
 
 ```bash
-cd deploy
-cp .env.example .env
-# 修改为生产环境值
-vim .env
+REGISTRY_HOST=uwocn.tencentcloudcr.com
+REGISTRY_USER=<用户名>
+REGISTRY_PASS=<密码或令牌>
+REGISTRY_NAMESPACE=uwocn/uwocn
 ```
 
-### 3. 初始部署
+### `.env` / `.env.example`
 
-```bash
-# 创建密钥并部署
-./deploy.sh --init --version 1.0.0
-```
+栈的环境变量（数据库、JWT 密钥等）。将 `.env.example` 复制为 `.env` 并填写相应值。
 
-## 脚本参考
+---
 
-| 脚本 | 说明 |
+## 构建与推送
+
+### `build-and-push.ps1` / `build-and-push.sh`
+
+构建 Docker 镜像，可选择推送到镜像仓库。
+
+**选项：**
+
+| 选项 | 说明 |
 |------|------|
-| `deploy.sh` | 部署或更新整个栈 |
-| `update.sh` | 特定服务滚动更新 |
-| `rollback.sh` | 回滚到之前版本 |
-| `scale.sh` | 调整服务规模 |
-| `status.sh` | 查看栈和服务状态 |
+| `-t, --tag <tag>` | 镜像标签（默认：`latest`） |
+| `-p, --push` | 构建后推送到镜像仓库 |
+| `-l, --latest` | 同时添加并推送 `latest` 标签 |
+| `-s, --service <name>` | 仅构建指定服务（可重复使用） |
+| `-h, --help` | 显示帮助 |
 
-## 部署工作流
+**可用服务：** `backend`、`frontend`、`edge`、`chat-server`、`event-lens`
 
-### 新部署
+**示例：**
 
 ```bash
-./deploy.sh --init --version 1.0.0
+# 构建所有服务，标签为 "latest"
+./build-and-push.ps1
+./build-and-push.sh
+
+# 使用指定版本标签构建并推送所有服务
+./build-and-push.ps1 -t v1.2.0 -p
+./build-and-push.sh --tag v1.2.0 --push
+
+# 同时添加版本标签和 latest 标签
+./build-and-push.ps1 -t v1.2.0 -l -p
+./build-and-push.sh --tag v1.2.0 --latest --push
+
+# 仅构建 backend
+./build-and-push.ps1 -s backend
+./build-and-push.sh --service backend
+
+# 构建 backend 和 frontend 后推送
+./build-and-push.ps1 -s backend -s frontend -p
+./build-and-push.sh --service backend --service frontend --push
 ```
 
-### 滚动更新
+---
+
+## 部署
+
+### `deploy.ps1` / `deploy.sh`
+
+将 Gatrix 栈部署到 Docker Swarm。
+
+**选项：**
+
+| 选项 | 说明 |
+|------|------|
+| `-v, --version <version>` | 部署版本（默认：`latest`） |
+| `-e, --env-file <file>` | 环境文件路径（默认：`.env`） |
+| `-n, --stack <name>` | 栈名称（默认：`gatrix`） |
+| `-i, --init` | 初始化 Swarm 并创建密钥 |
+| `-u, --update` | 执行滚动更新 |
+| `--prune` | 部署后移除未使用的镜像 |
+| `-h, --help` | 显示帮助 |
+
+**示例：**
 
 ```bash
-# 将所有服务更新到新版本
-./update.sh --version 1.1.0 --all
+# 首次部署（初始化 Swarm + 密钥）
+./deploy.ps1 -v v1.0.0 -i
+./deploy.sh --version v1.0.0 --init
 
-# 仅更新特定服务
-./update.sh --version 1.1.0 --service backend
+# 滚动更新部署
+./deploy.ps1 -v v1.1.0 -u
+./deploy.sh --version v1.1.0 --update
+
+# 部署后清理旧镜像
+./deploy.ps1 -v v1.2.0 --prune
+./deploy.sh --version v1.2.0 --prune
 ```
 
-### 回滚
+---
+
+## 运维
+
+### `update.ps1` / `update.sh`
+
+对运行中的服务执行滚动更新。
+
+**选项：**
+
+| 选项 | 说明 |
+|------|------|
+| `-v, --version <version>` | 目标版本（必需） |
+| `-s, --service <name>` | 仅更新指定服务 |
+| `-a, --all` | 更新所有应用服务 |
+| `-f, --force` | 强制更新（即使镜像相同） |
+| `-n, --stack <name>` | 栈名称（默认：`gatrix`） |
+| `-h, --help` | 显示帮助 |
+
+**示例：**
 
 ```bash
-# 回滚特定服务
+# 将所有服务更新到 v1.2.0
+./update.ps1 -v v1.2.0 -a
+./update.sh --version v1.2.0 --all
+
+# 仅更新 backend
+./update.ps1 -v v1.2.0 -s backend
+./update.sh --version v1.2.0 --service backend
+
+# 强制重新部署（即使镜像相同）
+./update.ps1 -v v1.2.0 -s backend -f
+./update.sh --version v1.2.0 --service backend --force
+```
+
+---
+
+### `rollback.ps1` / `rollback.sh`
+
+将服务回滚到上一版本。
+
+**选项：**
+
+| 选项 | 说明 |
+|------|------|
+| `-s, --service <name>` | 回滚指定服务 |
+| `-a, --all` | 回滚所有应用服务 |
+| `-n, --stack <name>` | 栈名称（默认：`gatrix`） |
+| `-h, --help` | 显示帮助 |
+
+**示例：**
+
+```bash
+# 回滚 backend 服务
+./rollback.ps1 -s backend
 ./rollback.sh --service backend
 
 # 回滚所有服务
+./rollback.ps1 -a
 ./rollback.sh --all
 ```
 
-### 扩缩容
+---
+
+### `scale.ps1` / `scale.sh`
+
+调整服务副本数量。
+
+**选项：**
+
+| 选项 | 说明 |
+|------|------|
+| `-s, --service <name>` | 要扩展的服务 |
+| `-r, --replicas <n>` | 副本数量 |
+| `--preset <name>` | 使用预设：`minimal`、`standard`、`high` |
+| `--status` | 显示当前扩展状态 |
+| `-n, --stack <name>` | 栈名称（默认：`gatrix`） |
+| `-h, --help` | 显示帮助 |
+
+**预设：**
+
+- `minimal`：每个服务 1 个副本
+- `standard`：每个服务 2 个副本（推荐）
+- `high`：每个服务 4 个副本（高流量）
+
+**示例：**
 
 ```bash
-# 调整特定服务规模
+# 将 backend 扩展到 4 个副本
+./scale.ps1 -s backend -r 4
 ./scale.sh --service backend --replicas 4
 
-# 使用预设
-./scale.sh --preset minimal    # 每个服务1个副本
-./scale.sh --preset standard   # 关键服务2个副本
-./scale.sh --preset high       # 高流量4个以上副本
+# 应用高流量预设
+./scale.ps1 --preset high
+./scale.sh --preset high
 
-# 查看当前规模
+# 查看当前状态
+./scale.ps1 --status
 ./scale.sh --status
 ```
 
-### 状态监控
+---
+
+### `status.ps1` / `status.sh`
+
+显示已部署栈的状态。
+
+**选项：**
+
+| 选项 | 说明 |
+|------|------|
+| `-s, --services` | 仅显示服务列表 |
+| `-t, --tasks` | 仅显示运行中的任务 |
+| `-l, --logs <service>` | 流式查看服务日志 |
+| `--health` | 显示健康检查状态 |
+| `-n, --stack <name>` | 栈名称（默认：`gatrix`） |
+| `-h, --help` | 显示帮助 |
+
+**示例：**
 
 ```bash
-# 查看全部状态
+# 显示全部状态
+./status.ps1
 ./status.sh
 
-# 查看服务列表
+# 仅显示服务
+./status.ps1 -s
 ./status.sh --services
 
-# 查看运行中的任务
-./status.sh --tasks
-
-# 查看健康状态
-./status.sh --health
-
-# 查看日志流
+# 流式查看 backend 日志
+./status.ps1 -l backend
 ./status.sh --logs backend
+
+# 显示健康状态
+./status.ps1 --health
+./status.sh --health
 ```
 
-## 扩缩容预设
+---
 
-| 预设 | backend | frontend | event-lens | chat-server | edge |
-|------|---------|----------|------------|-------------|------|
-| minimal | 1 | 1 | 1 | 1 | 1 |
-| standard | 2 | 2 | 2 | 1 | 2 |
-| high | 4 | 4 | 4 | 4 | 4 |
+## 镜像仓库脚本
 
-## 更新配置
+### `login-registry.ps1` / `login-registry.sh`
 
-默认滚动更新设置：
-- `parallelism: 1` - 每次更新一个容器
-- `delay: 10s` - 更新间隔
-- `failure_action: rollback` - 失败时自动回滚
-- `monitor: 30s` - 更新后监控期
-- `order: start-first` - 先启动新容器再停止旧容器
+使用 `registry.env` 中的凭证登录腾讯云容器镜像服务。
 
-## 密钥管理
-
-`--init` 部署时创建的密钥：
-
-| 密钥 | 说明 |
-|------|------|
-| `db_root_password` | MySQL root 密码 |
-| `db_password` | 应用数据库密码 |
-| `jwt_secret` | JWT 签名密钥 |
-| `jwt_refresh_secret` | JWT 刷新令牌密钥 |
-| `session_secret` | 会话加密密钥 |
-| `api_secret` | 内部 API 认证 |
-| `edge_api_token` | Edge 服务器 API 令牌 |
-| `grafana_password` | Grafana 管理员密码 |
-
-更新密钥：
 ```bash
-# 删除旧密钥（需先移除使用它的服务）
-docker secret rm jwt_secret
-
-# 创建新密钥
-echo -n "new-secret-value" | docker secret create jwt_secret -
-
-# 重新部署相关服务
-./deploy.sh --version 1.0.0
+./login-registry.ps1
+./login-registry.sh
+# 输出：Login Succeeded
 ```
 
-## 网络架构
+---
 
-- `gatrix-internal`: 内部覆盖网络（隔离）
-- `gatrix-public`: 外部访问覆盖网络
+### `list-images.ps1` / `list-images.sh`
+
+列出镜像仓库命名空间中的所有镜像标签。
+
+```bash
+./list-images.ps1
+./list-images.sh
+# 输出：Tags found:
+#   backend-latest
+#   backend-v1.0.0
+#   frontend-latest
+#   ...
+```
+
+如果仓库为空：
+```
+Repository 'uwocn/uwocn' not found or has no images yet.
+```
+
+---
 
 ## 故障排除
 
-### 查看服务日志
-```bash
-docker service logs gatrix_backend --follow --tail 100
-```
+### "Login Failed" 错误
 
-### 查看任务状态
-```bash
-docker service ps gatrix_backend --no-trunc
-```
+- 检查 `registry.env` 中是否有有效的凭证。
+- 确认 `REGISTRY_HOST` 正确。
+- 尝试手动登录：`docker login uwocn.tencentcloudcr.com`
 
-### 强制更新服务
-```bash
-docker service update --force gatrix_backend
-```
+### 列出镜像时显示 "Repository not found"
 
-### 移除栈
-```bash
-docker stack rm gatrix
-```
+- 如果还没有推送过镜像，这是正常的。
+- 首先使用 `./build-and-push.ps1 -p` 推送镜像。
 
+### "Docker build failed" 构建失败
+
+- 检查 Docker 是否正在运行。
+- 检查 `packages/<service>/Dockerfile` 语法。
+- 直接运行 `docker build` 查看详细错误。
+
+### Swarm 未初始化
+
+- 运行 `docker swarm init` 或在 `deploy.ps1` 中使用 `--init` 参数。
+
+---
+
+## 文件参考
+
+| 文件 | 用途 |
+|------|------|
+| `build-and-push.ps1/.sh` | 构建和推送 Docker 镜像 |
+| `deploy.ps1/.sh` | 部署到 Docker Swarm |
+| `update.ps1/.sh` | 滚动更新 |
+| `rollback.ps1/.sh` | 服务回滚 |
+| `scale.ps1/.sh` | 副本扩展 |
+| `status.ps1/.sh` | 显示栈状态 |
+| `login-registry.ps1/.sh` | 镜像仓库登录 |
+| `list-images.ps1/.sh` | 列出镜像仓库镜像 |
+| `registry.env` | 镜像仓库凭证 |
+| `.env.example` | 环境配置模板 |
+| `docker-stack.yml` | Swarm 栈定义 |
