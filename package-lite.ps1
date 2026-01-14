@@ -14,7 +14,7 @@
 $ErrorActionPreference = "Stop"
 
 # Default values
-$DateSuffix = Get-Date -Format "yyyyMMdd"
+$DateSuffix = Get-Date -Format "yyyyMMdd-HHmm"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RootDir = $ScriptDir
 $ArtifactsDir = Join-Path $RootDir "artifacts"

@@ -19,7 +19,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # Default values
-DATE_SUFFIX=$(date +"%Y%m%d")
+DATE_SUFFIX=$(date +"%Y%m%d-%H%M")
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$SCRIPT_DIR"
 ARTIFACTS_DIR="$ROOT_DIR/artifacts"
