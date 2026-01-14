@@ -1,39 +1,83 @@
-<#
-.SYNOPSIS
-    Gatrix Swarm Update Script (Rolling Update)
-
-.DESCRIPTION
-    Script to perform a rolling update of Gatrix services in a Docker Swarm.
-
-.PARAMETER Stack
-    Stack name (default: gatrix).
-
-.PARAMETER Version
-    Version to update to (required).
-
-.PARAMETER Service
-    Update specific service only.
-
-.PARAMETER All
-    Update all application services.
-
-.PARAMETER Force
-    Force update even with same image.
-
-.EXAMPLE
-    .\update.ps1 -Version 1.2.0 -All
-    .\update.ps1 -Version 1.2.0 -Service backend
-#>
-
-param(
-    [string]$Stack = "gatrix",
-    [string]$Version = "",
-    [string]$Service = "",
-    [switch]$All = $false,
-    [switch]$Force = $false
-)
+#!/usr/bin/env pwsh
+#
+# Gatrix Swarm Update Script (Rolling Update)
+#
+# Usage:
+#   ./update.ps1 [options]
+#
+# Options:
+#   -n, --stack <name>        Stack name (default: gatrix)
+#   -v, --version <version>   Version to update to (required)
+#   -s, --service <name>      Update specific service only
+#   -a, --all                 Update all application services
+#   -f, --force               Force update even with same image
+#   -h, --help                Show help
 
 $ErrorActionPreference = "Stop"
+
+# Default values
+$Stack = "gatrix"
+$Version = ""
+$Service = ""
+$All = $false
+$Force = $false
+
+# Show help function
+function Show-Help {
+    Write-Host "Gatrix Swarm Update Script (Rolling Update)"
+    Write-Host ""
+    Write-Host "Usage: ./update.ps1 [options]"
+    Write-Host ""
+    Write-Host "Options:"
+    Write-Host "  -n, --stack <name>        Stack name (default: gatrix)"
+    Write-Host "  -v, --version <version>   Version to update to (required)"
+    Write-Host "  -s, --service <name>      Update specific service only"
+    Write-Host "  -a, --all                 Update all application services"
+    Write-Host "  -f, --force               Force update even with same image"
+    Write-Host "  -h, --help                Show help"
+    Write-Host ""
+    Write-Host "Examples:"
+    Write-Host "  ./update.ps1 -v 1.2.0 -a"
+    Write-Host "  ./update.ps1 --version 1.2.0 --all"
+    Write-Host "  ./update.ps1 -v 1.2.0 -s backend"
+    Write-Host "  ./update.ps1 --version 1.2.0 --service backend"
+    exit 0
+}
+
+# Parse arguments
+$i = 0
+while ($i -lt $args.Count) {
+    switch ($args[$i]) {
+        { $_ -eq "-n" -or $_ -eq "--stack" } {
+            $Stack = $args[$i + 1]
+            $i += 2
+        }
+        { $_ -eq "-v" -or $_ -eq "--version" } {
+            $Version = $args[$i + 1]
+            $i += 2
+        }
+        { $_ -eq "-s" -or $_ -eq "--service" } {
+            $Service = $args[$i + 1]
+            $i += 2
+        }
+        { $_ -eq "-a" -or $_ -eq "--all" } {
+            $All = $true
+            $i += 1
+        }
+        { $_ -eq "-f" -or $_ -eq "--force" } {
+            $Force = $true
+            $i += 1
+        }
+        { $_ -eq "-h" -or $_ -eq "--help" } {
+            Show-Help
+        }
+        default {
+            Write-Host "Unknown option: $($args[$i])" -ForegroundColor Red
+            Write-Host "Use --help for usage information"
+            exit 1
+        }
+    }
+}
 
 # Configuration
 $UpdateServices = @("backend", "frontend", "event-lens", "event-lens-worker", "chat-server", "edge")
@@ -86,7 +130,7 @@ Write-Host "========================================"
 Write-Host ""
 
 if (-not $Version) {
-    Show-Error "Version is required. Use -Version <version>"
+    Show-Error "Version is required. Use --version <version>"
     exit 1
 }
 
@@ -106,7 +150,7 @@ elseif ($All) {
     }
 }
 else {
-    Show-Error "Please specify -Service <name> or -All"
+    Show-Error "Please specify --service <name> or --all"
     exit 1
 }
 

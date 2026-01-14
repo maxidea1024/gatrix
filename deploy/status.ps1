@@ -1,40 +1,84 @@
-<#
-.SYNOPSIS
-    Gatrix Swarm Status Script
-
-.DESCRIPTION
-    Script to show status of Gatrix services in a Docker Swarm.
-
-.PARAMETER Stack
-    Stack name (default: gatrix).
-
-.PARAMETER Services
-    Show service list.
-
-.PARAMETER Tasks
-    Show running tasks.
-
-.PARAMETER Logs
-    Show logs for a service.
-
-.PARAMETER Health
-    Show health status.
-
-.EXAMPLE
-    .\status.ps1
-    .\status.ps1 -Services
-    .\status.ps1 -Logs backend
-#>
-
-param(
-    [string]$Stack = "gatrix",
-    [switch]$Services = $false,
-    [switch]$Tasks = $false,
-    [string]$Logs = "",
-    [switch]$Health = $false
-)
+#!/usr/bin/env pwsh
+#
+# Gatrix Swarm Status Script
+#
+# Usage:
+#   ./status.ps1 [options]
+#
+# Options:
+#   -n, --stack <name>        Stack name (default: gatrix)
+#   -s, --services            Show service list
+#   -t, --tasks               Show running tasks
+#   -l, --logs <service>      Show logs for a service
+#   --health                  Show health status
+#   -h, --help                Show help
 
 $ErrorActionPreference = "Stop"
+
+# Default values
+$Stack = "gatrix"
+$ShowServices = $false
+$ShowTasks = $false
+$Logs = ""
+$ShowHealth = $false
+
+# Show help function
+function Show-HelpText {
+    Write-Host "Gatrix Swarm Status Script"
+    Write-Host ""
+    Write-Host "Usage: ./status.ps1 [options]"
+    Write-Host ""
+    Write-Host "Options:"
+    Write-Host "  -n, --stack <name>        Stack name (default: gatrix)"
+    Write-Host "  -s, --services            Show service list"
+    Write-Host "  -t, --tasks               Show running tasks"
+    Write-Host "  -l, --logs <service>      Show logs for a service"
+    Write-Host "  --health                  Show health status"
+    Write-Host "  -h, --help                Show help"
+    Write-Host ""
+    Write-Host "Examples:"
+    Write-Host "  ./status.ps1"
+    Write-Host "  ./status.ps1 -s"
+    Write-Host "  ./status.ps1 --services"
+    Write-Host "  ./status.ps1 -l backend"
+    Write-Host "  ./status.ps1 --logs backend"
+    exit 0
+}
+
+# Parse arguments
+$i = 0
+while ($i -lt $args.Count) {
+    switch ($args[$i]) {
+        { $_ -eq "-n" -or $_ -eq "--stack" } {
+            $Stack = $args[$i + 1]
+            $i += 2
+        }
+        { $_ -eq "-s" -or $_ -eq "--services" } {
+            $ShowServices = $true
+            $i += 1
+        }
+        { $_ -eq "-t" -or $_ -eq "--tasks" } {
+            $ShowTasks = $true
+            $i += 1
+        }
+        { $_ -eq "-l" -or $_ -eq "--logs" } {
+            $Logs = $args[$i + 1]
+            $i += 2
+        }
+        "--health" {
+            $ShowHealth = $true
+            $i += 1
+        }
+        { $_ -eq "-h" -or $_ -eq "--help" } {
+            Show-HelpText
+        }
+        default {
+            Write-Host "Unknown option: $($args[$i])" -ForegroundColor Red
+            Write-Host "Use --help for usage information"
+            exit 1
+        }
+    }
+}
 
 function Show-Info($msg) { Write-Host "[INFO] $msg" -ForegroundColor Blue }
 function Show-Success($msg) { Write-Host "[SUCCESS] $msg" -ForegroundColor Green }
@@ -107,13 +151,13 @@ Write-Host "========================================"
 if ($Logs) {
     Show-ServiceLogs $Logs
 }
-elseif ($Services) {
+elseif ($ShowServices) {
     Show-ServicesList
 }
-elseif ($Tasks) {
+elseif ($ShowTasks) {
     Show-TasksList
 }
-elseif ($Health) {
+elseif ($ShowHealth) {
     Show-HealthStatus
 }
 else {

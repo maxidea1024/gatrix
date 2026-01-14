@@ -1,45 +1,75 @@
-<#
-.SYNOPSIS
-    Builds and pushes Docker images for Gatrix services.
-
-.DESCRIPTION
-    This script builds Docker images for backend, frontend, edge, chat-server, and event-lens.
-    It automatically logs in to the Tencent Cloud Registry and pushes images there.
-
-.PARAMETER Tag
-    The image tag (default: "latest").
-
-.PARAMETER Push
-    If specified, pushes the images to the registry.
-
-.PARAMETER Latest
-    If specified, also tags and pushes images as "latest".
-
-.PARAMETER Service
-    Optional. The specific service(s) to build (e.g., "backend", "frontend").
-    If omitted, all services are built.
-
-.EXAMPLE
-    .\build_and_push.ps1 -Tag "v1.0.0"
-    Builds all images locally with tag "v1.0.0".
-
-.EXAMPLE
-    .\build_and_push.ps1 -Tag "v1.0.0" -Latest -Push
-    Builds, tags as v1.0.0 and latest, and pushes both.
-
-.EXAMPLE
-    .\build_and_push.ps1 -Service backend,frontend -Tag "prod" -Push
-    Builds and pushes backend and frontend images.
-#>
-
-param(
-    [string]$Tag = "latest",
-    [switch]$Push = $false,
-    [switch]$Latest = $false,
-    [string[]]$Service = @()
-)
+#!/usr/bin/env pwsh
+#
+# Gatrix Build and Push Script
+#
+# Usage:
+#   ./build_and_push.ps1 [options]
+#
+# Options:
+#   -t, --tag <tag>           Image tag (default: latest)
+#   -p, --push                Push images to registry
+#   -l, --latest              Also tag and push as "latest"
+#   -s, --service <name>      Service to build (can be used multiple times)
+#   -h, --help                Show help
 
 $ErrorActionPreference = "Stop"
+
+# Default values
+$Tag = "latest"
+$Push = $false
+$TagLatest = $false
+$TargetServices = @()
+
+# Show help function
+function Show-Help {
+    Write-Host "Gatrix Build and Push Script"
+    Write-Host ""
+    Write-Host "Usage: ./build_and_push.ps1 [options]"
+    Write-Host ""
+    Write-Host "Options:"
+    Write-Host "  -t, --tag <tag>           Image tag (default: latest)"
+    Write-Host "  -p, --push                Push images to registry"
+    Write-Host "  -l, --latest              Also tag and push as 'latest'"
+    Write-Host "  -s, --service <name>      Service to build (repeatable)"
+    Write-Host "  -h, --help                Show help"
+    Write-Host ""
+    Write-Host "Examples:"
+    Write-Host "  ./build_and_push.ps1 -t v1.0.0 -l -p"
+    Write-Host "  ./build_and_push.ps1 --tag v1.0.0 --latest --push"
+    Write-Host "  ./build_and_push.ps1 --service backend --service frontend --push"
+    exit 0
+}
+
+# Parse arguments
+$i = 0
+while ($i -lt $args.Count) {
+    switch ($args[$i]) {
+        { $_ -eq "-t" -or $_ -eq "--tag" } {
+            $Tag = $args[$i + 1]
+            $i += 2
+        }
+        { $_ -eq "-p" -or $_ -eq "--push" } {
+            $Push = $true
+            $i += 1
+        }
+        { $_ -eq "-l" -or $_ -eq "--latest" } {
+            $TagLatest = $true
+            $i += 1
+        }
+        { $_ -eq "-s" -or $_ -eq "--service" } {
+            $TargetServices += $args[$i + 1]
+            $i += 2
+        }
+        { $_ -eq "-h" -or $_ -eq "--help" } {
+            Show-Help
+        }
+        default {
+            Write-Host "Unknown option: $($args[$i])" -ForegroundColor Red
+            Write-Host "Use --help for usage information"
+            exit 1
+        }
+    }
+}
 
 # Configuration
 $Registry = "uwocn.tencentcloudcr.com"
@@ -58,8 +88,8 @@ $allServices = @{
 # Determine services to build
 $servicesToBuild = @{}
 
-if ($Service.Count -gt 0) {
-    foreach ($svcName in $Service) {
+if ($TargetServices.Count -gt 0) {
+    foreach ($svcName in $TargetServices) {
         if ($allServices.ContainsKey($svcName)) {
             $servicesToBuild[$svcName] = $allServices[$svcName]
         }
@@ -79,7 +109,7 @@ else {
 $rootDir = Resolve-Path "$PSScriptRoot\.."
 $loginScript = Join-Path $PSScriptRoot "login_registry.ps1"
 
-Write-Host "Wrapper script for Gatrix Build & Push" -ForegroundColor Cyan
+Write-Host "Gatrix Build & Push" -ForegroundColor Cyan
 Write-Host "Root Directory: $rootDir"
 Write-Host "Tag: $Tag"
 Write-Host "Registry: $Registry/$Namespace/gatrix-<service>:<tag>"
@@ -101,6 +131,7 @@ foreach ($serviceName in $servicesToBuild.Keys) {
     $dockerfile = $servicesToBuild[$serviceName]
     
     $imageName = "$Registry/$Namespace/gatrix-$serviceName`:$Tag"
+    $latestImageName = "$Registry/$Namespace/gatrix-$serviceName`:latest"
 
     Write-Host "`n[$serviceName] Building image: $imageName..." -ForegroundColor Green
     
@@ -119,8 +150,7 @@ foreach ($serviceName in $servicesToBuild.Keys) {
         if ($LASTEXITCODE -ne 0) { throw "Docker build failed for $serviceName" }
         
         # Also tag as latest if requested
-        $latestImageName = "$Registry/$Namespace/gatrix-$serviceName`:latest"
-        if ($Latest -and $Tag -ne "latest") {
+        if ($TagLatest -and $Tag -ne "latest") {
             Write-Host "[$serviceName] Tagging as latest..."
             docker tag $imageName $latestImageName
         }
@@ -134,7 +164,7 @@ foreach ($serviceName in $servicesToBuild.Keys) {
             Write-Host "[$serviceName] Push $Tag success." -ForegroundColor Green
             
             # Push latest tag if requested
-            if ($Latest -and $Tag -ne "latest") {
+            if ($TagLatest -and $Tag -ne "latest") {
                 Write-Host "[$serviceName] Pushing latest to registry..."
                 docker push $latestImageName
                 if ($LASTEXITCODE -ne 0) { throw "Docker push latest failed for $serviceName" }

@@ -1,31 +1,69 @@
-<#
-.SYNOPSIS
-    Gatrix Swarm Rollback Script
-
-.DESCRIPTION
-    Script to rollback Gatrix services in a Docker Swarm.
-
-.PARAMETER Stack
-    Stack name (default: gatrix).
-
-.PARAMETER Service
-    Rollback specific service only.
-
-.PARAMETER All
-    Rollback all services.
-
-.EXAMPLE
-    .\rollback.ps1 -Service backend
-    .\rollback.ps1 -All
-#>
-
-param(
-    [string]$Stack = "gatrix",
-    [string]$Service = "",
-    [switch]$All = $false
-)
+#!/usr/bin/env pwsh
+#
+# Gatrix Swarm Rollback Script
+#
+# Usage:
+#   ./rollback.ps1 [options]
+#
+# Options:
+#   -n, --stack <name>        Stack name (default: gatrix)
+#   -s, --service <name>      Rollback specific service only
+#   -a, --all                 Rollback all services
+#   -h, --help                Show help
 
 $ErrorActionPreference = "Stop"
+
+# Default values
+$Stack = "gatrix"
+$Service = ""
+$All = $false
+
+# Show help function
+function Show-Help {
+    Write-Host "Gatrix Swarm Rollback Script"
+    Write-Host ""
+    Write-Host "Usage: ./rollback.ps1 [options]"
+    Write-Host ""
+    Write-Host "Options:"
+    Write-Host "  -n, --stack <name>        Stack name (default: gatrix)"
+    Write-Host "  -s, --service <name>      Rollback specific service only"
+    Write-Host "  -a, --all                 Rollback all services"
+    Write-Host "  -h, --help                Show help"
+    Write-Host ""
+    Write-Host "Examples:"
+    Write-Host "  ./rollback.ps1 -s backend"
+    Write-Host "  ./rollback.ps1 --service backend"
+    Write-Host "  ./rollback.ps1 -a"
+    Write-Host "  ./rollback.ps1 --all"
+    exit 0
+}
+
+# Parse arguments
+$i = 0
+while ($i -lt $args.Count) {
+    switch ($args[$i]) {
+        { $_ -eq "-n" -or $_ -eq "--stack" } {
+            $Stack = $args[$i + 1]
+            $i += 2
+        }
+        { $_ -eq "-s" -or $_ -eq "--service" } {
+            $Service = $args[$i + 1]
+            $i += 2
+        }
+        { $_ -eq "-a" -or $_ -eq "--all" } {
+            $All = $true
+            $i += 1
+        }
+        { $_ -eq "-h" -or $_ -eq "--help" } {
+            Show-Help
+        }
+        default {
+            Write-Host "Unknown option: $($args[$i])" -ForegroundColor Red
+            Write-Host "Use --help for usage information"
+            exit 1
+        }
+    }
+}
 
 # Configuration
 $RollbackServices = @("backend", "frontend", "event-lens", "event-lens-worker", "chat-server", "edge")
@@ -83,7 +121,7 @@ elseif ($All) {
     }
 }
 else {
-    Show-Error "Please specify -Service <name> or -All"
+    Show-Error "Please specify --service <name> or --all"
     Write-Host ""
     Write-Host "Available services: $($RollbackServices -join ', ')"
     exit 1

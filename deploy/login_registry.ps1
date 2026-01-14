@@ -1,3 +1,13 @@
+#!/usr/bin/env pwsh
+#
+# Gatrix Registry Login Script
+#
+# Usage:
+#   ./login_registry.ps1
+#
+# Description:
+#   Logs in to the Docker registry using credentials from registry.env
+
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $EnvFile = Join-Path $ScriptDir "registry.env"
 

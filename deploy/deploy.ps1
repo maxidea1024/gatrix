@@ -1,42 +1,88 @@
-<#
-.SYNOPSIS
-    Gatrix Swarm Deployment Script
-
-.DESCRIPTION
-    Script to deploy Gatrix stack to Docker Swarm.
-
-.PARAMETER Version
-    Version to deploy (default: latest).
-
-.PARAMETER EnvFile
-    Environment file path (default: .env).
-
-.PARAMETER Stack
-    Stack name (default: gatrix).
-
-.PARAMETER Init
-    Initialize swarm and create secrets.
-
-.PARAMETER Update
-    Update existing deployment (rolling update).
-
-.PARAMETER Prune
-    Remove unused images after deployment.
-
-.EXAMPLE
-    .\deploy.ps1 -Version "1.0.0" -Init
-#>
-
-param(
-    [string]$Version = "latest",
-    [string]$EnvFile = ".env",
-    [string]$Stack = "gatrix",
-    [switch]$Init = $false,
-    [switch]$Update = $false,
-    [switch]$Prune = $false
-)
+#!/usr/bin/env pwsh
+#
+# Gatrix Swarm Deployment Script
+#
+# Usage:
+#   ./deploy.ps1 [options]
+#
+# Options:
+#   -v, --version <version>   Version to deploy (default: latest)
+#   -e, --env-file <file>     Environment file path (default: .env)
+#   -n, --stack <name>        Stack name (default: gatrix)
+#   -i, --init                Initialize swarm and create secrets
+#   -u, --update              Update existing deployment (rolling update)
+#   --prune                   Remove unused images after deployment
+#   -h, --help                Show help
 
 $ErrorActionPreference = "Stop"
+
+# Default values
+$Version = "latest"
+$EnvFile = ".env"
+$Stack = "gatrix"
+$Init = $false
+$Update = $false
+$Prune = $false
+
+# Show help function
+function Show-Help {
+    Write-Host "Gatrix Swarm Deployment Script"
+    Write-Host ""
+    Write-Host "Usage: ./deploy.ps1 [options]"
+    Write-Host ""
+    Write-Host "Options:"
+    Write-Host "  -v, --version <version>   Version to deploy (default: latest)"
+    Write-Host "  -e, --env-file <file>     Environment file path (default: .env)"
+    Write-Host "  -n, --stack <name>        Stack name (default: gatrix)"
+    Write-Host "  -i, --init                Initialize swarm and create secrets"
+    Write-Host "  -u, --update              Update existing deployment (rolling update)"
+    Write-Host "  --prune                   Remove unused images after deployment"
+    Write-Host "  -h, --help                Show help"
+    Write-Host ""
+    Write-Host "Examples:"
+    Write-Host "  ./deploy.ps1 -v 1.0.0 -i"
+    Write-Host "  ./deploy.ps1 --version 1.0.0 --init"
+    exit 0
+}
+
+# Parse arguments
+$i = 0
+while ($i -lt $args.Count) {
+    switch ($args[$i]) {
+        { $_ -eq "-v" -or $_ -eq "--version" } {
+            $Version = $args[$i + 1]
+            $i += 2
+        }
+        { $_ -eq "-e" -or $_ -eq "--env-file" } {
+            $EnvFile = $args[$i + 1]
+            $i += 2
+        }
+        { $_ -eq "-n" -or $_ -eq "--stack" } {
+            $Stack = $args[$i + 1]
+            $i += 2
+        }
+        { $_ -eq "-i" -or $_ -eq "--init" } {
+            $Init = $true
+            $i += 1
+        }
+        { $_ -eq "-u" -or $_ -eq "--update" } {
+            $Update = $true
+            $i += 1
+        }
+        "--prune" {
+            $Prune = $true
+            $i += 1
+        }
+        { $_ -eq "-h" -or $_ -eq "--help" } {
+            Show-Help
+        }
+        default {
+            Write-Host "Unknown option: $($args[$i])" -ForegroundColor Red
+            Write-Host "Use --help for usage information"
+            exit 1
+        }
+    }
+}
 
 function Show-Info($msg) { Write-Host "[INFO] $msg" -ForegroundColor Blue }
 function Show-Success($msg) { Write-Host "[SUCCESS] $msg" -ForegroundColor Green }
@@ -57,7 +103,7 @@ if ($swarmState -ne "active") {
         docker swarm init
     }
     else {
-        Show-Error "Docker Swarm is not initialized. Run with -Init flag or run 'docker swarm init'"
+        Show-Error "Docker Swarm is not initialized. Run with --init flag or run 'docker swarm init'"
         exit 1
     }
 }

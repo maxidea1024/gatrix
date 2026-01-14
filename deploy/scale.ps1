@@ -1,40 +1,83 @@
-<#
-.SYNOPSIS
-    Gatrix Swarm Scaling Script
-
-.DESCRIPTION
-    Script to scale Gatrix services in a Docker Swarm.
-
-.PARAMETER Stack
-    Stack name (default: gatrix).
-
-.PARAMETER Service
-    Service to scale.
-
-.PARAMETER Replicas
-    Number of replicas.
-
-.PARAMETER Preset
-    Use scaling preset (minimal, standard, high).
-
-.PARAMETER Status
-    Show current scaling status.
-
-.EXAMPLE
-    .\scale.ps1 -Service backend -Replicas 4
-    .\scale.ps1 -Preset high
-    .\scale.ps1 -Status
-#>
-
-param(
-    [string]$Stack = "gatrix",
-    [string]$Service = "",
-    [int]$Replicas = 0,
-    [string]$Preset = "",
-    [switch]$Status = $false
-)
+#!/usr/bin/env pwsh
+#
+# Gatrix Swarm Scaling Script
+#
+# Usage:
+#   ./scale.ps1 [options]
+#
+# Options:
+#   -n, --stack <name>        Stack name (default: gatrix)
+#   -s, --service <name>      Service to scale
+#   -r, --replicas <count>    Number of replicas
+#   --preset <name>           Use scaling preset (minimal, standard, high)
+#   --status                  Show current scaling status
+#   -h, --help                Show help
 
 $ErrorActionPreference = "Stop"
+
+# Default values
+$Stack = "gatrix"
+$Service = ""
+$Replicas = 0
+$Preset = ""
+$Status = $false
+
+# Show help function
+function Show-Help {
+    Write-Host "Gatrix Swarm Scaling Script"
+    Write-Host ""
+    Write-Host "Usage: ./scale.ps1 [options]"
+    Write-Host ""
+    Write-Host "Options:"
+    Write-Host "  -n, --stack <name>        Stack name (default: gatrix)"
+    Write-Host "  -s, --service <name>      Service to scale"
+    Write-Host "  -r, --replicas <count>    Number of replicas"
+    Write-Host "  --preset <name>           Use scaling preset (minimal, standard, high)"
+    Write-Host "  --status                  Show current scaling status"
+    Write-Host "  -h, --help                Show help"
+    Write-Host ""
+    Write-Host "Examples:"
+    Write-Host "  ./scale.ps1 -s backend -r 4"
+    Write-Host "  ./scale.ps1 --service backend --replicas 4"
+    Write-Host "  ./scale.ps1 --preset high"
+    Write-Host "  ./scale.ps1 --status"
+    exit 0
+}
+
+# Parse arguments
+$i = 0
+while ($i -lt $args.Count) {
+    switch ($args[$i]) {
+        { $_ -eq "-n" -or $_ -eq "--stack" } {
+            $Stack = $args[$i + 1]
+            $i += 2
+        }
+        { $_ -eq "-s" -or $_ -eq "--service" } {
+            $Service = $args[$i + 1]
+            $i += 2
+        }
+        { $_ -eq "-r" -or $_ -eq "--replicas" } {
+            $Replicas = [int]$args[$i + 1]
+            $i += 2
+        }
+        "--preset" {
+            $Preset = $args[$i + 1]
+            $i += 2
+        }
+        "--status" {
+            $Status = $true
+            $i += 1
+        }
+        { $_ -eq "-h" -or $_ -eq "--help" } {
+            Show-Help
+        }
+        default {
+            Write-Host "Unknown option: $($args[$i])" -ForegroundColor Red
+            Write-Host "Use --help for usage information"
+            exit 1
+        }
+    }
+}
 
 # Configuration
 $ScalableServices = @("backend", "frontend", "event-lens", "event-lens-worker", "chat-server", "edge")
@@ -121,7 +164,7 @@ elseif ($Service -and $Replicas -gt 0) {
     Scale-Service $Service $Replicas
 }
 else {
-    Show-Error "Please specify -Service and -Replicas, -Preset, or -Status"
+    Show-Error "Please specify --service and --replicas, --preset, or --status"
     exit 1
 }
 

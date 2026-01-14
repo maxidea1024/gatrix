@@ -1,11 +1,13 @@
-<#
-.SYNOPSIS
-    List images/tags in Docker Registry (Tencent Cloud CR)
-
-.DESCRIPTION
-    Queries the registry API to list all available tags for Gatrix services.
-    Outputs full image URLs that can be used directly in docker-compose.yml.
-#>
+#!/usr/bin/env pwsh
+#
+# Gatrix List Images Script
+#
+# Usage:
+#   ./list_images.ps1
+#
+# Description:
+#   Queries the registry API to list all available tags for Gatrix services.
+#   Outputs full image URLs that can be used directly in docker-compose.yml.
 
 $ErrorActionPreference = "Stop"
 

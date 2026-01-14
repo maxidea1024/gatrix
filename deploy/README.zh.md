@@ -123,8 +123,8 @@ vim .env
 | 预设 | backend | frontend | event-lens | chat-server | edge |
 |------|---------|----------|------------|-------------|------|
 | minimal | 1 | 1 | 1 | 1 | 1 |
-| standard | 2 | 2 | 1 | 2 | 2 |
-| high | 4 | 4 | 2 | 4 | 4 |
+| standard | 2 | 2 | 2 | 1 | 2 |
+| high | 4 | 4 | 4 | 4 | 4 |
 
 ## 更新配置
 

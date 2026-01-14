@@ -2,6 +2,8 @@
 
 This directory contains scripts for building, deploying, and managing the Gatrix application stack.
 
+All scripts support **Linux-style arguments** (e.g., `-t`, `--tag`) for consistency between PowerShell and Bash.
+
 ---
 
 ## Table of Contents
@@ -46,39 +48,43 @@ Contains environment variables for the stack (database, JWT secrets, etc.). Copy
 
 ## Build & Push
 
-### `build_and_push.ps1` (PowerShell) / `build_and_push.sh` (Bash)
+### `build_and_push.ps1` / `build_and_push.sh`
 
 Builds Docker images and optionally pushes them to the registry.
 
 **Options:**
 
-| Parameter | Description |
-|-----------|-------------|
-| `-Tag <tag>` / `--tag <tag>` | Image tag (default: `latest`) |
-| `-Push` / `--push` | Push images to registry after building |
-| `-Service <name,...>` / `--service <name>` | Build specific service(s) only |
+| Option | Description |
+|--------|-------------|
+| `-t, --tag <tag>` | Image tag (default: `latest`) |
+| `-p, --push` | Push images to registry after building |
+| `-l, --latest` | Also tag and push images as `latest` |
+| `-s, --service <name>` | Build specific service(s) only (repeatable) |
+| `-h, --help` | Show help |
 
 **Available Services:** `backend`, `frontend`, `edge`, `chat-server`, `event-lens`
 
 **Examples:**
 
-```powershell
+```bash
 # Build all services, tag as "latest"
-.\build_and_push.ps1
+./build_and_push.ps1
+./build_and_push.sh
 
 # Build and push all services with a specific version tag
-.\build_and_push.ps1 -Tag "v1.2.0" -Push
+./build_and_push.ps1 -t v1.2.0 -p
+./build_and_push.sh --tag v1.2.0 --push
+
+# Build with version tag AND also tag as latest
+./build_and_push.ps1 -t v1.2.0 -l -p
+./build_and_push.sh --tag v1.2.0 --latest --push
 
 # Build only backend
-.\build_and_push.ps1 -Service backend
+./build_and_push.ps1 -s backend
+./build_and_push.sh --service backend
 
 # Build backend and frontend, then push
-.\build_and_push.ps1 -Service backend,frontend -Tag "prod" -Push
-```
-
-```bash
-# Bash equivalent
-./build_and_push.sh --tag "v1.2.0" --push
+./build_and_push.ps1 -s backend -s frontend -p
 ./build_and_push.sh --service backend --service frontend --push
 ```
 
@@ -92,26 +98,30 @@ Deploys the Gatrix stack to Docker Swarm.
 
 **Options:**
 
-| Parameter | Description |
-|-----------|-------------|
-| `-Version` / `--version` | Version to deploy (default: `latest`) |
-| `-EnvFile` / `--env-file` | Environment file path (default: `.env`) |
-| `-Stack` / `--stack` | Stack name (default: `gatrix`) |
-| `-Init` / `--init` | Initialize swarm and create secrets |
-| `-Update` / `--update` | Perform rolling update |
-| `-Prune` / `--prune` | Remove unused images after deployment |
+| Option | Description |
+|--------|-------------|
+| `-v, --version <version>` | Version to deploy (default: `latest`) |
+| `-e, --env-file <file>` | Environment file path (default: `.env`) |
+| `-n, --stack <name>` | Stack name (default: `gatrix`) |
+| `-i, --init` | Initialize swarm and create secrets |
+| `-u, --update` | Perform rolling update |
+| `--prune` | Remove unused images after deployment |
+| `-h, --help` | Show help |
 
 **Examples:**
 
-```powershell
+```bash
 # First-time deployment (init swarm + secrets)
-.\deploy.ps1 -Version "v1.0.0" -Init
+./deploy.ps1 -v v1.0.0 -i
+./deploy.sh --version v1.0.0 --init
 
 # Deploy with rolling update
-.\deploy.ps1 -Version "v1.1.0" -Update
+./deploy.ps1 -v v1.1.0 -u
+./deploy.sh --version v1.1.0 --update
 
 # Clean up old images after deploying
-.\deploy.ps1 -Version "v1.2.0" -Prune
+./deploy.ps1 -v v1.2.0 --prune
+./deploy.sh --version v1.2.0 --prune
 ```
 
 ---
@@ -124,24 +134,29 @@ Performs rolling updates on running services.
 
 **Options:**
 
-| Parameter | Description |
-|-----------|-------------|
-| `-Version` | Target version (required) |
-| `-Service <name>` | Update specific service |
-| `-All` | Update all application services |
-| `-Force` | Force update even with same image |
+| Option | Description |
+|--------|-------------|
+| `-v, --version <version>` | Target version (required) |
+| `-s, --service <name>` | Update specific service |
+| `-a, --all` | Update all application services |
+| `-f, --force` | Force update even with same image |
+| `-n, --stack <name>` | Stack name (default: `gatrix`) |
+| `-h, --help` | Show help |
 
 **Examples:**
 
-```powershell
+```bash
 # Update all services to v1.2.0
-.\update.ps1 -Version "v1.2.0" -All
+./update.ps1 -v v1.2.0 -a
+./update.sh --version v1.2.0 --all
 
 # Update only backend
-.\update.ps1 -Version "v1.2.0" -Service backend
+./update.ps1 -v v1.2.0 -s backend
+./update.sh --version v1.2.0 --service backend
 
 # Force re-deploy even if image is same
-.\update.ps1 -Version "v1.2.0" -Service backend -Force
+./update.ps1 -v v1.2.0 -s backend -f
+./update.sh --version v1.2.0 --service backend --force
 ```
 
 ---
@@ -152,19 +167,23 @@ Rolls back services to their previous version.
 
 **Options:**
 
-| Parameter | Description |
-|-----------|-------------|
-| `-Service <name>` | Rollback specific service |
-| `-All` | Rollback all application services |
+| Option | Description |
+|--------|-------------|
+| `-s, --service <name>` | Rollback specific service |
+| `-a, --all` | Rollback all application services |
+| `-n, --stack <name>` | Stack name (default: `gatrix`) |
+| `-h, --help` | Show help |
 
 **Examples:**
 
-```powershell
+```bash
 # Rollback backend service
-.\rollback.ps1 -Service backend
+./rollback.ps1 -s backend
+./rollback.sh --service backend
 
 # Rollback all services
-.\rollback.ps1 -All
+./rollback.ps1 -a
+./rollback.sh --all
 ```
 
 ---
@@ -175,12 +194,14 @@ Scales service replicas.
 
 **Options:**
 
-| Parameter | Description |
-|-----------|-------------|
-| `-Service <name>` | Service to scale |
-| `-Replicas <n>` | Number of replicas |
-| `-Preset <name>` | Use preset: `minimal`, `standard`, `high` |
-| `-Status` | Show current scaling status |
+| Option | Description |
+|--------|-------------|
+| `-s, --service <name>` | Service to scale |
+| `-r, --replicas <n>` | Number of replicas |
+| `--preset <name>` | Use preset: `minimal`, `standard`, `high` |
+| `--status` | Show current scaling status |
+| `-n, --stack <name>` | Stack name (default: `gatrix`) |
+| `-h, --help` | Show help |
 
 **Presets:**
 
@@ -190,15 +211,18 @@ Scales service replicas.
 
 **Examples:**
 
-```powershell
+```bash
 # Scale backend to 4 replicas
-.\scale.ps1 -Service backend -Replicas 4
+./scale.ps1 -s backend -r 4
+./scale.sh --service backend --replicas 4
 
 # Apply high-traffic preset
-.\scale.ps1 -Preset high
+./scale.ps1 --preset high
+./scale.sh --preset high
 
 # Show current status
-.\scale.ps1 -Status
+./scale.ps1 --status
+./scale.sh --status
 ```
 
 ---
@@ -209,27 +233,33 @@ Shows status of the deployed stack.
 
 **Options:**
 
-| Parameter | Description |
-|-----------|-------------|
-| `-Services` | Show service list only |
-| `-Tasks` | Show running tasks only |
-| `-Logs <service>` | Stream logs for a service |
-| `-Health` | Show health check status |
+| Option | Description |
+|--------|-------------|
+| `-s, --services` | Show service list only |
+| `-t, --tasks` | Show running tasks only |
+| `-l, --logs <service>` | Stream logs for a service |
+| `--health` | Show health check status |
+| `-n, --stack <name>` | Stack name (default: `gatrix`) |
+| `-h, --help` | Show help |
 
 **Examples:**
 
-```powershell
+```bash
 # Show all status
-.\status.ps1
+./status.ps1
+./status.sh
 
 # Show only services
-.\status.ps1 -Services
+./status.ps1 -s
+./status.sh --services
 
 # Stream backend logs
-.\status.ps1 -Logs backend
+./status.ps1 -l backend
+./status.sh --logs backend
 
 # Show health status
-.\status.ps1 -Health
+./status.ps1 --health
+./status.sh --health
 ```
 
 ---
@@ -240,8 +270,9 @@ Shows status of the deployed stack.
 
 Logs into the Tencent Cloud Registry using credentials from `registry.env`.
 
-```powershell
-.\login_registry.ps1
+```bash
+./login_registry.ps1
+./login_registry.sh
 # Output: Login Succeeded
 ```
 
@@ -251,8 +282,9 @@ Logs into the Tencent Cloud Registry using credentials from `registry.env`.
 
 Lists all image tags in the registry namespace.
 
-```powershell
-.\list_images.ps1
+```bash
+./list_images.ps1
+./list_images.sh
 # Output: Tags found:
 #   backend-latest
 #   backend-v1.0.0
@@ -278,7 +310,7 @@ Repository 'uwocn/uwocn' not found or has no images yet.
 ### "Repository not found" When Listing Images
 
 - This is normal if no images have been pushed yet.
-- Push an image first using `build_and_push.ps1 -Push`
+- Push an image first using `./build_and_push.ps1 -p`
 
 ### Build Fails with "Docker build failed"
 
@@ -288,7 +320,7 @@ Repository 'uwocn/uwocn' not found or has no images yet.
 
 ### Swarm Not Initialized
 
-- Run `docker swarm init` or use the `-Init` flag with `deploy.ps1`.
+- Run `docker swarm init` or use the `--init` flag with `deploy.ps1`.
 
 ---
 
