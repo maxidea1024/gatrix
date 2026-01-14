@@ -38,5 +38,21 @@
         "gitBranch":  "main",
         "tag":  "v0.0.1",
         "pushed":  true
+    },
+    {
+        "timestamp":  "2026-01-14T05:59:10Z",
+        "services":  [
+                         "chat-server",
+                         "backend",
+                         "frontend",
+                         "edge",
+                         "event-lens"
+                     ],
+        "latest":  true,
+        "gitHash":  "ee37d02e",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.0.2",
+        "pushed":  true
     }
 ]

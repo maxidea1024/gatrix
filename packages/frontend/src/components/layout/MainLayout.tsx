@@ -372,7 +372,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   // Load pending CR count on mount and environment change
   useEffect(() => {
-    if (hasEnvironmentAccess) {
+    // Only load when environment is properly selected
+    if (hasEnvironmentAccess && currentEnvironmentId) {
       loadPendingCRCount();
     }
   }, [hasEnvironmentAccess, currentEnvironmentId, loadPendingCRCount]);
@@ -403,8 +404,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   // Initial load - only for admin users with environment access
   useEffect(() => {
-    // Skip maintenance status check for users without environment access
-    if (!hasEnvironmentAccess) {
+    // Skip maintenance status check for users without environment access or no environment selected
+    if (!hasEnvironmentAccess || !currentEnvironmentId) {
       return;
     }
 
@@ -420,7 +421,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       setMaintenanceStatus({ isMaintenance: false, status: 'inactive', detail: null });
     });
     return () => { cancelled = true; };
-  }, [hasEnvironmentAccess]);
+  }, [hasEnvironmentAccess, currentEnvironmentId]);
 
   // Cleanup timer on unmount
   useEffect(() => {
