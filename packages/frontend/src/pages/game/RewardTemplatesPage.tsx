@@ -39,7 +39,7 @@ import { parseApiErrorMessage } from '../../utils/errorUtils';
 import rewardTemplateService, { RewardTemplate } from '../../services/rewardTemplateService';
 import { tagService } from '../../services/tagService';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyTableRow from '../../components/common/EmptyTableRow';
+import EmptyState from '../../components/common/EmptyState';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
@@ -639,150 +639,33 @@ const RewardTemplatesPage: React.FC = () => {
       {/* Table */}
       <Card>
         <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  {visibleColumns.map((column) => {
-                    if (column.id === 'checkbox') {
-                      if (!canManage) return null;
-                      return (
-                        <TableCell key={column.id} padding="checkbox">
-                          <Checkbox
-                            indeterminate={selectedIds.length > 0 && selectedIds.length < templates.length}
-                            checked={templates.length > 0 && selectedIds.length === templates.length}
-                            onChange={handleSelectAll}
-                          />
-                        </TableCell>
-                      );
-                    }
-                    if (column.id === 'actions') {
-                      if (!canManage) return null;
-                      return (
-                        <TableCell key={column.id} align="center">
-                          {t(column.labelKey)}
-                        </TableCell>
-                      );
-                    }
-                    // Sortable columns: name, createdAt
-                    const isSortable = ['name', 'createdAt'].includes(column.id);
-                    return (
-                      <TableCell key={column.id}>
-                        {isSortable ? (
-                          <TableSortLabel
-                            active={orderBy === column.id}
-                            direction={orderBy === column.id ? order : 'asc'}
-                            onClick={() => handleSort(column.id)}
-                          >
-                            {t(column.labelKey)}
-                          </TableSortLabel>
-                        ) : (
-                          t(column.labelKey)
-                        )}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading && isInitialLoad ? (
-                  <EmptyTableRow
-                    colSpan={visibleColumns.length - (canManage ? 0 : 2)}
-                    loading={true}
-                    message=""
-                    loadingMessage={t('common.loadingData')}
-                  />
-                ) : templates.length === 0 ? (
-                  <EmptyTableRow
-                    colSpan={visibleColumns.length - (canManage ? 0 : 2)}
-                    loading={false}
-                    message={t('rewardTemplates.noTemplatesFound')}
-                    loadingMessage=""
-                    subtitle={canManage ? t('common.addFirstItem') : undefined}
-                    onAddClick={canManage ? handleCreate : undefined}
-                    addButtonLabel={t('rewardTemplates.createTemplate')}
-                  />
-                ) : (
-                  templates.map((template) => (
-                    <TableRow
-                      key={template.id}
-                      hover
-                      selected={selectedIds.includes(template.id)}
-                    >
+          {loading && isInitialLoad ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+            </Box>
+          ) : templates.length === 0 ? (
+            <EmptyState
+              message={t('rewardTemplates.noTemplatesFound')}
+              onAddClick={canManage ? handleCreate : undefined}
+              addButtonLabel={t('rewardTemplates.createTemplate')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
+            />
+          ) : (
+            <>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
                       {visibleColumns.map((column) => {
                         if (column.id === 'checkbox') {
                           if (!canManage) return null;
                           return (
                             <TableCell key={column.id} padding="checkbox">
                               <Checkbox
-                                checked={selectedIds.includes(template.id)}
-                                onChange={() => handleSelectOne(template.id)}
+                                indeterminate={selectedIds.length > 0 && selectedIds.length < templates.length}
+                                checked={templates.length > 0 && selectedIds.length === templates.length}
+                                onChange={handleSelectAll}
                               />
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'name') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Typography
-                                sx={{
-                                  cursor: 'pointer',
-                                  '&:hover': {
-                                    textDecoration: 'underline'
-                                  }
-                                }}
-                                onClick={() => handleEdit(template)}
-                              >
-                                {template.name}
-                              </Typography>
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'description') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Typography
-                                sx={{
-                                  cursor: 'pointer',
-                                  '&:hover': {
-                                    textDecoration: 'underline'
-                                  }
-                                }}
-                                onClick={() => handleEdit(template)}
-                              >
-                                {template.description || '-'}
-                              </Typography>
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'rewardItems') {
-                          return (
-                            <TableCell key={column.id}>
-                              <RewardDisplay rewards={template.rewardItems} maxDisplay={3} />
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'tags') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 220 }}>
-                                {template.tags && template.tags.length > 0 ? (
-                                  template.tags.slice(0, 6).map((tag, idx) => (
-                                    <Tooltip key={`${tag.id}-${idx}`} title={tag.description || t('tags.noDescription')} arrow>
-                                      <Chip label={tag.name} size="small" sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }} />
-                                    </Tooltip>
-                                  ))
-                                ) : (
-                                  <Typography variant="body2" color="text.secondary">-</Typography>
-                                )}
-                              </Box>
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'createdAt') {
-                          return (
-                            <TableCell key={column.id}>
-                              {formatDateTimeDetailed(template.createdAt)}
                             </TableCell>
                           );
                         }
@@ -790,56 +673,166 @@ const RewardTemplatesPage: React.FC = () => {
                           if (!canManage) return null;
                           return (
                             <TableCell key={column.id} align="center">
-                              <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                                <Tooltip title={t('common.edit')}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleEdit(template)}
-                                  >
-                                    <EditIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('rewardTemplates.copyTemplate')}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleCopy(template)}
-                                  >
-                                    <ContentCopyIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('common.delete')}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleDelete(template)}
-                                  >
-                                    <DeleteIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              </Box>
+                              {t(column.labelKey)}
                             </TableCell>
                           );
                         }
-                        return null;
+                        const isSortable = ['name', 'createdAt'].includes(column.id);
+                        return (
+                          <TableCell key={column.id}>
+                            {isSortable ? (
+                              <TableSortLabel
+                                active={orderBy === column.id}
+                                direction={orderBy === column.id ? order : 'asc'}
+                                onClick={() => handleSort(column.id)}
+                              >
+                                {t(column.labelKey)}
+                              </TableSortLabel>
+                            ) : (
+                              t(column.labelKey)
+                            )}
+                          </TableCell>
+                        );
                       })}
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {templates.map((template) => (
+                      <TableRow
+                        key={template.id}
+                        hover
+                        selected={selectedIds.includes(template.id)}
+                      >
+                        {visibleColumns.map((column) => {
+                          if (column.id === 'checkbox') {
+                            if (!canManage) return null;
+                            return (
+                              <TableCell key={column.id} padding="checkbox">
+                                <Checkbox
+                                  checked={selectedIds.includes(template.id)}
+                                  onChange={() => handleSelectOne(template.id)}
+                                />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'name') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Typography
+                                  sx={{
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                      textDecoration: 'underline'
+                                    }
+                                  }}
+                                  onClick={() => handleEdit(template)}
+                                >
+                                  {template.name}
+                                </Typography>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'description') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Typography
+                                  sx={{
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                      textDecoration: 'underline'
+                                    }
+                                  }}
+                                  onClick={() => handleEdit(template)}
+                                >
+                                  {template.description || '-'}
+                                </Typography>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'rewardItems') {
+                            return (
+                              <TableCell key={column.id}>
+                                <RewardDisplay rewards={template.rewardItems} maxDisplay={3} />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'tags') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 220 }}>
+                                  {template.tags && template.tags.length > 0 ? (
+                                    template.tags.slice(0, 6).map((tag, idx) => (
+                                      <Tooltip key={`${tag.id}-${idx}`} title={tag.description || t('tags.noDescription')} arrow>
+                                        <Chip label={tag.name} size="small" sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }} />
+                                      </Tooltip>
+                                    ))
+                                  ) : (
+                                    <Typography variant="body2" color="text.secondary">-</Typography>
+                                  )}
+                                </Box>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'createdAt') {
+                            return (
+                              <TableCell key={column.id}>
+                                {formatDateTimeDetailed(template.createdAt)}
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'actions') {
+                            if (!canManage) return null;
+                            return (
+                              <TableCell key={column.id} align="center">
+                                <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                                  <Tooltip title={t('common.edit')}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => handleEdit(template)}
+                                    >
+                                      <EditIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Tooltip title={t('rewardTemplates.copyTemplate')}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => handleCopy(template)}
+                                    >
+                                      <ContentCopyIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Tooltip title={t('common.delete')}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => handleDelete(template)}
+                                    >
+                                      <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                </Box>
+                              </TableCell>
+                            );
+                          }
+                          return null;
+                        })}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
 
-          {/* Pagination */}
-          {!loading && templates.length > 0 && (
-            <SimplePagination
-              page={page}
-              rowsPerPage={rowsPerPage}
-              count={total}
-              onPageChange={(event, newPage) => setPage(newPage)}
-              onRowsPerPageChange={(event) => {
-                setRowsPerPage(Number(event.target.value));
-                setPage(0);
-              }}
-            />
+              {/* Pagination */}
+              <SimplePagination
+                page={page}
+                rowsPerPage={rowsPerPage}
+                count={total}
+                onPageChange={(event, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(event) => {
+                  setRowsPerPage(Number(event.target.value));
+                  setPage(0);
+                }}
+              />
+            </>
           )}
         </CardContent>
       </Card>

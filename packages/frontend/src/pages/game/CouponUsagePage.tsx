@@ -7,7 +7,7 @@ import SimplePagination from '@/components/common/SimplePagination';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { useDebounce } from '@/hooks/useDebounce';
 import DynamicFilterBar, { ActiveFilter, FilterDefinition } from '@/components/common/DynamicFilterBar';
-import EmptyTableRow from '@/components/common/EmptyTableRow';
+import EmptyState from '@/components/common/EmptyState';
 import { couponService, CouponSetting, UsageRecord } from '@/services/couponService';
 import { formatDateTime, getStoredTimezone, formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import { useI18n } from '@/contexts/I18nContext';
@@ -349,167 +349,171 @@ const CouponUsagePage: React.FC = () => {
       {/* List */}
       <Card>
         <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  {visibleColumns.map((col) => (
-                    <TableCell key={col.id} sortDirection={orderBy === col.id ? order : false as any}>
-                      <TableSortLabel
-                        active={orderBy === col.id}
-                        direction={orderBy === col.id ? order : 'asc'}
-                        onClick={() => handleSort(col.id)}
-                      >
-                        {t(col.labelKey)}
-                      </TableSortLabel>
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading ? (
-                  <EmptyTableRow colSpan={visibleColumns.length} loading message={t('common.loading') as string} />
-                ) : records.length === 0 ? (
-                  <EmptyTableRow colSpan={visibleColumns.length} loading={false} message={t('coupons.couponUsage.noRecords') as string} />
-                ) : (
-                  sortedRecords.map((r) => (
-                    <TableRow key={r.id} hover>
-                      {visibleColumns.map((col) => {
-                        switch (col.id) {
-                          case 'couponName':
-                            return (
-                              <TableCell key="couponName">
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  <Typography variant="body2">{r.couponName || '-'}</Typography>
-                                  {r.couponName && (
-                                    <Tooltip title={t('common.copy')}>
-                                      <IconButton size="small" onClick={() => handleCopy(r.couponName)}>
-                                        <ContentCopyIcon fontSize="inherit" />
-                                      </IconButton>
-                                    </Tooltip>
-                                  )}
-                                </Box>
-                              </TableCell>
-                            );
-                          case 'couponCode':
-                            return (
-                              <TableCell key="couponCode">
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  <Typography variant="body2">{r.couponCode || '-'}</Typography>
-                                  {r.couponCode && (
-                                    <Tooltip title={t('common.copy')}>
-                                      <IconButton size="small" onClick={() => handleCopy(r.couponCode)}>
-                                        <ContentCopyIcon fontSize="inherit" />
-                                      </IconButton>
-                                    </Tooltip>
-                                  )}
-                                </Box>
-                              </TableCell>
-                            );
-                          case 'userId':
-                            return (
-                              <TableCell key="userId">
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  <Typography variant="body2">{r.userId}</Typography>
-                                  <Tooltip title={t('common.copy')}>
-                                    <IconButton size="small" onClick={() => handleCopy(r.userId)}>
-                                      <ContentCopyIcon fontSize="inherit" />
-                                    </IconButton>
-                                  </Tooltip>
-                                </Box>
-                              </TableCell>
-                            );
-                          case 'userName':
-                            return (
-                              <TableCell key="userName">
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  <Typography variant="body2">{r.userName}</Typography>
-                                  <Tooltip title={t('common.copy')}>
-                                    <IconButton size="small" onClick={() => handleCopy(r.userName)}>
-                                      <ContentCopyIcon fontSize="inherit" />
-                                    </IconButton>
-                                  </Tooltip>
-                                </Box>
-                              </TableCell>
-                            );
-                          case 'characterId':
-                            return (
-                              <TableCell key="characterId">
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  <Typography variant="body2">{r.characterId || '-'}</Typography>
-                                  {r.characterId && (
-                                    <Tooltip title={t('common.copy')}>
-                                      <IconButton size="small" onClick={() => handleCopy(r.characterId)}>
-                                        <ContentCopyIcon fontSize="inherit" />
-                                      </IconButton>
-                                    </Tooltip>
-                                  )}
-                                </Box>
-                              </TableCell>
-                            );
-                          case 'sequence':
-                            return (
-                              <TableCell key="sequence"><Typography variant="body2">{r.sequence}</Typography></TableCell>
-                            );
-                          case 'usedAt':
-                            return (
-                              <TableCell key="usedAt">
-                                <Tooltip title={formatDateTimeDetailed(r.usedAt)}>
-                                  <Typography variant="caption">{formatRelativeTime(r.usedAt, undefined, language)}</Typography>
-                                </Tooltip>
-                              </TableCell>
-                            );
-                          case 'couponStartsAt':
-                            return (
-                              <TableCell key="couponStartsAt">
-                                <Tooltip title={r.couponStartsAt ? formatDateTimeDetailed(r.couponStartsAt) : '-'}>
-                                  <Typography variant="caption">{r.couponStartsAt ? formatRelativeTime(r.couponStartsAt, undefined, language) : '-'}</Typography>
-                                </Tooltip>
-                              </TableCell>
-                            );
-                          case 'couponExpiresAt':
-                            return (
-                              <TableCell key="couponExpiresAt">
-                                <Tooltip title={r.couponExpiresAt ? formatDateTimeDetailed(r.couponExpiresAt) : '-'}>
-                                  <Typography variant="caption">{r.couponExpiresAt ? formatRelativeTime(r.couponExpiresAt, undefined, language) : '-'}</Typography>
-                                </Tooltip>
-                              </TableCell>
-                            );
-                          case 'gameWorldId':
-                            return (
-                              <TableCell key="gameWorldId"><Typography variant="body2">{r.gameWorldId || '-'}</Typography></TableCell>
-                            );
-                          case 'platform':
-                            return (
-                              <TableCell key="platform"><Typography variant="body2">{r.platform || '-'}</Typography></TableCell>
-                            );
-                          case 'channel':
-                            return (
-                              <TableCell key="channel"><Typography variant="body2">{r.channel || '-'}</Typography></TableCell>
-                            );
-                          case 'subChannel':
-                            return (
-                              <TableCell key="subChannel"><Typography variant="body2">{r.subchannel || '-'}</Typography></TableCell>
-                            );
-                          default:
-                            return null;
-                        }
-                      })}
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-
-          {!loading && records.length > 0 && (
-            <SimplePagination
-              count={total}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onPageChange={(_, newPage) => setPage(newPage)}
-              onRowsPerPageChange={(e: any) => { setRowsPerPage(Number(e.target.value)); setPage(0); }}
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loading')}</Typography>
+            </Box>
+          ) : records.length === 0 ? (
+            <EmptyState
+              message={t('coupons.couponUsage.noRecords')}
             />
+          ) : (
+            <>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      {visibleColumns.map((col) => (
+                        <TableCell key={col.id} sortDirection={orderBy === col.id ? order : false as any}>
+                          <TableSortLabel
+                            active={orderBy === col.id}
+                            direction={orderBy === col.id ? order : 'asc'}
+                            onClick={() => handleSort(col.id)}
+                          >
+                            {t(col.labelKey)}
+                          </TableSortLabel>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {sortedRecords.map((r) => (
+                      <TableRow key={r.id} hover>
+                        {visibleColumns.map((col) => {
+                          switch (col.id) {
+                            case 'couponName':
+                              return (
+                                <TableCell key="couponName">
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <Typography variant="body2">{r.couponName || '-'}</Typography>
+                                    {r.couponName && (
+                                      <Tooltip title={t('common.copy')}>
+                                        <IconButton size="small" onClick={() => handleCopy(r.couponName)}>
+                                          <ContentCopyIcon fontSize="inherit" />
+                                        </IconButton>
+                                      </Tooltip>
+                                    )}
+                                  </Box>
+                                </TableCell>
+                              );
+                            case 'couponCode':
+                              return (
+                                <TableCell key="couponCode">
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <Typography variant="body2">{r.couponCode || '-'}</Typography>
+                                    {r.couponCode && (
+                                      <Tooltip title={t('common.copy')}>
+                                        <IconButton size="small" onClick={() => handleCopy(r.couponCode)}>
+                                          <ContentCopyIcon fontSize="inherit" />
+                                        </IconButton>
+                                      </Tooltip>
+                                    )}
+                                  </Box>
+                                </TableCell>
+                              );
+                            case 'userId':
+                              return (
+                                <TableCell key="userId">
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <Typography variant="body2">{r.userId}</Typography>
+                                    <Tooltip title={t('common.copy')}>
+                                      <IconButton size="small" onClick={() => handleCopy(r.userId)}>
+                                        <ContentCopyIcon fontSize="inherit" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </Box>
+                                </TableCell>
+                              );
+                            case 'userName':
+                              return (
+                                <TableCell key="userName">
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <Typography variant="body2">{r.userName}</Typography>
+                                    <Tooltip title={t('common.copy')}>
+                                      <IconButton size="small" onClick={() => handleCopy(r.userName)}>
+                                        <ContentCopyIcon fontSize="inherit" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </Box>
+                                </TableCell>
+                              );
+                            case 'characterId':
+                              return (
+                                <TableCell key="characterId">
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <Typography variant="body2">{r.characterId || '-'}</Typography>
+                                    {r.characterId && (
+                                      <Tooltip title={t('common.copy')}>
+                                        <IconButton size="small" onClick={() => handleCopy(r.characterId)}>
+                                          <ContentCopyIcon fontSize="inherit" />
+                                        </IconButton>
+                                      </Tooltip>
+                                    )}
+                                  </Box>
+                                </TableCell>
+                              );
+                            case 'sequence':
+                              return (
+                                <TableCell key="sequence"><Typography variant="body2">{r.sequence}</Typography></TableCell>
+                              );
+                            case 'usedAt':
+                              return (
+                                <TableCell key="usedAt">
+                                  <Tooltip title={formatDateTimeDetailed(r.usedAt)}>
+                                    <Typography variant="caption">{formatRelativeTime(r.usedAt, undefined, language)}</Typography>
+                                  </Tooltip>
+                                </TableCell>
+                              );
+                            case 'couponStartsAt':
+                              return (
+                                <TableCell key="couponStartsAt">
+                                  <Tooltip title={r.couponStartsAt ? formatDateTimeDetailed(r.couponStartsAt) : '-'}>
+                                    <Typography variant="caption">{r.couponStartsAt ? formatRelativeTime(r.couponStartsAt, undefined, language) : '-'}</Typography>
+                                  </Tooltip>
+                                </TableCell>
+                              );
+                            case 'couponExpiresAt':
+                              return (
+                                <TableCell key="couponExpiresAt">
+                                  <Tooltip title={r.couponExpiresAt ? formatDateTimeDetailed(r.couponExpiresAt) : '-'}>
+                                    <Typography variant="caption">{r.couponExpiresAt ? formatRelativeTime(r.couponExpiresAt, undefined, language) : '-'}</Typography>
+                                  </Tooltip>
+                                </TableCell>
+                              );
+                            case 'gameWorldId':
+                              return (
+                                <TableCell key="gameWorldId"><Typography variant="body2">{r.gameWorldId || '-'}</Typography></TableCell>
+                              );
+                            case 'platform':
+                              return (
+                                <TableCell key="platform"><Typography variant="body2">{r.platform || '-'}</Typography></TableCell>
+                              );
+                            case 'channel':
+                              return (
+                                <TableCell key="channel"><Typography variant="body2">{r.channel || '-'}</Typography></TableCell>
+                              );
+                            case 'subChannel':
+                              return (
+                                <TableCell key="subChannel"><Typography variant="body2">{r.subchannel || '-'}</Typography></TableCell>
+                              );
+                            default:
+                              return null;
+                          }
+                        })}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              <SimplePagination
+                count={total}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={(_, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(e: any) => { setRowsPerPage(Number(e.target.value)); setPage(0); }}
+              />
+            </>
           )}
         </CardContent>
       </Card>

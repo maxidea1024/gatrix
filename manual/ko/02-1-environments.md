@@ -10,8 +10,6 @@ Gatrix는 **여러 환경(Environment)**을 지원하여 개발, 테스트, 운�
 
 ### 일반적인 환경 구성
 
-### 일반적인 환경 구성
-
 ```mermaid
 flowchart LR
     subgraph 개발["🔧 Development"]

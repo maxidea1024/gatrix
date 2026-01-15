@@ -47,6 +47,27 @@ SMTP_PASS=Bxxxxxxxxxxxxxxxxxxxx
 SMTP_SECURE=true
 ```
 
+#### 3) Tencent Cloud SES (Simple Email Service)
+
+중국 지역에서 운영하는 경우 권장되는 방식입니다.
+Tencent Cloud 콘솔에서 SES 서비스를 활성화하고 SMTP 비밀번호를 생성해야 합니다.
+
+```env
+SMTP_HOST=smtp.qcloudmail.com
+SMTP_PORT=465
+SMTP_USER=your-sender@yourdomain.com
+SMTP_PASS=xxxxxxxxxxxxxxxxxxxx
+SMTP_FROM="Gatrix Support" <your-sender@yourdomain.com>
+SMTP_SECURE=true
+```
+
+> **📌 Tencent Cloud SES 설정 시 주의사항:**
+>
+> 1. **발신자 도메인 인증:** Tencent Cloud SES를 사용하기 전에 발신 도메인의 DNS에 SPF, DKIM, DMARC 레코드를 설정해야 합니다.
+> 2. **발신자 주소 등록:** `SMTP_FROM`에 사용할 이메일 주소를 Tencent Cloud 콘솔에서 사전에 등록하고 인증해야 합니다.
+> 3. **SMTP 비밀번호:** Tencent Cloud 콘솔 > SES > 설정 > SMTP 비밀번호에서 생성한 비밀번호를 사용합니다. (로그인 비밀번호와 다릅니다.)
+> 4. **리전 선택:** 중국 내 서버인 경우 `smtp.qcloudmail.com`을, 홍콩/해외 서버인 경우 `sg-smtp.qcloudmail.com` (싱가포르) 등 해당 리전의 엔드포인트를 사용하세요.
+
 ---
 
 ## 2. 문제 해결 (Troubleshooting)

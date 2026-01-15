@@ -44,7 +44,7 @@ import { tagService } from '../../services/tagService';
 import SyncPreviewDialog, { SelectedSyncItems as DialogSelectedSyncItems } from '../../components/game/SyncPreviewDialog';
 import BatchProcessDialog from '../../components/game/BatchProcessDialog';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyTableRow from '../../components/common/EmptyTableRow';
+import EmptyState from '../../components/common/EmptyState';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
@@ -865,109 +865,148 @@ const StoreProductsPage: React.FC = () => {
       {/* Table */}
       <Card>
         <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  {visibleColumns.map((column) => {
-                    if (column.id === 'checkbox') {
-                      if (!canManage) return null;
-                      return (
-                        <TableCell key={column.id} padding="checkbox">
-                          <Checkbox
-                            indeterminate={selectedIds.length > 0 && selectedIds.length < products.length}
-                            checked={products.length > 0 && selectedIds.length === products.length}
-                            onChange={handleSelectAll}
-                          />
-                        </TableCell>
-                      );
-                    }
-                    if (column.id === 'actions') {
-                      if (!canManage) return null;
-                      return (
-                        <TableCell key={column.id} align="center">
-                          {t(column.labelKey)}
-                        </TableCell>
-                      );
-                    }
-                    const isSortable = ['cmsProductId', 'productId', 'productName', 'store', 'price', 'createdAt', 'updatedAt'].includes(column.id);
-                    return (
-                      <TableCell key={column.id}>
-                        {isSortable ? (
-                          <TableSortLabel
-                            active={orderBy === column.id}
-                            direction={orderBy === column.id ? order : 'asc'}
-                            onClick={() => handleSort(column.id)}
-                          >
-                            {t(column.labelKey)}
-                          </TableSortLabel>
-                        ) : (
-                          t(column.labelKey)
-                        )}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading && isInitialLoad ? (
-                  <EmptyTableRow
-                    colSpan={visibleColumns.length - (canManage ? 0 : 2)}
-                    loading={true}
-                    message=""
-                    loadingMessage={t('common.loadingData')}
-                  />
-                ) : products.length === 0 ? (
-                  <EmptyTableRow
-                    colSpan={visibleColumns.length - (canManage ? 0 : 2)}
-                    loading={false}
-                    message={t('storeProducts.noProductsFound')}
-                    loadingMessage=""
-                    subtitle={canManage ? t('common.addFirstItem') : undefined}
-                    onAddClick={canManage ? handleSyncPreview : undefined}
-                    addButtonLabel={t('storeProducts.syncWithPlanningData')}
-                  />
-                ) : (
-                  products.map((product) => (
-                    <TableRow
-                      key={product.id}
-                      hover
-                      selected={selectedIds.includes(product.id)}
-                    >
+          {loading && isInitialLoad ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+            </Box>
+          ) : products.length === 0 ? (
+            <EmptyState
+              message={t('storeProducts.noProductsFound')}
+              onAddClick={canManage ? handleSyncPreview : undefined}
+              addButtonLabel={t('storeProducts.syncWithPlanningData')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
+            />
+          ) : (
+            <>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
                       {visibleColumns.map((column) => {
                         if (column.id === 'checkbox') {
                           if (!canManage) return null;
                           return (
                             <TableCell key={column.id} padding="checkbox">
                               <Checkbox
-                                checked={selectedIds.includes(product.id)}
-                                onChange={() => handleSelectOne(product.id)}
+                                indeterminate={selectedIds.length > 0 && selectedIds.length < products.length}
+                                checked={products.length > 0 && selectedIds.length === products.length}
+                                onChange={handleSelectAll}
                               />
                             </TableCell>
                           );
                         }
-                        if (column.id === 'cmsProductId') {
+                        if (column.id === 'actions') {
+                          if (!canManage) return null;
                           return (
-                            <TableCell key={column.id}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <Box
-                                  component="span"
-                                  onClick={() => handleEdit(product)}
-                                  sx={{
-                                    cursor: 'pointer',
-                                    color: 'primary.main',
-                                    '&:hover': { textDecoration: 'underline' },
-                                  }}
-                                >
-                                  {product.cmsProductId ?? '-'}
+                            <TableCell key={column.id} align="center">
+                              {t(column.labelKey)}
+                            </TableCell>
+                          );
+                        }
+                        const isSortable = ['cmsProductId', 'productId', 'productName', 'store', 'price', 'createdAt', 'updatedAt'].includes(column.id);
+                        return (
+                          <TableCell key={column.id}>
+                            {isSortable ? (
+                              <TableSortLabel
+                                active={orderBy === column.id}
+                                direction={orderBy === column.id ? order : 'asc'}
+                                onClick={() => handleSort(column.id)}
+                              >
+                                {t(column.labelKey)}
+                              </TableSortLabel>
+                            ) : (
+                              t(column.labelKey)
+                            )}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {products.map((product) => (
+                      <TableRow
+                        key={product.id}
+                        hover
+                        selected={selectedIds.includes(product.id)}
+                      >
+                        {visibleColumns.map((column) => {
+                          if (column.id === 'checkbox') {
+                            if (!canManage) return null;
+                            return (
+                              <TableCell key={column.id} padding="checkbox">
+                                <Checkbox
+                                  checked={selectedIds.includes(product.id)}
+                                  onChange={() => handleSelectOne(product.id)}
+                                />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'cmsProductId') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Box
+                                    component="span"
+                                    onClick={() => handleEdit(product)}
+                                    sx={{
+                                      cursor: 'pointer',
+                                      color: 'primary.main',
+                                      '&:hover': { textDecoration: 'underline' },
+                                    }}
+                                  >
+                                    {product.cmsProductId ?? '-'}
+                                  </Box>
+                                  {product.cmsProductId && (
+                                    <Tooltip title={t('common.copy')}>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => {
+                                          copyToClipboardWithNotification(
+                                            String(product.cmsProductId),
+                                            () => enqueueSnackbar(t('common.copied'), { variant: 'success' }),
+                                            () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                          );
+                                        }}
+                                        sx={{ p: 0.25 }}
+                                      >
+                                        <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                      </IconButton>
+                                    </Tooltip>
+                                  )}
                                 </Box>
-                                {product.cmsProductId && (
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'isActive') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Chip
+                                  label={product.isActive ? t('storeProducts.statsActive') : t('storeProducts.statsInactive')}
+                                  color={product.isActive ? 'success' : 'default'}
+                                  size="small"
+                                />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'productId') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography
+                                    sx={{
+                                      cursor: 'pointer',
+                                      '&:hover': { textDecoration: 'underline' }
+                                    }}
+                                    onClick={() => handleEdit(product)}
+                                  >
+                                    {product.productId}
+                                  </Typography>
                                   <Tooltip title={t('common.copy')}>
                                     <IconButton
                                       size="small"
                                       onClick={() => {
                                         copyToClipboardWithNotification(
-                                          String(product.cmsProductId),
+                                          product.productId,
                                           () => enqueueSnackbar(t('common.copied'), { variant: 'success' }),
                                           () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
                                         );
@@ -977,205 +1016,159 @@ const StoreProductsPage: React.FC = () => {
                                       <ContentCopyIcon sx={{ fontSize: 14 }} />
                                     </IconButton>
                                   </Tooltip>
-                                )}
-                              </Box>
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'isActive') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Chip
-                                label={product.isActive ? t('storeProducts.statsActive') : t('storeProducts.statsInactive')}
-                                color={product.isActive ? 'success' : 'default'}
-                                size="small"
-                              />
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'productId') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <Typography
-                                  sx={{
-                                    cursor: 'pointer',
-                                    '&:hover': { textDecoration: 'underline' }
-                                  }}
-                                  onClick={() => handleEdit(product)}
-                                >
-                                  {product.productId}
-                                </Typography>
-                                <Tooltip title={t('common.copy')}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => {
-                                      copyToClipboardWithNotification(
-                                        product.productId,
-                                        () => enqueueSnackbar(t('common.copied'), { variant: 'success' }),
-                                        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                      );
-                                    }}
-                                    sx={{ p: 0.25 }}
-                                  >
-                                    <ContentCopyIcon sx={{ fontSize: 14 }} />
-                                  </IconButton>
-                                </Tooltip>
-                              </Box>
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'productName') {
-                          // Get localized product name based on current dashboard language
-                          let displayName = product.productName;
-                          if (i18n.language === 'ko' && product.nameKo) {
-                            displayName = product.nameKo;
-                          } else if (i18n.language === 'en' && product.nameEn) {
-                            displayName = product.nameEn;
-                          } else if (i18n.language === 'zh' && product.nameZh) {
-                            displayName = product.nameZh;
+                                </Box>
+                              </TableCell>
+                            );
                           }
-                          return (
-                            <TableCell key={column.id}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <Typography
-                                  sx={{
-                                    cursor: 'pointer',
-                                    '&:hover': { textDecoration: 'underline' }
-                                  }}
-                                  onClick={() => handleEdit(product)}
-                                >
-                                  {displayName}
-                                </Typography>
-                                <Tooltip title={t('common.copy')}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => {
-                                      copyToClipboardWithNotification(
-                                        displayName,
-                                        () => enqueueSnackbar(t('common.copied'), { variant: 'success' }),
-                                        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                      );
+                          if (column.id === 'productName') {
+                            let displayName = product.productName;
+                            if (i18n.language === 'ko' && product.nameKo) {
+                              displayName = product.nameKo;
+                            } else if (i18n.language === 'en' && product.nameEn) {
+                              displayName = product.nameEn;
+                            } else if (i18n.language === 'zh' && product.nameZh) {
+                              displayName = product.nameZh;
+                            }
+                            return (
+                              <TableCell key={column.id}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography
+                                    sx={{
+                                      cursor: 'pointer',
+                                      '&:hover': { textDecoration: 'underline' }
                                     }}
-                                    sx={{ p: 0.25 }}
+                                    onClick={() => handleEdit(product)}
                                   >
-                                    <ContentCopyIcon sx={{ fontSize: 14 }} />
-                                  </IconButton>
-                                </Tooltip>
-                              </Box>
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'store') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Chip
-                                label={STORE_DISPLAY_NAMES[product.store] || product.store}
-                                size="small"
-                                variant="outlined"
-                              />
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'price') {
-                          return (
-                            <TableCell key={column.id}>
-                              {product.price.toLocaleString()} {product.currency}
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'saleStartAt') {
-                          return (
-                            <TableCell key={column.id}>
-                              {product.saleStartAt ? formatDateTimeDetailed(product.saleStartAt) : '-'}
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'saleEndAt') {
-                          return (
-                            <TableCell key={column.id}>
-                              {product.saleEndAt ? formatDateTimeDetailed(product.saleEndAt) : '-'}
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'tags') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 220 }}>
-                                {product.tags && product.tags.length > 0 ? (
-                                  product.tags.slice(0, 6).map((tag, idx) => (
-                                    <Tooltip key={`${tag.id}-${idx}`} title={tag.description || t('tags.noDescription')} arrow>
-                                      <Chip label={tag.name} size="small" sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }} />
-                                    </Tooltip>
-                                  ))
-                                ) : (
-                                  <Typography variant="body2" color="text.secondary">-</Typography>
-                                )}
-                              </Box>
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'createdAt') {
-                          return (
-                            <TableCell key={column.id}>
-                              {formatDateTimeDetailed(product.createdAt)}
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'updatedAt') {
-                          return (
-                            <TableCell key={column.id}>
-                              {formatDateTimeDetailed(product.updatedAt)}
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'actions') {
-                          if (!canManage) return null;
-                          return (
-                            <TableCell key={column.id} align="center">
-                              <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                                <Tooltip title={t('common.edit')}>
-                                  <IconButton size="small" onClick={() => handleEdit(product)}>
-                                    <EditIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('storeProducts.copyProduct')}>
-                                  <span>
-                                    <IconButton size="small" onClick={() => handleCopy(product)} disabled>
-                                      <ContentCopyIcon fontSize="small" />
+                                    {displayName}
+                                  </Typography>
+                                  <Tooltip title={t('common.copy')}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => {
+                                        copyToClipboardWithNotification(
+                                          displayName,
+                                          () => enqueueSnackbar(t('common.copied'), { variant: 'success' }),
+                                          () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                        );
+                                      }}
+                                      sx={{ p: 0.25 }}
+                                    >
+                                      <ContentCopyIcon sx={{ fontSize: 14 }} />
                                     </IconButton>
-                                  </span>
-                                </Tooltip>
-                                <Tooltip title={t('common.delete')}>
-                                  <IconButton size="small" onClick={() => handleDelete(product)}>
-                                    <DeleteIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              </Box>
-                            </TableCell>
-                          );
-                        }
-                        return null;
-                      })}
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                                  </Tooltip>
+                                </Box>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'store') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Chip
+                                  label={STORE_DISPLAY_NAMES[product.store] || product.store}
+                                  size="small"
+                                  variant="outlined"
+                                />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'price') {
+                            return (
+                              <TableCell key={column.id}>
+                                {product.price.toLocaleString()} {product.currency}
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'saleStartAt') {
+                            return (
+                              <TableCell key={column.id}>
+                                {product.saleStartAt ? formatDateTimeDetailed(product.saleStartAt) : '-'}
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'saleEndAt') {
+                            return (
+                              <TableCell key={column.id}>
+                                {product.saleEndAt ? formatDateTimeDetailed(product.saleEndAt) : '-'}
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'tags') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 220 }}>
+                                  {product.tags && product.tags.length > 0 ? (
+                                    product.tags.slice(0, 6).map((tag, idx) => (
+                                      <Tooltip key={`${tag.id}-${idx}`} title={tag.description || t('tags.noDescription')} arrow>
+                                        <Chip label={tag.name} size="small" sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }} />
+                                      </Tooltip>
+                                    ))
+                                  ) : (
+                                    <Typography variant="body2" color="text.secondary">-</Typography>
+                                  )}
+                                </Box>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'createdAt') {
+                            return (
+                              <TableCell key={column.id}>
+                                {formatDateTimeDetailed(product.createdAt)}
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'updatedAt') {
+                            return (
+                              <TableCell key={column.id}>
+                                {formatDateTimeDetailed(product.updatedAt)}
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'actions') {
+                            if (!canManage) return null;
+                            return (
+                              <TableCell key={column.id} align="center">
+                                <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                                  <Tooltip title={t('common.edit')}>
+                                    <IconButton size="small" onClick={() => handleEdit(product)}>
+                                      <EditIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Tooltip title={t('storeProducts.copyProduct')}>
+                                    <span>
+                                      <IconButton size="small" onClick={() => handleCopy(product)} disabled>
+                                        <ContentCopyIcon fontSize="small" />
+                                      </IconButton>
+                                    </span>
+                                  </Tooltip>
+                                  <Tooltip title={t('common.delete')}>
+                                    <IconButton size="small" onClick={() => handleDelete(product)}>
+                                      <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                </Box>
+                              </TableCell>
+                            );
+                          }
+                          return null;
+                        })}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
 
-          {/* Pagination */}
-          {!loading && products.length > 0 && (
-            <SimplePagination
-              page={page}
-              rowsPerPage={rowsPerPage}
-              count={total}
-              onPageChange={(event, newPage) => setPage(newPage)}
-              onRowsPerPageChange={(event) => {
-                setRowsPerPage(Number(event.target.value));
-                setPage(0);
-              }}
-            />
+              {/* Pagination */}
+              <SimplePagination
+                page={page}
+                rowsPerPage={rowsPerPage}
+                count={total}
+                onPageChange={(event, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(event) => {
+                  setRowsPerPage(Number(event.target.value));
+                  setPage(0);
+                }}
+              />
+            </>
           )}
         </CardContent>
       </Card>

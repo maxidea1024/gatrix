@@ -24,7 +24,6 @@ import {
   DialogContent,
   DialogActions,
   DialogContentText,
-  Skeleton,
   Divider,
 } from '@mui/material';
 import {
@@ -48,7 +47,7 @@ import IngamePopupNoticeGuideDrawer from '../../components/game/IngamePopupNotic
 
 import SimplePagination from '../../components/common/SimplePagination';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
-import EmptyTableRow from '../../components/common/EmptyTableRow';
+import EmptyState from '../../components/common/EmptyState';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { formatDateTime, formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useI18n } from '../../contexts/I18nContext';
@@ -489,238 +488,208 @@ const IngamePopupNoticesPage: React.FC = () => {
       {/* Table */}
       <Card>
         <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  {canManage && (
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={notices.length > 0 && selectedIds.length === notices.length}
-                        indeterminate={selectedIds.length > 0 && selectedIds.length < notices.length}
-                        onChange={handleSelectAll}
-                      />
-                    </TableCell>
-                  )}
-                  {visibleColumns.map((column) => (
-                    <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
-                  ))}
-                  {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {isInitialLoad && loading ? (
-                  // Skeleton loading (only on initial load)
-                  Array.from({ length: 5 }).map((_, index) => (
-                    <TableRow key={`skeleton-${index}`}>
-                      {canManage && (
-                        <TableCell padding="checkbox">
-                          <Skeleton variant="rectangular" width={24} height={24} />
-                        </TableCell>
-                      )}
-                      {visibleColumns.map((column) => (
-                        <TableCell key={column.id}>
-                          <Skeleton variant="text" width="80%" />
-                        </TableCell>
-                      ))}
-                      {canManage && (
-                        <TableCell align="center">
-                          <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
-                          <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
-                          <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block' }} />
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))
-                ) : notices.length === 0 ? (
-                  <EmptyTableRow
-                    colSpan={visibleColumns.length + (canManage ? 2 : 0)}
-                    loading={loading}
-                    message={t('ingamePopupNotices.noNoticesFound')}
-                    subtitle={canManage ? t('common.addFirstItem') : undefined}
-                    onAddClick={canManage ? handleCreate : undefined}
-                    addButtonLabel={t('ingamePopupNotices.createNotice')}
-                  />
-                ) : (
-                  notices.map((notice) => (
-                    <TableRow key={notice.id} hover>
+          {isInitialLoad && loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+            </Box>
+          ) : notices.length === 0 ? (
+            <EmptyState
+              message={t('ingamePopupNotices.noNoticesFound')}
+              onAddClick={canManage ? handleCreate : undefined}
+              addButtonLabel={t('ingamePopupNotices.createNotice')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
+            />
+          ) : (
+            <>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
                       {canManage && (
                         <TableCell padding="checkbox">
                           <Checkbox
-                            checked={selectedIds.includes(notice.id)}
-                            onChange={() => handleSelectOne(notice.id)}
+                            checked={notices.length > 0 && selectedIds.length === notices.length}
+                            indeterminate={selectedIds.length > 0 && selectedIds.length < notices.length}
+                            onChange={handleSelectAll}
                           />
                         </TableCell>
                       )}
-                      {visibleColumns.map((column) => {
-                        if (column.id === 'status') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Chip
-                                label={notice.isActive ? t('common.active') : t('common.inactive')}
-                                color={notice.isActive ? 'success' : 'default'}
-                                size="small"
-                              />
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'currentlyVisible') {
-                          // Check if notice is currently visible (isActive + within date range)
-                          // startDate is optional - if null, treat as immediately available
-                          // endDate is optional - if null, treat as permanent (no end date)
-                          const now = dayjs();
-                          const startDate = notice.startDate ? dayjs(notice.startDate) : null;
-                          const endDate = notice.endDate ? dayjs(notice.endDate) : null;
-                          const isCurrentlyVisible = notice.isActive && (!startDate || now.isAfter(startDate)) && (!endDate || now.isBefore(endDate));
-
-                          return (
-                            <TableCell key={column.id}>
-                              <Chip
-                                label={isCurrentlyVisible ? t('ingamePopupNotices.visible') : t('ingamePopupNotices.notVisible')}
-                                color={isCurrentlyVisible ? 'primary' : 'default'}
-                                size="small"
-                                variant={isCurrentlyVisible ? 'filled' : 'outlined'}
-                              />
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'content') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Typography
-                                variant="body2"
-                                noWrap
-                                sx={{
-                                  maxWidth: 300,
-                                  cursor: 'pointer',
-                                  '&:hover': {
-                                    textDecoration: 'underline',
-                                  }
-                                }}
-                                onClick={() => handleEdit(notice)}
-                              >
-                                {notice.content || t('ingamePopupNotices.noContent')}
-                              </Typography>
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'priority') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Chip label={notice.displayPriority} size="small" />
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'targeting') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                {/* Platforms */}
-                                {notice.targetPlatforms && notice.targetPlatforms.length > 0 ? (
-                                  <>
-                                    {notice.targetPlatforms.map((platform) => (
-                                      <Chip key={platform} label={platform} size="small" />
-                                    ))}
-                                  </>
-                                ) : (
-                                  <Chip label={t('common.all')} size="small" variant="outlined" />
-                                )}
-                                {/* Worlds */}
-                                {notice.targetWorlds && notice.targetWorlds.length > 0 && (
-                                  <Chip label={`${t('ingamePopupNotices.targetWorlds')}: ${notice.targetWorlds.length}`} size="small" />
-                                )}
-                                {/* Markets */}
-                                {notice.targetMarkets && notice.targetMarkets.length > 0 && (
-                                  <Chip label={`${t('ingamePopupNotices.targetMarkets')}: ${notice.targetMarkets.length}`} size="small" />
-                                )}
-                                {/* Client Versions */}
-                                {notice.targetClientVersions && notice.targetClientVersions.length > 0 && (
-                                  <Chip label={`${t('ingamePopupNotices.targetClientVersions')}: ${notice.targetClientVersions.length}`} size="small" />
-                                )}
-                                {/* Account IDs */}
-                                {notice.targetAccountIds && notice.targetAccountIds.length > 0 && (
-                                  <Chip label={`${t('ingamePopupNotices.targetAccountIds')}: ${notice.targetAccountIds.length}`} size="small" />
-                                )}
-                                {/* Show Once */}
-                                {notice.showOnce && (
-                                  <Chip label={t('ingamePopupNotices.showOnce')} size="small" color="info" />
-                                )}
-                              </Box>
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'period') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Tooltip title={notice.startDate ? formatDateTimeDetailed(notice.startDate) : t('ingamePopupNotices.startImmediately')}>
-                                <Typography variant="caption" display="block">
-                                  {notice.startDate ? formatRelativeTime(notice.startDate, undefined, language) : t('ingamePopupNotices.startImmediately')}
-                                </Typography>
-                              </Tooltip>
-                              <Tooltip title={notice.endDate ? formatDateTimeDetailed(notice.endDate) : t('ingamePopupNotices.endDateNotSet')}>
-                                <Typography variant="caption" display="block" color="text.secondary">
-                                  ~ {notice.endDate ? formatRelativeTime(notice.endDate, undefined, language) : t('ingamePopupNotices.endDateNotSet')}
-                                </Typography>
-                              </Tooltip>
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'createdAt') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Tooltip title={formatDateTimeDetailed(notice.createdAt)}>
-                                <Typography variant="caption">
-                                  {formatRelativeTime(notice.createdAt, undefined, language)}
-                                </Typography>
-                              </Tooltip>
-                            </TableCell>
-                          );
-                        }
-                        return null;
-                      })}
-                      {canManage && (
-                        <TableCell align="center">
-                          <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                            <Tooltip title={t('common.edit')}>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleEdit(notice)}
-                                color="primary"
-                              >
-                                <EditIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title={t('common.delete')}>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleDelete(notice)}
-                                color="error"
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </Box>
-                        </TableCell>
-                      )}
+                      {visibleColumns.map((column) => (
+                        <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
+                      ))}
+                      {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {notices.map((notice) => (
+                      <TableRow key={notice.id} hover>
+                        {canManage && (
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              checked={selectedIds.includes(notice.id)}
+                              onChange={() => handleSelectOne(notice.id)}
+                            />
+                          </TableCell>
+                        )}
+                        {visibleColumns.map((column) => {
+                          if (column.id === 'status') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Chip
+                                  label={notice.isActive ? t('common.active') : t('common.inactive')}
+                                  color={notice.isActive ? 'success' : 'default'}
+                                  size="small"
+                                />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'currentlyVisible') {
+                            const now = dayjs();
+                            const startDate = notice.startDate ? dayjs(notice.startDate) : null;
+                            const endDate = notice.endDate ? dayjs(notice.endDate) : null;
+                            const isCurrentlyVisible = notice.isActive && (!startDate || now.isAfter(startDate)) && (!endDate || now.isBefore(endDate));
 
-          {/* Pagination */}
-          {!loading && notices.length > 0 && (
-            <SimplePagination
-              page={page}
-              rowsPerPage={rowsPerPage}
-              count={total}
-              onPageChange={(event, newPage) => setPage(newPage)}
-              onRowsPerPageChange={(event) => {
-                setRowsPerPage(Number(event.target.value));
-                setPage(0);
-              }}
-            />
+                            return (
+                              <TableCell key={column.id}>
+                                <Chip
+                                  label={isCurrentlyVisible ? t('ingamePopupNotices.visible') : t('ingamePopupNotices.notVisible')}
+                                  color={isCurrentlyVisible ? 'primary' : 'default'}
+                                  size="small"
+                                  variant={isCurrentlyVisible ? 'filled' : 'outlined'}
+                                />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'content') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Typography
+                                  variant="body2"
+                                  noWrap
+                                  sx={{
+                                    maxWidth: 300,
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                      textDecoration: 'underline',
+                                    }
+                                  }}
+                                  onClick={() => handleEdit(notice)}
+                                >
+                                  {notice.content || t('ingamePopupNotices.noContent')}
+                                </Typography>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'priority') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Chip label={notice.displayPriority} size="small" />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'targeting') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                                  {notice.targetPlatforms && notice.targetPlatforms.length > 0 ? (
+                                    <>
+                                      {notice.targetPlatforms.map((platform) => (
+                                        <Chip key={platform} label={platform} size="small" />
+                                      ))}
+                                    </>
+                                  ) : (
+                                    <Chip label={t('common.all')} size="small" variant="outlined" />
+                                  )}
+                                  {notice.targetWorlds && notice.targetWorlds.length > 0 && (
+                                    <Chip label={`${t('ingamePopupNotices.targetWorlds')}: ${notice.targetWorlds.length}`} size="small" />
+                                  )}
+                                  {notice.targetMarkets && notice.targetMarkets.length > 0 && (
+                                    <Chip label={`${t('ingamePopupNotices.targetMarkets')}: ${notice.targetMarkets.length}`} size="small" />
+                                  )}
+                                  {notice.targetClientVersions && notice.targetClientVersions.length > 0 && (
+                                    <Chip label={`${t('ingamePopupNotices.targetClientVersions')}: ${notice.targetClientVersions.length}`} size="small" />
+                                  )}
+                                  {notice.targetAccountIds && notice.targetAccountIds.length > 0 && (
+                                    <Chip label={`${t('ingamePopupNotices.targetAccountIds')}: ${notice.targetAccountIds.length}`} size="small" />
+                                  )}
+                                  {notice.showOnce && (
+                                    <Chip label={t('ingamePopupNotices.showOnce')} size="small" color="info" />
+                                  )}
+                                </Box>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'period') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Tooltip title={notice.startDate ? formatDateTimeDetailed(notice.startDate) : t('ingamePopupNotices.startImmediately')}>
+                                  <Typography variant="caption" display="block">
+                                    {notice.startDate ? formatRelativeTime(notice.startDate, undefined, language) : t('ingamePopupNotices.startImmediately')}
+                                  </Typography>
+                                </Tooltip>
+                                <Tooltip title={notice.endDate ? formatDateTimeDetailed(notice.endDate) : t('ingamePopupNotices.endDateNotSet')}>
+                                  <Typography variant="caption" display="block" color="text.secondary">
+                                    ~ {notice.endDate ? formatRelativeTime(notice.endDate, undefined, language) : t('ingamePopupNotices.endDateNotSet')}
+                                  </Typography>
+                                </Tooltip>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'createdAt') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Tooltip title={formatDateTimeDetailed(notice.createdAt)}>
+                                  <Typography variant="caption">
+                                    {formatRelativeTime(notice.createdAt, undefined, language)}
+                                  </Typography>
+                                </Tooltip>
+                              </TableCell>
+                            );
+                          }
+                          return null;
+                        })}
+                        {canManage && (
+                          <TableCell align="center">
+                            <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                              <Tooltip title={t('common.edit')}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleEdit(notice)}
+                                  color="primary"
+                                >
+                                  <EditIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title={t('common.delete')}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleDelete(notice)}
+                                  color="error"
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            </Box>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              {/* Pagination */}
+              <SimplePagination
+                page={page}
+                rowsPerPage={rowsPerPage}
+                count={total}
+                onPageChange={(event, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(event) => {
+                  setRowsPerPage(Number(event.target.value));
+                  setPage(0);
+                }}
+              />
+            </>
           )}
         </CardContent>
       </Card>

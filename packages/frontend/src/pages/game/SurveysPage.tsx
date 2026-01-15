@@ -39,7 +39,7 @@ import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import surveyService, { Survey } from '../../services/surveyService';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyTableRow from '../../components/common/EmptyTableRow';
+import EmptyState from '../../components/common/EmptyState';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
@@ -458,176 +458,33 @@ const SurveysPage: React.FC = () => {
       {/* Table */}
       <Card>
         <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  {visibleColumns.map((column) => {
-                    if (column.id === 'checkbox') {
-                      if (!canManage) return null;
-                      return (
-                        <TableCell key={column.id} padding="checkbox">
-                          <Checkbox
-                            indeterminate={selectedIds.length > 0 && selectedIds.length < surveys.length}
-                            checked={surveys.length > 0 && selectedIds.length === surveys.length}
-                            onChange={handleSelectAll}
-                          />
-                        </TableCell>
-                      );
-                    }
-                    if (column.id === 'actions') {
-                      if (!canManage) return null;
-                      return (
-                        <TableCell key={column.id} align="center">
-                          {t(column.labelKey)}
-                        </TableCell>
-                      );
-                    }
-                    return (
-                      <TableCell key={column.id}>
-                        {t(column.labelKey)}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading && isInitialLoad ? (
-                  <EmptyTableRow
-                    colSpan={visibleColumns.length - (canManage ? 0 : 2)}
-                    loading={true}
-                    message=""
-                    loadingMessage={t('common.loadingData')}
-                  />
-                ) : surveys.length === 0 ? (
-                  <EmptyTableRow
-                    colSpan={visibleColumns.length - (canManage ? 0 : 2)}
-                    loading={false}
-                    message={t('surveys.noSurveysFound')}
-                    loadingMessage=""
-                    subtitle={canManage ? t('common.addFirstItem') : undefined}
-                    onAddClick={canManage ? handleCreate : undefined}
-                    addButtonLabel={t('surveys.createSurvey')}
-                  />
-                ) : (
-                  surveys.map((survey) => (
-                    <TableRow
-                      key={survey.id}
-                      hover
-                      selected={selectedIds.includes(survey.id)}
-                    >
+          {loading && isInitialLoad ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+            </Box>
+          ) : surveys.length === 0 ? (
+            <EmptyState
+              message={t('surveys.noSurveysFound')}
+              onAddClick={canManage ? handleCreate : undefined}
+              addButtonLabel={t('surveys.createSurvey')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
+            />
+          ) : (
+            <>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
                       {visibleColumns.map((column) => {
                         if (column.id === 'checkbox') {
                           if (!canManage) return null;
                           return (
                             <TableCell key={column.id} padding="checkbox">
                               <Checkbox
-                                checked={selectedIds.includes(survey.id)}
-                                onChange={() => handleSelectOne(survey.id)}
+                                indeterminate={selectedIds.length > 0 && selectedIds.length < surveys.length}
+                                checked={surveys.length > 0 && selectedIds.length === surveys.length}
+                                onChange={handleSelectAll}
                               />
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'platformSurveyId') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Typography
-                                sx={{
-                                  cursor: 'pointer',
-                                  '&:hover': {
-                                    textDecoration: 'underline'
-                                  }
-                                }}
-                                onClick={() => handleEdit(survey)}
-                              >
-                                {survey.platformSurveyId}
-                              </Typography>
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'surveyTitle') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Typography
-                                sx={{
-                                  cursor: 'pointer',
-                                  '&:hover': {
-                                    textDecoration: 'underline'
-                                  }
-                                }}
-                                onClick={() => handleEdit(survey)}
-                              >
-                                {survey.surveyTitle}
-                              </Typography>
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'triggerConditions') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
-                                {survey.triggerConditions.map((condition, idx) => {
-                                  // Format condition label with unit
-                                  let label = '';
-                                  if (condition.type === 'userLevel') {
-                                    label = `${t('surveys.condition.userLevel')}: ${condition.value}${t('surveys.conditionUnit.levelOrMore')}`;
-                                  } else if (condition.type === 'joinDays') {
-                                    label = `${t('surveys.condition.joinDays')}: ${condition.value}${t('surveys.conditionUnit.daysOrMore')}`;
-                                  } else {
-                                    label = `${t(`surveys.condition.${condition.type}`)}: ${condition.value}`;
-                                  }
-
-                                  return (
-                                    <React.Fragment key={idx}>
-                                      <Chip
-                                        label={label}
-                                        size="small"
-                                      />
-                                      {idx < survey.triggerConditions.length - 1 && (
-                                        <Typography
-                                          variant="caption"
-                                          sx={{
-                                            fontWeight: 600,
-                                            color: 'primary.main',
-                                            px: 0.5
-                                          }}
-                                        >
-                                          AND
-                                        </Typography>
-                                      )}
-                                    </React.Fragment>
-                                  );
-                                })}
-                              </Box>
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'rewards') {
-                          return (
-                            <TableCell key={column.id}>
-                              <RewardDisplay
-                                rewards={survey.participationRewards}
-                                rewardTemplateId={survey.rewardTemplateId}
-                                maxDisplay={2}
-                              />
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'status') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Chip
-                                label={survey.isActive ? t('common.active') : t('common.inactive')}
-                                color={survey.isActive ? 'success' : 'default'}
-                                size="small"
-                              />
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'createdAt') {
-                          return (
-                            <TableCell key={column.id}>
-                              {formatDateTimeDetailed(survey.createdAt)}
                             </TableCell>
                           );
                         }
@@ -635,48 +492,185 @@ const SurveysPage: React.FC = () => {
                           if (!canManage) return null;
                           return (
                             <TableCell key={column.id} align="center">
-                              <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                                <Tooltip title={t('common.edit')}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleEdit(survey)}
-                                  >
-                                    <EditIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('common.delete')}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleDelete(survey)}
-                                  >
-                                    <DeleteIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              </Box>
+                              {t(column.labelKey)}
                             </TableCell>
                           );
                         }
-                        return null;
+                        return (
+                          <TableCell key={column.id}>
+                            {t(column.labelKey)}
+                          </TableCell>
+                        );
                       })}
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {surveys.map((survey) => (
+                      <TableRow
+                        key={survey.id}
+                        hover
+                        selected={selectedIds.includes(survey.id)}
+                      >
+                        {visibleColumns.map((column) => {
+                          if (column.id === 'checkbox') {
+                            if (!canManage) return null;
+                            return (
+                              <TableCell key={column.id} padding="checkbox">
+                                <Checkbox
+                                  checked={selectedIds.includes(survey.id)}
+                                  onChange={() => handleSelectOne(survey.id)}
+                                />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'platformSurveyId') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Typography
+                                  sx={{
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                      textDecoration: 'underline'
+                                    }
+                                  }}
+                                  onClick={() => handleEdit(survey)}
+                                >
+                                  {survey.platformSurveyId}
+                                </Typography>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'surveyTitle') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Typography
+                                  sx={{
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                      textDecoration: 'underline'
+                                    }
+                                  }}
+                                  onClick={() => handleEdit(survey)}
+                                >
+                                  {survey.surveyTitle}
+                                </Typography>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'triggerConditions') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
+                                  {survey.triggerConditions.map((condition, idx) => {
+                                    // Format condition label with unit
+                                    let label = '';
+                                    if (condition.type === 'userLevel') {
+                                      label = `${t('surveys.condition.userLevel')}: ${condition.value}${t('surveys.conditionUnit.levelOrMore')}`;
+                                    } else if (condition.type === 'joinDays') {
+                                      label = `${t('surveys.condition.joinDays')}: ${condition.value}${t('surveys.conditionUnit.daysOrMore')}`;
+                                    } else {
+                                      label = `${t(`surveys.condition.${condition.type}`)}: ${condition.value}`;
+                                    }
 
-          {/* Pagination */}
-          {!loading && surveys.length > 0 && (
-            <SimplePagination
-              page={page}
-              rowsPerPage={rowsPerPage}
-              count={total}
-              onPageChange={(event, newPage) => setPage(newPage)}
-              onRowsPerPageChange={(event) => {
-                setRowsPerPage(Number(event.target.value));
-                setPage(0);
-              }}
-            />
+                                    return (
+                                      <React.Fragment key={idx}>
+                                        <Chip
+                                          label={label}
+                                          size="small"
+                                        />
+                                        {idx < survey.triggerConditions.length - 1 && (
+                                          <Typography
+                                            variant="caption"
+                                            sx={{
+                                              fontWeight: 600,
+                                              color: 'primary.main',
+                                              px: 0.5
+                                            }}
+                                          >
+                                            AND
+                                          </Typography>
+                                        )}
+                                      </React.Fragment>
+                                    );
+                                  })}
+                                </Box>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'rewards') {
+                            return (
+                              <TableCell key={column.id}>
+                                <RewardDisplay
+                                  rewards={survey.participationRewards}
+                                  rewardTemplateId={survey.rewardTemplateId}
+                                  maxDisplay={2}
+                                />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'status') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Chip
+                                  label={survey.isActive ? t('common.active') : t('common.inactive')}
+                                  color={survey.isActive ? 'success' : 'default'}
+                                  size="small"
+                                />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'createdAt') {
+                            return (
+                              <TableCell key={column.id}>
+                                {formatDateTimeDetailed(survey.createdAt)}
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'actions') {
+                            if (!canManage) return null;
+                            return (
+                              <TableCell key={column.id} align="center">
+                                <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                                  <Tooltip title={t('common.edit')}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => handleEdit(survey)}
+                                    >
+                                      <EditIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Tooltip title={t('common.delete')}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => handleDelete(survey)}
+                                    >
+                                      <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                </Box>
+                              </TableCell>
+                            );
+                          }
+                          return null;
+                        })}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              {/* Pagination */}
+              <SimplePagination
+                page={page}
+                rowsPerPage={rowsPerPage}
+                count={total}
+                onPageChange={(event, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(event) => {
+                  setRowsPerPage(Number(event.target.value));
+                  setPage(0);
+                }}
+              />
+            </>
           )}
         </CardContent>
       </Card>

@@ -43,7 +43,7 @@ import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import bannerService, { Banner, BannerStatus } from '../../services/bannerService';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyTableRow from '../../components/common/EmptyTableRow';
+import EmptyState from '../../components/common/EmptyState';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
@@ -400,79 +400,78 @@ const BannerManagementPage: React.FC = () => {
 
       {/* Table */}
       <Card>
-        <CardContent sx={{ p: 0 }}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  {visibleColumns.map((column) => {
-                    if (column.id === 'checkbox') {
-                      if (!canManage) return null;
-                      return (<TableCell key={column.id} padding="checkbox"><Checkbox indeterminate={selectedIds.length > 0 && selectedIds.length < banners.length} checked={banners.length > 0 && selectedIds.length === banners.length} onChange={handleSelectAll} /></TableCell>);
-                    }
-                    if (column.id === 'actions') {
-                      if (!canManage) return null;
-                      return (<TableCell key={column.id} align="center">{t(column.labelKey)}</TableCell>);
-                    }
-                    const isSortable = ['name', 'createdAt', 'status'].includes(column.id);
-                    return (
-                      <TableCell key={column.id}>
-                        {isSortable ? (<TableSortLabel active={orderBy === column.id} direction={orderBy === column.id ? order : 'asc'} onClick={() => handleSort(column.id)}>{t(column.labelKey)}</TableSortLabel>) : (t(column.labelKey))}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading && isInitialLoad ? (
-                  <EmptyTableRow colSpan={visibleColumns.length} loading={true} message="" loadingMessage={t('common.loadingData')} />
-                ) : banners.length === 0 ? (
-                  <EmptyTableRow
-                    colSpan={visibleColumns.length}
-                    loading={false}
-                    message={t('banners.noBannersFound')}
-                    loadingMessage=""
-                    subtitle={canManage ? t('common.addFirstItem') : undefined}
-                    onAddClick={canManage ? handleCreate : undefined}
-                    addButtonLabel={t('banners.createBanner')}
-                  />
-                ) : (
-                  banners.map((banner) => (
-                    <TableRow key={banner.bannerId} hover selected={selectedIds.includes(banner.bannerId)}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+          {loading && isInitialLoad ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+            </Box>
+          ) : banners.length === 0 ? (
+            <EmptyState
+              message={t('banners.noBannersFound')}
+              onAddClick={canManage ? handleCreate : undefined}
+              addButtonLabel={t('banners.createBanner')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
+            />
+          ) : (
+            <>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
                       {visibleColumns.map((column) => {
                         if (column.id === 'checkbox') {
                           if (!canManage) return null;
-                          return (<TableCell key={column.id} padding="checkbox"><Checkbox checked={selectedIds.includes(banner.bannerId)} onChange={() => handleSelectOne(banner.bannerId)} /></TableCell>);
+                          return (<TableCell key={column.id} padding="checkbox"><Checkbox indeterminate={selectedIds.length > 0 && selectedIds.length < banners.length} checked={banners.length > 0 && selectedIds.length === banners.length} onChange={handleSelectAll} /></TableCell>);
                         }
-                        if (column.id === 'name') return (<TableCell key={column.id}><Typography sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => handleEdit(banner)}>{banner.name}</Typography></TableCell>);
-                        if (column.id === 'description') return (<TableCell key={column.id}><Typography sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => handleEdit(banner)}>{banner.description || '-'}</Typography></TableCell>);
-                        if (column.id === 'size') return (<TableCell key={column.id}>{banner.width} x {banner.height}</TableCell>);
-                        if (column.id === 'sequences') return (<TableCell key={column.id}><Chip label={banner.sequences?.length || 0} size="small" /></TableCell>);
-                        if (column.id === 'status') return (<TableCell key={column.id}><Chip label={t(`banners.statusLabels.${banner.status}`)} size="small" color={getStatusColor(banner.status)} /></TableCell>);
-                        if (column.id === 'version') return (<TableCell key={column.id}>v{banner.version}</TableCell>);
-                        if (column.id === 'createdAt') return (<TableCell key={column.id}>{formatDateTimeDetailed(banner.createdAt)}</TableCell>);
                         if (column.id === 'actions') {
                           if (!canManage) return null;
-                          return (
-                            <TableCell key={column.id} align="center">
-                              <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                                <Tooltip title={t('common.edit')}><IconButton size="small" onClick={() => handleEdit(banner)}><EditIcon fontSize="small" /></IconButton></Tooltip>
-                                <Tooltip title={t('common.delete')}><IconButton size="small" onClick={() => handleDelete(banner)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
-                                <IconButton size="small" onClick={(e) => handleActionMenuOpen(e, banner)}><MoreVertIcon fontSize="small" /></IconButton>
-                              </Box>
-                            </TableCell>
-                          );
+                          return (<TableCell key={column.id} align="center">{t(column.labelKey)}</TableCell>);
                         }
-                        return null;
+                        const isSortable = ['name', 'createdAt', 'status'].includes(column.id);
+                        return (
+                          <TableCell key={column.id}>
+                            {isSortable ? (<TableSortLabel active={orderBy === column.id} direction={orderBy === column.id ? order : 'asc'} onClick={() => handleSort(column.id)}>{t(column.labelKey)}</TableSortLabel>) : (t(column.labelKey))}
+                          </TableCell>
+                        );
                       })}
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          {!loading && banners.length > 0 && (
-            <SimplePagination page={page} rowsPerPage={rowsPerPage} count={total} onPageChange={(event, newPage) => setPage(newPage)} onRowsPerPageChange={(event) => { setRowsPerPage(Number(event.target.value)); setPage(0); }} />
+                  </TableHead>
+                  <TableBody>
+                    {banners.map((banner) => (
+                      <TableRow key={banner.bannerId} hover selected={selectedIds.includes(banner.bannerId)}>
+                        {visibleColumns.map((column) => {
+                          if (column.id === 'checkbox') {
+                            if (!canManage) return null;
+                            return (<TableCell key={column.id} padding="checkbox"><Checkbox checked={selectedIds.includes(banner.bannerId)} onChange={() => handleSelectOne(banner.bannerId)} /></TableCell>);
+                          }
+                          if (column.id === 'name') return (<TableCell key={column.id}><Typography sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => handleEdit(banner)}>{banner.name}</Typography></TableCell>);
+                          if (column.id === 'description') return (<TableCell key={column.id}><Typography sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => handleEdit(banner)}>{banner.description || '-'}</Typography></TableCell>);
+                          if (column.id === 'size') return (<TableCell key={column.id}>{banner.width} x {banner.height}</TableCell>);
+                          if (column.id === 'sequences') return (<TableCell key={column.id}><Chip label={banner.sequences?.length || 0} size="small" /></TableCell>);
+                          if (column.id === 'status') return (<TableCell key={column.id}><Chip label={t(`banners.statusLabels.${banner.status}`)} size="small" color={getStatusColor(banner.status)} /></TableCell>);
+                          if (column.id === 'version') return (<TableCell key={column.id}>v{banner.version}</TableCell>);
+                          if (column.id === 'createdAt') return (<TableCell key={column.id}>{formatDateTimeDetailed(banner.createdAt)}</TableCell>);
+                          if (column.id === 'actions') {
+                            if (!canManage) return null;
+                            return (
+                              <TableCell key={column.id} align="center">
+                                <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                                  <Tooltip title={t('common.edit')}><IconButton size="small" onClick={() => handleEdit(banner)}><EditIcon fontSize="small" /></IconButton></Tooltip>
+                                  <Tooltip title={t('common.delete')}><IconButton size="small" onClick={() => handleDelete(banner)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
+                                  <IconButton size="small" onClick={(e) => handleActionMenuOpen(e, banner)}><MoreVertIcon fontSize="small" /></IconButton>
+                                </Box>
+                              </TableCell>
+                            );
+                          }
+                          return null;
+                        })}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <SimplePagination page={page} rowsPerPage={rowsPerPage} count={total} onPageChange={(event, newPage) => setPage(newPage)} onRowsPerPageChange={(event) => { setRowsPerPage(Number(event.target.value)); setPage(0); }} />
+            </>
           )}
         </CardContent>
       </Card>

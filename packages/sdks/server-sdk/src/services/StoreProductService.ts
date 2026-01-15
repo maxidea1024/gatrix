@@ -39,7 +39,10 @@ export class StoreProductService extends BaseEnvironmentService<StoreProduct, St
   /**
    * Refresh cached store products for a specific environment
    */
-  async refreshByEnvironment(environment: string): Promise<StoreProduct[]> {
+  async refreshByEnvironment(environment: string, suppressWarnings?: boolean): Promise<StoreProduct[]> {
+    if (!this.featureEnabled && !suppressWarnings) {
+      this.logger.warn('StoreProductService.refreshByEnvironment() called but feature is disabled', { environment });
+    }
     this.logger.info('Refreshing store products cache', { environment });
     // Invalidate ETag cache to force fresh data fetch
     this.apiClient.invalidateEtagCache(this.getEndpoint(environment));

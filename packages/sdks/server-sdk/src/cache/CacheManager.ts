@@ -381,16 +381,27 @@ export class CacheManager {
       }
 
       if (this.features.storeProduct === true && this.storeProductService) {
-        if (envList.length > 0) {
+        if (isMultiEnvMode) {
+          if (envList.length > 0) {
+            promises.push(
+              this.storeProductService.listByEnvironments(envList).catch((error) => {
+                this.logger.warn('Failed to load store products', { error: error.message });
+                return [];
+              })
+            );
+            featureTypes.push('storeProduct');
+          }
+          // Skip if multi-env mode but no environments available
+        } else {
+          const defaultEnv = this.envResolver.getDefaultEnvironment();
           promises.push(
-            this.storeProductService.listByEnvironments(envList).catch((error) => {
+            this.storeProductService.listByEnvironment(defaultEnv).catch((error) => {
               this.logger.warn('Failed to load store products', { error: error.message });
               return [];
             })
           );
           featureTypes.push('storeProduct');
         }
-        // Skip if no environments available
       }
 
       // Load all enabled features in parallel
@@ -815,9 +826,19 @@ export class CacheManager {
       }
 
       if (this.features.storeProduct === true && this.storeProductService) {
-        if (envList.length > 0) {
+        if (isMultiEnvMode) {
+          if (envList.length > 0) {
+            promises.push(
+              this.storeProductService.listByEnvironments(envList).catch((error) => {
+                this.logger.warn('Failed to refresh store products', { error: error.message });
+              })
+            );
+            refreshedTypes.push('storeProduct');
+          }
+        } else {
+          const defaultEnv = this.envResolver.getDefaultEnvironment();
           promises.push(
-            this.storeProductService.listByEnvironments(envList).catch((error) => {
+            this.storeProductService.refreshByEnvironment(defaultEnv, true).catch((error) => {
               this.logger.warn('Failed to refresh store products', { error: error.message });
             })
           );

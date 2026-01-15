@@ -447,6 +447,9 @@ const UsersManagementPage: React.FC = () => {
   const [newUserAllowAllEnvs, setNewUserAllowAllEnvs] = useState(false);
   const [newUserEnvIds, setNewUserEnvIds] = useState<string[]>([]);
 
+  // Permission state for new user
+  const [newUserPermissions, setNewUserPermissions] = useState<Permission[]>([]);
+
   // Delete confirmation state
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState({
     open: false,
@@ -1358,6 +1361,7 @@ const UsersManagementPage: React.FC = () => {
     setNewUserTags([]);
     setNewUserAllowAllEnvs(false);
     setNewUserEnvIds([]);
+    setNewUserPermissions([]);
     setAddUserDialog(true);
 
     // 브라우저 자동완성을 방지하기 위해 약간의 지연 후 다시 초기화
@@ -1384,6 +1388,7 @@ const UsersManagementPage: React.FC = () => {
     setNewUserTags([]);
     setNewUserAllowAllEnvs(false);
     setNewUserEnvIds([]);
+    setNewUserPermissions([]);
     setNewUserErrors({
       name: '',
       email: '',
@@ -1425,7 +1430,16 @@ const UsersManagementPage: React.FC = () => {
         allowAllEnvironments: newUserAllowAllEnvs,
         environments: newUserAllowAllEnvs ? [] : newUserEnvIds,
       };
-      await apiService.post('/admin/users', userData);
+      const response = await apiService.post<{ user: User }>('/admin/users', userData);
+      const createdUser = response.data?.user;
+
+      // Set permissions for admin users after creation
+      if (createdUser && newUserData.role === 'admin' && newUserPermissions.length > 0) {
+        await apiService.put(`/admin/users/${createdUser.id}/permissions`, {
+          permissions: newUserPermissions
+        });
+      }
+
       enqueueSnackbar(t('users.userCreated'), { variant: 'success' });
       mutateUsers(); // SWR cache 갱신
       handleCloseAddUserDialog();
@@ -2227,27 +2241,34 @@ const UsersManagementPage: React.FC = () => {
               />
             </Box>
 
-            {/* Environment Access */}
-            <Box sx={{ mt: 2 }}>
-              <PermissionSelector
-                permissions={[]}
-                onChange={() => { }}
-                showTitle={false}
-                showSelectAll={false}
-                showEnvironments={true}
-                environments={environments.map(env => ({
-                  id: env.environment,
-                  environment: env.environment,
-                  name: env.environmentName,
-                  displayName: env.displayName,
-                  environmentName: env.environmentName
-                }))}
-                allowAllEnvs={newUserAllowAllEnvs}
-                selectedEnvironments={newUserEnvIds}
-                onAllowAllEnvsChange={setNewUserAllowAllEnvs}
-                onEnvironmentsChange={setNewUserEnvIds}
-              />
-            </Box>
+            {/* Permissions & Environment Access - Only for admin role */}
+            {newUserData.role === 'admin' && (
+              <Box sx={{ mt: 2 }}>
+                <PermissionSelector
+                  permissions={newUserPermissions}
+                  onChange={setNewUserPermissions}
+                  showEnvironments={true}
+                  environments={environments.map(env => ({
+                    id: env.environment,
+                    environment: env.environment,
+                    name: env.environmentName,
+                    displayName: env.displayName,
+                    environmentName: env.environmentName
+                  }))}
+                  allowAllEnvs={newUserAllowAllEnvs}
+                  selectedEnvironments={newUserEnvIds}
+                  onAllowAllEnvsChange={setNewUserAllowAllEnvs}
+                  onEnvironmentsChange={setNewUserEnvIds}
+                />
+              </Box>
+            )}
+
+            {/* Non-admin users cannot set permissions */}
+            {newUserData.role !== 'admin' && (
+              <Alert severity="info" sx={{ mt: 2 }}>
+                {t('users.noEnvironmentAccessForUser')}
+              </Alert>
+            )}
           </Box>
         </Box>
 

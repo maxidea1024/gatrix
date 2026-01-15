@@ -6,7 +6,7 @@ import { Delete as DeleteIcon, Edit as EditIcon, Save as SaveIcon, Close as Clos
 import { useTranslation } from 'react-i18next';
 import { tagService, Tag } from '@/services/tagService';
 import { useSnackbar } from 'notistack';
-import EmptyTableRow from '@/components/common/EmptyTableRow';
+import EmptyState from '@/components/common/EmptyState';
 import { TableLoadingRow } from '@/components/common/TableLoadingRow';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { ColorPicker } from '@/components/common/ColorPicker';
@@ -197,37 +197,40 @@ const TagsPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Table list */}
+      {/* Table list - only show when there's data or loading */}
       <Card>
-        <CardContent sx={{ p: 0 }}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t('tags.name')}</TableCell>
-                  <TableCell>{t('tags.description')}</TableCell>
-                  <TableCell sx={{ width: 100 }}>{t('common.color')}</TableCell>
-                  <TableCell>{t('common.createdAt')}</TableCell>
-                  <TableCell>{t('common.updatedAt')}</TableCell>
-                  <TableCell>{t('common.createdBy')}</TableCell>
-                  {canManage && <TableCell align="right">{t('common.actions')}</TableCell>}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading && filtered.length === 0 ? (
-                  <TableLoadingRow colSpan={7} loading={loading} />
-                ) : filtered.length === 0 ? (
-                  <EmptyTableRow
-                    colSpan={7}
-                    loading={loading}
-                    message={tags.length === 0 ? t('tags.noTagsFound') : t('tags.noMatchingTags')}
-                    loadingMessage={t('common.loadingData')}
-                    subtitle={canManage && tags.length === 0 ? t('common.addFirstItem') : undefined}
-                    onAddClick={canManage && tags.length === 0 ? () => nameInputRef.current?.focus() : undefined}
-                    addButtonLabel={t('tags.addTag')}
-                  />
-                ) : (
-                  filtered.map(tag => (
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+            </Box>
+          ) : tags.length === 0 ? (
+            <EmptyState
+              message={t('tags.noTagsFound')}
+              onAddClick={canManage ? () => nameInputRef.current?.focus() : undefined}
+              addButtonLabel={t('tags.addTag')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
+            />
+          ) : filtered.length === 0 ? (
+            <EmptyState
+              message={t('tags.noMatchingTags')}
+            />
+          ) : (
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>{t('tags.name')}</TableCell>
+                    <TableCell>{t('tags.description')}</TableCell>
+                    <TableCell sx={{ width: 100 }}>{t('common.color')}</TableCell>
+                    <TableCell>{t('common.createdAt')}</TableCell>
+                    <TableCell>{t('common.updatedAt')}</TableCell>
+                    <TableCell>{t('common.createdBy')}</TableCell>
+                    {canManage && <TableCell align="right">{t('common.actions')}</TableCell>}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filtered.map(tag => (
                     <TableRow key={tag.id} hover>
                       <TableCell sx={{ width: 260 }}>
                         <Stack direction="row" spacing={1} alignItems="center">
@@ -327,11 +330,11 @@ const TagsPage: React.FC = () => {
                         </TableCell>
                       )}
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </CardContent>
       </Card>
 

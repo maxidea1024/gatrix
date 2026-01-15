@@ -249,7 +249,7 @@ def generate_html():
         extension_configs=extension_configs
     )
     
-    # Full HTML template
+    # Full HTML template with GitHub style
     html_template = f'''<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -257,15 +257,21 @@ def generate_html():
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gatrix 운영자 매뉴얼</title>
     <style>
+        /* GitHub Style Theme */
         :root {{
-            --primary-color: #2196F3;
-            --secondary-color: #1976D2;
-            --success-color: #4CAF50;
-            --warning-color: #FF9800;
-            --danger-color: #F44336;
-            --text-color: #333;
-            --bg-color: #fff;
-            --border-color: #e0e0e0;
+            --color-fg-default: #1f2328;
+            --color-fg-muted: #656d76;
+            --color-fg-subtle: #6e7781;
+            --color-canvas-default: #ffffff;
+            --color-canvas-subtle: #f6f8fa;
+            --color-border-default: #d0d7de;
+            --color-border-muted: #d8dee4;
+            --color-accent-fg: #0969da;
+            --color-accent-emphasis: #0969da;
+            --color-success-fg: #1a7f37;
+            --color-attention-fg: #9a6700;
+            --color-danger-fg: #d1242f;
+            --color-done-fg: #8250df;
         }}
         
         * {{
@@ -273,28 +279,37 @@ def generate_html():
         }}
         
         body {{
-            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.8;
-            color: var(--text-color);
-            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--color-fg-default);
+            background-color: var(--color-canvas-default);
             margin: 0;
             padding: 20px;
+            word-wrap: break-word;
         }}
         
         .container {{
-            max-width: 900px;
+            max-width: 980px;
             margin: 0 auto;
-            background: var(--bg-color);
-            padding: 40px 60px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            background: var(--color-canvas-default);
+            padding: 45px;
+            border: 1px solid var(--color-border-default);
+            border-radius: 6px;
+        }}
+        
+        /* Headings */
+        h1, h2, h3, h4, h5, h6 {{
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            line-height: 1.25;
         }}
         
         h1 {{
-            color: var(--primary-color);
-            border-bottom: 3px solid var(--primary-color);
-            padding-bottom: 15px;
-            margin-top: 50px;
+            font-size: 2em;
+            padding-bottom: 0.3em;
+            border-bottom: 1px solid var(--color-border-muted);
         }}
         
         h1:first-child {{
@@ -302,99 +317,37 @@ def generate_html():
         }}
         
         h2 {{
-            color: var(--secondary-color);
-            border-left: 4px solid var(--primary-color);
-            padding-left: 15px;
-            margin-top: 40px;
+            font-size: 1.5em;
+            padding-bottom: 0.3em;
+            border-bottom: 1px solid var(--color-border-muted);
         }}
         
         h3 {{
-            color: #424242;
-            margin-top: 30px;
+            font-size: 1.25em;
         }}
         
-        table {{
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 14px;
+        h4 {{
+            font-size: 1em;
         }}
         
-        th, td {{
-            border: 1px solid var(--border-color);
-            padding: 12px 15px;
-            text-align: left;
+        h5 {{
+            font-size: 0.875em;
         }}
         
-        th {{
-            background-color: #f5f7fa;
-            color: #333;
-            font-weight: 700;
-            border-bottom: 2px solid #e0e0e0;
+        h6 {{
+            font-size: 0.85em;
+            color: var(--color-fg-muted);
         }}
         
-        tr:nth-child(even) {{
-            background-color: #fff;
+        /* Paragraphs and text */
+        p {{
+            margin-top: 0;
+            margin-bottom: 16px;
         }}
         
-        tr:hover {{
-            background-color: #f9f9f9;
-        }}
-        
-        code {{
-            background-color: #f5f5f5;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.9em;
-            color: #e91e63;
-        }}
-        
-        pre {{
-            background-color: #2d2d2d;
-            color: #f8f8f2;
-            padding: 20px;
-            border-radius: 8px;
-            overflow-x: auto;
-            font-size: 14px;
-        }}
-        
-        pre code {{
-            background: none;
-            color: inherit;
-            padding: 0;
-        }}
-        
-        /* Mermaid diagram container */
-        pre.mermaid {{
-            background: white;
-            padding: 20px;
-            text-align: center;
-        }}
-        
-        .mermaid {{
-            background: white !important;
-        }}
-        
-        blockquote {{
-            border-left: 4px solid var(--warning-color);
-            background-color: #fff8e1;
-            padding: 15px 20px;
-            margin: 20px 0;
-            border-radius: 0 8px 8px 0;
-        }}
-        
-        img {{
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            margin: 20px 0;
-            display: block;
-        }}
-        
+        /* Links */
         a {{
-            color: var(--primary-color);
+            color: var(--color-accent-fg);
             text-decoration: none;
         }}
         
@@ -402,17 +355,138 @@ def generate_html():
             text-decoration: underline;
         }}
         
-        hr {{
-            border: none;
-            border-top: 1px solid var(--border-color);
-            margin: 40px 0;
+        /* Lists */
+        ul, ol {{
+            padding-left: 2em;
+            margin-top: 0;
+            margin-bottom: 16px;
         }}
         
+        li {{
+            margin-top: 0.25em;
+        }}
+        
+        li + li {{
+            margin-top: 0.25em;
+        }}
+        
+        /* Tables */
+        table {{
+            width: 100%;
+            border-spacing: 0;
+            border-collapse: collapse;
+            margin-top: 0;
+            margin-bottom: 16px;
+            display: block;
+            overflow: auto;
+        }}
+        
+        th, td {{
+            padding: 6px 13px;
+            border: 1px solid var(--color-border-default);
+        }}
+        
+        th {{
+            font-weight: 600;
+            background-color: var(--color-canvas-subtle);
+        }}
+        
+        tr {{
+            background-color: var(--color-canvas-default);
+            border-top: 1px solid var(--color-border-muted);
+        }}
+        
+        tr:nth-child(2n) {{
+            background-color: var(--color-canvas-subtle);
+        }}
+        
+        /* Code */
+        code {{
+            padding: 0.2em 0.4em;
+            margin: 0;
+            font-size: 85%;
+            white-space: break-spaces;
+            background-color: rgba(175, 184, 193, 0.2);
+            border-radius: 6px;
+            font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+        }}
+        
+        pre {{
+            padding: 16px;
+            overflow: auto;
+            font-size: 85%;
+            line-height: 1.45;
+            color: var(--color-fg-default);
+            background-color: var(--color-canvas-subtle);
+            border-radius: 6px;
+            margin-top: 0;
+            margin-bottom: 16px;
+        }}
+        
+        pre code {{
+            padding: 0;
+            margin: 0;
+            overflow: visible;
+            font-size: 100%;
+            line-height: inherit;
+            word-wrap: normal;
+            background-color: transparent;
+            border: 0;
+        }}
+        
+        /* Mermaid diagram container */
+        pre.mermaid {{
+            background: var(--color-canvas-default);
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--color-border-default);
+        }}
+        
+        .mermaid {{
+            background: var(--color-canvas-default) !important;
+        }}
+        
+        /* Blockquote */
+        blockquote {{
+            margin: 0 0 16px 0;
+            padding: 0 1em;
+            color: var(--color-fg-muted);
+            border-left: 0.25em solid var(--color-border-default);
+        }}
+        
+        blockquote > :first-child {{
+            margin-top: 0;
+        }}
+        
+        blockquote > :last-child {{
+            margin-bottom: 0;
+        }}
+        
+        /* Images */
+        img {{
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid var(--color-border-default);
+            margin: 16px 0;
+            display: block;
+        }}
+        
+        /* Horizontal rule */
+        hr {{
+            height: 0.25em;
+            padding: 0;
+            margin: 24px 0;
+            background-color: var(--color-border-default);
+            border: 0;
+        }}
+        
+        /* Page break for printing */
         .page-break {{
             page-break-before: always;
-            margin-top: 60px;
-            padding-top: 20px;
-            border-top: 2px dashed var(--border-color);
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--color-border-muted);
         }}
         
         /* Print styles */
@@ -422,7 +496,7 @@ def generate_html():
                 padding: 0;
             }}
             .container {{
-                box-shadow: none;
+                border: none;
                 padding: 20px;
             }}
             .page-break {{
@@ -430,15 +504,23 @@ def generate_html():
             }}
         }}
         
-        /* TOC styling */
-        .toc {{
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
+        /* Note/Warning boxes (GitHub style alerts) */
+        blockquote p:first-child strong {{
+            display: inline-block;
+        }}
+        
+        /* Korean font support */
+        @font-face {{
+            font-family: 'Noto Sans KR';
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/notosanskr/v36/PbyxFmXiEBPT4ITbgNA5Cgms3VYcOA-vvnIzzuoyeLTq8H4hfeE.woff2) format('woff2');
+        }}
+        
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', Helvetica, Arial, sans-serif;
         }}
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Mermaid.js for diagram rendering -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 </head>

@@ -30,7 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { varsService, VarItem } from '@/services/varsService';
-import EmptyTableRow from '@/components/common/EmptyTableRow';
+import EmptyState from '@/components/common/EmptyState';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import KeyValueFormDrawer from '@/components/settings/KeyValueFormDrawer';
@@ -248,34 +248,33 @@ const KeyValuePage: React.FC = () => {
 
       {/* Table */}
       <Card>
-        <CardContent sx={{ p: 0 }}>
-
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t('settings.kv.key')}</TableCell>
-                  <TableCell>{t('settings.kv.type')}</TableCell>
-                  <TableCell>{t('settings.kv.value')}</TableCell>
-                  <TableCell>{t('settings.kv.description')}</TableCell>
-                  <TableCell>{t('common.updatedAt')}</TableCell>
-                  {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading && items.length === 0 ? (
-                  <TableLoadingRow colSpan={canManage ? 6 : 5} loading={loading} />
-                ) : items.length === 0 ? (
-                  <EmptyTableRow
-                    colSpan={canManage ? 6 : 5}
-                    message={t('settings.kv.noItems')}
-                    loading={loading}
-                    subtitle={canManage ? t('common.addFirstItem') : undefined}
-                    onAddClick={canManage ? handleCreate : undefined}
-                    addButtonLabel={t('settings.kv.create')}
-                  />
-                ) : (
-                  items.map((item) => (
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+          {loading && items.length === 0 ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+            </Box>
+          ) : items.length === 0 ? (
+            <EmptyState
+              message={t('settings.kv.noItems')}
+              onAddClick={canManage ? handleCreate : undefined}
+              addButtonLabel={t('settings.kv.create')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
+            />
+          ) : (
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>{t('settings.kv.key')}</TableCell>
+                    <TableCell>{t('settings.kv.type')}</TableCell>
+                    <TableCell>{t('settings.kv.value')}</TableCell>
+                    <TableCell>{t('settings.kv.description')}</TableCell>
+                    <TableCell>{t('common.updatedAt')}</TableCell>
+                    {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {items.map((item) => (
                     <TableRow key={item.varKey} hover>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -371,11 +370,11 @@ const KeyValuePage: React.FC = () => {
                         </TableCell>
                       )}
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </CardContent>
       </Card>
 
