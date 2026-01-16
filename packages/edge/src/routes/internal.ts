@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { sdkManager } from '../services/sdkManager';
 import { tokenMirrorService } from '../services/tokenMirrorService';
+import { requestStats } from '../services/requestStats';
 
 const router = Router();
 
@@ -223,6 +224,68 @@ router.post('/cache/refresh', async (req: Request, res: Response) => {
       timestamp: new Date().toISOString(),
     });
   }
+});
+
+// ============================================================================
+// Request Statistics Endpoints
+// ============================================================================
+
+/**
+ * Get request statistics snapshot
+ * GET /internal/stats/requests
+ */
+router.get('/stats/requests', (req: Request, res: Response) => {
+  const snapshot = requestStats.getSnapshot();
+  res.json({
+    success: true,
+    data: snapshot,
+    rateLimit: requestStats.getRateLimit(),
+  });
+});
+
+/**
+ * Reset request statistics
+ * POST /internal/stats/requests/reset
+ */
+router.post('/stats/requests/reset', (req: Request, res: Response) => {
+  requestStats.reset();
+  res.json({
+    success: true,
+    message: 'Request statistics reset',
+    timestamp: new Date().toISOString(),
+  });
+});
+
+/**
+ * Get/Set rate limit for request logging
+ * GET /internal/stats/rate-limit
+ * POST /internal/stats/rate-limit { limit: number }
+ */
+router.get('/stats/rate-limit', (req: Request, res: Response) => {
+  res.json({
+    success: true,
+    rateLimit: requestStats.getRateLimit(),
+    description: 'Maximum request logs per second (0 = disabled)',
+  });
+});
+
+router.post('/stats/rate-limit', (req: Request, res: Response) => {
+  const { limit } = req.body;
+
+  if (typeof limit !== 'number' || limit < 0) {
+    res.status(400).json({
+      success: false,
+      error: 'Invalid limit. Must be a non-negative number.',
+    });
+    return;
+  }
+
+  requestStats.setRateLimit(limit);
+  res.json({
+    success: true,
+    rateLimit: limit,
+    message: limit === 0 ? 'Request logging disabled' : `Rate limit set to ${limit}/second`,
+  });
 });
 
 export default router;

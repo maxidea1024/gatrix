@@ -266,6 +266,87 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     })).filter(category => category.children.length > 0);
   }, [isAdmin, filterMenuItems, pendingCRCount, currentEnvironment]);
 
+  // Flag to track if initial URL sync has been done
+  const initialSyncDoneRef = useRef(false);
+
+  // Sync sidebar state (selectedCategory and expandedSubmenus) with current URL path
+  // This only runs on initial page load to sync the sidebar with the URL
+  useEffect(() => {
+    // Only perform sync once on initial load
+    if (initialSyncDoneRef.current) return;
+
+    const categories = getFilteredMenuCategories();
+    const currentPath = location.pathname;
+
+    // Helper function to find if a path is within an item or its children
+    const findPathInItem = (item: NavMenuItem, path: string): boolean => {
+      if (item.path === path) return true;
+      if (item.children) {
+        return item.children.some(child => findPathInItem(child, path));
+      }
+      return false;
+    };
+
+    // Helper function to find submenu index that contains the path
+    const findSubmenuIndex = (items: NavMenuItem[], path: string): number => {
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.children && item.children.some(child => findPathInItem(child, path))) {
+          return i;
+        }
+        if (item.path === path) {
+          return -1; // Found at top level, no submenu needed
+        }
+      }
+      return -1;
+    };
+
+    // Find which category contains the current path
+    for (const category of categories) {
+      const hasPath = category.children.some(item => findPathInItem(item, currentPath));
+      if (hasPath) {
+        // Skip "navigation" category - it's the main menu and should not set selectedCategory
+        // This allows "Back to Main" to work properly
+        if (category.id === 'navigation') {
+          initialSyncDoneRef.current = true;
+          return;
+        }
+
+        // Update selectedCategory if different
+        if (selectedCategory !== category.id) {
+          setSelectedCategory(category.id);
+          try {
+            localStorage.setItem('sidebarSelectedCategory', category.id);
+          } catch (error) {
+            console.warn('Failed to save selected category:', error);
+          }
+        }
+
+        // Find and expand the submenu that contains this path
+        const submenuIndex = findSubmenuIndex(category.children, currentPath);
+        if (submenuIndex >= 0) {
+          const submenuKey = `submenu-${submenuIndex}`;
+          if (!expandedSubmenus[submenuKey]) {
+            setExpandedSubmenus(prev => {
+              const newState = { ...prev, [submenuKey]: true };
+              try {
+                localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState));
+              } catch (error) {
+                console.warn('Failed to save expanded submenus:', error);
+              }
+              return newState;
+            });
+          }
+        }
+
+        initialSyncDoneRef.current = true;
+        return; // Found the category, no need to continue
+      }
+    }
+
+    initialSyncDoneRef.current = true;
+  }, [location.pathname, getFilteredMenuCategories, selectedCategory, expandedSubmenus]);
+
   // Mail notification state
   const [unreadMailCount, setUnreadMailCount] = useState(0);
 

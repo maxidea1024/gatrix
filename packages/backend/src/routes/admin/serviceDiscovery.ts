@@ -485,6 +485,190 @@ router.get('/:type/:instanceId/cache', async (req: Request, res: Response) => {
 });
 
 /**
+ * Get request statistics from a service instance
+ * GET /api/v1/admin/services/:type/:instanceId/stats/requests
+ * Proxies request to the service's /internal/stats/requests endpoint
+ */
+router.get('/:type/:instanceId/stats/requests', async (req: Request, res: Response) => {
+  try {
+    const { type, instanceId } = req.params;
+
+    if (!type || !instanceId) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'type and instanceId are required' },
+      });
+    }
+
+    const services = await serviceDiscoveryService.getServices(type);
+    const service = services.find(s => s.instanceId === instanceId);
+
+    if (!service) {
+      return res.status(404).json({
+        success: false,
+        error: { message: 'Service not found' },
+      });
+    }
+
+    const webPort = service.ports?.internalApi || service.ports?.externalApi || service.ports?.web || service.ports?.http || service.ports?.api;
+    if (!webPort) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Service does not have an API port' },
+      });
+    }
+
+    const address = service.internalAddress || service.externalAddress;
+    const statsUrl = `http://${address}:${webPort}/internal/stats/requests`;
+
+    const axios = (await import('axios')).default;
+    const startTime = Date.now();
+
+    try {
+      const response = await axios.get(statsUrl, { timeout: 5000 });
+      const latency = Date.now() - startTime;
+
+      res.json({
+        success: true,
+        ...response.data,
+        latency,
+      });
+    } catch (statsError: any) {
+      const latency = Date.now() - startTime;
+      const message = statsError.code === 'ECONNREFUSED'
+        ? 'Connection refused'
+        : statsError.code === 'ETIMEDOUT' || statsError.code === 'ECONNABORTED'
+          ? 'Connection timeout'
+          : statsError.message || 'Unknown error';
+
+      res.json({
+        success: false,
+        error: message,
+        latency,
+      });
+    }
+  } catch (error) {
+    logger.error('Error fetching request stats:', error);
+    res.status(500).json({
+      success: false,
+      error: { message: 'Failed to fetch request stats' },
+    });
+  }
+});
+
+/**
+ * Reset request statistics on a service instance
+ * POST /api/v1/admin/services/:type/:instanceId/stats/requests/reset
+ */
+router.post('/:type/:instanceId/stats/requests/reset', async (req: Request, res: Response) => {
+  try {
+    const { type, instanceId } = req.params;
+
+    if (!type || !instanceId) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'type and instanceId are required' },
+      });
+    }
+
+    const services = await serviceDiscoveryService.getServices(type);
+    const service = services.find(s => s.instanceId === instanceId);
+
+    if (!service) {
+      return res.status(404).json({
+        success: false,
+        error: { message: 'Service not found' },
+      });
+    }
+
+    const webPort = service.ports?.internalApi || service.ports?.externalApi || service.ports?.web || service.ports?.http || service.ports?.api;
+    if (!webPort) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Service does not have an API port' },
+      });
+    }
+
+    const address = service.internalAddress || service.externalAddress;
+    const resetUrl = `http://${address}:${webPort}/internal/stats/requests/reset`;
+
+    const axios = (await import('axios')).default;
+    const response = await axios.post(resetUrl, {}, { timeout: 5000 });
+
+    res.json(response.data);
+  } catch (error: any) {
+    logger.error('Error resetting request stats:', error);
+    const message = error.code === 'ECONNREFUSED'
+      ? 'Connection refused'
+      : error.message || 'Failed to reset request stats';
+    res.status(500).json({
+      success: false,
+      error: { message },
+    });
+  }
+});
+
+/**
+ * Set request log rate limit on a service instance
+ * POST /api/v1/admin/services/:type/:instanceId/stats/rate-limit
+ */
+router.post('/:type/:instanceId/stats/rate-limit', async (req: Request, res: Response) => {
+  try {
+    const { type, instanceId } = req.params;
+    const { limit } = req.body;
+
+    if (!type || !instanceId) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'type and instanceId are required' },
+      });
+    }
+
+    if (typeof limit !== 'number' || limit < 0) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'limit must be a non-negative number' },
+      });
+    }
+
+    const services = await serviceDiscoveryService.getServices(type);
+    const service = services.find(s => s.instanceId === instanceId);
+
+    if (!service) {
+      return res.status(404).json({
+        success: false,
+        error: { message: 'Service not found' },
+      });
+    }
+
+    const webPort = service.ports?.internalApi || service.ports?.externalApi || service.ports?.web || service.ports?.http || service.ports?.api;
+    if (!webPort) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Service does not have an API port' },
+      });
+    }
+
+    const address = service.internalAddress || service.externalAddress;
+    const rateLimitUrl = `http://${address}:${webPort}/internal/stats/rate-limit`;
+
+    const axios = (await import('axios')).default;
+    const response = await axios.post(rateLimitUrl, { limit }, { timeout: 5000 });
+
+    res.json(response.data);
+  } catch (error: any) {
+    logger.error('Error setting rate limit:', error);
+    const message = error.code === 'ECONNREFUSED'
+      ? 'Connection refused'
+      : error.message || 'Failed to set rate limit';
+    res.status(500).json({
+      success: false,
+      error: { message },
+    });
+  }
+});
+
+/**
  * Delete a service instance
  * DELETE /api/v1/admin/services/:type/:instanceId
  */

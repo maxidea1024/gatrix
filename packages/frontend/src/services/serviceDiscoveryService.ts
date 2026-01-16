@@ -134,6 +134,68 @@ class ServiceDiscoveryService {
   }
 
   /**
+   * Get request statistics from a service instance
+   * Calls the service's /internal/stats/requests endpoint via backend proxy
+   */
+  async getRequestStats(serviceType: string, instanceId: string): Promise<{
+    success: boolean;
+    data: {
+      startTime: string;
+      snapshotTime: string;
+      uptimeSeconds: number;
+      totalRequests: number;
+      statusCodes: Record<string, number>;
+      endpoints: Record<string, {
+        count: number;
+        avgDurationMs: number;
+        minDurationMs: number;
+        maxDurationMs: number;
+        p95DurationMs: number;
+        p99DurationMs: number;
+        bytesSent: number;
+        bytesReceived: number;
+      }>;
+      totals: {
+        bytesSent: number;
+        bytesReceived: number;
+        avgDurationMs: number;
+        minDurationMs: number;
+        maxDurationMs: number;
+      };
+    };
+    rateLimit: number;
+    latency?: number;
+    error?: string;
+  }> {
+    const response = await api.get(`/admin/services/${serviceType}/${instanceId}/stats/requests`);
+    return response.data;
+  }
+
+  /**
+   * Reset request statistics on a service instance
+   */
+  async resetRequestStats(serviceType: string, instanceId: string): Promise<{
+    success: boolean;
+    message: string;
+    timestamp: string;
+  }> {
+    const response = await api.post(`/admin/services/${serviceType}/${instanceId}/stats/requests/reset`);
+    return response.data;
+  }
+
+  /**
+   * Set request log rate limit on a service instance
+   */
+  async setRequestLogRateLimit(serviceType: string, instanceId: string, limit: number): Promise<{
+    success: boolean;
+    rateLimit: number;
+    message: string;
+  }> {
+    const response = await api.post(`/admin/services/${serviceType}/${instanceId}/stats/rate-limit`, { limit });
+    return response.data;
+  }
+
+  /**
    * Create SSE connection for real-time updates
    * Safari compatibility: Add timestamp to prevent caching
    */

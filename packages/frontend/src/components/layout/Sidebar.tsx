@@ -123,6 +123,44 @@ const getIconName = (icon: React.ReactElement): string => {
   return typeName.replace('Icon', '');
 };
 
+// Helper function to find parent menu items that contain the given path
+const findParentMenuItemsForPath = (
+  items: MenuItem[],
+  targetPath: string,
+  parentTexts: string[] = []
+): string[] => {
+  for (const item of items) {
+    if (item.path === targetPath) {
+      return parentTexts;
+    }
+    if (item.children && item.children.length > 0) {
+      const found = findParentMenuItemsForPath(
+        item.children,
+        targetPath,
+        [...parentTexts, item.text]
+      );
+      if (found.length > 0) {
+        return found;
+      }
+    }
+  }
+  return [];
+};
+
+// Helper function to find parent menu items from all menu categories
+const findExpandedItemsForPath = (
+  menuCategories: MenuCategory[],
+  targetPath: string
+): string[] => {
+  for (const category of menuCategories) {
+    const found = findParentMenuItemsForPath(category.children, targetPath);
+    if (found.length > 0) {
+      return found;
+    }
+  }
+  return [];
+};
+
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -138,18 +176,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
   const effectiveIsAdmin = isAdmin() && hasEnvironmentAccess;
   const menuCategories = getMenuCategories(effectiveIsAdmin);
 
-  // Debug logging - will be removed after fix is confirmed
+  // Sync expanded items with current URL path
   React.useEffect(() => {
-    console.log('[Sidebar] Debug state:', {
-      isAdmin: isAdmin(),
-      environmentsLoading,
-      environmentsCount: environments.length,
-      hasEnvironmentAccess,
-      effectiveIsAdmin,
-      menuCategoriesCount: menuCategories.length,
-      menuCategoryIds: menuCategories.map(c => c.id),
-    });
-  }, [isAdmin, environmentsLoading, environments.length, hasEnvironmentAccess, effectiveIsAdmin, menuCategories]);
+    const expandedFromPath = findExpandedItemsForPath(menuCategories, location.pathname);
+    if (expandedFromPath.length > 0) {
+      setExpandedItems(prev => {
+        // Merge existing expanded items with those needed for current path
+        const merged = new Set([...prev, ...expandedFromPath]);
+        return Array.from(merged);
+      });
+    }
+  }, [location.pathname, menuCategories]);
 
   const handleItemClick = (item: MenuItem) => {
     if (item.path) {
@@ -420,6 +457,18 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
   const hasEnvironmentAccess = environmentsLoading || environments.length > 0;
   const effectiveIsAdmin = isAdmin() && hasEnvironmentAccess;
   const menuCategories = getMenuCategories(effectiveIsAdmin);
+
+  // Sync expanded items with current URL path
+  React.useEffect(() => {
+    const expandedFromPath = findExpandedItemsForPath(menuCategories, location.pathname);
+    if (expandedFromPath.length > 0) {
+      setExpandedItems(prev => {
+        // Merge existing expanded items with those needed for current path
+        const merged = new Set([...prev, ...expandedFromPath]);
+        return Array.from(merged);
+      });
+    }
+  }, [location.pathname, menuCategories]);
 
   const handleItemClick = (item: MenuItem) => {
     if (item.path) {

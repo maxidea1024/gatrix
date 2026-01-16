@@ -7,6 +7,7 @@ import clientRoutes from './routes/client';
 import healthRoutes from './routes/health';
 import publicRoutes from './routes/public';
 import { sdkManager } from './services/sdkManager';
+import { requestStats } from './services/requestStats';
 
 // Create Express application
 const app: Application = express();
@@ -65,12 +66,32 @@ app.use(cors({
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Request logging and metrics middleware
+// Request statistics and rate-limited logging middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
+  const bytesReceived = parseInt(req.headers['content-length'] || '0', 10);
+
   res.on('finish', () => {
     const duration = Date.now() - start;
-    logger.debug(`${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`);
+    const bytesSent = parseInt(res.getHeader('content-length') as string || '0', 10);
+
+    // Normalize path for stats (remove dynamic segments like IDs)
+    const path = req.route?.path || req.path.replace(/\/[0-9a-f-]{36}/gi, '/:id').replace(/\/\d+/g, '/:id');
+
+    // Record stats and check if should log (rate limited)
+    const shouldLog = requestStats.record(
+      req.method,
+      path,
+      res.statusCode,
+      duration,
+      bytesSent,
+      bytesReceived
+    );
+
+    // Rate-limited logging
+    if (shouldLog) {
+      logger.debug(`${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`);
+    }
   });
   next();
 });
