@@ -128,7 +128,8 @@ export class ApiClient {
           // ignore metrics failures
         }
 
-        this.handleError(error);
+        // Don't call handleError here - it will be called in executeWithRetry on final failure
+        // This prevents duplicate error logs during retry cycles
         return Promise.reject(error);
       }
     );
@@ -235,7 +236,6 @@ export class ApiClient {
     return Math.min(delay, this.retryConfig.maxRetryDelay);
   }
 
-
   /**
    * Build a stable cache key for ETag storage based on URL and query params
    */
@@ -279,12 +279,35 @@ export class ApiClient {
     for (let attempt = 0; attempt <= maxAttempts; attempt++) {
       try {
         const response = await fn();
+
+        // Log recovery if this was a retry attempt (attempt > 0 means we had at least one failure)
+        if (attempt > 0) {
+          this.logger.info('Connection recovered after retries', {
+            method: context.method,
+            url: context.url,
+            retriesNeeded: attempt,
+          });
+        }
+
         return response.data;
       } catch (error) {
         lastError = error;
 
-        // If not retryable or last attempt, throw error
-        if (!this.isRetryableError(lastError) || attempt === maxAttempts) {
+        // Check if this is the final failure (not retryable or last attempt)
+        const isFinalFailure = !this.isRetryableError(lastError) || attempt === maxAttempts;
+
+        if (isFinalFailure) {
+          // Log detailed error only on final failure
+          this.logger.error('Request failed permanently', {
+            method: context.method,
+            url: context.url,
+            attempt: attempt + 1,
+            maxRetries: isInfiniteRetry ? 'infinite' : this.retryConfig.maxRetries,
+            error: this.extractDetailedErrorMessage(lastError),
+          });
+
+          // Call handleError to transform the error before throwing
+          this.handleError(lastError as AxiosError);
           throw error;
         }
 
@@ -296,7 +319,7 @@ export class ApiClient {
           attempt: attempt + 1,
           maxRetries: isInfiniteRetry ? 'infinite' : this.retryConfig.maxRetries,
           retryDelay: delay,
-          error: lastError.message,
+          error: this.extractDetailedErrorMessage(lastError),
         });
 
         await sleep(delay);
@@ -305,6 +328,31 @@ export class ApiClient {
 
     // This should never happen, but TypeScript needs it
     throw lastError;
+  }
+
+  /**
+   * Extract a detailed error message from various error types
+   */
+  private extractDetailedErrorMessage(error: any): string {
+    // Handle AxiosError with response data
+    if (error.response?.data) {
+      const data = error.response.data;
+      if (data.error?.message) {
+        return data.error.message;
+      }
+      if (data.message) {
+        return data.message;
+      }
+    }
+
+    // Handle network errors with more context
+    if (error.code) {
+      // Axios error codes like ECONNREFUSED, ENOTFOUND, ETIMEDOUT, etc.
+      return `${error.code}: ${error.message || 'Unknown error'}`;
+    }
+
+    // Default to error message
+    return error.message || 'Unknown error';
   }
 
   /**
