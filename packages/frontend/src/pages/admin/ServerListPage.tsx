@@ -2211,9 +2211,6 @@ const ServerListPage: React.FC = () => {
                     });
                   }, 1000); // Animation duration
 
-                  // Initialize ping progress for new service (for list view)
-                  setListViewLastHeartbeatTime((prev) => new Map(prev).set(serviceKey, Date.now()));
-
                   // Add new service and sort by createdAt (ascending - oldest first, newest last)
                   const newServices = [...prev, event.data];
                   newServices.sort((a, b) => {
