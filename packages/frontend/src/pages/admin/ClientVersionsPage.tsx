@@ -1496,114 +1496,39 @@ const ClientVersionsPage: React.FC = () => {
 
       {/* 테이블 */}
       <Card sx={{ position: 'relative' }}>
-        <TableContainer
-          sx={{
-            opacity: !isInitialLoad && loading ? 0.5 : 1,
-            transition: 'opacity 0.15s ease-in-out',
-            pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
-          }}
-        >
-          <Table sx={{ tableLayout: 'auto' }}>
-            <TableHead>
-              <TableRow>
-                {canManage && (
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectAll}
-                      indeterminate={selectedIds.length > 0 && selectedIds.length < clientVersions.length}
-                      onChange={(e) => handleSelectAll(e.target.checked)}
-                    />
-                  </TableCell>
-                )}
-                {columns.filter(col => col.visible).map((column) => (
-                  <TableCell
-                    key={column.id}
-                    align={column.id === 'guestModeAllowed' ? 'center' : 'left'}
-                    width={column.width}
-                  >
-                    {t(column.labelKey)}
-                    {(column.id === 'clientVersion' || column.id === 'platform') && ' ↓'}
-                  </TableCell>
-                ))}
-                <TableCell>{t('common.createdBy')}</TableCell>
-                {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {isInitialLoad && loading ? (
-                // 스켈레톤 로딩 (초기 로딩 시에만)
-                Array.from({ length: 5 }).map((_, index) => (
-                  <TableRow key={`skeleton-${index}`}>
-                    {canManage && (
-                      <TableCell padding="checkbox">
-                        <Skeleton variant="rectangular" width={24} height={24} />
-                      </TableCell>
-                    )}
-                    <TableCell>
-                      <Skeleton variant="rectangular" width={80} height={24} />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="rectangular" width={60} height={24} />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="rectangular" width={80} height={24} />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="text" width="80%" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="text" width="70%" />
-                    </TableCell>
-                    <TableCell align="center">
-                      <Skeleton variant="rectangular" width={60} height={24} sx={{ mx: 'auto' }} />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="text" width="70%" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="text" width="60%" />
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', gap: 0.5 }}>
-                        <Skeleton variant="rectangular" width={60} height={24} />
-                        <Skeleton variant="rectangular" width={60} height={24} />
-                      </Box>
-                    </TableCell>
-                    {canManage && (
-                      <TableCell align="center">
-                        <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
-                        <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block' }} />
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))
-              ) : clientVersions.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={canManage ? 12 : 10} sx={{ p: 0 }}>
-                    <EmptyState
-                      message={t('clientVersions.noVersionsFound')}
-                      subtitle={canManage ? t('common.addFirstItem') : undefined}
-                      onAddClick={canManage ? () => {
-                        setEditingClientVersion(null);
-                        setIsCopyMode(false);
-                        setFormDialogOpen(true);
-                      } : undefined}
-                      addButtonLabel={t('clientVersions.addIndividual')}
-                    />
-                  </TableCell>
-                </TableRow>
-              ) : (
-                clientVersions.map((clientVersion) => (
-                  <TableRow
-                    key={clientVersion.id}
-                    selected={selectedIds.includes(clientVersion.id)}
-                    hover
-                  >
+        {isInitialLoad && loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+            <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+          </Box>
+        ) : clientVersions.length === 0 ? (
+          <EmptyState
+            message={t('clientVersions.noVersionsFound')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+            onAddClick={canManage ? () => {
+              setEditingClientVersion(null);
+              setIsCopyMode(false);
+              setFormDialogOpen(true);
+            } : undefined}
+            addButtonLabel={t('clientVersions.addIndividual')}
+          />
+        ) : (
+          <>
+            <TableContainer
+              sx={{
+                opacity: !isInitialLoad && loading ? 0.5 : 1,
+                transition: 'opacity 0.15s ease-in-out',
+                pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
+              }}
+            >
+              <Table sx={{ tableLayout: 'auto' }}>
+                <TableHead>
+                  <TableRow>
                     {canManage && (
                       <TableCell padding="checkbox">
                         <Checkbox
-                          checked={selectedIds.includes(clientVersion.id)}
-                          onChange={(e) => handleSelectOne(clientVersion.id, e.target.checked)}
+                          checked={selectAll}
+                          indeterminate={selectedIds.length > 0 && selectedIds.length < clientVersions.length}
+                          onChange={(e) => handleSelectAll(e.target.checked)}
                         />
                       </TableCell>
                     )}
@@ -1613,102 +1538,132 @@ const ClientVersionsPage: React.FC = () => {
                         align={column.id === 'guestModeAllowed' ? 'center' : 'left'}
                         width={column.width}
                       >
-                        {renderCellContent(clientVersion, column.id)}
+                        {t(column.labelKey)}
+                        {(column.id === 'clientVersion' || column.id === 'platform') && ' ↓'}
                       </TableCell>
                     ))}
-                    <TableCell>
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          {clientVersion.createdByName || t('dashboard.unknown')}
-                        </Typography>
-                        {clientVersion.createdByEmail && (
-                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                            {clientVersion.createdByEmail}
-                          </Typography>
-                        )}
-                      </Box>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                        {canManage && (
-                          <>
-                            <Tooltip title={t('clientVersions.copyVersion')} arrow>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleCopyVersion(clientVersion)}
-                                color="primary"
-                                sx={{
-                                  '&:hover': {
-                                    backgroundColor: 'primary.light',
-                                    color: 'white',
-                                  },
-                                }}
-                              >
-                                <CopyIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title={t('common.edit')} arrow>
-                              <IconButton
-                                size="small"
-                                onClick={() => {
-                                  console.log('Edit button clicked for client version:', {
-                                    id: clientVersion.id,
-                                    clientVersion: clientVersion
-                                  });
-                                  setEditingClientVersion(clientVersion);
-                                  setIsCopyMode(false);
-                                  setFormDialogOpen(true);
-                                }}
-                                color="info"
-                                sx={{
-                                  '&:hover': {
-                                    backgroundColor: 'info.light',
-                                    color: 'white',
-                                  },
-                                }}
-                              >
-                                <EditIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title={t('common.delete')} arrow>
-                              <IconButton
-                                size="small"
-                                onClick={() => {
-                                  setSelectedClientVersion(clientVersion);
-                                  setDeleteDialogOpen(true);
-                                }}
-                                color="error"
-                                sx={{
-                                  '&:hover': {
-                                    backgroundColor: 'error.light',
-                                    color: 'white',
-                                  },
-                                }}
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </>
-                        )}
-                      </Box>
-                    </TableCell>
+                    <TableCell>{t('common.createdBy')}</TableCell>
+                    {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {clientVersions.map((clientVersion) => (
+                    <TableRow
+                      key={clientVersion.id}
+                      selected={selectedIds.includes(clientVersion.id)}
+                      hover
+                    >
+                      {canManage && (
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={selectedIds.includes(clientVersion.id)}
+                            onChange={(e) => handleSelectOne(clientVersion.id, e.target.checked)}
+                          />
+                        </TableCell>
+                      )}
+                      {columns.filter(col => col.visible).map((column) => (
+                        <TableCell
+                          key={column.id}
+                          align={column.id === 'guestModeAllowed' ? 'center' : 'left'}
+                          width={column.width}
+                        >
+                          {renderCellContent(clientVersion, column.id)}
+                        </TableCell>
+                      ))}
+                      <TableCell>
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {clientVersion.createdByName || t('dashboard.unknown')}
+                          </Typography>
+                          {clientVersion.createdByEmail && (
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                              {clientVersion.createdByEmail}
+                            </Typography>
+                          )}
+                        </Box>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                          {canManage && (
+                            <>
+                              <Tooltip title={t('clientVersions.copyVersion')} arrow>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleCopyVersion(clientVersion)}
+                                  color="primary"
+                                  sx={{
+                                    '&:hover': {
+                                      backgroundColor: 'primary.light',
+                                      color: 'white',
+                                    },
+                                  }}
+                                >
+                                  <CopyIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title={t('common.edit')} arrow>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => {
+                                    console.log('Edit button clicked for client version:', {
+                                      id: clientVersion.id,
+                                      clientVersion: clientVersion
+                                    });
+                                    setEditingClientVersion(clientVersion);
+                                    setIsCopyMode(false);
+                                    setFormDialogOpen(true);
+                                  }}
+                                  color="info"
+                                  sx={{
+                                    '&:hover': {
+                                      backgroundColor: 'info.light',
+                                      color: 'white',
+                                    },
+                                  }}
+                                >
+                                  <EditIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title={t('common.delete')} arrow>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => {
+                                    setSelectedClientVersion(clientVersion);
+                                    setDeleteDialogOpen(true);
+                                  }}
+                                  color="error"
+                                  sx={{
+                                    '&:hover': {
+                                      backgroundColor: 'error.light',
+                                      color: 'white',
+                                    },
+                                  }}
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            </>
+                          )}
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
 
-        {/* 페이지네이션 - 데이터가 있을 때만 표시 */}
-        {total > 0 && (
-          <SimplePagination
-            count={total}
-            page={pageState.page - 1} // MUI는 0부터 시작
-            rowsPerPage={pageState.limit}
-            onPageChange={handlePageChange}
-            onRowsPerPageChange={handleRowsPerPageChange}
-            rowsPerPageOptions={[5, 10, 25, 50, 100]}
-          />
+            {/* 페이지네이션 - 데이터가 있을 때만 표시 */}
+            {total > 0 && (
+              <SimplePagination
+                count={total}
+                page={pageState.page - 1} // MUI는 0부터 시작
+                rowsPerPage={pageState.limit}
+                onPageChange={handlePageChange}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                rowsPerPageOptions={[5, 10, 25, 50, 100]}
+              />
+            )}
+          </>
         )}
       </Card>
 

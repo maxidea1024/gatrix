@@ -1907,7 +1907,7 @@ const UsersManagementPage: React.FC = () => {
                         <Checkbox
                           indeterminate={selectedUsers.size > 0 && selectedUsers.size < users.length}
                           checked={users.length > 0 && selectedUsers.size === users.length}
-                          onChange={handleSelectAll}
+                          onChange={handleSelectAllUsers}
                         />
                       </TableCell>
                       {columns.filter(col => col.visible).map((column) => (

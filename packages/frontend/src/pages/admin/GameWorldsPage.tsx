@@ -1574,45 +1574,39 @@ const GameWorldsPage: React.FC = () => {
       {/* Game Worlds Table */}
       <Card>
         <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            modifiers={[restrictToVerticalAxis]}
-          >
-            <TableContainer>
-              <Table sx={{ tableLayout: 'auto' }}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell width="50px"></TableCell>
-                    {columns.filter(col => col.visible).map((column) => (
-                      <TableCell key={column.id} width={column.width}>
-                        {t(column.labelKey)}
-                      </TableCell>
-                    ))}
-                    <TableCell>{t('gameWorlds.creator')}</TableCell>
-                    {canManage && <TableCell align="center">{t('gameWorlds.actions')}</TableCell>}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {loading ? (
-                    <TableSkeletonRows
-                      rowCount={10}
-                      cellCount={1 + columns.filter(col => col.visible).length + 1 + (canManage ? 1 : 0)}
-                      loading={true}
-                    />
-                  ) : worlds.length === 0 ? (
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+            </Box>
+          ) : worlds.length === 0 ? (
+            <EmptyState
+              message={t('gameWorlds.noWorldsFound')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
+              onAddClick={canManage ? handleAddWorld : undefined}
+              addButtonLabel={t('gameWorlds.addGameWorld')}
+            />
+          ) : (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+              modifiers={[restrictToVerticalAxis]}
+            >
+              <TableContainer>
+                <Table sx={{ tableLayout: 'auto' }}>
+                  <TableHead>
                     <TableRow>
-                      <TableCell colSpan={1 + columns.filter(col => col.visible).length + 2} sx={{ p: 0 }}>
-                        <EmptyState
-                          message={t('gameWorlds.noWorldsFound')}
-                          subtitle={canManage ? t('common.addFirstItem') : undefined}
-                          onAddClick={canManage ? handleAddWorld : undefined}
-                          addButtonLabel={t('gameWorlds.addGameWorld')}
-                        />
-                      </TableCell>
+                      <TableCell width="50px"></TableCell>
+                      {columns.filter(col => col.visible).map((column) => (
+                        <TableCell key={column.id} width={column.width}>
+                          {t(column.labelKey)}
+                        </TableCell>
+                      ))}
+                      <TableCell>{t('gameWorlds.creator')}</TableCell>
+                      {canManage && <TableCell align="center">{t('gameWorlds.actions')}</TableCell>}
                     </TableRow>
-                  ) : (
+                  </TableHead>
+                  <TableBody>
                     <SortableContext
                       items={worlds.map(w => w.id)}
                       strategy={verticalListSortingStrategy}
@@ -1636,11 +1630,11 @@ const GameWorldsPage: React.FC = () => {
                         />
                       ))}
                     </SortableContext>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </DndContext>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </DndContext>
+          )}
 
           {/* Pagination removed (no server/client paging) */}
 
