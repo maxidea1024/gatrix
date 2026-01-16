@@ -168,7 +168,7 @@ class ServiceDiscoveryService {
     error?: string;
   }> {
     const response = await api.get(`/admin/services/${serviceType}/${instanceId}/stats/requests`);
-    return response.data;
+    return response as any;
   }
 
   /**

@@ -1,17 +1,13 @@
 config:
   target: "http://localhost:3400"
   phases:
-    - duration: 60
-      arrivalRate: 5
-      rampTo: 50
+    - duration: 30
+      arrivalRate: 10
+      rampTo: 30
       name: Warm up phase
-    - duration: 120
-      arrivalRate: 50
-      name: Sustained load phase
     - duration: 60
-      arrivalRate: 50
-      rampTo: 100
-      name: Stress phase
+      arrivalRate: 30
+      name: Sustained load phase
   defaults:
     headers:
       x-application-name: "benchmark-test"
@@ -21,15 +17,63 @@ config:
     environment: "development"
 
 scenarios:
-  - name: "Edge API Flow"
+  # Normal 200 responses
+  - name: "Normal 200 Flow"
+    weight: 60
     flow:
-      - get:
-          url: "/api/v1/client/{{ environment }}/client-version?platform=pc"
       - get:
           url: "/api/v1/client/{{ environment }}/game-worlds"
       - get:
           url: "/api/v1/client/{{ environment }}/banners"
       - get:
           url: "/api/v1/client/{{ environment }}/service-notices"
+
+  # 304 Not Modified (with If-Modified-Since header)
+  - name: "304 Cached Flow"
+    weight: 20
+    flow:
+      - get:
+          url: "/api/v1/client/{{ environment }}/service-notices"
+          headers:
+            If-Modified-Since: "Wed, 01 Jan 2099 00:00:00 GMT"
+      - get:
+          url: "/api/v1/client/{{ environment }}/game-worlds"
+          headers:
+            If-Modified-Since: "Wed, 01 Jan 2099 00:00:00 GMT"
+
+  # 404 Not Found (invalid endpoints)
+  - name: "404 Not Found Flow"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/v1/client/{{ environment }}/client-version?platform=pc"
       - get:
           url: "/api/v1/client/{{ environment }}/ingame-popup-notices"
+      - get:
+          url: "/api/v1/client/invalid-env/game-worlds"
+
+  # 400 Bad Request (missing required params)
+  - name: "400 Bad Request Flow"
+    weight: 5
+    flow:
+      - get:
+          url: "/api/v1/client/{{ environment }}/service-notices"
+          headers:
+            x-api-token: ""
+      - get:
+          url: "/api/v1/client/{{ environment }}/game-worlds"
+          headers:
+            x-application-name: ""
+
+  # Mixed responses
+  - name: "Mixed Flow"
+    weight: 5
+    flow:
+      - get:
+          url: "/api/v1/client/{{ environment }}/service-notices"
+      - get:
+          url: "/api/v1/client/{{ environment }}/client-version?platform=pc"
+      - get:
+          url: "/api/v1/client/{{ environment }}/game-worlds"
+          headers:
+            If-Modified-Since: "Wed, 01 Jan 2099 00:00:00 GMT"

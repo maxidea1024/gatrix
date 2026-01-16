@@ -16,6 +16,7 @@ export interface EndpointStats {
     durations: number[]; // For percentile calculations (limited size)
     bytesSent: number;
     bytesReceived: number;
+    statusCodes: Map<number, number>; // Status codes per endpoint
 }
 
 export interface RequestStatsSnapshot {
@@ -33,6 +34,7 @@ export interface RequestStatsSnapshot {
         p99DurationMs: number;
         bytesSent: number;
         bytesReceived: number;
+        statusCodes: Record<string, number>; // Per-endpoint status codes
     }>;
     totals: {
         bytesSent: number;
@@ -101,6 +103,7 @@ class RequestStats {
                 durations: [],
                 bytesSent: 0,
                 bytesReceived: 0,
+                statusCodes: new Map(),
             };
             this.endpoints.set(endpointKey, endpoint);
         }
@@ -111,6 +114,10 @@ class RequestStats {
         endpoint.maxDurationMs = Math.max(endpoint.maxDurationMs, durationMs);
         endpoint.bytesSent += bytesSent;
         endpoint.bytesReceived += bytesReceived;
+
+        // Track status code per endpoint
+        const currentEndpointStatus = endpoint.statusCodes.get(statusCode) || 0;
+        endpoint.statusCodes.set(statusCode, currentEndpointStatus + 1);
 
         // Keep limited durations for percentile calculation
         if (endpoint.durations.length < this.maxDurationsPerEndpoint) {
@@ -194,6 +201,11 @@ class RequestStats {
         const endpointsObj: Record<string, RequestStatsSnapshot['endpoints'][string]> = {};
         for (const [key, stats] of this.endpoints) {
             const sorted = [...stats.durations].sort((a, b) => a - b);
+            // Convert endpoint status codes Map to object
+            const endpointStatusCodes: Record<string, number> = {};
+            for (const [code, count] of stats.statusCodes) {
+                endpointStatusCodes[code.toString()] = count;
+            }
             endpointsObj[key] = {
                 count: stats.count,
                 avgDurationMs: stats.count > 0 ? Math.round(stats.totalDurationMs / stats.count) : 0,
@@ -203,6 +215,7 @@ class RequestStats {
                 p99DurationMs: this.percentile(sorted, 99),
                 bytesSent: stats.bytesSent,
                 bytesReceived: stats.bytesReceived,
+                statusCodes: endpointStatusCodes,
             };
         }
 

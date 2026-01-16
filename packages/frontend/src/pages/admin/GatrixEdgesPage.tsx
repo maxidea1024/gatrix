@@ -31,6 +31,8 @@ import {
     DialogActions,
     TextField,
     InputAdornment,
+    ToggleButton,
+    ToggleButtonGroup,
 } from '@mui/material';
 import {
     KeyboardArrowDown,
@@ -43,6 +45,11 @@ import {
     ContentCopy as CopyIcon,
     Close as CloseIcon,
     Search as SearchIcon,
+    BarChart as BarChartIcon,
+    ExpandMore as ExpandMoreIcon,
+    ExpandLess as ExpandLessIcon,
+    TableChart as TableChartIcon,
+    Visibility as VisibilityIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import Editor from '@monaco-editor/react';
@@ -69,6 +76,36 @@ interface CacheStatus {
     invalidationCount?: number;
     summary?: Record<string, Record<string, number>>;
     detail?: Record<string, any>;
+    latency?: number;
+    error?: string;
+    loading?: boolean;
+}
+
+// Request statistics interface
+interface RequestStats {
+    startTime: string;
+    snapshotTime: string;
+    uptimeSeconds: number;
+    totalRequests: number;
+    statusCodes: Record<string, number>;
+    endpoints: Record<string, {
+        count: number;
+        avgDurationMs: number;
+        minDurationMs: number;
+        maxDurationMs: number;
+        p95DurationMs: number;
+        p99DurationMs: number;
+        bytesSent: number;
+        bytesReceived: number;
+    }>;
+    totals: {
+        bytesSent: number;
+        bytesReceived: number;
+        avgDurationMs: number;
+        minDurationMs: number;
+        maxDurationMs: number;
+    };
+    rateLimit?: number;
     latency?: number;
     error?: string;
     loading?: boolean;
@@ -110,10 +147,17 @@ const GatrixEdgesPage: React.FC = () => {
     const [cacheStatuses, setCacheStatuses] = useState<Map<string, CacheStatus>>(new Map());
     const cachePollingRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Refresh interval state (persisted in localStorage)
-    const [refreshInterval, setRefreshInterval] = useState<number | null>(() => {
+    // Request stats per instance
+    const [requestStats, setRequestStats] = useState<Map<string, RequestStats>>(new Map());
+    const statsPollingRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Collapsible sections state
+    const [expandedSections, setExpandedSections] = useState<Map<string, Set<string>>>(new Map());
+
+    // Cache refresh interval state (persisted in localStorage)
+    const [cacheRefreshInterval, setCacheRefreshInterval] = useState<number | null>(() => {
         try {
-            const stored = localStorage.getItem('gatrix_edges_refresh_interval');
+            const stored = localStorage.getItem('gatrix_edges_cache_refresh_interval');
             if (stored === 'off') return null;
             const parsed = parseInt(stored || '10', 10);
             return isNaN(parsed) ? 10 : parsed;
@@ -122,24 +166,50 @@ const GatrixEdgesPage: React.FC = () => {
         }
     });
 
-    // Save refresh interval to localStorage
+    // Stats refresh interval state (persisted in localStorage)
+    const [statsRefreshInterval, setStatsRefreshInterval] = useState<number | null>(() => {
+        try {
+            const stored = localStorage.getItem('gatrix_edges_stats_refresh_interval');
+            if (stored === 'off') return null;
+            const parsed = parseInt(stored || '10', 10);
+            return isNaN(parsed) ? 10 : parsed;
+        } catch {
+            return 10;
+        }
+    });
+
+    // Save cache refresh interval to localStorage
     useEffect(() => {
         try {
-            if (refreshInterval === null) {
-                localStorage.setItem('gatrix_edges_refresh_interval', 'off');
+            if (cacheRefreshInterval === null) {
+                localStorage.setItem('gatrix_edges_cache_refresh_interval', 'off');
             } else {
-                localStorage.setItem('gatrix_edges_refresh_interval', refreshInterval.toString());
+                localStorage.setItem('gatrix_edges_cache_refresh_interval', cacheRefreshInterval.toString());
             }
         } catch (e) {
-            console.error('Failed to save refresh interval to localStorage', e);
+            console.error('Failed to save cache refresh interval to localStorage', e);
         }
-    }, [refreshInterval]);
+    }, [cacheRefreshInterval]);
+
+    // Save stats refresh interval to localStorage
+    useEffect(() => {
+        try {
+            if (statsRefreshInterval === null) {
+                localStorage.setItem('gatrix_edges_stats_refresh_interval', 'off');
+            } else {
+                localStorage.setItem('gatrix_edges_stats_refresh_interval', statsRefreshInterval.toString());
+            }
+        } catch (e) {
+            console.error('Failed to save stats refresh interval to localStorage', e);
+        }
+    }, [statsRefreshInterval]);
 
     // JSON Dialog
     const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
     const [jsonDialogData, setJsonDialogData] = useState<any>(null);
     const [jsonDialogTitle, setJsonDialogTitle] = useState('');
     const [fullJsonLoading, setFullJsonLoading] = useState<string | null>(null);
+    const [detailViewMode, setDetailViewMode] = useState<'table' | 'json'>('table');
 
     // JSON Search State
     const [jsonSearchQuery, setJsonSearchQuery] = useState('');
@@ -273,8 +343,8 @@ const GatrixEdgesPage: React.FC = () => {
                 .sort(([a], [b]) => a.localeCompare(b))
                 .map(([name, instances]) => {
                     const group: EdgeGroup = {
-                        id: `${currentLevel}-${name}`,
-                        name: name === 'unknown' ? `(${getGroupingLabel(currentLevel)} N/A)` : name,
+                        id: `${currentLevel} -${name} `,
+                        name: name === 'unknown' ? `(${getGroupingLabel(currentLevel)} N / A)` : name,
                         instances: nextLevels.length === 0 ? instances.sort((a, b) => a.instanceId.localeCompare(b.instanceId)) : [],
                         children: nextLevels.length > 0 ? buildGroups(instances, nextLevels) : undefined,
                     };
@@ -352,9 +422,9 @@ const GatrixEdgesPage: React.FC = () => {
             });
         };
 
-        if (expandedInstances.size > 0 && refreshInterval !== null) {
+        if (expandedInstances.size > 0 && cacheRefreshInterval !== null) {
             pollCacheStatuses();
-            cachePollingRef.current = setInterval(pollCacheStatuses, refreshInterval * 1000);
+            cachePollingRef.current = setInterval(pollCacheStatuses, cacheRefreshInterval * 1000);
         }
 
         return () => {
@@ -362,7 +432,86 @@ const GatrixEdgesPage: React.FC = () => {
                 clearInterval(cachePollingRef.current);
             }
         };
-    }, [expandedInstances, services, fetchCacheStatus, refreshInterval]);
+    }, [expandedInstances, services, fetchCacheStatus, cacheRefreshInterval]);
+
+    // Fetch request stats for an instance
+    const fetchRequestStats = useCallback(async (instance: ServiceInstance) => {
+        const key = instance.instanceId;
+        setRequestStats(prev => {
+            const next = new Map(prev);
+            const current = next.get(key) || {} as RequestStats;
+            next.set(key, { ...current, loading: true });
+            return next;
+        });
+
+        try {
+            const serviceType = instance.labels.service;
+            const result = await serviceDiscoveryService.getRequestStats(serviceType, instance.instanceId);
+            setRequestStats(prev => {
+                const next = new Map(prev);
+                next.set(key, { ...result.data, rateLimit: result.rateLimit, latency: result.latency, loading: false });
+                return next;
+            });
+        } catch (err: any) {
+            setRequestStats(prev => {
+                const next = new Map(prev);
+                const current = next.get(key) || {} as RequestStats;
+                next.set(key, { ...current, error: err.message, loading: false });
+                return next;
+            });
+        }
+    }, []);
+
+    // Poll request stats for expanded instances
+    useEffect(() => {
+        if (statsPollingRef.current) {
+            clearInterval(statsPollingRef.current);
+        }
+
+        const pollRequestStats = () => {
+            expandedInstances.forEach(instanceId => {
+                const instance = services.find(s => s.instanceId === instanceId);
+                if (instance) {
+                    fetchRequestStats(instance);
+                }
+            });
+        };
+
+        if (expandedInstances.size > 0 && statsRefreshInterval !== null) {
+            pollRequestStats();
+            statsPollingRef.current = setInterval(pollRequestStats, statsRefreshInterval * 1000);
+        }
+
+        return () => {
+            if (statsPollingRef.current) {
+                clearInterval(statsPollingRef.current);
+            }
+        };
+    }, [expandedInstances, services, fetchRequestStats, statsRefreshInterval]);
+
+    // Toggle collapsible section
+    const toggleSection = useCallback((instanceId: string, sectionName: string) => {
+        setExpandedSections(prev => {
+            const next = new Map(prev);
+            const sections = next.get(instanceId) || new Set(['cache', 'stats']); // Default: both expanded
+            const newSections = new Set(sections);
+            if (newSections.has(sectionName)) {
+                newSections.delete(sectionName);
+            } else {
+                newSections.add(sectionName);
+            }
+            next.set(instanceId, newSections);
+            return next;
+        });
+    }, []);
+
+    // Check if section is expanded
+    const isSectionExpanded = useCallback((instanceId: string, sectionName: string) => {
+        const sections = expandedSections.get(instanceId);
+        // Default: both expanded if not set
+        if (!sections) return true;
+        return sections.has(sectionName);
+    }, [expandedSections]);
 
     useEffect(() => {
         fetchServices();
@@ -399,6 +548,12 @@ const GatrixEdgesPage: React.FC = () => {
             newExpanded.delete(instanceId);
         } else {
             newExpanded.add(instanceId);
+            // Load cache and stats immediately when expanded
+            const instance = services.find(s => s.instanceId === instanceId);
+            if (instance) {
+                fetchCacheStatus(instance);
+                fetchRequestStats(instance);
+            }
         }
         setExpandedInstances(newExpanded);
     };
@@ -490,10 +645,10 @@ const GatrixEdgesPage: React.FC = () => {
                             </Typography>
                             <FormControl size="small" sx={{ minWidth: 60 }}>
                                 <Select
-                                    value={refreshInterval === null ? 'off' : refreshInterval}
+                                    value={cacheRefreshInterval === null ? 'off' : cacheRefreshInterval}
                                     onChange={(e) => {
                                         const val = e.target.value;
-                                        setRefreshInterval(val === 'off' ? null : Number(val));
+                                        setCacheRefreshInterval(val === 'off' ? null : Number(val));
                                     }}
                                     displayEmpty
                                     variant="standard"
@@ -550,12 +705,12 @@ const GatrixEdgesPage: React.FC = () => {
                         </Box>
 
                         {latency !== undefined && (
-                            <Tooltip title={lastRefreshedAt ? `${t('gatrixEdges.lastRefreshed')}: ${formatDateTimeDetailed(lastRefreshedAt)}` : ''}>
-                                <Chip label={`${latency}ms`} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.65rem', cursor: 'help' }} />
+                            <Tooltip title={lastRefreshedAt ? `${t('gatrixEdges.lastRefreshed')}: ${formatDateTimeDetailed(lastRefreshedAt)} ` : ''}>
+                                <Chip label={`${latency} ms`} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.65rem', cursor: 'help' }} />
                             </Tooltip>
                         )}
 
-                        <Tooltip title={t('gatrixEdges.viewJson')} leaveDelay={0}>
+                        <Tooltip title={t('gatrixEdges.viewDetails')} leaveDelay={0}>
                             <span>
                                 <IconButton
                                     size="small"
@@ -568,7 +723,7 @@ const GatrixEdgesPage: React.FC = () => {
                                     {fullJsonLoading === instance.instanceId ? (
                                         <CircularProgress size={16} color="inherit" />
                                     ) : (
-                                        <CodeIcon sx={{ fontSize: 16 }} />
+                                        <VisibilityIcon sx={{ fontSize: 16 }} />
                                     )}
                                 </IconButton>
                             </span>
@@ -588,7 +743,7 @@ const GatrixEdgesPage: React.FC = () => {
                         p: 1,
                         bgcolor: theme.palette.primary.main + '10',
                         borderRadius: 0,
-                        border: `1px solid ${theme.palette.primary.main}30`,
+                        border: `1px solid ${theme.palette.primary.main} 30`,
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
@@ -609,7 +764,7 @@ const GatrixEdgesPage: React.FC = () => {
                         width: '100%',
                         overflowX: 'auto',
                         mt: 1,
-                        border: `1px solid ${theme.palette.divider}`,
+                        border: `1px solid ${theme.palette.divider} `,
                         borderRadius: 0,
                         bgcolor: theme.palette.background.paper
                     }}>
@@ -723,7 +878,7 @@ const GatrixEdgesPage: React.FC = () => {
                             {Object.entries(ports).map(([name, port]) => (
                                 <Chip
                                     key={name}
-                                    label={`${name}: ${port}`}
+                                    label={`${name}: ${port} `}
                                     size="small"
                                     variant="outlined"
                                     sx={{ fontFamily: 'monospace', fontSize: '0.75rem', borderRadius: 0 }}
@@ -745,7 +900,7 @@ const GatrixEdgesPage: React.FC = () => {
                                 .map(([key, value]) => (
                                     <Chip
                                         key={key}
-                                        label={`${key}: ${value}`}
+                                        label={`${key}: ${value} `}
                                         size="small"
                                         color="primary"
                                         variant="outlined"
@@ -758,16 +913,329 @@ const GatrixEdgesPage: React.FC = () => {
 
                 <Divider sx={{ my: 3 }} />
 
-                {/* Cache Status Section - Moved below Basic Info */}
-                <Box sx={{ p: 1.5, bgcolor: theme.palette.background.paper, borderRadius: 0, border: `1px solid ${theme.palette.divider}` }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                {/* Cache Status Section - Collapsible */}
+                <Box sx={{ mb: 2, bgcolor: theme.palette.background.paper, borderRadius: 0, border: `1px solid ${theme.palette.divider} ` }}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            p: 1.5,
+                            cursor: 'pointer',
+                            '&:hover': { bgcolor: theme.palette.action.hover }
+                        }}
+                        onClick={() => toggleSection(instance.instanceId, 'cache')}
+                    >
                         <CachedIcon fontSize="small" color="primary" />
-                        <Typography variant="subtitle2" fontWeight="bold">
+                        <Typography variant="subtitle2" fontWeight="bold" sx={{ flex: 1 }}>
                             {t('gatrixEdges.cachingInfo')}
                         </Typography>
+                        {isSectionExpanded(instance.instanceId, 'cache') ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                     </Box>
-                    {renderCacheSummary(cacheStatus, instance)}
+                    <Collapse in={isSectionExpanded(instance.instanceId, 'cache')}>
+                        <Box sx={{ p: 1.5, pt: 0 }}>
+                            {renderCacheSummary(cacheStatus, instance)}
+                        </Box>
+                    </Collapse>
                 </Box>
+
+                {/* Request Statistics Section - Collapsible */}
+                <Box sx={{ bgcolor: theme.palette.background.paper, borderRadius: 0, border: `1px solid ${theme.palette.divider} ` }}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            p: 1.5,
+                            cursor: 'pointer',
+                            '&:hover': { bgcolor: theme.palette.action.hover }
+                        }}
+                        onClick={() => toggleSection(instance.instanceId, 'stats')}
+                    >
+                        <BarChartIcon fontSize="small" color="secondary" />
+                        <Typography variant="subtitle2" fontWeight="bold" sx={{ flex: 1 }}>
+                            {t('gatrixEdges.requestStats')}
+                        </Typography>
+                        {isSectionExpanded(instance.instanceId, 'stats') ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    </Box>
+                    <Collapse in={isSectionExpanded(instance.instanceId, 'stats')}>
+                        <Box sx={{ p: 1.5, pt: 0 }}>
+                            {renderRequestStatsSummary(requestStats.get(instance.instanceId), instance)}
+                        </Box>
+                    </Collapse>
+                </Box>
+            </Box>
+        );
+    };
+
+    // Render request statistics summary
+    const renderRequestStatsSummary = (stats: RequestStats | undefined, instance: ServiceInstance) => {
+        if (!stats) {
+            return (
+                <Typography variant="body2" color="text.secondary">
+                    {t('gatrixEdges.statsNotLoaded')}
+                </Typography>
+            );
+        }
+
+        const { endpoints, statusCodes, totals, uptimeSeconds, totalRequests, loading, error, latency } = stats;
+
+        // Format bytes
+        const formatBytes = (bytes: number) => {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        };
+
+        // Format uptime
+        const formatUptime = (seconds: number) => {
+            const days = Math.floor(seconds / 86400);
+            const hours = Math.floor((seconds % 86400) / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            if (days > 0) return `${days}d ${hours}h ${mins} m`;
+            if (hours > 0) return `${hours}h ${mins} m`;
+            return `${mins} m`;
+        };
+
+        return (
+            <Box sx={{ position: 'relative' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                    <Typography variant="subtitle2" fontWeight="bold">
+                        {t('gatrixEdges.requestStats')}
+                    </Typography>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <Typography variant="caption" color="text.secondary">
+                                {t('gatrixEdges.refreshInterval')}:
+                            </Typography>
+                            <FormControl size="small" sx={{ minWidth: 60 }}>
+                                <Select
+                                    value={statsRefreshInterval === null ? 'off' : statsRefreshInterval}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setStatsRefreshInterval(val === 'off' ? null : Number(val));
+                                    }}
+                                    displayEmpty
+                                    variant="standard"
+                                    disableUnderline
+                                    sx={{
+                                        fontSize: '0.8rem',
+                                        fontWeight: 'bold',
+                                        bgcolor: theme.palette.action.hover,
+                                        borderRadius: 0,
+                                        px: 1,
+                                        py: 0.25,
+                                        '& .MuiSelect-select': {
+                                            py: 0,
+                                            paddingRight: '24px !important'
+                                        }
+                                    }}
+                                >
+                                    <MenuItem value="off" sx={{ fontSize: '0.8rem' }}>{t('gatrixEdges.refreshOff')}</MenuItem>
+                                    <MenuItem value={5} sx={{ fontSize: '0.8rem' }}>5{t('gatrixEdges.seconds')}</MenuItem>
+                                    <MenuItem value={10} sx={{ fontSize: '0.8rem' }}>10{t('gatrixEdges.seconds')}</MenuItem>
+                                    <MenuItem value={30} sx={{ fontSize: '0.8rem' }}>30{t('gatrixEdges.seconds')}</MenuItem>
+                                    <MenuItem value={60} sx={{ fontSize: '0.8rem' }}>60{t('gatrixEdges.seconds')}</MenuItem>
+                                </Select>
+                            </FormControl>
+
+                            <Tooltip title={t('common.refresh')} leaveDelay={0}>
+                                <span>
+                                    <IconButton
+                                        size="small"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            fetchRequestStats(instance);
+                                        }}
+                                        disabled={loading}
+                                        sx={{ p: 0.5 }}
+                                    >
+                                        <RefreshIcon
+                                            fontSize="small"
+                                            sx={{
+                                                animation: loading ? 'spin 1s linear infinite' : 'none',
+                                                '@keyframes spin': {
+                                                    '0%': { transform: 'rotate(0deg)' },
+                                                    '100%': { transform: 'rotate(360deg)' },
+                                                },
+                                            }}
+                                        />
+                                    </IconButton>
+                                </span>
+                            </Tooltip>
+                        </Box>
+
+                        {latency !== undefined && (
+                            <Chip label={`${latency} ms`} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.65rem', cursor: 'help' }} />
+                        )}
+                        <Tooltip title={t('gatrixEdges.viewDetails')} leaveDelay={0}>
+                            <IconButton size="small" onClick={() => openJsonDialog(stats, t('gatrixEdges.requestStats'))}>
+                                <VisibilityIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                        </Tooltip>
+                    </Stack>
+                </Box>
+
+                {error && (
+                    <Alert severity="error" sx={{ py: 0.2, px: 1, mb: 1, '& .MuiAlert-message': { fontSize: '0.75rem' } }}>
+                        {error}
+                    </Alert>
+                )}
+
+                {/* Summary Table */}
+                <Box sx={{
+                    width: '100%',
+                    overflowX: 'auto',
+                    mb: 2,
+                    border: `1px solid ${theme.palette.divider} `,
+                    borderRadius: 0,
+                    bgcolor: theme.palette.background.paper
+                }}>
+                    <Table size="small" sx={{
+                        '& th': { fontWeight: 'bold', bgcolor: theme.palette.action.selected, py: 1, fontSize: '0.75rem' }
+                    }}>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>{t('gatrixEdges.uptime')}</TableCell>
+                                <TableCell align="right">{t('gatrixEdges.totalRequests')}</TableCell>
+                                <TableCell align="right">{t('gatrixEdges.avgResponse')}</TableCell>
+                                <TableCell align="right">Min</TableCell>
+                                <TableCell align="right">Max</TableCell>
+                                <TableCell align="right">↑</TableCell>
+                                <TableCell align="right">↓</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <TableRow sx={{ '& td': { py: 0.75, fontSize: '0.75rem' } }}>
+                                <TableCell sx={{ fontWeight: 'bold' }}>{formatUptime(uptimeSeconds || 0)}</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 'bold', color: theme.palette.secondary.main }}>{(totalRequests || 0).toLocaleString()}</TableCell>
+                                <TableCell align="right">{totals?.avgDurationMs || 0}ms</TableCell>
+                                <TableCell align="right">{totals?.minDurationMs || 0}ms</TableCell>
+                                <TableCell align="right">{totals?.maxDurationMs || 0}ms</TableCell>
+                                <TableCell align="right">{formatBytes(totals?.bytesSent || 0)}</TableCell>
+                                <TableCell align="right">{formatBytes(totals?.bytesReceived || 0)}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </Box>
+
+                {/* Status Codes Table */}
+                {statusCodes && Object.keys(statusCodes).length > 0 && (
+                    <Box sx={{
+                        width: '100%',
+                        overflowX: 'auto',
+                        mb: 2,
+                        border: `1px solid ${theme.palette.divider} `,
+                        borderRadius: 0,
+                        bgcolor: theme.palette.background.paper
+                    }}>
+                        <Table size="small" sx={{
+                            '& th': { fontWeight: 'bold', bgcolor: theme.palette.action.selected, py: 1, fontSize: '0.75rem' }
+                        }}>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell colSpan={Object.keys(statusCodes).length + 1}>{t('gatrixEdges.statusCodes')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    {Object.entries(statusCodes)
+                                        .sort(([a], [b]) => parseInt(a) - parseInt(b))
+                                        .map(([code]) => (
+                                            <TableCell
+                                                key={code}
+                                                align="center"
+                                                sx={{
+                                                    color: code.startsWith('2') ? theme.palette.success.main :
+                                                        code.startsWith('4') ? theme.palette.warning.main :
+                                                            code.startsWith('5') ? theme.palette.error.main : 'inherit'
+                                                }}
+                                            >
+                                                {code}
+                                            </TableCell>
+                                        ))}
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                <TableRow sx={{ '& td': { py: 0.75, fontSize: '0.75rem' } }}>
+                                    {Object.entries(statusCodes)
+                                        .sort(([a], [b]) => parseInt(a) - parseInt(b))
+                                        .map(([code, count]) => (
+                                            <TableCell key={code} align="center" sx={{ fontWeight: 'bold' }}>
+                                                {count.toLocaleString()}
+                                            </TableCell>
+                                        ))}
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </Box>
+                )}
+
+                {/* Endpoints Table */}
+                {endpoints && Object.keys(endpoints).length > 0 && (
+                    <Box sx={{
+                        width: '100%',
+                        overflowX: 'auto',
+                        border: `1px solid ${theme.palette.divider} `,
+                        borderRadius: 0,
+                        bgcolor: theme.palette.background.paper
+                    }}>
+                        <Table size="small" sx={{
+                            minWidth: 600,
+                            '& th': { fontWeight: 'bold', bgcolor: theme.palette.action.selected, py: 1, fontSize: '0.7rem' }
+                        }}>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>{t('gatrixEdges.endpoint')}</TableCell>
+                                    <TableCell align="right">{t('gatrixEdges.count')}</TableCell>
+                                    <TableCell>{t('gatrixEdges.statusCodes')}</TableCell>
+                                    <TableCell align="right">{t('gatrixEdges.avgMs')}</TableCell>
+                                    <TableCell align="right">P95</TableCell>
+                                    <TableCell align="right">P99</TableCell>
+                                    <TableCell align="right">↑ Sent</TableCell>
+                                    <TableCell align="right">↓ Recv</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {Object.entries(endpoints)
+                                    .sort(([, a], [, b]) => b.count - a.count)
+                                    .slice(0, 20) // Show top 20 endpoints
+                                    .map(([endpoint, data]) => (
+                                        <TableRow key={endpoint} sx={{
+                                            '& td': { py: 0.5, fontSize: '0.7rem' },
+                                            '&:nth-of-type(odd)': { bgcolor: theme.palette.action.hover }
+                                        }}>
+                                            <TableCell sx={{ fontFamily: 'monospace', maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                <Tooltip title={endpoint}>
+                                                    <span>{endpoint}</span>
+                                                </Tooltip>
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ fontWeight: 'bold' }}>{data.count.toLocaleString()}</TableCell>
+                                            <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                                                {(data as any).statusCodes && Object.entries((data as any).statusCodes)
+                                                    .sort(([a], [b]) => parseInt(a) - parseInt(b))
+                                                    .map(([code, count]) => (
+                                                        <Chip
+                                                            key={code}
+                                                            label={`${code}: ${(count as number).toLocaleString()} `}
+                                                            size="small"
+                                                            color={code.startsWith('2') ? 'success' : code.startsWith('3') ? 'info' : code.startsWith('4') ? 'warning' : code.startsWith('5') ? 'error' : 'default'}
+                                                            variant="outlined"
+                                                            sx={{ mr: 0.3, fontSize: '0.6rem', height: 18, '& .MuiChip-label': { px: 0.5 } }}
+                                                        />
+                                                    ))}
+                                            </TableCell>
+                                            <TableCell align="right">{data.avgDurationMs}</TableCell>
+                                            <TableCell align="right">{data.p95DurationMs}</TableCell>
+                                            <TableCell align="right">{data.p99DurationMs}</TableCell>
+                                            <TableCell align="right">{formatBytes(data.bytesSent)}</TableCell>
+                                            <TableCell align="right">{formatBytes(data.bytesReceived)}</TableCell>
+                                        </TableRow>
+                                    ))}
+                            </TableBody>
+                        </Table>
+                    </Box>
+                )}
             </Box>
         );
     };
@@ -846,7 +1314,7 @@ const GatrixEdgesPage: React.FC = () => {
 
                 <Card
                     sx={{
-                        border: `1px solid ${theme.palette.divider}`,
+                        border: `1px solid ${theme.palette.divider} `,
                         boxShadow: depth === 0 ? theme.shadows[1] : 'none'
                     }}
                 >
@@ -872,7 +1340,7 @@ const GatrixEdgesPage: React.FC = () => {
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             {hasChildren && (
                                 <Chip
-                                    label={`${group.children!.length} ${t('gatrixEdges.subgroups')}`}
+                                    label={`${group.children!.length} ${t('gatrixEdges.subgroups')} `}
                                     size="small"
                                     variant="outlined"
                                     sx={{ height: 20, fontSize: '0.7rem' }}
@@ -880,7 +1348,7 @@ const GatrixEdgesPage: React.FC = () => {
                             )}
                             {hasInstances && (
                                 <Chip
-                                    label={`${group.instances.length} ${t('gatrixEdges.instances')}`}
+                                    label={`${group.instances.length} ${t('gatrixEdges.instances')} `}
                                     size="small"
                                     variant="outlined"
                                     sx={{ height: 20, fontSize: '0.7rem' }}
@@ -930,7 +1398,7 @@ const GatrixEdgesPage: React.FC = () => {
                     position: 'relative',
                     px: 1.5, // Increased horizontal padding
                     pt: 3, // Increased top space for curve
-                    width: 440, // Increased width to match original look
+                    width: 550, // Increased width for better readability
                     flexShrink: 0,
                     display: 'flex',
                     flexDirection: 'column',
@@ -948,8 +1416,8 @@ const GatrixEdgesPage: React.FC = () => {
                                 right: 0,
                                 width: '50%',
                                 height: 24,
-                                borderTop: `2px solid ${theme.palette.divider}`,
-                                borderLeft: `2px solid ${theme.palette.divider}`,
+                                borderTop: `2px solid ${theme.palette.divider} `,
+                                borderLeft: `2px solid ${theme.palette.divider} `,
                                 borderTopLeftRadius: 12,
                             }} />
                         )}
@@ -962,8 +1430,8 @@ const GatrixEdgesPage: React.FC = () => {
                                 left: 0,
                                 width: '50%',
                                 height: 24,
-                                borderTop: `2px solid ${theme.palette.divider}`,
-                                borderRight: `2px solid ${theme.palette.divider}`,
+                                borderTop: `2px solid ${theme.palette.divider} `,
+                                borderRight: `2px solid ${theme.palette.divider} `,
                                 borderTopRightRadius: 12,
                             }} />
                         )}
@@ -1046,7 +1514,7 @@ const GatrixEdgesPage: React.FC = () => {
                     px: 2,
                     bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
                     borderRadius: 0,
-                    border: `1px solid ${theme.palette.divider}`
+                    border: `1px solid ${theme.palette.divider} `
                 }}>
                     <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5, mr: 0.5 }}>
                         {t('gatrixEdges.groupBy')}
@@ -1172,7 +1640,7 @@ const GatrixEdgesPage: React.FC = () => {
                             sx={{
                                 minWidth: 180,
                                 textAlign: 'center',
-                                border: `2px solid ${theme.palette.primary.main}`,
+                                border: `2px solid ${theme.palette.primary.main} `,
                                 boxShadow: theme.shadows[2],
                                 // Ensure card sits on top of the line
                                 zIndex: 1,
@@ -1205,7 +1673,7 @@ const GatrixEdgesPage: React.FC = () => {
                     {/* Groups container */}
                     <Box sx={{
                         width: '100%',
-                        maxWidth: groupingLevels.length === 0 ? '100%' : 480,
+                        maxWidth: groupingLevels.length === 0 ? '100%' : 600,
                         display: 'flex',
                         flexDirection: groupingLevels.length === 0 ? 'row' : 'column',
                         alignItems: groupingLevels.length === 0 ? 'flex-start' : 'center',
@@ -1281,7 +1749,7 @@ const GatrixEdgesPage: React.FC = () => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: 2,
-                        borderBottom: `1px solid ${theme.palette.divider}`,
+                        borderBottom: `1px solid ${theme.palette.divider} `,
                         bgcolor: theme.palette.background.default
                     }}
                 >
@@ -1307,71 +1775,384 @@ const GatrixEdgesPage: React.FC = () => {
                     </Box>
 
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <TextField
+                        {/* View Mode Toggle */}
+                        <ToggleButtonGroup
+                            value={detailViewMode}
+                            exclusive
+                            onChange={(_, newMode) => newMode && setDetailViewMode(newMode)}
                             size="small"
-                            placeholder="Find..."
-                            value={jsonSearchQuery}
-                            onChange={(e) => setJsonSearchQuery(e.target.value)}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon fontSize="small" sx={{ color: 'text.secondary' }} />
-                                    </InputAdornment>
-                                ),
-                                sx: {
-                                    height: 36,
-                                    width: 220,
-                                    fontSize: '0.875rem',
-                                    bgcolor: theme.palette.background.paper
+                            sx={{
+                                height: 36,
+                                '& .MuiToggleButton-root': {
+                                    borderRadius: 0,
+                                    px: 1.5,
+                                    textTransform: 'none',
+                                    fontSize: '0.8rem'
                                 }
                             }}
-                        />
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: theme.palette.action.hover, borderRadius: 0, px: 0.5, height: 36, visibility: jsonSearchMatches.length > 0 ? 'visible' : 'hidden' }}>
-                            <Typography variant="caption" sx={{ mx: 0.5, minWidth: 40, textAlign: 'center', fontWeight: 'bold' }}>
-                                {jsonSearchIndex + 1} / {jsonSearchMatches.length}
-                            </Typography>
-                            <Divider orientation="vertical" flexItem sx={{ my: 0.5 }} />
-                            <IconButton size="small" onClick={handlePrevMatch} sx={{ p: 0.5 }}>
-                                <KeyboardArrowUp fontSize="small" />
-                            </IconButton>
-                            <IconButton size="small" onClick={handleNextMatch} sx={{ p: 0.5 }}>
-                                <KeyboardArrowDown fontSize="small" />
-                            </IconButton>
-                        </Box>
+                        >
+                            <ToggleButton value="table">
+                                <TableChartIcon sx={{ fontSize: 18, mr: 0.5 }} />
+                                {t('common.table')}
+                            </ToggleButton>
+                            <ToggleButton value="json">
+                                <CodeIcon sx={{ fontSize: 18, mr: 0.5 }} />
+                                JSON
+                            </ToggleButton>
+                        </ToggleButtonGroup>
+
+                        {/* Search - JSON mode only */}
+                        {detailViewMode === 'json' && (
+                            <>
+                                <TextField
+                                    size="small"
+                                    placeholder="Find..."
+                                    value={jsonSearchQuery}
+                                    onChange={(e) => setJsonSearchQuery(e.target.value)}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <SearchIcon fontSize="small" sx={{ color: 'text.secondary' }} />
+                                            </InputAdornment>
+                                        ),
+                                        sx: {
+                                            height: 36,
+                                            width: 180,
+                                            fontSize: '0.875rem',
+                                            bgcolor: theme.palette.background.paper
+                                        }
+                                    }}
+                                />
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: theme.palette.action.hover, borderRadius: 0, px: 0.5, height: 36, visibility: jsonSearchMatches.length > 0 ? 'visible' : 'hidden' }}>
+                                    <Typography variant="caption" sx={{ mx: 0.5, minWidth: 40, textAlign: 'center', fontWeight: 'bold' }}>
+                                        {jsonSearchIndex + 1} / {jsonSearchMatches.length}
+                                    </Typography>
+                                    <Divider orientation="vertical" flexItem sx={{ my: 0.5 }} />
+                                    <IconButton size="small" onClick={handlePrevMatch} sx={{ p: 0.5 }}>
+                                        <KeyboardArrowUp fontSize="small" />
+                                    </IconButton>
+                                    <IconButton size="small" onClick={handleNextMatch} sx={{ p: 0.5 }}>
+                                        <KeyboardArrowDown fontSize="small" />
+                                    </IconButton>
+                                </Box>
+                            </>
+                        )}
                     </Box>
                 </Box>
 
-                {/* Monaco Editor Content */}
+                {/* Content - Table or JSON */}
                 <DialogContent sx={{
-                    p: 0,
-                    bgcolor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#ffffff',
-                    overflow: 'hidden'
+                    p: detailViewMode === 'table' ? 2 : 0,
+                    bgcolor: detailViewMode === 'json' ? (theme.palette.mode === 'dark' ? '#1e1e1e' : '#ffffff') : 'inherit',
+                    overflow: 'auto'
                 }}>
-                    <Box sx={{ height: 'calc(70vh - 160px)', minHeight: 400 }}>
-                        <Editor
-                            height="100%"
-                            language="json"
-                            theme={theme.palette.mode === 'dark' ? 'vs-dark' : 'light'}
-                            value={JSON.stringify(jsonDialogData, null, 2)}
-                            onMount={handleEditorDidMount}
-                            options={{
-                                readOnly: true,
-                                minimap: { enabled: true },
-                                scrollBeyondLastLine: false,
-                                fontSize: 13,
-                                lineNumbers: 'on',
-                                automaticLayout: true,
-                                padding: { top: 16, bottom: 16 },
-                                renderLineHighlight: 'all',
-                                wordWrap: 'off',
-                                folding: true,
-                                scrollbar: {
-                                    verticalScrollbarSize: 12,
-                                    horizontalScrollbarSize: 12
-                                }
-                            }}
-                        />
-                    </Box>
+                    {detailViewMode === 'table' ? (
+                        <Box sx={{ height: 'calc(70vh - 160px)', minHeight: 400, overflow: 'auto', p: 2 }}>
+                            {jsonDialogData && (() => {
+                                // Helper: Get color for status code chip
+                                const getStatusColor = (code: string): 'success' | 'info' | 'warning' | 'error' | 'default' => {
+                                    if (code.startsWith('2')) return 'success';
+                                    if (code.startsWith('3')) return 'info';
+                                    if (code.startsWith('4')) return 'warning';
+                                    if (code.startsWith('5')) return 'error';
+                                    return 'default';
+                                };
+
+                                // Helper: Format bytes
+                                const formatBytesLocal = (bytes: number): string => {
+                                    if (bytes === 0) return '0 B';
+                                    const k = 1024;
+                                    const sizes = ['B', 'KB', 'MB', 'GB'];
+                                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                                };
+
+                                // Render primitive value with formatting
+                                const renderPrimitive = (val: any, key?: string): React.ReactNode => {
+                                    if (val === null || val === undefined) {
+                                        return <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>null</Typography>;
+                                    }
+                                    // Format based on key hints
+                                    if (key) {
+                                        const lowerKey = key.toLowerCase();
+                                        if (lowerKey.includes('bytes') && typeof val === 'number') {
+                                            return <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{formatBytesLocal(val)}</Typography>;
+                                        }
+                                        if ((lowerKey.includes('time') || lowerKey.includes('date')) && typeof val === 'string') {
+                                            try {
+                                                const date = new Date(val);
+                                                if (!isNaN(date.getTime())) {
+                                                    return <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{date.toLocaleString()}</Typography>;
+                                                }
+                                            } catch { }
+                                        }
+                                        if (lowerKey.includes('duration') && typeof val === 'number') {
+                                            return <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{val} ms</Typography>;
+                                        }
+                                    }
+                                    return <Typography variant="body2" sx={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>{String(val)}</Typography>;
+                                };
+
+                                // Render status codes as colored chips
+                                const renderStatusCodes = (codes: Record<string, number>): React.ReactNode => {
+                                    const entries = Object.entries(codes).sort(([a], [b]) => parseInt(a) - parseInt(b));
+                                    return (
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                            {entries.map(([code, count]) => (
+                                                <Chip
+                                                    key={code}
+                                                    label={`${code}: ${count.toLocaleString()}`}
+                                                    size="small"
+                                                    color={getStatusColor(code)}
+                                                    variant="filled"
+                                                    sx={{ fontSize: '0.75rem', fontWeight: 'bold' }}
+                                                />
+                                            ))}
+                                        </Box>
+                                    );
+                                };
+
+                                // Render endpoints table with expandable rows
+                                const renderEndpoints = (endpoints: Record<string, any>): React.ReactNode => {
+                                    const entries = Object.entries(endpoints).sort(([, a], [, b]) => (b.count || 0) - (a.count || 0));
+                                    return (
+                                        <Box sx={{ border: `1px solid ${theme.palette.divider}` }}>
+                                            <Table size="small">
+                                                <TableHead>
+                                                    <TableRow sx={{ bgcolor: theme.palette.action.selected }}>
+                                                        <TableCell sx={{ fontWeight: 'bold', width: '35%' }}>{t('gatrixEdges.endpoint')}</TableCell>
+                                                        <TableCell align="right" sx={{ fontWeight: 'bold' }}>{t('gatrixEdges.count')}</TableCell>
+                                                        <TableCell sx={{ fontWeight: 'bold' }}>{t('gatrixEdges.statusCodes')}</TableCell>
+                                                        <TableCell align="right" sx={{ fontWeight: 'bold' }}>Avg</TableCell>
+                                                        <TableCell align="right" sx={{ fontWeight: 'bold' }}>P95</TableCell>
+                                                        <TableCell align="right" sx={{ fontWeight: 'bold' }}>↑ Sent</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {entries.map(([endpoint, data]) => (
+                                                        <TableRow key={endpoint} sx={{ '&:nth-of-type(odd)': { bgcolor: theme.palette.action.hover } }}>
+                                                            <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                                                                <Tooltip title={endpoint}><span>{endpoint}</span></Tooltip>
+                                                            </TableCell>
+                                                            <TableCell align="right" sx={{ fontWeight: 'bold' }}>{data.count?.toLocaleString() || 0}</TableCell>
+                                                            <TableCell>
+                                                                {data.statusCodes && Object.keys(data.statusCodes).length > 0
+                                                                    ? renderStatusCodes(data.statusCodes)
+                                                                    : <Typography variant="caption" color="text.secondary">-</Typography>
+                                                                }
+                                                            </TableCell>
+                                                            <TableCell align="right">{data.avgDurationMs ?? 0}ms</TableCell>
+                                                            <TableCell align="right">{data.p95DurationMs ?? 0}ms</TableCell>
+                                                            <TableCell align="right">{formatBytesLocal(data.bytesSent || 0)}</TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </Box>
+                                    );
+                                };
+
+                                // Render totals section
+                                const renderTotals = (totals: Record<string, any>): React.ReactNode => {
+                                    return (
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                                            {Object.entries(totals).map(([key, val]) => (
+                                                <Box key={key} sx={{
+                                                    p: 1.5,
+                                                    bgcolor: theme.palette.action.hover,
+                                                    border: `1px solid ${theme.palette.divider}`,
+                                                    minWidth: 120,
+                                                    textAlign: 'center'
+                                                }}>
+                                                    <Typography variant="caption" color="text.secondary" display="block">{key}</Typography>
+                                                    <Typography variant="h6" sx={{ fontFamily: 'monospace', fontWeight: 'bold' }}>
+                                                        {key.toLowerCase().includes('bytes')
+                                                            ? formatBytesLocal(val as number)
+                                                            : key.toLowerCase().includes('duration')
+                                                                ? `${val}ms`
+                                                                : typeof val === 'number' ? val.toLocaleString() : String(val)
+                                                        }
+                                                    </Typography>
+                                                </Box>
+                                            ))}
+                                        </Box>
+                                    );
+                                };
+
+                                // Render generic object as table
+                                const renderObject = (obj: Record<string, any>, level: number = 0): React.ReactNode => {
+                                    const entries = Object.entries(obj);
+                                    return (
+                                        <Table size="small" sx={{
+                                            ml: level * 2,
+                                            '& td': { py: 0.75, fontSize: '0.875rem', borderBottom: `1px solid ${theme.palette.divider}` }
+                                        }}>
+                                            <TableBody>
+                                                {entries.map(([key, val]) => (
+                                                    <TableRow key={key}>
+                                                        <TableCell sx={{
+                                                            fontWeight: 'bold',
+                                                            width: '35%',
+                                                            fontSize: '0.875rem',
+                                                            bgcolor: level === 0 ? theme.palette.action.selected : theme.palette.action.hover,
+                                                            verticalAlign: 'top'
+                                                        }}>
+                                                            {key}
+                                                        </TableCell>
+                                                        <TableCell sx={{ fontSize: '0.875rem' }}>{renderAnyValue(val, key, level)}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    );
+                                };
+
+                                // Main render function for any value
+                                const renderAnyValue = (val: any, key?: string, level: number = 0): React.ReactNode => {
+                                    // Null/undefined
+                                    if (val === null || val === undefined) {
+                                        return <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>null</Typography>;
+                                    }
+
+                                    // Primitives
+                                    if (typeof val !== 'object') {
+                                        return renderPrimitive(val, key);
+                                    }
+
+                                    // Arrays
+                                    if (Array.isArray(val)) {
+                                        if (val.length === 0) {
+                                            return <Typography variant="body2" color="text.secondary">[ ]</Typography>;
+                                        }
+                                        if (val.every(v => typeof v !== 'object')) {
+                                            return (
+                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                    {val.slice(0, 20).map((item, i) => (
+                                                        <Chip key={i} label={String(item)} size="small" variant="outlined" sx={{ fontSize: '0.8rem' }} />
+                                                    ))}
+                                                    {val.length > 20 && <Chip label={`+${val.length - 20} more`} size="small" color="default" />}
+                                                </Box>
+                                            );
+                                        }
+                                        return (
+                                            <Box component="pre" sx={{ m: 0, p: 1, bgcolor: theme.palette.action.hover, fontSize: '0.8rem', fontFamily: 'monospace', maxHeight: 150, overflow: 'auto', whiteSpace: 'pre-wrap' }}>
+                                                {JSON.stringify(val, null, 2)}
+                                            </Box>
+                                        );
+                                    }
+
+                                    // Special handling for known keys
+                                    const lowerKey = key?.toLowerCase() || '';
+
+                                    // Status codes
+                                    if (lowerKey === 'statuscodes' && Object.keys(val).every(k => /^\d+$/.test(k))) {
+                                        return renderStatusCodes(val);
+                                    }
+
+                                    // Endpoints
+                                    if (lowerKey === 'endpoints') {
+                                        return renderEndpoints(val);
+                                    }
+
+                                    // Totals
+                                    if (lowerKey === 'totals') {
+                                        return renderTotals(val);
+                                    }
+
+                                    // Generic objects - expand up to level 2
+                                    const entries = Object.entries(val);
+                                    if (entries.length === 0) {
+                                        return <Typography variant="body2" color="text.secondary">{'{ }'}</Typography>;
+                                    }
+
+                                    // Small simple objects as chips
+                                    if (entries.length <= 4 && entries.every(([, v]) => typeof v !== 'object')) {
+                                        return (
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                {entries.map(([k, v]) => (
+                                                    <Chip key={k} label={`${k}: ${v}`} size="small" variant="outlined" sx={{ fontSize: '0.8rem', fontFamily: 'monospace' }} />
+                                                ))}
+                                            </Box>
+                                        );
+                                    }
+
+                                    // Nested objects - show as collapsible or nested table
+                                    if (level < 2) {
+                                        return renderObject(val, level + 1);
+                                    }
+
+                                    // Deep nesting - show as JSON
+                                    return (
+                                        <Box component="pre" sx={{ m: 0, p: 0.5, bgcolor: theme.palette.action.hover, fontSize: '0.8rem', fontFamily: 'monospace', maxHeight: 100, overflow: 'auto', whiteSpace: 'pre-wrap' }}>
+                                            {JSON.stringify(val, null, 2)}
+                                        </Box>
+                                    );
+                                };
+
+                                // Main render
+                                return (
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                        {Object.entries(jsonDialogData).map(([key, value]) => {
+                                            const isComplex = typeof value === 'object' && value !== null && !Array.isArray(value) && Object.keys(value).length > 4;
+
+                                            return (
+                                                <Box key={key} sx={{ border: `1px solid ${theme.palette.divider}` }}>
+                                                    <Box sx={{
+                                                        px: 2,
+                                                        py: 1,
+                                                        bgcolor: theme.palette.action.selected,
+                                                        borderBottom: `1px solid ${theme.palette.divider}`,
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        alignItems: 'center'
+                                                    }}>
+                                                        <Typography variant="subtitle2" fontWeight="bold">{key}</Typography>
+                                                        {typeof value === 'object' && value !== null && (
+                                                            <Chip
+                                                                label={Array.isArray(value) ? `${value.length} items` : `${Object.keys(value).length} keys`}
+                                                                size="small"
+                                                                variant="outlined"
+                                                                sx={{ fontSize: '0.65rem', height: 20 }}
+                                                            />
+                                                        )}
+                                                    </Box>
+                                                    <Box sx={{ p: isComplex ? 0 : 2 }}>
+                                                        {renderAnyValue(value, key)}
+                                                    </Box>
+                                                </Box>
+                                            );
+                                        })}
+                                    </Box>
+                                );
+                            })()}
+                        </Box>
+                    ) : (
+                        <Box sx={{ height: 'calc(70vh - 160px)', minHeight: 400 }}>
+                            <Editor
+                                height="100%"
+                                language="json"
+                                theme={theme.palette.mode === 'dark' ? 'vs-dark' : 'light'}
+                                value={JSON.stringify(jsonDialogData, null, 2)}
+                                onMount={handleEditorDidMount}
+                                options={{
+                                    readOnly: true,
+                                    minimap: { enabled: true },
+                                    scrollBeyondLastLine: false,
+                                    fontSize: 13,
+                                    lineNumbers: 'on',
+                                    automaticLayout: true,
+                                    padding: { top: 16, bottom: 16 },
+                                    renderLineHighlight: 'all',
+                                    wordWrap: 'off',
+                                    folding: true,
+                                    scrollbar: {
+                                        verticalScrollbarSize: 12,
+                                        horizontalScrollbarSize: 12
+                                    }
+                                }}
+                            />
+                        </Box>
+                    )}
                 </DialogContent>
 
                 {/* Footer Actions */}
@@ -1379,16 +2160,14 @@ const GatrixEdgesPage: React.FC = () => {
                     sx={{
                         px: 3,
                         py: 2,
-                        borderTop: `1px solid ${theme.palette.divider}`,
+                        borderTop: `1px solid ${theme.palette.divider} `,
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         bgcolor: theme.palette.background.default
                     }}
                 >
-                    <Typography variant="caption" color="text.secondary">
-                        {t('gatrixEdges.viewJson')}
-                    </Typography>
+                    <Box />{/* Spacer */}
                     <Stack direction="row" spacing={1.5}>
                         <Button
                             variant="outlined"
