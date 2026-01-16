@@ -87,6 +87,7 @@ import { usePageState } from '../../hooks/usePageState';
 import { useDebounce } from '../../hooks/useDebounce';
 import LogViewer from '../../components/LogViewer';
 import StackTraceViewer from '../../components/StackTraceViewer';
+import SearchTextField from '../../components/common/SearchTextField';
 
 // Column definition interface
 interface ColumnConfig {
@@ -878,49 +879,11 @@ const CrashEventsPage: React.FC = () => {
             />
 
             {/* Search */}
-            <TextField
+            <SearchTextField
               placeholder={t('crashes.searchPlaceholder')}
-              size="small"
-              sx={{
-                minWidth: 450,
-                flexGrow: 1,
-                maxWidth: 450,
-                '& .MuiOutlinedInput-root': {
-                  height: '40px',
-                  borderRadius: '20px',
-                  bgcolor: 'background.paper',
-                  transition: 'all 0.2s ease-in-out',
-                  '& fieldset': {
-                    borderColor: 'divider',
-                  },
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                    '& fieldset': {
-                      borderColor: 'primary.light',
-                    }
-                  },
-                  '&.Mui-focused': {
-                    bgcolor: 'background.paper',
-                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                    '& fieldset': {
-                      borderColor: 'primary.main',
-                      borderWidth: '1px',
-                    }
-                  }
-                },
-                '& .MuiInputBase-input': {
-                  fontSize: '0.875rem',
-                }
-              }}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                  </InputAdornment>
-                ),
-              }}
+              onChange={setSearchTerm}
+              sx={{ minWidth: 450, maxWidth: 450 }}
             />
 
             {/* Dynamic Filter Bar */}

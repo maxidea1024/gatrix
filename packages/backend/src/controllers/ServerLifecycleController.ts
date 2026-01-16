@@ -16,6 +16,7 @@ class ServerLifecycleController {
             const {
                 page = 1,
                 limit = 20,
+                search,
                 serviceType,
                 instanceId,
                 environment,
@@ -39,6 +40,21 @@ class ServerLifecycleController {
             const query = ServerLifecycleEvent.query()
                 .select('g_server_lifecycle_events.*')
                 .orderBy(`g_server_lifecycle_events.${safeSortBy}`, safeSortOrder);
+
+            // Generic search across multiple fields
+            if (search) {
+                const searchTerm = `%${search}%`;
+                query.where(function () {
+                    this.where('g_server_lifecycle_events.serviceType', 'like', searchTerm)
+                        .orWhere('g_server_lifecycle_events.instanceId', 'like', searchTerm)
+                        .orWhere('g_server_lifecycle_events.hostname', 'like', searchTerm)
+                        .orWhere('g_server_lifecycle_events.serviceGroup', 'like', searchTerm)
+                        .orWhere('g_server_lifecycle_events.environment', 'like', searchTerm)
+                        .orWhere('g_server_lifecycle_events.externalAddress', 'like', searchTerm)
+                        .orWhere('g_server_lifecycle_events.internalAddress', 'like', searchTerm)
+                        .orWhere('g_server_lifecycle_events.appVersion', 'like', searchTerm);
+                });
+            }
 
             if (serviceType) {
                 query.where('g_server_lifecycle_events.serviceType', serviceType as string);

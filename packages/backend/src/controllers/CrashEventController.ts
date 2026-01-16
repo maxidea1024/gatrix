@@ -43,15 +43,14 @@ export class CrashEventController {
     // Build query
     let query = CrashEvent.query();
 
-    // Search filter (accountId, characterId, gameUserId, userName, firstLine)
+    // Search filter (accountId, characterId, gameUserId, userName)
     if (search) {
       query = query.where((builder) => {
         builder
           .where('accountId', 'like', `%${search}%`)
           .orWhere('characterId', 'like', `%${search}%`)
           .orWhere('gameUserId', 'like', `%${search}%`)
-          .orWhere('userName', 'like', `%${search}%`)
-          .orWhere('firstLine', 'like', `%${search}%`);
+          .orWhere('userName', 'like', `%${search}%`);
       });
     }
 

@@ -117,6 +117,7 @@ import MaintenanceSettingsInput from '../../components/common/MaintenanceSetting
 import { parseJson5 } from '../../components/common/JsonEditor';
 import { TableLoadingRow } from '@/components/common/TableLoadingRow';
 import { TableSkeletonRows } from '@/components/common/TableSkeletonRows';
+import SearchTextField from '../../components/common/SearchTextField';
 
 // Column definition interface
 interface ColumnConfig {
@@ -1493,49 +1494,10 @@ const GameWorldsPage: React.FC = () => {
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', justifyContent: 'space-between' }}>
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flexGrow: 1 }}>
-              <TextField
+              <SearchTextField
                 placeholder={t('gameWorlds.searchPlaceholder')}
                 value={search}
-                onChange={handleSearchChange}
-                sx={{
-                  minWidth: 200,
-                  flexGrow: 1,
-                  maxWidth: 320,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
-                    '& fieldset': {
-                      borderColor: 'divider',
-                    },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': {
-                        borderColor: 'primary.light',
-                      }
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      }
-                    }
-                  },
-                  '& .MuiInputBase-input': {
-                    fontSize: '0.875rem',
-                  }
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                    </InputAdornment>
-                  ),
-                }}
-                size="small"
+                onChange={setSearch}
               />
 
               {/* Dynamic Filter Bar */}
