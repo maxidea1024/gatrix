@@ -222,4 +222,3 @@ export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, Popu
     return filtered.sort((a, b) => a.displayPriority - b.displayPriority);
   }
 }
-

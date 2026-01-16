@@ -267,4 +267,3 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     return this.envResolver.isMultiEnvironmentMode();
   }
 }
-

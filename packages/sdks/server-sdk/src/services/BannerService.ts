@@ -142,4 +142,3 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
     return banners.filter((b) => b.status === status);
   }
 }
-

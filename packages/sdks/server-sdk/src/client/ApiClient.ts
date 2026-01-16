@@ -39,6 +39,11 @@ export class ApiClient {
   private etagStore: Map<string, string>;
   private bodyCache: Map<string, ApiResponse<any>>;
 
+  // Connection recovery callback system
+  private connectionRecoveryCallbacks: Array<() => void> = [];
+  private lastRecoveryTriggerTime: number = 0;
+  private recoveryThrottleMs: number = 5000; // Throttle: max once per 5 seconds
+
   constructor(config: ApiClientConfig) {
     this.logger = config.logger || new Logger();
     this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...config.retry };
@@ -282,11 +287,14 @@ export class ApiClient {
 
         // Log recovery if this was a retry attempt (attempt > 0 means we had at least one failure)
         if (attempt > 0) {
-          this.logger.info('Connection recovered after retries', {
+          this.logger.info('*** API connection restored ***', {
             method: context.method,
             url: context.url,
             retriesNeeded: attempt,
           });
+
+          // Trigger connection recovery callbacks (throttled)
+          this.triggerConnectionRecoveryCallbacks();
         }
 
         return response.data;
@@ -563,5 +571,60 @@ export class ApiClient {
     this.etagStore.clear();
     this.bodyCache.clear();
     this.logger.debug('Cleared all ETag cache', { count });
+  }
+
+  /**
+   * Register a callback to be called when connection is recovered after retries
+   * Callbacks are throttled to prevent multiple triggers in quick succession
+   * @param callback Function to call on connection recovery
+   * @returns Function to unregister the callback
+   */
+  onConnectionRecovered(callback: () => void): () => void {
+    this.connectionRecoveryCallbacks.push(callback);
+    return () => {
+      const index = this.connectionRecoveryCallbacks.indexOf(callback);
+      if (index !== -1) {
+        this.connectionRecoveryCallbacks.splice(index, 1);
+      }
+    };
+  }
+
+  /**
+   * Trigger connection recovery callbacks (with throttle)
+   * Called internally when a request succeeds after retries
+   */
+  private triggerConnectionRecoveryCallbacks(): void {
+    const now = Date.now();
+
+    // Throttle: only trigger if enough time has passed since last trigger
+    if (now - this.lastRecoveryTriggerTime < this.recoveryThrottleMs) {
+      this.logger.debug('Connection recovery callback throttled', {
+        timeSinceLastTrigger: now - this.lastRecoveryTriggerTime,
+        throttleMs: this.recoveryThrottleMs,
+      });
+      return;
+    }
+
+    this.lastRecoveryTriggerTime = now;
+
+    // Call all registered callbacks asynchronously (don't block the request)
+    if (this.connectionRecoveryCallbacks.length > 0) {
+      this.logger.debug('Triggering connection recovery callbacks', {
+        count: this.connectionRecoveryCallbacks.length,
+      });
+
+      // Execute callbacks in a microtask to avoid blocking
+      Promise.resolve().then(() => {
+        for (const callback of this.connectionRecoveryCallbacks) {
+          try {
+            callback();
+          } catch (error: any) {
+            this.logger.error('Error in connection recovery callback', {
+              error: error.message,
+            });
+          }
+        }
+      });
+    }
   }
 }

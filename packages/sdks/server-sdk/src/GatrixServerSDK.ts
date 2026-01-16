@@ -71,6 +71,11 @@ export class GatrixServerSDK {
   // Cloud metadata (auto-detected on initialization)
   private cloudMetadata: CloudMetadata = { provider: 'unknown' };
 
+  // Connection recovery handling
+  private connectionRecoveryUnsubscribe?: () => void;
+  private isRefreshingAfterRecovery: boolean = false;
+  private connectionEventListeners: Map<string, EventCallback[]> = new Map();
+
   /**
    * Create SDK instance with optional overrides
    * Merges override options with base config, allowing per-program customization.
@@ -436,6 +441,11 @@ export class GatrixServerSDK {
 
       await this.cacheManager.initialize();
 
+      // Register connection recovery callback to refresh stale cache data
+      // When connection is restored after retries, cached data may be stale
+      // This ensures cache is refreshed with latest data from backend
+      this.registerConnectionRecoveryHandler();
+
       // Initialize event listener only if using event-based refresh method
       const refreshMethod = cacheConfig.refreshMethod ?? 'polling';
       if (this.config.redis && refreshMethod === 'event') {
@@ -487,6 +497,83 @@ export class GatrixServerSDK {
     } catch (error: any) {
       this.logger.error('Failed to initialize SDK', { error: error.message });
       throw error;
+    }
+  }
+
+  /**
+   * Register connection recovery handler to refresh cache when connection is restored
+   * This ensures cached data is up-to-date after connection issues
+   */
+  private registerConnectionRecoveryHandler(): void {
+    // Unsubscribe from previous handler if exists (shouldn't happen, but defensive)
+    if (this.connectionRecoveryUnsubscribe) {
+      this.connectionRecoveryUnsubscribe();
+    }
+
+    // Register callback with ApiClient
+    this.connectionRecoveryUnsubscribe = this.apiClient.onConnectionRecovered(() => {
+      // Emit connection.restored event to listeners
+      this.emitConnectionEvent('connection.restored');
+
+      // Skip if already refreshing (prevents concurrent refresh attempts)
+      if (this.isRefreshingAfterRecovery) {
+        this.logger.debug('Skipping cache refresh - already in progress');
+        return;
+      }
+
+      // Skip if cache manager is not available
+      if (!this.cacheManager) {
+        this.logger.debug('Skipping cache refresh - cache manager not initialized');
+        return;
+      }
+
+      this.isRefreshingAfterRecovery = true;
+
+      this.logger.info('Refreshing cache after connection recovery');
+
+      // Refresh cache asynchronously - don't block the request completion
+      this.cacheManager.refreshAll()
+        .then(() => {
+          this.logger.info('Cache refreshed successfully after connection recovery');
+        })
+        .catch((error: any) => {
+          // Log error but don't throw - cache refresh failure should not affect server operation
+          this.logger.warn('Failed to refresh cache after connection recovery', {
+            error: error.message,
+          });
+        })
+        .finally(() => {
+          this.isRefreshingAfterRecovery = false;
+        });
+    });
+
+    this.logger.debug('Connection recovery handler registered');
+  }
+
+  /**
+   * Emit connection event to all registered listeners
+   */
+  private emitConnectionEvent(eventType: string): void {
+    const listeners = this.connectionEventListeners.get(eventType) || [];
+    if (listeners.length === 0) {
+      return;
+    }
+
+    const event: SdkEvent = {
+      type: eventType,
+      data: {},
+      timestamp: new Date().toISOString(),
+    };
+
+    for (const callback of listeners) {
+      try {
+        callback(event);
+      } catch (error: any) {
+        this.logger.error('Error in connection event callback', {
+          eventType,
+          error: error.message,
+        });
+      }
     }
   }
 
@@ -1218,9 +1305,26 @@ export class GatrixServerSDK {
    * Register event listener
    * Works with both event-based and polling refresh methods
    * Also supports local.maintenance.started, local.maintenance.ended, and local.maintenance.updated events
+   * Also supports connection.restored event (triggered when API connection is recovered after retries)
    * Returns a function to unregister the listener
    */
   on(eventType: string, callback: EventCallback): () => void {
+    // Handle connection events
+    if (eventType === 'connection.restored') {
+      const listeners = this.connectionEventListeners.get(eventType) || [];
+      listeners.push(callback);
+      this.connectionEventListeners.set(eventType, listeners);
+
+      // Return unsubscribe function
+      return () => {
+        const currentListeners = this.connectionEventListeners.get(eventType) || [];
+        this.connectionEventListeners.set(
+          eventType,
+          currentListeners.filter((cb) => cb !== callback)
+        );
+      };
+    }
+
     // Handle local maintenance events separately (these are local events from MaintenanceWatcher)
     if (eventType === 'local.maintenance.started' || eventType === 'local.maintenance.ended' || eventType === 'local.maintenance.updated' || eventType === 'local.maintenance.grace_period_expired') {
       const listeners = this.maintenanceEventListeners.get(eventType) || [];
@@ -1255,11 +1359,19 @@ export class GatrixServerSDK {
       }
       const unsubscribe = this.cacheManager.onRefresh((type: string, data: any) => {
         // Convert cache refresh events to SDK events
-        callback({
-          type: type,
-          data: data,
-          timestamp: new Date().toISOString(),
-        });
+        // Wrap in try-catch to prevent user callback errors from affecting SDK
+        try {
+          callback({
+            type: type,
+            data: data,
+            timestamp: new Date().toISOString(),
+          });
+        } catch (error: any) {
+          this.logger.error('Error in user event callback', {
+            eventType: type,
+            error: error.message,
+          });
+        }
       });
       return unsubscribe;
     }
@@ -1698,6 +1810,12 @@ export class GatrixServerSDK {
     this.logger.info('Closing GatrixServerSDK...');
 
     try {
+      // Unsubscribe from connection recovery handler
+      if (this.connectionRecoveryUnsubscribe) {
+        this.connectionRecoveryUnsubscribe();
+        this.connectionRecoveryUnsubscribe = undefined;
+      }
+
       // Stop cache auto-refresh
       if (this.cacheManager) {
         this.cacheManager.destroy();

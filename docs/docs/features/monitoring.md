@@ -45,6 +45,9 @@ Grafana (both dev/prod):
 - `GRAFANA_ADMIN_PASSWORD`: default `admin` (mapped to `GF_SECURITY_ADMIN_PASSWORD`)
 - `GF_USERS_ALLOW_SIGN_UP`: defaults to `false`
 
+Backend:
+- `PROMETHEUS_IN_DOCKER`: default `true`. Set to `false` if Prometheus runs outside Docker (e.g., on host machine or separate monitoring server).
+
 Frontend:
 - `VITE_GRAFANA_URL`: Optional. If set, the Admin Panel shortcut uses this URL; otherwise it defaults to `http(s)://<host>:44000`.
 
@@ -225,19 +228,28 @@ Implementation pattern (Node.js/Express):
 
 When Prometheus runs in Docker but game servers run on the host (via PM2), Prometheus cannot access host IPs directly.
 
-**Solution**: The Backend automatically converts host IPs to `host.docker.internal` when `RUNNING_IN_DOCKER=true`:
+**Solution**: The Backend automatically converts host IPs to `host.docker.internal` for Prometheus targeting.
 
-1. Add to `docker-compose.yml` (backend service):
-   ```yaml
-   environment:
-     RUNNING_IN_DOCKER: "true"
-   ```
+**How it works:**
+- The Backend's `/api/v1/public/monitoring/prometheus/targets` endpoint checks if game server IPs are Docker internal (172.x.x.x) or host machine IPs.
+- For host machine IPs, it automatically converts them to `host.docker.internal`.
 
-2. Add to `docker-compose.yml` (prometheus service):
-   ```yaml
-   extra_hosts:
-     - "host.docker.internal:host-gateway"
-   ```
+**Environment Variable:**
+- `PROMETHEUS_IN_DOCKER` (default: `true`): Controls whether host IPs should be converted to `host.docker.internal`.
+  - `true` (default): Prometheus runs in Docker, convert host IPs to `host.docker.internal`
+  - `false`: Prometheus runs externally (e.g., on host or separate machine), use actual IP addresses
+
+**Docker Configuration:**
+Add to `docker-compose.yml` (prometheus service):
+```yaml
+extra_hosts:
+  - "host.docker.internal:host-gateway"
+```
+
+**When to set `PROMETHEUS_IN_DOCKER=false`:**
+- Prometheus runs directly on host machine (not in Docker)
+- Prometheus runs on a separate monitoring server
+- Using Kubernetes with proper network policies
 
 ### Grafana Logs Dashboard Not Showing All Log Levels
 

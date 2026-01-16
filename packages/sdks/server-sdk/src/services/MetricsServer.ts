@@ -197,11 +197,6 @@ export function createMetricsServer(config: MetricsServerConfig = {}): MetricsSe
     start(): void {
       server = app.listen(port, bindAddress, () => {
         config.logger?.info(`Metrics server listening on ${bindAddress}:${port}`);
-        if (bindAddress === '0.0.0.0') {
-          config.logger?.warn('⚠️  Metrics server is accessible within Docker network only');
-        } else {
-          config.logger?.warn('⚠️  Metrics server is bound to localhost only for security');
-        }
       });
     },
 
@@ -226,4 +221,3 @@ export function createMetricsServer(config: MetricsServerConfig = {}): MetricsSe
     },
   };
 }
-
