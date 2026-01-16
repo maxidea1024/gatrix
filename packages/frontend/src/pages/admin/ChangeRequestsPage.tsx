@@ -44,7 +44,7 @@ import changeRequestService, {
     ChangeRequestStatus,
 } from '@/services/changeRequestService';
 import SimplePagination from '@/components/common/SimplePagination';
-import EmptyTableRow from '@/components/common/EmptyTableRow';
+import EmptyState from '@/components/common/EmptyState';
 import ChangeRequestDetailDrawer from '@/components/admin/ChangeRequestDetailDrawer';
 import RevertPreviewDrawer from '@/components/admin/RevertPreviewDrawer';
 import { formatChangeRequestTitle } from '@/utils/changeRequestFormatter';
@@ -638,44 +638,44 @@ const ChangeRequestsPage: React.FC = () => {
 
                     {isLoading && <LinearProgress />}
 
-                    <TableContainer>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
+                    {!isLoading && (!data?.items || data.items.length === 0) ? (
+                        <EmptyState message={t('changeRequest.noRequests')} />
+                    ) : (
+                        <>
+                            <TableContainer>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>{t('changeRequest.status')}</TableCell>
+                                            <TableCell>{t('changeRequest.titleField')}</TableCell>
+                                            <TableCell>{t('changeRequest.requester')}</TableCell>
+                                            <TableCell>{t('changeRequest.priorityField')}</TableCell>
+                                            <TableCell align="center">{t('changeRequest.items')}</TableCell>
+                                            <TableCell align="center">{t('changeRequest.approvalProgress')}</TableCell>
+                                            <TableCell align="center">{t('changeRequest.lastUpdated')}</TableCell>
+                                            <TableCell align="center">{t('changeRequest.actions.label')}</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {data?.items.map((cr, idx) => (
+                                            <ChangeRequestRow key={cr.id} cr={cr} index={idx} onRefresh={handleRefresh} onOpenDrawer={handleOpenDrawer} />
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
 
-                                    <TableCell>{t('changeRequest.status')}</TableCell>
-                                    <TableCell>{t('changeRequest.titleField')}</TableCell>
-                                    <TableCell>{t('changeRequest.requester')}</TableCell>
-                                    <TableCell>{t('changeRequest.priorityField')}</TableCell>
-                                    <TableCell align="center">{t('changeRequest.items')}</TableCell>
-                                    <TableCell align="center">{t('changeRequest.approvalProgress')}</TableCell>
-                                    <TableCell align="center">{t('changeRequest.lastUpdated')}</TableCell>
-                                    <TableCell align="center">{t('changeRequest.actions.label')}</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {data?.items && data.items.length > 0 ? (
-                                    data.items.map((cr, idx) => (
-                                        <ChangeRequestRow key={cr.id} cr={cr} index={idx} onRefresh={handleRefresh} onOpenDrawer={handleOpenDrawer} />
-                                    ))
-                                ) : (
-                                    <EmptyTableRow colSpan={8} message={t('changeRequest.noRequests')} />
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-
-                    {/* Pagination */}
-                    {data && data.pagination && data.pagination.total > 0 && (
-                        <Box sx={{ p: 2 }}>
-                            <SimplePagination
-                                count={data.pagination.total}
-                                page={page}
-                                rowsPerPage={rowsPerPage}
-                                onPageChange={handlePageChange}
-                                onRowsPerPageChange={handleRowsPerPageChange}
-                            />
-                        </Box>
+                            {data && data.pagination && data.pagination.total > 0 && (
+                                <Box sx={{ p: 2 }}>
+                                    <SimplePagination
+                                        count={data.pagination.total}
+                                        page={page}
+                                        rowsPerPage={rowsPerPage}
+                                        onPageChange={handlePageChange}
+                                        onRowsPerPageChange={handleRowsPerPageChange}
+                                    />
+                                </Box>
+                            )}
+                        </>
                     )}
                 </CardContent>
             </Card>

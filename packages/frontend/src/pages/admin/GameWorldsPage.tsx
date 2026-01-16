@@ -104,7 +104,7 @@ import { useI18n } from '../../contexts/I18nContext';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { computeMaintenanceStatus, getMaintenanceStatusDisplay, MaintenanceStatusType } from '@/utils/maintenanceStatusUtils';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
-import EmptyTableRow from '../../components/common/EmptyTableRow';
+import EmptyState from '../../components/common/EmptyState';
 import translationService from '../../services/translationService';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import { messageTemplateService, MessageTemplate } from '@/services/messageTemplateService';
@@ -1602,15 +1602,16 @@ const GameWorldsPage: React.FC = () => {
                       loading={true}
                     />
                   ) : worlds.length === 0 ? (
-                    <EmptyTableRow
-                      colSpan={1 + columns.filter(col => col.visible).length + 2}
-                      loading={false}
-                      message={t('gameWorlds.noWorldsFound')}
-                      loadingMessage={t('common.loadingData')}
-                      subtitle={canManage ? t('common.addFirstItem') : undefined}
-                      onAddClick={canManage ? handleAddWorld : undefined}
-                      addButtonLabel={t('gameWorlds.addGameWorld')}
-                    />
+                    <TableRow>
+                      <TableCell colSpan={1 + columns.filter(col => col.visible).length + 2} sx={{ p: 0 }}>
+                        <EmptyState
+                          message={t('gameWorlds.noWorldsFound')}
+                          subtitle={canManage ? t('common.addFirstItem') : undefined}
+                          onAddClick={canManage ? handleAddWorld : undefined}
+                          addButtonLabel={t('gameWorlds.addGameWorld')}
+                        />
+                      </TableCell>
+                    </TableRow>
                   ) : (
                     <SortableContext
                       items={worlds.map(w => w.id)}

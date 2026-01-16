@@ -78,7 +78,7 @@ import { AuditLogService, AuditLogFilters } from '../../services/auditLogService
 import { AuditLog } from '../../types';
 import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyTableRow from '../../components/common/EmptyTableRow';
+import EmptyState from '../../components/common/EmptyState';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useI18n } from '../../contexts/I18nContext';
 import { koKR, zhCN, enUS } from '@mui/x-date-pickers/locales';
@@ -681,26 +681,19 @@ const AuditLogsPage: React.FC = () => {
             </TableHead>
             <TableBody>
               {isInitialLoad && loading ? (
-                // 스켈레톤 로딩 (초기 로딩 시에만)
-                Array.from({ length: 5 }).map((_, index) => (
-                  <TableRow key={`skeleton-${index}`}>
-                    <TableCell>
-                      <Skeleton variant="circular" width={32} height={32} />
-                    </TableCell>
-                    {columns.filter(col => col.visible).map((column) => (
-                      <TableCell key={column.id}>
-                        <Skeleton variant="text" width="80%" />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
+                <TableRow>
+                  <TableCell colSpan={columns.filter(col => col.visible).length + 1} align="center" sx={{ py: 6 }}>
+                    <Typography color="text.secondary">{t('common.loadingAuditLogs')}</Typography>
+                  </TableCell>
+                </TableRow>
               ) : auditLogs.length === 0 ? (
-                <EmptyTableRow
-                  colSpan={columns.filter(col => col.visible).length + 1}
-                  loading={false}
-                  message={t('auditLogs.noLogsFound')}
-                  loadingMessage={t('common.loadingAuditLogs')}
-                />
+                <TableRow>
+                  <TableCell colSpan={columns.filter(col => col.visible).length + 1} sx={{ p: 0 }}>
+                    <EmptyState
+                      message={t('auditLogs.noLogsFound')}
+                    />
+                  </TableCell>
+                </TableRow>
               ) : (
                 auditLogs.map((log, index) => (
                   <React.Fragment key={log.id}>

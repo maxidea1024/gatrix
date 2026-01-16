@@ -124,7 +124,7 @@ import { formatDateTimeDetailed, formatRelativeTime, parseUTCForPicker } from '.
 import { useI18n } from '../../contexts/I18nContext';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyTableRow from '../../components/common/EmptyTableRow';
+import EmptyState from '../../components/common/EmptyState';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import ClientVersionGuideDrawer from '../../components/admin/ClientVersionGuideDrawer';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
@@ -1578,19 +1578,20 @@ const ClientVersionsPage: React.FC = () => {
                   </TableRow>
                 ))
               ) : clientVersions.length === 0 ? (
-                <EmptyTableRow
-                  colSpan={canManage ? 12 : 10}
-                  loading={false}
-                  message={t('clientVersions.noVersionsFound')}
-                  loadingMessage={t('common.loadingClientVersions')}
-                  subtitle={canManage ? t('common.addFirstItem') : undefined}
-                  onAddClick={canManage ? () => {
-                    setEditingClientVersion(null);
-                    setIsCopyMode(false);
-                    setFormDialogOpen(true);
-                  } : undefined}
-                  addButtonLabel={t('clientVersions.addIndividual')}
-                />
+                <TableRow>
+                  <TableCell colSpan={canManage ? 12 : 10} sx={{ p: 0 }}>
+                    <EmptyState
+                      message={t('clientVersions.noVersionsFound')}
+                      subtitle={canManage ? t('common.addFirstItem') : undefined}
+                      onAddClick={canManage ? () => {
+                        setEditingClientVersion(null);
+                        setIsCopyMode(false);
+                        setFormDialogOpen(true);
+                      } : undefined}
+                      addButtonLabel={t('clientVersions.addIndividual')}
+                    />
+                  </TableCell>
+                </TableRow>
               ) : (
                 clientVersions.map((clientVersion) => (
                   <TableRow

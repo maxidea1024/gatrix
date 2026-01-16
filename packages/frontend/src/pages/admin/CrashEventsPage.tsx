@@ -80,7 +80,7 @@ import {
 } from '@/types/crash';
 import crashService from '@/services/crashService';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyTableRow from '../../components/common/EmptyTableRow';
+import EmptyState from '../../components/common/EmptyState';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import DateRangePicker, { DateRangePreset } from '../../components/common/DateRangePicker';
 import { usePageState } from '../../hooks/usePageState';
@@ -1000,8 +1000,18 @@ const CrashEventsPage: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {events.length === 0 ? (
-                <EmptyTableRow colSpan={columns.filter(col => col.visible).length + 2} message={t('crashes.noEvents')} loading={loading} />
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={columns.filter(col => col.visible).length + 2} align="center" sx={{ py: 6 }}>
+                    <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+                  </TableCell>
+                </TableRow>
+              ) : events.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={columns.filter(col => col.visible).length + 2} sx={{ p: 0 }}>
+                    <EmptyState message={t('crashes.noEvents')} />
+                  </TableCell>
+                </TableRow>
               ) : (
                 events.map((event, index) => (
                   <React.Fragment key={event.id}>

@@ -55,7 +55,7 @@ import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import JobForm from '../../components/jobs/JobForm';
 import JobExecutionHistory from '../../components/jobs/JobExecutionHistory';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyTableRow from '../../components/common/EmptyTableRow';
+import EmptyState from '../../components/common/EmptyState';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { getContrastColor } from '@/utils/colorUtils';
 
@@ -571,37 +571,40 @@ const JobsPage: React.FC = () => {
       </Box>
 
       {/* Jobs Table */}
-      <TableContainer
-        component={Paper}
-        sx={{
-          maxWidth: '100%',
-          overflow: 'auto'
-        }}
-      >
-        <Table sx={{ tableLayout: 'auto' }}>
-          <TableHead>
-            <TableRow>
-              {columns.filter(col => col.visible).map((column) => (
-                <TableCell key={column.id}>
-                  {t(column.labelKey)}
-                </TableCell>
-              ))}
-              {canManage && <TableCell align="right" sx={{ width: 150 }}>{t('common.actions')}</TableCell>}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {jobs.length === 0 ? (
-              <EmptyTableRow
-                colSpan={columns.filter(col => col.visible).length + (canManage ? 1 : 0)}
-                loading={loading}
-                message={t('jobs.noJobsFound')}
-                loadingMessage={t('common.loadingJobs')}
-                subtitle={canManage ? t('common.addFirstItem') : undefined}
-                onAddClick={canManage ? handleAddJob : undefined}
-                addButtonLabel={t('jobs.addJob')}
-              />
-            ) : (
-              jobs.map((job, index) => (
+      {loading ? (
+        <Paper sx={{ p: 6, textAlign: 'center' }}>
+          <Typography color="text.secondary">{t('common.loadingJobs')}</Typography>
+        </Paper>
+      ) : jobs.length === 0 ? (
+        <Paper sx={{ p: 0 }}>
+          <EmptyState
+            message={t('jobs.noJobsFound')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+            onAddClick={canManage ? handleAddJob : undefined}
+            addButtonLabel={t('jobs.addJob')}
+          />
+        </Paper>
+      ) : (
+        <TableContainer
+          component={Paper}
+          sx={{
+            maxWidth: '100%',
+            overflow: 'auto'
+          }}
+        >
+          <Table sx={{ tableLayout: 'auto' }}>
+            <TableHead>
+              <TableRow>
+                {columns.filter(col => col.visible).map((column) => (
+                  <TableCell key={column.id}>
+                    {t(column.labelKey)}
+                  </TableCell>
+                ))}
+                {canManage && <TableCell align="right" sx={{ width: 150 }}>{t('common.actions')}</TableCell>}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {jobs.map((job, index) => (
                 <TableRow
                   key={job.id}
                   sx={{
@@ -646,20 +649,19 @@ const JobsPage: React.FC = () => {
                     </TableCell>
                   )}
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableBody>
+          </Table>
 
-        {/* 페이지네이션 */}
-        <SimplePagination
-          count={total}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handlePageChange}
-          onRowsPerPageChange={handleRowsPerPageChange}
-        />
-      </TableContainer>
+          <SimplePagination
+            count={total}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+          />
+        </TableContainer>
+      )}
 
       {/* Job Form Drawer */}
       <Drawer

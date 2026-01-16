@@ -87,7 +87,7 @@ import { ApiAccessToken, TokenType } from '@/types/apiToken';
 import { apiTokenService } from '@/services/apiTokenService';
 import { environmentService, Environment } from '@/services/environmentService';
 import SimplePagination from '@/components/common/SimplePagination';
-import EmptyTableRow from '@/components/common/EmptyTableRow';
+import EmptyState from '@/components/common/EmptyState';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
@@ -1046,16 +1046,23 @@ const ApiTokensPage: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {!filteredTokens || filteredTokens.length === 0 ? (
-                  <EmptyTableRow
-                    colSpan={columns.filter(col => col.visible).length + (canManage ? 2 : 1)}
-                    loading={loading}
-                    message={searchTerm ? t('common.noSearchResults') : t('apiTokens.noTokens')}
-                    loadingMessage={t('common.loadingData')}
-                    subtitle={canManage && !searchTerm ? t('common.addFirstItem') : undefined}
-                    onAddClick={canManage && !searchTerm ? openCreateDialog : undefined}
-                    addButtonLabel={t('apiTokens.createToken')}
-                  />
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={columns.filter(col => col.visible).length + (canManage ? 2 : 1)} align="center" sx={{ py: 6 }}>
+                      <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : !filteredTokens || filteredTokens.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={columns.filter(col => col.visible).length + (canManage ? 2 : 1)} sx={{ p: 0 }}>
+                      <EmptyState
+                        message={searchTerm ? t('common.noSearchResults') : t('apiTokens.noTokens')}
+                        subtitle={canManage && !searchTerm ? t('common.addFirstItem') : undefined}
+                        onAddClick={canManage && !searchTerm ? openCreateDialog : undefined}
+                        addButtonLabel={t('apiTokens.createToken')}
+                      />
+                    </TableCell>
+                  </TableRow>
                 ) : (
                   filteredTokens.map((token) => (
                     <TableRow key={token.id} hover selected={selectedTokenIds.includes(token.id)}>

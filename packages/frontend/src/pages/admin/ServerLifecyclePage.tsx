@@ -54,7 +54,7 @@ import serverLifecycleService, { ServerLifecycleEvent } from '../../services/ser
 import SimplePagination from '../../components/common/SimplePagination';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import { useDebounce } from '../../hooks/useDebounce';
-import EmptyTableRow from '../../components/common/EmptyTableRow';
+import EmptyState from '../../components/common/EmptyState';
 import {
     DndContext,
     closestCenter,
@@ -1006,11 +1006,22 @@ const ServerLifecyclePage: React.FC = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {(data?.data || []).map((event: ServerLifecycleEvent, index: number) => (
-                            <EventRow key={event.id} event={event} visibleColumns={visibleColumns} index={index} enqueueSnackbar={enqueueSnackbar} />
-                        ))}
-                        {!isLoading && (!data?.data || data.data.length === 0) && (
-                            <EmptyTableRow colSpan={visibleColumns.length + 1} message={t('serverLifecycle.noEvents')} />
+                        {isLoading ? (
+                            <TableRow>
+                                <TableCell colSpan={visibleColumns.length + 1} align="center" sx={{ py: 6 }}>
+                                    <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+                                </TableCell>
+                            </TableRow>
+                        ) : (!data?.data || data.data.length === 0) ? (
+                            <TableRow>
+                                <TableCell colSpan={visibleColumns.length + 1} sx={{ p: 0 }}>
+                                    <EmptyState message={t('serverLifecycle.noEvents')} />
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            data.data.map((event: ServerLifecycleEvent, index: number) => (
+                                <EventRow key={event.id} event={event} visibleColumns={visibleColumns} index={index} enqueueSnackbar={enqueueSnackbar} />
+                            ))
                         )}
                     </TableBody>
                 </Table>

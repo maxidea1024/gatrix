@@ -19,7 +19,7 @@ import { usePlatformConfig } from '@/contexts/PlatformConfigContext';
 import { useGameWorld } from '@/contexts/GameWorldContext';
 
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
-import EmptyTableRow from '@/components/common/EmptyTableRow';
+import EmptyState from '@/components/common/EmptyState';
 import { formatDateTime, parseUTCForPicker, formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import { useI18n } from '@/contexts/I18nContext';
 import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSettingsDialog';
@@ -1152,16 +1152,22 @@ const CouponSettingsPage: React.FC = () => {
               </TableHead>
               <TableBody>
                 {loading ? (
-                  <EmptyTableRow colSpan={colCount} loading={true} message={t('common.loading') as string} />
+                  <TableRow>
+                    <TableCell colSpan={colCount} align="center" sx={{ py: 6 }}>
+                      <Typography color="text.secondary">{t('common.loading')}</Typography>
+                    </TableCell>
+                  </TableRow>
                 ) : items.length === 0 ? (
-                  <EmptyTableRow
-                    colSpan={colCount}
-                    loading={false}
-                    message={t('coupons.couponSettings.noCoupons') as string}
-                    subtitle={canManage ? t('common.addFirstItem') : undefined}
-                    onAddClick={canManage ? () => { resetForm(); setOpenForm(true); } : undefined}
-                    addButtonLabel={t('coupons.couponSettings.addCoupon')}
-                  />
+                  <TableRow>
+                    <TableCell colSpan={colCount} sx={{ p: 0 }}>
+                      <EmptyState
+                        message={t('coupons.couponSettings.noCoupons')}
+                        subtitle={canManage ? t('common.addFirstItem') : undefined}
+                        onAddClick={canManage ? () => { resetForm(); setOpenForm(true); } : undefined}
+                        addButtonLabel={t('coupons.couponSettings.addCoupon')}
+                      />
+                    </TableCell>
+                  </TableRow>
                 ) : (
                   sortedItems.map((it) => (
                     <TableRow key={it.id} hover sx={{ height: 48 }}>
@@ -2077,9 +2083,17 @@ const CouponSettingsPage: React.FC = () => {
                 </TableHead>
                 <TableBody>
                   {codesLoading ? (
-                    <EmptyTableRow colSpan={4} loading={true} message={t('common.loading') as string} />
+                    <TableRow>
+                      <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
+                        <Typography color="text.secondary">{t('common.loading')}</Typography>
+                      </TableCell>
+                    </TableRow>
                   ) : codesItems.length === 0 ? (
-                    <EmptyTableRow colSpan={4} loading={false} message={t('common.noData') as string} />
+                    <TableRow>
+                      <TableCell colSpan={4} sx={{ p: 0 }}>
+                        <EmptyState message={t('common.noData')} />
+                      </TableCell>
+                    </TableRow>
                   ) : (
                     codesItems.map((c) => (
                       <TableRow key={c.id} hover sx={{ height: 48 }}>

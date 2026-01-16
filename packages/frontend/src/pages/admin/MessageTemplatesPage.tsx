@@ -90,7 +90,7 @@ import translationService from '@/services/translationService';
 import { getLanguageDisplayName } from '@/contexts/I18nContext';
 import SimplePagination from '@/components/common/SimplePagination';
 import FormDialogHeader from '@/components/common/FormDialogHeader';
-import EmptyTableRow from '@/components/common/EmptyTableRow';
+import EmptyState from '@/components/common/EmptyState';
 import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/MultiLanguageMessageInput';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
 import { api } from '@/services/api';
@@ -876,108 +876,85 @@ const MessageTemplatesPage: React.FC = () => {
 
       <Card sx={{ position: 'relative' }}>
         <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          <TableContainer
-            sx={{
-              opacity: !isInitialLoad && loading ? 0.5 : 1,
-              transition: 'opacity 0.15s ease-in-out',
-              pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
-            }}
-          >
-            <Table sx={{ tableLayout: 'auto' }}>
-              <TableHead>
-                <TableRow>
-                  {canManage && (
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectAll}
-                        indeterminate={selectedIds.length > 0 && selectedIds.length < items.filter(item => item.id).length}
-                        onChange={(e) => handleSelectAll(e.target.checked)}
-                      />
-                    </TableCell>
-                  )}
-                  {columns.filter(col => col.visible).map((column) => (
-                    <TableCell key={column.id} width={column.width}>
-                      {t(column.labelKey)}
-                    </TableCell>
-                  ))}
-                  {canManage && <TableCell align="right" sx={{ width: 100, minWidth: 100 }}>{t('common.actions')}</TableCell>}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {isInitialLoad && loading ? (
-                  // 스켈레톤 로딩 (초기 로딩 시에만)
-                  Array.from({ length: 5 }).map((_, index) => (
-                    <TableRow key={`skeleton-${index}`}>
-                      {canManage && (
-                        <TableCell padding="checkbox">
-                          <Skeleton variant="rectangular" width={24} height={24} />
-                        </TableCell>
-                      )}
-                      {columns.filter(col => col.visible).map((column) => (
-                        <TableCell key={column.id}>
-                          <Skeleton variant="text" width="80%" />
-                        </TableCell>
-                      ))}
-                      {canManage && (
-                        <TableCell align="right">
-                          <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
-                          <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block' }} />
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))
-                ) : items.length === 0 ? (
-                  <EmptyTableRow
-                    colSpan={columns.filter(col => col.visible).length + (canManage ? 2 : 0)}
-                    loading={loading}
-                    message={t('messageTemplates.noTemplatesFound')}
-                    loadingMessage={t('common.loadingData')}
-                    subtitle={canManage ? t('common.addFirstItem') : undefined}
-                    onAddClick={canManage ? handleAdd : undefined}
-                    addButtonLabel={t('messageTemplates.addTemplate')}
-                  />
-                ) : (
-                  items.map(row => (
-                    <TableRow key={row.id} hover>
+          {isInitialLoad && loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+            </Box>
+          ) : items.length === 0 ? (
+            <EmptyState
+              message={t('messageTemplates.noTemplatesFound')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
+              onAddClick={canManage ? handleAdd : undefined}
+              addButtonLabel={t('messageTemplates.addTemplate')}
+            />
+          ) : (
+            <>
+              <TableContainer
+                sx={{
+                  opacity: !isInitialLoad && loading ? 0.5 : 1,
+                  transition: 'opacity 0.15s ease-in-out',
+                  pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
+                }}
+              >
+                <Table sx={{ tableLayout: 'auto' }}>
+                  <TableHead>
+                    <TableRow>
                       {canManage && (
                         <TableCell padding="checkbox">
                           <Checkbox
-                            checked={selectedIds.includes(row.id!)}
-                            onChange={(e) => handleSelectItem(row.id!, e.target.checked)}
-                            disabled={!row.id}
+                            checked={selectAll}
+                            indeterminate={selectedIds.length > 0 && selectedIds.length < items.filter(item => item.id).length}
+                            onChange={(e) => handleSelectAll(e.target.checked)}
                           />
                         </TableCell>
                       )}
                       {columns.filter(col => col.visible).map((column) => (
-                        <TableCell key={column.id}>
-                          {renderCellContent(row, column.id)}
+                        <TableCell key={column.id} width={column.width}>
+                          {t(column.labelKey)}
                         </TableCell>
                       ))}
-                      {canManage && (
-                        <TableCell align="right">
-                          <IconButton size="small" onClick={() => handleEdit(row)}><EditIcon fontSize="small" /></IconButton>
-                          <IconButton size="small" color="error" onClick={() => openDeleteDialog(row)}><DeleteIcon fontSize="small" /></IconButton>
-                        </TableCell>
-                      )}
+                      {canManage && <TableCell align="right" sx={{ width: 100, minWidth: 100 }}>{t('common.actions')}</TableCell>}
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {items.map(row => (
+                      <TableRow key={row.id} hover>
+                        {canManage && (
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              checked={selectedIds.includes(row.id!)}
+                              onChange={(e) => handleSelectItem(row.id!, e.target.checked)}
+                              disabled={!row.id}
+                            />
+                          </TableCell>
+                        )}
+                        {columns.filter(col => col.visible).map((column) => (
+                          <TableCell key={column.id}>
+                            {renderCellContent(row, column.id)}
+                          </TableCell>
+                        ))}
+                        {canManage && (
+                          <TableCell align="right">
+                            <IconButton size="small" onClick={() => handleEdit(row)}><EditIcon fontSize="small" /></IconButton>
+                            <IconButton size="small" color="error" onClick={() => openDeleteDialog(row)}><DeleteIcon fontSize="small" /></IconButton>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <SimplePagination
+                count={total}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={handlePageChange}
+                onRowsPerPageChange={handleRowsPerPageChange}
+              />
+            </>
+          )}
         </CardContent>
       </Card>
-
-      {/* 페이지네이션 - 데이터가 있을 때만 표시 */}
-      {total > 0 && (
-        <SimplePagination
-          count={total}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handlePageChange}
-          onRowsPerPageChange={handleRowsPerPageChange}
-        />
-      )}
 
       <ResizableDrawer
         open={dialogOpen}
