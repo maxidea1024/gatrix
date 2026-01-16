@@ -3565,10 +3565,13 @@ const ServerListPage: React.FC = () => {
                     );
                   case 'ports':
                     const portEntries = Object.entries(service.ports || {});
+                    const portsExpanded = expandedCells.has(`${serviceKey}-ports`);
+                    const visiblePorts = portsExpanded ? portEntries : portEntries.slice(0, 2);
+                    const hiddenPortsCount = portEntries.length - 2;
                     return (
                       <TableCell key={column.id}>
-                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                          {portEntries.map(([name, port]) => (
+                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
+                          {visiblePorts.map(([name, port]) => (
                             <Chip
                               key={`${service.instanceId}-${name}`}
                               label={`${name}:${port}`}
@@ -3576,6 +3579,26 @@ const ServerListPage: React.FC = () => {
                               sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.7rem', height: '22px', borderRadius: 0 }}
                             />
                           ))}
+                          {hiddenPortsCount > 0 && !portsExpanded && (
+                            <Typography
+                              variant="caption"
+                              color="primary"
+                              sx={{ cursor: 'pointer', textDecoration: 'underline', '&:hover': { color: 'primary.dark' } }}
+                              onClick={() => setExpandedCells(prev => new Set(prev).add(`${serviceKey}-ports`))}
+                            >
+                              +{hiddenPortsCount} {t('common.more')}
+                            </Typography>
+                          )}
+                          {portsExpanded && hiddenPortsCount > 0 && (
+                            <Typography
+                              variant="caption"
+                              color="primary"
+                              sx={{ cursor: 'pointer', textDecoration: 'underline', '&:hover': { color: 'primary.dark' } }}
+                              onClick={() => setExpandedCells(prev => { const next = new Set(prev); next.delete(`${serviceKey}-ports`); return next; })}
+                            >
+                              {t('common.showLess')}
+                            </Typography>
+                          )}
                         </Box>
                       </TableCell>
                     );
@@ -3658,12 +3681,36 @@ const ServerListPage: React.FC = () => {
                       </TableCell>
                     );
                   case 'labels':
+                    const labelEntries = Object.entries(service.labels);
+                    const labelsExpanded = expandedCells.has(`${serviceKey}-labels`);
+                    const visibleLabels = labelsExpanded ? labelEntries : labelEntries.slice(0, 2);
+                    const hiddenLabelsCount = labelEntries.length - 2;
                     return (
                       <TableCell key={column.id}>
-                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                          {Object.entries(service.labels).map(([k, v]) => (
+                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
+                          {visibleLabels.map(([k, v]) => (
                             <Chip key={k} label={`${k}=${v}`} size="small" variant="outlined" sx={{ fontSize: '0.65rem', height: 18 }} />
                           ))}
+                          {hiddenLabelsCount > 0 && !labelsExpanded && (
+                            <Typography
+                              variant="caption"
+                              color="primary"
+                              sx={{ cursor: 'pointer', textDecoration: 'underline', '&:hover': { color: 'primary.dark' } }}
+                              onClick={() => setExpandedCells(prev => new Set(prev).add(`${serviceKey}-labels`))}
+                            >
+                              +{hiddenLabelsCount} {t('common.more')}
+                            </Typography>
+                          )}
+                          {labelsExpanded && hiddenLabelsCount > 0 && (
+                            <Typography
+                              variant="caption"
+                              color="primary"
+                              sx={{ cursor: 'pointer', textDecoration: 'underline', '&:hover': { color: 'primary.dark' } }}
+                              onClick={() => setExpandedCells(prev => { const next = new Set(prev); next.delete(`${serviceKey}-labels`); return next; })}
+                            >
+                              {t('common.showLess')}
+                            </Typography>
+                          )}
                         </Box>
                       </TableCell>
                     );
