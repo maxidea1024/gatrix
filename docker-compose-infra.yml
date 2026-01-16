@@ -73,6 +73,11 @@ services:
       - --initial-cluster-token=etcd-cluster-dev
       - --initial-cluster-state=new
       - --log-level=info
+      # Storage optimization: prevent "database space exceeded" error
+      - --auto-compaction-mode=periodic
+      - --auto-compaction-retention=1h
+      - --quota-backend-bytes=4294967296
+      - --snapshot-count=50000
     ports:
       - "0.0.0.0:${ETCD_CLIENT_PORT:-42379}:2379"
       - "0.0.0.0:${ETCD_PEER_PORT:-42380}:2380"

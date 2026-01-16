@@ -39,9 +39,12 @@ const JSON5 = require('json5');
 // Configuration
 // ============================================================================
 
-const DEFAULT_CMS_DIR = path.join(__dirname, '../../../cms');
+// Gatrix repository directory structure:
+// - gatrix/planning-data-source/client (CMS data)
+// - gatrix/planning-data-source/locdata (localization data)
+const DEFAULT_CMS_DIR = path.join(__dirname, '../../../../../planning-data-source/client');
 const DEFAULT_OUTPUT_DIR = __dirname;
-const DEFAULT_LOCTAB_SOURCE = path.join(DEFAULT_CMS_DIR, 'locdata', 'locdata');
+const DEFAULT_LOCTAB_SOURCE = path.join(__dirname, '../../../../../planning-data-source/locdata/locdata');
 
 // ============================================================================
 // REWARD_TYPE Definitions (from game server rewardDesc.ts)
@@ -2655,7 +2658,11 @@ function convertLocalizationTable(inputPath, outputPath) {
     return null;
   }
 
-  const content = fs.readFileSync(inputPath, 'utf8');
+  let content = fs.readFileSync(inputPath, 'utf8');
+  // Remove UTF-8 BOM if present (otherwise first key gets corrupted)
+  if (content.charCodeAt(0) === 0xFEFF) {
+    content = content.slice(1);
+  }
   // Handle both Windows (CRLF) and Unix (LF) line endings
   const lines = content.split(/\r?\n/);
 
@@ -3589,7 +3596,9 @@ Usage:
   node adminToolDataBuilder.js [options]
 
 Options:
-  --cms-dir <path>      CMS directory path (default: ../../../cms)
+  --source-root <path>  Source root directory containing 'client' and 'locdata' subdirectories
+                        (e.g., game/cms or gatrix/planning-data-source)
+  --cms-dir <path>      CMS directory path (alternative to --source-root, for backward compat)
   --output-dir <path>   Output directory path (default: current directory)
   --binary-code <code>  Binary code suffix for CMS files (default: cn)
                         e.g., 'cn' uses CashShop_BCCN.json
@@ -3598,13 +3607,23 @@ Options:
   --help, -h            Show this help message
 
 Examples:
-  node adminToolDataBuilder.js
-  node adminToolDataBuilder.js --binary-code cn --country-code 6
-  node adminToolDataBuilder.js --cms-dir /path/to/cms
+  # Using source-root (recommended)
+  node adminToolDataBuilder.js --source-root ../../cms --output-dir ./output
+
+  # Legacy cms-dir usage (locdata expected at cms-dir/../locdata)
+  node adminToolDataBuilder.js --cms-dir /path/to/cms/client
       `);
       process.exit(0);
+    } else if (arg === '--source-root') {
+      // Source root contains both 'client' and 'locdata' subdirectories
+      const sourceRoot = args[++i];
+      cmsDir = path.join(sourceRoot, 'client');
+      global.LOCDATA_DIR = path.join(sourceRoot, 'locdata');
     } else if (arg === '--cms-dir') {
       cmsDir = args[++i];
+      // For backward compat: assume locdata is sibling of client's parent
+      // e.g., cms/client -> cms/locdata
+      global.LOCDATA_DIR = path.join(path.dirname(cmsDir), 'locdata');
     } else if (arg === '--output-dir') {
       outputDir = args[++i];
     } else if (arg === '--binary-code') {
@@ -3613,6 +3632,11 @@ Examples:
       countryCode = parseInt(args[++i], 10);
     }
     // All other options are ignored - always build everything
+  }
+
+  // If LOCDATA_DIR not set, use default based on cmsDir
+  if (!global.LOCDATA_DIR) {
+    global.LOCDATA_DIR = path.join(path.dirname(cmsDir), 'locdata');
   }
 
   // Store global settings for use by builder functions
@@ -3635,7 +3659,7 @@ Examples:
   // NOTE: loctab.json is NOT saved to output - it's only used internally for conversion
   let loctab = {};
   if (buildLocalization || buildRewards || buildUILists || buildEvents) {
-    const loctabSource = path.join(cmsDir, 'locdata', 'locdata');
+    const loctabSource = path.join(global.LOCDATA_DIR, 'locdata_UWO.json');
     const loadedLoctab = convertLocalizationTable(loctabSource, null);
     if (loadedLoctab) {
       loctab = loadedLoctab;

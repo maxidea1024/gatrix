@@ -4421,8 +4421,12 @@
       "countryCodeDesc": "Filtering mask (default: 6=CHINA, 0=KOREA, 2=GLOBAL)",
       "cliUpload": "Remote Upload via CLI",
       "cliUploadDesc": "Upload converted data to the remote server.",
+      "standaloneUpload": "Standalone Tool (game repo)",
+      "standaloneUploadDesc": "Convert and upload planning data using only the game repository, without requiring the Gatrix repository.",
       "curlUpload": "Upload via curl",
-      "curlUploadDesc": "Upload files directly using the curl command."
+      "curlUploadDesc": "Upload files directly using the curl command.",
+      "storeProductSyncTitle": "⚠️ Important: Store Product Sync",
+      "storeProductSyncDesc": "Uploading planning data does NOT automatically update the store product list. You must click the 'Sync Planning Data' button on the Store Product Management page to apply changes. This is intentional to prevent accidental updates to the live store."
     },
     "uploadInfo": {
       "lastUpload": "Last Upload",

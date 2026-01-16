@@ -124,14 +124,21 @@ yarn planning-data:convert --input=./cms --output=./converted-planning-data --bi
     const uploadCommand = `yarn upload-planning-data \\
   --api-url=${backendUrl} \\
   --env=qa \\
-  --dir=./converted-planning-data \\
-  --token=<YOUR_API_TOKEN>
+  --dir=./converted-planning-data
 
 # Options:
 #   --api-url   (Required) Backend API URL
-#   --env       (Required) Target environment (dev, qa, production)
-#   --dir       (Required) Directory containing planning data files
-#   --token     (Required) Server API token for authentication`;
+#   --env       (Required) Target environment (dev, qa, production, development)
+#   --dir       (Optional) Directory with planning data files (default: ./output)
+#   --token     (Optional) Server API token (default: gatrix-unsecured-server-api-token)
+#   --uploader  (Optional) Uploader name for CI/CD
+#   --comment   (Optional) Upload comment`;
+
+    const standaloneCommand = `# game 저장소 독립 도구 (Gatrix 저장소 없이 사용 가능)
+cd game/gatrix/planning-data
+yarn install
+yarn convert                                    # game/cms → ./output
+yarn upload --api-url=${backendUrl} --env=qa    # 업로드`;
 
     const curlCommand = `# Upload all JSON files from a directory
 for file in ./converted-planning-data/*.json; do
@@ -208,14 +215,37 @@ curl -X POST ${backendUrl}/api/v1/server/qa/planning-data/upload \\
                 <CodeBlock code={uploadCommand} onCopy={() => handleCopy(uploadCommand)} />
             </Box>
 
+            {/* Standalone Tool */}
+            <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>4. {t('planningData.uploadGuide.standaloneUpload')}</strong>
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, pl: 2 }}>
+                {t('planningData.uploadGuide.standaloneUploadDesc')}
+            </Typography>
+            <Box sx={{ mb: 3 }}>
+                <CodeBlock code={standaloneCommand} onCopy={() => handleCopy(standaloneCommand)} />
+            </Box>
+
             {/* Curl Upload */}
             <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>4. {t('planningData.uploadGuide.curlUpload')}</strong>
+                <strong>5. {t('planningData.uploadGuide.curlUpload')}</strong>
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2, pl: 2 }}>
                 {t('planningData.uploadGuide.curlUploadDesc')}
             </Typography>
-            <CodeBlock code={curlCommand} onCopy={() => handleCopy(curlCommand)} />
+            <Box sx={{ mb: 3 }}>
+                <CodeBlock code={curlCommand} onCopy={() => handleCopy(curlCommand)} />
+            </Box>
+
+            {/* Store Product Sync Warning */}
+            <Alert severity="warning" sx={{ textAlign: 'left' }}>
+                <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                    {t('planningData.uploadGuide.storeProductSyncTitle')}
+                </Typography>
+                <Typography variant="body2">
+                    {t('planningData.uploadGuide.storeProductSyncDesc')}
+                </Typography>
+            </Alert>
         </Box>
     );
 };

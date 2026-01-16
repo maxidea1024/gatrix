@@ -4444,8 +4444,12 @@
       "countryCodeDesc": "过滤掩码 (默认: 6=中国, 0=韩国, 2=全球)",
       "cliUpload": "通过CLI远程上传",
       "cliUploadDesc": "将转换后的数据上传到远程服务器.",
+      "standaloneUpload": "独立工具 (game仓库)",
+      "standaloneUploadDesc": "无需Gatrix仓库，仅使用game仓库即可转换和上传策划数据。",
       "curlUpload": "通过curl上传",
-      "curlUploadDesc": "使用curl命令直接上传文件."
+      "curlUploadDesc": "使用curl命令直接上传文件.",
+      "storeProductSyncTitle": "⚠️ 重要：商城商品同步",
+      "storeProductSyncDesc": "上传策划数据后，商城商品列表不会自动更新。必须在商城商品管理页面点击\"同步策划数据\"按钮才能应用更改。这是为了防止意外更新线上商城。"
     },
     "uploadInfo": {
       "lastUpload": "最近上传",
