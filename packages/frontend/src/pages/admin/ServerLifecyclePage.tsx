@@ -51,10 +51,10 @@ import { useSnackbar } from 'notistack';
 import useSWR from 'swr';
 import { RelativeTime } from '../../components/common/RelativeTime';
 import serverLifecycleService, { ServerLifecycleEvent } from '../../services/serverLifecycleService';
+import EmptyState from '../../components/common/EmptyState';
 import SimplePagination from '../../components/common/SimplePagination';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import { useDebounce } from '../../hooks/useDebounce';
-import EmptyState from '../../components/common/EmptyState';
 import {
     DndContext,
     closestCenter,
@@ -968,64 +968,54 @@ const ServerLifecyclePage: React.FC = () => {
             </Popover>
 
             {/* Table */}
-            <TableContainer component={Paper} elevation={2} sx={{ borderRadius: 2, position: 'relative' }}>
-                {isLoading && <LinearProgress sx={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 1 }} color="primary" />}
-                <Table
-                    aria-label="server lifecycle table"
-                    size="small"
-                    sx={{
-                        opacity: isLoading ? 0.5 : 1,
-                        transition: 'opacity 0.15s ease-in-out',
-                        pointerEvents: isLoading ? 'none' : 'auto',
-                    }}
-                >
-                    <TableHead sx={{ bgcolor: 'action.hover' }}>
-                        <TableRow>
-                            <TableCell width="50" />
-                            {visibleColumns.map((colId) => {
-                                const col = columns.find(c => c.id === colId);
-                                const sortField = columnToSortField[colId];
-                                const isSortable = !!sortField;
-                                const isActive = sortBy === sortField;
-                                return col ? (
-                                    <TableCell key={colId} sx={{ fontWeight: 600 }}>
-                                        {isSortable ? (
-                                            <TableSortLabel
-                                                active={isActive}
-                                                direction={isActive ? sortOrder : 'desc'}
-                                                onClick={() => handleSort(colId)}
-                                            >
-                                                {t(col.labelKey)}
-                                            </TableSortLabel>
-                                        ) : (
-                                            t(col.labelKey)
-                                        )}
-                                    </TableCell>
-                                ) : null;
-                            })}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {isLoading ? (
-                            <TableRow>
-                                <TableCell colSpan={visibleColumns.length + 1} align="center" sx={{ py: 6 }}>
-                                    <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-                                </TableCell>
-                            </TableRow>
-                        ) : (!data?.data || data.data.length === 0) ? (
-                            <TableRow>
-                                <TableCell colSpan={visibleColumns.length + 1} sx={{ p: 0 }}>
-                                    <EmptyState message={t('serverLifecycle.noEvents')} />
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            data.data.map((event: ServerLifecycleEvent, index: number) => (
-                                <EventRow key={event.id} event={event} visibleColumns={visibleColumns} index={index} enqueueSnackbar={enqueueSnackbar} />
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-                {data && (
+            <Paper elevation={2} sx={{ borderRadius: 2, position: 'relative' }}>
+                {isLoading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+                        <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+                    </Box>
+                ) : (!data?.data || data.data.length === 0) ? (
+                    <EmptyState message={t('serverLifecycle.noEvents')} />
+                ) : (
+                    <TableContainer>
+                        <Table
+                            aria-label="server lifecycle table"
+                            size="small"
+                        >
+                            <TableHead sx={{ bgcolor: 'action.hover' }}>
+                                <TableRow>
+                                    <TableCell width="50" />
+                                    {visibleColumns.map((colId) => {
+                                        const col = columns.find(c => c.id === colId);
+                                        const sortField = columnToSortField[colId];
+                                        const isSortable = !!sortField;
+                                        const isActive = sortBy === sortField;
+                                        return col ? (
+                                            <TableCell key={colId} sx={{ fontWeight: 600 }}>
+                                                {isSortable ? (
+                                                    <TableSortLabel
+                                                        active={isActive}
+                                                        direction={isActive ? sortOrder : 'desc'}
+                                                        onClick={() => handleSort(colId)}
+                                                    >
+                                                        {t(col.labelKey)}
+                                                    </TableSortLabel>
+                                                ) : (
+                                                    t(col.labelKey)
+                                                )}
+                                            </TableCell>
+                                        ) : null;
+                                    })}
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {data.data.map((event: ServerLifecycleEvent, index: number) => (
+                                    <EventRow key={event.id} event={event} visibleColumns={visibleColumns} index={index} enqueueSnackbar={enqueueSnackbar} />
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                )}
+                {data && data.data && data.data.length > 0 && (
                     <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
                         <SimplePagination
                             count={data.total}
@@ -1036,7 +1026,7 @@ const ServerLifecyclePage: React.FC = () => {
                         />
                     </Box>
                 )}
-            </TableContainer>
+            </Paper>
         </Box>
     );
 };

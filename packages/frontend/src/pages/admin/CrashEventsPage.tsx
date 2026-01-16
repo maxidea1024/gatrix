@@ -974,679 +974,681 @@ const CrashEventsPage: React.FC = () => {
 
       {/* Table */}
       <Card>
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-            <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-          </Box>
-        ) : events.length === 0 ? (
-          <EmptyState message={t('crashes.noEvents')} />
-        ) : (
-          <>
-            <TableContainer>
-              <Table sx={{ tableLayout: 'auto' }}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ width: 40 }}></TableCell>
-                    {columns.filter(col => col.visible).map((column) => (
-                      <TableCell key={column.id}>
-                        {column.sortable ? (
-                          <Box
-                            sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }}
-                            onClick={() => handleSort(column.id)}
-                          >
-                            {t(column.labelKey)}
-                            {pageState.sortBy === column.id && (
-                              pageState.sortOrder === 'DESC' ? <ArrowDownwardIcon fontSize="small" /> : <ArrowUpwardIcon fontSize="small" />
-                            )}
-                          </Box>
-                        ) : (
-                          t(column.labelKey)
-                        )}
-                      </TableCell>
-                    ))}
-                    <TableCell align="center" sx={{ width: 100 }}>{t('crashes.columns.actions')}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {events.map((event, index) => (
-                    <React.Fragment key={event.id}>
-                      <TableRow
-                        hover
-                        sx={{
-                          bgcolor: (theme) =>
-                            index % 2 === 0
-                              ? 'transparent'
-                              : theme.palette.mode === 'dark'
-                                ? 'rgba(255, 255, 255, 0.02)'
-                                : 'rgba(0, 0, 0, 0.02)',
-                        }}
-                      >
-                        <TableCell>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleToggleRow(event.id)}
-                          >
-                            {expandedRowId === event.id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                          </IconButton>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+            </Box>
+          ) : events.length === 0 ? (
+            <EmptyState message={t('crashes.noEvents')} />
+          ) : (
+            <>
+              <TableContainer>
+                <Table sx={{ tableLayout: 'auto' }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ width: 40 }}></TableCell>
+                      {columns.filter(col => col.visible).map((column) => (
+                        <TableCell key={column.id}>
+                          {column.sortable ? (
+                            <Box
+                              sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }}
+                              onClick={() => handleSort(column.id)}
+                            >
+                              {t(column.labelKey)}
+                              {pageState.sortBy === column.id && (
+                                pageState.sortOrder === 'DESC' ? <ArrowDownwardIcon fontSize="small" /> : <ArrowUpwardIcon fontSize="small" />
+                              )}
+                            </Box>
+                          ) : (
+                            t(column.labelKey)
+                          )}
                         </TableCell>
-                        {columns.filter(col => col.visible).map((column) => (
-                          <TableCell key={column.id}>
-                            {renderCellContent(event, column.id)}
+                      ))}
+                      <TableCell align="center" sx={{ width: 100 }}>{t('crashes.columns.actions')}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {events.map((event, index) => (
+                      <React.Fragment key={event.id}>
+                        <TableRow
+                          hover
+                          sx={{
+                            bgcolor: (theme) =>
+                              index % 2 === 0
+                                ? 'transparent'
+                                : theme.palette.mode === 'dark'
+                                  ? 'rgba(255, 255, 255, 0.02)'
+                                  : 'rgba(0, 0, 0, 0.02)',
+                          }}
+                        >
+                          <TableCell>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleToggleRow(event.id)}
+                            >
+                              {expandedRowId === event.id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                            </IconButton>
                           </TableCell>
-                        ))}
-                        <TableCell align="center">
-                          <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                            <Tooltip title={t('crashes.viewStackTrace')}>
-                              <IconButton
-                                size="small"
-                                onClick={async () => {
-                                  try {
-                                    const stackData = await crashService.getStackTrace(event.id);
-                                    setSelectedEvent(event);
-                                    setStackTraceMap(prev => ({
-                                      ...prev,
-                                      [event.id]: stackData.stackTrace,
-                                    }));
-                                    setDrawerType('stackTrace');
-                                    setDrawerOpen(true);
-                                  } catch (error) {
-                                    console.error('Failed to load stack trace:', error);
-                                    enqueueSnackbar(t('crashes.loadError'), { variant: 'error' });
-                                  }
-                                }}
-                              >
-                                <BugReportIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            {event.logFilePath && (
-                              <Tooltip title={t('crashes.viewLog')}>
+                          {columns.filter(col => col.visible).map((column) => (
+                            <TableCell key={column.id}>
+                              {renderCellContent(event, column.id)}
+                            </TableCell>
+                          ))}
+                          <TableCell align="center">
+                            <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                              <Tooltip title={t('crashes.viewStackTrace')}>
                                 <IconButton
                                   size="small"
-                                  onClick={() => handleViewLog(event)}
-                                >
-                                  <LogIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            )}
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell colSpan={columns.filter(col => col.visible).length + 2} sx={{ p: 0, border: 0 }}>
-                          <Collapse in={expandedRowId === event.id} timeout="auto" unmountOnExit>
-                            <Box sx={{
-                              py: 2,
-                              pl: 10,
-                              pr: 3,
-                              bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
-                              borderTop: 1,
-                              borderBottom: 1,
-                              borderColor: 'divider',
-                            }}>
-                              {/* Properties Title */}
-                              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                                {t('crashes.properties')}
-                              </Typography>
-
-                              {/* Table View */}
-                              {detailViewMode === 'table' && (
-                                <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
-                                  <Table size="small">
-                                    <TableBody>
-                                      {/* ID */}
-                                      <TableRow>
-                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                          ID
-                                        </TableCell>
-                                        <TableCell>
-                                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                                              {event.id}
-                                            </Typography>
-                                            <IconButton
-                                              size="small"
-                                              onClick={async () => {
-                                                await copyToClipboardWithNotification(
-                                                  event.id,
-                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                );
-                                              }}
-                                            >
-                                              <CopyIcon fontSize="small" />
-                                            </IconButton>
-                                          </Box>
-                                        </TableCell>
-                                      </TableRow>
-
-                                      {/* Created At */}
-                                      <TableRow>
-                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                          {t('crashes.table.createdAt')}
-                                        </TableCell>
-                                        <TableCell>
-                                          <Typography variant="body2">
-                                            {dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss')}
-                                          </Typography>
-                                        </TableCell>
-                                      </TableRow>
-
-                                      {/* Platform */}
-                                      <TableRow>
-                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                          {t('crashes.table.platform')}
-                                        </TableCell>
-                                        <TableCell>
-                                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <Chip
-                                              label={getPlatformName(event.platform)}
-                                              size="small"
-                                              color="primary"
-                                              variant="outlined"
-                                            />
-                                            <IconButton
-                                              size="small"
-                                              onClick={async () => {
-                                                await copyToClipboardWithNotification(
-                                                  event.platform,
-                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                );
-                                              }}
-                                            >
-                                              <CopyIcon fontSize="small" />
-                                            </IconButton>
-                                          </Box>
-                                        </TableCell>
-                                      </TableRow>
-
-                                      {/* Environment */}
-                                      <TableRow>
-                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                          {t('crashes.table.environment')}
-                                        </TableCell>
-                                        <TableCell>
-                                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <Chip
-                                              label={getEnvironmentName(event.environment)}
-                                              size="small"
-                                              color="secondary"
-                                              variant="outlined"
-                                            />
-                                            <IconButton
-                                              size="small"
-                                              onClick={async () => {
-                                                await copyToClipboardWithNotification(
-                                                  event.environment,
-                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                );
-                                              }}
-                                            >
-                                              <CopyIcon fontSize="small" />
-                                            </IconButton>
-                                          </Box>
-                                        </TableCell>
-                                      </TableRow>
-
-                                      {/* Branch */}
-                                      <TableRow>
-                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                          {t('crashes.table.branch')}
-                                        </TableCell>
-                                        <TableCell>
-                                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <Chip
-                                              label={event.branch}
-                                              size="small"
-                                              color="info"
-                                              variant="outlined"
-                                            />
-                                            <IconButton
-                                              size="small"
-                                              onClick={async () => {
-                                                await copyToClipboardWithNotification(
-                                                  event.branch,
-                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                );
-                                              }}
-                                            >
-                                              <CopyIcon fontSize="small" />
-                                            </IconButton>
-                                          </Box>
-                                        </TableCell>
-                                      </TableRow>
-
-                                      {/* App Version */}
-                                      <TableRow>
-                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                          {t('crashes.table.appVersion')}
-                                        </TableCell>
-                                        <TableCell>
-                                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <Chip
-                                              label={event.appVersion || '-'}
-                                              size="small"
-                                              variant="outlined"
-                                            />
-                                            {event.appVersion && (
-                                              <IconButton
-                                                size="small"
-                                                onClick={async () => {
-                                                  await copyToClipboardWithNotification(
-                                                    event.appVersion!,
-                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon fontSize="small" />
-                                              </IconButton>
-                                            )}
-                                          </Box>
-                                        </TableCell>
-                                      </TableRow>
-
-                                      {/* Res Version */}
-                                      <TableRow>
-                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                          {t('crashes.table.resVersion')}
-                                        </TableCell>
-                                        <TableCell>
-                                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <Chip
-                                              label={event.resVersion || '-'}
-                                              size="small"
-                                              variant="outlined"
-                                            />
-                                            {event.resVersion && (
-                                              <IconButton
-                                                size="small"
-                                                onClick={async () => {
-                                                  await copyToClipboardWithNotification(
-                                                    event.resVersion!,
-                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon fontSize="small" />
-                                              </IconButton>
-                                            )}
-                                          </Box>
-                                        </TableCell>
-                                      </TableRow>
-
-                                      {/* Account ID */}
-                                      {event.accountId != null && (
-                                        <TableRow>
-                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                            {t('crashes.table.accountId')}
-                                          </TableCell>
-                                          <TableCell>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                              <Typography variant="body2">{event.accountId}</Typography>
-                                              <IconButton
-                                                size="small"
-                                                onClick={async () => {
-                                                  await copyToClipboardWithNotification(
-                                                    String(event.accountId),
-                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon fontSize="small" />
-                                              </IconButton>
-                                            </Box>
-                                          </TableCell>
-                                        </TableRow>
-                                      )}
-
-                                      {/* Character ID */}
-                                      {event.characterId != null && (
-                                        <TableRow>
-                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                            {t('crashes.table.characterId')}
-                                          </TableCell>
-                                          <TableCell>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                              <Typography variant="body2">{event.characterId}</Typography>
-                                              <IconButton
-                                                size="small"
-                                                onClick={async () => {
-                                                  await copyToClipboardWithNotification(
-                                                    String(event.characterId),
-                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon fontSize="small" />
-                                              </IconButton>
-                                            </Box>
-                                          </TableCell>
-                                        </TableRow>
-                                      )}
-
-                                      {/* Game User ID */}
-                                      {event.gameUserId != null && (
-                                        <TableRow>
-                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                            {t('crashes.table.gameUserId')}
-                                          </TableCell>
-                                          <TableCell>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                              <Typography variant="body2">{event.gameUserId}</Typography>
-                                              <IconButton
-                                                size="small"
-                                                onClick={async () => {
-                                                  await copyToClipboardWithNotification(
-                                                    String(event.gameUserId),
-                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon fontSize="small" />
-                                              </IconButton>
-                                            </Box>
-                                          </TableCell>
-                                        </TableRow>
-                                      )}
-
-                                      {/* User Name */}
-                                      {!!event.userName && (
-                                        <TableRow>
-                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                            {t('crashes.table.userName')}
-                                          </TableCell>
-                                          <TableCell>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                              <Typography variant="body2">{event.userName}</Typography>
-                                              <IconButton
-                                                size="small"
-                                                onClick={async () => {
-                                                  await copyToClipboardWithNotification(
-                                                    event.userName!,
-                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon fontSize="small" />
-                                              </IconButton>
-                                            </Box>
-                                          </TableCell>
-                                        </TableRow>
-                                      )}
-
-                                      {/* Game Server ID */}
-                                      {event.gameServerId != null && (
-                                        <TableRow>
-                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                            {t('crashes.table.gameServerId')}
-                                          </TableCell>
-                                          <TableCell>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                              <Typography variant="body2">{event.gameServerId}</Typography>
-                                              <IconButton
-                                                size="small"
-                                                onClick={async () => {
-                                                  await copyToClipboardWithNotification(
-                                                    String(event.gameServerId),
-                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon fontSize="small" />
-                                              </IconButton>
-                                            </Box>
-                                          </TableCell>
-                                        </TableRow>
-                                      )}
-
-                                      {/* Market Type */}
-                                      {!!event.marketType && (
-                                        <TableRow>
-                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                            {t('crashes.table.marketType')}
-                                          </TableCell>
-                                          <TableCell>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                              <Typography variant="body2">{event.marketType}</Typography>
-                                              <IconButton
-                                                size="small"
-                                                onClick={async () => {
-                                                  await copyToClipboardWithNotification(
-                                                    event.marketType!,
-                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon fontSize="small" />
-                                              </IconButton>
-                                            </Box>
-                                          </TableCell>
-                                        </TableRow>
-                                      )}
-
-                                      {/* Is Editor */}
-                                      {!!event.isEditor && (
-                                        <TableRow>
-                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                            {t('crashes.table.isEditor')}
-                                          </TableCell>
-                                          <TableCell>
-                                            <Chip label="Editor" size="small" color="warning" />
-                                          </TableCell>
-                                        </TableRow>
-                                      )}
-
-                                      {/* IP Address */}
-                                      <TableRow>
-                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                          {t('crashes.table.ipAddress')}
-                                        </TableCell>
-                                        <TableCell>
-                                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                                              {event.crashEventIp || '-'}
-                                            </Typography>
-                                            {event.crashEventIp && (
-                                              <IconButton
-                                                size="small"
-                                                onClick={async () => {
-                                                  await copyToClipboardWithNotification(
-                                                    event.crashEventIp!,
-                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon fontSize="small" />
-                                              </IconButton>
-                                            )}
-                                          </Box>
-                                        </TableCell>
-                                      </TableRow>
-
-                                      {/* User Agent */}
-                                      <TableRow>
-                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                          {t('crashes.table.userAgent')}
-                                        </TableCell>
-                                        <TableCell>
-                                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem', wordBreak: 'break-all' }}>
-                                              {event.crashEventUserAgent || '-'}
-                                            </Typography>
-                                            {event.crashEventUserAgent && (
-                                              <IconButton
-                                                size="small"
-                                                onClick={async () => {
-                                                  await copyToClipboardWithNotification(
-                                                    event.crashEventUserAgent!,
-                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon fontSize="small" />
-                                              </IconButton>
-                                            )}
-                                          </Box>
-                                        </TableCell>
-                                      </TableRow>
-
-                                      {/* First Line */}
-                                      {!!(event as any).firstLine && (
-                                        <TableRow>
-                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                                            {t('crashes.table.firstLine')}
-                                          </TableCell>
-                                          <TableCell>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem', wordBreak: 'break-all' }}>
-                                                {(event as any).firstLine}
-                                              </Typography>
-                                              <IconButton
-                                                size="small"
-                                                onClick={() => {
-                                                  copyToClipboardWithNotification(
-                                                    (event as any).firstLine!,
-                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon fontSize="small" />
-                                              </IconButton>
-                                            </Box>
-                                          </TableCell>
-                                        </TableRow>
-                                      )}
-
-                                      {/* User Message */}
-                                      {!!event.userMessage && (
-                                        <TableRow>
-                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', verticalAlign: 'top', whiteSpace: 'nowrap' }}>
-                                            {t('crashes.table.userMessage')}
-                                          </TableCell>
-                                          <TableCell>
-                                            <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1 }}>
-                                              <Typography
-                                                variant="body2"
-                                                sx={{
-                                                  flex: 1,
-                                                  whiteSpace: 'pre-wrap',
-                                                  wordBreak: 'break-word',
-                                                }}
-                                              >
-                                                {event.userMessage}
-                                              </Typography>
-                                              <IconButton
-                                                size="small"
-                                                onClick={async () => {
-                                                  await copyToClipboardWithNotification(
-                                                    event.userMessage!,
-                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-                                                  );
-                                                }}
-                                              >
-                                                <CopyIcon fontSize="small" />
-                                              </IconButton>
-                                            </Box>
-                                          </TableCell>
-                                        </TableRow>
-                                      )}
-                                    </TableBody>
-                                  </Table>
-                                </Paper>
-                              )}
-
-                              {/* JSON View */}
-                              {detailViewMode === 'json' && (
-                                <Paper
-                                  variant="outlined"
-                                  sx={{
-                                    p: 2,
-                                    bgcolor: 'background.default',
-                                    maxHeight: 600,
-                                    overflow: 'auto',
-                                  }}
-                                >
-                                  <pre style={{
-                                    margin: 0,
-                                    fontSize: '0.875rem',
-                                    fontFamily: 'monospace',
-                                    lineHeight: 1.6,
-                                  }}>
-                                    {JSON.stringify(event, null, 2)}
-                                  </pre>
-                                </Paper>
-                              )}
-
-                              {/* Toggle and Copy Button */}
-                              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1, mt: 2 }}>
-                                <ToggleButtonGroup
-                                  value={detailViewMode}
-                                  exclusive
-                                  onChange={(_, newMode) => {
-                                    if (newMode !== null) {
-                                      setDetailViewMode(newMode);
+                                  onClick={async () => {
+                                    try {
+                                      const stackData = await crashService.getStackTrace(event.id);
+                                      setSelectedEvent(event);
+                                      setStackTraceMap(prev => ({
+                                        ...prev,
+                                        [event.id]: stackData.stackTrace,
+                                      }));
+                                      setDrawerType('stackTrace');
+                                      setDrawerOpen(true);
+                                    } catch (error) {
+                                      console.error('Failed to load stack trace:', error);
+                                      enqueueSnackbar(t('crashes.loadError'), { variant: 'error' });
                                     }
                                   }}
-                                  size="small"
                                 >
-                                  <ToggleButton value="table">
-                                    <TableIcon fontSize="small" sx={{ mr: 0.5 }} />
-                                    Table
-                                  </ToggleButton>
-                                  <ToggleButton value="json">
-                                    <JsonIcon fontSize="small" sx={{ mr: 0.5 }} />
-                                    JSON
-                                  </ToggleButton>
-                                </ToggleButtonGroup>
-                                <Tooltip title={detailViewMode === 'table' ? 'Copy as Table' : 'Copy as JSON'}>
+                                  <BugReportIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              {event.logFilePath && (
+                                <Tooltip title={t('crashes.viewLog')}>
                                   <IconButton
                                     size="small"
-                                    onClick={() => {
-                                      if (detailViewMode === 'table') {
-                                        handleCopyTableData(event);
-                                      } else {
-                                        handleCopyJsonData(event);
-                                      }
-                                    }}
+                                    onClick={() => handleViewLog(event)}
                                   >
-                                    <CopyIcon fontSize="small" />
+                                    <LogIcon fontSize="small" />
                                   </IconButton>
                                 </Tooltip>
-                              </Box>
+                              )}
                             </Box>
-                          </Collapse>
-                        </TableCell>
-                      </TableRow>
-                    </React.Fragment>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell colSpan={columns.filter(col => col.visible).length + 2} sx={{ p: 0, border: 0 }}>
+                            <Collapse in={expandedRowId === event.id} timeout="auto" unmountOnExit>
+                              <Box sx={{
+                                py: 2,
+                                pl: 10,
+                                pr: 3,
+                                bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+                                borderTop: 1,
+                                borderBottom: 1,
+                                borderColor: 'divider',
+                              }}>
+                                {/* Properties Title */}
+                                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                  {t('crashes.properties')}
+                                </Typography>
 
-            {/* Pagination */}
-            <SimplePagination
-              count={total}
-              page={pageState.page - 1} // SimplePagination uses 0-based
-              rowsPerPage={pageState.limit}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-            />
-          </>
-        )}
+                                {/* Table View */}
+                                {detailViewMode === 'table' && (
+                                  <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
+                                    <Table size="small">
+                                      <TableBody>
+                                        {/* ID */}
+                                        <TableRow>
+                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                            ID
+                                          </TableCell>
+                                          <TableCell>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                              <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                                                {event.id}
+                                              </Typography>
+                                              <IconButton
+                                                size="small"
+                                                onClick={async () => {
+                                                  await copyToClipboardWithNotification(
+                                                    event.id,
+                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                  );
+                                                }}
+                                              >
+                                                <CopyIcon fontSize="small" />
+                                              </IconButton>
+                                            </Box>
+                                          </TableCell>
+                                        </TableRow>
+
+                                        {/* Created At */}
+                                        <TableRow>
+                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                            {t('crashes.table.createdAt')}
+                                          </TableCell>
+                                          <TableCell>
+                                            <Typography variant="body2">
+                                              {dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+                                            </Typography>
+                                          </TableCell>
+                                        </TableRow>
+
+                                        {/* Platform */}
+                                        <TableRow>
+                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                            {t('crashes.table.platform')}
+                                          </TableCell>
+                                          <TableCell>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                              <Chip
+                                                label={getPlatformName(event.platform)}
+                                                size="small"
+                                                color="primary"
+                                                variant="outlined"
+                                              />
+                                              <IconButton
+                                                size="small"
+                                                onClick={async () => {
+                                                  await copyToClipboardWithNotification(
+                                                    event.platform,
+                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                  );
+                                                }}
+                                              >
+                                                <CopyIcon fontSize="small" />
+                                              </IconButton>
+                                            </Box>
+                                          </TableCell>
+                                        </TableRow>
+
+                                        {/* Environment */}
+                                        <TableRow>
+                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                            {t('crashes.table.environment')}
+                                          </TableCell>
+                                          <TableCell>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                              <Chip
+                                                label={getEnvironmentName(event.environment)}
+                                                size="small"
+                                                color="secondary"
+                                                variant="outlined"
+                                              />
+                                              <IconButton
+                                                size="small"
+                                                onClick={async () => {
+                                                  await copyToClipboardWithNotification(
+                                                    event.environment,
+                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                  );
+                                                }}
+                                              >
+                                                <CopyIcon fontSize="small" />
+                                              </IconButton>
+                                            </Box>
+                                          </TableCell>
+                                        </TableRow>
+
+                                        {/* Branch */}
+                                        <TableRow>
+                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                            {t('crashes.table.branch')}
+                                          </TableCell>
+                                          <TableCell>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                              <Chip
+                                                label={event.branch}
+                                                size="small"
+                                                color="info"
+                                                variant="outlined"
+                                              />
+                                              <IconButton
+                                                size="small"
+                                                onClick={async () => {
+                                                  await copyToClipboardWithNotification(
+                                                    event.branch,
+                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                  );
+                                                }}
+                                              >
+                                                <CopyIcon fontSize="small" />
+                                              </IconButton>
+                                            </Box>
+                                          </TableCell>
+                                        </TableRow>
+
+                                        {/* App Version */}
+                                        <TableRow>
+                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                            {t('crashes.table.appVersion')}
+                                          </TableCell>
+                                          <TableCell>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                              <Chip
+                                                label={event.appVersion || '-'}
+                                                size="small"
+                                                variant="outlined"
+                                              />
+                                              {event.appVersion && (
+                                                <IconButton
+                                                  size="small"
+                                                  onClick={async () => {
+                                                    await copyToClipboardWithNotification(
+                                                      event.appVersion!,
+                                                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                    );
+                                                  }}
+                                                >
+                                                  <CopyIcon fontSize="small" />
+                                                </IconButton>
+                                              )}
+                                            </Box>
+                                          </TableCell>
+                                        </TableRow>
+
+                                        {/* Res Version */}
+                                        <TableRow>
+                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                            {t('crashes.table.resVersion')}
+                                          </TableCell>
+                                          <TableCell>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                              <Chip
+                                                label={event.resVersion || '-'}
+                                                size="small"
+                                                variant="outlined"
+                                              />
+                                              {event.resVersion && (
+                                                <IconButton
+                                                  size="small"
+                                                  onClick={async () => {
+                                                    await copyToClipboardWithNotification(
+                                                      event.resVersion!,
+                                                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                    );
+                                                  }}
+                                                >
+                                                  <CopyIcon fontSize="small" />
+                                                </IconButton>
+                                              )}
+                                            </Box>
+                                          </TableCell>
+                                        </TableRow>
+
+                                        {/* Account ID */}
+                                        {event.accountId != null && (
+                                          <TableRow>
+                                            <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                              {t('crashes.table.accountId')}
+                                            </TableCell>
+                                            <TableCell>
+                                              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <Typography variant="body2">{event.accountId}</Typography>
+                                                <IconButton
+                                                  size="small"
+                                                  onClick={async () => {
+                                                    await copyToClipboardWithNotification(
+                                                      String(event.accountId),
+                                                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                    );
+                                                  }}
+                                                >
+                                                  <CopyIcon fontSize="small" />
+                                                </IconButton>
+                                              </Box>
+                                            </TableCell>
+                                          </TableRow>
+                                        )}
+
+                                        {/* Character ID */}
+                                        {event.characterId != null && (
+                                          <TableRow>
+                                            <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                              {t('crashes.table.characterId')}
+                                            </TableCell>
+                                            <TableCell>
+                                              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <Typography variant="body2">{event.characterId}</Typography>
+                                                <IconButton
+                                                  size="small"
+                                                  onClick={async () => {
+                                                    await copyToClipboardWithNotification(
+                                                      String(event.characterId),
+                                                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                    );
+                                                  }}
+                                                >
+                                                  <CopyIcon fontSize="small" />
+                                                </IconButton>
+                                              </Box>
+                                            </TableCell>
+                                          </TableRow>
+                                        )}
+
+                                        {/* Game User ID */}
+                                        {event.gameUserId != null && (
+                                          <TableRow>
+                                            <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                              {t('crashes.table.gameUserId')}
+                                            </TableCell>
+                                            <TableCell>
+                                              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <Typography variant="body2">{event.gameUserId}</Typography>
+                                                <IconButton
+                                                  size="small"
+                                                  onClick={async () => {
+                                                    await copyToClipboardWithNotification(
+                                                      String(event.gameUserId),
+                                                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                    );
+                                                  }}
+                                                >
+                                                  <CopyIcon fontSize="small" />
+                                                </IconButton>
+                                              </Box>
+                                            </TableCell>
+                                          </TableRow>
+                                        )}
+
+                                        {/* User Name */}
+                                        {!!event.userName && (
+                                          <TableRow>
+                                            <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                              {t('crashes.table.userName')}
+                                            </TableCell>
+                                            <TableCell>
+                                              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <Typography variant="body2">{event.userName}</Typography>
+                                                <IconButton
+                                                  size="small"
+                                                  onClick={async () => {
+                                                    await copyToClipboardWithNotification(
+                                                      event.userName!,
+                                                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                    );
+                                                  }}
+                                                >
+                                                  <CopyIcon fontSize="small" />
+                                                </IconButton>
+                                              </Box>
+                                            </TableCell>
+                                          </TableRow>
+                                        )}
+
+                                        {/* Game Server ID */}
+                                        {event.gameServerId != null && (
+                                          <TableRow>
+                                            <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                              {t('crashes.table.gameServerId')}
+                                            </TableCell>
+                                            <TableCell>
+                                              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <Typography variant="body2">{event.gameServerId}</Typography>
+                                                <IconButton
+                                                  size="small"
+                                                  onClick={async () => {
+                                                    await copyToClipboardWithNotification(
+                                                      String(event.gameServerId),
+                                                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                    );
+                                                  }}
+                                                >
+                                                  <CopyIcon fontSize="small" />
+                                                </IconButton>
+                                              </Box>
+                                            </TableCell>
+                                          </TableRow>
+                                        )}
+
+                                        {/* Market Type */}
+                                        {!!event.marketType && (
+                                          <TableRow>
+                                            <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                              {t('crashes.table.marketType')}
+                                            </TableCell>
+                                            <TableCell>
+                                              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <Typography variant="body2">{event.marketType}</Typography>
+                                                <IconButton
+                                                  size="small"
+                                                  onClick={async () => {
+                                                    await copyToClipboardWithNotification(
+                                                      event.marketType!,
+                                                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                    );
+                                                  }}
+                                                >
+                                                  <CopyIcon fontSize="small" />
+                                                </IconButton>
+                                              </Box>
+                                            </TableCell>
+                                          </TableRow>
+                                        )}
+
+                                        {/* Is Editor */}
+                                        {!!event.isEditor && (
+                                          <TableRow>
+                                            <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                              {t('crashes.table.isEditor')}
+                                            </TableCell>
+                                            <TableCell>
+                                              <Chip label="Editor" size="small" color="warning" />
+                                            </TableCell>
+                                          </TableRow>
+                                        )}
+
+                                        {/* IP Address */}
+                                        <TableRow>
+                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                            {t('crashes.table.ipAddress')}
+                                          </TableCell>
+                                          <TableCell>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                              <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                                                {event.crashEventIp || '-'}
+                                              </Typography>
+                                              {event.crashEventIp && (
+                                                <IconButton
+                                                  size="small"
+                                                  onClick={async () => {
+                                                    await copyToClipboardWithNotification(
+                                                      event.crashEventIp!,
+                                                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                    );
+                                                  }}
+                                                >
+                                                  <CopyIcon fontSize="small" />
+                                                </IconButton>
+                                              )}
+                                            </Box>
+                                          </TableCell>
+                                        </TableRow>
+
+                                        {/* User Agent */}
+                                        <TableRow>
+                                          <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                            {t('crashes.table.userAgent')}
+                                          </TableCell>
+                                          <TableCell>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem', wordBreak: 'break-all' }}>
+                                                {event.crashEventUserAgent || '-'}
+                                              </Typography>
+                                              {event.crashEventUserAgent && (
+                                                <IconButton
+                                                  size="small"
+                                                  onClick={async () => {
+                                                    await copyToClipboardWithNotification(
+                                                      event.crashEventUserAgent!,
+                                                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                    );
+                                                  }}
+                                                >
+                                                  <CopyIcon fontSize="small" />
+                                                </IconButton>
+                                              )}
+                                            </Box>
+                                          </TableCell>
+                                        </TableRow>
+
+                                        {/* First Line */}
+                                        {!!(event as any).firstLine && (
+                                          <TableRow>
+                                            <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                              {t('crashes.table.firstLine')}
+                                            </TableCell>
+                                            <TableCell>
+                                              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem', wordBreak: 'break-all' }}>
+                                                  {(event as any).firstLine}
+                                                </Typography>
+                                                <IconButton
+                                                  size="small"
+                                                  onClick={() => {
+                                                    copyToClipboardWithNotification(
+                                                      (event as any).firstLine!,
+                                                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                    );
+                                                  }}
+                                                >
+                                                  <CopyIcon fontSize="small" />
+                                                </IconButton>
+                                              </Box>
+                                            </TableCell>
+                                          </TableRow>
+                                        )}
+
+                                        {/* User Message */}
+                                        {!!event.userMessage && (
+                                          <TableRow>
+                                            <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', verticalAlign: 'top', whiteSpace: 'nowrap' }}>
+                                              {t('crashes.table.userMessage')}
+                                            </TableCell>
+                                            <TableCell>
+                                              <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1 }}>
+                                                <Typography
+                                                  variant="body2"
+                                                  sx={{
+                                                    flex: 1,
+                                                    whiteSpace: 'pre-wrap',
+                                                    wordBreak: 'break-word',
+                                                  }}
+                                                >
+                                                  {event.userMessage}
+                                                </Typography>
+                                                <IconButton
+                                                  size="small"
+                                                  onClick={async () => {
+                                                    await copyToClipboardWithNotification(
+                                                      event.userMessage!,
+                                                      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                    );
+                                                  }}
+                                                >
+                                                  <CopyIcon fontSize="small" />
+                                                </IconButton>
+                                              </Box>
+                                            </TableCell>
+                                          </TableRow>
+                                        )}
+                                      </TableBody>
+                                    </Table>
+                                  </Paper>
+                                )}
+
+                                {/* JSON View */}
+                                {detailViewMode === 'json' && (
+                                  <Paper
+                                    variant="outlined"
+                                    sx={{
+                                      p: 2,
+                                      bgcolor: 'background.default',
+                                      maxHeight: 600,
+                                      overflow: 'auto',
+                                    }}
+                                  >
+                                    <pre style={{
+                                      margin: 0,
+                                      fontSize: '0.875rem',
+                                      fontFamily: 'monospace',
+                                      lineHeight: 1.6,
+                                    }}>
+                                      {JSON.stringify(event, null, 2)}
+                                    </pre>
+                                  </Paper>
+                                )}
+
+                                {/* Toggle and Copy Button */}
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1, mt: 2 }}>
+                                  <ToggleButtonGroup
+                                    value={detailViewMode}
+                                    exclusive
+                                    onChange={(_, newMode) => {
+                                      if (newMode !== null) {
+                                        setDetailViewMode(newMode);
+                                      }
+                                    }}
+                                    size="small"
+                                  >
+                                    <ToggleButton value="table">
+                                      <TableIcon fontSize="small" sx={{ mr: 0.5 }} />
+                                      Table
+                                    </ToggleButton>
+                                    <ToggleButton value="json">
+                                      <JsonIcon fontSize="small" sx={{ mr: 0.5 }} />
+                                      JSON
+                                    </ToggleButton>
+                                  </ToggleButtonGroup>
+                                  <Tooltip title={detailViewMode === 'table' ? 'Copy as Table' : 'Copy as JSON'}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => {
+                                        if (detailViewMode === 'table') {
+                                          handleCopyTableData(event);
+                                        } else {
+                                          handleCopyJsonData(event);
+                                        }
+                                      }}
+                                    >
+                                      <CopyIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                </Box>
+                              </Box>
+                            </Collapse>
+                          </TableCell>
+                        </TableRow>
+                      </React.Fragment>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              {/* Pagination */}
+              <SimplePagination
+                count={total}
+                page={pageState.page - 1} // SimplePagination uses 0-based
+                rowsPerPage={pageState.limit}
+                onPageChange={handlePageChange}
+                onRowsPerPageChange={handleRowsPerPageChange}
+              />
+            </>
+          )}
+        </CardContent>
       </Card>
 
       {/* Drawer for Stack Trace and Log */}
