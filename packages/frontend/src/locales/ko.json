@@ -46,6 +46,8 @@
   "common.table": "표",
   "common.key": "키",
   "common.value": "값",
+  "common.more": "더 보기",
+  "common.showLess": "간략히",
   "gatrixEdges.appVersion": "애플리케이션 버전",
   "gatrixEdges.sdkVersion": "SDK 버전",
   "gatrixEdges.requestStats": "요청 통계",

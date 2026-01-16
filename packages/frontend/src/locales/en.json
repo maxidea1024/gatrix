@@ -46,6 +46,8 @@
   "common.table": "Table",
   "common.key": "Key",
   "common.value": "Value",
+  "common.more": "more",
+  "common.showLess": "show less",
   "gatrixEdges.appVersion": "App Version",
   "gatrixEdges.sdkVersion": "SDK Version",
   "gatrixEdges.requestStats": "Request Statistics",

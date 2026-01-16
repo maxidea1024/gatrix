@@ -1963,6 +1963,9 @@ const ServerListPage: React.FC = () => {
   const [bulkHealthCheckRunning, setBulkHealthCheckRunning] = useState(false);
   const [bulkHealthCheckSelected, setBulkHealthCheckSelected] = useState<Set<string>>(new Set());
 
+  // Track expanded table cells (for labels and ports columns)
+  const [expandedCells, setExpandedCells] = useState<Set<string>>(new Set());
+
   // Multi-level grouping state (persisted in localStorage)
   const [groupingLevels, setGroupingLevels] = useState<GroupingField[]>(() => {
     try {
@@ -3689,7 +3692,7 @@ const ServerListPage: React.FC = () => {
                       <TableCell key={column.id}>
                         <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
                           {visibleLabels.map(([k, v]) => (
-                            <Chip key={k} label={`${k}=${v}`} size="small" variant="outlined" sx={{ fontSize: '0.65rem', height: 18 }} />
+                            <Chip key={k} label={`${k}=${v}`} size="small" variant="outlined" sx={{ fontSize: '0.75rem', height: 22 }} />
                           ))}
                           {hiddenLabelsCount > 0 && !labelsExpanded && (
                             <Typography

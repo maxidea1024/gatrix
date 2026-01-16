@@ -46,6 +46,8 @@
   "common.table": "表格",
   "common.key": "键",
   "common.value": "值",
+  "common.more": "更多",
+  "common.showLess": "收起",
   "gatrixEdges.appVersion": "应用版本",
   "gatrixEdges.sdkVersion": "SDK 版本",
   "gatrixEdges.requestStats": "请求统计",
