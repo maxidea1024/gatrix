@@ -368,16 +368,6 @@ const DashboardPage: React.FC = () => {
       });
     }
 
-    if (hasPermission(PERMISSIONS.REMOTE_CONFIG_VIEW)) {
-      actions.push({
-        key: 'remoteConfig',
-        title: t('sidebar.remoteConfig'),
-        description: t('dashboard.quickActions.remoteConfigDesc'),
-        icon: <SettingsIcon />,
-        path: '/admin/remote-config',
-      });
-    }
-
     // Game Management actions
     if (hasPermission(PERMISSIONS.SERVICE_NOTICES_VIEW)) {
       actions.push({
@@ -1147,10 +1137,8 @@ const DashboardPage: React.FC = () => {
                             }}
                           >
                             {[
-                              { label: 'envTemplates', value: env.counts.templates, path: '/admin/remote-config' },
                               { label: 'envGameWorlds', value: env.counts.gameWorlds, path: '/admin/game-worlds' },
                               { label: 'envClientVersions', value: env.counts.clientVersions, path: '/admin/client-versions' },
-                              { label: 'envSegments', value: env.counts.segments, path: '/admin/remote-config' },
                               { label: 'envVars', value: env.counts.vars, path: '/settings/kv' },
                               { label: 'envMessageTemplates', value: env.counts.messageTemplates, path: '/admin/maintenance-templates' },
                               { label: 'envSurveys', value: env.counts.surveys, path: '/game/surveys' },

@@ -99,77 +99,77 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
   };
 
   return (
-  <Box
-    sx={{
-      backgroundColor: '#fff',
-      borderRadius: 1,
-      '& .swagger-ui': {
-        padding: 0,
-        backgroundColor: 'transparent',
-        color: '#3b4151',
-      },
-      '& .swagger-ui .topbar': { display: 'none' },
-      '& .swagger-ui .scheme-container': { backgroundColor: 'transparent', padding: '0 !important' },
-      '& .swagger-ui .info': { color: '#3b4151' },
-      '& .swagger-ui .info .title': { color: '#3b4151', fontWeight: 700 },
-      '& .swagger-ui .info .description': { color: '#6b7280' },
-      '& .swagger-ui .opblock': { borderColor: '#e5e7eb' },
-      '& .swagger-ui .opblock-summary': {
-        backgroundColor: '#f9fafb',
-      },
-      '& .swagger-ui .opblock-summary-description': { color: '#3b4151' },
-      '& .swagger-ui .opblock-summary-path': { color: '#3b4151' },
-      '& .swagger-ui .parameter__name': { color: '#3b4151', fontWeight: 600 },
-      '& .swagger-ui .parameter__type': { color: '#6b7280' },
-      '& .swagger-ui .response-col_description': { color: '#3b4151' },
-      '& .swagger-ui table': { color: '#3b4151' },
-      '& .swagger-ui table thead tr': {
-        backgroundColor: '#f9fafb',
-      },
-      '& .swagger-ui table tbody tr': {
-        backgroundColor: '#ffffff',
-      },
-      '& .swagger-ui .model': { color: '#3b4151' },
-      '& .swagger-ui .model-title': { color: '#3b4151' },
-      '& .swagger-ui .prop-type': { color: '#6b7280' },
-      '& .swagger-ui .response-col': { color: '#3b4151' },
-      '& .swagger-ui .response-col_status': { color: '#3b4151' },
-      '& .swagger-ui .response-col_links': { color: '#3b4151' },
-      '& .swagger-ui .tab': { color: '#3b4151' },
-      '& .swagger-ui .tab.active': { color: '#2563eb', borderBottomColor: '#2563eb' },
-      '& .swagger-ui .tab:hover': { color: '#3b4151' },
-      '& .swagger-ui .btn': { color: '#3b4151' },
-      '& .swagger-ui .btn:hover': { backgroundColor: '#f3f4f6' },
-      '& .swagger-ui .model-box': { backgroundColor: '#f9fafb' },
-      '& .swagger-ui .model-box-control': { color: '#3b4151' },
-      '& .swagger-ui .model-hint': { color: '#6b7280' },
-      '& .swagger-ui .model-toggle': { color: '#3b4151' },
-      '& .swagger-ui .model-toggle:hover': { color: '#2563eb' },
-      '& .swagger-ui .model-toggle::after': { color: '#3b4151' },
-      '& .swagger-ui .model-toggle.collapsed::after': { color: '#3b4151' },
-      '& .swagger-ui .response': { color: '#3b4151' },
-      '& .swagger-ui .response-col_description__inner': { color: '#3b4151' },
-      '& .swagger-ui .response-col_description__inner p': { color: '#3b4151' },
-      '& .swagger-ui .response-col_description__inner a': { color: '#2563eb' },
-      '& .swagger-ui .opblock-description-text': { color: '#6b7280' },
-      '& .swagger-ui .opblock-external-docs-url': { color: '#2563eb' },
-      '& .swagger-ui .opblock-tag': { color: '#3b4151' },
-      '& .swagger-ui .opblock-tag-section': { color: '#3b4151' },
-      '& .swagger-ui .opblock-tag-section .opblock-tag': { color: '#3b4151' },
-      '& .swagger-ui .opblock-tag-section .opblock-tag:hover': { color: '#2563eb' },
-    }}
-  >
-    <SwaggerUI
-      spec={updatedSpec}
-      persistAuthorization={true}
-      tryItOutEnabled={true}
-      requestInterceptor={(request) => {
-        // Add credentials to requests
-        request.credentials = 'include';
-        return request;
+    <Box
+      sx={{
+        backgroundColor: '#fff',
+        borderRadius: 1,
+        '& .swagger-ui': {
+          padding: 0,
+          backgroundColor: 'transparent',
+          color: '#3b4151',
+        },
+        '& .swagger-ui .topbar': { display: 'none' },
+        '& .swagger-ui .scheme-container': { backgroundColor: 'transparent', padding: '0 !important' },
+        '& .swagger-ui .info': { color: '#3b4151' },
+        '& .swagger-ui .info .title': { color: '#3b4151', fontWeight: 700 },
+        '& .swagger-ui .info .description': { color: '#6b7280' },
+        '& .swagger-ui .opblock': { borderColor: '#e5e7eb' },
+        '& .swagger-ui .opblock-summary': {
+          backgroundColor: '#f9fafb',
+        },
+        '& .swagger-ui .opblock-summary-description': { color: '#3b4151' },
+        '& .swagger-ui .opblock-summary-path': { color: '#3b4151' },
+        '& .swagger-ui .parameter__name': { color: '#3b4151', fontWeight: 600 },
+        '& .swagger-ui .parameter__type': { color: '#6b7280' },
+        '& .swagger-ui .response-col_description': { color: '#3b4151' },
+        '& .swagger-ui table': { color: '#3b4151' },
+        '& .swagger-ui table thead tr': {
+          backgroundColor: '#f9fafb',
+        },
+        '& .swagger-ui table tbody tr': {
+          backgroundColor: '#ffffff',
+        },
+        '& .swagger-ui .model': { color: '#3b4151' },
+        '& .swagger-ui .model-title': { color: '#3b4151' },
+        '& .swagger-ui .prop-type': { color: '#6b7280' },
+        '& .swagger-ui .response-col': { color: '#3b4151' },
+        '& .swagger-ui .response-col_status': { color: '#3b4151' },
+        '& .swagger-ui .response-col_links': { color: '#3b4151' },
+        '& .swagger-ui .tab': { color: '#3b4151' },
+        '& .swagger-ui .tab.active': { color: '#2563eb', borderBottomColor: '#2563eb' },
+        '& .swagger-ui .tab:hover': { color: '#3b4151' },
+        '& .swagger-ui .btn': { color: '#3b4151' },
+        '& .swagger-ui .btn:hover': { backgroundColor: '#f3f4f6' },
+        '& .swagger-ui .model-box': { backgroundColor: '#f9fafb' },
+        '& .swagger-ui .model-box-control': { color: '#3b4151' },
+        '& .swagger-ui .model-hint': { color: '#6b7280' },
+        '& .swagger-ui .model-toggle': { color: '#3b4151' },
+        '& .swagger-ui .model-toggle:hover': { color: '#2563eb' },
+        '& .swagger-ui .model-toggle::after': { color: '#3b4151' },
+        '& .swagger-ui .model-toggle.collapsed::after': { color: '#3b4151' },
+        '& .swagger-ui .response': { color: '#3b4151' },
+        '& .swagger-ui .response-col_description__inner': { color: '#3b4151' },
+        '& .swagger-ui .response-col_description__inner p': { color: '#3b4151' },
+        '& .swagger-ui .response-col_description__inner a': { color: '#2563eb' },
+        '& .swagger-ui .opblock-description-text': { color: '#6b7280' },
+        '& .swagger-ui .opblock-external-docs-url': { color: '#2563eb' },
+        '& .swagger-ui .opblock-tag': { color: '#3b4151' },
+        '& .swagger-ui .opblock-tag-section': { color: '#3b4151' },
+        '& .swagger-ui .opblock-tag-section .opblock-tag': { color: '#3b4151' },
+        '& .swagger-ui .opblock-tag-section .opblock-tag:hover': { color: '#2563eb' },
       }}
-    />
-  </Box>
+    >
+      <SwaggerUI
+        spec={updatedSpec}
+        persistAuthorization={true}
+        tryItOutEnabled={true}
+        requestInterceptor={(request) => {
+          // Add credentials to requests
+          request.credentials = 'include';
+          return request;
+        }}
+      />
+    </Box>
   );
 };
 
@@ -209,8 +209,7 @@ function createAdminApiSpec() {
       '/admin/api-tokens': { get: { summary: 'List API tokens', tags: ['API Tokens'], security: [{ bearerAuth: [] }], responses: { '200': { description: 'List of API tokens' } } }, post: { summary: 'Create API token', tags: ['API Tokens'], security: [{ bearerAuth: [] }], responses: { '201': { description: 'API token created' } } } },
       '/admin/api-tokens/{id}': { put: { summary: 'Update API token', tags: ['API Tokens'], security: [{ bearerAuth: [] }], parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }], responses: { '200': { description: 'API token updated' } } }, delete: { summary: 'Delete API token', tags: ['API Tokens'], security: [{ bearerAuth: [] }], parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }], responses: { '204': { description: 'API token deleted' } } } },
       '/admin/api-tokens/{id}/regenerate': { post: { summary: 'Regenerate API token', tags: ['API Tokens'], security: [{ bearerAuth: [] }], parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }], responses: { '200': { description: 'API token regenerated' } } } },
-      '/admin/remote-config': { get: { summary: 'List remote configurations', tags: ['Configuration'], security: [{ bearerAuth: [] }], responses: { '200': { description: 'Remote configurations' } } }, post: { summary: 'Create remote configuration', tags: ['Configuration'], security: [{ bearerAuth: [] }], responses: { '201': { description: 'Configuration created' } } } },
-      '/admin/remote-config/{id}': { get: { summary: 'Get configuration by ID', tags: ['Configuration'], security: [{ bearerAuth: [] }], parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }], responses: { '200': { description: 'Configuration details' } } }, put: { summary: 'Update configuration', tags: ['Configuration'], security: [{ bearerAuth: [] }], parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }], responses: { '200': { description: 'Configuration updated' } } }, delete: { summary: 'Delete configuration', tags: ['Configuration'], security: [{ bearerAuth: [] }], parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }], responses: { '204': { description: 'Configuration deleted' } } } },
+
       '/admin/maintenance': { get: { summary: 'Get maintenance status', tags: ['Maintenance'], security: [{ bearerAuth: [] }], responses: { '200': { description: 'Maintenance status' } } }, post: { summary: 'Set maintenance status', tags: ['Maintenance'], security: [{ bearerAuth: [] }], responses: { '200': { description: 'Maintenance status updated' } } } },
       '/admin/maintenance/templates': { get: { summary: 'Get maintenance templates', tags: ['Maintenance'], security: [{ bearerAuth: [] }], responses: { '200': { description: 'Maintenance templates' } } }, post: { summary: 'Save maintenance templates', tags: ['Maintenance'], security: [{ bearerAuth: [] }], responses: { '200': { description: 'Templates saved' } } } },
       '/admin/campaigns': { get: { summary: 'List campaigns', tags: ['Campaigns'], security: [{ bearerAuth: [] }], responses: { '200': { description: 'List of campaigns' } } }, post: { summary: 'Create campaign', tags: ['Campaigns'], security: [{ bearerAuth: [] }], responses: { '201': { description: 'Campaign created' } } } },
@@ -257,8 +256,7 @@ function createServerSdkApiSpec() {
       '/server/chat/activity': { post: { summary: 'Report chat activity', tags: ['Chat'], security: [{ apiKeyHeader: [] }], responses: { '200': { description: 'Activity reported' } } } },
       '/server/chat/servers': { get: { summary: 'Get registered chat servers', tags: ['Chat'], security: [{ apiKeyHeader: [] }], responses: { '200': { description: 'List of registered servers' } } } },
       '/server/coupons/{code}/redeem': { post: { summary: 'Redeem coupon', description: 'Redeem a coupon code for a user', tags: ['Coupons'], security: [{ apiKeyHeader: [] }], parameters: [{ name: 'code', in: 'path', required: true, schema: { type: 'string' } }], responses: { '200': { description: 'Coupon redeemed' } } } },
-      '/server/templates': { get: { summary: 'Get remote config templates', tags: ['Configuration'], security: [{ apiKeyHeader: [] }], responses: { '200': { description: 'Templates list' } } } },
-      '/server/metrics': { post: { summary: 'Submit metrics', description: 'Submit performance and usage metrics', tags: ['Metrics'], security: [{ apiKeyHeader: [] }], responses: { '200': { description: 'Metrics received' } } } },
+
       '/server/services': { get: { summary: 'Service discovery', description: 'Discover available services', tags: ['Services'], security: [{ apiKeyHeader: [] }], responses: { '200': { description: 'Available services' } } } },
     },
     components: {
@@ -285,10 +283,7 @@ function createClientSdkApiSpec() {
       '/client/game-worlds': { get: { summary: 'Get game worlds', description: 'Retrieve list of available game worlds (public endpoint)', tags: ['Game Worlds'], responses: { '200': { description: 'List of game worlds' } } } },
       '/client/cache-stats': { get: { summary: 'Get cache statistics', description: 'Retrieve cache statistics (public endpoint)', tags: ['Cache'], responses: { '200': { description: 'Cache stats' } } } },
       '/client/invalidate-cache': { post: { summary: 'Invalidate cache', description: 'Invalidate client-side cache (public endpoint)', tags: ['Cache'], responses: { '200': { description: 'Cache invalidated' } } } },
-      '/client/remote-config/evaluate': { post: { summary: 'Evaluate remote configuration', description: 'Evaluate remote configuration with context (supports both public and authenticated requests)', tags: ['Configuration'], responses: { '200': { description: 'Evaluated configuration' } } } },
-      '/client/remote-config/{key}': { post: { summary: 'Get configuration by key', description: 'Get specific configuration value by key (public endpoint)', tags: ['Configuration'], parameters: [{ name: 'key', in: 'path', required: true, schema: { type: 'string' } }], responses: { '200': { description: 'Configuration value' } } } },
-      '/client/remote-config/templates': { get: { summary: 'Get config templates', description: 'Get remote configuration templates (requires authentication)', tags: ['Configuration'], security: [{ apiKeyHeader: [] }], responses: { '200': { description: 'Templates list' } } } },
-      '/client/remote-config/metrics': { post: { summary: 'Submit metrics', description: 'Submit client-side metrics and analytics', tags: ['Metrics'], security: [{ apiKeyHeader: [] }], responses: { '200': { description: 'Metrics received' } } } },
+
       '/client/crashes/upload': { post: { summary: 'Upload crash report', description: 'Upload crash report with stack trace and context information', tags: ['Crash Reports'], security: [{ apiKeyHeader: [] }], responses: { '200': { description: 'Crash report received' } } } },
     },
     components: {

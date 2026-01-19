@@ -92,7 +92,7 @@ export const adminPanelMenuItems: MenuItem[] = [
   { text: 'sidebar.auditLogs', icon: <HistoryIcon />, path: '/admin/audit-logs', adminOnly: true, requiredPermission: PERMISSIONS.AUDIT_LOGS_VIEW },
   { text: 'sidebar.realtimeEvents', icon: <TimelineIcon />, path: '/admin/realtime-events', adminOnly: true, requiredPermission: PERMISSIONS.REALTIME_EVENTS_VIEW },
   { text: 'sidebar.crashEvents', icon: <BugReportIcon />, path: '/admin/crash-events', adminOnly: true, requiredPermission: PERMISSIONS.CRASH_EVENTS_VIEW },
-  { text: 'sidebar.remoteConfig', icon: <CloudSyncIcon />, path: '/admin/remote-config', adminOnly: true, requiredPermission: [PERMISSIONS.REMOTE_CONFIG_VIEW, PERMISSIONS.REMOTE_CONFIG_MANAGE] },
+
   {
     text: 'sidebar.security', icon: <SecurityIcon />, adminOnly: true, requiredPermission: [PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE], children: [
       { text: 'sidebar.apiAccessTokens', icon: <VpnKeyIcon />, path: '/admin/api-tokens', adminOnly: true, requiredPermission: [PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE] },

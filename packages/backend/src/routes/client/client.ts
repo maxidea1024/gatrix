@@ -1,7 +1,5 @@
 import { Router } from 'express';
 import { ClientController } from '../../controllers/ClientController';
-import RemoteConfigClientController from '../../controllers/RemoteConfigClientController';
-import RemoteConfigSDKController from '../../controllers/RemoteConfigSDKController';
 import { ClientCrashController } from '../../controllers/ClientCrashController';
 import { BannerClientController } from '../../controllers/BannerClientController';
 import { requestLogger } from '../../middleware/requestLogger';
@@ -376,19 +374,7 @@ router.get('/cache-stats', clientSDKAuth, ClientController.getCacheStats);
 
 router.post('/invalidate-cache', clientSDKAuth, ClientController.invalidateCache);
 
-router.post('/remote-config/evaluate',
-  body('context').optional().isObject(),
-  body('keys').optional().isArray(),
-  validateRequest,
-  RemoteConfigClientController.evaluate
-);
-
-router.post('/remote-config/:key',
-  param('key').isString().isLength({ min: 1, max: 255 }),
-  body('context').optional().isObject(),
-  validateRequest,
-  RemoteConfigClientController.getConfigByKey
-);
+// Note: Remote config routes removed - will be reimplemented with new system
 
 // Client SDK routes (with API token authentication)
 router.get('/test', clientSDKAuth, (req: any, res: any) => {
@@ -405,9 +391,6 @@ router.get('/test', clientSDKAuth, (req: any, res: any) => {
     }
   });
 });
-router.get('/remote-config/templates', clientSDKAuth, RemoteConfigSDKController.getClientTemplates);
-router.post('/remote-config/evaluate', clientSDKAuth, RemoteConfigSDKController.evaluateConfig);
-router.post('/remote-config/metrics', clientSDKAuth, RemoteConfigSDKController.submitMetrics);
 
 // Crash upload endpoint (requires client API token)
 router.post('/crashes/upload',

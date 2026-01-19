@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { Environment } from '../models/Environment';
-import { RemoteConfigSegment } from '../models/RemoteConfigSegment';
 import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import logger from '../config/logger';
@@ -111,9 +110,8 @@ export class EnvironmentController {
         createdBy: userId
       });
 
-      // Create predefined segments and system KV for the new environment (only if no base environment)
+      // Note: Segments will be created by new remote config system when implemented
       if (!baseEnvironment) {
-        await RemoteConfigSegment.createPredefinedSegments(newEnv.environment, userId);
         // Initialize system-defined KV items ($channels, $platforms, $clientVersionPassiveData)
         await initializeSystemKV(newEnv.environment);
         logger.info(`System KV items initialized for new environment: ${environment}`);
@@ -361,7 +359,7 @@ export class EnvironmentController {
   });
 
   /**
-   * Get environment segments
+   * Get environment segments - Placeholder for new remote config system
    */
   static getEnvironmentSegments = asyncHandler(async (req: Request, res: Response) => {
     const { environment } = req.params;
@@ -374,16 +372,15 @@ export class EnvironmentController {
       });
     }
 
-    const segments = await RemoteConfigSegment.getAllByEnvironment(env.environment);
-
+    // Segments will be implemented in new remote config system
     res.json({
       success: true,
-      data: segments
+      data: []
     });
   });
 
   /**
-   * Create predefined segments for environment
+   * Create predefined segments for environment - Placeholder for new remote config system
    */
   static createPredefinedSegments = asyncHandler(async (req: Request, res: Response) => {
     const { environment } = req.params;
@@ -404,23 +401,12 @@ export class EnvironmentController {
       });
     }
 
-    try {
-      const segments = await RemoteConfigSegment.createPredefinedSegments(env.environment, userId);
-
-      logger.info(`Predefined segments created for environment: ${env.environment} by user ${userId}`);
-
-      res.json({
-        success: true,
-        data: segments,
-        message: 'Predefined segments created successfully'
-      });
-    } catch (error) {
-      logger.error('Error creating predefined segments:', error);
-      res.status(400).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to create predefined segments'
-      });
-    }
+    // Segments will be implemented in new remote config system
+    res.json({
+      success: true,
+      data: [],
+      message: 'Segments feature is being rebuilt - no predefined segments created'
+    });
   });
 
   /**

@@ -80,9 +80,7 @@ import SchedulerPage from './pages/admin/SchedulerPage';
 import JobsPage from './pages/admin/JobsPage';
 import QueueMonitorPage from './pages/admin/QueueMonitorPage';
 import CustomQueueMonitorPage from './pages/admin/CustomQueueMonitorPage';
-import RemoteConfigPage from './pages/admin/RemoteConfigPage';
-import RemoteConfigHistoryPage from './pages/admin/RemoteConfigHistoryPage';
-import RemoteConfigDashboard from './pages/RemoteConfig/RemoteConfigParametersPage';
+
 import ApiTokensPage from './pages/admin/ApiTokensPage';
 import CrashEventsPage from './pages/admin/CrashEventsPage';
 import ChatPage from './pages/chat/ChatPage';
@@ -465,9 +463,6 @@ const AppContent: React.FC = () => {
                                   <Route path="audit-logs" element={<AuditLogsPage />} />
                                   <Route path="realtime-events" element={<RealtimeEventsPage />} />
                                   <Route path="crash-events" element={<CrashEventsPage />} />
-                                  <Route path="remote-config" element={<RemoteConfigDashboard />} />
-                                  <Route path="remote-config-old" element={<RemoteConfigPage />} />
-                                  <Route path="remote-config/history" element={<RemoteConfigHistoryPage />} />
                                   <Route path="api-tokens" element={<ApiTokensPage />} />
                                   <Route path="console" element={<SystemConsolePage />} />
                                   <Route path="server-list" element={<ServerListPage />} />

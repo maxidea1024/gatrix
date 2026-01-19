@@ -14,7 +14,6 @@ export const getTableLocalizationKey = (tableName: string): string => {
         'ingame_popup_notices': 'tables.ingamePopupNotices',
         'coupons': 'tables.coupons',
         'events': 'tables.events',
-        'remote_configs': 'tables.remoteConfigs',
         'store_products': 'tables.storeProducts',
         'server_lifecycle_events': 'tables.serverLifecycleEvents',
         'users': 'tables.users',

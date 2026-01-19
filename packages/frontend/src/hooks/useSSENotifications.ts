@@ -234,18 +234,6 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         window.dispatchEvent(new CustomEvent('planning-data-updated', { detail: event.data }));
         break;
 
-      case 'remote_config_change':
-        handleRemoteConfigChange(event.data);
-        break;
-
-      case 'remote_config_deployment':
-        handleRemoteConfigDeployment(event.data);
-        break;
-
-      case 'campaign_status_change':
-        handleCampaignStatusChange(event.data);
-        break;
-
       case 'maintenance_status_change':
         // Handled by MainLayout via onEvent. We still acknowledge to avoid noisy logs.
         break;
@@ -310,36 +298,6 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         break;
     }
   }, [t]);
-
-  // Handle remote config change notifications
-  const handleRemoteConfigChange = useCallback((data: any) => {
-    const { action, config } = data;
-
-    switch (action) {
-      case 'created':
-        enqueueSnackbar(t('remoteConfig.createSuccess'), { variant: 'success' });
-        break;
-      case 'updated':
-        enqueueSnackbar(`Config "${config.keyName}" updated`, { variant: 'info' });
-        break;
-      case 'deleted':
-        enqueueSnackbar(`Config "${config.keyName}" deleted`, { variant: 'info' });
-        break;
-    }
-  }, [t, enqueueSnackbar]);
-
-  // Handle deployment notifications
-  const handleRemoteConfigDeployment = useCallback((data: any) => {
-    const { configCount } = data;
-    enqueueSnackbar(`${configCount} configs deployed successfully`, { variant: 'success' });
-  }, [enqueueSnackbar]);
-
-  // Handle campaign status change notifications
-  const handleCampaignStatusChange = useCallback((data: any) => {
-    const { campaignId, isActive, reason } = data;
-    const status = isActive ? 'activated' : 'deactivated';
-    enqueueSnackbar(`Campaign ${campaignId} ${status} (${reason})`, { variant: 'info' });
-  }, [enqueueSnackbar]);
 
   // Handle invitation created notifications
   const handleInvitationCreated = useCallback((data: any) => {

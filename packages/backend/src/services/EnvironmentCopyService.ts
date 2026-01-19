@@ -1,7 +1,5 @@
 import knex from '../config/knex';
 import logger from '../config/logger';
-import { RemoteConfigTemplate } from '../models/RemoteConfigTemplate';
-import { RemoteConfigSegment } from '../models/RemoteConfigSegment';
 import { GameWorldModel } from '../models/GameWorld';
 import { PlanningDataService } from './PlanningDataService';
 
@@ -103,9 +101,7 @@ export class EnvironmentCopyService {
   ): Promise<CopyPreview> {
     // Get source counts
     const [
-      templates,
       gameWorlds,
-      segments,
       banners,
       clientVersions,
       coupons,
@@ -116,15 +112,11 @@ export class EnvironmentCopyService {
       serviceNotices,
       surveys,
       vars,
-      contextFields,
-      campaigns,
       accountWhitelist,
       ipWhitelist,
       jobs
     ] = await Promise.all([
-      RemoteConfigTemplate.query().where('environment', sourceEnvironment).select('templateName'),
       knex('g_game_worlds').where('environment', sourceEnvironment).select('worldId'),
-      RemoteConfigSegment.query().where('environment', sourceEnvironment).select('segmentName'),
       knex('g_banners').where('environment', sourceEnvironment).select('bannerId'),
       knex('g_client_versions').where('environment', sourceEnvironment).select('id', 'platform', 'version'),
       knex('g_coupons').where('environment', sourceEnvironment).select('id', 'code'),
@@ -135,8 +127,6 @@ export class EnvironmentCopyService {
       knex('g_service_notices').where('environment', sourceEnvironment).select('id'),
       knex('g_surveys').where('environment', sourceEnvironment).select('id'),
       knex('g_vars').where('environment', sourceEnvironment).select('id', 'varKey'),
-      knex('g_remote_config_context_fields').where('environment', sourceEnvironment).select('id', 'fieldKey'),
-      knex('g_remote_config_campaigns').where('environment', sourceEnvironment).select('id', 'campaignName'),
       knex('g_account_whitelist').where('environment', sourceEnvironment).select('id', 'accountId'),
       knex('g_ip_whitelist').where('environment', sourceEnvironment).select('id', 'ipAddress'),
       knex('g_jobs').where('environment', sourceEnvironment).select('id', 'name')
@@ -144,9 +134,7 @@ export class EnvironmentCopyService {
 
     // Get target existing items
     const [
-      existingTemplates,
       existingWorlds,
-      existingSegments,
       existingBanners,
       existingClientVersions,
       existingCoupons,
@@ -157,15 +145,11 @@ export class EnvironmentCopyService {
       existingServiceNotices,
       existingSurveys,
       existingVars,
-      existingContextFields,
-      existingCampaigns,
       existingAccountWhitelist,
       existingIpWhitelist,
       existingJobs
     ] = await Promise.all([
-      RemoteConfigTemplate.query().where('environment', targetEnvironment).select('templateName'),
       knex('g_game_worlds').where('environment', targetEnvironment).select('worldId'),
-      RemoteConfigSegment.query().where('environment', targetEnvironment).select('segmentName'),
       knex('g_banners').where('environment', targetEnvironment).select('bannerId'),
       knex('g_client_versions').where('environment', targetEnvironment).select('platform', 'version'),
       knex('g_coupons').where('environment', targetEnvironment).select('code'),
@@ -176,55 +160,42 @@ export class EnvironmentCopyService {
       knex('g_service_notices').where('environment', targetEnvironment).select('id'),
       knex('g_surveys').where('environment', targetEnvironment).select('id'),
       knex('g_vars').where('environment', targetEnvironment).select('varKey'),
-      knex('g_remote_config_context_fields').where('environment', targetEnvironment).select('fieldKey'),
-      knex('g_remote_config_campaigns').where('environment', targetEnvironment).select('campaignName'),
       knex('g_account_whitelist').where('environment', targetEnvironment).select('accountId'),
       knex('g_ip_whitelist').where('environment', targetEnvironment).select('ipAddress'),
       knex('g_jobs').where('environment', targetEnvironment).select('name')
     ]);
 
-    // Create sets for conflict detection
-    const existingTemplateName = new Set(existingTemplates.map(t => t.templateName));
-    const existingWorldId = new Set(existingWorlds.map(w => w.worldId));
-    const existingSegmentName = new Set(existingSegments.map(s => s.segmentName));
-    const existingClientVersionKey = new Set(existingClientVersions.map(c => `${c.platform}:${c.version}`));
-    const existingCouponCode = new Set(existingCoupons.map(c => c.code));
-    const existingMessageTemplateKey = new Set(existingMessageTemplates.map(m => m.templateKey));
-    const existingRewardTemplateKey = new Set(existingRewardTemplates.map(r => r.templateKey));
-    const existingVarKey = new Set(existingVars.map(v => v.varKey));
-    const existingContextFieldKey = new Set(existingContextFields.map(c => c.fieldKey));
-    const existingCampaignName = new Set(existingCampaigns.map(c => c.campaignName));
-    const existingAccountId = new Set(existingAccountWhitelist.map(a => a.accountId));
-    const existingIpAddress = new Set(existingIpWhitelist.map(i => i.ipAddress));
-    const existingJobName = new Set(existingJobs.map(j => j.name));
+    const existingWorldId = new Set(existingWorlds.map((w: { worldId: string }) => w.worldId));
+    const existingClientVersionKey = new Set(existingClientVersions.map((c: { platform: string; version: string }) => `${c.platform}:${c.version}`));
+    const existingCouponCode = new Set(existingCoupons.map((c: { code: string }) => c.code));
+    const existingMessageTemplateKey = new Set(existingMessageTemplates.map((m: { templateKey: string }) => m.templateKey));
+    const existingRewardTemplateKey = new Set(existingRewardTemplates.map((r: { templateKey: string }) => r.templateKey));
+    const existingVarKey = new Set(existingVars.map((v: { varKey: string }) => v.varKey));
+    const existingAccountId = new Set(existingAccountWhitelist.map((a: { accountId: string }) => a.accountId));
+    const existingIpAddress = new Set(existingIpWhitelist.map((i: { ipAddress: string }) => i.ipAddress));
+    const existingJobName = new Set(existingJobs.map((j: { name: string }) => j.name));
 
     return {
       source: { environment: '', name: '' }, // Will be filled by controller
       target: { environment: '', name: '' },
       summary: {
-        templates: {
-          total: templates.length,
-          conflicts: templates.filter(t => existingTemplateName.has(t.templateName)).length
-        },
+        templates: { total: 0, conflicts: 0 }, // Remote config templates removed - will be reimplemented
         gameWorlds: {
           total: gameWorlds.length,
-          conflicts: gameWorlds.filter(w => existingWorldId.has(w.worldId)).length
+          conflicts: gameWorlds.filter((w: { worldId: string }) => existingWorldId.has(w.worldId)).length
         },
-        segments: {
-          total: segments.length,
-          conflicts: segments.filter(s => existingSegmentName.has(s.segmentName)).length
-        },
+        segments: { total: 0, conflicts: 0 }, // Remote config segments removed - will be reimplemented
         banners: {
           total: banners.length,
           conflicts: existingBanners.length // Banners don't have unique key, so any existing is conflict
         },
         clientVersions: {
           total: clientVersions.length,
-          conflicts: clientVersions.filter(c => existingClientVersionKey.has(`${c.platform}:${c.version}`)).length
+          conflicts: clientVersions.filter((c: { platform: string; version: string }) => existingClientVersionKey.has(`${c.platform}:${c.version}`)).length
         },
         coupons: {
           total: coupons.length,
-          conflicts: coupons.filter(c => existingCouponCode.has(c.code)).length
+          conflicts: coupons.filter((c: { code: string }) => existingCouponCode.has(c.code)).length
         },
         ingamePopupNotices: {
           total: ingamePopupNotices.length,
@@ -232,11 +203,11 @@ export class EnvironmentCopyService {
         },
         messageTemplates: {
           total: messageTemplates.length,
-          conflicts: messageTemplates.filter(m => existingMessageTemplateKey.has(m.templateKey)).length
+          conflicts: messageTemplates.filter((m: { templateKey: string }) => existingMessageTemplateKey.has(m.templateKey)).length
         },
         rewardTemplates: {
           total: rewardTemplates.length,
-          conflicts: rewardTemplates.filter(r => existingRewardTemplateKey.has(r.templateKey)).length
+          conflicts: rewardTemplates.filter((r: { templateKey: string }) => existingRewardTemplateKey.has(r.templateKey)).length
         },
         serviceMaintenance: {
           total: serviceMaintenance.length,
@@ -252,27 +223,21 @@ export class EnvironmentCopyService {
         },
         vars: {
           total: vars.length,
-          conflicts: vars.filter(v => existingVarKey.has(v.varKey)).length
+          conflicts: vars.filter((v: { varKey: string }) => existingVarKey.has(v.varKey)).length
         },
-        contextFields: {
-          total: contextFields.length,
-          conflicts: contextFields.filter(c => existingContextFieldKey.has(c.fieldKey)).length
-        },
-        campaigns: {
-          total: campaigns.length,
-          conflicts: campaigns.filter(c => existingCampaignName.has(c.campaignName)).length
-        },
+        contextFields: { total: 0, conflicts: 0 }, // Remote config context fields removed - will be reimplemented
+        campaigns: { total: 0, conflicts: 0 }, // Remote config campaigns removed - will be reimplemented
         accountWhitelist: {
           total: accountWhitelist.length,
-          conflicts: accountWhitelist.filter(a => existingAccountId.has(a.accountId)).length
+          conflicts: accountWhitelist.filter((a: { accountId: string }) => existingAccountId.has(a.accountId)).length
         },
         ipWhitelist: {
           total: ipWhitelist.length,
-          conflicts: ipWhitelist.filter(i => existingIpAddress.has(i.ipAddress)).length
+          conflicts: ipWhitelist.filter((i: { ipAddress: string }) => existingIpAddress.has(i.ipAddress)).length
         },
         jobs: {
           total: jobs.length,
-          conflicts: jobs.filter(j => existingJobName.has(j.name)).length
+          conflicts: jobs.filter((j: { name: string }) => existingJobName.has(j.name)).length
         },
         planningData: {
           total: 1, // Planning data is treated as a single unit
@@ -315,9 +280,9 @@ export class EnvironmentCopyService {
 
     const { overwriteExisting = false } = options;
 
-    // Copy Templates
+    // Note: Remote config templates copy removed - will be reimplemented with new system
     if (options.copyTemplates !== false) {
-      await this.copyTemplates(sourceEnvironment, targetEnvironment, userId, overwriteExisting, result.templates);
+      // Templates copy disabled - new remote config system pending
     }
 
     // Copy Game Worlds
@@ -325,9 +290,9 @@ export class EnvironmentCopyService {
       await this.copyGameWorlds(sourceEnvironment, targetEnvironment, userId, overwriteExisting, result.gameWorlds);
     }
 
-    // Copy Segments
+    // Note: Remote config segments copy removed - will be reimplemented with new system
     if (options.copySegments !== false) {
-      await this.copySegments(sourceEnvironment, targetEnvironment, userId, overwriteExisting, result.segments);
+      // Segments copy disabled - new remote config system pending
     }
 
     // Copy Banners
@@ -380,14 +345,14 @@ export class EnvironmentCopyService {
       await this.copyVars(sourceEnvironment, targetEnvironment, userId, overwriteExisting, result.vars);
     }
 
-    // Copy Context Fields
+    // Note: Remote config context fields copy removed - will be reimplemented with new system
     if (options.copyContextFields !== false) {
-      await this.copyContextFields(sourceEnvironment, targetEnvironment, userId, overwriteExisting, result.contextFields);
+      // Context fields copy disabled - new remote config system pending
     }
 
-    // Copy Campaigns
+    // Note: Remote config campaigns copy removed - will be reimplemented with new system
     if (options.copyCampaigns !== false) {
-      await this.copyCampaigns(sourceEnvironment, targetEnvironment, userId, overwriteExisting, result.campaigns);
+      // Campaigns copy disabled - new remote config system pending
     }
 
     // Copy Account Whitelist
@@ -430,35 +395,11 @@ export class EnvironmentCopyService {
     }
   }
 
-  // Individual copy methods
+  // Note: copyTemplates method removed - remote config templates will be reimplemented
   private static async copyTemplates(
-    sourceEnv: string, targetEnv: string, userId: number, overwrite: boolean, result: CopyResultItem
+    _sourceEnv: string, _targetEnv: string, _userId: number, _overwrite: boolean, _result: CopyResultItem
   ): Promise<void> {
-    const sources = await RemoteConfigTemplate.query().where('environment', sourceEnv);
-    for (const item of sources) {
-      try {
-        const existing = await RemoteConfigTemplate.query()
-          .where('environment', targetEnv)
-          .where('templateName', item.templateName)
-          .first();
-        if (existing && !overwrite) { result.skipped++; continue; }
-        if (existing) {
-          await RemoteConfigTemplate.query().findById(existing.id).patch({
-            displayName: item.displayName, description: item.description,
-            templateType: item.templateType, templateData: item.templateData,
-            metadata: item.metadata, status: 'draft', updatedBy: userId, updatedAt: new Date()
-          });
-        } else {
-          await RemoteConfigTemplate.query().insert({
-            environment: targetEnv, templateName: item.templateName,
-            displayName: item.displayName, description: item.description,
-            templateType: item.templateType, status: 'draft', version: 1,
-            templateData: item.templateData, metadata: item.metadata, createdBy: userId
-          });
-        }
-        result.copied++;
-      } catch (e) { result.errors.push(`Template ${item.templateName}: ${e instanceof Error ? e.message : 'Error'}`); }
-    }
+    // Remote config templates copy disabled - will be reimplemented with new system
   }
 
   private static async copyGameWorlds(
@@ -490,30 +431,11 @@ export class EnvironmentCopyService {
     }
   }
 
+  // Note: copySegments method removed - remote config segments will be reimplemented
   private static async copySegments(
-    sourceEnv: string, targetEnv: string, userId: number, overwrite: boolean, result: CopyResultItem
+    _sourceEnv: string, _targetEnv: string, _userId: number, _overwrite: boolean, _result: CopyResultItem
   ): Promise<void> {
-    const sources = await RemoteConfigSegment.query().where('environment', sourceEnv);
-    for (const item of sources) {
-      try {
-        const existing = await RemoteConfigSegment.query()
-          .where('environment', targetEnv).where('segmentName', item.segmentName).first();
-        if (existing && !overwrite) { result.skipped++; continue; }
-        if (existing) {
-          await RemoteConfigSegment.query().findById(existing.id).patch({
-            displayName: item.displayName, description: item.description,
-            segmentConditions: item.segmentConditions, updatedBy: userId, updatedAt: new Date()
-          });
-        } else {
-          await RemoteConfigSegment.query().insert({
-            environment: targetEnv, segmentName: item.segmentName,
-            displayName: item.displayName, description: item.description,
-            segmentConditions: item.segmentConditions, isActive: item.isActive, createdBy: userId
-          });
-        }
-        result.copied++;
-      } catch (e) { result.errors.push(`Segment ${item.segmentName}: ${e instanceof Error ? e.message : 'Error'}`); }
-    }
+    // Remote config segments copy disabled - will be reimplemented with new system
   }
 
   private static async copySimpleTable(
@@ -701,52 +623,18 @@ export class EnvironmentCopyService {
     }
   }
 
+  // Note: copyContextFields method removed - remote config context fields will be reimplemented
   private static async copyContextFields(
-    sourceEnv: string, targetEnv: string, userId: number, overwrite: boolean, result: CopyResultItem
+    _sourceEnv: string, _targetEnv: string, _userId: number, _overwrite: boolean, _result: CopyResultItem
   ): Promise<void> {
-    const sources = await knex('g_remote_config_context_fields').where('environment', sourceEnv);
-    for (const item of sources) {
-      try {
-        const existing = await knex('g_remote_config_context_fields')
-          .where('environment', targetEnv).where('fieldKey', item.fieldKey).first();
-        if (existing && !overwrite) { result.skipped++; continue; }
-        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
-        if (existing) {
-          await knex('g_remote_config_context_fields').where('id', existing.id).update({
-            ...data, environment: targetEnv, updatedBy: userId, updatedAt: new Date()
-          });
-        } else {
-          await knex('g_remote_config_context_fields').insert({
-            ...data, environment: targetEnv, createdBy: userId, createdAt: new Date(), updatedAt: new Date()
-          });
-        }
-        result.copied++;
-      } catch (e) { result.errors.push(`ContextField ${item.fieldKey}: ${e instanceof Error ? e.message : 'Error'}`); }
-    }
+    // Remote config context fields copy disabled - will be reimplemented with new system
   }
 
+  // Note: copyCampaigns method removed - remote config campaigns will be reimplemented
   private static async copyCampaigns(
-    sourceEnv: string, targetEnv: string, userId: number, overwrite: boolean, result: CopyResultItem
+    _sourceEnv: string, _targetEnv: string, _userId: number, _overwrite: boolean, _result: CopyResultItem
   ): Promise<void> {
-    const sources = await knex('g_remote_config_campaigns').where('environment', sourceEnv);
-    for (const item of sources) {
-      try {
-        const existing = await knex('g_remote_config_campaigns')
-          .where('environment', targetEnv).where('campaignName', item.campaignName).first();
-        if (existing && !overwrite) { result.skipped++; continue; }
-        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
-        if (existing) {
-          await knex('g_remote_config_campaigns').where('id', existing.id).update({
-            ...data, environment: targetEnv, status: 'draft', updatedBy: userId, updatedAt: new Date()
-          });
-        } else {
-          await knex('g_remote_config_campaigns').insert({
-            ...data, environment: targetEnv, status: 'draft', createdBy: userId, createdAt: new Date(), updatedAt: new Date()
-          });
-        }
-        result.copied++;
-      } catch (e) { result.errors.push(`Campaign ${item.campaignName}: ${e instanceof Error ? e.message : 'Error'}`); }
-    }
+    // Remote config campaigns copy disabled - will be reimplemented with new system
   }
 
   private static async copyAccountWhitelist(

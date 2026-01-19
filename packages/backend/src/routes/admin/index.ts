@@ -16,12 +16,8 @@ import translationRoutes from './translation';
 import varsRoutes from './vars';
 import gameWorldRoutes from './gameWorlds';
 import apiTokenRoutes from './apiTokens';
-import campaignRoutes from './campaigns';
-import contextFieldRoutes from './contextFields';
 import notificationRoutes from './notifications';
-import platformDefaultRoutes from './platformDefaults';
-import remoteConfigRoutes from './remoteConfig';
-import remoteConfigV2Routes from './remoteConfigV2';
+
 import environmentRoutes from './environments';
 import jobRoutes from './jobs';
 import maintenanceRoutes from './maintenance';
@@ -83,27 +79,16 @@ router.use('/audit-logs', requirePermission(PERMISSIONS.AUDIT_LOGS_VIEW) as any,
 // Tags - requires tags.view or tags.manage permission
 router.use('/tags', requirePermission([PERMISSIONS.TAGS_VIEW, PERMISSIONS.TAGS_MANAGE]) as any, tagRoutes);
 
-// Translation and vars (part of remote config)
-router.use('/message-templates', requirePermission([PERMISSIONS.REMOTE_CONFIG_VIEW, PERMISSIONS.REMOTE_CONFIG_MANAGE]) as any, messageTemplateRoutes);
-router.use('/translation', requirePermission([PERMISSIONS.REMOTE_CONFIG_VIEW, PERMISSIONS.REMOTE_CONFIG_MANAGE]) as any, translationRoutes);
+// Message templates and translation - part of maintenance templates
+router.use('/message-templates', requirePermission([PERMISSIONS.MAINTENANCE_TEMPLATES_VIEW, PERMISSIONS.MAINTENANCE_TEMPLATES_MANAGE]) as any, messageTemplateRoutes);
+router.use('/translation', requirePermission([PERMISSIONS.MAINTENANCE_TEMPLATES_VIEW, PERMISSIONS.MAINTENANCE_TEMPLATES_MANAGE]) as any, translationRoutes);
 // vars (KV) - no permission required, used by many components for basic data like platform, channels
 router.use('/vars', varsRoutes);
 
 // Game worlds - requires game-worlds.view or game-worlds.manage permission
 router.use('/game-worlds', requirePermission([PERMISSIONS.GAME_WORLDS_VIEW, PERMISSIONS.GAME_WORLDS_MANAGE]) as any, gameWorldRoutes);
 
-// Campaigns (part of remote config)
-router.use('/campaigns', requirePermission([PERMISSIONS.REMOTE_CONFIG_VIEW, PERMISSIONS.REMOTE_CONFIG_MANAGE]) as any, campaignRoutes);
 
-// Context fields (part of remote config)
-router.use('/context-fields', requirePermission([PERMISSIONS.REMOTE_CONFIG_VIEW, PERMISSIONS.REMOTE_CONFIG_MANAGE]) as any, contextFieldRoutes);
-
-// Platform defaults (part of remote config)
-router.use('/platform-defaults', requirePermission([PERMISSIONS.REMOTE_CONFIG_VIEW, PERMISSIONS.REMOTE_CONFIG_MANAGE]) as any, platformDefaultRoutes);
-
-// Remote config - requires remote-config.view or remote-config.manage permission
-router.use('/remote-config', requirePermission([PERMISSIONS.REMOTE_CONFIG_VIEW, PERMISSIONS.REMOTE_CONFIG_MANAGE]) as any, remoteConfigRoutes);
-router.use('/remote-config-v2', requirePermission([PERMISSIONS.REMOTE_CONFIG_VIEW, PERMISSIONS.REMOTE_CONFIG_MANAGE]) as any, remoteConfigV2Routes);
 
 // Environments - no permission required for listing (returns only user's accessible environments)
 // Managing environments (create/update/delete) requires permission check inside routes

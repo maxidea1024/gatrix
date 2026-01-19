@@ -2,7 +2,6 @@ import express from 'express';
 import multer from 'multer';
 import { authenticateServerApiToken } from '../../middleware/apiTokenAuth';
 import { resolveEnvironment } from '../../middleware/environmentResolver';
-import RemoteConfigSDKController from '../../controllers/RemoteConfigSDKController';
 import ServerAuthController from '../../controllers/ServerAuthController';
 import ServerUserController from '../../controllers/ServerUserController';
 import ServerNotificationController from '../../controllers/ServerNotificationController';
@@ -97,9 +96,7 @@ router.use('/services', serviceDiscoveryRoutes);
 // Environment-specific routes: /api/v1/server/:env/...
 // ============================================================================
 
-// Remote config templates
-router.get('/:env/templates', authenticateServerApiToken, resolveEnvironment, RemoteConfigSDKController.getServerTemplates);
-router.post('/:env/metrics', authenticateServerApiToken, resolveEnvironment, RemoteConfigSDKController.submitMetrics);
+// Note: Remote config templates routes removed - will be reimplemented with new system
 
 // Coupon routes
 router.post('/:env/coupons/:code/redeem', authenticateServerApiToken, resolveEnvironment, CouponRedeemController.redeem);

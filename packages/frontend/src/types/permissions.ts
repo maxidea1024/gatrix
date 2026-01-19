@@ -38,10 +38,6 @@ export const PERMISSIONS = {
   // Crash Events
   CRASH_EVENTS_VIEW: 'crash-events.view',
 
-  // Remote Config
-  REMOTE_CONFIG_VIEW: 'remote-config.view',
-  REMOTE_CONFIG_MANAGE: 'remote-config.manage',
-
   // Security
   SECURITY_VIEW: 'security.view',
   SECURITY_MANAGE: 'security.manage',
@@ -154,8 +150,6 @@ export const PERMISSION_CATEGORIES: Record<string, PermissionCategory> = {
       PERMISSIONS.AUDIT_LOGS_VIEW,
       PERMISSIONS.REALTIME_EVENTS_VIEW,
       PERMISSIONS.CRASH_EVENTS_VIEW,
-      PERMISSIONS.REMOTE_CONFIG_VIEW,
-      PERMISSIONS.REMOTE_CONFIG_MANAGE,
       PERMISSIONS.SECURITY_VIEW,
       PERMISSIONS.SECURITY_MANAGE,
       PERMISSIONS.SERVERS_VIEW,

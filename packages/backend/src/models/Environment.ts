@@ -498,20 +498,10 @@ export class Environment extends Model implements EnvironmentData {
     publishedTemplates: number;
     pendingApprovals: number;
   }> {
-    const { RemoteConfigTemplate } = require('./RemoteConfigTemplate');
-
-    const templateStats = await RemoteConfigTemplate.query()
-      .where('environment', this.environment)
-      .select('status')
-      .groupBy('status')
-      .count('* as count');
-
-    const totalTemplates = templateStats.reduce((sum: number, stat: any) => sum + parseInt(stat.count as string), 0);
-    const publishedTemplates = templateStats.find((stat: any) => stat.status === 'published')?.count || 0;
-
+    // Note: Remote config templates removed - will be reimplemented with new system
     return {
-      templateCount: totalTemplates,
-      publishedTemplates: parseInt(publishedTemplates as string),
+      templateCount: 0,
+      publishedTemplates: 0,
       pendingApprovals: 0
     };
   }
