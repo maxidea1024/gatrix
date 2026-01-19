@@ -14,6 +14,7 @@ import BannerService from './BannerService';
 import { WhitelistService } from './WhitelistService';
 import { IpWhitelistService } from './IpWhitelistService';
 import { TagService } from './TagService';
+import { featureFlagService } from './FeatureFlagService';
 import logger from '../config/logger';
 
 export interface ServiceHandler {
@@ -224,6 +225,29 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
       }
 
       return { varKey, value: data.value };
+    }
+  },
+
+  // Feature Flags
+  'g_feature_flags': {
+    apply: async (id, data, environment, userId) => {
+      // Get current flag name for service call
+      const FeatureFlagModel = (await import('../models/FeatureFlag')).FeatureFlagModel;
+      const existingFlag = await FeatureFlagModel.findById(String(id));
+      if (!existingFlag) {
+        throw new Error(`Feature flag with id ${id} not found`);
+      }
+      return await featureFlagService.updateFlag(environment, existingFlag.flagName, data, userId || 0);
+    },
+    create: async (data, environment, userId) => {
+      return await featureFlagService.createFlag({ ...data, environment }, userId || 0);
+    },
+    delete: async (id, environment, userId) => {
+      const FeatureFlagModel = (await import('../models/FeatureFlag')).FeatureFlagModel;
+      const existingFlag = await FeatureFlagModel.findById(String(id));
+      if (existingFlag) {
+        await featureFlagService.deleteFlag(environment, existingFlag.flagName, userId || 0);
+      }
     }
   },
 };

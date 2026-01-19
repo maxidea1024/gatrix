@@ -296,6 +296,11 @@ export const SERVER_SDK_ETAG = {
    * Store products for server SDK
    */
   STORE_PRODUCTS: 'server_sdk:etag:store_products',
+
+  /**
+   * Feature flags for server SDK
+   */
+  FEATURE_FLAGS: 'server_sdk:etag:feature_flags',
 } as const;
 
 /**
@@ -350,6 +355,7 @@ export const ENV_SCOPED = {
     MAINTENANCE: 'server_sdk:etag:maintenance',
     SURVEYS: 'server_sdk:etag:surveys',
     SURVEY_SETTINGS: 'server_sdk:etag:survey_settings',
+    FEATURE_FLAGS: 'server_sdk:etag:feature_flags',
   },
 
   /**
@@ -384,6 +390,16 @@ export const ENV_SCOPED = {
   POPUP_NOTICES: {
     ALL: 'popup_notices:all',
     ACTIVE: 'popup_notices:active',
+  },
+
+  /**
+   * Feature flags (environment-specific)
+   */
+  FEATURE_FLAGS: {
+    ALL: 'feature_flags:all',
+    BY_NAME: (flagName: string) => `feature_flag:${flagName}`,
+    SEGMENTS: 'feature_segments:all',
+    CONTEXT_FIELDS: 'feature_context_fields:all',
   },
 } as const;
 

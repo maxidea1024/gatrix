@@ -40,6 +40,7 @@ import {
   ViewCarousel as ViewCarouselIcon,
   Layers as LayersIcon,
   Storefront as StorefrontIcon,
+  Flag as FlagIcon,
 } from '@mui/icons-material';
 import { Permission, PERMISSIONS } from '@/types/permissions';
 
@@ -147,6 +148,7 @@ export const gameMenuItems: MenuItem[] = [
       { text: 'sidebar.planningDataHistory', icon: <HistoryIcon />, path: '/game/planning-data-history', adminOnly: true, requiredPermission: [PERMISSIONS.PLANNING_DATA_VIEW, PERMISSIONS.PLANNING_DATA_MANAGE] },
     ]
   },
+  { text: 'sidebar.featureFlags', icon: <FlagIcon />, path: '/game/feature-flags', adminOnly: true, requiredPermission: [PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE] },
 ];
 
 // 변경 요청 메뉴

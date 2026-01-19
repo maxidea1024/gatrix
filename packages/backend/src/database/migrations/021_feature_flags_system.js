@@ -1,6 +1,7 @@
 /**
  * Feature Flags System Database Schema
  * Creates all tables for the feature flag system
+ * Uses ULID for primary keys
  * 
  * Tables:
  * - g_feature_flags: Feature flag definitions
@@ -13,12 +14,12 @@
  */
 
 exports.up = async function (connection) {
-    console.log('Creating Feature Flags system tables...');
+  console.log('Creating Feature Flags system tables...');
 
-    // 1. Feature Flags table
-    await connection.execute(`
+  // 1. Feature Flags table
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_feature_flags (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id VARCHAR(26) PRIMARY KEY COMMENT 'ULID',
       environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
       flagName VARCHAR(255) NOT NULL COMMENT 'Unique flag identifier',
       displayName VARCHAR(500) NULL COMMENT 'Human-readable name',
@@ -48,13 +49,13 @@ exports.up = async function (connection) {
       INDEX idx_updated_by (updatedBy)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Feature flag definitions'
   `);
-    console.log('✓ g_feature_flags table created');
+  console.log('✓ g_feature_flags table created');
 
-    // 2. Feature Strategies table
-    await connection.execute(`
+  // 2. Feature Strategies table
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_feature_strategies (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      flagId INT NOT NULL COMMENT 'Reference to feature flag',
+      id VARCHAR(26) PRIMARY KEY COMMENT 'ULID',
+      flagId VARCHAR(26) NOT NULL COMMENT 'Reference to feature flag',
       strategyName VARCHAR(255) NOT NULL COMMENT 'Strategy name (default, userWithId, gradualRollout, etc.)',
       parameters JSON NULL COMMENT 'Strategy parameters (rollout, stickiness, groupId)',
       constraints JSON NULL COMMENT 'Array of constraints [{contextName, operator, values}]',
@@ -73,13 +74,13 @@ exports.up = async function (connection) {
       INDEX idx_is_enabled (isEnabled)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Feature flag targeting strategies'
   `);
-    console.log('✓ g_feature_strategies table created');
+  console.log('✓ g_feature_strategies table created');
 
-    // 3. Feature Variants table
-    await connection.execute(`
+  // 3. Feature Variants table
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_feature_variants (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      flagId INT NOT NULL COMMENT 'Reference to feature flag',
+      id VARCHAR(26) PRIMARY KEY COMMENT 'ULID',
+      flagId VARCHAR(26) NOT NULL COMMENT 'Reference to feature flag',
       variantName VARCHAR(255) NOT NULL COMMENT 'Variant identifier',
       weight INT NOT NULL DEFAULT 0 COMMENT 'Weight percentage (0-1000, divide by 10 for actual %)',
       payload JSON NULL COMMENT 'Variant payload data',
@@ -99,12 +100,12 @@ exports.up = async function (connection) {
       INDEX idx_weight (weight)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Feature flag A/B test variants'
   `);
-    console.log('✓ g_feature_variants table created');
+  console.log('✓ g_feature_variants table created');
 
-    // 4. Feature Segments table
-    await connection.execute(`
+  // 4. Feature Segments table
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_feature_segments (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id VARCHAR(26) PRIMARY KEY COMMENT 'ULID',
       environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
       segmentName VARCHAR(255) NOT NULL COMMENT 'Unique segment identifier',
       displayName VARCHAR(500) NULL COMMENT 'Human-readable name',
@@ -124,14 +125,14 @@ exports.up = async function (connection) {
       INDEX idx_is_active (isActive)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Reusable user segments'
   `);
-    console.log('✓ g_feature_segments table created');
+  console.log('✓ g_feature_segments table created');
 
-    // 5. Feature Flag-Segment junction table
-    await connection.execute(`
+  // 5. Feature Flag-Segment junction table
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_feature_flag_segments (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      strategyId INT NOT NULL COMMENT 'Reference to strategy',
-      segmentId INT NOT NULL COMMENT 'Reference to segment',
+      id VARCHAR(26) PRIMARY KEY COMMENT 'ULID',
+      strategyId VARCHAR(26) NOT NULL COMMENT 'Reference to strategy',
+      segmentId VARCHAR(26) NOT NULL COMMENT 'Reference to segment',
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       CONSTRAINT fk_flag_segments_strategy FOREIGN KEY (strategyId) REFERENCES g_feature_strategies(id) ON DELETE CASCADE,
       CONSTRAINT fk_flag_segments_segment FOREIGN KEY (segmentId) REFERENCES g_feature_segments(id) ON DELETE CASCADE,
@@ -140,12 +141,12 @@ exports.up = async function (connection) {
       INDEX idx_segment_id (segmentId)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Flag strategy to segment mappings'
   `);
-    console.log('✓ g_feature_flag_segments table created');
+  console.log('✓ g_feature_flag_segments table created');
 
-    // 6. Feature Context Fields table
-    await connection.execute(`
+  // 6. Feature Context Fields table
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_feature_context_fields (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id VARCHAR(26) PRIMARY KEY COMMENT 'ULID',
       fieldName VARCHAR(255) NOT NULL UNIQUE COMMENT 'Context field name',
       fieldType ENUM('string', 'number', 'boolean', 'date', 'semver') NOT NULL COMMENT 'Field data type',
       description TEXT NULL COMMENT 'Field description',
@@ -164,12 +165,12 @@ exports.up = async function (connection) {
       INDEX idx_sort_order (sortOrder)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Context field definitions'
   `);
-    console.log('✓ g_feature_context_fields table created');
+  console.log('✓ g_feature_context_fields table created');
 
-    // 7. Feature Metrics table
-    await connection.execute(`
+  // 7. Feature Metrics table
+  await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_feature_metrics (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id VARCHAR(26) PRIMARY KEY COMMENT 'ULID',
       environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
       flagName VARCHAR(255) NOT NULL COMMENT 'Flag identifier',
       metricsBucket DATETIME NOT NULL COMMENT 'Hourly bucket timestamp',
@@ -184,40 +185,47 @@ exports.up = async function (connection) {
       INDEX idx_env_flag_bucket (environment, flagName, metricsBucket)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Feature flag usage metrics'
   `);
-    console.log('✓ g_feature_metrics table created');
+  console.log('✓ g_feature_metrics table created');
 
-    // Insert default context fields
-    await connection.execute(`
-    INSERT INTO g_feature_context_fields (fieldName, fieldType, description, stickiness, sortOrder)
-    VALUES 
-      ('userId', 'string', 'Unique user identifier', TRUE, 1),
-      ('sessionId', 'string', 'Session identifier', TRUE, 2),
-      ('environmentName', 'string', 'Environment name (development, staging, production)', FALSE, 3),
-      ('appName', 'string', 'Application name (web, mobile-ios, mobile-android)', FALSE, 4),
-      ('appVersion', 'semver', 'Application version (semver format)', FALSE, 5),
-      ('country', 'string', 'Country code (ISO 3166-1 alpha-2)', FALSE, 6),
-      ('city', 'string', 'City name', FALSE, 7),
-      ('ip', 'string', 'IP address', FALSE, 8),
-      ('userAgent', 'string', 'User agent string', FALSE, 9),
-      ('currentTime', 'date', 'Current timestamp (ISO 8601)', FALSE, 10)
-    ON DUPLICATE KEY UPDATE description = VALUES(description)
-  `);
-    console.log('✓ Default context fields inserted');
+  // Insert default context fields with ULIDs
+  const { ulid } = require('ulid');
+  const defaultFields = [
+    { fieldName: 'userId', fieldType: 'string', description: 'Unique user identifier', stickiness: true, sortOrder: 1 },
+    { fieldName: 'sessionId', fieldType: 'string', description: 'Session identifier', stickiness: true, sortOrder: 2 },
+    { fieldName: 'environmentName', fieldType: 'string', description: 'Environment name (development, staging, production)', stickiness: false, sortOrder: 3 },
+    { fieldName: 'appName', fieldType: 'string', description: 'Application name (web, mobile-ios, mobile-android)', stickiness: false, sortOrder: 4 },
+    { fieldName: 'appVersion', fieldType: 'semver', description: 'Application version (semver format)', stickiness: false, sortOrder: 5 },
+    { fieldName: 'country', fieldType: 'string', description: 'Country code (ISO 3166-1 alpha-2)', stickiness: false, sortOrder: 6 },
+    { fieldName: 'city', fieldType: 'string', description: 'City name', stickiness: false, sortOrder: 7 },
+    { fieldName: 'ip', fieldType: 'string', description: 'IP address', stickiness: false, sortOrder: 8 },
+    { fieldName: 'userAgent', fieldType: 'string', description: 'User agent string', stickiness: false, sortOrder: 9 },
+    { fieldName: 'currentTime', fieldType: 'date', description: 'Current timestamp (ISO 8601)', stickiness: false, sortOrder: 10 },
+  ];
 
-    console.log('Feature Flags system tables created successfully!');
+  for (const field of defaultFields) {
+    await connection.execute(
+      `INSERT INTO g_feature_context_fields (id, fieldName, fieldType, description, stickiness, sortOrder)
+       VALUES (?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE description = VALUES(description)`,
+      [ulid(), field.fieldName, field.fieldType, field.description, field.stickiness, field.sortOrder]
+    );
+  }
+  console.log('✓ Default context fields inserted');
+
+  console.log('Feature Flags system tables created successfully!');
 };
 
 exports.down = async function (connection) {
-    console.log('Dropping Feature Flags system tables...');
+  console.log('Dropping Feature Flags system tables...');
 
-    // Drop in reverse order due to foreign key constraints
-    await connection.execute('DROP TABLE IF EXISTS g_feature_metrics');
-    await connection.execute('DROP TABLE IF EXISTS g_feature_flag_segments');
-    await connection.execute('DROP TABLE IF EXISTS g_feature_segments');
-    await connection.execute('DROP TABLE IF EXISTS g_feature_variants');
-    await connection.execute('DROP TABLE IF EXISTS g_feature_strategies');
-    await connection.execute('DROP TABLE IF EXISTS g_feature_flags');
-    await connection.execute('DROP TABLE IF EXISTS g_feature_context_fields');
+  // Drop in reverse order due to foreign key constraints
+  await connection.execute('DROP TABLE IF EXISTS g_feature_metrics');
+  await connection.execute('DROP TABLE IF EXISTS g_feature_flag_segments');
+  await connection.execute('DROP TABLE IF EXISTS g_feature_segments');
+  await connection.execute('DROP TABLE IF EXISTS g_feature_variants');
+  await connection.execute('DROP TABLE IF EXISTS g_feature_strategies');
+  await connection.execute('DROP TABLE IF EXISTS g_feature_flags');
+  await connection.execute('DROP TABLE IF EXISTS g_feature_context_fields');
 
-    console.log('Feature Flags system tables dropped successfully!');
+  console.log('Feature Flags system tables dropped successfully!');
 };

@@ -1,0 +1,142 @@
+import api from './api';
+
+// ==================== Types ====================
+
+export type FlagType = 'release' | 'experiment' | 'operational' | 'permission';
+export type FlagStatus = 'enabled' | 'disabled' | 'archived';
+
+export interface FeatureFlag {
+    id: string;
+    environment: string;
+    flagName: string;
+    displayName?: string;
+    description?: string;
+    flagType: FlagType;
+    isEnabled: boolean;
+    isArchived: boolean;
+    impressionDataEnabled: boolean;
+    staleAfterDays?: number;
+    tags?: string[];
+    lastSeenAt?: string;
+    archivedAt?: string;
+    createdBy?: number;
+    updatedBy?: number;
+    createdAt: string;
+    updatedAt?: string;
+}
+
+export interface FeatureFlagListParams {
+    page?: number;
+    limit?: number;
+    search?: string;
+    flagType?: FlagType;
+    isEnabled?: boolean;
+    isArchived?: boolean;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+}
+
+export interface FeatureFlagListResponse {
+    flags: FeatureFlag[];
+    total: number;
+    page: number;
+    limit: number;
+}
+
+export interface CreateFeatureFlagInput {
+    flagName: string;
+    displayName?: string;
+    description?: string;
+    flagType?: FlagType;
+    isEnabled?: boolean;
+    impressionDataEnabled?: boolean;
+    staleAfterDays?: number;
+    tags?: string[];
+}
+
+export interface UpdateFeatureFlagInput {
+    displayName?: string;
+    description?: string;
+    isEnabled?: boolean;
+    impressionDataEnabled?: boolean;
+    staleAfterDays?: number;
+    tags?: string[];
+}
+
+// ==================== Service ====================
+
+/**
+ * Get all feature flags
+ */
+export async function getFeatureFlags(params: FeatureFlagListParams = {}): Promise<FeatureFlagListResponse> {
+    const response = await api.get('/api/v1/admin/features', { params });
+    return response.data;
+}
+
+/**
+ * Get a specific feature flag
+ */
+export async function getFeatureFlag(flagName: string): Promise<FeatureFlag> {
+    const response = await api.get(`/api/v1/admin/features/${flagName}`);
+    return response.data.flag;
+}
+
+/**
+ * Create a new feature flag
+ */
+export async function createFeatureFlag(data: CreateFeatureFlagInput): Promise<FeatureFlag> {
+    const response = await api.post('/api/v1/admin/features', data);
+    return response.data.flag;
+}
+
+/**
+ * Update a feature flag
+ */
+export async function updateFeatureFlag(flagName: string, data: UpdateFeatureFlagInput): Promise<FeatureFlag> {
+    const response = await api.put(`/api/v1/admin/features/${flagName}`, data);
+    return response.data.flag;
+}
+
+/**
+ * Toggle a feature flag
+ */
+export async function toggleFeatureFlag(flagName: string, isEnabled: boolean): Promise<FeatureFlag> {
+    const response = await api.post(`/api/v1/admin/features/${flagName}/toggle`, { isEnabled });
+    return response.data.flag;
+}
+
+/**
+ * Archive a feature flag
+ */
+export async function archiveFeatureFlag(flagName: string): Promise<FeatureFlag> {
+    const response = await api.post(`/api/v1/admin/features/${flagName}/archive`);
+    return response.data.flag;
+}
+
+/**
+ * Revive an archived feature flag
+ */
+export async function reviveFeatureFlag(flagName: string): Promise<FeatureFlag> {
+    const response = await api.post(`/api/v1/admin/features/${flagName}/revive`);
+    return response.data.flag;
+}
+
+/**
+ * Delete a feature flag
+ */
+export async function deleteFeatureFlag(flagName: string): Promise<void> {
+    await api.delete(`/api/v1/admin/features/${flagName}`);
+}
+
+const featureFlagService = {
+    getFeatureFlags,
+    getFeatureFlag,
+    createFeatureFlag,
+    updateFeatureFlag,
+    toggleFeatureFlag,
+    archiveFeatureFlag,
+    reviveFeatureFlag,
+    deleteFeatureFlag,
+};
+
+export default featureFlagService;

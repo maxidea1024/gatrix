@@ -91,6 +91,10 @@ export const PERMISSIONS = {
   PLANNING_DATA_VIEW: 'planning-data.view',
   PLANNING_DATA_MANAGE: 'planning-data.manage',
 
+  // Game Management - Feature Flags
+  FEATURE_FLAGS_VIEW: 'feature-flags.view',
+  FEATURE_FLAGS_MANAGE: 'feature-flags.manage',
+
   // Game Management - Change Requests
   CHANGE_REQUESTS_VIEW: 'change-requests.view',
   CHANGE_REQUESTS_MANAGE: 'change-requests.manage',
@@ -180,6 +184,8 @@ export const PERMISSION_CATEGORIES: Record<string, PermissionCategory> = {
       PERMISSIONS.BANNERS_MANAGE,
       PERMISSIONS.PLANNING_DATA_VIEW,
       PERMISSIONS.PLANNING_DATA_MANAGE,
+      PERMISSIONS.FEATURE_FLAGS_VIEW,
+      PERMISSIONS.FEATURE_FLAGS_MANAGE,
       PERMISSIONS.CHANGE_REQUESTS_VIEW,
       PERMISSIONS.CHANGE_REQUESTS_MANAGE,
     ],

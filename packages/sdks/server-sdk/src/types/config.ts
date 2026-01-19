@@ -102,6 +102,7 @@ export interface FeaturesConfig {
   serviceNotice?: boolean; // Service notice caching (default: false)
   banner?: boolean; // Banner caching (default: false)
   storeProduct?: boolean; // Store product caching (default: false)
+  featureFlag?: boolean; // Feature flag caching and evaluation (default: false)
 }
 
 /**

@@ -16,6 +16,7 @@ import { WhitelistService } from './services/WhitelistService';
 import { ServiceMaintenanceService } from './services/ServiceMaintenanceService';
 import { ServiceDiscoveryService } from './services/ServiceDiscoveryService';
 import { StoreProductService } from './services/StoreProductService';
+import { FeatureFlagService } from './services/FeatureFlagService';
 import { CacheManager } from './cache/CacheManager';
 import { EventListener } from './cache/EventListener';
 import { EventCallback, SdkEvent } from './types/events';
@@ -41,6 +42,7 @@ import {
   Banner,
   StoreProduct,
 } from './types/api';
+import { EvaluationContext, EvaluationResult, Variant } from './types/featureFlags';
 import { detectCloudMetadata, CloudMetadata, CloudProvider } from './utils/cloudMetadata';
 
 /**
@@ -687,6 +689,18 @@ export class GatrixServerSDK {
     const service = this.cacheManager?.getStoreProductService();
     if (!service) {
       throw new Error('StoreProductService is not available. SDK may not be initialized or storeProduct feature is disabled.');
+    }
+    return service;
+  }
+
+  /**
+   * Get FeatureFlagService instance
+   * @throws Error if SDK is not initialized or feature is disabled
+   */
+  get featureFlag(): FeatureFlagService {
+    const service = this.cacheManager?.getFeatureFlagService();
+    if (!service) {
+      throw new Error('FeatureFlagService is not available. SDK may not be initialized or featureFlag feature is disabled.');
     }
     return service;
   }

@@ -14,6 +14,7 @@ import { ClientVersionService } from '../services/ClientVersionService';
 import { ServiceNoticeService } from '../services/ServiceNoticeService';
 import { BannerService } from '../services/BannerService';
 import { StoreProductService } from '../services/StoreProductService';
+import { FeatureFlagService } from '../services/FeatureFlagService';
 import { EnvironmentService } from '../services/EnvironmentService';
 import { EnvironmentResolver } from '../utils/EnvironmentResolver';
 import { ApiClient } from '../client/ApiClient';
@@ -38,6 +39,7 @@ export class CacheManager {
   private serviceNoticeService?: ServiceNoticeService;
   private bannerService?: BannerService;
   private storeProductService?: StoreProductService;
+  private featureFlagService?: FeatureFlagService;
   private apiClient: ApiClient;
   private refreshInterval?: NodeJS.Timeout;
   private refreshCallbacks: Array<(type: string, data: any) => void> = [];
@@ -132,6 +134,10 @@ export class CacheManager {
     if (this.features.storeProduct === true) {
       this.storeProductService = new StoreProductService(apiClient, logger, this.envResolver);
       this.storeProductService.setFeatureEnabled(true);
+    }
+    if (this.features.featureFlag === true) {
+      this.featureFlagService = new FeatureFlagService(apiClient, logger, this.envResolver);
+      this.featureFlagService.setFeatureEnabled(true);
     }
   }
 
@@ -1285,6 +1291,13 @@ export class CacheManager {
    */
   getStoreProductService(): StoreProductService | undefined {
     return this.storeProductService;
+  }
+
+  /**
+   * Get FeatureFlagService instance
+   */
+  getFeatureFlagService(): FeatureFlagService | undefined {
+    return this.featureFlagService;
   }
 
   /**

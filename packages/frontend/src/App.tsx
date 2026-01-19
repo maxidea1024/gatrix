@@ -118,6 +118,10 @@ import HotTimeButtonEventPage from './pages/game/HotTimeButtonEventPage';
 import LiveEventPage from './pages/game/LiveEventPage';
 import PlanningDataPage from './pages/game/PlanningDataPage';
 import PlanningDataHistoryPage from './pages/game/PlanningDataHistoryPage';
+import FeatureFlagsPage from './pages/game/FeatureFlagsPage';
+import FeatureFlagDetailPage from './pages/game/FeatureFlagDetailPage';
+import FeatureSegmentsPage from './pages/game/FeatureSegmentsPage';
+import FeatureContextFieldsPage from './pages/game/FeatureContextFieldsPage';
 
 // Conditional Landing Page Component - Simplified since FirstVisitGuard handles first-visit logic
 const ConditionalLandingPage: React.FC = () => {
@@ -517,6 +521,10 @@ const AppContent: React.FC = () => {
                                     <Route path="live-event" element={<LiveEventPage />} />
                                     <Route path="planning-data" element={<PlanningDataPage />} />
                                     <Route path="planning-data-history" element={<PlanningDataHistoryPage />} />
+                                    <Route path="feature-flags" element={<FeatureFlagsPage />} />
+                                    <Route path="feature-flags/:flagName" element={<FeatureFlagDetailPage />} />
+                                    <Route path="feature-segments" element={<FeatureSegmentsPage />} />
+                                    <Route path="feature-context-fields" element={<FeatureContextFieldsPage />} />
                                   </Routes>
                                 </EnvironmentAwareLayout>
                               </PlanningDataProvider>

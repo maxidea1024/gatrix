@@ -38,6 +38,7 @@ import bannerRoutes from './banners';
 import cmsCashShopRoutes from './cmsCashShop';
 import serverLifecycleRoutes from './serverLifecycle';
 import changeRequestRoutes from './changeRequests';
+import featureRoutes from './features';
 
 const router = express.Router();
 
@@ -147,5 +148,8 @@ router.use('/server-lifecycle', requirePermission(PERMISSIONS.SERVERS_VIEW) as a
 
 // Change Requests - requires change-requests.view or change-requests.manage permission
 router.use('/change-requests', requirePermission([PERMISSIONS.CHANGE_REQUESTS_VIEW, PERMISSIONS.CHANGE_REQUESTS_MANAGE]) as any, changeRequestRoutes);
+
+// Feature Flags - requires feature-flags.view or feature-flags.manage permission
+router.use('/features', requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any, featureRoutes);
 
 export default router;
