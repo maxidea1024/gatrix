@@ -5,10 +5,10 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import { Language } from '@/types';
 import { UserService } from '@/services/users';
 
-// Import translation files
-import enTranslations from '@/locales/en.json';
-import koTranslations from '@/locales/ko.json';
-import zhTranslations from '@/locales/zh.json';
+// Import translation files (INI format)
+import enTranslations from '@/locales/en.ini';
+import koTranslations from '@/locales/ko.ini';
+import zhTranslations from '@/locales/zh.ini';
 
 // Language configuration
 const resources = {

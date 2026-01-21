@@ -37,6 +37,9 @@ export interface CreateFlagInput {
     impressionDataEnabled?: boolean;
     staleAfterDays?: number;
     tags?: string[];
+    // Optional: create strategies and variants along with the flag
+    strategies?: CreateStrategyInput[];
+    variants?: CreateVariantInput[];
 }
 
 export interface UpdateFlagInput {
@@ -199,13 +202,45 @@ class FeatureFlagService {
             createdBy: userId,
         });
 
+        // Create strategies if provided
+        if (input.strategies && input.strategies.length > 0) {
+            for (let i = 0; i < input.strategies.length; i++) {
+                const strategyInput = input.strategies[i];
+                await FeatureStrategyModel.create({
+                    flagId: flag.id,
+                    strategyName: strategyInput.strategyName,
+                    parameters: strategyInput.parameters,
+                    constraints: strategyInput.constraints,
+                    sortOrder: strategyInput.sortOrder ?? i + 1,
+                    isEnabled: strategyInput.isEnabled ?? true,
+                    createdBy: userId,
+                });
+            }
+        }
+
+        // Create variants if provided
+        if (input.variants && input.variants.length > 0) {
+            for (const variantInput of input.variants) {
+                await FeatureVariantModel.create({
+                    flagId: flag.id,
+                    variantName: variantInput.variantName,
+                    weight: variantInput.weight,
+                    payload: variantInput.payload,
+                    payloadType: variantInput.payloadType || 'json',
+                    stickiness: variantInput.stickiness || 'default',
+                    overrides: variantInput.overrides,
+                    createdBy: userId,
+                });
+            }
+        }
+
         // Audit log
         await AuditLogModel.create({
             action: 'feature_flag.create',
             resourceType: 'FeatureFlag',
             resourceId: flag.id,
             userId,
-            newValues: flag,
+            newValues: { ...flag, strategies: input.strategies, variants: input.variants },
         });
 
         // Invalidate cache

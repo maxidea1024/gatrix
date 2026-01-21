@@ -10,15 +10,15 @@ export type FieldType = 'string' | 'number' | 'boolean' | 'date' | 'semver';
 
 export type ConstraintOperator =
     // String operators
-    | 'eq' | 'neq' | 'contains' | 'startsWith' | 'endsWith' | 'in' | 'notIn'
+    | 'str_eq' | 'str_neq' | 'str_contains' | 'str_starts_with' | 'str_ends_with' | 'str_in' | 'str_not_in'
     // Number operators
-    | 'gt' | 'gte' | 'lt' | 'lte'
+    | 'num_eq' | 'num_gt' | 'num_gte' | 'num_lt' | 'num_lte'
     // Boolean operators
-    | 'is'
+    | 'bool_is'
     // Date operators
-    | 'after' | 'before'
+    | 'date_gt' | 'date_gte' | 'date_lt' | 'date_lte'
     // Semver operators
-    | 'semverEq' | 'semverGt' | 'semverGte' | 'semverLt' | 'semverLte';
+    | 'semver_eq' | 'semver_gt' | 'semver_gte' | 'semver_lt' | 'semver_lte';
 
 export interface StrategyParameters {
     rollout?: number;

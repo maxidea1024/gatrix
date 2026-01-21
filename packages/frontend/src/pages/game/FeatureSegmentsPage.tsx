@@ -18,11 +18,9 @@ import {
     Tooltip,
     Card,
     CardContent,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Grid,
+    Divider,
+    Stack,
+    FormHelperText,
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -40,7 +38,9 @@ import EmptyState from '../../components/common/EmptyState';
 import { useDebounce } from '../../hooks/useDebounce';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
+import ResizableDrawer from '../../components/common/ResizableDrawer';
 import api from '../../services/api';
+import ConstraintEditor, { Constraint, ContextField } from '../../components/features/ConstraintEditor';
 
 interface FeatureSegment {
     id: string;
@@ -48,7 +48,7 @@ interface FeatureSegment {
     segmentName: string;
     displayName: string;
     description: string;
-    constraints: any[];
+    constraints: Constraint[];
     createdAt: string;
     updatedAt: string;
 }
@@ -70,14 +70,40 @@ const FeatureSegmentsPage: React.FC = () => {
     const [deletingSegment, setDeletingSegment] = useState<FeatureSegment | null>(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editingSegment, setEditingSegment] = useState<Partial<FeatureSegment> | null>(null);
+    const [originalSegment, setOriginalSegment] = useState<Partial<FeatureSegment> | null>(null);
+    const [contextFields, setContextFields] = useState<ContextField[]>([]);
 
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+    // Load context fields for constraint editor
+    const loadContextFields = async () => {
+        try {
+            const result = await api.get('/admin/features/context-fields');
+            const fields = result.data?.contextFields || [];
+            setContextFields(fields.map((f: any) => ({
+                fieldName: f.fieldName,
+                displayName: f.displayName || f.fieldName,
+                fieldType: f.fieldType || 'string',
+                legalValues: f.legalValues || [],
+            })));
+        } catch (error) {
+            console.error('Failed to load context fields:', error);
+            // Provide default context fields if API fails
+            setContextFields([
+                { fieldName: 'userId', displayName: 'User ID', fieldType: 'string' },
+                { fieldName: 'sessionId', displayName: 'Session ID', fieldType: 'string' },
+                { fieldName: 'appName', displayName: 'App Name', fieldType: 'string' },
+                { fieldName: 'environment', displayName: 'Environment', fieldType: 'string' },
+                { fieldName: 'currentTime', displayName: 'Current Time', fieldType: 'datetime' },
+            ]);
+        }
+    };
 
     // Load segments
     const loadSegments = async () => {
         setLoading(true);
         try {
-            const result = await api.get('/api/v1/admin/features/segments', {
+            const result = await api.get('/admin/features/segments', {
                 params: {
                     page: page + 1,
                     limit: rowsPerPage,
@@ -96,28 +122,68 @@ const FeatureSegmentsPage: React.FC = () => {
     };
 
     useEffect(() => {
+        loadContextFields();
+    }, []);
+
+    useEffect(() => {
         loadSegments();
     }, [page, rowsPerPage, debouncedSearchTerm]);
 
     // Handlers
     const handleEdit = (segment: FeatureSegment) => {
-        setEditingSegment(segment);
+        const segmentData = {
+            ...segment,
+            constraints: segment.constraints || [],
+        };
+        setEditingSegment(segmentData);
+        setOriginalSegment(JSON.parse(JSON.stringify(segmentData)));
         setEditDialogOpen(true);
     };
 
     const handleCreate = () => {
-        setEditingSegment({ segmentName: '', displayName: '', description: '', constraints: [] });
+        const newSegment = { segmentName: '', displayName: '', description: '', constraints: [] };
+        setEditingSegment(newSegment);
+        setOriginalSegment(null);
         setEditDialogOpen(true);
+    };
+
+    // Check if segment has been modified
+    const hasChanges = (): boolean => {
+        if (!editingSegment) return false;
+        if (!originalSegment) return true; // New segment always has "changes"
+        return JSON.stringify(editingSegment) !== JSON.stringify(originalSegment);
+    };
+
+    // Check if segment is valid for saving
+    const isSegmentValid = (): boolean => {
+        if (!editingSegment?.segmentName) return false;
+
+        // All constraints must have valid contextName and value
+        const constraints = editingSegment.constraints || [];
+        for (const constraint of constraints) {
+            // Must have a context field selected
+            if (!constraint.contextName) return false;
+
+            // Must have value(s) based on operator type
+            const isMultiValue = constraint.operator === 'str_in' || constraint.operator === 'str_not_in';
+            if (isMultiValue) {
+                if (!constraint.values?.length) return false;
+            } else {
+                if (constraint.value === undefined || constraint.value === '') return false;
+            }
+        }
+
+        return true;
     };
 
     const handleSave = async () => {
         if (!editingSegment) return;
         try {
             if (editingSegment.id) {
-                await api.put(`/api/v1/admin/features/segments/${editingSegment.id}`, editingSegment);
+                await api.put(`/admin/features/segments/${editingSegment.id}`, editingSegment);
                 enqueueSnackbar(t('featureFlags.updateSuccess'), { variant: 'success' });
             } else {
-                await api.post('/api/v1/admin/features/segments', editingSegment);
+                await api.post('/admin/features/segments', editingSegment);
                 enqueueSnackbar(t('featureFlags.createSuccess'), { variant: 'success' });
             }
             setEditDialogOpen(false);
@@ -136,7 +202,7 @@ const FeatureSegmentsPage: React.FC = () => {
     const handleDeleteConfirm = async () => {
         if (!deletingSegment) return;
         try {
-            await api.delete(`/api/v1/admin/features/segments/${deletingSegment.id}`);
+            await api.delete(`/admin/features/segments/${deletingSegment.id}`);
             enqueueSnackbar(t('featureFlags.deleteSuccess'), { variant: 'success' });
             loadSegments();
         } catch (error: any) {
@@ -145,6 +211,10 @@ const FeatureSegmentsPage: React.FC = () => {
             setDeleteConfirmOpen(false);
             setDeletingSegment(null);
         }
+    };
+
+    const handleConstraintsChange = (constraints: Constraint[]) => {
+        setEditingSegment(prev => prev ? { ...prev, constraints } : null);
     };
 
     return (
@@ -246,45 +316,74 @@ const FeatureSegmentsPage: React.FC = () => {
                 </CardContent>
             </Card>
 
-            {/* Edit Dialog */}
-            <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>{editingSegment?.id ? t('featureFlags.editSegment') : t('featureFlags.addSegment')}</DialogTitle>
-                <DialogContent>
-                    <Grid container spacing={2} sx={{ mt: 1 }}>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label={t('featureFlags.segmentName')}
-                                value={editingSegment?.segmentName || ''}
-                                onChange={(e) => setEditingSegment(prev => ({ ...prev, segmentName: e.target.value }))}
-                                disabled={!!editingSegment?.id}
+            {/* Edit Drawer */}
+            <ResizableDrawer
+                open={editDialogOpen}
+                onClose={() => setEditDialogOpen(false)}
+                title={editingSegment?.id ? t('featureFlags.editSegment') : t('featureFlags.addSegment')}
+                subtitle={t('featureFlags.segmentsDescription')}
+                storageKey="featureSegmentDrawerWidth"
+                defaultWidth={500}
+            >
+                <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
+                    <Stack spacing={3}>
+                        <TextField
+                            fullWidth
+                            label={t('featureFlags.segmentName')}
+                            value={editingSegment?.segmentName || ''}
+                            onChange={(e) => setEditingSegment(prev => ({ ...prev, segmentName: e.target.value.replace(/[^a-zA-Z0-9_-]/g, '') }))}
+                            disabled={!!editingSegment?.id}
+                            helperText={t('featureFlags.segmentNameHelp')}
+                            placeholder="beta-users, premium-tier..."
+                        />
+
+                        <TextField
+                            fullWidth
+                            label={t('featureFlags.displayName')}
+                            value={editingSegment?.displayName || ''}
+                            onChange={(e) => setEditingSegment(prev => ({ ...prev, displayName: e.target.value }))}
+                            helperText={t('featureFlags.segmentDisplayNameHelp')}
+                        />
+
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={3}
+                            label={t('featureFlags.description')}
+                            value={editingSegment?.description || ''}
+                            onChange={(e) => setEditingSegment(prev => ({ ...prev, description: e.target.value }))}
+                            helperText={t('featureFlags.segmentDescriptionHelp')}
+                        />
+
+                        <Divider />
+
+                        <Box>
+                            <Typography variant="subtitle2" gutterBottom>{t('featureFlags.constraints')}</Typography>
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                                {t('featureFlags.segmentConstraintsHelp')}
+                            </Typography>
+                            <ConstraintEditor
+                                constraints={editingSegment?.constraints || []}
+                                onChange={handleConstraintsChange}
+                                contextFields={contextFields}
+                                disabled={!canManage}
                             />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label={t('featureFlags.displayName')}
-                                value={editingSegment?.displayName || ''}
-                                onChange={(e) => setEditingSegment(prev => ({ ...prev, displayName: e.target.value }))}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                multiline
-                                rows={3}
-                                label={t('featureFlags.description')}
-                                value={editingSegment?.description || ''}
-                                onChange={(e) => setEditingSegment(prev => ({ ...prev, description: e.target.value }))}
-                            />
-                        </Grid>
-                    </Grid>
-                </DialogContent>
-                <DialogActions>
+                        </Box>
+                    </Stack>
+                </Box>
+
+                {/* Footer Actions */}
+                <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider', display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
                     <Button onClick={() => setEditDialogOpen(false)}>{t('common.cancel')}</Button>
-                    <Button variant="contained" onClick={handleSave}>{t('common.save')}</Button>
-                </DialogActions>
-            </Dialog>
+                    <Button
+                        variant="contained"
+                        onClick={handleSave}
+                        disabled={!hasChanges() || !isSegmentValid()}
+                    >
+                        {editingSegment?.id ? t('common.update') : t('common.create')}
+                    </Button>
+                </Box>
+            </ResizableDrawer>
 
             {/* Delete Dialog */}
             <ConfirmDeleteDialog

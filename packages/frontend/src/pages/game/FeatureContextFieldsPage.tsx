@@ -18,16 +18,15 @@ import {
     Tooltip,
     Card,
     CardContent,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Grid,
     FormControl,
     InputLabel,
     Select,
     MenuItem,
+    Autocomplete,
+    Stack,
+    FormHelperText,
 } from '@mui/material';
+import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {
     Add as AddIcon,
     Search as SearchIcon,
@@ -76,6 +75,7 @@ const FeatureContextFieldsPage: React.FC = () => {
     const [deletingField, setDeletingField] = useState<FeatureContextField | null>(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editingField, setEditingField] = useState<Partial<FeatureContextField> | null>(null);
+    const [originalField, setOriginalField] = useState<Partial<FeatureContextField> | null>(null);
 
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -83,7 +83,7 @@ const FeatureContextFieldsPage: React.FC = () => {
     const loadFields = async () => {
         setLoading(true);
         try {
-            const result = await api.get('/api/v1/admin/features/context-fields', {
+            const result = await api.get('/admin/features/context-fields', {
                 params: {
                     page: page + 1,
                     limit: rowsPerPage,
@@ -108,22 +108,32 @@ const FeatureContextFieldsPage: React.FC = () => {
     // Handlers
     const handleEdit = (field: FeatureContextField) => {
         setEditingField(field);
+        setOriginalField(JSON.parse(JSON.stringify(field)));
         setEditDialogOpen(true);
     };
 
     const handleCreate = () => {
-        setEditingField({ fieldName: '', displayName: '', description: '', fieldType: 'string', legalValues: [], sortOrder: 0 });
+        const newField = { fieldName: '', displayName: '', description: '', fieldType: 'string' as const, legalValues: [], sortOrder: 0 };
+        setEditingField(newField);
+        setOriginalField(null);
         setEditDialogOpen(true);
+    };
+
+    // Check if field has been modified
+    const hasChanges = (): boolean => {
+        if (!editingField) return false;
+        if (!originalField) return true; // New field always has "changes"
+        return JSON.stringify(editingField) !== JSON.stringify(originalField);
     };
 
     const handleSave = async () => {
         if (!editingField) return;
         try {
             if (editingField.id) {
-                await api.put(`/api/v1/admin/features/context-fields/${editingField.id}`, editingField);
+                await api.put(`/admin/features/context-fields/${editingField.id}`, editingField);
                 enqueueSnackbar(t('featureFlags.updateSuccess'), { variant: 'success' });
             } else {
-                await api.post('/api/v1/admin/features/context-fields', editingField);
+                await api.post('/admin/features/context-fields', editingField);
                 enqueueSnackbar(t('featureFlags.createSuccess'), { variant: 'success' });
             }
             setEditDialogOpen(false);
@@ -142,7 +152,7 @@ const FeatureContextFieldsPage: React.FC = () => {
     const handleDeleteConfirm = async () => {
         if (!deletingField) return;
         try {
-            await api.delete(`/api/v1/admin/features/context-fields/${deletingField.id}`);
+            await api.delete(`/admin/features/context-fields/${deletingField.id}`);
             enqueueSnackbar(t('featureFlags.deleteSuccess'), { variant: 'success' });
             loadFields();
         } catch (error: any) {
@@ -263,62 +273,100 @@ const FeatureContextFieldsPage: React.FC = () => {
                 </CardContent>
             </Card>
 
-            {/* Edit Dialog */}
-            <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>{editingField?.id ? t('featureFlags.editContextField') : t('featureFlags.addContextField')}</DialogTitle>
-                <DialogContent>
-                    <Grid container spacing={2} sx={{ mt: 1 }}>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label={t('featureFlags.fieldName')}
-                                value={editingField?.fieldName || ''}
-                                onChange={(e) => setEditingField(prev => ({ ...prev, fieldName: e.target.value }))}
+            {/* Edit Drawer */}
+            <ResizableDrawer
+                open={editDialogOpen}
+                onClose={() => setEditDialogOpen(false)}
+                title={editingField?.id ? t('featureFlags.editContextField') : t('featureFlags.addContextField')}
+                subtitle={t('featureFlags.contextFieldsDescription')}
+                storageKey="featureContextFieldDrawerWidth"
+                defaultWidth={500}
+            >
+                <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
+                    <Stack spacing={3}>
+                        <TextField
+                            fullWidth
+                            label={t('featureFlags.fieldName')}
+                            value={editingField?.fieldName || ''}
+                            onChange={(e) => setEditingField(prev => ({ ...prev, fieldName: e.target.value.replace(/[^a-zA-Z0-9_]/g, '') }))}
+                            disabled={!!editingField?.id}
+                            helperText={t('featureFlags.fieldNameHelp')}
+                            placeholder="userId, deviceType, country..."
+                        />
+
+                        <TextField
+                            fullWidth
+                            label={t('featureFlags.displayName')}
+                            value={editingField?.displayName || ''}
+                            onChange={(e) => setEditingField(prev => ({ ...prev, displayName: e.target.value }))}
+                            helperText={t('featureFlags.displayNameHelp')}
+                        />
+
+                        <FormControl fullWidth>
+                            <InputLabel>{t('featureFlags.fieldType')}</InputLabel>
+                            <Select
+                                value={editingField?.fieldType || 'string'}
+                                label={t('featureFlags.fieldType')}
+                                onChange={(e) => setEditingField(prev => ({ ...prev, fieldType: e.target.value as any }))}
                                 disabled={!!editingField?.id}
+                            >
+                                <MenuItem value="string">{t('featureFlags.fieldTypes.string')}</MenuItem>
+                                <MenuItem value="number">{t('featureFlags.fieldTypes.number')}</MenuItem>
+                                <MenuItem value="boolean">{t('featureFlags.fieldTypes.boolean')}</MenuItem>
+                                <MenuItem value="datetime">{t('featureFlags.fieldTypes.datetime')}</MenuItem>
+                                <MenuItem value="semver">{t('featureFlags.fieldTypes.semver')}</MenuItem>
+                            </Select>
+                            <FormHelperText>{t('featureFlags.fieldTypeHelp')}</FormHelperText>
+                        </FormControl>
+
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={3}
+                            label={t('featureFlags.description')}
+                            value={editingField?.description || ''}
+                            onChange={(e) => setEditingField(prev => ({ ...prev, description: e.target.value }))}
+                            helperText={t('featureFlags.descriptionHelp')}
+                        />
+
+                        {/* Legal Values - only show for string and number types */}
+                        {(editingField?.fieldType === 'string' || editingField?.fieldType === 'number') && (
+                            <Autocomplete
+                                multiple
+                                freeSolo
+                                options={[]}
+                                value={editingField?.legalValues || []}
+                                onChange={(_, newValue) => setEditingField(prev => ({ ...prev, legalValues: newValue as string[] }))}
+                                renderTags={(value, getTagProps) =>
+                                    value.map((option, idx) => (
+                                        <Chip size="small" label={option} {...getTagProps({ index: idx })} key={idx} />
+                                    ))
+                                }
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label={t('featureFlags.legalValues')}
+                                        placeholder={t('featureFlags.legalValuesPlaceholder')}
+                                        helperText={t('featureFlags.legalValuesHelp')}
+                                    />
+                                )}
                             />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label={t('featureFlags.displayName')}
-                                value={editingField?.displayName || ''}
-                                onChange={(e) => setEditingField(prev => ({ ...prev, displayName: e.target.value }))}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <FormControl fullWidth>
-                                <InputLabel>{t('featureFlags.fieldType')}</InputLabel>
-                                <Select
-                                    value={editingField?.fieldType || 'string'}
-                                    label={t('featureFlags.fieldType')}
-                                    onChange={(e) => setEditingField(prev => ({ ...prev, fieldType: e.target.value as any }))}
-                                    disabled={!!editingField?.id}
-                                >
-                                    <MenuItem value="string">{t('featureFlags.fieldTypes.string')}</MenuItem>
-                                    <MenuItem value="number">{t('featureFlags.fieldTypes.number')}</MenuItem>
-                                    <MenuItem value="boolean">{t('featureFlags.fieldTypes.boolean')}</MenuItem>
-                                    <MenuItem value="datetime">{t('featureFlags.fieldTypes.datetime')}</MenuItem>
-                                    <MenuItem value="semver">{t('featureFlags.fieldTypes.semver')}</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                multiline
-                                rows={3}
-                                label={t('featureFlags.description')}
-                                value={editingField?.description || ''}
-                                onChange={(e) => setEditingField(prev => ({ ...prev, description: e.target.value }))}
-                            />
-                        </Grid>
-                    </Grid>
-                </DialogContent>
-                <DialogActions>
+                        )}
+                    </Stack>
+                </Box>
+
+                {/* Footer Actions */}
+                <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider', display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
                     <Button onClick={() => setEditDialogOpen(false)}>{t('common.cancel')}</Button>
-                    <Button variant="contained" onClick={handleSave}>{t('common.save')}</Button>
-                </DialogActions>
-            </Dialog>
+                    <Button
+                        variant="contained"
+                        onClick={handleSave}
+                        disabled={!hasChanges() || !editingField?.fieldName}
+                    >
+                        {editingField?.id ? t('common.update') : t('common.create')}
+                    </Button>
+                </Box>
+            </ResizableDrawer>
 
             {/* Delete Dialog */}
             <ConfirmDeleteDialog

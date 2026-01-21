@@ -1,280 +1,385 @@
+/**
+ * Navigation Configuration
+ * 
+ * SINGLE SOURCE OF TRUTH for sidebar menu structure.
+ * To add a new menu item, only modify MENU_CONFIG below.
+ * 
+ * Icon names: See menuIcons.ts for available icons
+ * Permission shorthand: 'users' auto-expands to ['users.view', 'users.manage']
+ */
 import React from 'react';
-import {
-  Dashboard as DashboardIcon,
-  People as PeopleIcon,
-  Settings as SettingsIcon,
-  Security as SecurityIcon,
-  History as HistoryIcon,
-  Timeline as TimelineIcon,
-  BugReport as BugReportIcon,
-  CloudSync as CloudSyncIcon,
-  VpnKey as VpnKeyIcon,
-  Terminal as TerminalIcon,
-  Chat as ChatIcon,
-  Mail as MailIcon,
-  Widgets as WidgetsIcon,
-  Language as LanguageIcon,
-  Build as BuildIcon,
-  TextFields as TextIcon,
-  Schedule as ScheduleIcon,
-  Work as JobIcon,
-  Monitor as MonitorIcon,
-  Label as LabelIcon,
-  CardGiftcard as CardGiftcardIcon,
-  Announcement as AnnouncementIcon,
-  Campaign as CampaignIcon,
-  ConfirmationNumber as ConfirmationNumberIcon,
-  Poll as PollIcon,
-  SportsEsports as SportsEsportsIcon,
-  Storage as StorageIcon,
-  Event as EventIcon,
-  Whatshot as WhatshotIcon,
-  Celebration as CelebrationIcon,
-  Dns as DnsIcon,
-  Notifications as NotificationsIcon,
-  AdminPanelSettings,
-  Storage as ServerIcon,
-  Api as ApiIcon,
-  Insights as InsightsIcon,
-  Folder as FolderIcon,
-  ViewCarousel as ViewCarouselIcon,
-  Layers as LayersIcon,
-  Storefront as StorefrontIcon,
-  Flag as FlagIcon,
-} from '@mui/icons-material';
 import { Permission, PERMISSIONS } from '@/types/permissions';
+import { getIcon } from './menuIcons';
+
+// ==================== Types ====================
+
+export interface MenuItemConfig {
+  /** Localization key for menu text */
+  text: string;
+  /** Icon name (see menuIcons.ts for available icons) */
+  icon: string;
+  /** Route path (if navigable) */
+  path?: string;
+  /** Permission shorthand (e.g., 'users' -> 'users.view', 'users.manage') */
+  permission?: string;
+  /** Explicit permissions (overrides permission shorthand) */
+  requiredPermission?: Permission | Permission[];
+  /** Child menu items */
+  children?: MenuItemConfig[];
+  /** Show divider before this item */
+  divider?: boolean;
+  /** Badge to display */
+  badge?: string | number;
+}
+
+export interface MenuCategoryConfig {
+  /** Unique identifier */
+  id: string;
+  /** Localization key for category text */
+  text: string;
+  /** Icon name */
+  icon: string;
+  /** Direct navigation path (optional) */
+  path?: string;
+  /** Admin-only category */
+  adminOnly?: boolean;
+  /** Child menu items */
+  children: MenuItemConfig[];
+  /** Badge to display */
+  badge?: string | number;
+  /** Conditional display based on options */
+  condition?: (options: MenuOptions) => boolean;
+}
+
+export interface MenuOptions {
+  requiresApproval?: boolean;
+  badges?: Record<string, string | number>;
+}
+
+// ==================== Legacy Types (for compatibility) ====================
 
 export interface MenuItem {
   text: string;
   icon: React.ReactElement;
   path?: string;
   adminOnly?: boolean;
-  requiredPermission?: Permission | Permission[]; // Required permission(s) to view this menu item
+  requiredPermission?: Permission | Permission[];
   children?: MenuItem[];
-  divider?: boolean; // Show divider before this item
-  badge?: string | number; // Optional badge to show next to the item
+  divider?: boolean;
+  badge?: string | number;
 }
 
 export interface MenuCategory {
   id: string;
   text: string;
   icon: React.ReactElement;
-  path?: string; // Optional path to navigate directly
+  path?: string;
   adminOnly?: boolean;
   children: MenuItem[];
-  badge?: string | number; // Optional badge to show on the category
+  badge?: string | number;
 }
 
-// 기본 메뉴 (모든 사용자)
-export const baseMenuItems: MenuItem[] = [
-  { text: 'sidebar.dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-  { text: 'settings.general.title', icon: <SettingsIcon />, path: '/settings' },
-];
+// ==================== Permission Helper ====================
 
-// 관리자 메뉴 - 관리자패널 카테고리
-export const adminPanelMenuItems: MenuItem[] = [
-  { text: 'sidebar.userManagement', icon: <PeopleIcon />, path: '/admin/users', adminOnly: true, requiredPermission: [PERMISSIONS.USERS_VIEW, PERMISSIONS.USERS_MANAGE] },
-  { text: 'sidebar.clientVersions', icon: <WidgetsIcon />, path: '/admin/client-versions', adminOnly: true, requiredPermission: [PERMISSIONS.CLIENT_VERSIONS_VIEW, PERMISSIONS.CLIENT_VERSIONS_MANAGE] },
-  { text: 'sidebar.gameWorlds', icon: <LanguageIcon />, path: '/admin/game-worlds', adminOnly: true, requiredPermission: [PERMISSIONS.GAME_WORLDS_VIEW, PERMISSIONS.GAME_WORLDS_MANAGE] },
-  {
-    text: 'sidebar.serviceControl', icon: <BuildIcon />, adminOnly: true, requiredPermission: [PERMISSIONS.MAINTENANCE_VIEW, PERMISSIONS.MAINTENANCE_MANAGE], children: [
-      { text: 'sidebar.maintenance', icon: <BuildIcon />, path: '/admin/maintenance', adminOnly: true, requiredPermission: [PERMISSIONS.MAINTENANCE_VIEW, PERMISSIONS.MAINTENANCE_MANAGE] },
-      { text: 'sidebar.playerConnections', icon: <PeopleIcon />, path: '/admin/player-connections', adminOnly: true, requiredPermission: [PERMISSIONS.MAINTENANCE_VIEW, PERMISSIONS.MAINTENANCE_MANAGE] },
-    ]
-  },
-  { text: 'sidebar.maintenanceTemplates', icon: <TextIcon />, path: '/admin/maintenance-templates', adminOnly: true, requiredPermission: [PERMISSIONS.MAINTENANCE_TEMPLATES_VIEW, PERMISSIONS.MAINTENANCE_TEMPLATES_MANAGE] },
-  {
-    text: 'sidebar.scheduleManagement', icon: <ScheduleIcon />, adminOnly: true, requiredPermission: [PERMISSIONS.SCHEDULER_VIEW, PERMISSIONS.SCHEDULER_MANAGE], children: [
-      { text: 'sidebar.scheduler', icon: <ScheduleIcon />, path: '/admin/scheduler', adminOnly: true, requiredPermission: [PERMISSIONS.SCHEDULER_VIEW, PERMISSIONS.SCHEDULER_MANAGE] },
-      { text: 'sidebar.jobs', icon: <JobIcon />, path: '/admin/jobs', adminOnly: true, requiredPermission: [PERMISSIONS.SCHEDULER_VIEW, PERMISSIONS.SCHEDULER_MANAGE] },
-      { text: 'sidebar.queueMonitor', icon: <MonitorIcon />, path: '/admin/queue-monitor', adminOnly: true, requiredPermission: [PERMISSIONS.SCHEDULER_VIEW, PERMISSIONS.SCHEDULER_MANAGE] },
-    ]
-  },
-  { text: 'sidebar.auditLogs', icon: <HistoryIcon />, path: '/admin/audit-logs', adminOnly: true, requiredPermission: PERMISSIONS.AUDIT_LOGS_VIEW },
-  { text: 'sidebar.realtimeEvents', icon: <TimelineIcon />, path: '/admin/realtime-events', adminOnly: true, requiredPermission: PERMISSIONS.REALTIME_EVENTS_VIEW },
-  { text: 'sidebar.crashEvents', icon: <BugReportIcon />, path: '/admin/crash-events', adminOnly: true, requiredPermission: PERMISSIONS.CRASH_EVENTS_VIEW },
+/**
+ * Expand permission shorthand to full permission array
+ * e.g., 'users' -> [PERMISSIONS.USERS_VIEW, PERMISSIONS.USERS_MANAGE]
+ */
+function expandPermission(shorthand: string): Permission[] {
+  const key = shorthand.toUpperCase().replace(/-/g, '_');
+  const viewKey = `${key}_VIEW` as keyof typeof PERMISSIONS;
+  const manageKey = `${key}_MANAGE` as keyof typeof PERMISSIONS;
 
-  {
-    text: 'sidebar.security', icon: <SecurityIcon />, adminOnly: true, requiredPermission: [PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE], children: [
-      { text: 'sidebar.apiAccessTokens', icon: <VpnKeyIcon />, path: '/admin/api-tokens', adminOnly: true, requiredPermission: [PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE] },
-      { text: 'sidebar.whitelist', icon: <SecurityIcon />, path: '/admin/whitelist', adminOnly: true, requiredPermission: [PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE] },
-    ]
-  },
-  {
-    text: 'sidebar.serverManagement', icon: <DnsIcon />, adminOnly: true, requiredPermission: [PERMISSIONS.SERVERS_VIEW, PERMISSIONS.SERVERS_MANAGE], children: [
-      { text: 'sidebar.serverList', icon: <ServerIcon />, path: '/admin/server-list', adminOnly: true, requiredPermission: [PERMISSIONS.SERVERS_VIEW, PERMISSIONS.SERVERS_MANAGE] },
-      { text: 'sidebar.serverLifecycle', icon: <HistoryIcon />, path: '/admin/server-lifecycle', adminOnly: true, requiredPermission: PERMISSIONS.SERVERS_VIEW },
-      { text: 'sidebar.gatrixEdges', icon: <DnsIcon />, path: '/admin/gatrix-edges', adminOnly: true, requiredPermission: PERMISSIONS.SERVERS_VIEW },
-    ]
-  },
-  {
-    text: 'sidebar.monitoring', icon: <MonitorIcon />, adminOnly: true, requiredPermission: PERMISSIONS.MONITORING_VIEW, children: [
-      { text: 'sidebar.grafana', icon: <MonitorIcon />, path: '/admin/grafana-dashboard', adminOnly: true, requiredPermission: PERMISSIONS.MONITORING_VIEW },
-      { text: 'sidebar.logs', icon: <MonitorIcon />, path: '/monitoring/logs', adminOnly: true, requiredPermission: PERMISSIONS.MONITORING_VIEW },
-      { text: 'sidebar.alerts', icon: <NotificationsIcon />, path: '/monitoring/alerts', adminOnly: true, requiredPermission: PERMISSIONS.MONITORING_VIEW },
-    ]
-  },
-  { text: 'sidebar.openApi', icon: <ApiIcon />, path: '/admin/open-api', adminOnly: true, requiredPermission: PERMISSIONS.OPEN_API_VIEW },
-  { text: 'sidebar.console', icon: <TerminalIcon />, path: '/admin/console', adminOnly: true, requiredPermission: PERMISSIONS.CONSOLE_ACCESS },
-];
+  const permissions: Permission[] = [];
+  if (PERMISSIONS[viewKey]) permissions.push(PERMISSIONS[viewKey]);
+  if (PERMISSIONS[manageKey]) permissions.push(PERMISSIONS[manageKey]);
 
-// 게임관리 메뉴
-export const gameMenuItems: MenuItem[] = [
-  { text: 'sidebar.serviceNotices', icon: <AnnouncementIcon />, path: '/game/service-notices', adminOnly: true, requiredPermission: [PERMISSIONS.SERVICE_NOTICES_VIEW, PERMISSIONS.SERVICE_NOTICES_MANAGE] },
-  { text: 'sidebar.ingamePopupNotices', icon: <NotificationsIcon />, path: '/game/ingame-popup-notices', adminOnly: true, requiredPermission: [PERMISSIONS.INGAME_POPUP_NOTICES_VIEW, PERMISSIONS.INGAME_POPUP_NOTICES_MANAGE] },
+  // If no view/manage, try direct key (e.g., AUDIT_LOGS_VIEW)
+  if (permissions.length === 0) {
+    const directKey = key as keyof typeof PERMISSIONS;
+    if (PERMISSIONS[directKey]) permissions.push(PERMISSIONS[directKey]);
+  }
+
+  return permissions;
+}
+
+/**
+ * Get permissions for a menu item
+ */
+function getItemPermissions(item: MenuItemConfig): Permission[] | undefined {
+  if (item.requiredPermission) {
+    return Array.isArray(item.requiredPermission)
+      ? item.requiredPermission
+      : [item.requiredPermission];
+  }
+  if (item.permission) {
+    return expandPermission(item.permission);
+  }
+  return undefined;
+}
+
+// ==================== Menu Configuration ====================
+
+export const MENU_CONFIG: MenuCategoryConfig[] = [
+  // Navigation (Base menu for all users)
   {
-    text: 'sidebar.coupons', icon: <ConfirmationNumberIcon />, adminOnly: true, requiredPermission: [PERMISSIONS.COUPONS_VIEW, PERMISSIONS.COUPONS_MANAGE], children: [
-      { text: 'sidebar.couponSettings', icon: <SettingsIcon />, path: '/game/coupon-settings', adminOnly: true, requiredPermission: [PERMISSIONS.COUPONS_VIEW, PERMISSIONS.COUPONS_MANAGE] },
-      { text: 'sidebar.couponUsage', icon: <HistoryIcon />, path: '/game/coupon-usage', adminOnly: true, requiredPermission: [PERMISSIONS.COUPONS_VIEW, PERMISSIONS.COUPONS_MANAGE] },
-    ]
-  },
-  { text: 'sidebar.surveys', icon: <PollIcon />, path: '/game/surveys', adminOnly: true, requiredPermission: [PERMISSIONS.SURVEYS_VIEW, PERMISSIONS.SURVEYS_MANAGE] },
-  {
-    text: 'sidebar.operationEvents',
-    icon: <EventIcon />,
-    adminOnly: true,
-    requiredPermission: [PERMISSIONS.OPERATION_EVENTS_VIEW, PERMISSIONS.OPERATION_EVENTS_MANAGE],
+    id: 'navigation',
+    text: 'sidebar.navigation',
+    icon: 'Dashboard',
     children: [
-      { text: 'sidebar.hotTimeButtonEvent', icon: <WhatshotIcon />, path: '/game/hot-time-button-event', adminOnly: true, requiredPermission: [PERMISSIONS.OPERATION_EVENTS_VIEW, PERMISSIONS.OPERATION_EVENTS_MANAGE] },
-      { text: 'sidebar.liveEvent', icon: <CelebrationIcon />, path: '/game/live-event', adminOnly: true, requiredPermission: [PERMISSIONS.OPERATION_EVENTS_VIEW, PERMISSIONS.OPERATION_EVENTS_MANAGE] },
+      { text: 'sidebar.dashboard', icon: 'Dashboard', path: '/dashboard' },
+      { text: 'settings.general.title', icon: 'Settings', path: '/settings' },
     ]
   },
-  { text: 'sidebar.storeProducts', icon: <StorefrontIcon />, path: '/game/store-products', adminOnly: true, requiredPermission: [PERMISSIONS.STORE_PRODUCTS_VIEW, PERMISSIONS.STORE_PRODUCTS_MANAGE] },
-  { text: 'sidebar.rewardTemplates', icon: <CardGiftcardIcon />, path: '/game/reward-templates', adminOnly: true, requiredPermission: [PERMISSIONS.REWARD_TEMPLATES_VIEW, PERMISSIONS.REWARD_TEMPLATES_MANAGE] },
-  { text: 'sidebar.banners', icon: <ViewCarouselIcon />, path: '/game/banners', adminOnly: true, requiredPermission: [PERMISSIONS.BANNERS_VIEW, PERMISSIONS.BANNERS_MANAGE] },
+
+  // Admin Panel
   {
-    text: 'sidebar.planningData', icon: <StorageIcon />, adminOnly: true, requiredPermission: [PERMISSIONS.PLANNING_DATA_VIEW, PERMISSIONS.PLANNING_DATA_MANAGE], children: [
-      { text: 'sidebar.planningDataManagement', icon: <StorageIcon />, path: '/game/planning-data', adminOnly: true, requiredPermission: [PERMISSIONS.PLANNING_DATA_VIEW, PERMISSIONS.PLANNING_DATA_MANAGE] },
-      { text: 'sidebar.planningDataHistory', icon: <HistoryIcon />, path: '/game/planning-data-history', adminOnly: true, requiredPermission: [PERMISSIONS.PLANNING_DATA_VIEW, PERMISSIONS.PLANNING_DATA_MANAGE] },
+    id: 'admin-panel',
+    text: 'sidebar.adminPanel',
+    icon: 'AdminPanelSettings',
+    adminOnly: true,
+    children: [
+      { text: 'sidebar.userManagement', icon: 'People', path: '/admin/users', permission: 'users' },
+      { text: 'sidebar.clientVersions', icon: 'Widgets', path: '/admin/client-versions', permission: 'client-versions' },
+      { text: 'sidebar.gameWorlds', icon: 'Language', path: '/admin/game-worlds', permission: 'game-worlds' },
+      {
+        text: 'sidebar.serviceControl', icon: 'Build', permission: 'maintenance',
+        children: [
+          { text: 'sidebar.maintenance', icon: 'Build', path: '/admin/maintenance', permission: 'maintenance' },
+          { text: 'sidebar.playerConnections', icon: 'People', path: '/admin/player-connections', permission: 'maintenance' },
+        ]
+      },
+      { text: 'sidebar.maintenanceTemplates', icon: 'TextFields', path: '/admin/maintenance-templates', permission: 'maintenance-templates' },
+      {
+        text: 'sidebar.scheduleManagement', icon: 'Schedule', permission: 'scheduler',
+        children: [
+          { text: 'sidebar.scheduler', icon: 'Schedule', path: '/admin/scheduler', permission: 'scheduler' },
+          { text: 'sidebar.jobs', icon: 'Work', path: '/admin/jobs', permission: 'scheduler' },
+          { text: 'sidebar.queueMonitor', icon: 'Monitor', path: '/admin/queue-monitor', permission: 'scheduler' },
+        ]
+      },
+      { text: 'sidebar.auditLogs', icon: 'History', path: '/admin/audit-logs', requiredPermission: PERMISSIONS.AUDIT_LOGS_VIEW },
+      { text: 'sidebar.realtimeEvents', icon: 'Timeline', path: '/admin/realtime-events', requiredPermission: PERMISSIONS.REALTIME_EVENTS_VIEW },
+      { text: 'sidebar.crashEvents', icon: 'BugReport', path: '/admin/crash-events', requiredPermission: PERMISSIONS.CRASH_EVENTS_VIEW },
+      {
+        text: 'sidebar.security', icon: 'Security', permission: 'security',
+        children: [
+          { text: 'sidebar.apiAccessTokens', icon: 'VpnKey', path: '/admin/api-tokens', permission: 'security' },
+          { text: 'sidebar.whitelist', icon: 'Security', path: '/admin/whitelist', permission: 'security' },
+        ]
+      },
+      {
+        text: 'sidebar.serverManagement', icon: 'Dns', permission: 'servers',
+        children: [
+          { text: 'sidebar.serverList', icon: 'Storage', path: '/admin/server-list', permission: 'servers' },
+          { text: 'sidebar.serverLifecycle', icon: 'History', path: '/admin/server-lifecycle', requiredPermission: PERMISSIONS.SERVERS_VIEW },
+          { text: 'sidebar.gatrixEdges', icon: 'Dns', path: '/admin/gatrix-edges', requiredPermission: PERMISSIONS.SERVERS_VIEW },
+        ]
+      },
+      {
+        text: 'sidebar.monitoring', icon: 'Monitor', requiredPermission: PERMISSIONS.MONITORING_VIEW,
+        children: [
+          { text: 'sidebar.grafana', icon: 'Monitor', path: '/admin/grafana-dashboard', requiredPermission: PERMISSIONS.MONITORING_VIEW },
+          { text: 'sidebar.logs', icon: 'Monitor', path: '/monitoring/logs', requiredPermission: PERMISSIONS.MONITORING_VIEW },
+          { text: 'sidebar.alerts', icon: 'Notifications', path: '/monitoring/alerts', requiredPermission: PERMISSIONS.MONITORING_VIEW },
+        ]
+      },
+      { text: 'sidebar.openApi', icon: 'Api', path: '/admin/open-api', requiredPermission: PERMISSIONS.OPEN_API_VIEW },
+      { text: 'sidebar.console', icon: 'Terminal', path: '/admin/console', requiredPermission: PERMISSIONS.CONSOLE_ACCESS },
     ]
   },
-  { text: 'sidebar.featureFlags', icon: <FlagIcon />, path: '/game/feature-flags', adminOnly: true, requiredPermission: [PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE] },
+
+  // Game Management
+  {
+    id: 'game-management',
+    text: 'sidebar.gameManagement',
+    icon: 'SportsEsports',
+    adminOnly: true,
+    children: [
+      { text: 'sidebar.serviceNotices', icon: 'Announcement', path: '/game/service-notices', permission: 'service-notices' },
+      { text: 'sidebar.ingamePopupNotices', icon: 'Notifications', path: '/game/ingame-popup-notices', permission: 'ingame-popup-notices' },
+      {
+        text: 'sidebar.coupons', icon: 'ConfirmationNumber', permission: 'coupons',
+        children: [
+          { text: 'sidebar.couponSettings', icon: 'Settings', path: '/game/coupon-settings', permission: 'coupons' },
+          { text: 'sidebar.couponUsage', icon: 'History', path: '/game/coupon-usage', permission: 'coupons' },
+        ]
+      },
+      { text: 'sidebar.surveys', icon: 'Poll', path: '/game/surveys', permission: 'surveys' },
+      {
+        text: 'sidebar.operationEvents', icon: 'Event', permission: 'operation-events',
+        children: [
+          { text: 'sidebar.hotTimeButtonEvent', icon: 'Whatshot', path: '/game/hot-time-button-event', permission: 'operation-events' },
+          { text: 'sidebar.liveEvent', icon: 'Celebration', path: '/game/live-event', permission: 'operation-events' },
+        ]
+      },
+      { text: 'sidebar.storeProducts', icon: 'Storefront', path: '/game/store-products', permission: 'store-products' },
+      { text: 'sidebar.rewardTemplates', icon: 'CardGiftcard', path: '/game/reward-templates', permission: 'reward-templates' },
+      { text: 'sidebar.banners', icon: 'ViewCarousel', path: '/game/banners', permission: 'banners' },
+      {
+        text: 'sidebar.planningData', icon: 'Storage', permission: 'planning-data',
+        children: [
+          { text: 'sidebar.planningDataManagement', icon: 'Storage', path: '/game/planning-data', permission: 'planning-data' },
+          { text: 'sidebar.planningDataHistory', icon: 'History', path: '/game/planning-data-history', permission: 'planning-data' },
+        ]
+      },
+    ]
+  },
+
+  // Event Lens
+  {
+    id: 'event-lens',
+    text: 'sidebar.eventLens',
+    icon: 'Insights',
+    adminOnly: true,
+    children: [
+      { text: 'sidebar.projects', icon: 'Folder', path: '/admin/event-lens/projects', permission: 'event-lens' },
+    ]
+  },
+
+  // Feature Flags
+  {
+    id: 'feature-flags',
+    text: 'sidebar.featureFlagsCategory',
+    icon: 'Flag',
+    adminOnly: true,
+    children: [
+      { text: 'sidebar.featureFlags', icon: 'Flag', path: '/game/feature-flags', permission: 'feature-flags' },
+      { text: 'sidebar.featureSegments', icon: 'People', path: '/game/feature-segments', permission: 'feature-flags' },
+      { text: 'sidebar.featureContextFields', icon: 'Settings', path: '/game/feature-context-fields', permission: 'feature-flags' },
+    ]
+  },
+
+  // Change Requests (conditional)
+  {
+    id: 'change-requests',
+    text: 'sidebar.changeRequests',
+    icon: 'Campaign',
+    path: '/admin/change-requests',
+    adminOnly: true,
+    condition: (options) => options.requiresApproval !== false,
+    children: [
+      { text: 'sidebar.changeRequests', icon: 'Campaign', path: '/admin/change-requests', permission: 'change-requests' },
+    ]
+  },
+
+  // Settings
+  {
+    id: 'settings',
+    text: 'sidebar.settings',
+    icon: 'Settings',
+    adminOnly: true,
+    children: [
+      { text: 'settings.systemSettings', icon: 'Settings', path: '/settings/system', permission: 'system-settings' },
+      { text: 'tags.title', icon: 'Label', path: '/settings/tags', permission: 'tags' },
+      { text: 'sidebar.dataManagement', icon: 'CloudSync', path: '/admin/data-management', permission: 'data-management' },
+      { text: 'environments.title', icon: 'Layers', path: '/settings/environments', permission: 'environments' },
+    ]
+  },
 ];
 
-// 변경 요청 메뉴
-export const changeRequestMenuItems: MenuItem[] = [
-  { text: 'sidebar.changeRequests', icon: <CampaignIcon />, path: '/admin/change-requests', adminOnly: true, requiredPermission: [PERMISSIONS.CHANGE_REQUESTS_VIEW, PERMISSIONS.CHANGE_REQUESTS_MANAGE] },
-];
+// ==================== Config to Runtime Conversion ====================
 
-// 이벤트 렌즈 메뉴
-export const eventLensMenuItems: MenuItem[] = [
-  { text: 'sidebar.projects', icon: <FolderIcon />, path: '/admin/event-lens/projects', adminOnly: true, requiredPermission: [PERMISSIONS.EVENT_LENS_VIEW, PERMISSIONS.EVENT_LENS_MANAGE] },
-];
+/**
+ * Convert MenuItemConfig to MenuItem (with React.ReactElement icons)
+ */
+function convertMenuItem(config: MenuItemConfig): MenuItem {
+  const permissions = getItemPermissions(config);
 
-// 설정 메뉴 - admin 전용
-export const settingsMenuItems: MenuItem[] = [
-  { text: 'settings.systemSettings', icon: <SettingsIcon />, path: '/settings/system', adminOnly: true, requiredPermission: [PERMISSIONS.SYSTEM_SETTINGS_VIEW, PERMISSIONS.SYSTEM_SETTINGS_MANAGE] },
-  { text: 'tags.title', icon: <LabelIcon />, path: '/settings/tags', adminOnly: true, requiredPermission: [PERMISSIONS.TAGS_VIEW, PERMISSIONS.TAGS_MANAGE] },
-  { text: 'sidebar.dataManagement', icon: <CloudSyncIcon />, path: '/admin/data-management', adminOnly: true, requiredPermission: [PERMISSIONS.DATA_MANAGEMENT_VIEW, PERMISSIONS.DATA_MANAGEMENT_MANAGE] },
-  { text: 'environments.title', icon: <LayersIcon />, path: '/settings/environments', adminOnly: true, requiredPermission: [PERMISSIONS.ENVIRONMENTS_VIEW, PERMISSIONS.ENVIRONMENTS_MANAGE] },
-];
+  return {
+    text: config.text,
+    icon: getIcon(config.icon),
+    path: config.path,
+    adminOnly: !!config.permission || !!config.requiredPermission,
+    requiredPermission: permissions,
+    children: config.children?.map(convertMenuItem),
+    divider: config.divider,
+    badge: config.badge,
+  };
+}
 
-// 메뉴 카테고리 구성
+/**
+ * Convert MenuCategoryConfig to MenuCategory
+ */
+function convertCategory(config: MenuCategoryConfig, badges?: Record<string, string | number>): MenuCategory {
+  return {
+    id: config.id,
+    text: config.text,
+    icon: getIcon(config.icon),
+    path: config.path,
+    adminOnly: config.adminOnly,
+    children: config.children.map(convertMenuItem),
+    badge: badges?.[config.text] || config.badge,
+  };
+}
+
+// ==================== Public API (Legacy Compatible) ====================
+
+/**
+ * Get menu categories for sidebar
+ * This is the main function used by MainLayout
+ */
 export const getMenuCategories = (
   isAdmin: boolean,
   badges?: Record<string, string | number>,
-  options?: { requiresApproval?: boolean }
+  options?: MenuOptions
 ): MenuCategory[] => {
-  // Helper to apply badges to menu items recursively
-  const applyBadges = (items: MenuItem[]): MenuItem[] => {
-    if (!badges) return items;
-    return items.map(item => ({
-      ...item,
-      badge: badges[item.text] || item.badge,
-      children: item.children ? applyBadges(item.children) : undefined
-    }));
-  };
+  const mergedOptions: MenuOptions = { ...options, badges };
 
-  // Helper to sum up numeric badges for a category
-  const sumBadges = (items: MenuItem[]): number => {
-    return items.reduce((sum, item) => {
-      const itemBadge = typeof item.badge === 'number' ? item.badge : 0;
-      const childrenSum = item.children ? sumBadges(item.children) : 0;
-      return sum + itemBadge + childrenSum;
-    }, 0);
-  };
+  // Filter and convert categories
+  const categories = MENU_CONFIG
+    .filter(config => {
+      // Check admin requirement
+      if (config.adminOnly && !isAdmin) return false;
+      // Check condition
+      if (config.condition && !config.condition(mergedOptions)) return false;
+      return true;
+    })
+    .map(config => convertCategory(config, badges));
 
-  const categories: MenuCategory[] = [
-    {
-      id: 'navigation',
-      text: 'sidebar.navigation',
-      icon: <DashboardIcon />,
-      children: applyBadges(baseMenuItems),
-    },
-  ];
+  // Apply badges recursively
+  if (badges) {
+    categories.forEach(category => {
+      const applyBadges = (items: MenuItem[]): void => {
+        items.forEach(item => {
+          if (badges[item.text]) item.badge = badges[item.text];
+          if (item.children) applyBadges(item.children);
+        });
+      };
+      applyBadges(category.children);
 
-  if (isAdmin) {
-    categories.push(
-      {
-        id: 'admin-panel',
-        text: 'sidebar.adminPanel',
-        icon: <AdminPanelSettings />,
-        adminOnly: true,
-        children: applyBadges(adminPanelMenuItems),
-      },
-      {
-        id: 'game-management',
-        text: 'sidebar.gameManagement',
-        icon: <SportsEsportsIcon />,
-        adminOnly: true,
-        children: applyBadges(gameMenuItems),
-      },
-      {
-        id: 'event-lens',
-        text: 'sidebar.eventLens',
-        icon: <InsightsIcon />,
-        adminOnly: true,
-        children: applyBadges(eventLensMenuItems),
-      }
-    );
-
-    // Only add Change Requests category if environment requires approval
-    if (options?.requiresApproval !== false) {
-      categories.push({
-        id: 'change-requests',
-        text: 'sidebar.changeRequests',
-        icon: <CampaignIcon />,
-        path: '/admin/change-requests',
-        adminOnly: true,
-        children: applyBadges(changeRequestMenuItems),
-      });
-    }
-
-    categories.push({
-      id: 'settings',
-      text: 'sidebar.settings',
-      icon: <SettingsIcon />,
-      adminOnly: true,
-      children: applyBadges(settingsMenuItems),
+      // Sum badges for category
+      const sumBadges = (items: MenuItem[]): number => {
+        return items.reduce((sum, item) => {
+          const itemBadge = typeof item.badge === 'number' ? item.badge : 0;
+          const childrenSum = item.children ? sumBadges(item.children) : 0;
+          return sum + itemBadge + childrenSum;
+        }, 0);
+      };
+      const total = sumBadges(category.children);
+      if (total > 0) category.badge = total;
     });
   }
-
-  // Calculate badges for each category
-  categories.forEach(category => {
-    const total = sumBadges(category.children);
-    if (total > 0) {
-      category.badge = total;
-    }
-  });
 
   return categories;
 };
 
-// 기존 호환성을 위한 함수
+/**
+ * Get all menu items (flat list for compatibility)
+ */
 export const getAllMenuItems = (isAdmin: boolean): MenuItem[] => {
-  if (isAdmin) {
-    return [
-      ...baseMenuItems,
-      ...adminPanelMenuItems,
-      ...gameMenuItems,
-      ...eventLensMenuItems,
-      ...settingsMenuItems
-    ];
+  if (!isAdmin) {
+    // Return only navigation items for non-admin
+    const navConfig = MENU_CONFIG.find(c => c.id === 'navigation');
+    return navConfig ? navConfig.children.map(convertMenuItem) : [];
   }
-  return baseMenuItems;
+
+  // Return all items for admin
+  return MENU_CONFIG.flatMap(config => config.children.map(convertMenuItem));
 };
 
-// Sidebar.tsx용 NavItem 타입과 호환되는 변환 함수
+// ==================== Legacy Exports (for Sidebar.tsx compatibility) ====================
+
 export interface NavItem {
   id: string;
   label: string;
@@ -285,40 +390,31 @@ export interface NavItem {
   divider?: boolean;
 }
 
-// MenuItem을 NavItem으로 변환 (재귀적)
 export const menuItemToNavItem = (item: MenuItem, _parentPath?: string): NavItem => {
-  // 아이콘 이름 추출 (예: <DashboardIcon /> -> 'Dashboard')
-  let iconName = 'Dashboard';
-  const type = item.icon.type as any;
-  if (type) {
-    iconName = (type.displayName || type.name || 'Dashboard').replace('Icon', '');
-  }
+  const iconName = (() => {
+    const type = item.icon.type as any;
+    if (type) {
+      return (type.displayName || type.name || 'Dashboard').replace('Icon', '');
+    }
+    return 'Dashboard';
+  })();
 
-  // id 생성: path가 있으면 path 기반, 없으면 text 기반
   const id = item.path
     ? item.path.replace(/\//g, '-').replace(/^-/, '')
     : item.text.replace(/\./g, '-').toLowerCase();
 
-  const navItem: NavItem = {
+  return {
     id,
     label: item.text,
     icon: iconName,
     path: item.path,
     roles: item.adminOnly ? ['admin'] : undefined,
     divider: item.divider,
+    children: item.children?.map(child => menuItemToNavItem(child, item.path)),
   };
-
-  // 자식 메뉴가 있으면 재귀적으로 변환
-  if (item.children && item.children.length > 0) {
-    navItem.children = item.children.map(child => menuItemToNavItem(child, item.path));
-  }
-
-  return navItem;
 };
 
-// Sidebar.tsx용 네비게이션 아이템 생성
 export const getNavigationItems = (isAdmin: boolean): NavItem[] => {
   const items = getAllMenuItems(isAdmin);
   return items.map(item => menuItemToNavItem(item));
 };
-

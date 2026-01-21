@@ -69,7 +69,7 @@ export interface UpdateFeatureFlagInput {
  * Get all feature flags
  */
 export async function getFeatureFlags(params: FeatureFlagListParams = {}): Promise<FeatureFlagListResponse> {
-    const response = await api.get('/api/v1/admin/features', { params });
+    const response = await api.get('/admin/features', { params });
     return response.data;
 }
 
@@ -77,7 +77,7 @@ export async function getFeatureFlags(params: FeatureFlagListParams = {}): Promi
  * Get a specific feature flag
  */
 export async function getFeatureFlag(flagName: string): Promise<FeatureFlag> {
-    const response = await api.get(`/api/v1/admin/features/${flagName}`);
+    const response = await api.get(`/admin/features/${flagName}`);
     return response.data.flag;
 }
 
@@ -85,7 +85,7 @@ export async function getFeatureFlag(flagName: string): Promise<FeatureFlag> {
  * Create a new feature flag
  */
 export async function createFeatureFlag(data: CreateFeatureFlagInput): Promise<FeatureFlag> {
-    const response = await api.post('/api/v1/admin/features', data);
+    const response = await api.post('/admin/features', data);
     return response.data.flag;
 }
 
@@ -93,7 +93,7 @@ export async function createFeatureFlag(data: CreateFeatureFlagInput): Promise<F
  * Update a feature flag
  */
 export async function updateFeatureFlag(flagName: string, data: UpdateFeatureFlagInput): Promise<FeatureFlag> {
-    const response = await api.put(`/api/v1/admin/features/${flagName}`, data);
+    const response = await api.put(`/admin/features/${flagName}`, data);
     return response.data.flag;
 }
 
@@ -101,7 +101,7 @@ export async function updateFeatureFlag(flagName: string, data: UpdateFeatureFla
  * Toggle a feature flag
  */
 export async function toggleFeatureFlag(flagName: string, isEnabled: boolean): Promise<FeatureFlag> {
-    const response = await api.post(`/api/v1/admin/features/${flagName}/toggle`, { isEnabled });
+    const response = await api.post(`/admin/features/${flagName}/toggle`, { isEnabled });
     return response.data.flag;
 }
 
@@ -109,7 +109,7 @@ export async function toggleFeatureFlag(flagName: string, isEnabled: boolean): P
  * Archive a feature flag
  */
 export async function archiveFeatureFlag(flagName: string): Promise<FeatureFlag> {
-    const response = await api.post(`/api/v1/admin/features/${flagName}/archive`);
+    const response = await api.post(`/admin/features/${flagName}/archive`);
     return response.data.flag;
 }
 
@@ -117,7 +117,7 @@ export async function archiveFeatureFlag(flagName: string): Promise<FeatureFlag>
  * Revive an archived feature flag
  */
 export async function reviveFeatureFlag(flagName: string): Promise<FeatureFlag> {
-    const response = await api.post(`/api/v1/admin/features/${flagName}/revive`);
+    const response = await api.post(`/admin/features/${flagName}/revive`);
     return response.data.flag;
 }
 
@@ -125,7 +125,7 @@ export async function reviveFeatureFlag(flagName: string): Promise<FeatureFlag> 
  * Delete a feature flag
  */
 export async function deleteFeatureFlag(flagName: string): Promise<void> {
-    await api.delete(`/api/v1/admin/features/${flagName}`);
+    await api.delete(`/admin/features/${flagName}`);
 }
 
 const featureFlagService = {

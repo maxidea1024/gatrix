@@ -10,6 +10,131 @@ import { featureFlagService } from '../../services/FeatureFlagService';
 
 const router = Router();
 
+// ==================== Segments (MUST be before /:flagName routes) ====================
+
+// List segments
+router.get(
+    '/segments',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const environment = req.environment || 'development';
+        const { search } = req.query;
+
+        const segments = await featureFlagService.listSegments(environment, search as string);
+
+        res.json({ success: true, data: { segments } });
+    })
+);
+
+// Get segment by ID
+router.get(
+    '/segments/:id',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const segment = await featureFlagService.getSegment(req.params.id);
+
+        if (!segment) {
+            return res.status(404).json({ success: false, error: 'Segment not found' });
+        }
+
+        res.json({ success: true, data: { segment } });
+    })
+);
+
+// Create a segment
+router.post(
+    '/segments',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const environment = req.environment || 'development';
+        const userId = req.user?.id;
+
+        const segment = await featureFlagService.createSegment(
+            { ...req.body, environment },
+            userId!
+        );
+
+        res.status(201).json({ success: true, data: { segment } });
+    })
+);
+
+// Update a segment
+router.put(
+    '/segments/:id',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const userId = req.user?.id;
+
+        const segment = await featureFlagService.updateSegment(
+            req.params.id,
+            req.body,
+            userId!
+        );
+
+        res.json({ success: true, data: { segment } });
+    })
+);
+
+// Delete a segment
+router.delete(
+    '/segments/:id',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const userId = req.user?.id;
+
+        await featureFlagService.deleteSegment(req.params.id, userId!);
+
+        res.json({ success: true, message: 'Segment deleted successfully' });
+    })
+);
+
+// ==================== Context Fields (MUST be before /:flagName routes) ====================
+
+// List context fields
+router.get(
+    '/context-fields',
+    asyncHandler(async (_req: AuthenticatedRequest, res: Response) => {
+        const fields = await featureFlagService.listContextFields();
+
+        res.json({ success: true, data: { contextFields: fields } });
+    })
+);
+
+// Create a context field
+router.post(
+    '/context-fields',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const userId = req.user?.id;
+
+        const field = await featureFlagService.createContextField(req.body, userId!);
+
+        res.status(201).json({ success: true, data: { field } });
+    })
+);
+
+// Update a context field
+router.put(
+    '/context-fields/:fieldName',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const userId = req.user?.id;
+
+        const field = await featureFlagService.updateContextField(
+            req.params.fieldName,
+            req.body,
+            userId!
+        );
+
+        res.json({ success: true, data: { field } });
+    })
+);
+
+// Delete a context field
+router.delete(
+    '/context-fields/:fieldName',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const userId = req.user?.id;
+
+        await featureFlagService.deleteContextField(req.params.fieldName, userId!);
+
+        res.json({ success: true, message: 'Context field deleted successfully' });
+    })
+);
+
 // ==================== Feature Flags ====================
 
 // List feature flags
@@ -36,21 +161,6 @@ router.get(
     })
 );
 
-// Get a single feature flag
-router.get(
-    '/:flagName',
-    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment || 'development';
-        const flag = await featureFlagService.getFlag(environment, req.params.flagName);
-
-        if (!flag) {
-            return res.status(404).json({ success: false, error: 'Flag not found' });
-        }
-
-        res.json({ success: true, data: { flag } });
-    })
-);
-
 // Create a feature flag
 router.post(
     '/',
@@ -64,6 +174,21 @@ router.post(
         );
 
         res.status(201).json({ success: true, data: { flag } });
+    })
+);
+
+// Get a single feature flag (MUST be after /segments and /context-fields)
+router.get(
+    '/:flagName',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const environment = req.environment || 'development';
+        const flag = await featureFlagService.getFlag(environment, req.params.flagName);
+
+        if (!flag) {
+            return res.status(404).json({ success: false, error: 'Flag not found' });
+        }
+
+        res.json({ success: true, data: { flag } });
     })
 );
 
@@ -220,131 +345,6 @@ router.put(
         );
 
         res.json({ success: true, data: { variants } });
-    })
-);
-
-// ==================== Segments ====================
-
-// List segments
-router.get(
-    '/segments/list',
-    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment || 'development';
-        const { search } = req.query;
-
-        const segments = await featureFlagService.listSegments(environment, search as string);
-
-        res.json({ success: true, data: { segments } });
-    })
-);
-
-// Get segment by ID
-router.get(
-    '/segments/:id',
-    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const segment = await featureFlagService.getSegment(req.params.id);
-
-        if (!segment) {
-            return res.status(404).json({ success: false, error: 'Segment not found' });
-        }
-
-        res.json({ success: true, data: { segment } });
-    })
-);
-
-// Create a segment
-router.post(
-    '/segments',
-    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment || 'development';
-        const userId = req.user?.id;
-
-        const segment = await featureFlagService.createSegment(
-            { ...req.body, environment },
-            userId!
-        );
-
-        res.status(201).json({ success: true, data: { segment } });
-    })
-);
-
-// Update a segment
-router.put(
-    '/segments/:id',
-    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const userId = req.user?.id;
-
-        const segment = await featureFlagService.updateSegment(
-            req.params.id,
-            req.body,
-            userId!
-        );
-
-        res.json({ success: true, data: { segment } });
-    })
-);
-
-// Delete a segment
-router.delete(
-    '/segments/:id',
-    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const userId = req.user?.id;
-
-        await featureFlagService.deleteSegment(req.params.id, userId!);
-
-        res.json({ success: true, message: 'Segment deleted successfully' });
-    })
-);
-
-// ==================== Context Fields ====================
-
-// List context fields
-router.get(
-    '/context-fields/list',
-    asyncHandler(async (_req: AuthenticatedRequest, res: Response) => {
-        const fields = await featureFlagService.listContextFields();
-
-        res.json({ success: true, data: { fields } });
-    })
-);
-
-// Create a context field
-router.post(
-    '/context-fields',
-    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const userId = req.user?.id;
-
-        const field = await featureFlagService.createContextField(req.body, userId!);
-
-        res.status(201).json({ success: true, data: { field } });
-    })
-);
-
-// Update a context field
-router.put(
-    '/context-fields/:fieldName',
-    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const userId = req.user?.id;
-
-        const field = await featureFlagService.updateContextField(
-            req.params.fieldName,
-            req.body,
-            userId!
-        );
-
-        res.json({ success: true, data: { field } });
-    })
-);
-
-// Delete a context field
-router.delete(
-    '/context-fields/:fieldName',
-    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const userId = req.user?.id;
-
-        await featureFlagService.deleteContextField(req.params.fieldName, userId!);
-
-        res.json({ success: true, message: 'Context field deleted successfully' });
     })
 );
 

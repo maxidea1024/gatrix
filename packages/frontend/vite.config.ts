@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 import http from 'http'
 import https from 'https'
+import iniPlugin from './src/plugins/vite-plugin-ini'
 
 // Force platform for WSL compatibility
 process.env.ROLLUP_BINARY_PATH = process.env.ROLLUP_BINARY_PATH || '';
@@ -50,7 +51,7 @@ const frontendRoot = path.resolve(__dirname).replace(/\\/g, '/');
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), iniPlugin()],
   define: {
     __APP_VERSION__: JSON.stringify(process.env.VITE_APP_VERSION || '0.0.0'),
   },
