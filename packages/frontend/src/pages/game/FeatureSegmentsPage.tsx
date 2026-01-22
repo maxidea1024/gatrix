@@ -29,6 +29,9 @@ import {
     Refresh as RefreshIcon,
     Edit as EditIcon,
     Delete as DeleteIcon,
+    ContentCopy as CopyIcon,
+    ExpandMore as ExpandMoreIcon,
+    ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -36,7 +39,8 @@ import { parseApiErrorMessage } from '../../utils/errorUtils';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyState from '../../components/common/EmptyState';
 import { useDebounce } from '../../hooks/useDebounce';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import api from '../../services/api';
@@ -72,6 +76,7 @@ const FeatureSegmentsPage: React.FC = () => {
     const [editingSegment, setEditingSegment] = useState<Partial<FeatureSegment> | null>(null);
     const [originalSegment, setOriginalSegment] = useState<Partial<FeatureSegment> | null>(null);
     const [contextFields, setContextFields] = useState<ContextField[]>([]);
+    const [expandedConstraints, setExpandedConstraints] = useState<Set<string>>(new Set());
 
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -279,7 +284,7 @@ const FeatureSegmentsPage: React.FC = () => {
                                         <TableRow>
                                             <TableCell>{t('featureFlags.segmentName')}</TableCell>
                                             <TableCell>{t('featureFlags.displayName')}</TableCell>
-                                            <TableCell>{t('featureFlags.constraintsCount')}</TableCell>
+                                            <TableCell>{t('featureFlags.constraints')}</TableCell>
                                             <TableCell>{t('featureFlags.createdAt')}</TableCell>
                                             {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                                         </TableRow>
@@ -287,10 +292,66 @@ const FeatureSegmentsPage: React.FC = () => {
                                     <TableBody>
                                         {segments.map((segment) => (
                                             <TableRow key={segment.id} hover>
-                                                <TableCell><Typography fontWeight={500}>{segment.segmentName}</Typography></TableCell>
-                                                <TableCell>{segment.displayName || '-'}</TableCell>
-                                                <TableCell><Chip label={segment.constraints?.length || 0} size="small" /></TableCell>
-                                                <TableCell>{formatDateTimeDetailed(segment.createdAt)}</TableCell>
+                                                <TableCell>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                        <Typography
+                                                            fontWeight={500}
+                                                            sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                                                            onClick={() => handleEdit(segment)}
+                                                        >
+                                                            {segment.segmentName}
+                                                        </Typography>
+                                                        <Tooltip title={t('common.copy')}>
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={(e) => { e.stopPropagation(); copyToClipboardWithNotification(segment.segmentName, enqueueSnackbar, t); }}
+                                                                sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
+                                                            >
+                                                                <CopyIcon sx={{ fontSize: 14 }} />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </Box>
+                                                </TableCell>
+                                                <TableCell>{segment.displayName || segment.segmentName}</TableCell>
+                                                <TableCell>
+                                                    {segment.constraints && segment.constraints.length > 0 ? (
+                                                        <Box>
+                                                            <Box
+                                                                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }}
+                                                                onClick={() => {
+                                                                    setExpandedConstraints(prev => {
+                                                                        const newSet = new Set(prev);
+                                                                        if (newSet.has(segment.id)) {
+                                                                            newSet.delete(segment.id);
+                                                                        } else {
+                                                                            newSet.add(segment.id);
+                                                                        }
+                                                                        return newSet;
+                                                                    });
+                                                                }}
+                                                            >
+                                                                <Chip label={segment.constraints.length} size="small" />
+                                                                {expandedConstraints.has(segment.id) ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+                                                            </Box>
+                                                            {expandedConstraints.has(segment.id) && (
+                                                                <Box sx={{ mt: 1, pl: 1, borderLeft: 2, borderColor: 'divider' }}>
+                                                                    {segment.constraints.map((c, idx) => (
+                                                                        <Typography key={idx} variant="caption" sx={{ display: 'block', mb: 0.5 }}>
+                                                                            {c.contextName} {c.operator} {c.values?.join(', ') || c.value}
+                                                                        </Typography>
+                                                                    ))}
+                                                                </Box>
+                                                            )}
+                                                        </Box>
+                                                    ) : (
+                                                        <Typography variant="body2" color="text.disabled">-</Typography>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Tooltip title={formatDateTimeDetailed(segment.createdAt)}>
+                                                        <span>{formatRelativeTime(segment.createdAt)}</span>
+                                                    </Tooltip>
+                                                </TableCell>
                                                 {canManage && (
                                                     <TableCell align="center">
                                                         <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>

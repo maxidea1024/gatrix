@@ -30,6 +30,12 @@ import {
     DragIndicator,
     TextFields as TextFieldsIcon,
     PriorityHigh as InvertIcon,
+    Abc as StringIcon,
+    Numbers as NumberIcon,
+    ToggleOn as BooleanIcon,
+    Schedule as DateTimeIcon,
+    Tag as SemverIcon,
+    HelpOutline as MissingIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
@@ -209,33 +215,72 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                         onChange={(e) => handleConstraintChange(index, 'contextName', e.target.value)}
                         displayEmpty
                         disabled={disabled}
+                        renderValue={(selected) => {
+                            if (!selected) {
+                                return <em style={{ color: 'gray' }}>{t('featureFlags.selectContextField')}</em>;
+                            }
+                            const selectedField = contextFields.find(f => f.fieldName === selected);
+                            // Show missing icon for deleted/unknown fields
+                            if (!selectedField) {
+                                return (
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Tooltip title={t('featureFlags.missingContextField')}>
+                                            <MissingIcon sx={{ fontSize: 16, color: 'error.main', mr: 1 }} />
+                                        </Tooltip>
+                                        <Typography sx={{ color: 'error.main' }}>{selected}</Typography>
+                                    </Box>
+                                );
+                            }
+                            const getTypeIconForRender = (type: string) => {
+                                switch (type) {
+                                    case 'string': return <StringIcon sx={{ fontSize: 16, color: 'info.main', mr: 1 }} />;
+                                    case 'number': return <NumberIcon sx={{ fontSize: 16, color: 'success.main', mr: 1 }} />;
+                                    case 'boolean': return <BooleanIcon sx={{ fontSize: 16, color: 'warning.main', mr: 1 }} />;
+                                    case 'datetime': return <DateTimeIcon sx={{ fontSize: 16, color: 'secondary.main', mr: 1 }} />;
+                                    case 'semver': return <SemverIcon sx={{ fontSize: 16, color: 'primary.main', mr: 1 }} />;
+                                    default: return <StringIcon sx={{ fontSize: 16, color: 'text.disabled', mr: 1 }} />;
+                                }
+                            };
+                            return (
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    {getTypeIconForRender(selectedField.fieldType)}
+                                    {selectedField.displayName || selectedField.fieldName}
+                                </Box>
+                            );
+                        }}
                     >
                         <MenuItem value="" disabled>
                             <em>{t('featureFlags.selectContextField')}</em>
                         </MenuItem>
                         {contextFields.map((field) => {
                             const isUsed = usedFieldNames.includes(field.fieldName);
+                            // Get icon for field type
+                            const getTypeIcon = (type: string) => {
+                                switch (type) {
+                                    case 'string': return <StringIcon sx={{ fontSize: 16, color: 'info.main' }} />;
+                                    case 'number': return <NumberIcon sx={{ fontSize: 16, color: 'success.main' }} />;
+                                    case 'boolean': return <BooleanIcon sx={{ fontSize: 16, color: 'warning.main' }} />;
+                                    case 'datetime': return <DateTimeIcon sx={{ fontSize: 16, color: 'secondary.main' }} />;
+                                    case 'semver': return <SemverIcon sx={{ fontSize: 16, color: 'primary.main' }} />;
+                                    default: return <StringIcon sx={{ fontSize: 16, color: 'text.disabled' }} />;
+                                }
+                            };
                             return (
                                 <MenuItem
                                     key={field.fieldName}
                                     value={field.fieldName}
                                     disabled={isUsed}
-                                    sx={{ display: 'flex', justifyContent: 'space-between', gap: 1 }}
+                                    sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}
                                 >
+                                    <Tooltip title={field.fieldType}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            {getTypeIcon(field.fieldType)}
+                                        </Box>
+                                    </Tooltip>
                                     <Box component="span" sx={{ flex: 1 }}>
                                         {field.displayName || field.fieldName}
                                         {isUsed && ` (${t('featureFlags.alreadyUsed')})`}
                                     </Box>
-                                    <Chip
-                                        label={field.fieldType}
-                                        size="small"
-                                        sx={{
-                                            width: 72,
-                                            height: 20,
-                                            fontSize: '0.65rem',
-                                            fontWeight: 500,
-                                        }}
-                                    />
                                 </MenuItem>
                             );
                         })}

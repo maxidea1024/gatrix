@@ -34,6 +34,7 @@ import {
     Refresh as RefreshIcon,
     Edit as EditIcon,
     Delete as DeleteIcon,
+    ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -41,7 +42,8 @@ import { parseApiErrorMessage } from '../../utils/errorUtils';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyState from '../../components/common/EmptyState';
 import { useDebounce } from '../../hooks/useDebounce';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import api from '../../services/api';
 
@@ -76,6 +78,7 @@ const FeatureContextFieldsPage: React.FC = () => {
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editingField, setEditingField] = useState<Partial<FeatureContextField> | null>(null);
     const [originalField, setOriginalField] = useState<Partial<FeatureContextField> | null>(null);
+    const [expandedLegalValues, setExpandedLegalValues] = useState<Set<string>>(new Set());
 
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -130,7 +133,7 @@ const FeatureContextFieldsPage: React.FC = () => {
         if (!editingField) return;
         try {
             if (editingField.id) {
-                await api.put(`/admin/features/context-fields/${editingField.id}`, editingField);
+                await api.put(`/admin/features/context-fields/${editingField.fieldName}`, editingField);
                 enqueueSnackbar(t('featureFlags.updateSuccess'), { variant: 'success' });
             } else {
                 await api.post('/admin/features/context-fields', editingField);
@@ -152,7 +155,7 @@ const FeatureContextFieldsPage: React.FC = () => {
     const handleDeleteConfirm = async () => {
         if (!deletingField) return;
         try {
-            await api.delete(`/admin/features/context-fields/${deletingField.id}`);
+            await api.delete(`/admin/features/context-fields/${deletingField.fieldName}`);
             enqueueSnackbar(t('featureFlags.deleteSuccess'), { variant: 'success' });
             loadFields();
         } catch (error: any) {
@@ -237,6 +240,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                                             <TableCell>{t('featureFlags.fieldName')}</TableCell>
                                             <TableCell>{t('featureFlags.displayName')}</TableCell>
                                             <TableCell>{t('featureFlags.fieldType')}</TableCell>
+                                            <TableCell>{t('featureFlags.legalValuesColumn')}</TableCell>
                                             <TableCell>{t('featureFlags.createdAt')}</TableCell>
                                             {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                                         </TableRow>
@@ -244,10 +248,79 @@ const FeatureContextFieldsPage: React.FC = () => {
                                     <TableBody>
                                         {fields.map((field) => (
                                             <TableRow key={field.id} hover>
-                                                <TableCell><Typography fontWeight={500}>{field.fieldName}</Typography></TableCell>
-                                                <TableCell>{field.displayName || '-'}</TableCell>
+                                                <TableCell>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                        <Typography
+                                                            fontWeight={500}
+                                                            sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                                                            onClick={() => handleEdit(field)}
+                                                        >
+                                                            {field.fieldName}
+                                                        </Typography>
+                                                        <Tooltip title={t('common.copy')}>
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={(e) => { e.stopPropagation(); copyToClipboardWithNotification(field.fieldName, enqueueSnackbar, t); }}
+                                                                sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
+                                                            >
+                                                                <CopyIcon sx={{ fontSize: 14 }} />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </Box>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                        <Typography>{field.displayName || field.fieldName}</Typography>
+                                                        <Tooltip title={t('common.copy')}>
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={(e) => { e.stopPropagation(); copyToClipboardWithNotification(field.displayName || field.fieldName, enqueueSnackbar, t); }}
+                                                                sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
+                                                            >
+                                                                <CopyIcon sx={{ fontSize: 14 }} />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </Box>
+                                                </TableCell>
                                                 <TableCell><Chip label={getFieldTypeLabel(field.fieldType)} size="small" /></TableCell>
-                                                <TableCell>{formatDateTimeDetailed(field.createdAt)}</TableCell>
+                                                <TableCell>
+                                                    {field.legalValues && field.legalValues.length > 0 ? (
+                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'center' }}>
+                                                            {(expandedLegalValues.has(field.id) ? field.legalValues : field.legalValues.slice(0, 3)).map((value, idx) => (
+                                                                <Chip key={idx} label={value} size="small" variant="outlined" sx={{ fontSize: '0.75rem' }} />
+                                                            ))}
+                                                            {field.legalValues.length > 3 && (
+                                                                <Typography
+                                                                    variant="caption"
+                                                                    sx={{ cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' } }}
+                                                                    onClick={() => {
+                                                                        setExpandedLegalValues(prev => {
+                                                                            const newSet = new Set(prev);
+                                                                            if (newSet.has(field.id)) {
+                                                                                newSet.delete(field.id);
+                                                                            } else {
+                                                                                newSet.add(field.id);
+                                                                            }
+                                                                            return newSet;
+                                                                        });
+                                                                    }}
+                                                                >
+                                                                    {expandedLegalValues.has(field.id)
+                                                                        ? t('featureFlags.showLess')
+                                                                        : t('featureFlags.showMore', { count: field.legalValues.length - 3 })
+                                                                    }
+                                                                </Typography>
+                                                            )}
+                                                        </Box>
+                                                    ) : (
+                                                        <Typography variant="body2" color="text.disabled">-</Typography>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Tooltip title={formatDateTimeDetailed(field.createdAt)}>
+                                                        <span>{formatRelativeTime(field.createdAt)}</span>
+                                                    </Tooltip>
+                                                </TableCell>
                                                 {canManage && (
                                                     <TableCell align="center">
                                                         <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>

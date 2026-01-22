@@ -70,6 +70,9 @@ import {
     Visibility as VisibilityIcon,
     VisibilityOff as VisibilityOffIcon,
     Warning as WarningIcon,
+    Abc as StringTypeIcon,
+    Numbers as NumberTypeIcon,
+    DataObject as JsonTypeIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -1529,10 +1532,35 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     onChange={(e) => setFlag({ ...flag, variantType: e.target.value as FeatureFlag['variantType'] })}
                                     label={t('featureFlags.variantType')}
                                     disabled={!canManage}
+                                    renderValue={(selected) => {
+                                        const getIcon = () => {
+                                            switch (selected) {
+                                                case 'string': return <StringTypeIcon sx={{ fontSize: 18, color: 'info.main', mr: 1 }} />;
+                                                case 'number': return <NumberTypeIcon sx={{ fontSize: 18, color: 'success.main', mr: 1 }} />;
+                                                case 'json': return <JsonTypeIcon sx={{ fontSize: 18, color: 'warning.main', mr: 1 }} />;
+                                                default: return <StringTypeIcon sx={{ fontSize: 18, color: 'text.disabled', mr: 1 }} />;
+                                            }
+                                        };
+                                        return (
+                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                {getIcon()}
+                                                {t(`featureFlags.variantTypes.${selected}`)}
+                                            </Box>
+                                        );
+                                    }}
                                 >
-                                    <MenuItem value="string">{t('featureFlags.variantTypes.string')}</MenuItem>
-                                    <MenuItem value="number">{t('featureFlags.variantTypes.number')}</MenuItem>
-                                    <MenuItem value="json">{t('featureFlags.variantTypes.json')}</MenuItem>
+                                    <MenuItem value="string" sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                                        <StringTypeIcon sx={{ fontSize: 18, color: 'info.main' }} />
+                                        {t('featureFlags.variantTypes.string')}
+                                    </MenuItem>
+                                    <MenuItem value="number" sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                                        <NumberTypeIcon sx={{ fontSize: 18, color: 'success.main' }} />
+                                        {t('featureFlags.variantTypes.number')}
+                                    </MenuItem>
+                                    <MenuItem value="json" sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                                        <JsonTypeIcon sx={{ fontSize: 18, color: 'warning.main' }} />
+                                        {t('featureFlags.variantTypes.json')}
+                                    </MenuItem>
                                 </Select>
                                 <FormHelperText>{t('featureFlags.variantTypeHelp')}</FormHelperText>
                             </FormControl>
