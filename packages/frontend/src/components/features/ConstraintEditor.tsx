@@ -220,9 +220,22 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                                     key={field.fieldName}
                                     value={field.fieldName}
                                     disabled={isUsed}
+                                    sx={{ display: 'flex', justifyContent: 'space-between', gap: 1 }}
                                 >
-                                    {field.displayName || field.fieldName}
-                                    {isUsed && ` (${t('featureFlags.alreadyUsed')})`}
+                                    <Box component="span" sx={{ flex: 1 }}>
+                                        {field.displayName || field.fieldName}
+                                        {isUsed && ` (${t('featureFlags.alreadyUsed')})`}
+                                    </Box>
+                                    <Chip
+                                        label={field.fieldType}
+                                        size="small"
+                                        sx={{
+                                            width: 72,
+                                            height: 20,
+                                            fontSize: '0.65rem',
+                                            fontWeight: 500,
+                                        }}
+                                    />
                                 </MenuItem>
                             );
                         })}
@@ -231,6 +244,28 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                         <FormHelperText>{t('featureFlags.fieldRequired')}</FormHelperText>
                     )}
                 </FormControl>
+
+                {/* Inverted (!) - placed before operator for natural reading order */}
+                <Tooltip title={t('featureFlags.invertedHelp')}>
+                    <span>
+                        <IconButton
+                            size="small"
+                            onClick={() => handleConstraintChange(index, 'inverted', !constraint.inverted)}
+                            disabled={disabled}
+                            sx={{
+                                width: 32,
+                                height: 32,
+                                color: constraint.inverted ? 'warning.main' : 'text.disabled',
+                                bgcolor: constraint.inverted ? 'action.selected' : 'transparent',
+                                '&:hover': {
+                                    bgcolor: 'action.hover',
+                                },
+                            }}
+                        >
+                            <InvertIcon fontSize="small" />
+                        </IconButton>
+                    </span>
+                </Tooltip>
 
                 {/* Operator Selector */}
                 <FormControl size="small" sx={{ minWidth: 130, flex: '1 1 130px' }}>
@@ -280,27 +315,7 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                             </IconButton>
                         </span>
                     </Tooltip>
-                    {/* Inverted (!) */}
-                    <Tooltip title={t('featureFlags.invertedHelp')}>
-                        <span>
-                            <IconButton
-                                size="small"
-                                onClick={() => handleConstraintChange(index, 'inverted', !constraint.inverted)}
-                                disabled={disabled}
-                                sx={{
-                                    width: 32,
-                                    height: 32,
-                                    color: constraint.inverted ? 'warning.main' : 'text.disabled',
-                                    bgcolor: constraint.inverted ? 'action.selected' : 'transparent',
-                                    '&:hover': {
-                                        bgcolor: 'action.hover',
-                                    },
-                                }}
-                            >
-                                <InvertIcon fontSize="small" />
-                            </IconButton>
-                        </span>
-                    </Tooltip>
+
                     {/* Delete Button */}
                     <Tooltip title={t('common.delete')}>
                         <span>
@@ -544,7 +559,9 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
         // Date input
         if (fieldType === 'datetime') {
             // Convert stored ISO string to dayjs for DateTimePicker
-            const dateValue: Dayjs | null = constraint.value ? dayjs(constraint.value) : null;
+            // Only use the value if it's a valid date
+            const parsedDate = constraint.value ? dayjs(constraint.value) : null;
+            const dateValue: Dayjs | null = parsedDate && parsedDate.isValid() ? parsedDate : null;
             return (
                 <DateTimePicker
                     value={dateValue}
