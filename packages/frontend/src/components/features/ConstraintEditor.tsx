@@ -28,6 +28,8 @@ import {
     Add as AddIcon,
     Delete as DeleteIcon,
     DragIndicator,
+    TextFields as TextFieldsIcon,
+    PriorityHigh as InvertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
@@ -48,6 +50,8 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import dayjs, { Dayjs } from 'dayjs';
 
 // Constraint types matching backend FeatureFlag.ts
 export interface Constraint {
@@ -253,17 +257,72 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                     )}
                 </Box>
 
-                {/* Delete Button */}
-                <Tooltip title={t('common.delete')}>
-                    <IconButton
-                        size="small"
-                        onClick={() => handleRemoveConstraint(index)}
-                        disabled={disabled}
-                        sx={{ mt: 0.5 }}
-                    >
-                        <DeleteIcon fontSize="small" />
-                    </IconButton>
-                </Tooltip>
+                {/* Constraint Options & Delete */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+                    {/* Case Insensitive - always show but disable for non-string operators */}
+                    <Tooltip title={t('featureFlags.caseInsensitiveHelp')}>
+                        <span>
+                            <IconButton
+                                size="small"
+                                onClick={() => handleConstraintChange(index, 'caseInsensitive', !constraint.caseInsensitive)}
+                                disabled={disabled || !validOperator.startsWith('str_')}
+                                sx={{
+                                    width: 32,
+                                    height: 32,
+                                    color: constraint.caseInsensitive ? 'primary.main' : 'text.disabled',
+                                    bgcolor: constraint.caseInsensitive ? 'action.selected' : 'transparent',
+                                    '&:hover': {
+                                        bgcolor: 'action.hover',
+                                    },
+                                }}
+                            >
+                                <TextFieldsIcon fontSize="small" />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                    {/* Inverted (!) */}
+                    <Tooltip title={t('featureFlags.invertedHelp')}>
+                        <span>
+                            <IconButton
+                                size="small"
+                                onClick={() => handleConstraintChange(index, 'inverted', !constraint.inverted)}
+                                disabled={disabled}
+                                sx={{
+                                    width: 32,
+                                    height: 32,
+                                    color: constraint.inverted ? 'warning.main' : 'text.disabled',
+                                    bgcolor: constraint.inverted ? 'action.selected' : 'transparent',
+                                    '&:hover': {
+                                        bgcolor: 'action.hover',
+                                    },
+                                }}
+                            >
+                                <InvertIcon fontSize="small" />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                    {/* Delete Button */}
+                    <Tooltip title={t('common.delete')}>
+                        <span>
+                            <IconButton
+                                size="small"
+                                onClick={() => handleRemoveConstraint(index)}
+                                disabled={disabled}
+                                sx={{
+                                    width: 32,
+                                    height: 32,
+                                    color: 'text.secondary',
+                                    '&:hover': {
+                                        bgcolor: 'action.hover',
+                                        color: 'error.main',
+                                    },
+                                }}
+                            >
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                </Box>
             </Box>
         </Card>
     );
@@ -484,15 +543,30 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
 
         // Date input
         if (fieldType === 'datetime') {
+            // Convert stored ISO string to dayjs for DateTimePicker
+            const dateValue: Dayjs | null = constraint.value ? dayjs(constraint.value) : null;
             return (
-                <TextField
-                    fullWidth
-                    size="small"
-                    type="datetime-local"
-                    value={constraint.value || ''}
-                    onChange={(e) => handleConstraintChange(index, 'value', e.target.value)}
-                    InputLabelProps={{ shrink: true }}
+                <DateTimePicker
+                    value={dateValue}
+                    onChange={(newValue: Dayjs | null) => {
+                        // Store as ISO string for backend compatibility
+                        handleConstraintChange(index, 'value', newValue ? newValue.toISOString() : '');
+                    }}
                     disabled={disabled}
+                    ampm={true}
+                    format="YYYY-MM-DD A hh:mm"
+                    views={['year', 'month', 'day', 'hours', 'minutes']}
+                    timeSteps={{ minutes: 1 }}
+                    slotProps={{
+                        textField: {
+                            fullWidth: true,
+                            size: 'small',
+                            slotProps: { input: { readOnly: true } },
+                        },
+                        actionBar: {
+                            actions: ['clear', 'cancel', 'accept']
+                        }
+                    }}
                 />
             );
         }
@@ -529,7 +603,7 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="subtitle2" color="text.secondary">
-                    {t('featureFlags.constraints')}
+                    {t('featureFlags.constraintsList')}
                 </Typography>
                 {!disabled && (
                     <Button

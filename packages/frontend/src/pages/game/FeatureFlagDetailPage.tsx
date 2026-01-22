@@ -97,6 +97,7 @@ interface Strategy {
 interface Variant {
     name: string;
     weight: number;
+    weightLock?: boolean; // If true, weight is manually set; otherwise auto-distributed
     stickiness?: string;
     payload?: {
         type: 'string' | 'json' | 'csv';
@@ -122,7 +123,7 @@ interface FeatureFlag {
     tags?: string[];
     strategies?: Strategy[];
     variants?: Variant[];
-    variantType?: 'string' | 'json' | 'boolean' | 'number'; // All variants share this type
+    variantType?: 'string' | 'json' | 'number'; // All variants share this type
     lastSeenAt?: string;
     archivedAt?: string;
     createdBy?: number;
@@ -458,10 +459,49 @@ const FeatureFlagDetailPage: React.FC = () => {
         }
     };
     // Variant Handlers
+    // Utility function to distribute weights
+    const distributeVariantWeights = (variants: Variant[]) => {
+        if (variants.length === 0) return;
+        if (variants.length === 1) {
+            variants[0].weight = 100;
+            variants[0].weightLock = false;
+            return;
+        }
+
+        // Calculate locked weight total - only count weightLock=true variants
+        let lockedTotal = 0;
+        let unlockedCount = 0;
+
+        for (const v of variants) {
+            if (v.weightLock === true) {
+                lockedTotal += v.weight || 0;
+            } else {
+                unlockedCount++;
+            }
+        }
+
+        // Distribute remaining to unlocked variants
+        const remaining = Math.max(0, 100 - lockedTotal);
+
+        if (unlockedCount > 0) {
+            const equalWeight = Math.floor(remaining / unlockedCount);
+            const remainder = remaining - (equalWeight * unlockedCount);
+            let unlockedIndex = 0;
+
+            for (const v of variants) {
+                if (v.weightLock !== true) {
+                    v.weight = equalWeight + (unlockedIndex < remainder ? 1 : 0);
+                    unlockedIndex++;
+                }
+            }
+        }
+    };
+
     const handleAddVariant = () => {
         setEditingVariant({
             name: '',
-            weight: 50,
+            weight: 0,
+            weightLock: false,
             stickiness: 'userId',
         });
         setVariantDialogOpen(true);
@@ -472,11 +512,14 @@ const FeatureFlagDetailPage: React.FC = () => {
 
         const variants = [...(flag.variants || [])];
         const existingIdx = variants.findIndex(v => v.name === editingVariant.name);
+
         if (existingIdx !== -1) {
             variants[existingIdx] = editingVariant;
         } else {
-            variants.push(editingVariant);
+            variants.push({ ...editingVariant, weightLock: false });
         }
+
+        distributeVariantWeights(variants);
         setFlag({ ...flag, variants });
         setVariantDialogOpen(false);
         setEditingVariant(null);
@@ -485,6 +528,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     const handleDeleteVariant = (variantName: string) => {
         if (!flag) return;
         const variants = (flag.variants || []).filter(v => v.name !== variantName);
+        distributeVariantWeights(variants);
         setFlag({ ...flag, variants });
     };
 
@@ -629,34 +673,37 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         helperText={t('featureFlags.descriptionHelp')}
                                     />
 
-                                    <FormControl fullWidth disabled={!isCreating}>
-                                        <InputLabel>{t('featureFlags.flagType')}</InputLabel>
-                                        <Select
-                                            value={flag.flagType}
-                                            label={t('featureFlags.flagType')}
-                                            onChange={(e) => setFlag({ ...flag, flagType: e.target.value as any })}
-                                        >
-                                            <MenuItem value="release">{t('featureFlags.flagTypes.release')}</MenuItem>
-                                            <MenuItem value="experiment">{t('featureFlags.flagTypes.experiment')}</MenuItem>
-                                            <MenuItem value="operational">{t('featureFlags.flagTypes.operational')}</MenuItem>
-                                            <MenuItem value="permission">{t('featureFlags.flagTypes.permission')}</MenuItem>
-                                            <MenuItem value="killSwitch">{t('featureFlags.flagTypes.killSwitch')}</MenuItem>
-                                        </Select>
-                                        <FormHelperText>{t('featureFlags.flagTypeHelp')}</FormHelperText>
-                                    </FormControl>
+                                    {/* Flag Type + Stale Days Row */}
+                                    <Box sx={{ display: 'flex', gap: 2 }}>
+                                        <FormControl sx={{ flex: 1 }} disabled={!isCreating}>
+                                            <InputLabel>{t('featureFlags.flagType')}</InputLabel>
+                                            <Select
+                                                value={flag.flagType}
+                                                label={t('featureFlags.flagType')}
+                                                onChange={(e) => setFlag({ ...flag, flagType: e.target.value as any })}
+                                            >
+                                                <MenuItem value="release">{t('featureFlags.flagTypes.release')}</MenuItem>
+                                                <MenuItem value="experiment">{t('featureFlags.flagTypes.experiment')}</MenuItem>
+                                                <MenuItem value="operational">{t('featureFlags.flagTypes.operational')}</MenuItem>
+                                                <MenuItem value="permission">{t('featureFlags.flagTypes.permission')}</MenuItem>
+                                                <MenuItem value="killSwitch">{t('featureFlags.flagTypes.killSwitch')}</MenuItem>
+                                            </Select>
+                                            <FormHelperText>{t('featureFlags.flagTypeHelp')}</FormHelperText>
+                                        </FormControl>
 
-                                    <TextField
-                                        fullWidth
-                                        type="number"
-                                        label={t('featureFlags.staleAfterDays')}
-                                        value={flag.staleAfterDays || ''}
-                                        onChange={(e) => setFlag({ ...flag, staleAfterDays: parseInt(e.target.value) || undefined })}
-                                        disabled={!canManage}
-                                        helperText={t('featureFlags.staleAfterDaysHelp')}
-                                        InputProps={{
-                                            endAdornment: <InputAdornment position="end">{t('common.days')}</InputAdornment>
-                                        }}
-                                    />
+                                        <TextField
+                                            type="number"
+                                            label={t('featureFlags.staleAfterDays')}
+                                            value={flag.staleAfterDays || ''}
+                                            onChange={(e) => setFlag({ ...flag, staleAfterDays: parseInt(e.target.value) || undefined })}
+                                            disabled={!canManage}
+                                            helperText={t('featureFlags.staleAfterDaysHelp')}
+                                            InputProps={{
+                                                endAdornment: <InputAdornment position="end">{t('common.days')}</InputAdornment>
+                                            }}
+                                            sx={{ width: 200 }}
+                                        />
+                                    </Box>
 
                                     <FormControlLabel
                                         control={
@@ -767,7 +814,19 @@ const FeatureFlagDetailPage: React.FC = () => {
                         <Box sx={{ mb: 3 }}>
                             <Typography variant="h6">{t('featureFlags.activationStrategies')}</Typography>
                             <Typography variant="body2" color="text.secondary">
-                                {t('featureFlags.strategiesDescription')}
+                                {(() => {
+                                    const strategies = flag.strategies || [];
+                                    const totalSegments = strategies.reduce((sum, s) => sum + (s.segments?.length || 0), 0);
+                                    const totalConstraints = strategies.reduce((sum, s) => sum + (s.constraints?.length || 0), 0);
+
+                                    if (totalSegments === 0 && totalConstraints === 0) {
+                                        return t('featureFlags.strategiesDescriptionEmpty');
+                                    }
+                                    return t('featureFlags.strategiesDescriptionWithCount', {
+                                        segmentCount: totalSegments,
+                                        constraintCount: totalConstraints
+                                    });
+                                })()}
                             </Typography>
                         </Box>
 
@@ -1123,278 +1182,281 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                 />
                                             )}
 
-                                            {/* Segment Selector - FIRST (base targeting rule) */}
-                                            <Box>
-                                                <Typography variant="subtitle2" gutterBottom>{t('featureFlags.segments')}</Typography>
-                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                                                    {t('featureFlags.segmentSelectorHelp')}
-                                                </Typography>
+                                            {/* Segment & Constraints Section - separated from strategy params */}
+                                            <Paper variant="outlined" sx={{ p: 2, bgcolor: 'action.hover' }}>
+                                                {/* Segment Selector */}
+                                                <Box sx={{ mb: 2 }}>
+                                                    <Typography variant="subtitle2" gutterBottom>{t('featureFlags.segments')}</Typography>
+                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                                                        {t('featureFlags.segmentSelectorHelp')}
+                                                    </Typography>
 
-                                                {/* Selected Segments + Add Selector in a row */}
-                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'flex-start' }}>
-                                                    {(strategy.segments || []).map((segName: string) => {
-                                                        const seg = segments.find((s: any) => s.segmentName === segName);
-                                                        const isExpanded = expandedSegments.has(`${index}-${segName}`);
-                                                        const isEmpty = !seg?.constraints || seg.constraints.length === 0;
+                                                    {/* Selected Segments + Add Selector in a row */}
+                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'flex-start' }}>
+                                                        {(strategy.segments || []).map((segName: string) => {
+                                                            const seg = segments.find((s: any) => s.segmentName === segName);
+                                                            const isExpanded = expandedSegments.has(`${index}-${segName}`);
+                                                            const isEmpty = !seg?.constraints || seg.constraints.length === 0;
 
-                                                        // Format operator for display - universal symbols
-                                                        const getOperatorLabel = (op: string): string => {
-                                                            const opLabels: Record<string, string> = {
-                                                                'str_eq': '=',
-                                                                'str_neq': '≠',
-                                                                'str_contains': 'contains',
-                                                                'str_starts_with': 'starts with',
-                                                                'str_ends_with': 'ends with',
-                                                                'str_in': 'is one of',
-                                                                'str_not_in': 'is not one of',
-                                                                'num_eq': '=',
-                                                                'num_gt': '>',
-                                                                'num_gte': '≥',
-                                                                'num_lt': '<',
-                                                                'num_lte': '≤',
-                                                                'bool_is': '=',
-                                                                'date_gt': '>',
-                                                                'date_gte': '≥',
-                                                                'date_lt': '<',
-                                                                'date_lte': '≤',
-                                                                'semver_eq': '=',
-                                                                'semver_gt': '>',
-                                                                'semver_gte': '≥',
-                                                                'semver_lt': '<',
-                                                                'semver_lte': '≤',
+                                                            // Format operator for display - universal symbols
+                                                            const getOperatorLabel = (op: string): string => {
+                                                                const opLabels: Record<string, string> = {
+                                                                    'str_eq': '=',
+                                                                    'str_neq': '≠',
+                                                                    'str_contains': 'contains',
+                                                                    'str_starts_with': 'starts with',
+                                                                    'str_ends_with': 'ends with',
+                                                                    'str_in': 'is one of',
+                                                                    'str_not_in': 'is not one of',
+                                                                    'num_eq': '=',
+                                                                    'num_gt': '>',
+                                                                    'num_gte': '≥',
+                                                                    'num_lt': '<',
+                                                                    'num_lte': '≤',
+                                                                    'bool_is': '=',
+                                                                    'date_gt': '>',
+                                                                    'date_gte': '≥',
+                                                                    'date_lt': '<',
+                                                                    'date_lte': '≤',
+                                                                    'semver_eq': '=',
+                                                                    'semver_gt': '>',
+                                                                    'semver_gte': '≥',
+                                                                    'semver_lt': '<',
+                                                                    'semver_lte': '≤',
+                                                                };
+                                                                return opLabels[op] || op;
                                                             };
-                                                            return opLabels[op] || op;
-                                                        };
 
-                                                        // Get constraint value display
-                                                        const getValueDisplay = (c: any): string => {
-                                                            if (c.values && c.values.length > 0) {
-                                                                return c.values.join(', ');
-                                                            }
-                                                            if (c.value !== undefined && c.value !== null) {
-                                                                if (typeof c.value === 'boolean') {
-                                                                    return c.value ? 'True' : 'False';
+                                                            // Get constraint value display
+                                                            const getValueDisplay = (c: any): string => {
+                                                                if (c.values && c.values.length > 0) {
+                                                                    return c.values.join(', ');
                                                                 }
-                                                                return String(c.value);
-                                                            }
-                                                            return '-';
-                                                        };
-
-                                                        return (
-                                                            <Box key={segName} sx={{ maxWidth: isExpanded ? 500 : 'auto' }}>
-                                                                <Chip
-                                                                    label={
-                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                            <GroupIcon sx={{ fontSize: 14 }} />
-                                                                            <span>{seg?.displayName || segName}</span>
-                                                                            <IconButton
-                                                                                size="small"
-                                                                                onClick={(e) => {
-                                                                                    e.stopPropagation();
-                                                                                    const key = `${index}-${segName}`;
-                                                                                    setExpandedSegments(prev => {
-                                                                                        const next = new Set(prev);
-                                                                                        if (next.has(key)) next.delete(key);
-                                                                                        else next.add(key);
-                                                                                        return next;
-                                                                                    });
-                                                                                }}
-                                                                                sx={{ p: 0, ml: 0.5, color: 'inherit' }}
-                                                                            >
-                                                                                {isExpanded ? <VisibilityOffIcon sx={{ fontSize: 14 }} /> : <VisibilityIcon sx={{ fontSize: 14 }} />}
-                                                                            </IconButton>
-                                                                        </Box>
+                                                                if (c.value !== undefined && c.value !== null) {
+                                                                    if (typeof c.value === 'boolean') {
+                                                                        return c.value ? 'True' : 'False';
                                                                     }
-                                                                    size="small"
-                                                                    color={isEmpty ? 'warning' : 'default'}
-                                                                    variant="outlined"
-                                                                    onDelete={canManage ? () => {
-                                                                        const strategies = [...(flag.strategies || [])];
-                                                                        strategies[index] = {
-                                                                            ...strategies[index],
-                                                                            segments: (strategy.segments || []).filter((s: string) => s !== segName)
-                                                                        };
-                                                                        setFlag({ ...flag, strategies });
-                                                                    } : undefined}
-                                                                    sx={{
-                                                                        borderWidth: isEmpty ? 2 : 1,
-                                                                        '& .MuiChip-label': { pr: 0.5 }
-                                                                    }}
-                                                                />
+                                                                    return String(c.value);
+                                                                }
+                                                                return '-';
+                                                            };
 
-                                                                {/* Expanded segment details */}
-                                                                {isExpanded && seg && (
-                                                                    <Paper
+                                                            return (
+                                                                <Box key={segName} sx={{ maxWidth: isExpanded ? 500 : 'auto' }}>
+                                                                    <Chip
+                                                                        label={
+                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                                <GroupIcon sx={{ fontSize: 14 }} />
+                                                                                <span>{seg?.displayName || segName}</span>
+                                                                                <IconButton
+                                                                                    size="small"
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        const key = `${index}-${segName}`;
+                                                                                        setExpandedSegments(prev => {
+                                                                                            const next = new Set(prev);
+                                                                                            if (next.has(key)) next.delete(key);
+                                                                                            else next.add(key);
+                                                                                            return next;
+                                                                                        });
+                                                                                    }}
+                                                                                    sx={{ p: 0, ml: 0.5, color: 'inherit' }}
+                                                                                >
+                                                                                    {isExpanded ? <VisibilityOffIcon sx={{ fontSize: 14 }} /> : <VisibilityIcon sx={{ fontSize: 14 }} />}
+                                                                                </IconButton>
+                                                                            </Box>
+                                                                        }
+                                                                        size="small"
+                                                                        color={isEmpty ? 'warning' : 'default'}
+                                                                        variant="outlined"
+                                                                        onDelete={canManage ? () => {
+                                                                            const strategies = [...(flag.strategies || [])];
+                                                                            strategies[index] = {
+                                                                                ...strategies[index],
+                                                                                segments: (strategy.segments || []).filter((s: string) => s !== segName)
+                                                                            };
+                                                                            setFlag({ ...flag, strategies });
+                                                                        } : undefined}
                                                                         sx={{
-                                                                            mt: 1,
-                                                                            p: 2,
-                                                                            bgcolor: 'background.default',
-                                                                            border: 1,
-                                                                            borderColor: isEmpty ? 'warning.main' : 'divider',
-                                                                            borderRadius: 1
+                                                                            borderWidth: isEmpty ? 2 : 1,
+                                                                            '& .MuiChip-label': { pr: 0.5 }
                                                                         }}
-                                                                        elevation={0}
-                                                                    >
-                                                                        {isEmpty ? (
-                                                                            <Alert severity="warning" icon={<WarningIcon />}>
-                                                                                <Typography variant="body2">
-                                                                                    {t('featureFlags.emptySegmentWarning', { name: seg.displayName || segName })}
-                                                                                </Typography>
-                                                                            </Alert>
-                                                                        ) : (
-                                                                            <Box>
-                                                                                <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
-                                                                                    📋 {t('featureFlags.segmentConditions')}
-                                                                                </Typography>
-                                                                                <Stack spacing={1}>
-                                                                                    {seg.constraints.map((c: any, ci: number) => (
-                                                                                        <React.Fragment key={ci}>
-                                                                                            {ci > 0 && (
-                                                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-                                                                                                    <Divider sx={{ flexGrow: 1 }} />
-                                                                                                    <Chip
-                                                                                                        label="AND"
-                                                                                                        size="small"
-                                                                                                        sx={{
-                                                                                                            height: 22,
-                                                                                                            fontSize: '0.7rem',
-                                                                                                            bgcolor: 'action.selected',
-                                                                                                            fontWeight: 600
-                                                                                                        }}
-                                                                                                    />
-                                                                                                    <Divider sx={{ flexGrow: 1 }} />
-                                                                                                </Box>
-                                                                                            )}
-                                                                                            {/* Unleash-style constraint row */}
-                                                                                            <Box
-                                                                                                sx={{
-                                                                                                    display: 'flex',
-                                                                                                    alignItems: 'center',
-                                                                                                    gap: 1,
-                                                                                                    p: 1,
-                                                                                                    border: 1,
-                                                                                                    borderColor: 'primary.main',
-                                                                                                    borderRadius: 1,
-                                                                                                    bgcolor: 'background.paper'
-                                                                                                }}
-                                                                                            >
-                                                                                                {/* Field Name */}
+                                                                    />
+
+                                                                    {/* Expanded segment details */}
+                                                                    {isExpanded && seg && (
+                                                                        <Paper
+                                                                            sx={{
+                                                                                mt: 1,
+                                                                                p: 2,
+                                                                                bgcolor: 'background.default',
+                                                                                border: 1,
+                                                                                borderColor: isEmpty ? 'warning.main' : 'divider',
+                                                                                borderRadius: 1
+                                                                            }}
+                                                                            elevation={0}
+                                                                        >
+                                                                            {isEmpty ? (
+                                                                                <Alert severity="warning" icon={<WarningIcon />}>
+                                                                                    <Typography variant="body2">
+                                                                                        {t('featureFlags.emptySegmentWarning', { name: seg.displayName || segName })}
+                                                                                    </Typography>
+                                                                                </Alert>
+                                                                            ) : (
+                                                                                <Box>
+                                                                                    <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
+                                                                                        📋 {t('featureFlags.segmentConditions')}
+                                                                                    </Typography>
+                                                                                    <Stack spacing={1}>
+                                                                                        {seg.constraints.map((c: any, ci: number) => (
+                                                                                            <React.Fragment key={ci}>
+                                                                                                {ci > 0 && (
+                                                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
+                                                                                                        <Divider sx={{ flexGrow: 1 }} />
+                                                                                                        <Chip
+                                                                                                            label="AND"
+                                                                                                            size="small"
+                                                                                                            sx={{
+                                                                                                                height: 22,
+                                                                                                                fontSize: '0.7rem',
+                                                                                                                bgcolor: 'action.selected',
+                                                                                                                fontWeight: 600
+                                                                                                            }}
+                                                                                                        />
+                                                                                                        <Divider sx={{ flexGrow: 1 }} />
+                                                                                                    </Box>
+                                                                                                )}
+                                                                                                {/* Unleash-style constraint row */}
                                                                                                 <Box
                                                                                                     sx={{
-                                                                                                        px: 1.5,
-                                                                                                        py: 0.5,
-                                                                                                        bgcolor: 'primary.main',
-                                                                                                        color: 'primary.contrastText',
-                                                                                                        borderRadius: 0.5
+                                                                                                        display: 'flex',
+                                                                                                        alignItems: 'center',
+                                                                                                        gap: 1,
+                                                                                                        p: 1,
+                                                                                                        border: 1,
+                                                                                                        borderColor: 'primary.main',
+                                                                                                        borderRadius: 1,
+                                                                                                        bgcolor: 'background.paper'
                                                                                                     }}
                                                                                                 >
-                                                                                                    <Typography variant="body2" fontWeight={600}>
-                                                                                                        {c.contextName}
-                                                                                                    </Typography>
-                                                                                                </Box>
+                                                                                                    {/* Field Name */}
+                                                                                                    <Box
+                                                                                                        sx={{
+                                                                                                            px: 1.5,
+                                                                                                            py: 0.5,
+                                                                                                            bgcolor: 'primary.main',
+                                                                                                            color: 'primary.contrastText',
+                                                                                                            borderRadius: 0.5
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        <Typography variant="body2" fontWeight={600}>
+                                                                                                            {c.contextName}
+                                                                                                        </Typography>
+                                                                                                    </Box>
 
-                                                                                                {/* Operator Chip */}
-                                                                                                <Chip
-                                                                                                    label={getOperatorLabel(c.operator)}
-                                                                                                    size="small"
-                                                                                                    variant="outlined"
-                                                                                                    sx={{ fontWeight: 500, fontSize: '0.75rem' }}
-                                                                                                />
-
-                                                                                                {/* Case sensitivity indicator for string operators */}
-                                                                                                {c.operator?.startsWith('str_') && (
+                                                                                                    {/* Operator Chip */}
                                                                                                     <Chip
-                                                                                                        label={c.caseInsensitive ? 'Aa' : 'AA'}
+                                                                                                        label={getOperatorLabel(c.operator)}
                                                                                                         size="small"
                                                                                                         variant="outlined"
-                                                                                                        sx={{
-                                                                                                            height: 22,
-                                                                                                            fontSize: '0.7rem',
-                                                                                                            minWidth: 32
-                                                                                                        }}
+                                                                                                        sx={{ fontWeight: 500, fontSize: '0.75rem' }}
                                                                                                     />
-                                                                                                )}
 
-                                                                                                {/* Value */}
-                                                                                                <Box
-                                                                                                    sx={{
-                                                                                                        px: 1.5,
-                                                                                                        py: 0.5,
-                                                                                                        bgcolor: 'primary.main',
-                                                                                                        color: 'primary.contrastText',
-                                                                                                        borderRadius: 0.5
-                                                                                                    }}
-                                                                                                >
-                                                                                                    <Typography variant="body2" fontWeight={600}>
-                                                                                                        {getValueDisplay(c)}
-                                                                                                    </Typography>
+                                                                                                    {/* Case sensitivity indicator for string operators */}
+                                                                                                    {c.operator?.startsWith('str_') && (
+                                                                                                        <Chip
+                                                                                                            label={c.caseInsensitive ? 'Aa' : 'AA'}
+                                                                                                            size="small"
+                                                                                                            variant="outlined"
+                                                                                                            sx={{
+                                                                                                                height: 22,
+                                                                                                                fontSize: '0.7rem',
+                                                                                                                minWidth: 32
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    )}
+
+                                                                                                    {/* Value */}
+                                                                                                    <Box
+                                                                                                        sx={{
+                                                                                                            px: 1.5,
+                                                                                                            py: 0.5,
+                                                                                                            bgcolor: 'primary.main',
+                                                                                                            color: 'primary.contrastText',
+                                                                                                            borderRadius: 0.5
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        <Typography variant="body2" fontWeight={600}>
+                                                                                                            {getValueDisplay(c)}
+                                                                                                        </Typography>
+                                                                                                    </Box>
                                                                                                 </Box>
-                                                                                            </Box>
-                                                                                        </React.Fragment>
-                                                                                    ))}
-                                                                                </Stack>
-                                                                            </Box>
-                                                                        )}
-                                                                    </Paper>
-                                                                )}
-                                                            </Box>
-                                                        );
-                                                    })}
+                                                                                            </React.Fragment>
+                                                                                        ))}
+                                                                                    </Stack>
+                                                                                </Box>
+                                                                            )}
+                                                                        </Paper>
+                                                                    )}
+                                                                </Box>
+                                                            );
+                                                        })}
 
-                                                    {/* Add segment selector - inline with chips */}
-                                                    <Autocomplete
-                                                        size="small"
-                                                        sx={{ minWidth: 200, flexShrink: 0 }}
-                                                        options={segments.filter((s: any) => !(strategy.segments || []).includes(s.segmentName))}
-                                                        getOptionLabel={(option: any) => option.displayName || option.segmentName}
-                                                        value={null}
-                                                        onChange={(_, selected) => {
-                                                            if (selected) {
-                                                                const strategies = [...(flag.strategies || [])];
-                                                                strategies[index] = {
-                                                                    ...strategies[index],
-                                                                    segments: [...(strategy.segments || []), selected.segmentName]
-                                                                };
-                                                                setFlag({ ...flag, strategies });
-                                                            }
+                                                        {/* Add segment selector - inline with chips */}
+                                                        <Autocomplete
+                                                            size="small"
+                                                            sx={{ minWidth: 200, flexShrink: 0 }}
+                                                            options={segments.filter((s: any) => !(strategy.segments || []).includes(s.segmentName))}
+                                                            getOptionLabel={(option: any) => option.displayName || option.segmentName}
+                                                            value={null}
+                                                            onChange={(_, selected) => {
+                                                                if (selected) {
+                                                                    const strategies = [...(flag.strategies || [])];
+                                                                    strategies[index] = {
+                                                                        ...strategies[index],
+                                                                        segments: [...(strategy.segments || []), selected.segmentName]
+                                                                    };
+                                                                    setFlag({ ...flag, strategies });
+                                                                }
+                                                            }}
+                                                            renderInput={(params) => (
+                                                                <TextField {...params} placeholder={t('featureFlags.selectSegments')} size="small" />
+                                                            )}
+                                                            disabled={!canManage || segments.length === 0}
+                                                            noOptionsText={t('featureFlags.noSegments')}
+                                                            clearOnBlur
+                                                            blurOnSelect
+                                                        />
+                                                    </Box>
+                                                </Box>
+
+                                                {/* AND Indicator between segments and constraints */}
+                                                {(strategy.segments?.length > 0 || (strategy.constraints?.length > 0)) && (
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
+                                                        <Divider sx={{ flexGrow: 1 }} />
+                                                        <Chip label="AND" size="small" variant="outlined" sx={{ fontWeight: 600 }} />
+                                                        <Divider sx={{ flexGrow: 1 }} />
+                                                    </Box>
+                                                )}
+
+                                                {/* Constraints - AFTER segments */}
+                                                <Box>
+                                                    <Typography variant="subtitle2" gutterBottom>{t('featureFlags.constraints')}</Typography>
+                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                                                        {t('featureFlags.constraintsHelp')}
+                                                    </Typography>
+                                                    <ConstraintEditor
+                                                        constraints={strategy.constraints || []}
+                                                        onChange={(constraints) => {
+                                                            const strategies = [...(flag.strategies || [])];
+                                                            strategies[index] = { ...strategies[index], constraints };
+                                                            setFlag({ ...flag, strategies });
                                                         }}
-                                                        renderInput={(params) => (
-                                                            <TextField {...params} placeholder={t('featureFlags.selectSegments')} size="small" />
-                                                        )}
-                                                        disabled={!canManage || segments.length === 0}
-                                                        noOptionsText={t('featureFlags.noSegments')}
-                                                        clearOnBlur
-                                                        blurOnSelect
+                                                        contextFields={contextFields}
+                                                        disabled={!canManage}
                                                     />
                                                 </Box>
-                                            </Box>
-
-                                            {/* AND Indicator between segments and constraints */}
-                                            {(strategy.segments?.length > 0 || (strategy.constraints?.length > 0)) && (
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-                                                    <Divider sx={{ flexGrow: 1 }} />
-                                                    <Chip label="AND" size="small" variant="outlined" sx={{ fontWeight: 600 }} />
-                                                    <Divider sx={{ flexGrow: 1 }} />
-                                                </Box>
-                                            )}
-
-                                            {/* Constraints - AFTER segments */}
-                                            <Box>
-                                                <Typography variant="subtitle2" gutterBottom>{t('featureFlags.constraints')}</Typography>
-                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                                                    {t('featureFlags.constraintsHelp')}
-                                                </Typography>
-                                                <ConstraintEditor
-                                                    constraints={strategy.constraints || []}
-                                                    onChange={(constraints) => {
-                                                        const strategies = [...(flag.strategies || [])];
-                                                        strategies[index] = { ...strategies[index], constraints };
-                                                        setFlag({ ...flag, strategies });
-                                                    }}
-                                                    contextFields={contextFields}
-                                                    disabled={!canManage}
-                                                />
-                                            </Box>
+                                            </Paper>
 
                                             {/* Delete Button - only show if there are 2+ strategies */}
                                             {canManage && (flag.strategies?.length || 0) > 1 && (
@@ -1469,9 +1531,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     disabled={!canManage}
                                 >
                                     <MenuItem value="string">{t('featureFlags.variantTypes.string')}</MenuItem>
-                                    <MenuItem value="json">{t('featureFlags.variantTypes.json')}</MenuItem>
-                                    <MenuItem value="boolean">{t('featureFlags.variantTypes.boolean')}</MenuItem>
                                     <MenuItem value="number">{t('featureFlags.variantTypes.number')}</MenuItem>
+                                    <MenuItem value="json">{t('featureFlags.variantTypes.json')}</MenuItem>
                                 </Select>
                                 <FormHelperText>{t('featureFlags.variantTypeHelp')}</FormHelperText>
                             </FormControl>
@@ -1480,149 +1541,190 @@ const FeatureFlagDetailPage: React.FC = () => {
                         {/* Weight Distribution Info */}
                         {(flag.variants?.length || 0) > 1 && (() => {
                             const variants = flag.variants || [];
-                            const fixedWeights = variants.filter(v => v.weight !== undefined && v.weight > 0);
-                            const totalFixed = fixedWeights.reduce((sum, v) => sum + (v.weight || 0), 0);
-                            const remaining = 100 - totalFixed;
-                            const autoCount = variants.length - fixedWeights.length;
+                            const lockedVariants = variants.filter(v => v.weightLock === true);
+                            const totalLocked = lockedVariants.reduce((sum, v) => sum + (v.weight || 0), 0);
+                            const remaining = Math.max(0, 100 - totalLocked);
+                            const autoCount = variants.length - lockedVariants.length;
                             return (
                                 <Alert severity="info" sx={{ mb: 2 }}>
                                     {t('featureFlags.weightDistribution', {
-                                        fixed: totalFixed,
-                                        remaining: remaining > 0 ? remaining : 0,
+                                        fixed: totalLocked,
+                                        remaining: remaining,
                                         autoCount: autoCount
                                     })}
                                 </Alert>
                             );
                         })()}
-
                         {/* Inline Variants Editor */}
                         <Stack spacing={2}>
-                            {(flag.variants || []).map((variant, index) => (
-                                <Paper key={index} variant="outlined" sx={{ p: 2 }}>
-                                    <Stack spacing={2}>
-                                        {/* Row 1: Name and Weight */}
-                                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-                                            <TextField
-                                                size="small"
-                                                label={t('featureFlags.variantName')}
-                                                value={variant.name || ''}
-                                                onChange={(e) => {
-                                                    const variants = [...(flag.variants || [])];
-                                                    variants[index] = { ...variants[index], name: e.target.value };
-                                                    setFlag({ ...flag, variants });
-                                                }}
-                                                disabled={!canManage}
-                                                sx={{ flex: 1, minWidth: 150 }}
-                                            />
-                                            <Box sx={{ width: 250, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>{t('featureFlags.weight')}:</Typography>
-                                                <Slider
+                            {(flag.variants || []).map((variant, index) => {
+                                // Color palette for variant tips
+                                const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f97316', '#10b981', '#06b6d4', '#3b82f6', '#f59e0b'];
+                                const tipColor = colors[index % colors.length];
+
+                                return (
+                                    <Paper
+                                        key={index}
+                                        variant="outlined"
+                                        sx={{
+                                            p: 0,
+                                            overflow: 'hidden',
+                                            display: 'flex',
+                                        }}
+                                    >
+                                        {/* Left color tip */}
+                                        <Box sx={{ width: 6, bgcolor: tipColor, flexShrink: 0 }} />
+
+                                        {/* Content */}
+                                        <Box sx={{ flex: 1, p: 2.5 }}>
+                                            {/* Row 1: Header - Label left, Delete right */}
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                                                {/* Left: Label + Help */}
+                                                <Box>
+                                                    <Typography variant="subtitle2" fontWeight={600}>
+                                                        {t('featureFlags.variantName')}
+                                                    </Typography>
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        {t('featureFlags.variantNameHelp')}
+                                                    </Typography>
+                                                </Box>
+
+                                                {/* Right: Delete only */}
+                                                {canManage && (
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleDeleteVariant(variant.name)}
+                                                        sx={{ color: 'text.secondary' }}
+                                                    >
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                )}
+                                            </Box>
+
+                                            {/* Row 2: Name input + Switch + Weight input */}
+                                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                                                <TextField
                                                     size="small"
-                                                    value={variant.weight || 0}
-                                                    onChange={(_, value) => {
+                                                    value={variant.name || ''}
+                                                    onChange={(e) => {
                                                         const variants = [...(flag.variants || [])];
-                                                        variants[index] = { ...variants[index], weight: value as number };
+                                                        variants[index] = { ...variants[index], name: e.target.value };
                                                         setFlag({ ...flag, variants });
                                                     }}
                                                     disabled={!canManage}
-                                                    min={0}
-                                                    max={100}
                                                     sx={{ flex: 1 }}
+                                                    placeholder={`variant-${index + 1}`}
                                                 />
-                                                <Typography variant="body2" sx={{ width: 45, textAlign: 'right' }}>{variant.weight || 0}%</Typography>
-                                            </Box>
-                                            {canManage && (
-                                                <IconButton
-                                                    size="small"
-                                                    color="error"
-                                                    onClick={() => handleDeleteVariant(variant.name)}
-                                                >
-                                                    <DeleteIcon fontSize="small" />
-                                                </IconButton>
-                                            )}
-                                        </Box>
-
-                                        {/* Row 2: Payload based on type */}
-                                        <Box>
-                                            <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
-                                                {t('featureFlags.payload')}
-                                            </Typography>
-                                            {(flag.variantType || 'string') === 'boolean' ? (
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            checked={variant.payload?.value === 'true'}
+                                                {(flag.variants?.length || 0) > 1 && (
+                                                    <>
+                                                        <FormControlLabel
+                                                            control={
+                                                                <Switch
+                                                                    size="small"
+                                                                    checked={variant.weightLock || false}
+                                                                    onChange={(e) => {
+                                                                        const variants = [...(flag.variants || [])];
+                                                                        variants[index] = { ...variants[index], weightLock: e.target.checked };
+                                                                        distributeVariantWeights(variants);
+                                                                        setFlag({ ...flag, variants });
+                                                                    }}
+                                                                    disabled={!canManage}
+                                                                />
+                                                            }
+                                                            label={<Typography variant="body2">{t('featureFlags.customWeight')}</Typography>}
+                                                            labelPlacement="start"
+                                                            sx={{ ml: 0, mr: 0 }}
+                                                        />
+                                                        <TextField
+                                                            size="small"
+                                                            type="number"
+                                                            label={t('featureFlags.variantWeight')}
+                                                            value={variant.weight || 0}
                                                             onChange={(e) => {
+                                                                const value = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
                                                                 const variants = [...(flag.variants || [])];
-                                                                variants[index] = {
-                                                                    ...variants[index],
-                                                                    payload: { type: 'string', value: e.target.checked ? 'true' : 'false' }
-                                                                };
+                                                                variants[index] = { ...variants[index], weight: value };
+                                                                distributeVariantWeights(variants);
                                                                 setFlag({ ...flag, variants });
                                                             }}
-                                                            disabled={!canManage}
+                                                            disabled={!canManage || !variant.weightLock}
+                                                            InputProps={{
+                                                                endAdornment: <Typography variant="body2">%</Typography>,
+                                                                inputProps: { min: 0, max: 100 }
+                                                            }}
+                                                            sx={{ width: 130 }}
                                                         />
-                                                    }
-                                                    label={variant.payload?.value === 'true' ? 'true' : 'false'}
-                                                />
-                                            ) : (flag.variantType || 'string') === 'number' ? (
-                                                <TextField
-                                                    size="small"
-                                                    type="number"
-                                                    value={variant.payload?.value || ''}
-                                                    onChange={(e) => {
-                                                        const variants = [...(flag.variants || [])];
-                                                        variants[index] = {
-                                                            ...variants[index],
-                                                            payload: { type: 'string', value: e.target.value }
-                                                        };
-                                                        setFlag({ ...flag, variants });
-                                                    }}
-                                                    disabled={!canManage}
-                                                    fullWidth
-                                                    placeholder="0"
-                                                />
-                                            ) : (flag.variantType || 'string') === 'json' ? (
-                                                <TextField
-                                                    size="small"
-                                                    multiline
-                                                    rows={3}
-                                                    value={variant.payload?.value || ''}
-                                                    onChange={(e) => {
-                                                        const variants = [...(flag.variants || [])];
-                                                        variants[index] = {
-                                                            ...variants[index],
-                                                            payload: { type: 'json', value: e.target.value }
-                                                        };
-                                                        setFlag({ ...flag, variants });
-                                                    }}
-                                                    disabled={!canManage}
-                                                    fullWidth
-                                                    placeholder='{"key": "value"}'
-                                                    sx={{ fontFamily: 'monospace' }}
-                                                    InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.875rem' } }}
-                                                />
-                                            ) : (
-                                                <TextField
-                                                    size="small"
-                                                    value={variant.payload?.value || ''}
-                                                    onChange={(e) => {
-                                                        const variants = [...(flag.variants || [])];
-                                                        variants[index] = {
-                                                            ...variants[index],
-                                                            payload: { type: 'string', value: e.target.value }
-                                                        };
-                                                        setFlag({ ...flag, variants });
-                                                    }}
-                                                    disabled={!canManage}
-                                                    fullWidth
-                                                    placeholder={t('featureFlags.payloadPlaceholder')}
-                                                />
-                                            )}
+                                                    </>
+                                                )}
+                                            </Box>
+
+                                            {/* Row 3: Payload */}
+                                            <Box sx={{ mt: 2 }}>
+                                                <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                                                    {t('featureFlags.payload')}
+                                                </Typography>
+                                                {(flag.variantType || 'string') === 'number' ? (
+                                                    <TextField
+                                                        size="small"
+                                                        type="number"
+                                                        value={variant.payload?.value || ''}
+                                                        onChange={(e) => {
+                                                            const variants = [...(flag.variants || [])];
+                                                            variants[index] = {
+                                                                ...variants[index],
+                                                                payload: { type: 'string', value: e.target.value }
+                                                            };
+                                                            setFlag({ ...flag, variants });
+                                                        }}
+                                                        disabled={!canManage}
+                                                        fullWidth
+                                                        placeholder="0"
+                                                        helperText={t('featureFlags.payloadHelp')}
+                                                    />
+                                                ) : (flag.variantType || 'string') === 'json' ? (
+                                                    <TextField
+                                                        size="small"
+                                                        multiline
+                                                        rows={3}
+                                                        value={variant.payload?.value || ''}
+                                                        onChange={(e) => {
+                                                            const variants = [...(flag.variants || [])];
+                                                            variants[index] = {
+                                                                ...variants[index],
+                                                                payload: { type: 'json', value: e.target.value }
+                                                            };
+                                                            setFlag({ ...flag, variants });
+                                                        }}
+                                                        disabled={!canManage}
+                                                        fullWidth
+                                                        placeholder='{"key": "value"}'
+                                                        sx={{ fontFamily: 'monospace' }}
+                                                        InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.875rem' } }}
+                                                        helperText={t('featureFlags.payloadHelp')}
+                                                    />
+                                                ) : (
+                                                    <TextField
+                                                        size="small"
+                                                        value={variant.payload?.value || ''}
+                                                        onChange={(e) => {
+                                                            const variants = [...(flag.variants || [])];
+                                                            variants[index] = {
+                                                                ...variants[index],
+                                                                payload: { type: 'string', value: e.target.value }
+                                                            };
+                                                            setFlag({ ...flag, variants });
+                                                        }}
+                                                        disabled={!canManage}
+                                                        fullWidth
+                                                        placeholder={t('featureFlags.payloadPlaceholder')}
+                                                        helperText={t('featureFlags.payloadHelp')}
+                                                    />
+                                                )}
+                                            </Box>
                                         </Box>
-                                    </Stack>
-                                </Paper>
-                            ))}
+                                    </Paper>
+                                );
+                            })}
 
                             {/* Add Variant Button */}
                             {canManage && (
@@ -1631,14 +1733,17 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     startIcon={<AddIcon />}
                                     onClick={() => {
                                         const variantType = flag.variantType || 'string';
-                                        const defaultValue = variantType === 'boolean' ? 'false' : variantType === 'number' ? '0' : '';
+                                        const defaultValue = variantType === 'number' ? '0' : '';
                                         const newVariant: Variant = {
                                             name: `variant-${(flag.variants?.length || 0) + 1}`,
-                                            weight: 0, // 0 means auto-distribute
+                                            weight: 0,
+                                            weightLock: false,
                                             payload: { type: variantType === 'json' ? 'json' : 'string', value: defaultValue },
                                             stickiness: 'default',
                                         };
-                                        setFlag({ ...flag, variants: [...(flag.variants || []), newVariant] });
+                                        const updatedVariants = [...(flag.variants || []), newVariant];
+                                        distributeVariantWeights(updatedVariants);
+                                        setFlag({ ...flag, variants: updatedVariants });
                                     }}
                                     sx={{ alignSelf: 'flex-start' }}
                                 >
@@ -1646,6 +1751,50 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 </Button>
                             )}
 
+                            {/* Weight Distribution Bar */}
+                            {(flag.variants?.length || 0) > 1 && (
+                                <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
+                                    <Typography variant="subtitle2" gutterBottom>
+                                        {t('featureFlags.flagVariants')} ({flag.variants?.length})
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', width: '100%', height: 24, overflow: 'hidden' }}>
+                                        {(flag.variants || []).map((variant, index) => {
+                                            const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f97316', '#10b981', '#06b6d4', '#3b82f6', '#f59e0b'];
+                                            const barColor = colors[index % colors.length];
+                                            const weight = variant.weight || 0;
+
+                                            if (weight === 0) return null;
+
+                                            return (
+                                                <Tooltip
+                                                    key={index}
+                                                    title={`${variant.name}: ${weight}%`}
+                                                    arrow
+                                                >
+                                                    <Box
+                                                        sx={{
+                                                            width: `${weight}%`,
+                                                            bgcolor: barColor,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            color: 'white',
+                                                            fontSize: '0.75rem',
+                                                            fontWeight: 500,
+                                                            cursor: 'pointer',
+                                                            transition: 'opacity 0.2s',
+                                                            '&:hover': { opacity: 0.8 },
+                                                            borderRight: index < (flag.variants?.length || 0) - 1 ? '1px solid rgba(255,255,255,0.3)' : 'none',
+                                                        }}
+                                                    >
+                                                        {weight >= 10 ? `${weight}%` : ''}
+                                                    </Box>
+                                                </Tooltip>
+                                            );
+                                        })}
+                                    </Box>
+                                </Paper>
+                            )}
                             {/* Save Button */}
                             {canManage && (flag.variants?.length || 0) > 0 && !isCreating && (
                                 <Box sx={{ mt: 2 }}>
