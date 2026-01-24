@@ -79,8 +79,11 @@ const LocalizedDateTimePicker: React.FC<LocalizedDateTimePickerProps> = ({
         onChange(isoString);
     };
 
+    // Get the locale for LocalizationProvider
+    const dateLocale = getDateLocale(i18n.language);
+
     return (
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={dateLocale}>
             <DateTimePicker
                 label={label}
                 value={parseUTCForPicker(value)}
