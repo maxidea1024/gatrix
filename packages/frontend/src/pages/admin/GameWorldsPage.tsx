@@ -752,7 +752,6 @@ const GameWorldsPage: React.FC = () => {
 
       setWorlds(result.worlds);
 
-
     } catch (error: any) {
       console.error('Failed to load game worlds:', error);
 
@@ -1160,10 +1159,11 @@ const GameWorldsPage: React.FC = () => {
         }
 
         // 점검 활성화: 점검 전용 API 사용
+        // NOTE: 날짜 필드는 값이 있으면 그대로, 없으면 null로 전송해야 DB에 저장됨
         const updateData: any = {
           isMaintenance: true,
-          maintenanceStartDate: maintenanceStartDate || undefined,
-          maintenanceEndDate: maintenanceEndDate || undefined,
+          maintenanceStartDate: maintenanceStartDate || null,
+          maintenanceEndDate: maintenanceEndDate || null,
           forceDisconnect: forceDisconnect,
           gracePeriodMinutes: forceDisconnect ? gracePeriodMinutes : undefined,
         };

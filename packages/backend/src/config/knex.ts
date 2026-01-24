@@ -40,8 +40,13 @@ const convertBitToBoolean = (obj: any): any => {
         // Preserve Buffer objects as-is
         converted[key] = value;
       } else if (value instanceof Date) {
-        // Convert Date to UTC ISO string
-        converted[key] = value.toISOString();
+        // Convert Date to UTC ISO string with error handling
+        if (isNaN(value.getTime())) {
+          console.warn(`[knex] Invalid Date for key ${key}:`, value);
+          converted[key] = null;
+        } else {
+          converted[key] = value.toISOString();
+        }
       } else if (typeof value === 'object') {
         converted[key] = convertBitToBoolean(value);
       } else {

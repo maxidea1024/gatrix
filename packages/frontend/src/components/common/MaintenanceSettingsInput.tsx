@@ -168,7 +168,11 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
             <DateTimePicker
               label={t('maintenance.startDate')}
               value={parseUTCForPicker(startDate)}
-              onChange={(date) => onStartDateChange(date ? date.toISOString() : '')}
+              onChange={(date) => {
+                // DateTimePicker returns Dayjs in user's timezone, convert to UTC ISO string
+                const isoString = date ? date.utc().toISOString() : '';
+                onStartDateChange(isoString);
+              }}
               timeSteps={{ minutes: 1 }}
               slotProps={{
                 textField: {
@@ -185,7 +189,11 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
             <DateTimePicker
               label={t('maintenance.endDate')}
               value={parseUTCForPicker(endDate)}
-              onChange={(date) => onEndDateChange(date ? date.toISOString() : '')}
+              onChange={(date) => {
+                // DateTimePicker returns Dayjs in user's timezone, convert to UTC ISO string
+                const isoString = date ? date.utc().toISOString() : '';
+                onEndDateChange(isoString);
+              }}
               timeSteps={{ minutes: 1 }}
               slotProps={{
                 textField: {

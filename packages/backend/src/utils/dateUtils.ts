@@ -137,6 +137,11 @@ export function convertFromMySQLDateTime(mysqlDateTime: string | Date | null | u
       return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000Z`;
     }
 
+    // If already an ISO 8601 string (from knex postProcessResponse), return as-is
+    if (typeof mysqlDateTime === 'string' && mysqlDateTime.includes('T') && mysqlDateTime.endsWith('Z')) {
+      return mysqlDateTime;
+    }
+
     // MySQL DATETIME은 UTC로 저장되어 있으므로 'Z'를 추가하여 UTC임을 명시
     const isoString = mysqlDateTime.replace(' ', 'T') + '.000Z';
     const date = new Date(isoString);

@@ -84,8 +84,8 @@ const updateGameWorldSchema = Joi.object({
 // Update maintenance status schema
 const updateMaintenanceSchema = Joi.object({
   isMaintenance: Joi.boolean().required(),
-  maintenanceStartDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
-  maintenanceEndDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
+  maintenanceStartDate: Joi.string().isoDate().optional().allow('', null).empty('').default(null),
+  maintenanceEndDate: Joi.string().isoDate().optional().allow('', null).empty('').default(null),
   maintenanceMessageTemplateId: Joi.number().integer().optional().allow(null),
   maintenanceMessage: Joi.when('maintenanceMessageTemplateId', {
     is: Joi.exist().not(null),
