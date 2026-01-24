@@ -14,14 +14,13 @@ import {
   Chip,
   Tooltip,
 } from '@mui/material';
-import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useTranslation } from 'react-i18next';
 import BuildIcon from '@mui/icons-material/Build';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import MultiLanguageMessageInput, { MessageLocale } from './MultiLanguageMessageInput';
+import LocalizedDateTimePicker from './LocalizedDateTimePicker';
 import { MessageTemplate } from '@/services/messageTemplateService';
-import { getDateLocale, parseUTCForPicker, formatDateTimeDetailed } from '@/utils/dateFormat';
+import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { computeMaintenanceStatus, getMaintenanceStatusDisplay } from '@/utils/maintenanceStatusUtils';
 
 export interface MaintenanceSettingsInputProps {
@@ -161,209 +160,179 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
         {t('maintenance.description')}
       </Typography>
 
-      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
-        <Stack spacing={2}>
-          {/* 점검 시작일과 종료일 */}
-          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-            <DateTimePicker
-              label={t('maintenance.startDate')}
-              value={parseUTCForPicker(startDate)}
-              onChange={(date) => {
-                // DateTimePicker returns Dayjs in user's timezone, convert to UTC ISO string
-                const isoString = date ? date.utc().toISOString() : '';
-                onStartDateChange(isoString);
-              }}
-              timeSteps={{ minutes: 1 }}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  helperText: t('maintenance.startDateHelp'),
-                  slotProps: { input: { readOnly: true } },
-                },
-                actionBar: {
-                  actions: ['clear', 'cancel', 'accept'],
-                },
-              }}
-            />
+      <Stack spacing={2}>
+        {/* 점검 시작일과 종료일 */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+          <LocalizedDateTimePicker
+            label={t('maintenance.startDate')}
+            value={startDate}
+            onChange={onStartDateChange}
+            helperText={t('maintenance.startDateHelp')}
+          />
 
-            <DateTimePicker
-              label={t('maintenance.endDate')}
-              value={parseUTCForPicker(endDate)}
-              onChange={(date) => {
-                // DateTimePicker returns Dayjs in user's timezone, convert to UTC ISO string
-                const isoString = date ? date.utc().toISOString() : '';
-                onEndDateChange(isoString);
-              }}
-              timeSteps={{ minutes: 1 }}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  helperText: t('maintenance.endDateHelp'),
-                  slotProps: { input: { readOnly: true } },
-                },
-                actionBar: {
-                  actions: ['clear', 'cancel', 'accept'],
-                },
-              }}
-            />
-          </Box>
+          <LocalizedDateTimePicker
+            label={t('maintenance.endDate')}
+            value={endDate}
+            onChange={onEndDateChange}
+            helperText={t('maintenance.endDateHelp')}
+          />
+        </Box>
 
-          {/* 구분선 */}
-          <Box sx={{ width: '100%', my: 2 }}>
-            <Box sx={{
-              height: '1px',
-              backgroundColor: 'divider',
-              width: '100%'
-            }} />
-          </Box>
+        {/* 구분선 */}
+        <Box sx={{ width: '100%', my: 2 }}>
+          <Box sx={{
+            height: '1px',
+            backgroundColor: 'divider',
+            width: '100%'
+          }} />
+        </Box>
 
-          {/* 메시지 소스 선택 */}
-          <TextField
-            select
-            label={t('maintenance.messageSource')}
-            value={inputMode}
-            onChange={(e) => onInputModeChange(e.target.value as 'direct' | 'template')}
-            fullWidth
-          >
-            <MenuItem value="direct">{t('maintenance.directInput')}</MenuItem>
-            <MenuItem value="template">{t('maintenance.useTemplate')}</MenuItem>
-          </TextField>
-          <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
-            {t('maintenance.messageSourceHelp')}
-          </Typography>
+        {/* 메시지 소스 선택 */}
+        <TextField
+          select
+          label={t('maintenance.messageSource')}
+          value={inputMode}
+          onChange={(e) => onInputModeChange(e.target.value as 'direct' | 'template')}
+          fullWidth
+        >
+          <MenuItem value="direct">{t('maintenance.directInput')}</MenuItem>
+          <MenuItem value="template">{t('maintenance.useTemplate')}</MenuItem>
+        </TextField>
+        <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
+          {t('maintenance.messageSourceHelp')}
+        </Typography>
 
-          {/* 직접 입력 모드 */}
-          {inputMode === 'direct' && (
-            <MultiLanguageMessageInput
-              defaultMessage={maintenanceMessage}
-              onDefaultMessageChange={onMaintenanceMessageChange}
-              defaultMessageLabel={t('maintenance.defaultMessage')}
-              defaultMessageHelperText={t('maintenance.defaultMessageHelp')}
-              defaultMessageRequired={messageRequired}
-              defaultMessageError={messageError}
-              supportsMultiLanguage={supportsMultiLanguage}
-              onSupportsMultiLanguageChange={onSupportsMultiLanguageChange}
-              supportsMultiLanguageLabel={t('maintenance.supportsMultiLanguage')}
-              supportsMultiLanguageHelperText={t('maintenance.supportsMultiLanguageHelp')}
-              locales={maintenanceLocales}
-              onLocalesChange={onMaintenanceLocalesChange}
-              languageSpecificMessagesLabel={t('maintenance.languageSpecificMessages')}
-              enableTranslation={true}
-              translateButtonLabel={t('common.autoTranslate')}
-              translateTooltip={t('maintenance.translateTooltip')}
-            />
-          )}
+        {/* 직접 입력 모드 */}
+        {inputMode === 'direct' && (
+          <MultiLanguageMessageInput
+            defaultMessage={maintenanceMessage}
+            onDefaultMessageChange={onMaintenanceMessageChange}
+            defaultMessageLabel={t('maintenance.defaultMessage')}
+            defaultMessageHelperText={t('maintenance.defaultMessageHelp')}
+            defaultMessageRequired={messageRequired}
+            defaultMessageError={messageError}
+            supportsMultiLanguage={supportsMultiLanguage}
+            onSupportsMultiLanguageChange={onSupportsMultiLanguageChange}
+            supportsMultiLanguageLabel={t('maintenance.supportsMultiLanguage')}
+            supportsMultiLanguageHelperText={t('maintenance.supportsMultiLanguageHelp')}
+            locales={maintenanceLocales}
+            onLocalesChange={onMaintenanceLocalesChange}
+            languageSpecificMessagesLabel={t('maintenance.languageSpecificMessages')}
+            enableTranslation={true}
+            translateButtonLabel={t('common.autoTranslate')}
+            translateTooltip={t('maintenance.translateTooltip')}
+          />
+        )}
 
-          {/* 템플릿 모드 */}
-          {inputMode === 'template' && (
-            <Box>
-              <FormControl fullWidth>
-                <InputLabel>{t('maintenance.selectTemplate')}</InputLabel>
-                <Select
-                  value={selectedTemplateId}
-                  onChange={(e: SelectChangeEvent<number | ''>) => onSelectedTemplateIdChange(e.target.value as number | '')}
-                  label={t('maintenance.selectTemplate')}
-                >
-                  <MenuItem value="">
-                    <em>{t('maintenance.noTemplateSelected')}</em>
+        {/* 템플릿 모드 */}
+        {inputMode === 'template' && (
+          <Box>
+            <FormControl fullWidth>
+              <InputLabel>{t('maintenance.selectTemplate')}</InputLabel>
+              <Select
+                value={selectedTemplateId}
+                onChange={(e: SelectChangeEvent<number | ''>) => onSelectedTemplateIdChange(e.target.value as number | '')}
+                label={t('maintenance.selectTemplate')}
+              >
+                <MenuItem value="">
+                  <em>{t('maintenance.noTemplateSelected')}</em>
+                </MenuItem>
+                {templates.map((tpl) => (
+                  <MenuItem key={tpl.id} value={tpl.id}>
+                    {tpl.name}
                   </MenuItem>
-                  {templates.map((tpl) => (
-                    <MenuItem key={tpl.id} value={tpl.id}>
-                      {tpl.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
-                {t('maintenance.selectTemplateHelp')}
-              </Typography>
+                ))}
+              </Select>
+            </FormControl>
+            <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
+              {t('maintenance.selectTemplateHelp')}
+            </Typography>
 
-              {/* 선택된 템플릿 미리보기 */}
-              {selectedTemplateId && (() => {
-                const selectedTemplate = templates.find(t => t.id === selectedTemplateId);
-                if (!selectedTemplate) return null;
+            {/* 선택된 템플릿 미리보기 */}
+            {selectedTemplateId && (() => {
+              const selectedTemplate = templates.find(t => t.id === selectedTemplateId);
+              if (!selectedTemplate) return null;
 
-                return (
-                  <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      {t('maintenance.templatePreview')}
-                    </Typography>
-                    <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', mb: 1 }}>
-                      <strong>{t('clientVersions.maintenance.defaultMessage')}:</strong> {selectedTemplate.defaultMessage || '-'}
-                    </Typography>
-                    {selectedTemplate.locales && selectedTemplate.locales.length > 0 && (
-                      <Box sx={{ mt: 1 }}>
-                        <Typography variant="caption" color="text.secondary">
-                          {t('clientVersions.maintenance.languageSpecificMessages')}:
+              return (
+                <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    {t('maintenance.templatePreview')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', mb: 1 }}>
+                    <strong>{t('clientVersions.maintenance.defaultMessage')}:</strong> {selectedTemplate.defaultMessage || '-'}
+                  </Typography>
+                  {selectedTemplate.locales && selectedTemplate.locales.length > 0 && (
+                    <Box sx={{ mt: 1 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('clientVersions.maintenance.languageSpecificMessages')}:
+                      </Typography>
+                      {selectedTemplate.locales.map((locale) => (
+                        <Typography key={locale.lang} variant="body2" sx={{ ml: 2, whiteSpace: 'pre-wrap' }}>
+                          <strong>{locale.lang.toUpperCase()}:</strong> {locale.message || '-'}
                         </Typography>
-                        {selectedTemplate.locales.map((locale) => (
-                          <Typography key={locale.lang} variant="body2" sx={{ ml: 2, whiteSpace: 'pre-wrap' }}>
-                            <strong>{locale.lang.toUpperCase()}:</strong> {locale.message || '-'}
-                          </Typography>
-                        ))}
-                      </Box>
-                    )}
-                  </Box>
-                );
-              })()}
-            </Box>
-          )}
+                      ))}
+                    </Box>
+                  )}
+                </Box>
+              );
+            })()}
+          </Box>
+        )}
 
-          {/* 강제 종료 옵션 (showForceDisconnect가 true일 때만 표시) */}
-          {showForceDisconnect && (
-            <>
-              {/* 구분선 */}
-              <Box sx={{ width: '100%', my: 1 }}>
-                <Box sx={{
-                  height: '1px',
-                  backgroundColor: 'divider',
-                  width: '100%'
-                }} />
+        {/* 강제 종료 옵션 (showForceDisconnect가 true일 때만 표시) */}
+        {showForceDisconnect && (
+          <>
+            {/* 구분선 */}
+            <Box sx={{ width: '100%', my: 1 }}>
+              <Box sx={{
+                height: '1px',
+                backgroundColor: 'divider',
+                width: '100%'
+              }} />
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3, flexWrap: 'wrap' }}>
+              <Box sx={{ flex: '0 0 auto' }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={forceDisconnect}
+                      onChange={(e) => onForceDisconnectChange?.(e.target.checked)}
+                      color="warning"
+                    />
+                  }
+                  label={t('maintenance.kickExistingPlayers')}
+                />
+                <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary', maxWidth: 300 }}>
+                  {t('maintenance.kickExistingPlayersHelp')}
+                </Typography>
               </Box>
 
-              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3, flexWrap: 'wrap' }}>
-                <Box sx={{ flex: '0 0 auto' }}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={forceDisconnect}
-                        onChange={(e) => onForceDisconnectChange?.(e.target.checked)}
-                        color="warning"
-                      />
-                    }
-                    label={t('maintenance.kickExistingPlayers')}
-                  />
-                  <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary', maxWidth: 300 }}>
-                    {t('maintenance.kickExistingPlayersHelp')}
+              {forceDisconnect === true && (
+                <Box sx={{ flex: '0 0 auto', minWidth: 200 }}>
+                  <TextField
+                    select
+                    label={t('maintenance.kickDelayMinutes')}
+                    value={gracePeriodMinutes}
+                    onChange={(e) => onGracePeriodMinutesChange?.(Number(e.target.value))}
+                    size="small"
+                    sx={{ width: 180 }}
+                  >
+                    <MenuItem value={0}>{t('maintenance.kickDelayImmediate')}</MenuItem>
+                    <MenuItem value={1}>{t('maintenance.kickDelay1Min')}</MenuItem>
+                    <MenuItem value={5}>{t('maintenance.kickDelay5Min')}</MenuItem>
+                    <MenuItem value={10}>{t('maintenance.kickDelay10Min')}</MenuItem>
+                    <MenuItem value={30}>{t('maintenance.kickDelay30Min')}</MenuItem>
+                  </TextField>
+                  <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
+                    {t('maintenance.kickDelayHelp')}
                   </Typography>
                 </Box>
-
-                {forceDisconnect === true && (
-                  <Box sx={{ flex: '0 0 auto', minWidth: 200 }}>
-                    <TextField
-                      select
-                      label={t('maintenance.kickDelayMinutes')}
-                      value={gracePeriodMinutes}
-                      onChange={(e) => onGracePeriodMinutesChange?.(Number(e.target.value))}
-                      size="small"
-                      sx={{ width: 180 }}
-                    >
-                      <MenuItem value={0}>{t('maintenance.kickDelayImmediate')}</MenuItem>
-                      <MenuItem value={1}>{t('maintenance.kickDelay1Min')}</MenuItem>
-                      <MenuItem value={5}>{t('maintenance.kickDelay5Min')}</MenuItem>
-                      <MenuItem value={10}>{t('maintenance.kickDelay10Min')}</MenuItem>
-                      <MenuItem value={30}>{t('maintenance.kickDelay30Min')}</MenuItem>
-                    </TextField>
-                    <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
-                      {t('maintenance.kickDelayHelp')}
-                    </Typography>
-                  </Box>
-                )}
-              </Box>
-            </>
-          )}
-        </Stack>
-      </LocalizationProvider>
+              )}
+            </Box>
+          </>
+        )}
+      </Stack>
     </Box>
   );
 };

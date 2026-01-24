@@ -56,8 +56,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import dayjs, { Dayjs } from 'dayjs';
+import LocalizedDateTimePicker from '@/components/common/LocalizedDateTimePicker';
 
 // Constraint types matching backend FeatureFlag.ts
 export interface Constraint {
@@ -603,32 +602,14 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
 
         // Date input
         if (fieldType === 'datetime') {
-            // Convert stored ISO string to dayjs for DateTimePicker
-            // Only use the value if it's a valid date
-            const parsedDate = constraint.value ? dayjs(constraint.value) : null;
-            const dateValue: Dayjs | null = parsedDate && parsedDate.isValid() ? parsedDate : null;
             return (
-                <DateTimePicker
-                    value={dateValue}
-                    onChange={(newValue: Dayjs | null) => {
-                        // Store as ISO string for backend compatibility
-                        handleConstraintChange(index, 'value', newValue ? newValue.toISOString() : '');
+                <LocalizedDateTimePicker
+                    value={constraint.value || null}
+                    onChange={(isoString: string) => {
+                        // LocalizedDateTimePicker already returns UTC ISO string
+                        handleConstraintChange(index, 'value', isoString);
                     }}
                     disabled={disabled}
-                    ampm={true}
-                    format="YYYY-MM-DD A hh:mm"
-                    views={['year', 'month', 'day', 'hours', 'minutes']}
-                    timeSteps={{ minutes: 1 }}
-                    slotProps={{
-                        textField: {
-                            fullWidth: true,
-                            size: 'small',
-                            slotProps: { input: { readOnly: true } },
-                        },
-                        actionBar: {
-                            actions: ['clear', 'cancel', 'accept']
-                        }
-                    }}
                 />
             );
         }
