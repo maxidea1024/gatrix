@@ -209,6 +209,10 @@ export function createMetricsServer(config: MetricsServerConfig = {}): MetricsSe
           resolve();
           return;
         }
+        // Force close all existing connections to prevent hanging
+        if (typeof server.closeAllConnections === 'function') {
+          server.closeAllConnections();
+        }
         server.close((err: Error | undefined) => {
           if (err) {
             reject(err);
