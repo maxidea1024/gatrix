@@ -589,4 +589,6 @@ export interface CurrentMaintenanceStatus {
   worldId?: string;
   /** Maintenance detail (only present when isMaintenanceActive is true) */
   detail?: MaintenanceDetailSummary;
+  /** Whether the client is whitelisted (IP or account) - only present when whitelist check was performed */
+  isWhitelisted?: boolean;
 }

@@ -931,6 +931,69 @@ export class GatrixServerSDK {
     };
   }
 
+  /**
+   * Get maintenance status for a client, considering whitelist exemptions.
+   * This method checks both IP and account whitelists to determine if the client
+   * should be exempt from maintenance mode.
+   *
+   * Usage:
+   * 1. Before auth (IP check only): getMaintenanceStatusForClient({ clientIp })
+   * 2. After auth (IP + account check): getMaintenanceStatusForClient({ clientIp, accountId })
+   *
+   * When whitelisted:
+   * - isMaintenanceActive = false (client can connect)
+   * - isWhitelisted = true (indicates exemption reason)
+   *
+   * @param options.clientIp Client IP address (for IP whitelist check)
+   * @param options.accountId Account ID (for account whitelist check, typically after auth)
+   * @param options.environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @returns CurrentMaintenanceStatus with isWhitelisted field
+   */
+  getMaintenanceStatusForClient(options: {
+    clientIp?: string;
+    accountId?: string;
+    environment?: string;
+  }): CurrentMaintenanceStatus {
+    const { clientIp, accountId, environment } = options;
+    const env = this.resolveEnvironment(environment, 'getMaintenanceStatusForClient');
+
+    // First get the raw maintenance status
+    const status = this.getCurrentMaintenanceStatus(env);
+
+    // If not in maintenance, return as-is
+    if (!status.isMaintenanceActive) {
+      return status;
+    }
+
+    // Check IP whitelist
+    if (clientIp) {
+      const isIpWhitelisted = this.whitelist.isIpWhitelisted(clientIp, env);
+      if (isIpWhitelisted) {
+        return {
+          isMaintenanceActive: false,
+          isWhitelisted: true,
+        };
+      }
+    }
+
+    // Check account whitelist
+    if (accountId) {
+      const isAccountWhitelisted = this.whitelist.isAccountWhitelisted(accountId, env);
+      if (isAccountWhitelisted) {
+        return {
+          isMaintenanceActive: false,
+          isWhitelisted: true,
+        };
+      }
+    }
+
+    // Not whitelisted, return original maintenance status
+    return {
+      ...status,
+      isWhitelisted: false,
+    };
+  }
+
   // ============================================================================
   // Integrated Maintenance Methods
   // ============================================================================
