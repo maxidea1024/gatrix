@@ -464,10 +464,18 @@ const FeatureFlagDetailPage: React.FC = () => {
         } else {
             // In edit mode, call API
             try {
+                // Transform frontend format to backend format
+                const strategyData = {
+                    strategyName: editingStrategy.name,
+                    parameters: editingStrategy.parameters,
+                    constraints: editingStrategy.constraints,
+                    sortOrder: editingStrategy.sortOrder,
+                    isEnabled: !editingStrategy.disabled,
+                };
                 if (editingStrategy.id) {
-                    await api.put(`/admin/features/${flag.flagName}/strategies/${editingStrategy.id}`, editingStrategy);
+                    await api.put(`/admin/features/${flag.flagName}/strategies/${editingStrategy.id}`, strategyData);
                 } else {
-                    await api.post(`/admin/features/${flag.flagName}/strategies`, editingStrategy);
+                    await api.post(`/admin/features/${flag.flagName}/strategies`, strategyData);
                 }
                 enqueueSnackbar(t('featureFlags.strategySaved'), { variant: 'success' });
                 setStrategyDialogOpen(false);
