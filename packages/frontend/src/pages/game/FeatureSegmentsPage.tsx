@@ -23,6 +23,8 @@ import {
     FormHelperText,
     Autocomplete,
     Switch,
+    FormControlLabel,
+    Checkbox,
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -344,11 +346,11 @@ const FeatureSegmentsPage: React.FC = () => {
                                 <Table>
                                     <TableHead>
                                         <TableRow>
+                                            <TableCell>{t('featureFlags.visibility')}</TableCell>
                                             <TableCell>{t('featureFlags.segmentName')}</TableCell>
                                             <TableCell>{t('featureFlags.displayName')}</TableCell>
                                             <TableCell>{t('featureFlags.constraints')}</TableCell>
                                             <TableCell>{t('featureFlags.tags')}</TableCell>
-                                            <TableCell>{t('featureFlags.enabled')}</TableCell>
                                             <TableCell>{t('featureFlags.createdAt')}</TableCell>
                                             {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                                         </TableRow>
@@ -356,6 +358,21 @@ const FeatureSegmentsPage: React.FC = () => {
                                     <TableBody>
                                         {segments.map((segment) => (
                                             <TableRow key={segment.id} hover>
+                                                <TableCell>
+                                                    <Switch
+                                                        size="small"
+                                                        checked={segment.isActive !== false}
+                                                        onChange={async () => {
+                                                            try {
+                                                                await api.put(`/admin/features/segments/${segment.id}`, { isActive: !segment.isActive });
+                                                                loadSegments();
+                                                            } catch (error: any) {
+                                                                enqueueSnackbar(parseApiErrorMessage(error, t('common.saveFailed')), { variant: 'error' });
+                                                            }
+                                                        }}
+                                                        disabled={!canManage}
+                                                    />
+                                                </TableCell>
                                                 <TableCell>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                         <Typography
@@ -440,21 +457,6 @@ const FeatureSegmentsPage: React.FC = () => {
                                                     )}
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Switch
-                                                        size="small"
-                                                        checked={segment.isActive !== false}
-                                                        onChange={async () => {
-                                                            try {
-                                                                await api.put(`/admin/features/segments/${segment.id}`, { isActive: !segment.isActive });
-                                                                loadSegments();
-                                                            } catch (error: any) {
-                                                                enqueueSnackbar(parseApiErrorMessage(error, t('common.saveFailed')), { variant: 'error' });
-                                                            }
-                                                        }}
-                                                        disabled={!canManage}
-                                                    />
-                                                </TableCell>
-                                                <TableCell>
                                                     <Tooltip title={formatDateTimeDetailed(segment.createdAt)}>
                                                         <span>{formatRelativeTime(segment.createdAt)}</span>
                                                     </Tooltip>
@@ -495,8 +497,22 @@ const FeatureSegmentsPage: React.FC = () => {
             >
                 <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
                     <Stack spacing={3}>
+                        <Box>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={editingSegment?.isActive !== false}
+                                        onChange={(e) => setEditingSegment(prev => ({ ...prev, isActive: e.target.checked }))}
+                                    />
+                                }
+                                label={t('featureFlags.visibility')}
+                            />
+                            <FormHelperText sx={{ ml: 4, mt: -0.5 }}>{t('featureFlags.visibilityHelp')}</FormHelperText>
+                        </Box>
+
                         <TextField
                             fullWidth
+                            required
                             label={t('featureFlags.segmentName')}
                             value={editingSegment?.segmentName || ''}
                             onChange={(e) => setEditingSegment(prev => ({ ...prev, segmentName: e.target.value.replace(/[^a-zA-Z0-9_-]/g, '') }))}

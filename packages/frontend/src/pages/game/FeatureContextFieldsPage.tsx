@@ -26,6 +26,8 @@ import {
     Stack,
     FormHelperText,
     Switch,
+    FormControlLabel,
+    Checkbox,
 } from '@mui/material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {
@@ -277,13 +279,13 @@ const FeatureContextFieldsPage: React.FC = () => {
                                 <Table>
                                     <TableHead>
                                         <TableRow>
+                                            <TableCell>{t('featureFlags.visibility')}</TableCell>
                                             <TableCell>{t('featureFlags.fieldName')}</TableCell>
                                             <TableCell>{t('featureFlags.displayName')}</TableCell>
                                             <TableCell>{t('featureFlags.description')}</TableCell>
                                             <TableCell>{t('featureFlags.fieldType')}</TableCell>
                                             <TableCell>{t('featureFlags.legalValuesColumn')}</TableCell>
                                             <TableCell>{t('featureFlags.tags')}</TableCell>
-                                            <TableCell>{t('featureFlags.enabled')}</TableCell>
                                             <TableCell>{t('featureFlags.createdAt')}</TableCell>
                                             {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                                         </TableRow>
@@ -291,6 +293,21 @@ const FeatureContextFieldsPage: React.FC = () => {
                                     <TableBody>
                                         {fields.map((field) => (
                                             <TableRow key={field.id} hover>
+                                                <TableCell>
+                                                    <Switch
+                                                        size="small"
+                                                        checked={field.isEnabled !== false}
+                                                        onChange={async () => {
+                                                            try {
+                                                                await api.put(`/admin/features/context-fields/${field.id}`, { isEnabled: !field.isEnabled });
+                                                                loadFields();
+                                                            } catch (error: any) {
+                                                                enqueueSnackbar(parseApiErrorMessage(error, t('common.saveFailed')), { variant: 'error' });
+                                                            }
+                                                        }}
+                                                        disabled={!canManage}
+                                                    />
+                                                </TableCell>
                                                 <TableCell>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                         <Typography
@@ -391,21 +408,6 @@ const FeatureContextFieldsPage: React.FC = () => {
                                                     )}
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Switch
-                                                        size="small"
-                                                        checked={field.isEnabled !== false}
-                                                        onChange={async () => {
-                                                            try {
-                                                                await api.put(`/admin/features/context-fields/${field.id}`, { isEnabled: !field.isEnabled });
-                                                                loadFields();
-                                                            } catch (error: any) {
-                                                                enqueueSnackbar(parseApiErrorMessage(error, t('common.saveFailed')), { variant: 'error' });
-                                                            }
-                                                        }}
-                                                        disabled={!canManage}
-                                                    />
-                                                </TableCell>
-                                                <TableCell>
                                                     <Tooltip title={formatDateTimeDetailed(field.createdAt)}>
                                                         <span>{formatRelativeTime(field.createdAt)}</span>
                                                     </Tooltip>
@@ -446,8 +448,22 @@ const FeatureContextFieldsPage: React.FC = () => {
             >
                 <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
                     <Stack spacing={3}>
+                        <Box>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={editingField?.isEnabled !== false}
+                                        onChange={(e) => setEditingField(prev => ({ ...prev, isEnabled: e.target.checked }))}
+                                    />
+                                }
+                                label={t('featureFlags.visibility')}
+                            />
+                            <FormHelperText sx={{ ml: 4, mt: -0.5 }}>{t('featureFlags.visibilityHelp')}</FormHelperText>
+                        </Box>
+
                         <TextField
                             fullWidth
+                            required
                             label={t('featureFlags.fieldName')}
                             value={editingField?.fieldName || ''}
                             onChange={(e) => setEditingField(prev => ({ ...prev, fieldName: e.target.value.replace(/[^a-zA-Z0-9_]/g, '') }))}
