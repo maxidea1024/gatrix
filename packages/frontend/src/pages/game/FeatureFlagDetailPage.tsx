@@ -1461,164 +1461,181 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                     return '-';
                                                                 };
 
-                                                                return (
-                                                                    <Box key={segName} sx={{ maxWidth: isExpanded ? 500 : 'auto' }}>
-                                                                        <Chip
-                                                                            label={
-                                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                                    <GroupIcon sx={{ fontSize: 14 }} />
-                                                                                    <span>{seg?.displayName || segName}</span>
-                                                                                    <IconButton
-                                                                                        size="small"
-                                                                                        onClick={(e) => {
-                                                                                            e.stopPropagation();
-                                                                                            const key = `${index}-${segName}`;
-                                                                                            setExpandedSegments(prev => {
-                                                                                                const next = new Set(prev);
-                                                                                                if (next.has(key)) next.delete(key);
-                                                                                                else next.add(key);
-                                                                                                return next;
-                                                                                            });
-                                                                                        }}
-                                                                                        sx={{ p: 0, ml: 0.5, color: 'inherit' }}
-                                                                                    >
-                                                                                        {isExpanded ? <VisibilityOffIcon sx={{ fontSize: 14 }} /> : <VisibilityIcon sx={{ fontSize: 14 }} />}
-                                                                                    </IconButton>
-                                                                                </Box>
-                                                                            }
-                                                                            size="small"
-                                                                            color={isEmpty ? 'warning' : 'default'}
-                                                                            variant="outlined"
-                                                                            onDelete={canManage ? () => {
-                                                                                const strategies = [...(flag.strategies || [])];
-                                                                                strategies[index] = {
-                                                                                    ...strategies[index],
-                                                                                    segments: (strategy.segments || []).filter((s: string) => s !== segName)
-                                                                                };
-                                                                                setFlag({ ...flag, strategies });
-                                                                            } : undefined}
-                                                                            sx={{
-                                                                                borderWidth: isEmpty ? 2 : 1,
-                                                                                '& .MuiChip-label': { pr: 0.5 }
-                                                                            }}
-                                                                        />
+                                                                const segIndex = (strategy.segments || []).indexOf(segName);
 
-                                                                        {/* Expanded segment details */}
-                                                                        {isExpanded && seg && (
-                                                                            <Paper
+                                                                return (
+                                                                    <React.Fragment key={segName}>
+                                                                        {segIndex > 0 && (
+                                                                            <Chip
+                                                                                label="AND"
+                                                                                size="small"
                                                                                 sx={{
-                                                                                    mt: 1,
-                                                                                    p: 2,
-                                                                                    bgcolor: 'background.default',
-                                                                                    border: 1,
-                                                                                    borderColor: isEmpty ? 'warning.main' : 'divider',
-                                                                                    borderRadius: 1
+                                                                                    height: 24,
+                                                                                    fontSize: '0.7rem',
+                                                                                    bgcolor: 'info.main',
+                                                                                    color: 'info.contrastText',
+                                                                                    fontWeight: 600
                                                                                 }}
-                                                                                elevation={0}
-                                                                            >
-                                                                                {isEmpty ? (
-                                                                                    <Alert severity="warning" icon={<WarningIcon />}>
-                                                                                        <Typography variant="body2">
-                                                                                            {t('featureFlags.emptySegmentWarning', { name: seg.displayName || segName })}
-                                                                                        </Typography>
-                                                                                    </Alert>
-                                                                                ) : (
-                                                                                    <Box>
-                                                                                        <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
-                                                                                            📋 {t('featureFlags.segmentConditions')}
-                                                                                        </Typography>
-                                                                                        <Stack spacing={1}>
-                                                                                            {seg.constraints.map((c: any, ci: number) => (
-                                                                                                <React.Fragment key={ci}>
-                                                                                                    {ci > 0 && (
-                                                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-                                                                                                            <Divider sx={{ flexGrow: 1 }} />
-                                                                                                            <Chip
-                                                                                                                label="AND"
-                                                                                                                size="small"
-                                                                                                                sx={{
-                                                                                                                    height: 22,
-                                                                                                                    fontSize: '0.7rem',
-                                                                                                                    bgcolor: 'action.selected',
-                                                                                                                    fontWeight: 600
-                                                                                                                }}
-                                                                                                            />
-                                                                                                            <Divider sx={{ flexGrow: 1 }} />
-                                                                                                        </Box>
-                                                                                                    )}
-                                                                                                    {/* Unleash-style constraint row */}
-                                                                                                    <Box
-                                                                                                        sx={{
-                                                                                                            display: 'flex',
-                                                                                                            alignItems: 'center',
-                                                                                                            gap: 1,
-                                                                                                            p: 1,
-                                                                                                            border: 1,
-                                                                                                            borderColor: 'primary.main',
-                                                                                                            borderRadius: 1,
-                                                                                                            bgcolor: 'background.paper'
-                                                                                                        }}
-                                                                                                    >
-                                                                                                        {/* Field Name */}
+                                                                            />
+                                                                        )}
+                                                                        <Box sx={{ maxWidth: isExpanded ? 500 : 'auto' }}>
+                                                                            <Chip
+                                                                                label={
+                                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                                        <GroupIcon sx={{ fontSize: 14 }} />
+                                                                                        <span>{seg?.displayName || segName}</span>
+                                                                                        <IconButton
+                                                                                            size="small"
+                                                                                            onClick={(e) => {
+                                                                                                e.stopPropagation();
+                                                                                                const key = `${index}-${segName}`;
+                                                                                                setExpandedSegments(prev => {
+                                                                                                    const next = new Set(prev);
+                                                                                                    if (next.has(key)) next.delete(key);
+                                                                                                    else next.add(key);
+                                                                                                    return next;
+                                                                                                });
+                                                                                            }}
+                                                                                            sx={{ p: 0, ml: 0.5, color: 'inherit' }}
+                                                                                        >
+                                                                                            {isExpanded ? <VisibilityOffIcon sx={{ fontSize: 14 }} /> : <VisibilityIcon sx={{ fontSize: 14 }} />}
+                                                                                        </IconButton>
+                                                                                    </Box>
+                                                                                }
+                                                                                size="small"
+                                                                                color={isEmpty ? 'warning' : 'default'}
+                                                                                variant="outlined"
+                                                                                onDelete={canManage ? () => {
+                                                                                    const strategies = [...(flag.strategies || [])];
+                                                                                    strategies[index] = {
+                                                                                        ...strategies[index],
+                                                                                        segments: (strategy.segments || []).filter((s: string) => s !== segName)
+                                                                                    };
+                                                                                    setFlag({ ...flag, strategies });
+                                                                                } : undefined}
+                                                                                sx={{
+                                                                                    borderWidth: isEmpty ? 2 : 1,
+                                                                                    '& .MuiChip-label': { pr: 0.5 }
+                                                                                }}
+                                                                            />
+
+                                                                            {/* Expanded segment details */}
+                                                                            {isExpanded && seg && (
+                                                                                <Paper
+                                                                                    sx={{
+                                                                                        mt: 1,
+                                                                                        p: 2,
+                                                                                        bgcolor: 'background.default',
+                                                                                        border: 1,
+                                                                                        borderColor: isEmpty ? 'warning.main' : 'divider',
+                                                                                        borderRadius: 1
+                                                                                    }}
+                                                                                    elevation={0}
+                                                                                >
+                                                                                    {isEmpty ? (
+                                                                                        <Alert severity="warning" icon={<WarningIcon />}>
+                                                                                            <Typography variant="body2">
+                                                                                                {t('featureFlags.emptySegmentWarning', { name: seg.displayName || segName })}
+                                                                                            </Typography>
+                                                                                        </Alert>
+                                                                                    ) : (
+                                                                                        <Box>
+                                                                                            <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
+                                                                                                📋 {t('featureFlags.segmentConditions')}
+                                                                                            </Typography>
+                                                                                            <Stack spacing={1}>
+                                                                                                {seg.constraints.map((c: any, ci: number) => (
+                                                                                                    <React.Fragment key={ci}>
+                                                                                                        {ci > 0 && (
+                                                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
+                                                                                                                <Divider sx={{ flexGrow: 1 }} />
+                                                                                                                <Chip
+                                                                                                                    label="AND"
+                                                                                                                    size="small"
+                                                                                                                    sx={{
+                                                                                                                        height: 22,
+                                                                                                                        fontSize: '0.7rem',
+                                                                                                                        bgcolor: 'action.selected',
+                                                                                                                        fontWeight: 600
+                                                                                                                    }}
+                                                                                                                />
+                                                                                                                <Divider sx={{ flexGrow: 1 }} />
+                                                                                                            </Box>
+                                                                                                        )}
+                                                                                                        {/* Unleash-style constraint row */}
                                                                                                         <Box
                                                                                                             sx={{
-                                                                                                                px: 1.5,
-                                                                                                                py: 0.5,
-                                                                                                                bgcolor: 'primary.main',
-                                                                                                                color: 'primary.contrastText',
-                                                                                                                borderRadius: 0.5
+                                                                                                                display: 'flex',
+                                                                                                                alignItems: 'center',
+                                                                                                                gap: 1,
+                                                                                                                p: 1,
+                                                                                                                border: 1,
+                                                                                                                borderColor: 'primary.main',
+                                                                                                                borderRadius: 1,
+                                                                                                                bgcolor: 'background.paper'
                                                                                                             }}
                                                                                                         >
-                                                                                                            <Typography variant="body2" fontWeight={600}>
-                                                                                                                {c.contextName}
-                                                                                                            </Typography>
-                                                                                                        </Box>
+                                                                                                            {/* Field Name */}
+                                                                                                            <Box
+                                                                                                                sx={{
+                                                                                                                    px: 1.5,
+                                                                                                                    py: 0.5,
+                                                                                                                    bgcolor: 'primary.main',
+                                                                                                                    color: 'primary.contrastText',
+                                                                                                                    borderRadius: 0.5
+                                                                                                                }}
+                                                                                                            >
+                                                                                                                <Typography variant="body2" fontWeight={600}>
+                                                                                                                    {c.contextName}
+                                                                                                                </Typography>
+                                                                                                            </Box>
 
-                                                                                                        {/* Operator Chip */}
-                                                                                                        <Chip
-                                                                                                            label={getOperatorLabel(c.operator)}
-                                                                                                            size="small"
-                                                                                                            variant="outlined"
-                                                                                                            sx={{ fontWeight: 500, fontSize: '0.75rem' }}
-                                                                                                        />
-
-                                                                                                        {/* Case sensitivity indicator for string operators */}
-                                                                                                        {c.operator?.startsWith('str_') && (
+                                                                                                            {/* Operator Chip */}
                                                                                                             <Chip
-                                                                                                                label={c.caseInsensitive ? 'Aa' : 'AA'}
+                                                                                                                label={getOperatorLabel(c.operator)}
                                                                                                                 size="small"
                                                                                                                 variant="outlined"
-                                                                                                                sx={{
-                                                                                                                    height: 22,
-                                                                                                                    fontSize: '0.7rem',
-                                                                                                                    minWidth: 32
-                                                                                                                }}
+                                                                                                                sx={{ fontWeight: 500, fontSize: '0.75rem' }}
                                                                                                             />
-                                                                                                        )}
 
-                                                                                                        {/* Value */}
-                                                                                                        <Box
-                                                                                                            sx={{
-                                                                                                                px: 1.5,
-                                                                                                                py: 0.5,
-                                                                                                                bgcolor: 'primary.main',
-                                                                                                                color: 'primary.contrastText',
-                                                                                                                borderRadius: 0.5
-                                                                                                            }}
-                                                                                                        >
-                                                                                                            <Typography variant="body2" fontWeight={600}>
-                                                                                                                {getValueDisplay(c)}
-                                                                                                            </Typography>
+                                                                                                            {/* Case sensitivity indicator for string operators */}
+                                                                                                            {c.operator?.startsWith('str_') && (
+                                                                                                                <Chip
+                                                                                                                    label={c.caseInsensitive ? 'Aa' : 'AA'}
+                                                                                                                    size="small"
+                                                                                                                    variant="outlined"
+                                                                                                                    sx={{
+                                                                                                                        height: 22,
+                                                                                                                        fontSize: '0.7rem',
+                                                                                                                        minWidth: 32
+                                                                                                                    }}
+                                                                                                                />
+                                                                                                            )}
+
+                                                                                                            {/* Value */}
+                                                                                                            <Box
+                                                                                                                sx={{
+                                                                                                                    px: 1.5,
+                                                                                                                    py: 0.5,
+                                                                                                                    bgcolor: 'primary.main',
+                                                                                                                    color: 'primary.contrastText',
+                                                                                                                    borderRadius: 0.5
+                                                                                                                }}
+                                                                                                            >
+                                                                                                                <Typography variant="body2" fontWeight={600}>
+                                                                                                                    {getValueDisplay(c)}
+                                                                                                                </Typography>
+                                                                                                            </Box>
                                                                                                         </Box>
-                                                                                                    </Box>
-                                                                                                </React.Fragment>
-                                                                                            ))}
-                                                                                        </Stack>
-                                                                                    </Box>
-                                                                                )}
-                                                                            </Paper>
-                                                                        )}
-                                                                    </Box>
+                                                                                                    </React.Fragment>
+                                                                                                ))}
+                                                                                            </Stack>
+                                                                                        </Box>
+                                                                                    )}
+                                                                                </Paper>
+                                                                            )}
+                                                                        </Box>
+                                                                    </React.Fragment>
                                                                 );
                                                             })}
 
