@@ -431,9 +431,9 @@ const FeatureFlagDetailPage: React.FC = () => {
     const handleAddStrategy = () => {
         setEditingStrategy({
             id: '',
-            name: 'default',
-            title: 'Standard',
-            parameters: {},
+            name: 'flexibleRollout',
+            title: 'Flexible Rollout',
+            parameters: { rollout: 100, stickiness: 'default', groupId: '' },
             constraints: [],
             segments: [],
             sortOrder: (flag?.strategies?.length || 0) + 1,
@@ -496,6 +496,20 @@ const FeatureFlagDetailPage: React.FC = () => {
         // Always update local state - changes are saved when user clicks "Save Strategies"
         const strategies = (flag.strategies || []).filter((_, idx) => idx !== strategyIndex);
         setFlag({ ...flag, strategies });
+    };
+
+    // Move strategy up/down for reordering
+    const handleMoveStrategy = (fromIndex: number, toIndex: number) => {
+        if (!flag || !flag.strategies) return;
+        if (toIndex < 0 || toIndex >= flag.strategies.length) return;
+
+        const strategies = [...flag.strategies];
+        const [movedItem] = strategies.splice(fromIndex, 1);
+        strategies.splice(toIndex, 0, movedItem);
+
+        // Update sortOrder values
+        const updatedStrategies = strategies.map((s, idx) => ({ ...s, sortOrder: idx }));
+        setFlag({ ...flag, strategies: updatedStrategies });
     };
 
     const handleSaveStrategies = async () => {
@@ -942,294 +956,224 @@ const FeatureFlagDetailPage: React.FC = () => {
                         </Box>
 
                         {/* Inline Strategies Editor */}
-                        <Stack spacing={2}>
+                        <Stack spacing={0}>
                             {(flag.strategies || []).map((strategy, index) => (
-                                <Accordion key={strategy.id || index} defaultExpanded>
-                                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
-                                            <DragIcon sx={{ color: 'text.disabled' }} />
-                                            <Box sx={{ flex: 1 }}>
-                                                <Typography fontWeight={500}>{strategy.title || strategy.name}</Typography>
-                                                <Typography variant="caption" color="text.secondary">
-                                                    {strategy.constraints?.length || 0} {t('featureFlags.constraints')}
-                                                </Typography>
-                                            </Box>
-                                            <FormControlLabel
-                                                control={
-                                                    <Switch
-                                                        size="small"
-                                                        checked={!strategy.disabled}
-                                                        onChange={(e) => {
-                                                            e.stopPropagation();
-                                                            const strategies = [...(flag.strategies || [])];
-                                                            strategies[index] = { ...strategies[index], disabled: !e.target.checked };
-                                                            setFlag({ ...flag, strategies });
-                                                        }}
-                                                        onClick={(e) => e.stopPropagation()}
-                                                        disabled={!canManage}
-                                                    />
-                                                }
-                                                label=""
-                                                onClick={(e) => e.stopPropagation()}
-                                            />
+                                <React.Fragment key={strategy.id || index}>
+                                    {/* OR divider between strategies */}
+                                    {index > 0 && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 1 }}>
+                                            <Divider sx={{ flexGrow: 1 }} />
+                                            <Chip label="OR" size="small" variant="outlined" color="secondary" sx={{ fontWeight: 600 }} />
+                                            <Divider sx={{ flexGrow: 1 }} />
                                         </Box>
-                                    </AccordionSummary>
-                                    <AccordionDetails>
-                                        <Stack spacing={2}>
-                                            {/* Strategy Type Select */}
-                                            <FormControl fullWidth size="small">
-                                                <InputLabel>{t('featureFlags.strategyType')}</InputLabel>
-                                                <Select
-                                                    value={strategy.name || 'default'}
-                                                    label={t('featureFlags.strategyType')}
-                                                    onChange={(e) => {
-                                                        const strategyType = STRATEGY_TYPES.find(s => s.name === e.target.value);
-                                                        const strategies = [...(flag.strategies || [])];
-                                                        strategies[index] = {
-                                                            ...strategies[index],
-                                                            name: e.target.value,
-                                                            title: strategyType?.titleKey ? t(strategyType.titleKey) : e.target.value,
-                                                        };
-                                                        setFlag({ ...flag, strategies });
-                                                    }}
-                                                    disabled={!canManage}
-                                                >
-                                                    {STRATEGY_TYPES.map((s) => (
-                                                        <MenuItem key={s.name} value={s.name}>
-                                                            <Box>
-                                                                <Typography variant="body2">{t(s.titleKey)}</Typography>
-                                                                <Typography variant="caption" color="text.secondary">{t(s.descKey)}</Typography>
-                                                            </Box>
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
-
-                                            {/* Strategy Parameters */}
-                                            {strategy.name === 'gradualRolloutRandom' && (
-                                                <Box sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
-                                                    <Typography variant="subtitle2" gutterBottom>
-                                                        {t('featureFlags.rolloutPercentage')}
-                                                    </Typography>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                                        <Box sx={{ flex: 1, pr: 3 }}>
-                                                            <Slider
-                                                                value={strategy.parameters?.percentage || 0}
-                                                                onChange={(_, value) => {
-                                                                    const strategies = [...(flag.strategies || [])];
-                                                                    strategies[index] = {
-                                                                        ...strategies[index],
-                                                                        parameters: { ...strategies[index].parameters, percentage: value as number }
-                                                                    };
-                                                                    setFlag({ ...flag, strategies });
-                                                                }}
-                                                                disabled={!canManage}
-                                                                valueLabelDisplay="auto"
-                                                                marks={[
-                                                                    { value: 0, label: '0%' },
-                                                                    { value: 25, label: '25%' },
-                                                                    { value: 50, label: '50%' },
-                                                                    { value: 75, label: '75%' },
-                                                                    { value: 100, label: '100%' },
-                                                                ]}
-                                                            />
-                                                        </Box>
-                                                        <TextField
+                                    )}
+                                    <Accordion defaultExpanded>
+                                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
+                                                {/* Move up/down buttons - only show when more than 1 strategy */}
+                                                {canManage && (flag.strategies?.length || 0) > 1 && (
+                                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }} onClick={(e) => e.stopPropagation()}>
+                                                        <IconButton
                                                             size="small"
-                                                            type="number"
-                                                            value={strategy.parameters?.percentage || 0}
-                                                            onChange={(e) => {
-                                                                const value = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
-                                                                const strategies = [...(flag.strategies || [])];
-                                                                strategies[index] = {
-                                                                    ...strategies[index],
-                                                                    parameters: { ...strategies[index].parameters, percentage: value }
-                                                                };
-                                                                setFlag({ ...flag, strategies });
-                                                            }}
-                                                            disabled={!canManage}
-                                                            InputProps={{
-                                                                endAdornment: <Typography>%</Typography>,
-                                                                inputProps: { min: 0, max: 100 }
-                                                            }}
-                                                            sx={{ width: 100 }}
-                                                        />
+                                                            onClick={() => handleMoveStrategy(index, index - 1)}
+                                                            disabled={index === 0}
+                                                            sx={{ p: 0.25 }}
+                                                        >
+                                                            <ExpandMoreIcon sx={{ transform: 'rotate(180deg)', fontSize: 18 }} />
+                                                        </IconButton>
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => handleMoveStrategy(index, index + 1)}
+                                                            disabled={index === (flag.strategies?.length || 0) - 1}
+                                                            sx={{ p: 0.25 }}
+                                                        >
+                                                            <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                                                        </IconButton>
                                                     </Box>
+                                                )}
+                                                <Box sx={{ flex: 1 }}>
+                                                    <Typography fontWeight={500}>{strategy.title || strategy.name}</Typography>
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        {strategy.constraints?.length || 0} {t('featureFlags.constraints')}
+                                                    </Typography>
                                                 </Box>
-                                            )}
-
-                                            {strategy.name === 'userWithId' && (
-                                                <TextField
-                                                    fullWidth
-                                                    size="small"
-                                                    multiline
-                                                    rows={2}
-                                                    label={t('featureFlags.userIds')}
-                                                    value={strategy.parameters?.userIds || ''}
-                                                    onChange={(e) => {
-                                                        const strategies = [...(flag.strategies || [])];
-                                                        strategies[index] = {
-                                                            ...strategies[index],
-                                                            parameters: { ...strategies[index].parameters, userIds: e.target.value }
-                                                        };
-                                                        setFlag({ ...flag, strategies });
-                                                    }}
-                                                    disabled={!canManage}
-                                                    helperText={t('featureFlags.userIdsHelp')}
-                                                />
-                                            )}
-
-                                            {/* Gradual Rollout (Sticky) Parameters */}
-                                            {strategy.name === 'gradualRolloutUserId' && (
-                                                <Box sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
-                                                    <Typography variant="subtitle2" gutterBottom>
-                                                        {t('featureFlags.rolloutPercentage')}
-                                                    </Typography>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                                        <Box sx={{ flex: 1, pr: 3 }}>
-                                                            <Slider
-                                                                value={strategy.parameters?.percentage || 0}
-                                                                onChange={(_, value) => {
-                                                                    const strategies = [...(flag.strategies || [])];
-                                                                    strategies[index] = {
-                                                                        ...strategies[index],
-                                                                        parameters: { ...strategies[index].parameters, percentage: value as number }
-                                                                    };
-                                                                    setFlag({ ...flag, strategies });
-                                                                }}
-                                                                disabled={!canManage}
-                                                                valueLabelDisplay="auto"
-                                                                marks={[
-                                                                    { value: 0, label: '0%' },
-                                                                    { value: 25, label: '25%' },
-                                                                    { value: 50, label: '50%' },
-                                                                    { value: 75, label: '75%' },
-                                                                    { value: 100, label: '100%' },
-                                                                ]}
-                                                            />
-                                                        </Box>
-                                                        <TextField
+                                                <FormControlLabel
+                                                    control={
+                                                        <Switch
                                                             size="small"
-                                                            type="number"
-                                                            value={strategy.parameters?.percentage || 0}
+                                                            checked={!strategy.disabled}
                                                             onChange={(e) => {
-                                                                const value = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
+                                                                e.stopPropagation();
                                                                 const strategies = [...(flag.strategies || [])];
-                                                                strategies[index] = {
-                                                                    ...strategies[index],
-                                                                    parameters: { ...strategies[index].parameters, percentage: value }
-                                                                };
+                                                                strategies[index] = { ...strategies[index], disabled: !e.target.checked };
                                                                 setFlag({ ...flag, strategies });
                                                             }}
+                                                            onClick={(e) => e.stopPropagation()}
                                                             disabled={!canManage}
-                                                            InputProps={{
-                                                                endAdornment: <Typography>%</Typography>,
-                                                                inputProps: { min: 0, max: 100 }
-                                                            }}
-                                                            sx={{ width: 100 }}
                                                         />
-                                                    </Box>
-                                                    <TextField
-                                                        fullWidth
-                                                        size="small"
-                                                        label={t('featureFlags.groupId')}
-                                                        value={strategy.parameters?.groupId || flag.flagName || ''}
+                                                    }
+                                                    label=""
+                                                    onClick={(e) => e.stopPropagation()}
+                                                />
+                                            </Box>
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                            <Stack spacing={2}>
+                                                {/* Strategy Type Select */}
+                                                <FormControl fullWidth size="small">
+                                                    <InputLabel>{t('featureFlags.strategyType')}</InputLabel>
+                                                    <Select
+                                                        value={strategy.name || 'default'}
+                                                        label={t('featureFlags.strategyType')}
                                                         onChange={(e) => {
+                                                            const strategyType = STRATEGY_TYPES.find(s => s.name === e.target.value);
                                                             const strategies = [...(flag.strategies || [])];
                                                             strategies[index] = {
                                                                 ...strategies[index],
-                                                                parameters: { ...strategies[index].parameters, groupId: e.target.value }
+                                                                name: e.target.value,
+                                                                title: strategyType?.titleKey ? t(strategyType.titleKey) : e.target.value,
                                                             };
                                                             setFlag({ ...flag, strategies });
                                                         }}
                                                         disabled={!canManage}
-                                                    />
-                                                </Box>
-                                            )}
+                                                    >
+                                                        {STRATEGY_TYPES.map((s) => (
+                                                            <MenuItem key={s.name} value={s.name}>
+                                                                <Box>
+                                                                    <Typography variant="body2">{t(s.titleKey)}</Typography>
+                                                                    <Typography variant="caption" color="text.secondary">{t(s.descKey)}</Typography>
+                                                                </Box>
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                </FormControl>
 
-                                            {/* Flexible Rollout Parameters - Unleash Style */}
-                                            {strategy.name === 'flexibleRollout' && (
-                                                <Box sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
-                                                    {/* Rollout Section */}
-                                                    <Typography variant="subtitle2" gutterBottom>
-                                                        {t('featureFlags.rolloutPercentage')}
-                                                    </Typography>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                                                        <Box sx={{ flex: 1, pr: 3 }}>
-                                                            <Slider
-                                                                value={strategy.parameters?.rollout || 0}
-                                                                onChange={(_, value) => {
+                                                {/* Strategy Parameters */}
+                                                {strategy.name === 'gradualRolloutRandom' && (
+                                                    <Box sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
+                                                        <Typography variant="subtitle2" gutterBottom>
+                                                            {t('featureFlags.rolloutPercentage')}
+                                                        </Typography>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                            <Box sx={{ flex: 1, pr: 3 }}>
+                                                                <Slider
+                                                                    value={strategy.parameters?.percentage || 0}
+                                                                    onChange={(_, value) => {
+                                                                        const strategies = [...(flag.strategies || [])];
+                                                                        strategies[index] = {
+                                                                            ...strategies[index],
+                                                                            parameters: { ...strategies[index].parameters, percentage: value as number }
+                                                                        };
+                                                                        setFlag({ ...flag, strategies });
+                                                                    }}
+                                                                    disabled={!canManage}
+                                                                    valueLabelDisplay="auto"
+                                                                    marks={[
+                                                                        { value: 0, label: '0%' },
+                                                                        { value: 25, label: '25%' },
+                                                                        { value: 50, label: '50%' },
+                                                                        { value: 75, label: '75%' },
+                                                                        { value: 100, label: '100%' },
+                                                                    ]}
+                                                                />
+                                                            </Box>
+                                                            <TextField
+                                                                size="small"
+                                                                type="number"
+                                                                value={strategy.parameters?.percentage || 0}
+                                                                onChange={(e) => {
+                                                                    const value = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
                                                                     const strategies = [...(flag.strategies || [])];
                                                                     strategies[index] = {
                                                                         ...strategies[index],
-                                                                        parameters: { ...strategies[index].parameters, rollout: value as number }
+                                                                        parameters: { ...strategies[index].parameters, percentage: value }
                                                                     };
                                                                     setFlag({ ...flag, strategies });
                                                                 }}
                                                                 disabled={!canManage}
-                                                                valueLabelDisplay="auto"
-                                                                marks={[
-                                                                    { value: 0, label: '0%' },
-                                                                    { value: 25, label: '25%' },
-                                                                    { value: 50, label: '50%' },
-                                                                    { value: 75, label: '75%' },
-                                                                    { value: 100, label: '100%' },
-                                                                ]}
+                                                                InputProps={{
+                                                                    endAdornment: <Typography>%</Typography>,
+                                                                    inputProps: { min: 0, max: 100 }
+                                                                }}
+                                                                sx={{ width: 100 }}
+                                                            />
+                                                        </Box>
+                                                    </Box>
+                                                )}
+
+                                                {strategy.name === 'userWithId' && (
+                                                    <TextField
+                                                        fullWidth
+                                                        size="small"
+                                                        multiline
+                                                        rows={2}
+                                                        label={t('featureFlags.userIds')}
+                                                        value={strategy.parameters?.userIds || ''}
+                                                        onChange={(e) => {
+                                                            const strategies = [...(flag.strategies || [])];
+                                                            strategies[index] = {
+                                                                ...strategies[index],
+                                                                parameters: { ...strategies[index].parameters, userIds: e.target.value }
+                                                            };
+                                                            setFlag({ ...flag, strategies });
+                                                        }}
+                                                        disabled={!canManage}
+                                                        helperText={t('featureFlags.userIdsHelp')}
+                                                    />
+                                                )}
+
+                                                {/* Gradual Rollout (Sticky) Parameters */}
+                                                {strategy.name === 'gradualRolloutUserId' && (
+                                                    <Box sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
+                                                        <Typography variant="subtitle2" gutterBottom>
+                                                            {t('featureFlags.rolloutPercentage')}
+                                                        </Typography>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                                                            <Box sx={{ flex: 1, pr: 3 }}>
+                                                                <Slider
+                                                                    value={strategy.parameters?.percentage || 0}
+                                                                    onChange={(_, value) => {
+                                                                        const strategies = [...(flag.strategies || [])];
+                                                                        strategies[index] = {
+                                                                            ...strategies[index],
+                                                                            parameters: { ...strategies[index].parameters, percentage: value as number }
+                                                                        };
+                                                                        setFlag({ ...flag, strategies });
+                                                                    }}
+                                                                    disabled={!canManage}
+                                                                    valueLabelDisplay="auto"
+                                                                    marks={[
+                                                                        { value: 0, label: '0%' },
+                                                                        { value: 25, label: '25%' },
+                                                                        { value: 50, label: '50%' },
+                                                                        { value: 75, label: '75%' },
+                                                                        { value: 100, label: '100%' },
+                                                                    ]}
+                                                                />
+                                                            </Box>
+                                                            <TextField
+                                                                size="small"
+                                                                type="number"
+                                                                value={strategy.parameters?.percentage || 0}
+                                                                onChange={(e) => {
+                                                                    const value = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
+                                                                    const strategies = [...(flag.strategies || [])];
+                                                                    strategies[index] = {
+                                                                        ...strategies[index],
+                                                                        parameters: { ...strategies[index].parameters, percentage: value }
+                                                                    };
+                                                                    setFlag({ ...flag, strategies });
+                                                                }}
+                                                                disabled={!canManage}
+                                                                InputProps={{
+                                                                    endAdornment: <Typography>%</Typography>,
+                                                                    inputProps: { min: 0, max: 100 }
+                                                                }}
+                                                                sx={{ width: 100 }}
                                                             />
                                                         </Box>
                                                         <TextField
-                                                            size="small"
-                                                            type="number"
-                                                            value={strategy.parameters?.rollout || 0}
-                                                            onChange={(e) => {
-                                                                const value = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
-                                                                const strategies = [...(flag.strategies || [])];
-                                                                strategies[index] = {
-                                                                    ...strategies[index],
-                                                                    parameters: { ...strategies[index].parameters, rollout: value }
-                                                                };
-                                                                setFlag({ ...flag, strategies });
-                                                            }}
-                                                            disabled={!canManage}
-                                                            InputProps={{
-                                                                endAdornment: <Typography>%</Typography>,
-                                                                inputProps: { min: 0, max: 100 }
-                                                            }}
-                                                            sx={{ width: 100 }}
-                                                        />
-                                                    </Box>
-
-                                                    {/* Stickiness + groupId Row */}
-                                                    <Box sx={{ display: 'flex', gap: 2 }}>
-                                                        <FormControl size="small" sx={{ flex: 1 }}>
-                                                            <InputLabel>{t('featureFlags.stickiness')}</InputLabel>
-                                                            <Select
-                                                                value={strategy.parameters?.stickiness || 'default'}
-                                                                label={t('featureFlags.stickiness')}
-                                                                onChange={(e) => {
-                                                                    const strategies = [...(flag.strategies || [])];
-                                                                    strategies[index] = {
-                                                                        ...strategies[index],
-                                                                        parameters: { ...strategies[index].parameters, stickiness: e.target.value }
-                                                                    };
-                                                                    setFlag({ ...flag, strategies });
-                                                                }}
-                                                                disabled={!canManage}
-                                                            >
-                                                                <MenuItem value="default">
-                                                                    <Box>
-                                                                        <Typography variant="body2">Default</Typography>
-                                                                        <Typography variant="caption" color="text.secondary">
-                                                                            {t('featureFlags.stickinessDefaultHelp')}
-                                                                        </Typography>
-                                                                    </Box>
-                                                                </MenuItem>
-                                                                <MenuItem value="userId">User ID</MenuItem>
-                                                                <MenuItem value="sessionId">Session ID</MenuItem>
-                                                                <MenuItem value="random">Random</MenuItem>
-                                                            </Select>
-                                                        </FormControl>
-                                                        <TextField
+                                                            fullWidth
                                                             size="small"
                                                             label={t('featureFlags.groupId')}
                                                             value={strategy.parameters?.groupId || flag.flagName || ''}
@@ -1242,349 +1186,449 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                 setFlag({ ...flag, strategies });
                                                             }}
                                                             disabled={!canManage}
-                                                            placeholder="feature-flag-1"
-                                                            sx={{ flex: 1 }}
                                                         />
-                                                    </Box>
-                                                </Box>
-                                            )}
-
-                                            {/* IP Address Parameters */}
-                                            {strategy.name === 'remoteAddress' && (
-                                                <TextField
-                                                    fullWidth
-                                                    size="small"
-                                                    multiline
-                                                    rows={2}
-                                                    label={t('featureFlags.ipAddresses')}
-                                                    value={strategy.parameters?.IPs || ''}
-                                                    onChange={(e) => {
-                                                        const strategies = [...(flag.strategies || [])];
-                                                        strategies[index] = {
-                                                            ...strategies[index],
-                                                            parameters: { ...strategies[index].parameters, IPs: e.target.value }
-                                                        };
-                                                        setFlag({ ...flag, strategies });
-                                                    }}
-                                                    disabled={!canManage}
-                                                    helperText={t('featureFlags.ipAddressesHelp')}
-                                                />
-                                            )}
-
-                                            {/* Hostname Parameters */}
-                                            {strategy.name === 'applicationHostname' && (
-                                                <TextField
-                                                    fullWidth
-                                                    size="small"
-                                                    multiline
-                                                    rows={2}
-                                                    label={t('featureFlags.hostnames')}
-                                                    value={strategy.parameters?.hostNames || ''}
-                                                    onChange={(e) => {
-                                                        const strategies = [...(flag.strategies || [])];
-                                                        strategies[index] = {
-                                                            ...strategies[index],
-                                                            parameters: { ...strategies[index].parameters, hostNames: e.target.value }
-                                                        };
-                                                        setFlag({ ...flag, strategies });
-                                                    }}
-                                                    disabled={!canManage}
-                                                    helperText={t('featureFlags.hostnamesHelp')}
-                                                />
-                                            )}
-
-                                            {/* Segment & Constraints Section - separated from strategy params */}
-                                            <Paper variant="outlined" sx={{ p: 2, bgcolor: 'action.hover' }}>
-                                                {/* Segment Selector */}
-                                                <Box sx={{ mb: 2 }}>
-                                                    <Typography variant="subtitle2" gutterBottom>{t('featureFlags.segments')}</Typography>
-                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                                                        {t('featureFlags.segmentSelectorHelp')}
-                                                    </Typography>
-
-                                                    {/* Selected Segments + Add Selector in a row */}
-                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'flex-start' }}>
-                                                        {(strategy.segments || []).map((segName: string) => {
-                                                            const seg = segments.find((s: any) => s.segmentName === segName);
-                                                            const isExpanded = expandedSegments.has(`${index}-${segName}`);
-                                                            const isEmpty = !seg?.constraints || seg.constraints.length === 0;
-
-                                                            // Format operator for display - universal symbols
-                                                            const getOperatorLabel = (op: string): string => {
-                                                                const opLabels: Record<string, string> = {
-                                                                    'str_eq': '=',
-                                                                    'str_neq': '≠',
-                                                                    'str_contains': 'contains',
-                                                                    'str_starts_with': 'starts with',
-                                                                    'str_ends_with': 'ends with',
-                                                                    'str_in': 'is one of',
-                                                                    'str_not_in': 'is not one of',
-                                                                    'num_eq': '=',
-                                                                    'num_gt': '>',
-                                                                    'num_gte': '≥',
-                                                                    'num_lt': '<',
-                                                                    'num_lte': '≤',
-                                                                    'bool_is': '=',
-                                                                    'date_gt': '>',
-                                                                    'date_gte': '≥',
-                                                                    'date_lt': '<',
-                                                                    'date_lte': '≤',
-                                                                    'semver_eq': '=',
-                                                                    'semver_gt': '>',
-                                                                    'semver_gte': '≥',
-                                                                    'semver_lt': '<',
-                                                                    'semver_lte': '≤',
-                                                                };
-                                                                return opLabels[op] || op;
-                                                            };
-
-                                                            // Get constraint value display
-                                                            const getValueDisplay = (c: any): string => {
-                                                                if (c.values && c.values.length > 0) {
-                                                                    return c.values.join(', ');
-                                                                }
-                                                                if (c.value !== undefined && c.value !== null) {
-                                                                    if (typeof c.value === 'boolean') {
-                                                                        return c.value ? 'True' : 'False';
-                                                                    }
-                                                                    return String(c.value);
-                                                                }
-                                                                return '-';
-                                                            };
-
-                                                            return (
-                                                                <Box key={segName} sx={{ maxWidth: isExpanded ? 500 : 'auto' }}>
-                                                                    <Chip
-                                                                        label={
-                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                                <GroupIcon sx={{ fontSize: 14 }} />
-                                                                                <span>{seg?.displayName || segName}</span>
-                                                                                <IconButton
-                                                                                    size="small"
-                                                                                    onClick={(e) => {
-                                                                                        e.stopPropagation();
-                                                                                        const key = `${index}-${segName}`;
-                                                                                        setExpandedSegments(prev => {
-                                                                                            const next = new Set(prev);
-                                                                                            if (next.has(key)) next.delete(key);
-                                                                                            else next.add(key);
-                                                                                            return next;
-                                                                                        });
-                                                                                    }}
-                                                                                    sx={{ p: 0, ml: 0.5, color: 'inherit' }}
-                                                                                >
-                                                                                    {isExpanded ? <VisibilityOffIcon sx={{ fontSize: 14 }} /> : <VisibilityIcon sx={{ fontSize: 14 }} />}
-                                                                                </IconButton>
-                                                                            </Box>
-                                                                        }
-                                                                        size="small"
-                                                                        color={isEmpty ? 'warning' : 'default'}
-                                                                        variant="outlined"
-                                                                        onDelete={canManage ? () => {
-                                                                            const strategies = [...(flag.strategies || [])];
-                                                                            strategies[index] = {
-                                                                                ...strategies[index],
-                                                                                segments: (strategy.segments || []).filter((s: string) => s !== segName)
-                                                                            };
-                                                                            setFlag({ ...flag, strategies });
-                                                                        } : undefined}
-                                                                        sx={{
-                                                                            borderWidth: isEmpty ? 2 : 1,
-                                                                            '& .MuiChip-label': { pr: 0.5 }
-                                                                        }}
-                                                                    />
-
-                                                                    {/* Expanded segment details */}
-                                                                    {isExpanded && seg && (
-                                                                        <Paper
-                                                                            sx={{
-                                                                                mt: 1,
-                                                                                p: 2,
-                                                                                bgcolor: 'background.default',
-                                                                                border: 1,
-                                                                                borderColor: isEmpty ? 'warning.main' : 'divider',
-                                                                                borderRadius: 1
-                                                                            }}
-                                                                            elevation={0}
-                                                                        >
-                                                                            {isEmpty ? (
-                                                                                <Alert severity="warning" icon={<WarningIcon />}>
-                                                                                    <Typography variant="body2">
-                                                                                        {t('featureFlags.emptySegmentWarning', { name: seg.displayName || segName })}
-                                                                                    </Typography>
-                                                                                </Alert>
-                                                                            ) : (
-                                                                                <Box>
-                                                                                    <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
-                                                                                        📋 {t('featureFlags.segmentConditions')}
-                                                                                    </Typography>
-                                                                                    <Stack spacing={1}>
-                                                                                        {seg.constraints.map((c: any, ci: number) => (
-                                                                                            <React.Fragment key={ci}>
-                                                                                                {ci > 0 && (
-                                                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-                                                                                                        <Divider sx={{ flexGrow: 1 }} />
-                                                                                                        <Chip
-                                                                                                            label="AND"
-                                                                                                            size="small"
-                                                                                                            sx={{
-                                                                                                                height: 22,
-                                                                                                                fontSize: '0.7rem',
-                                                                                                                bgcolor: 'action.selected',
-                                                                                                                fontWeight: 600
-                                                                                                            }}
-                                                                                                        />
-                                                                                                        <Divider sx={{ flexGrow: 1 }} />
-                                                                                                    </Box>
-                                                                                                )}
-                                                                                                {/* Unleash-style constraint row */}
-                                                                                                <Box
-                                                                                                    sx={{
-                                                                                                        display: 'flex',
-                                                                                                        alignItems: 'center',
-                                                                                                        gap: 1,
-                                                                                                        p: 1,
-                                                                                                        border: 1,
-                                                                                                        borderColor: 'primary.main',
-                                                                                                        borderRadius: 1,
-                                                                                                        bgcolor: 'background.paper'
-                                                                                                    }}
-                                                                                                >
-                                                                                                    {/* Field Name */}
-                                                                                                    <Box
-                                                                                                        sx={{
-                                                                                                            px: 1.5,
-                                                                                                            py: 0.5,
-                                                                                                            bgcolor: 'primary.main',
-                                                                                                            color: 'primary.contrastText',
-                                                                                                            borderRadius: 0.5
-                                                                                                        }}
-                                                                                                    >
-                                                                                                        <Typography variant="body2" fontWeight={600}>
-                                                                                                            {c.contextName}
-                                                                                                        </Typography>
-                                                                                                    </Box>
-
-                                                                                                    {/* Operator Chip */}
-                                                                                                    <Chip
-                                                                                                        label={getOperatorLabel(c.operator)}
-                                                                                                        size="small"
-                                                                                                        variant="outlined"
-                                                                                                        sx={{ fontWeight: 500, fontSize: '0.75rem' }}
-                                                                                                    />
-
-                                                                                                    {/* Case sensitivity indicator for string operators */}
-                                                                                                    {c.operator?.startsWith('str_') && (
-                                                                                                        <Chip
-                                                                                                            label={c.caseInsensitive ? 'Aa' : 'AA'}
-                                                                                                            size="small"
-                                                                                                            variant="outlined"
-                                                                                                            sx={{
-                                                                                                                height: 22,
-                                                                                                                fontSize: '0.7rem',
-                                                                                                                minWidth: 32
-                                                                                                            }}
-                                                                                                        />
-                                                                                                    )}
-
-                                                                                                    {/* Value */}
-                                                                                                    <Box
-                                                                                                        sx={{
-                                                                                                            px: 1.5,
-                                                                                                            py: 0.5,
-                                                                                                            bgcolor: 'primary.main',
-                                                                                                            color: 'primary.contrastText',
-                                                                                                            borderRadius: 0.5
-                                                                                                        }}
-                                                                                                    >
-                                                                                                        <Typography variant="body2" fontWeight={600}>
-                                                                                                            {getValueDisplay(c)}
-                                                                                                        </Typography>
-                                                                                                    </Box>
-                                                                                                </Box>
-                                                                                            </React.Fragment>
-                                                                                        ))}
-                                                                                    </Stack>
-                                                                                </Box>
-                                                                            )}
-                                                                        </Paper>
-                                                                    )}
-                                                                </Box>
-                                                            );
-                                                        })}
-
-                                                        {/* Add segment selector - inline with chips */}
-                                                        <Autocomplete
-                                                            size="small"
-                                                            sx={{ minWidth: 200, flexShrink: 0 }}
-                                                            options={segments.filter((s: any) => !(strategy.segments || []).includes(s.segmentName))}
-                                                            getOptionLabel={(option: any) => option.displayName || option.segmentName}
-                                                            value={null}
-                                                            onChange={(_, selected) => {
-                                                                if (selected) {
-                                                                    const strategies = [...(flag.strategies || [])];
-                                                                    strategies[index] = {
-                                                                        ...strategies[index],
-                                                                        segments: [...(strategy.segments || []), selected.segmentName]
-                                                                    };
-                                                                    setFlag({ ...flag, strategies });
-                                                                }
-                                                            }}
-                                                            renderInput={(params) => (
-                                                                <TextField {...params} placeholder={t('featureFlags.selectSegments')} size="small" />
-                                                            )}
-                                                            disabled={!canManage || segments.length === 0}
-                                                            noOptionsText={t('featureFlags.noSegments')}
-                                                            clearOnBlur
-                                                            blurOnSelect
-                                                        />
-                                                    </Box>
-                                                </Box>
-
-                                                {/* AND Indicator between segments and constraints */}
-                                                {(strategy.segments?.length > 0 || (strategy.constraints?.length > 0)) && (
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-                                                        <Divider sx={{ flexGrow: 1 }} />
-                                                        <Chip label="AND" size="small" variant="outlined" sx={{ fontWeight: 600 }} />
-                                                        <Divider sx={{ flexGrow: 1 }} />
                                                     </Box>
                                                 )}
 
-                                                {/* Constraints - AFTER segments */}
-                                                <Box>
-                                                    <Typography variant="subtitle2" gutterBottom>{t('featureFlags.constraints')}</Typography>
-                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                                                        {t('featureFlags.constraintsHelp')}
-                                                    </Typography>
-                                                    <ConstraintEditor
-                                                        constraints={strategy.constraints || []}
-                                                        onChange={(constraints) => {
+                                                {/* Flexible Rollout Parameters - Unleash Style */}
+                                                {strategy.name === 'flexibleRollout' && (
+                                                    <Box sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
+                                                        {/* Rollout Section */}
+                                                        <Typography variant="subtitle2" gutterBottom>
+                                                            {t('featureFlags.rolloutPercentage')}
+                                                        </Typography>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                                                            <Box sx={{ flex: 1, pr: 3 }}>
+                                                                <Slider
+                                                                    value={strategy.parameters?.rollout || 0}
+                                                                    onChange={(_, value) => {
+                                                                        const strategies = [...(flag.strategies || [])];
+                                                                        strategies[index] = {
+                                                                            ...strategies[index],
+                                                                            parameters: { ...strategies[index].parameters, rollout: value as number }
+                                                                        };
+                                                                        setFlag({ ...flag, strategies });
+                                                                    }}
+                                                                    disabled={!canManage}
+                                                                    valueLabelDisplay="auto"
+                                                                    marks={[
+                                                                        { value: 0, label: '0%' },
+                                                                        { value: 25, label: '25%' },
+                                                                        { value: 50, label: '50%' },
+                                                                        { value: 75, label: '75%' },
+                                                                        { value: 100, label: '100%' },
+                                                                    ]}
+                                                                />
+                                                            </Box>
+                                                            <TextField
+                                                                size="small"
+                                                                type="number"
+                                                                value={strategy.parameters?.rollout || 0}
+                                                                onChange={(e) => {
+                                                                    const value = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
+                                                                    const strategies = [...(flag.strategies || [])];
+                                                                    strategies[index] = {
+                                                                        ...strategies[index],
+                                                                        parameters: { ...strategies[index].parameters, rollout: value }
+                                                                    };
+                                                                    setFlag({ ...flag, strategies });
+                                                                }}
+                                                                disabled={!canManage}
+                                                                InputProps={{
+                                                                    endAdornment: <Typography>%</Typography>,
+                                                                    inputProps: { min: 0, max: 100 }
+                                                                }}
+                                                                sx={{ width: 100 }}
+                                                            />
+                                                        </Box>
+
+                                                        {/* Stickiness + groupId Row */}
+                                                        <Box sx={{ display: 'flex', gap: 2 }}>
+                                                            <FormControl size="small" sx={{ flex: 1 }}>
+                                                                <InputLabel>{t('featureFlags.stickiness')}</InputLabel>
+                                                                <Select
+                                                                    value={strategy.parameters?.stickiness || 'default'}
+                                                                    label={t('featureFlags.stickiness')}
+                                                                    onChange={(e) => {
+                                                                        const strategies = [...(flag.strategies || [])];
+                                                                        strategies[index] = {
+                                                                            ...strategies[index],
+                                                                            parameters: { ...strategies[index].parameters, stickiness: e.target.value }
+                                                                        };
+                                                                        setFlag({ ...flag, strategies });
+                                                                    }}
+                                                                    disabled={!canManage}
+                                                                >
+                                                                    <MenuItem value="default">
+                                                                        <Box>
+                                                                            <Typography variant="body2">Default</Typography>
+                                                                            <Typography variant="caption" color="text.secondary">
+                                                                                {t('featureFlags.stickinessDefaultHelp')}
+                                                                            </Typography>
+                                                                        </Box>
+                                                                    </MenuItem>
+                                                                    <MenuItem value="userId">User ID</MenuItem>
+                                                                    <MenuItem value="sessionId">Session ID</MenuItem>
+                                                                    <MenuItem value="random">Random</MenuItem>
+                                                                </Select>
+                                                            </FormControl>
+                                                            <TextField
+                                                                size="small"
+                                                                label={t('featureFlags.groupId')}
+                                                                value={strategy.parameters?.groupId || flag.flagName || ''}
+                                                                onChange={(e) => {
+                                                                    const strategies = [...(flag.strategies || [])];
+                                                                    strategies[index] = {
+                                                                        ...strategies[index],
+                                                                        parameters: { ...strategies[index].parameters, groupId: e.target.value }
+                                                                    };
+                                                                    setFlag({ ...flag, strategies });
+                                                                }}
+                                                                disabled={!canManage}
+                                                                placeholder="feature-flag-1"
+                                                                sx={{ flex: 1 }}
+                                                            />
+                                                        </Box>
+                                                    </Box>
+                                                )}
+
+                                                {/* IP Address Parameters */}
+                                                {strategy.name === 'remoteAddress' && (
+                                                    <TextField
+                                                        fullWidth
+                                                        size="small"
+                                                        multiline
+                                                        rows={2}
+                                                        label={t('featureFlags.ipAddresses')}
+                                                        value={strategy.parameters?.IPs || ''}
+                                                        onChange={(e) => {
                                                             const strategies = [...(flag.strategies || [])];
-                                                            strategies[index] = { ...strategies[index], constraints };
+                                                            strategies[index] = {
+                                                                ...strategies[index],
+                                                                parameters: { ...strategies[index].parameters, IPs: e.target.value }
+                                                            };
                                                             setFlag({ ...flag, strategies });
                                                         }}
-                                                        contextFields={contextFields}
                                                         disabled={!canManage}
+                                                        helperText={t('featureFlags.ipAddressesHelp')}
                                                     />
-                                                </Box>
-                                            </Paper>
+                                                )}
 
-                                            {/* Delete Button - only show if there are 2+ strategies */}
-                                            {canManage && (flag.strategies?.length || 0) > 1 && (
-                                                <Box>
-                                                    <Button
+                                                {/* Hostname Parameters */}
+                                                {strategy.name === 'applicationHostname' && (
+                                                    <TextField
+                                                        fullWidth
                                                         size="small"
-                                                        color="error"
-                                                        startIcon={<DeleteIcon />}
-                                                        onClick={() => handleDeleteStrategy(strategy.id, index)}
-                                                    >
-                                                        {t('featureFlags.removeStrategy')}
-                                                    </Button>
-                                                </Box>
-                                            )}
-                                        </Stack>
-                                    </AccordionDetails>
-                                </Accordion>
+                                                        multiline
+                                                        rows={2}
+                                                        label={t('featureFlags.hostnames')}
+                                                        value={strategy.parameters?.hostNames || ''}
+                                                        onChange={(e) => {
+                                                            const strategies = [...(flag.strategies || [])];
+                                                            strategies[index] = {
+                                                                ...strategies[index],
+                                                                parameters: { ...strategies[index].parameters, hostNames: e.target.value }
+                                                            };
+                                                            setFlag({ ...flag, strategies });
+                                                        }}
+                                                        disabled={!canManage}
+                                                        helperText={t('featureFlags.hostnamesHelp')}
+                                                    />
+                                                )}
+
+                                                {/* Segment & Constraints Section - separated from strategy params */}
+                                                <Paper variant="outlined" sx={{ p: 2, bgcolor: 'action.hover' }}>
+                                                    {/* Segment Selector */}
+                                                    <Box sx={{ mb: 2 }}>
+                                                        <Typography variant="subtitle2" gutterBottom>{t('featureFlags.segments')}</Typography>
+                                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                                                            {t('featureFlags.segmentSelectorHelp')}
+                                                        </Typography>
+
+                                                        {/* Selected Segments + Add Selector in a row */}
+                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'flex-start' }}>
+                                                            {(strategy.segments || []).map((segName: string) => {
+                                                                const seg = segments.find((s: any) => s.segmentName === segName);
+                                                                const isExpanded = expandedSegments.has(`${index}-${segName}`);
+                                                                const isEmpty = !seg?.constraints || seg.constraints.length === 0;
+
+                                                                // Format operator for display - universal symbols
+                                                                const getOperatorLabel = (op: string): string => {
+                                                                    const opLabels: Record<string, string> = {
+                                                                        'str_eq': '=',
+                                                                        'str_neq': '≠',
+                                                                        'str_contains': 'contains',
+                                                                        'str_starts_with': 'starts with',
+                                                                        'str_ends_with': 'ends with',
+                                                                        'str_in': 'is one of',
+                                                                        'str_not_in': 'is not one of',
+                                                                        'num_eq': '=',
+                                                                        'num_gt': '>',
+                                                                        'num_gte': '≥',
+                                                                        'num_lt': '<',
+                                                                        'num_lte': '≤',
+                                                                        'bool_is': '=',
+                                                                        'date_gt': '>',
+                                                                        'date_gte': '≥',
+                                                                        'date_lt': '<',
+                                                                        'date_lte': '≤',
+                                                                        'semver_eq': '=',
+                                                                        'semver_gt': '>',
+                                                                        'semver_gte': '≥',
+                                                                        'semver_lt': '<',
+                                                                        'semver_lte': '≤',
+                                                                    };
+                                                                    return opLabels[op] || op;
+                                                                };
+
+                                                                // Get constraint value display
+                                                                const getValueDisplay = (c: any): string => {
+                                                                    if (c.values && c.values.length > 0) {
+                                                                        return c.values.join(', ');
+                                                                    }
+                                                                    if (c.value !== undefined && c.value !== null) {
+                                                                        if (typeof c.value === 'boolean') {
+                                                                            return c.value ? 'True' : 'False';
+                                                                        }
+                                                                        return String(c.value);
+                                                                    }
+                                                                    return '-';
+                                                                };
+
+                                                                return (
+                                                                    <Box key={segName} sx={{ maxWidth: isExpanded ? 500 : 'auto' }}>
+                                                                        <Chip
+                                                                            label={
+                                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                                    <GroupIcon sx={{ fontSize: 14 }} />
+                                                                                    <span>{seg?.displayName || segName}</span>
+                                                                                    <IconButton
+                                                                                        size="small"
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            const key = `${index}-${segName}`;
+                                                                                            setExpandedSegments(prev => {
+                                                                                                const next = new Set(prev);
+                                                                                                if (next.has(key)) next.delete(key);
+                                                                                                else next.add(key);
+                                                                                                return next;
+                                                                                            });
+                                                                                        }}
+                                                                                        sx={{ p: 0, ml: 0.5, color: 'inherit' }}
+                                                                                    >
+                                                                                        {isExpanded ? <VisibilityOffIcon sx={{ fontSize: 14 }} /> : <VisibilityIcon sx={{ fontSize: 14 }} />}
+                                                                                    </IconButton>
+                                                                                </Box>
+                                                                            }
+                                                                            size="small"
+                                                                            color={isEmpty ? 'warning' : 'default'}
+                                                                            variant="outlined"
+                                                                            onDelete={canManage ? () => {
+                                                                                const strategies = [...(flag.strategies || [])];
+                                                                                strategies[index] = {
+                                                                                    ...strategies[index],
+                                                                                    segments: (strategy.segments || []).filter((s: string) => s !== segName)
+                                                                                };
+                                                                                setFlag({ ...flag, strategies });
+                                                                            } : undefined}
+                                                                            sx={{
+                                                                                borderWidth: isEmpty ? 2 : 1,
+                                                                                '& .MuiChip-label': { pr: 0.5 }
+                                                                            }}
+                                                                        />
+
+                                                                        {/* Expanded segment details */}
+                                                                        {isExpanded && seg && (
+                                                                            <Paper
+                                                                                sx={{
+                                                                                    mt: 1,
+                                                                                    p: 2,
+                                                                                    bgcolor: 'background.default',
+                                                                                    border: 1,
+                                                                                    borderColor: isEmpty ? 'warning.main' : 'divider',
+                                                                                    borderRadius: 1
+                                                                                }}
+                                                                                elevation={0}
+                                                                            >
+                                                                                {isEmpty ? (
+                                                                                    <Alert severity="warning" icon={<WarningIcon />}>
+                                                                                        <Typography variant="body2">
+                                                                                            {t('featureFlags.emptySegmentWarning', { name: seg.displayName || segName })}
+                                                                                        </Typography>
+                                                                                    </Alert>
+                                                                                ) : (
+                                                                                    <Box>
+                                                                                        <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
+                                                                                            📋 {t('featureFlags.segmentConditions')}
+                                                                                        </Typography>
+                                                                                        <Stack spacing={1}>
+                                                                                            {seg.constraints.map((c: any, ci: number) => (
+                                                                                                <React.Fragment key={ci}>
+                                                                                                    {ci > 0 && (
+                                                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
+                                                                                                            <Divider sx={{ flexGrow: 1 }} />
+                                                                                                            <Chip
+                                                                                                                label="AND"
+                                                                                                                size="small"
+                                                                                                                sx={{
+                                                                                                                    height: 22,
+                                                                                                                    fontSize: '0.7rem',
+                                                                                                                    bgcolor: 'action.selected',
+                                                                                                                    fontWeight: 600
+                                                                                                                }}
+                                                                                                            />
+                                                                                                            <Divider sx={{ flexGrow: 1 }} />
+                                                                                                        </Box>
+                                                                                                    )}
+                                                                                                    {/* Unleash-style constraint row */}
+                                                                                                    <Box
+                                                                                                        sx={{
+                                                                                                            display: 'flex',
+                                                                                                            alignItems: 'center',
+                                                                                                            gap: 1,
+                                                                                                            p: 1,
+                                                                                                            border: 1,
+                                                                                                            borderColor: 'primary.main',
+                                                                                                            borderRadius: 1,
+                                                                                                            bgcolor: 'background.paper'
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        {/* Field Name */}
+                                                                                                        <Box
+                                                                                                            sx={{
+                                                                                                                px: 1.5,
+                                                                                                                py: 0.5,
+                                                                                                                bgcolor: 'primary.main',
+                                                                                                                color: 'primary.contrastText',
+                                                                                                                borderRadius: 0.5
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <Typography variant="body2" fontWeight={600}>
+                                                                                                                {c.contextName}
+                                                                                                            </Typography>
+                                                                                                        </Box>
+
+                                                                                                        {/* Operator Chip */}
+                                                                                                        <Chip
+                                                                                                            label={getOperatorLabel(c.operator)}
+                                                                                                            size="small"
+                                                                                                            variant="outlined"
+                                                                                                            sx={{ fontWeight: 500, fontSize: '0.75rem' }}
+                                                                                                        />
+
+                                                                                                        {/* Case sensitivity indicator for string operators */}
+                                                                                                        {c.operator?.startsWith('str_') && (
+                                                                                                            <Chip
+                                                                                                                label={c.caseInsensitive ? 'Aa' : 'AA'}
+                                                                                                                size="small"
+                                                                                                                variant="outlined"
+                                                                                                                sx={{
+                                                                                                                    height: 22,
+                                                                                                                    fontSize: '0.7rem',
+                                                                                                                    minWidth: 32
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        )}
+
+                                                                                                        {/* Value */}
+                                                                                                        <Box
+                                                                                                            sx={{
+                                                                                                                px: 1.5,
+                                                                                                                py: 0.5,
+                                                                                                                bgcolor: 'primary.main',
+                                                                                                                color: 'primary.contrastText',
+                                                                                                                borderRadius: 0.5
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <Typography variant="body2" fontWeight={600}>
+                                                                                                                {getValueDisplay(c)}
+                                                                                                            </Typography>
+                                                                                                        </Box>
+                                                                                                    </Box>
+                                                                                                </React.Fragment>
+                                                                                            ))}
+                                                                                        </Stack>
+                                                                                    </Box>
+                                                                                )}
+                                                                            </Paper>
+                                                                        )}
+                                                                    </Box>
+                                                                );
+                                                            })}
+
+                                                            {/* Add segment selector - inline with chips */}
+                                                            <Autocomplete
+                                                                size="small"
+                                                                sx={{ minWidth: 200, flexShrink: 0 }}
+                                                                options={segments.filter((s: any) => !(strategy.segments || []).includes(s.segmentName))}
+                                                                getOptionLabel={(option: any) => option.displayName || option.segmentName}
+                                                                value={null}
+                                                                onChange={(_, selected) => {
+                                                                    if (selected) {
+                                                                        const strategies = [...(flag.strategies || [])];
+                                                                        strategies[index] = {
+                                                                            ...strategies[index],
+                                                                            segments: [...(strategy.segments || []), selected.segmentName]
+                                                                        };
+                                                                        setFlag({ ...flag, strategies });
+                                                                    }
+                                                                }}
+                                                                renderInput={(params) => (
+                                                                    <TextField {...params} placeholder={t('featureFlags.selectSegments')} size="small" />
+                                                                )}
+                                                                disabled={!canManage || segments.length === 0}
+                                                                noOptionsText={t('featureFlags.noSegments')}
+                                                                clearOnBlur
+                                                                blurOnSelect
+                                                            />
+                                                        </Box>
+                                                    </Box>
+
+                                                    {/* AND Indicator between segments and constraints */}
+                                                    {(strategy.segments?.length > 0 || (strategy.constraints?.length > 0)) && (
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
+                                                            <Divider sx={{ flexGrow: 1 }} />
+                                                            <Chip label="AND" size="small" variant="outlined" sx={{ fontWeight: 600 }} />
+                                                            <Divider sx={{ flexGrow: 1 }} />
+                                                        </Box>
+                                                    )}
+
+                                                    {/* Constraints - AFTER segments */}
+                                                    <Box>
+                                                        <Typography variant="subtitle2" gutterBottom>{t('featureFlags.constraints')}</Typography>
+                                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                                                            {t('featureFlags.constraintsHelp')}
+                                                        </Typography>
+                                                        <ConstraintEditor
+                                                            constraints={strategy.constraints || []}
+                                                            onChange={(constraints) => {
+                                                                const strategies = [...(flag.strategies || [])];
+                                                                strategies[index] = { ...strategies[index], constraints };
+                                                                setFlag({ ...flag, strategies });
+                                                            }}
+                                                            contextFields={contextFields}
+                                                            disabled={!canManage}
+                                                        />
+                                                    </Box>
+                                                </Paper>
+
+                                                {/* Delete Button - only show if there are 2+ strategies */}
+                                                {canManage && (flag.strategies?.length || 0) > 1 && (
+                                                    <Box>
+                                                        <Button
+                                                            size="small"
+                                                            color="error"
+                                                            startIcon={<DeleteIcon />}
+                                                            onClick={() => handleDeleteStrategy(strategy.id, index)}
+                                                        >
+                                                            {t('featureFlags.removeStrategy')}
+                                                        </Button>
+                                                    </Box>
+                                                )}
+                                            </Stack>
+                                        </AccordionDetails>
+                                    </Accordion>
+                                </React.Fragment>
                             ))}
 
                             {/* Add Strategy Button */}
