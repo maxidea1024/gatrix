@@ -526,6 +526,26 @@ export class FeatureSegmentModel {
         }
     }
 
+    static async findByName(environment: string, segmentName: string): Promise<FeatureSegmentAttributes | null> {
+        try {
+            const segment = await db('g_feature_segments')
+                .where('environment', environment)
+                .where('segmentName', segmentName)
+                .first();
+            if (!segment) return null;
+
+            return {
+                ...segment,
+                isActive: Boolean(segment.isActive),
+                constraints: parseJsonField<Constraint[]>(segment.constraints) || [],
+                tags: parseJsonField<string[]>(segment.tags) || [],
+            };
+        } catch (error) {
+            logger.error('Error finding segment by name:', error);
+            throw error;
+        }
+    }
+
     static async create(data: Omit<FeatureSegmentAttributes, 'id' | 'createdAt' | 'updatedAt'>): Promise<FeatureSegmentAttributes> {
         try {
             const id = ulid();

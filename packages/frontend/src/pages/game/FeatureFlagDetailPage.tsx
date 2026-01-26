@@ -571,8 +571,18 @@ const FeatureFlagDetailPage: React.FC = () => {
         } else {
             // In edit mode, call API to save all strategies
             try {
+                // Transform strategies for backend format
+                const strategiesForApi = (flag.strategies || []).map((s: any) => ({
+                    strategyName: s.name || s.strategyName,
+                    parameters: s.parameters,
+                    constraints: s.constraints,
+                    segments: s.segments,
+                    sortOrder: s.sortOrder,
+                    isEnabled: !s.disabled,
+                }));
+
                 await api.put(`/admin/features/${flag.flagName}/strategies`, {
-                    strategies: flag.strategies || [],
+                    strategies: strategiesForApi,
                 });
                 enqueueSnackbar(t('featureFlags.strategiesSaved'), { variant: 'success' });
                 loadFlag();

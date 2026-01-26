@@ -25,6 +25,7 @@ import { AuditLogModel } from '../models/AuditLog';
 import logger from '../config/logger';
 import { pubSubService } from './PubSubService';
 import { ENV_SCOPED } from '../constants/cacheKeys';
+import db from '../config/knex';
 
 // Types for service methods
 export interface CreateFlagInput {
@@ -56,6 +57,7 @@ export interface CreateStrategyInput {
     strategyName: string;
     parameters?: StrategyParameters;
     constraints?: Constraint[];
+    segments?: string[];  // Array of segment names
     sortOrder?: number;
     isEnabled?: boolean;
 }
@@ -430,13 +432,13 @@ class FeatureFlagService {
             throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
         }
 
-        // Delete existing strategies
+        // Delete existing strategies (CASCADE will delete segment links)
         const existingStrategies = await FeatureStrategyModel.findByFlagId(flag.id);
         for (const strategy of existingStrategies) {
             await FeatureStrategyModel.delete(strategy.id);
         }
 
-        // Create new strategies
+        // Create new strategies with segments
         const newStrategies: FeatureStrategyAttributes[] = [];
         for (let i = 0; i < strategies.length; i++) {
             const input = strategies[i];
@@ -449,10 +451,35 @@ class FeatureFlagService {
                 isEnabled: input.isEnabled ?? true,
                 createdBy: userId,
             });
+
+            // Save segment links if provided
+            if (input.segments && input.segments.length > 0) {
+                for (const segmentName of input.segments) {
+                    // Find segment by name in same environment
+                    const segment = await FeatureSegmentModel.findByName(environment, segmentName);
+                    if (segment) {
+                        await this.linkStrategySegment(strategy.id, segment.id);
+                    }
+                }
+            }
+
             newStrategies.push(strategy);
         }
 
         return newStrategies;
+    }
+
+    /**
+     * Link a strategy to a segment
+     */
+    private async linkStrategySegment(strategyId: string, segmentId: string): Promise<void> {
+        const { ulid } = await import('ulid');
+        await db('g_feature_flag_segments').insert({
+            id: ulid(),
+            strategyId,
+            segmentId,
+            createdAt: new Date(),
+        });
     }
 
     // ==================== Variants ====================
