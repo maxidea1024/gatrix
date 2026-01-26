@@ -247,6 +247,7 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
       { text: 'sidebar.featureFlags', icon: 'Flag', path: '/game/feature-flags', permission: 'feature-flags' },
       { text: 'sidebar.featureSegments', icon: 'People', path: '/game/feature-segments', permission: 'feature-flags' },
       { text: 'sidebar.featureContextFields', icon: 'Settings', path: '/game/feature-context-fields', permission: 'feature-flags' },
+      { text: 'sidebar.featureFlagTypes', icon: 'Category', path: '/game/feature-flag-types', permission: 'feature-flags' },
     ]
   },
 

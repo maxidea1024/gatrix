@@ -7,8 +7,29 @@ import { Router, Response } from 'express';
 import { AuthenticatedRequest } from '../../middleware/auth';
 import { asyncHandler } from '../../middleware/errorHandler';
 import { featureFlagService } from '../../services/FeatureFlagService';
+import { FeatureFlagTypeModel } from '../../models/FeatureFlagType';
 
 const router = Router();
+
+// ==================== Flag Types ====================
+
+// List all flag types
+router.get(
+    '/types',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const types = await FeatureFlagTypeModel.findAll();
+        res.json({ success: true, data: { types } });
+    })
+);
+
+// Update a flag type
+router.put(
+    '/types/:flagType',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const flagType = await FeatureFlagTypeModel.update(req.params.flagType, req.body);
+        res.json({ success: true, data: { flagType } });
+    })
+);
 
 // ==================== Segments (MUST be before /:flagName routes) ====================
 
