@@ -371,8 +371,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                     variants: cleanVariants,
                 });
                 enqueueSnackbar(t('featureFlags.createSuccess'), { variant: 'success' });
-                // Navigate to the new flag's detail page
-                navigate(`/game/feature-flags/${response.data?.flag?.flagName || flag.flagName}`);
+                // Navigate back to list page
+                navigate('/game/feature-flags');
             } else {
                 // Update existing flag
                 const response = await api.put(`/admin/features/${flag.flagName}`, {
