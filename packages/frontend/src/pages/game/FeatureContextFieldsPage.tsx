@@ -126,7 +126,22 @@ const FeatureContextFieldsPage: React.FC = () => {
     const hasChanges = (): boolean => {
         if (!editingField) return false;
         if (!originalField) return true; // New field always has "changes"
-        return JSON.stringify(editingField) !== JSON.stringify(originalField);
+
+        // Compare each field explicitly to avoid JSON.stringify key order issues
+        const fieldNameChanged = (editingField.fieldName || '') !== (originalField.fieldName || '');
+        const displayNameChanged = (editingField.displayName || '') !== (originalField.displayName || '');
+        const descriptionChanged = (editingField.description || '') !== (originalField.description || '');
+        const fieldTypeChanged = (editingField.fieldType || 'string') !== (originalField.fieldType || 'string');
+        const sortOrderChanged = (editingField.sortOrder || 0) !== (originalField.sortOrder || 0);
+
+        // Compare legalValues arrays
+        const editingLegalValues = editingField.legalValues || [];
+        const originalLegalValues = originalField.legalValues || [];
+        const legalValuesChanged = editingLegalValues.length !== originalLegalValues.length ||
+            editingLegalValues.some((v, i) => v !== originalLegalValues[i]);
+
+        return fieldNameChanged || displayNameChanged || descriptionChanged ||
+            fieldTypeChanged || sortOrderChanged || legalValuesChanged;
     };
 
     const handleSave = async () => {
