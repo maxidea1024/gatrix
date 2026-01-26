@@ -2,7 +2,7 @@ import api from './api';
 
 // ==================== Types ====================
 
-export type FlagType = 'release' | 'experiment' | 'operational' | 'permission';
+export type FlagType = 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission';
 export type FlagStatus = 'enabled' | 'disabled' | 'archived';
 
 export interface FeatureFlag {

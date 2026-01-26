@@ -231,7 +231,6 @@ const FeatureFlagDetailPage: React.FC = () => {
             flag.displayName !== originalFlag.displayName ||
             flag.description !== originalFlag.description ||
             flag.impressionDataEnabled !== originalFlag.impressionDataEnabled ||
-            flag.staleAfterDays !== originalFlag.staleAfterDays ||
             JSON.stringify(flag.tags || []) !== JSON.stringify(originalFlag.tags || [])
         );
     };
@@ -367,7 +366,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                     description: flag.description,
                     flagType: flag.flagType,
                     impressionDataEnabled: flag.impressionDataEnabled,
-                    staleAfterDays: flag.staleAfterDays,
                     tags: flag.tags,
                     strategies: cleanStrategies,
                     variants: cleanVariants,
@@ -381,7 +379,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                     displayName: flag.displayName,
                     description: flag.description,
                     impressionDataEnabled: flag.impressionDataEnabled,
-                    staleAfterDays: flag.staleAfterDays,
                     tags: flag.tags,
                 });
                 setFlag(response.data?.flag || flag);
@@ -752,23 +749,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                 <MenuItem value="release">{t('featureFlags.flagTypes.release')}</MenuItem>
                                                 <MenuItem value="experiment">{t('featureFlags.flagTypes.experiment')}</MenuItem>
                                                 <MenuItem value="operational">{t('featureFlags.flagTypes.operational')}</MenuItem>
+                                                <MenuItem value="killSwitch">{t('featureFlags.flagTypes.killSwitch')}</MenuItem>
                                                 <MenuItem value="permission">{t('featureFlags.flagTypes.permission')}</MenuItem>
                                             </Select>
                                             <FormHelperText>{t('featureFlags.flagTypeHelp')}</FormHelperText>
                                         </FormControl>
-
-                                        <TextField
-                                            type="number"
-                                            label={t('featureFlags.staleAfterDays')}
-                                            value={flag.staleAfterDays || ''}
-                                            onChange={(e) => setFlag({ ...flag, staleAfterDays: parseInt(e.target.value) || undefined })}
-                                            disabled={!canManage}
-                                            helperText={t('featureFlags.staleAfterDaysHelp')}
-                                            InputProps={{
-                                                endAdornment: <InputAdornment position="end">{t('common.days')}</InputAdornment>
-                                            }}
-                                            sx={{ width: 200 }}
-                                        />
                                     </Box>
 
                                     <FormControlLabel

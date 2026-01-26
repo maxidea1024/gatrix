@@ -35,6 +35,7 @@ import {
     Unarchive as UnarchiveIcon,
     Delete as DeleteIcon,
     ContentCopy as CopyIcon,
+    Warning as WarningIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -48,6 +49,12 @@ import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { tagService, Tag } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
+import api from '../../services/api';
+
+interface FlagTypeInfo {
+    flagType: string;
+    lifetimeDays: number | null;
+}
 
 const FeatureFlagsPage: React.FC = () => {
     const { t } = useTranslation();
@@ -69,6 +76,7 @@ const FeatureFlagsPage: React.FC = () => {
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [deletingFlag, setDeletingFlag] = useState<FeatureFlag | null>(null);
     const [allTags, setAllTags] = useState<Tag[]>([]);
+    const [flagTypes, setFlagTypes] = useState<FlagTypeInfo[]>([]);
 
     // Sorting state
     const [orderBy, setOrderBy] = useState<string>(() => {
@@ -131,7 +139,28 @@ const FeatureFlagsPage: React.FC = () => {
 
     useEffect(() => {
         loadTags();
+        loadFlagTypes();
     }, []);
+
+    const loadFlagTypes = async () => {
+        try {
+            const response = await api.get('/admin/features/types');
+            setFlagTypes(response.data?.types || []);
+        } catch {
+            setFlagTypes([]);
+        }
+    };
+
+    // Check if a flag is stale based on its type's lifetime
+    const isStale = (flag: FeatureFlag): boolean => {
+        if (!flag.createdAt) return false;
+        const typeInfo = flagTypes.find(t => t.flagType === flag.flagType);
+        if (!typeInfo || typeInfo.lifetimeDays === null) return false;
+        const createdAt = new Date(flag.createdAt);
+        const now = new Date();
+        const daysSinceCreation = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+        return daysSinceCreation > typeInfo.lifetimeDays;
+    };
 
     // Sort handler
     const handleSort = (colId: string) => {
@@ -268,6 +297,7 @@ const FeatureFlagsPage: React.FC = () => {
                                     <MenuItem value="release">{t('featureFlags.types.release')}</MenuItem>
                                     <MenuItem value="experiment">{t('featureFlags.types.experiment')}</MenuItem>
                                     <MenuItem value="operational">{t('featureFlags.types.operational')}</MenuItem>
+                                    <MenuItem value="killSwitch">{t('featureFlags.types.killSwitch')}</MenuItem>
                                     <MenuItem value="permission">{t('featureFlags.types.permission')}</MenuItem>
                                 </Select>
                             </FormControl>
@@ -339,6 +369,11 @@ const FeatureFlagsPage: React.FC = () => {
                                             >
                                                 <TableCell>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                        {isStale(flag) && (
+                                                            <Tooltip title={t('featureFlags.staleWarning')}>
+                                                                <WarningIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                                                            </Tooltip>
+                                                        )}
                                                         <Typography
                                                             fontWeight={500}
                                                             sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}

@@ -4,7 +4,7 @@ import { ulid } from 'ulid';
 
 // ==================== Types ====================
 
-export type FlagType = 'release' | 'experiment' | 'operational' | 'permission';
+export type FlagType = 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission';
 export type PayloadType = 'string' | 'number' | 'boolean' | 'json';
 export type FieldType = 'string' | 'number' | 'boolean' | 'date' | 'semver';
 
