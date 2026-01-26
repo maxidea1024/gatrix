@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { Box, Typography, Chip, Paper, Stack, Tooltip } from '@mui/material';
-import TextFieldsIcon from '@mui/icons-material/TextFields';
+import { useSettings } from '../../contexts/SettingsContext';
 
 export interface ConstraintValue {
     contextName: string;
@@ -12,6 +12,7 @@ export interface ConstraintValue {
     value?: string;
     values?: string[];
     inverted?: boolean;
+    caseInsensitive?: boolean;
 }
 
 interface ConstraintDisplayProps {
@@ -22,23 +23,23 @@ interface ConstraintDisplayProps {
 // Get operator display label
 const getOperatorLabel = (op: string): string => {
     const opLabels: Record<string, string> = {
-        'str_eq': 'equals',
-        'str_neq': 'not equals',
-        'str_contains': 'contains',
-        'str_starts_with': 'starts with',
-        'str_ends_with': 'ends with',
-        'str_in': 'is one of',
-        'str_not_in': 'is not one of',
+        'str_eq': '=',
+        'str_neq': '≠',
+        'str_contains': '⊃',
+        'str_starts_with': '^',
+        'str_ends_with': '$',
+        'str_in': '∈',
+        'str_not_in': '∉',
         'num_eq': '=',
         'num_gt': '>',
         'num_gte': '≥',
         'num_lt': '<',
         'num_lte': '≤',
-        'bool_is': 'is',
-        'date_gt': 'after',
-        'date_gte': 'on or after',
-        'date_lt': 'before',
-        'date_lte': 'on or before',
+        'bool_is': '=',
+        'date_gt': '>',
+        'date_gte': '≥',
+        'date_lt': '<',
+        'date_lte': '≤',
         'semver_eq': '=',
         'semver_gt': '>',
         'semver_gte': '≥',
@@ -48,26 +49,66 @@ const getOperatorLabel = (op: string): string => {
     return opLabels[op] || op;
 };
 
-// Get constraint value display
-const getValueDisplay = (c: ConstraintValue): string => {
-    if (c.values && c.values.length > 0) {
-        return c.values.join(', ');
+// Format date with timezone
+const formatDateValue = (value: string, timezone?: string): string => {
+    if (!value) return value;
+    try {
+        const date = new Date(value);
+        if (isNaN(date.getTime())) return value;
+
+        // Format with timezone if available
+        const options: Intl.DateTimeFormatOptions = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            timeZone: timezone || 'UTC',
+            timeZoneName: 'short'
+        };
+        return new Intl.DateTimeFormat('ko-KR', options).format(date);
+    } catch {
+        return value;
     }
-    if (c.value !== undefined && c.value !== null) {
-        if (typeof c.value === 'boolean') {
-            return c.value ? 'True' : 'False';
-        }
-        return String(c.value);
-    }
-    return '-';
+};
+
+// Check if operator is date-related
+const isDateOperator = (op: string): boolean => {
+    return op.startsWith('date_');
 };
 
 /**
- * Single constraint display row
+ * Single constraint display row - Unleash style
  */
 export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint, compact = false }) => {
-    const valueDisplay = getValueDisplay(constraint);
-    const isMultiValue = constraint.values && constraint.values.length > 1;
+    const { settings } = useSettings();
+    const timezone = settings?.timezone;
+
+    // Get constraint value display
+    const getValueDisplay = (): string => {
+        let value = '';
+        if (constraint.values && constraint.values.length > 0) {
+            value = constraint.values.join(', ');
+        } else if (constraint.value !== undefined && constraint.value !== null) {
+            if (typeof constraint.value === 'boolean') {
+                return constraint.value ? 'true' : 'false';
+            }
+            value = String(constraint.value);
+        } else {
+            return '-';
+        }
+
+        // Format date values with timezone
+        if (isDateOperator(constraint.operator)) {
+            return formatDateValue(value, timezone);
+        }
+
+        return value;
+    };
+
+    const valueDisplay = getValueDisplay();
+    const showCaseSensitivity = constraint.operator?.startsWith('str_');
 
     if (compact) {
         return (
@@ -92,42 +133,71 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                 borderColor: 'divider',
                 borderRadius: 1,
                 bgcolor: 'background.paper',
+                flexWrap: 'wrap',
             }}
         >
-            <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80 }}>
-                Constraint
-            </Typography>
-            <Typography variant="body2" fontWeight={600} color="primary.main">
-                {constraint.contextName}
-            </Typography>
+            {/* Context Name - Blue chip */}
+            <Chip
+                label={constraint.contextName}
+                size="small"
+                sx={{
+                    bgcolor: 'primary.main',
+                    color: 'primary.contrastText',
+                    fontWeight: 600,
+                    fontSize: '0.8rem',
+                    height: 28,
+                }}
+            />
+
+            {/* Operator - Outlined chip */}
             <Chip
                 label={getOperatorLabel(constraint.operator)}
                 size="small"
                 variant="outlined"
-                sx={{ height: 24, fontSize: '0.75rem' }}
+                sx={{
+                    height: 28,
+                    fontSize: '0.8rem',
+                    fontWeight: 500,
+                    minWidth: 32,
+                }}
             />
-            {isMultiValue ? (
-                <Tooltip title={<TextFieldsIcon sx={{ fontSize: 14 }} />}>
+
+            {/* Case sensitivity indicator for string operators */}
+            {showCaseSensitivity && (
+                <Tooltip title={constraint.caseInsensitive ? 'Case insensitive' : 'Case sensitive'}>
                     <Chip
-                        label="Aa"
+                        label={constraint.caseInsensitive ? 'Aa' : 'AA'}
                         size="small"
                         variant="outlined"
-                        sx={{ height: 24, fontSize: '0.7rem', minWidth: 28 }}
+                        sx={{
+                            height: 28,
+                            fontSize: '0.75rem',
+                            minWidth: 36,
+                            fontFamily: 'monospace',
+                        }}
                     />
                 </Tooltip>
-            ) : null}
-            <Typography
-                variant="body2"
+            )}
+
+            {/* Value - Blue background */}
+            <Box
                 sx={{
-                    fontFamily: 'monospace',
-                    bgcolor: 'action.hover',
-                    px: 1,
+                    px: 1.5,
                     py: 0.5,
+                    bgcolor: 'primary.main',
+                    color: 'primary.contrastText',
                     borderRadius: 0.5,
+                    fontFamily: 'monospace',
+                    fontSize: '0.85rem',
+                    fontWeight: 500,
+                    maxWidth: 400,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
                 }}
             >
                 {valueDisplay}
-            </Typography>
+            </Box>
         </Box>
     );
 };
@@ -150,31 +220,30 @@ export const ConstraintList: React.FC<ConstraintListProps> = ({ constraints, tit
     }
 
     return (
-        <Stack spacing={1}>
+        <Stack spacing={0}>
             {title && (
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
                     {title}
                 </Typography>
             )}
             {constraints.map((c, i) => (
                 <React.Fragment key={i}>
-                    {i > 0 && (
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-                            <Box sx={{ flex: 1, borderBottom: 1, borderColor: 'divider' }} />
+                    <ConstraintDisplay constraint={c} />
+                    {i < constraints.length - 1 && (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.5 }}>
                             <Chip
                                 label="AND"
                                 size="small"
                                 sx={{
-                                    height: 20,
-                                    fontSize: '0.65rem',
-                                    bgcolor: 'action.selected',
+                                    height: 22,
+                                    fontSize: '0.7rem',
+                                    bgcolor: 'grey.200',
+                                    color: 'text.secondary',
                                     fontWeight: 600,
                                 }}
                             />
-                            <Box sx={{ flex: 1, borderBottom: 1, borderColor: 'divider' }} />
                         </Box>
                     )}
-                    <ConstraintDisplay constraint={c} />
                 </React.Fragment>
             ))}
         </Stack>
@@ -197,13 +266,19 @@ export const SegmentPreview: React.FC<SegmentPreviewProps> = ({
     constraints,
 }) => {
     return (
-        <Paper variant="outlined" sx={{ p: 2, mt: 1, bgcolor: 'grey.50' }}>
+        <Paper
+            variant="outlined"
+            sx={{
+                p: 2,
+                mt: 1,
+                bgcolor: 'background.default',
+                borderColor: 'primary.light',
+                borderWidth: 2,
+            }}
+        >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                <Typography variant="body2" color="text.secondary">
-                    Segment
-                </Typography>
-                <Typography variant="body2" fontWeight={600} color="primary.main">
-                    {displayName || segmentName}
+                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    세그먼트 조건
                 </Typography>
             </Box>
             <ConstraintList constraints={constraints} />
