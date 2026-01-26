@@ -490,6 +490,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       return;
     }
 
+    // Reset refs when environment changes to avoid stale state from previous environment
+    maintenanceUpdatedBySSE.current = false;
+    prevMaintenanceRef.current = null;
+
+    // Reset maintenance status immediately when environment changes
+    setMaintenanceStatus({ isMaintenance: false, status: 'inactive', detail: null });
+
     let cancelled = false;
     maintenanceService.getStatus().then(({ isUnderMaintenance, detail }) => {
       if (cancelled) return;
