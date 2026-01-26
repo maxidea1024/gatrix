@@ -241,6 +241,35 @@ const FeatureFlagDetailPage: React.FC = () => {
         return JSON.stringify(flag.strategies || []) !== JSON.stringify(originalFlag.strategies || []);
     };
 
+    // Validate all strategies - check constraints have required fields
+    const validateStrategies = (): { isValid: boolean; errors: string[] } => {
+        const errors: string[] = [];
+
+        for (const strategy of (flag?.strategies || [])) {
+            // Check constraints
+            for (const constraint of (strategy.constraints || [])) {
+                if (!constraint.contextName) {
+                    errors.push(t('featureFlags.validation.constraintMissingField'));
+                    break;
+                }
+                const isMultiValue = constraint.operator === 'str_in' || constraint.operator === 'str_not_in';
+                if (isMultiValue) {
+                    if (!constraint.values || constraint.values.length === 0) {
+                        errors.push(t('featureFlags.validation.constraintMissingValue'));
+                        break;
+                    }
+                } else {
+                    if (!constraint.value && constraint.value !== '0' && constraint.value !== 'false') {
+                        errors.push(t('featureFlags.validation.constraintMissingValue'));
+                        break;
+                    }
+                }
+            }
+        }
+
+        return { isValid: errors.length === 0, errors };
+    };
+
     // Load data
     const loadFlag = useCallback(async () => {
         if (!flagName || isCreating) return;
@@ -528,6 +557,13 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     const handleSaveStrategies = async () => {
         if (!flag) return;
+
+        // Validate strategies before saving
+        const validation = validateStrategies();
+        if (!validation.isValid) {
+            enqueueSnackbar(validation.errors[0], { variant: 'error' });
+            return;
+        }
 
         if (isCreating) {
             // In create mode, strategies are already in local state
@@ -1678,7 +1714,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                             {/* Save Button */}
                             {canManage && (flag.strategies?.length || 0) > 0 && !isCreating && (
                                 <Box sx={{ mt: 2 }}>
-                                    <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSaveStrategies} disabled={!hasStrategyChanges()}>
+                                    <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSaveStrategies} disabled={!hasStrategyChanges() || !validateStrategies().isValid}>
                                         {t('featureFlags.saveStrategies')}
                                     </Button>
                                 </Box>
