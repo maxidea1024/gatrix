@@ -1639,10 +1639,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     onClick={() => {
                                         const newStrategy = {
                                             id: undefined,
-                                            name: 'default',
-                                            title: 'Default',
-                                            parameters: {},
+                                            name: 'flexibleRollout',
+                                            title: 'Flexible Rollout',
+                                            parameters: { rollout: 100, stickiness: 'default', groupId: '' },
                                             constraints: [],
+                                            segments: [],
+                                            sortOrder: (flag?.strategies?.length || 0),
                                             disabled: false,
                                         };
                                         setFlag({ ...flag, strategies: [...(flag.strategies || []), newStrategy] });
