@@ -117,6 +117,7 @@ export interface FeatureContextFieldAttributes {
     fieldType: FieldType;
     description?: string;
     legalValues?: string[];
+    tags?: string[];
     stickiness: boolean;
     sortOrder: number;
     createdBy?: number;
@@ -609,6 +610,7 @@ export class FeatureContextFieldModel {
                 ...f,
                 stickiness: Boolean(f.stickiness),
                 legalValues: parseJsonField<string[]>(f.legalValues),
+                tags: parseJsonField<string[]>(f.tags) || [],
             }));
         } catch (error) {
             logger.error('Error finding context fields:', error);
@@ -625,6 +627,7 @@ export class FeatureContextFieldModel {
                 ...field,
                 stickiness: Boolean(field.stickiness),
                 legalValues: parseJsonField<string[]>(field.legalValues),
+                tags: parseJsonField<string[]>(field.tags) || [],
             };
         } catch (error) {
             logger.error('Error finding context field:', error);
@@ -641,6 +644,7 @@ export class FeatureContextFieldModel {
                 fieldType: data.fieldType,
                 description: data.description || null,
                 legalValues: data.legalValues ? JSON.stringify(data.legalValues) : null,
+                tags: data.tags ? JSON.stringify(data.tags) : null,
                 stickiness: data.stickiness ?? false,
                 sortOrder: data.sortOrder ?? 0,
                 createdBy: data.createdBy,
@@ -662,6 +666,7 @@ export class FeatureContextFieldModel {
             if (data.fieldType !== undefined) updateData.fieldType = data.fieldType;
             if (data.description !== undefined) updateData.description = data.description;
             if (data.legalValues !== undefined) updateData.legalValues = JSON.stringify(data.legalValues);
+            if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
             if (data.stickiness !== undefined) updateData.stickiness = data.stickiness;
             if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder;
             if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;

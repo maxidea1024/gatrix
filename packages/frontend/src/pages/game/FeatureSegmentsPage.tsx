@@ -21,6 +21,8 @@ import {
     Divider,
     Stack,
     FormHelperText,
+    Autocomplete,
+    Switch,
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -45,6 +47,8 @@ import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import api from '../../services/api';
 import ConstraintEditor, { Constraint, ContextField } from '../../components/features/ConstraintEditor';
+import { tagService } from '../../services/tagService';
+import { getContrastColor } from '../../utils/colorUtils';
 
 interface FeatureSegment {
     id: string;
@@ -53,6 +57,8 @@ interface FeatureSegment {
     displayName: string;
     description: string;
     constraints: Constraint[];
+    isActive?: boolean;
+    tags?: string[];
     createdAt: string;
     updatedAt: string;
 }
@@ -77,6 +83,7 @@ const FeatureSegmentsPage: React.FC = () => {
     const [originalSegment, setOriginalSegment] = useState<Partial<FeatureSegment> | null>(null);
     const [contextFields, setContextFields] = useState<ContextField[]>([]);
     const [expandedConstraints, setExpandedConstraints] = useState<Set<string>>(new Set());
+    const [allTags, setAllTags] = useState<{ id: number; name: string; color: string; description?: string }[]>([]);
 
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -85,12 +92,15 @@ const FeatureSegmentsPage: React.FC = () => {
         try {
             const result = await api.get('/admin/features/context-fields');
             const fields = result.data?.contextFields || [];
-            setContextFields(fields.map((f: any) => ({
-                fieldName: f.fieldName,
-                displayName: f.displayName || f.fieldName,
-                fieldType: f.fieldType || 'string',
-                legalValues: f.legalValues || [],
-            })));
+            setContextFields(fields
+                .filter((f: any) => f.isEnabled !== false)
+                .map((f: any) => ({
+                    fieldName: f.fieldName,
+                    displayName: f.displayName || f.fieldName,
+                    description: f.description || '',
+                    fieldType: f.fieldType || 'string',
+                    legalValues: f.legalValues || [],
+                })));
         } catch (error) {
             console.error('Failed to load context fields:', error);
             // Provide default context fields if API fails
@@ -130,6 +140,19 @@ const FeatureSegmentsPage: React.FC = () => {
         loadContextFields();
     }, []);
 
+    // Load tags for selection
+    useEffect(() => {
+        const loadTags = async () => {
+            try {
+                const tags = await tagService.list();
+                setAllTags(tags);
+            } catch (error) {
+                console.error('Failed to load tags:', error);
+            }
+        };
+        loadTags();
+    }, []);
+
     useEffect(() => {
         loadSegments();
     }, [page, rowsPerPage, debouncedSearchTerm]);
@@ -146,7 +169,7 @@ const FeatureSegmentsPage: React.FC = () => {
     };
 
     const handleCreate = () => {
-        const newSegment = { segmentName: '', displayName: '', description: '', constraints: [] };
+        const newSegment = { segmentName: '', displayName: '', description: '', constraints: [], tags: [] };
         setEditingSegment(newSegment);
         setOriginalSegment(null);
         setEditDialogOpen(true);
@@ -156,7 +179,46 @@ const FeatureSegmentsPage: React.FC = () => {
     const hasChanges = (): boolean => {
         if (!editingSegment) return false;
         if (!originalSegment) return true; // New segment always has "changes"
-        return JSON.stringify(editingSegment) !== JSON.stringify(originalSegment);
+
+        // Compare basic fields
+        if ((editingSegment.segmentName || '') !== (originalSegment.segmentName || '')) return true;
+        if ((editingSegment.displayName || '') !== (originalSegment.displayName || '')) return true;
+        if ((editingSegment.description || '') !== (originalSegment.description || '')) return true;
+
+        // Deep compare constraints
+        const editingConstraints = editingSegment.constraints || [];
+        const originalConstraints = originalSegment.constraints || [];
+
+        if (editingConstraints.length !== originalConstraints.length) return true;
+
+        for (let i = 0; i < editingConstraints.length; i++) {
+            const ec = editingConstraints[i];
+            const oc = originalConstraints[i];
+
+            if (ec.contextName !== oc.contextName) return true;
+            if (ec.operator !== oc.operator) return true;
+            if ((ec.value ?? '') !== (oc.value ?? '')) return true;
+            if (Boolean(ec.caseInsensitive) !== Boolean(oc.caseInsensitive)) return true;
+            if (Boolean(ec.inverted) !== Boolean(oc.inverted)) return true;
+
+            // Compare values arrays
+            const ecValues = ec.values || [];
+            const ocValues = oc.values || [];
+            if (ecValues.length !== ocValues.length) return true;
+            for (let j = 0; j < ecValues.length; j++) {
+                if (ecValues[j] !== ocValues[j]) return true;
+            }
+        }
+
+        // Compare tags
+        const editingTags = editingSegment.tags || [];
+        const originalTags = originalSegment.tags || [];
+        if (editingTags.length !== originalTags.length) return true;
+        for (let i = 0; i < editingTags.length; i++) {
+            if (editingTags[i] !== originalTags[i]) return true;
+        }
+
+        return false;
     };
 
     // Check if segment is valid for saving
@@ -285,6 +347,8 @@ const FeatureSegmentsPage: React.FC = () => {
                                             <TableCell>{t('featureFlags.segmentName')}</TableCell>
                                             <TableCell>{t('featureFlags.displayName')}</TableCell>
                                             <TableCell>{t('featureFlags.constraints')}</TableCell>
+                                            <TableCell>{t('featureFlags.tags')}</TableCell>
+                                            <TableCell>{t('featureFlags.enabled')}</TableCell>
                                             <TableCell>{t('featureFlags.createdAt')}</TableCell>
                                             {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                                         </TableRow>
@@ -312,7 +376,14 @@ const FeatureSegmentsPage: React.FC = () => {
                                                         </Tooltip>
                                                     </Box>
                                                 </TableCell>
-                                                <TableCell>{segment.displayName || segment.segmentName}</TableCell>
+                                                <TableCell>
+                                                    <Typography
+                                                        sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                                                        onClick={() => handleEdit(segment)}
+                                                    >
+                                                        {segment.displayName || segment.segmentName}
+                                                    </Typography>
+                                                </TableCell>
                                                 <TableCell>
                                                     {segment.constraints && segment.constraints.length > 0 ? (
                                                         <Box>
@@ -346,6 +417,42 @@ const FeatureSegmentsPage: React.FC = () => {
                                                     ) : (
                                                         <Typography variant="body2" color="text.disabled">-</Typography>
                                                     )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {segment.tags && segment.tags.length > 0 ? (
+                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                            {segment.tags.map((tagName, idx) => {
+                                                                const tagData = allTags.find(t => t.name === tagName);
+                                                                const color = tagData?.color || '#888888';
+                                                                return (
+                                                                    <Tooltip key={idx} title={tagData?.description || ''} arrow>
+                                                                        <Chip
+                                                                            label={tagName}
+                                                                            size="small"
+                                                                            sx={{ bgcolor: color, color: getContrastColor(color), fontSize: '0.75rem' }}
+                                                                        />
+                                                                    </Tooltip>
+                                                                );
+                                                            })}
+                                                        </Box>
+                                                    ) : (
+                                                        <Typography variant="body2" color="text.disabled">-</Typography>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Switch
+                                                        size="small"
+                                                        checked={segment.isActive !== false}
+                                                        onChange={async () => {
+                                                            try {
+                                                                await api.put(`/admin/features/segments/${segment.id}`, { isActive: !segment.isActive });
+                                                                loadSegments();
+                                                            } catch (error: any) {
+                                                                enqueueSnackbar(parseApiErrorMessage(error, t('common.saveFailed')), { variant: 'error' });
+                                                            }
+                                                        }}
+                                                        disabled={!canManage}
+                                                    />
                                                 </TableCell>
                                                 <TableCell>
                                                     <Tooltip title={formatDateTimeDetailed(segment.createdAt)}>
@@ -430,6 +537,66 @@ const FeatureSegmentsPage: React.FC = () => {
                                 disabled={!canManage}
                             />
                         </Box>
+
+                        <Divider />
+
+                        {/* Tags */}
+                        <Autocomplete
+                            multiple
+                            options={allTags}
+                            getOptionLabel={(option) => typeof option === 'string' ? option : option.name}
+                            filterSelectedOptions
+                            isOptionEqualToValue={(option, value) => {
+                                const optName = typeof option === 'string' ? option : option.name;
+                                const valName = typeof value === 'string' ? value : value.name;
+                                return optName === valName;
+                            }}
+                            value={(editingSegment?.tags || []).map(tagName => {
+                                const found = allTags.find(t => t.name === tagName);
+                                return found || { id: 0, name: tagName, color: '#888888' };
+                            })}
+                            onChange={(_, newValue) => {
+                                const tagNames = newValue.map(v => typeof v === 'string' ? v : v.name);
+                                setEditingSegment(prev => ({ ...prev, tags: tagNames }));
+                            }}
+                            renderTags={(value, getTagProps) =>
+                                value.map((option, idx) => {
+                                    const { key, ...chipProps } = getTagProps({ index: idx });
+                                    const tagData = typeof option === 'string' ? { name: option, color: '#888888' } : option;
+                                    return (
+                                        <Tooltip key={key} title={tagData.description || ''} arrow>
+                                            <Chip
+                                                size="small"
+                                                label={tagData.name}
+                                                sx={{ bgcolor: tagData.color, color: getContrastColor(tagData.color) }}
+                                                {...chipProps}
+                                            />
+                                        </Tooltip>
+                                    );
+                                })
+                            }
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label={t('featureFlags.tags')}
+                                    placeholder={t('featureFlags.tagsPlaceholder')}
+                                    helperText={t('featureFlags.tagsHelp')}
+                                />
+                            )}
+                            renderOption={(props, option) => {
+                                const tagData = typeof option === 'string' ? { name: option, color: '#888888', description: '' } : option;
+                                return (
+                                    <Box component="li" {...props}>
+                                        <Chip
+                                            label={tagData.name}
+                                            size="small"
+                                            sx={{ bgcolor: tagData.color, color: getContrastColor(tagData.color), mr: 1 }}
+                                        />
+                                        {tagData.description || t('tags.noDescription')}
+                                    </Box>
+                                );
+                            }}
+                        />
                     </Stack>
                 </Box>
 

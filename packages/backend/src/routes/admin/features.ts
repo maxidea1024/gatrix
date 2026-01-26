@@ -300,6 +300,24 @@ router.post(
     })
 );
 
+// Update all strategies for a flag (bulk replace)
+router.put(
+    '/:flagName/strategies',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const environment = req.environment || 'development';
+        const userId = req.user?.id;
+
+        const strategies = await featureFlagService.updateStrategies(
+            environment,
+            req.params.flagName,
+            req.body.strategies || [],
+            userId!
+        );
+
+        res.json({ success: true, data: { strategies } });
+    })
+);
+
 // Update a strategy
 router.put(
     '/:flagName/strategies/:strategyId',

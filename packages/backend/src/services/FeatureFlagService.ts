@@ -348,6 +348,11 @@ class FeatureFlagService {
             throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
         }
 
+        // Only archived flags can be deleted for safety
+        if (!flag.isArchived) {
+            throw new GatrixError('Only archived flags can be deleted. Please archive the flag first.', 400, true, ErrorCodes.BAD_REQUEST);
+        }
+
         await FeatureFlagModel.delete(flag.id);
 
         await AuditLogModel.create({
@@ -414,6 +419,40 @@ class FeatureFlagService {
         }
 
         await FeatureStrategyModel.delete(strategyId);
+    }
+
+    /**
+     * Update all strategies for a flag (bulk replace)
+     */
+    async updateStrategies(environment: string, flagName: string, strategies: CreateStrategyInput[], userId: number): Promise<FeatureStrategyAttributes[]> {
+        const flag = await this.getFlag(environment, flagName);
+        if (!flag) {
+            throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
+        }
+
+        // Delete existing strategies
+        const existingStrategies = await FeatureStrategyModel.findByFlagId(flag.id);
+        for (const strategy of existingStrategies) {
+            await FeatureStrategyModel.delete(strategy.id);
+        }
+
+        // Create new strategies
+        const newStrategies: FeatureStrategyAttributes[] = [];
+        for (let i = 0; i < strategies.length; i++) {
+            const input = strategies[i];
+            const strategy = await FeatureStrategyModel.create({
+                flagId: flag.id,
+                strategyName: input.strategyName,
+                parameters: input.parameters,
+                constraints: input.constraints,
+                sortOrder: input.sortOrder ?? i,
+                isEnabled: input.isEnabled ?? true,
+                createdBy: userId,
+            });
+            newStrategies.push(strategy);
+        }
+
+        return newStrategies;
     }
 
     // ==================== Variants ====================
@@ -555,6 +594,7 @@ class FeatureFlagService {
             fieldType: input.fieldType!,
             description: input.description,
             legalValues: input.legalValues,
+            tags: input.tags,
             stickiness: input.stickiness ?? false,
             sortOrder: input.sortOrder ?? 0,
             createdBy: userId,

@@ -34,6 +34,7 @@ import {
     Archive as ArchiveIcon,
     Unarchive as UnarchiveIcon,
     Delete as DeleteIcon,
+    ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -42,8 +43,11 @@ import featureFlagService, { FeatureFlag, FlagType } from '../../services/featur
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyState from '../../components/common/EmptyState';
 import { useDebounce } from '../../hooks/useDebounce';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import { tagService, Tag } from '../../services/tagService';
+import { getContrastColor } from '../../utils/colorUtils';
 
 const FeatureFlagsPage: React.FC = () => {
     const { t } = useTranslation();
@@ -64,6 +68,7 @@ const FeatureFlagsPage: React.FC = () => {
     const [showArchived, setShowArchived] = useState(false);
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [deletingFlag, setDeletingFlag] = useState<FeatureFlag | null>(null);
+    const [allTags, setAllTags] = useState<Tag[]>([]);
 
     // Sorting state
     const [orderBy, setOrderBy] = useState<string>(() => {
@@ -111,9 +116,22 @@ const FeatureFlagsPage: React.FC = () => {
         }
     };
 
+    const loadTags = async () => {
+        try {
+            const tags = await tagService.list();
+            setAllTags(tags);
+        } catch {
+            setAllTags([]);
+        }
+    };
+
     useEffect(() => {
         loadFlags();
     }, [page, rowsPerPage, debouncedSearchTerm, orderBy, order, flagTypeFilter, showArchived]);
+
+    useEffect(() => {
+        loadTags();
+    }, []);
 
     // Sort handler
     const handleSort = (colId: string) => {
@@ -306,6 +324,7 @@ const FeatureFlagsPage: React.FC = () => {
                                                     {t('featureFlags.createdAt')}
                                                 </TableSortLabel>
                                             </TableCell>
+                                            <TableCell>{t('featureFlags.tags')}</TableCell>
                                             {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                                         </TableRow>
                                     </TableHead>
@@ -315,23 +334,50 @@ const FeatureFlagsPage: React.FC = () => {
                                                 key={flag.id}
                                                 hover
                                                 sx={{
-                                                    cursor: 'pointer',
                                                     ...(flag.isArchived ? { opacity: 0.6 } : {})
                                                 }}
-                                                onClick={() => navigate(`/game/feature-flags/${flag.flagName}`)}
                                             >
                                                 <TableCell>
-                                                    <Typography fontWeight={500}>{flag.flagName}</Typography>
-                                                    {flag.tags && flag.tags.length > 0 && (
-                                                        <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5 }}>
-                                                            {flag.tags.slice(0, 3).map((tag, idx) => (
-                                                                <Chip key={idx} label={tag} size="small" variant="outlined" sx={{ height: 20 }} />
-                                                            ))}
-                                                            {flag.tags.length > 3 && <Chip label={`+${flag.tags.length - 3}`} size="small" sx={{ height: 20 }} />}
-                                                        </Box>
-                                                    )}
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                        <Typography
+                                                            fontWeight={500}
+                                                            sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                                                            onClick={() => navigate(`/game/feature-flags/${flag.flagName}`)}
+                                                        >
+                                                            {flag.flagName}
+                                                        </Typography>
+                                                        <Tooltip title={t('common.copy')}>
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={(e) => { e.stopPropagation(); copyToClipboardWithNotification(flag.flagName, enqueueSnackbar, t); }}
+                                                                sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
+                                                            >
+                                                                <CopyIcon sx={{ fontSize: 14 }} />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </Box>
                                                 </TableCell>
-                                                <TableCell>{flag.displayName || '-'}</TableCell>
+                                                <TableCell>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                        <Typography
+                                                            sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                                                            onClick={() => navigate(`/game/feature-flags/${flag.flagName}`)}
+                                                        >
+                                                            {flag.displayName || '-'}
+                                                        </Typography>
+                                                        {flag.displayName && (
+                                                            <Tooltip title={t('common.copy')}>
+                                                                <IconButton
+                                                                    size="small"
+                                                                    onClick={(e) => { e.stopPropagation(); copyToClipboardWithNotification(flag.displayName!, enqueueSnackbar, t); }}
+                                                                    sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
+                                                                >
+                                                                    <CopyIcon sx={{ fontSize: 14 }} />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        )}
+                                                    </Box>
+                                                </TableCell>
                                                 <TableCell>
                                                     <Chip label={t(`featureFlags.types.${flag.flagType}`)} size="small" color={getTypeColor(flag.flagType)} />
                                                 </TableCell>
@@ -341,22 +387,49 @@ const FeatureFlagsPage: React.FC = () => {
                                                         checked={flag.isEnabled}
                                                         onChange={() => handleToggle(flag)}
                                                         disabled={flag.isArchived || !canManage}
+                                                        onClick={(e) => e.stopPropagation()}
                                                     />
                                                 </TableCell>
-                                                <TableCell>{formatDateTimeDetailed(flag.createdAt)}</TableCell>
+                                                <TableCell>
+                                                    <Tooltip title={formatDateTimeDetailed(flag.createdAt)}>
+                                                        <span>{formatRelativeTime(flag.createdAt)}</span>
+                                                    </Tooltip>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                        {flag.tags?.slice(0, 3).map((tagName) => {
+                                                            const tagData = allTags.find(t => t.name === tagName);
+                                                            const color = tagData?.color || '#888888';
+                                                            return (
+                                                                <Tooltip key={tagName} title={tagData?.description || ''} arrow>
+                                                                    <Chip
+                                                                        label={tagName}
+                                                                        size="small"
+                                                                        sx={{ height: 20, bgcolor: color, color: getContrastColor(color) }}
+                                                                    />
+                                                                </Tooltip>
+                                                            );
+                                                        })}
+                                                        {flag.tags && flag.tags.length > 3 && (
+                                                            <Chip label={`+${flag.tags.length - 3}`} size="small" sx={{ height: 20 }} />
+                                                        )}
+                                                    </Box>
+                                                </TableCell>
                                                 {canManage && (
                                                     <TableCell align="center">
                                                         <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
                                                             <Tooltip title={flag.isArchived ? t('featureFlags.revive') : t('featureFlags.archive')}>
-                                                                <IconButton size="small" onClick={() => handleArchiveToggle(flag)}>
+                                                                <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleArchiveToggle(flag); }}>
                                                                     {flag.isArchived ? <UnarchiveIcon fontSize="small" /> : <ArchiveIcon fontSize="small" />}
                                                                 </IconButton>
                                                             </Tooltip>
-                                                            <Tooltip title={t('common.delete')}>
-                                                                <IconButton size="small" onClick={() => handleDelete(flag)}>
-                                                                    <DeleteIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
+                                                            {flag.isArchived && (
+                                                                <Tooltip title={t('common.delete')}>
+                                                                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleDelete(flag); }}>
+                                                                        <DeleteIcon fontSize="small" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            )}
                                                         </Box>
                                                     </TableCell>
                                                 )}

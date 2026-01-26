@@ -70,7 +70,14 @@ export interface UpdateFeatureFlagInput {
  */
 export async function getFeatureFlags(params: FeatureFlagListParams = {}): Promise<FeatureFlagListResponse> {
     const response = await api.get('/admin/features', { params });
-    return response.data;
+    // Backend returns { data: [...], total: N }, map to { flags: [...], total: N }
+    const result = response.data;
+    return {
+        flags: result.data || [],
+        total: result.total || 0,
+        page: params.page || 1,
+        limit: params.limit || 50,
+    };
 }
 
 /**

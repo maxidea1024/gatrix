@@ -80,9 +80,11 @@ import { parseApiErrorMessage } from '../../utils/errorUtils';
 import api from '../../services/api';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import ConstraintEditor, { Constraint, ContextField } from '../../components/features/ConstraintEditor';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
+import { tagService, Tag } from '../../services/tagService';
+import { getContrastColor } from '../../utils/colorUtils';
 
 // ==================== Types ====================
 
@@ -217,6 +219,22 @@ const FeatureFlagDetailPage: React.FC = () => {
     const [contextFields, setContextFields] = useState<ContextField[]>([]);
     const [segments, setSegments] = useState<any[]>([]);
     const [expandedSegments, setExpandedSegments] = useState<Set<string>>(new Set());
+    const [allTags, setAllTags] = useState<Tag[]>([]);
+    const [originalFlag, setOriginalFlag] = useState<FeatureFlag | null>(null);
+
+    // Check if there are unsaved changes
+    const hasChanges = (): boolean => {
+        if (!flag) return false;
+        if (isCreating) return true; // Always allow save for new flags
+        if (!originalFlag) return false;
+        return (
+            flag.displayName !== originalFlag.displayName ||
+            flag.description !== originalFlag.description ||
+            flag.impressionDataEnabled !== originalFlag.impressionDataEnabled ||
+            flag.staleAfterDays !== originalFlag.staleAfterDays ||
+            JSON.stringify(flag.tags || []) !== JSON.stringify(originalFlag.tags || [])
+        );
+    };
 
     // Load data
     const loadFlag = useCallback(async () => {
@@ -224,7 +242,9 @@ const FeatureFlagDetailPage: React.FC = () => {
         setLoading(true);
         try {
             const response = await api.get(`/admin/features/${flagName}`);
-            setFlag(response.data?.flag || null);
+            const loadedFlag = response.data?.flag || null;
+            setFlag(loadedFlag);
+            setOriginalFlag(loadedFlag ? { ...loadedFlag } : null);
         } catch (error: any) {
             enqueueSnackbar(parseApiErrorMessage(error, t('featureFlags.loadFailed')), { variant: 'error' });
             navigate('/game/feature-flags');
@@ -237,12 +257,15 @@ const FeatureFlagDetailPage: React.FC = () => {
         try {
             const response = await api.get('/admin/features/context-fields');
             const fields = response.data?.contextFields || [];
-            setContextFields(fields.map((f: any) => ({
-                fieldName: f.fieldName,
-                displayName: f.displayName || f.fieldName,
-                fieldType: f.fieldType || 'string',
-                legalValues: f.legalValues || [],
-            })));
+            setContextFields(fields
+                .filter((f: any) => f.isEnabled !== false)
+                .map((f: any) => ({
+                    fieldName: f.fieldName,
+                    displayName: f.displayName || f.fieldName,
+                    description: f.description || '',
+                    fieldType: f.fieldType || 'string',
+                    legalValues: f.legalValues || [],
+                })));
         } catch {
             // Use defaults if API fails
             setContextFields([
@@ -257,9 +280,19 @@ const FeatureFlagDetailPage: React.FC = () => {
     const loadSegments = useCallback(async () => {
         try {
             const response = await api.get('/admin/features/segments');
-            setSegments(response.data?.segments || []);
+            const allSegments = response.data?.segments || [];
+            setSegments(allSegments.filter((s: any) => s.isActive !== false));
         } catch {
             setSegments([]);
+        }
+    }, []);
+
+    const loadTags = useCallback(async () => {
+        try {
+            const tags = await tagService.list();
+            setAllTags(tags);
+        } catch {
+            setAllTags([]);
         }
     }, []);
 
@@ -269,7 +302,8 @@ const FeatureFlagDetailPage: React.FC = () => {
         }
         loadContextFields();
         loadSegments();
-    }, [loadFlag, loadContextFields, loadSegments, isCreating]);
+        loadTags();
+    }, [loadFlag, loadContextFields, loadSegments, loadTags, isCreating]);
 
     // Handlers
     const handleToggle = async () => {
@@ -351,7 +385,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     tags: flag.tags,
                 });
                 setFlag(response.data?.flag || flag);
+                setOriginalFlag(response.data?.flag || flag);
                 enqueueSnackbar(t('featureFlags.updateSuccess'), { variant: 'success' });
+                navigate('/game/feature-flags');
             }
         } catch (error: any) {
             enqueueSnackbar(parseApiErrorMessage(error, isCreating ? t('featureFlags.createFailed') : t('featureFlags.updateFailed')), { variant: 'error' });
@@ -458,6 +494,26 @@ const FeatureFlagDetailPage: React.FC = () => {
                 loadFlag();
             } catch (error: any) {
                 enqueueSnackbar(parseApiErrorMessage(error, t('featureFlags.strategyDeleteFailed')), { variant: 'error' });
+            }
+        }
+    };
+
+    const handleSaveStrategies = async () => {
+        if (!flag) return;
+
+        if (isCreating) {
+            // In create mode, strategies are already in local state
+            return;
+        } else {
+            // In edit mode, call API to save all strategies
+            try {
+                await api.put(`/admin/features/${flag.flagName}/strategies`, {
+                    strategies: flag.strategies || [],
+                });
+                enqueueSnackbar(t('featureFlags.strategiesSaved'), { variant: 'success' });
+                loadFlag();
+            } catch (error: any) {
+                enqueueSnackbar(parseApiErrorMessage(error, t('featureFlags.strategiesSaveFailed')), { variant: 'error' });
             }
         }
     };
@@ -689,7 +745,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                 <MenuItem value="experiment">{t('featureFlags.flagTypes.experiment')}</MenuItem>
                                                 <MenuItem value="operational">{t('featureFlags.flagTypes.operational')}</MenuItem>
                                                 <MenuItem value="permission">{t('featureFlags.flagTypes.permission')}</MenuItem>
-                                                <MenuItem value="killSwitch">{t('featureFlags.flagTypes.killSwitch')}</MenuItem>
                                             </Select>
                                             <FormHelperText>{t('featureFlags.flagTypeHelp')}</FormHelperText>
                                         </FormControl>
@@ -727,33 +782,66 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     {/* Tags */}
                                     <Divider sx={{ my: 3 }} />
                                     <Typography variant="subtitle2" gutterBottom>{t('featureFlags.tags')}</Typography>
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                        {flag.tags?.map((tag) => (
-                                            <Chip
-                                                key={tag}
-                                                label={tag}
-                                                onDelete={canManage ? () => setFlag({ ...flag, tags: flag.tags?.filter(t => t !== tag) }) : undefined}
-                                                size="small"
-                                            />
-                                        ))}
-                                        {canManage && (
-                                            <Chip
-                                                icon={<AddIcon />}
-                                                label={t('featureFlags.addTag')}
-                                                onClick={() => {
-                                                    // Add an empty tag for now, user can edit
-                                                    const tagName = `tag-${Date.now().toString(36).slice(-4)}`;
-                                                    setFlag({ ...flag, tags: [...(flag.tags || []), tagName] });
-                                                }}
-                                                variant="outlined"
-                                                size="small"
-                                            />
-                                        )}
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}>
+                                        {flag.tags?.map((tagName) => {
+                                            const tagData = allTags.find(t => t.name === tagName);
+                                            const color = tagData?.color || '#888888';
+                                            return (
+                                                <Tooltip key={tagName} title={tagData?.description || ''} arrow>
+                                                    <Chip
+                                                        label={tagName}
+                                                        onDelete={canManage ? () => setFlag({ ...flag, tags: flag.tags?.filter(t => t !== tagName) }) : undefined}
+                                                        size="small"
+                                                        sx={{ bgcolor: color, color: getContrastColor(color) }}
+                                                    />
+                                                </Tooltip>
+                                            );
+                                        })}
                                     </Box>
+                                    {canManage && (
+                                        <Autocomplete
+                                            size="small"
+                                            sx={{ maxWidth: 300 }}
+                                            options={allTags.filter(t => !(flag.tags || []).includes(t.name))}
+                                            getOptionLabel={(option) => option.name}
+                                            value={null}
+                                            onChange={(_, selected) => {
+                                                if (selected) {
+                                                    setFlag({ ...flag, tags: [...(flag.tags || []), selected.name] });
+                                                }
+                                            }}
+                                            renderOption={(props, option) => (
+                                                <Box component="li" {...props} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <Box
+                                                        sx={{
+                                                            width: 16,
+                                                            height: 16,
+                                                            borderRadius: '50%',
+                                                            bgcolor: option.color || '#888888',
+                                                            flexShrink: 0,
+                                                        }}
+                                                    />
+                                                    <Box>
+                                                        <Typography variant="body2">{option.name}</Typography>
+                                                        {option.description && (
+                                                            <Typography variant="caption" color="text.secondary">{option.description}</Typography>
+                                                        )}
+                                                    </Box>
+                                                </Box>
+                                            )}
+                                            renderInput={(params) => (
+                                                <TextField {...params} placeholder={t('featureFlags.selectTags')} size="small" />
+                                            )}
+                                            disabled={allTags.length === 0}
+                                            noOptionsText={t('featureFlags.noTagsAvailable')}
+                                            clearOnBlur
+                                            blurOnSelect
+                                        />
+                                    )}
 
                                     {canManage && (
                                         <Box sx={{ mt: 3 }}>
-                                            <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSave} disabled={saving}>
+                                            <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSave} disabled={saving || !hasChanges()}>
                                                 {isCreating ? t('common.create') : t('common.save')}
                                             </Button>
                                         </Box>
@@ -768,16 +856,37 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         <Typography variant="subtitle2" gutterBottom>{t('featureFlags.metadata')}</Typography>
                                         <List dense>
                                             <ListItem>
-                                                <ListItemText primary={t('featureFlags.createdAt')} secondary={formatDateTimeDetailed(flag.createdAt)} />
+                                                <ListItemText
+                                                    primary={t('featureFlags.createdAt')}
+                                                    secondary={
+                                                        <Tooltip title={formatDateTimeDetailed(flag.createdAt)} arrow>
+                                                            <span>{formatRelativeTime(flag.createdAt)}</span>
+                                                        </Tooltip>
+                                                    }
+                                                />
                                             </ListItem>
                                             {flag.updatedAt && (
                                                 <ListItem>
-                                                    <ListItemText primary={t('featureFlags.updatedAt')} secondary={formatDateTimeDetailed(flag.updatedAt)} />
+                                                    <ListItemText
+                                                        primary={t('featureFlags.updatedAt')}
+                                                        secondary={
+                                                            <Tooltip title={formatDateTimeDetailed(flag.updatedAt)} arrow>
+                                                                <span>{formatRelativeTime(flag.updatedAt)}</span>
+                                                            </Tooltip>
+                                                        }
+                                                    />
                                                 </ListItem>
                                             )}
                                             {flag.lastSeenAt && (
                                                 <ListItem>
-                                                    <ListItemText primary={t('featureFlags.lastSeenAt')} secondary={formatDateTimeDetailed(flag.lastSeenAt)} />
+                                                    <ListItemText
+                                                        primary={t('featureFlags.lastSeenAt')}
+                                                        secondary={
+                                                            <Tooltip title={formatDateTimeDetailed(flag.lastSeenAt)} arrow>
+                                                                <span>{formatRelativeTime(flag.lastSeenAt)}</span>
+                                                            </Tooltip>
+                                                        }
+                                                    />
                                                 </ListItem>
                                             )}
                                         </List>
@@ -793,15 +902,17 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                 >
                                                     {flag.isArchived ? t('featureFlags.revive') : t('featureFlags.archive')}
                                                 </Button>
-                                                <Button
-                                                    variant="outlined"
-                                                    color="error"
-                                                    startIcon={<DeleteIcon />}
-                                                    onClick={() => setDeleteDialogOpen(true)}
-                                                    fullWidth
-                                                >
-                                                    {t('common.delete')}
-                                                </Button>
+                                                {flag.isArchived && (
+                                                    <Button
+                                                        variant="outlined"
+                                                        color="error"
+                                                        startIcon={<DeleteIcon />}
+                                                        onClick={() => setDeleteDialogOpen(true)}
+                                                        fullWidth
+                                                    >
+                                                        {t('common.delete')}
+                                                    </Button>
+                                                )}
                                             </Box>
                                         )}
                                     </Paper>
@@ -1841,10 +1952,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                         <Alert severity="info">{t('featureFlags.metricsComingSoon')}</Alert>
                     </CardContent>
                 </TabPanel>
-            </Card>
+            </Card >
 
             {/* Delete Confirmation Dialog */}
-            <ConfirmDeleteDialog
+            < ConfirmDeleteDialog
                 open={deleteDialogOpen}
                 onClose={() => setDeleteDialogOpen(false)}
                 onConfirm={handleDelete}

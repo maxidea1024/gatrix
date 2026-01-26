@@ -25,6 +25,7 @@ import {
     Autocomplete,
     Stack,
     FormHelperText,
+    Switch,
 } from '@mui/material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {
@@ -46,6 +47,8 @@ import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateForm
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import api from '../../services/api';
+import { tagService } from '../../services/tagService';
+import { getContrastColor } from '../../utils/colorUtils';
 
 interface FeatureContextField {
     id: string;
@@ -55,6 +58,8 @@ interface FeatureContextField {
     description: string;
     fieldType: 'string' | 'number' | 'boolean' | 'datetime' | 'semver';
     legalValues: string[];
+    isEnabled: boolean;
+    tags: string[];
     sortOrder: number;
     createdAt: string;
     updatedAt: string;
@@ -79,6 +84,7 @@ const FeatureContextFieldsPage: React.FC = () => {
     const [editingField, setEditingField] = useState<Partial<FeatureContextField> | null>(null);
     const [originalField, setOriginalField] = useState<Partial<FeatureContextField> | null>(null);
     const [expandedLegalValues, setExpandedLegalValues] = useState<Set<string>>(new Set());
+    const [allTags, setAllTags] = useState<{ id: number; name: string; color: string; description?: string }[]>([]);
 
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -108,6 +114,19 @@ const FeatureContextFieldsPage: React.FC = () => {
         loadFields();
     }, [page, rowsPerPage, debouncedSearchTerm]);
 
+    // Load tags for selection
+    useEffect(() => {
+        const loadTags = async () => {
+            try {
+                const tags = await tagService.list();
+                setAllTags(tags);
+            } catch (error) {
+                console.error('Failed to load tags:', error);
+            }
+        };
+        loadTags();
+    }, []);
+
     // Handlers
     const handleEdit = (field: FeatureContextField) => {
         setEditingField(field);
@@ -116,7 +135,7 @@ const FeatureContextFieldsPage: React.FC = () => {
     };
 
     const handleCreate = () => {
-        const newField = { fieldName: '', displayName: '', description: '', fieldType: 'string' as const, legalValues: [], sortOrder: 0 };
+        const newField = { fieldName: '', displayName: '', description: '', fieldType: 'string' as const, legalValues: [], tags: [], sortOrder: 0 };
         setEditingField(newField);
         setOriginalField(null);
         setEditDialogOpen(true);
@@ -140,8 +159,14 @@ const FeatureContextFieldsPage: React.FC = () => {
         const legalValuesChanged = editingLegalValues.length !== originalLegalValues.length ||
             editingLegalValues.some((v, i) => v !== originalLegalValues[i]);
 
+        // Compare tags arrays
+        const editingTags = editingField.tags || [];
+        const originalTags = originalField.tags || [];
+        const tagsChanged = editingTags.length !== originalTags.length ||
+            editingTags.some((v, i) => v !== originalTags[i]);
+
         return fieldNameChanged || displayNameChanged || descriptionChanged ||
-            fieldTypeChanged || sortOrderChanged || legalValuesChanged;
+            fieldTypeChanged || sortOrderChanged || legalValuesChanged || tagsChanged;
     };
 
     const handleSave = async () => {
@@ -254,8 +279,11 @@ const FeatureContextFieldsPage: React.FC = () => {
                                         <TableRow>
                                             <TableCell>{t('featureFlags.fieldName')}</TableCell>
                                             <TableCell>{t('featureFlags.displayName')}</TableCell>
+                                            <TableCell>{t('featureFlags.description')}</TableCell>
                                             <TableCell>{t('featureFlags.fieldType')}</TableCell>
                                             <TableCell>{t('featureFlags.legalValuesColumn')}</TableCell>
+                                            <TableCell>{t('featureFlags.tags')}</TableCell>
+                                            <TableCell>{t('featureFlags.enabled')}</TableCell>
                                             <TableCell>{t('featureFlags.createdAt')}</TableCell>
                                             {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                                         </TableRow>
@@ -285,7 +313,12 @@ const FeatureContextFieldsPage: React.FC = () => {
                                                 </TableCell>
                                                 <TableCell>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                        <Typography>{field.displayName || field.fieldName}</Typography>
+                                                        <Typography
+                                                            sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                                                            onClick={() => handleEdit(field)}
+                                                        >
+                                                            {field.displayName || field.fieldName}
+                                                        </Typography>
                                                         <Tooltip title={t('common.copy')}>
                                                             <IconButton
                                                                 size="small"
@@ -296,6 +329,11 @@ const FeatureContextFieldsPage: React.FC = () => {
                                                             </IconButton>
                                                         </Tooltip>
                                                     </Box>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                        {field.description || '-'}
+                                                    </Typography>
                                                 </TableCell>
                                                 <TableCell><Chip label={getFieldTypeLabel(field.fieldType)} size="small" /></TableCell>
                                                 <TableCell>
@@ -330,6 +368,42 @@ const FeatureContextFieldsPage: React.FC = () => {
                                                     ) : (
                                                         <Typography variant="body2" color="text.disabled">-</Typography>
                                                     )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {field.tags && field.tags.length > 0 ? (
+                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                            {field.tags.map((tagName, idx) => {
+                                                                const tagData = allTags.find(t => t.name === tagName);
+                                                                const color = tagData?.color || '#888888';
+                                                                return (
+                                                                    <Tooltip key={idx} title={tagData?.description || ''} arrow>
+                                                                        <Chip
+                                                                            label={tagName}
+                                                                            size="small"
+                                                                            sx={{ bgcolor: color, color: getContrastColor(color), fontSize: '0.75rem' }}
+                                                                        />
+                                                                    </Tooltip>
+                                                                );
+                                                            })}
+                                                        </Box>
+                                                    ) : (
+                                                        <Typography variant="body2" color="text.disabled">-</Typography>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Switch
+                                                        size="small"
+                                                        checked={field.isEnabled !== false}
+                                                        onChange={async () => {
+                                                            try {
+                                                                await api.put(`/admin/features/context-fields/${field.id}`, { isEnabled: !field.isEnabled });
+                                                                loadFields();
+                                                            } catch (error: any) {
+                                                                enqueueSnackbar(parseApiErrorMessage(error, t('common.saveFailed')), { variant: 'error' });
+                                                            }
+                                                        }}
+                                                        disabled={!canManage}
+                                                    />
                                                 </TableCell>
                                                 <TableCell>
                                                     <Tooltip title={formatDateTimeDetailed(field.createdAt)}>
@@ -440,6 +514,64 @@ const FeatureContextFieldsPage: React.FC = () => {
                                 )}
                             />
                         )}
+
+                        {/* Tags */}
+                        <Autocomplete
+                            multiple
+                            options={allTags}
+                            getOptionLabel={(option) => typeof option === 'string' ? option : option.name}
+                            filterSelectedOptions
+                            isOptionEqualToValue={(option, value) => {
+                                const optName = typeof option === 'string' ? option : option.name;
+                                const valName = typeof value === 'string' ? value : value.name;
+                                return optName === valName;
+                            }}
+                            value={(editingField?.tags || []).map(tagName => {
+                                const found = allTags.find(t => t.name === tagName);
+                                return found || { id: 0, name: tagName, color: '#888888' };
+                            })}
+                            onChange={(_, newValue) => {
+                                const tagNames = newValue.map(v => typeof v === 'string' ? v : v.name);
+                                setEditingField(prev => ({ ...prev, tags: tagNames }));
+                            }}
+                            renderTags={(value, getTagProps) =>
+                                value.map((option, idx) => {
+                                    const { key, ...chipProps } = getTagProps({ index: idx });
+                                    const tagData = typeof option === 'string' ? { name: option, color: '#888888' } : option;
+                                    return (
+                                        <Tooltip key={key} title={tagData.description || ''} arrow>
+                                            <Chip
+                                                size="small"
+                                                label={tagData.name}
+                                                sx={{ bgcolor: tagData.color, color: getContrastColor(tagData.color) }}
+                                                {...chipProps}
+                                            />
+                                        </Tooltip>
+                                    );
+                                })
+                            }
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label={t('featureFlags.tags')}
+                                    placeholder={t('featureFlags.tagsPlaceholder')}
+                                    helperText={t('featureFlags.tagsHelp')}
+                                />
+                            )}
+                            renderOption={(props, option) => {
+                                const tagData = typeof option === 'string' ? { name: option, color: '#888888', description: '' } : option;
+                                return (
+                                    <Box component="li" {...props}>
+                                        <Chip
+                                            label={tagData.name}
+                                            size="small"
+                                            sx={{ bgcolor: tagData.color, color: getContrastColor(tagData.color), mr: 1 }}
+                                        />
+                                        {tagData.description || t('tags.noDescription')}
+                                    </Box>
+                                );
+                            }}
+                        />
                     </Stack>
                 </Box>
 

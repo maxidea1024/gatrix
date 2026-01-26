@@ -83,6 +83,7 @@ export type ConstraintOperator =
 export interface ContextField {
     fieldName: string;
     displayName: string;
+    description?: string;
     fieldType: 'string' | 'number' | 'boolean' | 'datetime' | 'semver';
     legalValues?: string[];
 }
@@ -269,16 +270,23 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                                     key={field.fieldName}
                                     value={field.fieldName}
                                     disabled={isUsed}
-                                    sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}
+                                    sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start', py: 1 }}
                                 >
                                     <Tooltip title={field.fieldType}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
                                             {getTypeIcon(field.fieldType)}
                                         </Box>
                                     </Tooltip>
-                                    <Box component="span" sx={{ flex: 1 }}>
-                                        {field.displayName || field.fieldName}
-                                        {isUsed && ` (${t('featureFlags.alreadyUsed')})`}
+                                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                                        <Typography variant="body2">
+                                            {field.displayName || field.fieldName}
+                                            {isUsed && ` (${t('featureFlags.alreadyUsed')})`}
+                                        </Typography>
+                                        {field.description && (
+                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                {field.description}
+                                            </Typography>
+                                        )}
                                     </Box>
                                 </MenuItem>
                             );
