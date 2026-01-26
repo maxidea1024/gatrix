@@ -1014,7 +1014,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                         })()}
                                                     </Typography>
                                                     <Typography variant="caption" color="text.secondary">
-                                                        {strategy.constraints?.length || 0} {t('featureFlags.constraints')}
+                                                        {strategy.segments?.length || 0} {t('featureFlags.segments')}, {strategy.constraints?.length || 0} {t('featureFlags.constraints')}
                                                     </Typography>
                                                 </Box>
                                                 <FormControlLabel
