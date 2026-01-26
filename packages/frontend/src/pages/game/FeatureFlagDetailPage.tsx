@@ -248,8 +248,22 @@ const FeatureFlagDetailPage: React.FC = () => {
         try {
             const response = await api.get(`/admin/features/${flagName}`);
             const loadedFlag = response.data?.flag || null;
+
+            // Transform strategies - map strategyName to name and set title
+            if (loadedFlag?.strategies) {
+                loadedFlag.strategies = loadedFlag.strategies.map((s: any) => {
+                    const strategyType = STRATEGY_TYPES.find(st => st.name === s.strategyName || st.name === s.name);
+                    return {
+                        ...s,
+                        name: s.strategyName || s.name,
+                        title: s.title || (strategyType ? strategyType.titleKey : s.strategyName || s.name),
+                        disabled: s.isEnabled === false,
+                    };
+                });
+            }
+
             setFlag(loadedFlag);
-            setOriginalFlag(loadedFlag ? { ...loadedFlag } : null);
+            setOriginalFlag(loadedFlag ? JSON.parse(JSON.stringify(loadedFlag)) : null);
         } catch (error: any) {
             enqueueSnackbar(parseApiErrorMessage(error, t('featureFlags.loadFailed')), { variant: 'error' });
             navigate('/game/feature-flags');
@@ -992,7 +1006,13 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                     </Box>
                                                 )}
                                                 <Box sx={{ flex: 1 }}>
-                                                    <Typography fontWeight={500}>{strategy.title || strategy.name}</Typography>
+                                                    <Typography fontWeight={500}>
+                                                        {(() => {
+                                                            const strategyType = STRATEGY_TYPES.find(st => st.name === strategy.name);
+                                                            if (strategyType) return t(strategyType.titleKey);
+                                                            return strategy.title || strategy.name;
+                                                        })()}
+                                                    </Typography>
                                                     <Typography variant="caption" color="text.secondary">
                                                         {strategy.constraints?.length || 0} {t('featureFlags.constraints')}
                                                     </Typography>
