@@ -121,7 +121,7 @@ const FeatureFlagTypesPage: React.FC = () => {
     };
 
     return (
-        <Box sx={{ p: 3, maxWidth: 900, mx: 'auto' }}>
+        <Box sx={{ p: 3 }}>
             {/* Header */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
                 <Box>
