@@ -341,12 +341,33 @@ export class FeatureStrategyModel {
                 .where('flagId', flagId)
                 .orderBy('sortOrder', 'asc');
 
-            return strategies.map((s: any) => ({
-                ...s,
-                isEnabled: Boolean(s.isEnabled),
-                parameters: parseJsonField<StrategyParameters>(s.parameters),
-                constraints: parseJsonField<Constraint[]>(s.constraints) || [],
-            }));
+            // Load segments for each strategy
+            const result = [];
+            for (const s of strategies) {
+                const segmentLinks = await db('g_feature_flag_segments')
+                    .where('strategyId', s.id)
+                    .select('segmentId');
+
+                const segmentNames: string[] = [];
+                for (const link of segmentLinks) {
+                    const segment = await db('g_feature_segments')
+                        .where('id', link.segmentId)
+                        .first();
+                    if (segment) {
+                        segmentNames.push(segment.segmentName);
+                    }
+                }
+
+                result.push({
+                    ...s,
+                    isEnabled: Boolean(s.isEnabled),
+                    parameters: parseJsonField<StrategyParameters>(s.parameters),
+                    constraints: parseJsonField<Constraint[]>(s.constraints) || [],
+                    segments: segmentNames,
+                });
+            }
+
+            return result;
         } catch (error) {
             logger.error('Error finding strategies by flag ID:', error);
             throw error;
