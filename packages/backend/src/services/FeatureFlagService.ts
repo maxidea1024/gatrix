@@ -466,10 +466,10 @@ class FeatureFlagService {
             throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
         }
 
-        // Validate total weight
+        // Validate total weight (100% = 100)
         const totalWeight = variants.reduce((sum, v) => sum + v.weight, 0);
-        if (totalWeight !== 1000 && variants.length > 0) {
-            throw new GatrixError(`Total variant weight must equal 1000 (100%), got ${totalWeight}`, 400, true, ErrorCodes.BAD_REQUEST);
+        if (totalWeight !== 100 && variants.length > 0) {
+            throw new GatrixError(`Total variant weight must equal 100 (100%), got ${totalWeight}`, 400, true, ErrorCodes.BAD_REQUEST);
         }
 
         // Validate payload types are consistent
