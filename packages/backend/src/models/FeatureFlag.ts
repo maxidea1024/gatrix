@@ -602,9 +602,18 @@ export class FeatureSegmentModel {
 // ==================== Feature Context Field Model ====================
 
 export class FeatureContextFieldModel {
-    static async findAll(): Promise<FeatureContextFieldAttributes[]> {
+    static async findAll(search?: string): Promise<FeatureContextFieldAttributes[]> {
         try {
-            const fields = await db('g_feature_context_fields').orderBy('sortOrder', 'asc');
+            let query = db('g_feature_context_fields');
+
+            if (search) {
+                query = query.where((qb: any) => {
+                    qb.where('fieldName', 'like', `%${search}%`)
+                        .orWhere('description', 'like', `%${search}%`);
+                });
+            }
+
+            const fields = await query.orderBy('sortOrder', 'asc');
 
             return fields.map((f: any) => ({
                 ...f,

@@ -576,8 +576,8 @@ class FeatureFlagService {
     /**
      * List context fields
      */
-    async listContextFields(): Promise<FeatureContextFieldAttributes[]> {
-        return FeatureContextFieldModel.findAll();
+    async listContextFields(search?: string): Promise<FeatureContextFieldAttributes[]> {
+        return FeatureContextFieldModel.findAll(search);
     }
 
     /**

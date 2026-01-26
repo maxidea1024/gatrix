@@ -109,8 +109,9 @@ router.delete(
 // List context fields
 router.get(
     '/context-fields',
-    asyncHandler(async (_req: AuthenticatedRequest, res: Response) => {
-        const fields = await featureFlagService.listContextFields();
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const { search } = req.query;
+        const fields = await featureFlagService.listContextFields(search as string | undefined);
 
         res.json({ success: true, data: { contextFields: fields } });
     })
