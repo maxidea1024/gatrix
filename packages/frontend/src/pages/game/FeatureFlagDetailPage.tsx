@@ -606,8 +606,17 @@ const FeatureFlagDetailPage: React.FC = () => {
         } else {
             // In edit mode, call API
             try {
+                // Map frontend field names to backend field names
+                const mappedVariants = (flag.variants || []).map(v => ({
+                    variantName: v.name,
+                    weight: v.weight,
+                    stickiness: v.stickiness,
+                    payload: v.payload,
+                    payloadType: v.payload?.type || 'string',
+                    overrides: v.overrides,
+                }));
                 await api.put(`/admin/features/${flag.flagName}/variants`, {
-                    variants: flag.variants || [],
+                    variants: mappedVariants,
                 });
                 enqueueSnackbar(t('featureFlags.variantsSaved'), { variant: 'success' });
                 setVariantDialogOpen(false);
