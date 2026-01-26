@@ -235,6 +235,12 @@ const FeatureFlagDetailPage: React.FC = () => {
         );
     };
 
+    // Check if strategies have changed
+    const hasStrategyChanges = (): boolean => {
+        if (!flag || !originalFlag) return false;
+        return JSON.stringify(flag.strategies || []) !== JSON.stringify(originalFlag.strategies || []);
+    };
+
     // Load data
     const loadFlag = useCallback(async () => {
         if (!flagName || isCreating) return;
@@ -484,23 +490,12 @@ const FeatureFlagDetailPage: React.FC = () => {
         }
     };
 
-    const handleDeleteStrategy = async (strategyId: string, strategyIndex: number) => {
+    const handleDeleteStrategy = (_strategyId: string, strategyIndex: number) => {
         if (!flag) return;
 
-        if (isCreating) {
-            // In create mode, use index since new strategies don't have IDs
-            const strategies = (flag.strategies || []).filter((_, idx) => idx !== strategyIndex);
-            setFlag({ ...flag, strategies });
-        } else {
-            // In edit mode, call API
-            try {
-                await api.delete(`/admin/features/${flag.flagName}/strategies/${strategyId}`);
-                enqueueSnackbar(t('featureFlags.strategyDeleted'), { variant: 'success' });
-                loadFlag();
-            } catch (error: any) {
-                enqueueSnackbar(parseApiErrorMessage(error, t('featureFlags.strategyDeleteFailed')), { variant: 'error' });
-            }
-        }
+        // Always update local state - changes are saved when user clicks "Save Strategies"
+        const strategies = (flag.strategies || []).filter((_, idx) => idx !== strategyIndex);
+        setFlag({ ...flag, strategies });
     };
 
     const handleSaveStrategies = async () => {
@@ -1617,7 +1612,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                             {/* Save Button */}
                             {canManage && (flag.strategies?.length || 0) > 0 && !isCreating && (
                                 <Box sx={{ mt: 2 }}>
-                                    <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSaveStrategies}>
+                                    <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSaveStrategies} disabled={!hasStrategyChanges()}>
                                         {t('featureFlags.saveStrategies')}
                                     </Button>
                                 </Box>

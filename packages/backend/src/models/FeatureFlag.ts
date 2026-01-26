@@ -281,16 +281,7 @@ export class FeatureFlagModel {
                 updatedAt: new Date(),
             });
 
-            // Create default strategy
-            await FeatureStrategyModel.create({
-                flagId: id,
-                strategyName: 'default',
-                parameters: { rollout: 100, stickiness: 'default' },
-                constraints: [],
-                sortOrder: 0,
-                isEnabled: true,
-                createdBy: data.createdBy,
-            });
+            // Note: Default strategy is created by frontend, not here
 
             return this.findById(id) as Promise<FeatureFlagAttributes>;
         } catch (error) {
