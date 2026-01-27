@@ -234,9 +234,9 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                             sx={{
                                 height: 22,
                                 fontSize: '0.75rem',
-                                fontWeight: 500,
-                                bgcolor: 'primary.main',
-                                color: 'primary.contrastText',
+                                fontWeight: 600,
+                                bgcolor: 'action.hover',
+                                color: 'text.primary',
                                 borderRadius: '12px !important',
                                 '& .MuiChip-label': {
                                     px: 1.25,
@@ -252,9 +252,9 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                     sx={{
                         height: 22,
                         fontSize: '0.75rem',
-                        fontWeight: 500,
-                        bgcolor: 'primary.main',
-                        color: 'primary.contrastText',
+                        fontWeight: 600,
+                        bgcolor: 'action.hover',
+                        color: 'text.primary',
                         borderRadius: '12px !important',
                         '& .MuiChip-label': {
                             px: 1.25,
