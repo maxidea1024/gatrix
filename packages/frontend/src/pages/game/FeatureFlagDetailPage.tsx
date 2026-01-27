@@ -247,6 +247,9 @@ const FeatureFlagDetailPage: React.FC = () => {
     // Check if variants have changed
     const hasVariantChanges = (): boolean => {
         if (!flag || !originalFlag) return false;
+        // Check if variantType changed
+        if (flag.variantType !== originalFlag.variantType) return true;
+        // Check if variants changed
         return JSON.stringify(flag.variants || []) !== JSON.stringify(originalFlag.variants || []);
     };
 
@@ -2030,7 +2033,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                             {/* Save Button */}
                             {canManage && !isCreating && (
                                 <Box sx={{ mt: 2 }}>
-                                    <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSaveVariants} disabled={!hasVariantChanges() || Object.values(jsonPayloadErrors).some(e => e !== null)}>
+                                    <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSaveVariants} disabled={!hasVariantChanges() || (flag.variantType === 'json' && Object.values(jsonPayloadErrors).some(e => e !== null))}>
                                         {t('featureFlags.saveVariants')}
                                     </Button>
                                 </Box>
