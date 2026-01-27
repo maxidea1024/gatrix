@@ -170,10 +170,10 @@ export class FeatureFlagService {
         return result.enabled;
     }
 
-    // ==================== FeatBit-Style Variation Methods ====================
+    // ==================== Variation Methods ====================
 
     /**
-     * Get boolean variation (FeatBit-style)
+     * Get boolean variation
      * Returns the flag's enabled state
      */
     boolVariation(
@@ -186,7 +186,7 @@ export class FeatureFlagService {
     }
 
     /**
-     * Get boolean variation with evaluation details (FeatBit-style)
+     * Get boolean variation with evaluation details
      */
     boolVariationDetail(
         flagName: string,
@@ -203,7 +203,7 @@ export class FeatureFlagService {
     }
 
     /**
-     * Get string variation from variant payload (FeatBit-style)
+     * Get string variation from variant payload
      */
     stringVariation(
         flagName: string,
@@ -219,7 +219,7 @@ export class FeatureFlagService {
     }
 
     /**
-     * Get string variation with evaluation details (FeatBit-style)
+     * Get string variation with evaluation details
      */
     stringVariationDetail(
         flagName: string,
@@ -240,7 +240,7 @@ export class FeatureFlagService {
     }
 
     /**
-     * Get number variation from variant payload (FeatBit-style)
+     * Get number variation from variant payload
      */
     numberVariation(
         flagName: string,
@@ -258,7 +258,7 @@ export class FeatureFlagService {
     }
 
     /**
-     * Get number variation with evaluation details (FeatBit-style)
+     * Get number variation with evaluation details
      */
     numberVariationDetail(
         flagName: string,
@@ -282,7 +282,7 @@ export class FeatureFlagService {
     }
 
     /**
-     * Get JSON variation from variant payload (FeatBit-style)
+     * Get JSON variation from variant payload
      */
     jsonVariation<T = any>(
         flagName: string,
@@ -309,7 +309,7 @@ export class FeatureFlagService {
     }
 
     /**
-     * Get JSON variation with evaluation details (FeatBit-style)
+     * Get JSON variation with evaluation details
      */
     jsonVariationDetail<T = any>(
         flagName: string,
