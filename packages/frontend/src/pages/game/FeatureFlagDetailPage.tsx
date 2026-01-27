@@ -697,6 +697,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                     variants: mappedVariants,
                 });
                 enqueueSnackbar(t('featureFlags.variantsSaved'), { variant: 'success' });
+                // Update originalFlag to sync comparison baseline (disable save button)
+                setOriginalFlag(JSON.parse(JSON.stringify(flag)));
                 setVariantDialogOpen(false);
                 setEditingVariant(null);
             } catch (error: any) {
