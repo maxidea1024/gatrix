@@ -223,7 +223,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     const [expandedSegments, setExpandedSegments] = useState<Set<string>>(new Set());
     const [allTags, setAllTags] = useState<Tag[]>([]);
     const [originalFlag, setOriginalFlag] = useState<FeatureFlag | null>(null);
-    const [jsonPayloadErrors, setJsonPayloadErrors] = useState<Record<string, string | null>>({});
+    const [jsonPayloadErrors, setJsonPayloadErrors] = useState<Record<number, string | null>>({});
 
     // Check if there are unsaved changes
     const hasChanges = (): boolean => {
@@ -1928,12 +1928,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                         height={150}
                                                         readOnly={!canManage}
                                                         placeholder='{"key": "value"}'
-                                                        helperText={jsonPayloadErrors[variant.name] || t('featureFlags.payloadHelp')}
-                                                        error={jsonPayloadErrors[variant.name] || undefined}
+                                                        helperText={jsonPayloadErrors[index] || t('featureFlags.payloadHelp')}
+                                                        error={jsonPayloadErrors[index] || undefined}
                                                         onValidationError={(error) => {
                                                             setJsonPayloadErrors(prev => ({
                                                                 ...prev,
-                                                                [variant.name]: error
+                                                                [index]: error
                                                             }));
                                                         }}
                                                     />
