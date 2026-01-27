@@ -242,6 +242,12 @@ const FeatureFlagDetailPage: React.FC = () => {
         return JSON.stringify(flag.strategies || []) !== JSON.stringify(originalFlag.strategies || []);
     };
 
+    // Check if variants have changed
+    const hasVariantChanges = (): boolean => {
+        if (!flag || !originalFlag) return false;
+        return JSON.stringify(flag.variants || []) !== JSON.stringify(originalFlag.variants || []);
+    };
+
     // Validate all strategies - check constraints have required fields
     const validateStrategies = (): { isValid: boolean; errors: string[] } => {
         const errors: string[] = [];
@@ -1956,7 +1962,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                             {/* Save Button */}
                             {canManage && (flag.variants?.length || 0) > 0 && !isCreating && (
                                 <Box sx={{ mt: 2 }}>
-                                    <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSaveVariants}>
+                                    <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSaveVariants} disabled={!hasVariantChanges()}>
                                         {t('featureFlags.saveVariants')}
                                     </Button>
                                 </Box>
