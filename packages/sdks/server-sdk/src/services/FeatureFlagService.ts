@@ -298,6 +298,7 @@ export class FeatureFlagService {
 
     /**
      * Evaluate a constraint
+     * Supports both legacy operators (eq, neq) and new prefixed operators (str_eq, num_gt)
      */
     private evaluateConstraint(constraint: Constraint, context: EvaluationContext): boolean {
         const contextValue = this.getContextValue(constraint.contextName, context);
@@ -313,48 +314,124 @@ export class FeatureFlagService {
         const targetValues = constraint.values?.map(v => constraint.caseInsensitive ? v.toLowerCase() : v) || [];
 
         switch (constraint.operator) {
+            // String operators (both legacy and prefixed)
             case 'eq':
+            case 'str_eq':
                 result = compareValue === targetValue;
                 break;
             case 'neq':
+            case 'str_neq':
                 result = compareValue !== targetValue;
                 break;
             case 'contains':
+            case 'str_contains':
                 result = compareValue.includes(targetValue);
                 break;
             case 'startsWith':
+            case 'str_starts_with':
                 result = compareValue.startsWith(targetValue);
                 break;
             case 'endsWith':
+            case 'str_ends_with':
                 result = compareValue.endsWith(targetValue);
                 break;
             case 'in':
+            case 'str_in':
                 result = targetValues.includes(compareValue);
                 break;
             case 'notIn':
+            case 'str_not_in':
                 result = !targetValues.includes(compareValue);
                 break;
+            // Number operators
             case 'gt':
+            case 'num_gt':
                 result = Number(contextValue) > Number(constraint.value);
                 break;
             case 'gte':
+            case 'num_gte':
                 result = Number(contextValue) >= Number(constraint.value);
                 break;
             case 'lt':
+            case 'num_lt':
                 result = Number(contextValue) < Number(constraint.value);
                 break;
             case 'lte':
+            case 'num_lte':
                 result = Number(contextValue) <= Number(constraint.value);
                 break;
+            case 'num_eq':
+                result = Number(contextValue) === Number(constraint.value);
+                break;
+            // Boolean operators
             case 'is':
+            case 'bool_is':
                 result = Boolean(contextValue) === (constraint.value === 'true');
                 break;
-            // Date and semver operators would need additional implementation
+            // Date operators
+            case 'after':
+            case 'date_gt':
+                result = new Date(stringValue) > new Date(targetValue);
+                break;
+            case 'date_gte':
+                result = new Date(stringValue) >= new Date(targetValue);
+                break;
+            case 'before':
+            case 'date_lt':
+                result = new Date(stringValue) < new Date(targetValue);
+                break;
+            case 'date_lte':
+                result = new Date(stringValue) <= new Date(targetValue);
+                break;
+            // Semver operators
+            case 'semverEq':
+            case 'semver_eq':
+                result = this.compareSemver(stringValue, targetValue) === 0;
+                break;
+            case 'semverGt':
+            case 'semver_gt':
+                result = this.compareSemver(stringValue, targetValue) > 0;
+                break;
+            case 'semverGte':
+            case 'semver_gte':
+                result = this.compareSemver(stringValue, targetValue) >= 0;
+                break;
+            case 'semverLt':
+            case 'semver_lt':
+                result = this.compareSemver(stringValue, targetValue) < 0;
+                break;
+            case 'semverLte':
+            case 'semver_lte':
+                result = this.compareSemver(stringValue, targetValue) <= 0;
+                break;
             default:
                 result = false;
         }
 
         return constraint.inverted ? !result : result;
+    }
+
+    /**
+     * Compare semver versions
+     * Returns: -1 if a < b, 0 if a === b, 1 if a > b
+     */
+    private compareSemver(a: string, b: string): number {
+        const parseVersion = (v: string): number[] => {
+            const cleaned = v.replace(/^v/, '');
+            return cleaned.split('.').map(n => parseInt(n, 10) || 0);
+        };
+
+        const aParts = parseVersion(a);
+        const bParts = parseVersion(b);
+        const maxLen = Math.max(aParts.length, bParts.length);
+
+        for (let i = 0; i < maxLen; i++) {
+            const aVal = aParts[i] || 0;
+            const bVal = bParts[i] || 0;
+            if (aVal < bVal) return -1;
+            if (aVal > bVal) return 1;
+        }
+        return 0;
     }
 
     /**
@@ -407,22 +484,22 @@ export class FeatureFlagService {
 
     /**
      * Select a variant based on context and weights
+     * Weights are on a 0-100 scale (percentage)
      */
     private selectVariant(flag: FeatureFlag, context: EvaluationContext): Variant | undefined {
         if (!flag.variants || flag.variants.length === 0) {
             return undefined;
         }
 
-        const stickiness = flag.variants[0].payloadType || 'default';
+        // Use stickiness from first variant, or 'default' as fallback
+        const stickiness = flag.variants[0].stickiness || 'default';
         const percentage = this.calculatePercentage(context, stickiness, `${flag.name}-variant`);
 
-        // Normalize percentage to 0-1000 (weight unit)
-        const normalizedValue = percentage * 10;
-
+        // Weights are on 0-100 scale, percentage is also 0-100
         let cumulativeWeight = 0;
         for (const variant of flag.variants) {
             cumulativeWeight += variant.weight;
-            if (normalizedValue < cumulativeWeight) {
+            if (percentage <= cumulativeWeight) {
                 return variant;
             }
         }

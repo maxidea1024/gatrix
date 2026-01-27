@@ -9,16 +9,24 @@ export type PayloadType = 'string' | 'number' | 'boolean' | 'json';
 export type FieldType = 'string' | 'number' | 'boolean' | 'date' | 'semver';
 
 export type ConstraintOperator =
-    // String operators
+    // String operators (legacy)
     | 'eq' | 'neq' | 'contains' | 'startsWith' | 'endsWith' | 'in' | 'notIn'
-    // Number operators
+    // String operators (prefixed - backend format)
+    | 'str_eq' | 'str_neq' | 'str_contains' | 'str_starts_with' | 'str_ends_with' | 'str_in' | 'str_not_in'
+    // Number operators (legacy)
     | 'gt' | 'gte' | 'lt' | 'lte'
+    // Number operators (prefixed - backend format)
+    | 'num_eq' | 'num_gt' | 'num_gte' | 'num_lt' | 'num_lte'
     // Boolean operators
-    | 'is'
-    // Date operators
+    | 'is' | 'bool_is'
+    // Date operators (legacy)
     | 'after' | 'before'
-    // Semver operators
-    | 'semverEq' | 'semverGt' | 'semverGte' | 'semverLt' | 'semverLte';
+    // Date operators (prefixed - backend format)
+    | 'date_gt' | 'date_gte' | 'date_lt' | 'date_lte'
+    // Semver operators (legacy)
+    | 'semverEq' | 'semverGt' | 'semverGte' | 'semverLt' | 'semverLte'
+    // Semver operators (prefixed - backend format)
+    | 'semver_eq' | 'semver_gt' | 'semver_gte' | 'semver_lt' | 'semver_lte';
 
 // ==================== Evaluation Context ====================
 
@@ -69,6 +77,7 @@ export interface Variant {
     payload?: any;
     payloadType?: PayloadType;
     weight: number;
+    stickiness?: string;
 }
 
 // ==================== Strategy ====================
