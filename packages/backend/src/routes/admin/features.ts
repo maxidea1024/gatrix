@@ -381,7 +381,8 @@ router.put(
             environment,
             req.params.flagName,
             req.body.variants || [],
-            userId!
+            userId!,
+            req.body.variantType // Pass variantType to service
         );
 
         res.json({ success: true, data: { variants } });

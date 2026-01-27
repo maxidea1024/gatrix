@@ -708,6 +708,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                 }));
                 await api.put(`/admin/features/${flag.flagName}/variants`, {
                     variants: mappedVariants,
+                    variantType: flag.variantType || 'string',
                 });
                 enqueueSnackbar(t('featureFlags.variantsSaved'), { variant: 'success' });
                 // Update originalFlag to sync comparison baseline (disable save button)

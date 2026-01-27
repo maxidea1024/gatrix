@@ -56,6 +56,7 @@ export interface FeatureFlagAttributes {
     lastSeenAt?: Date;
     staleAfterDays: number;
     tags?: string[];
+    variantType?: 'string' | 'number' | 'json';
     createdBy: number;
     updatedBy?: number;
     createdAt?: Date;
@@ -276,6 +277,7 @@ export class FeatureFlagModel {
                 impressionDataEnabled: data.impressionDataEnabled ?? false,
                 staleAfterDays: data.staleAfterDays ?? 30,
                 tags: data.tags ? JSON.stringify(data.tags) : null,
+                variantType: data.variantType || 'string',
                 createdBy: data.createdBy,
                 createdAt: new Date(),
                 updatedAt: new Date(),
@@ -303,6 +305,7 @@ export class FeatureFlagModel {
             if (data.impressionDataEnabled !== undefined) updateData.impressionDataEnabled = data.impressionDataEnabled;
             if (data.staleAfterDays !== undefined) updateData.staleAfterDays = data.staleAfterDays;
             if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
+            if (data.variantType !== undefined) updateData.variantType = data.variantType;
             if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
             await db('g_feature_flags').where('id', id).update(updateData);

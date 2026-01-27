@@ -487,7 +487,7 @@ class FeatureFlagService {
     /**
      * Update variants for a flag (bulk replace)
      */
-    async updateVariants(environment: string, flagName: string, variants: CreateVariantInput[], userId: number): Promise<FeatureVariantAttributes[]> {
+    async updateVariants(environment: string, flagName: string, variants: CreateVariantInput[], userId: number, variantType?: 'string' | 'number' | 'json'): Promise<FeatureVariantAttributes[]> {
         const flag = await this.getFlag(environment, flagName);
         if (!flag) {
             throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
@@ -499,10 +499,12 @@ class FeatureFlagService {
             throw new GatrixError(`Total variant weight must equal 100 (100%), got ${totalWeight}`, 400, true, ErrorCodes.BAD_REQUEST);
         }
 
-        // Validate payload types are consistent
-        const payloadTypes = new Set(variants.map((v) => v.payloadType || 'json'));
-        if (payloadTypes.size > 1) {
-            throw new GatrixError('All variants must have the same payload type', 400, true, ErrorCodes.BAD_REQUEST);
+        // Update variantType on the flag if provided
+        if (variantType) {
+            await FeatureFlagModel.update(flag.id, {
+                variantType,
+                updatedBy: userId,
+            });
         }
 
         // Delete existing variants
