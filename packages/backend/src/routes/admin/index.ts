@@ -39,6 +39,7 @@ import cmsCashShopRoutes from './cmsCashShop';
 import serverLifecycleRoutes from './serverLifecycle';
 import changeRequestRoutes from './changeRequests';
 import featureRoutes from './features';
+import platformDefaultsRoutes from './platformDefaults';
 
 const router = express.Router();
 
@@ -151,5 +152,8 @@ router.use('/change-requests', requirePermission([PERMISSIONS.CHANGE_REQUESTS_VI
 
 // Feature Flags - requires feature-flags.view or feature-flags.manage permission
 router.use('/features', requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any, featureRoutes);
+
+// Platform Defaults - requires client-versions.view or client-versions.manage permission
+router.use('/platform-defaults', requirePermission([PERMISSIONS.CLIENT_VERSIONS_VIEW, PERMISSIONS.CLIENT_VERSIONS_MANAGE]) as any, platformDefaultsRoutes);
 
 export default router;

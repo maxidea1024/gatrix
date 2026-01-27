@@ -292,6 +292,14 @@ const FeatureFlagDetailPage: React.FC = () => {
                 });
             }
 
+            // Transform variants - map variantName to name
+            if (loadedFlag?.variants) {
+                loadedFlag.variants = loadedFlag.variants.map((v: any) => ({
+                    ...v,
+                    name: v.variantName || v.name,
+                }));
+            }
+
             setFlag(loadedFlag);
             setOriginalFlag(loadedFlag ? JSON.parse(JSON.stringify(loadedFlag)) : null);
         } catch (error: any) {
