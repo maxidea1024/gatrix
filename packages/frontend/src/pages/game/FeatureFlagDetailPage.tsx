@@ -1910,7 +1910,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                     />
                                                 ) : (flag.variantType || 'string') === 'json' ? (
                                                     <JsonEditor
-                                                        value={variant.payload?.value || ''}
+                                                        value={variant.payload?.value || '{}'}
                                                         onChange={(newValue) => {
                                                             const variants = [...(flag.variants || [])];
                                                             variants[index] = {
