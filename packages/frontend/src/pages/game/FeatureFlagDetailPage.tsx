@@ -1412,131 +1412,133 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                             {t('featureFlags.segmentSelectorHelp')}
                                                         </Typography>
 
-                                                        {/* Selected Segments + Add Selector in a row */}
-                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'flex-start' }}>
-                                                            {(strategy.segments || []).map((segName: string) => {
-                                                                const seg = segments.find((s: any) => s.segmentName === segName);
-                                                                const isExpanded = expandedSegments.has(`${index}-${segName}`);
-                                                                const isEmpty = !seg?.constraints || seg.constraints.length === 0;
+                                                        {/* Segment selector dropdown - fixed position */}
+                                                        <Autocomplete
+                                                            size="small"
+                                                            sx={{ maxWidth: 300, mb: 2 }}
+                                                            options={segments.filter((s: any) => !(strategy.segments || []).includes(s.segmentName))}
+                                                            getOptionLabel={(option: any) => option.displayName || option.segmentName}
+                                                            value={null}
+                                                            onChange={(_, selected) => {
+                                                                if (selected) {
+                                                                    const strategies = [...(flag.strategies || [])];
+                                                                    strategies[index] = {
+                                                                        ...strategies[index],
+                                                                        segments: [...(strategy.segments || []), selected.segmentName]
+                                                                    };
+                                                                    setFlag({ ...flag, strategies });
+                                                                }
+                                                            }}
+                                                            renderInput={(params) => (
+                                                                <TextField {...params} placeholder={t('featureFlags.selectSegments')} size="small" />
+                                                            )}
+                                                            disabled={!canManage || segments.length === 0}
+                                                            noOptionsText={t('featureFlags.noSegments')}
+                                                            clearOnBlur
+                                                            blurOnSelect
+                                                        />
 
-                                                                const segIndex = (strategy.segments || []).indexOf(segName);
+                                                        {/* Selected Segments - displayed below selector */}
+                                                        {(strategy.segments || []).length > 0 && (
+                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'flex-start' }}>
+                                                                {(strategy.segments || []).map((segName: string) => {
+                                                                    const seg = segments.find((s: any) => s.segmentName === segName);
+                                                                    const isExpanded = expandedSegments.has(`${index}-${segName}`);
+                                                                    const isEmpty = !seg?.constraints || seg.constraints.length === 0;
 
-                                                                return (
-                                                                    <React.Fragment key={segName}>
-                                                                        {segIndex > 0 && (
-                                                                            <Chip
-                                                                                label="AND"
-                                                                                size="small"
-                                                                                sx={{
-                                                                                    height: 24,
-                                                                                    fontSize: '0.7rem',
-                                                                                    bgcolor: 'info.main',
-                                                                                    color: 'info.contrastText',
-                                                                                    fontWeight: 600
-                                                                                }}
-                                                                            />
-                                                                        )}
-                                                                        <Box sx={{ maxWidth: isExpanded ? 500 : 'auto' }}>
-                                                                            <Chip
-                                                                                label={
-                                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                                        <GroupIcon sx={{ fontSize: 14 }} />
-                                                                                        <span>{seg?.displayName || segName}</span>
-                                                                                        <IconButton
-                                                                                            size="small"
-                                                                                            onClick={(e) => {
-                                                                                                e.stopPropagation();
-                                                                                                const key = `${index}-${segName}`;
-                                                                                                setExpandedSegments(prev => {
-                                                                                                    const next = new Set(prev);
-                                                                                                    if (next.has(key)) next.delete(key);
-                                                                                                    else next.add(key);
-                                                                                                    return next;
-                                                                                                });
-                                                                                            }}
-                                                                                            sx={{ p: 0, ml: 0.5, color: 'inherit' }}
-                                                                                        >
-                                                                                            {isExpanded ? <VisibilityOffIcon sx={{ fontSize: 14 }} /> : <VisibilityIcon sx={{ fontSize: 14 }} />}
-                                                                                        </IconButton>
-                                                                                    </Box>
-                                                                                }
-                                                                                size="small"
-                                                                                color={isEmpty ? 'warning' : 'default'}
-                                                                                variant="outlined"
-                                                                                onDelete={canManage ? () => {
-                                                                                    const strategies = [...(flag.strategies || [])];
-                                                                                    strategies[index] = {
-                                                                                        ...strategies[index],
-                                                                                        segments: (strategy.segments || []).filter((s: string) => s !== segName)
-                                                                                    };
-                                                                                    setFlag({ ...flag, strategies });
-                                                                                } : undefined}
-                                                                                sx={{
-                                                                                    borderWidth: isEmpty ? 2 : 1,
-                                                                                    '& .MuiChip-label': { pr: 0.5 }
-                                                                                }}
-                                                                            />
+                                                                    const segIndex = (strategy.segments || []).indexOf(segName);
 
-                                                                            {/* Expanded segment details */}
-                                                                            {isExpanded && seg && (
-                                                                                <Paper
+                                                                    return (
+                                                                        <React.Fragment key={segName}>
+                                                                            {segIndex > 0 && (
+                                                                                <Chip
+                                                                                    label="AND"
+                                                                                    size="small"
                                                                                     sx={{
-                                                                                        mt: 1,
-                                                                                        p: 2,
-                                                                                        bgcolor: 'background.default',
-                                                                                        border: 1,
-                                                                                        borderColor: isEmpty ? 'warning.main' : 'divider',
-                                                                                        borderRadius: 1
+                                                                                        height: 24,
+                                                                                        fontSize: '0.7rem',
+                                                                                        bgcolor: 'info.main',
+                                                                                        color: 'info.contrastText',
+                                                                                        fontWeight: 600
                                                                                     }}
-                                                                                    elevation={0}
-                                                                                >
-                                                                                    {isEmpty ? (
-                                                                                        <Alert severity="warning" icon={<WarningIcon />}>
-                                                                                            <Typography variant="body2">
-                                                                                                {t('featureFlags.emptySegmentWarning', { name: seg.displayName || segName })}
-                                                                                            </Typography>
-                                                                                        </Alert>
-                                                                                    ) : (
-                                                                                        <Box>
-                                                                                            <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
-                                                                                                📋 {t('featureFlags.segmentConditions')}
-                                                                                            </Typography>
-                                                                                            <ConstraintList constraints={seg.constraints} contextFields={contextFields} />
-                                                                                        </Box>
-                                                                                    )}
-                                                                                </Paper>
+                                                                                />
                                                                             )}
-                                                                        </Box>
-                                                                    </React.Fragment>
-                                                                );
-                                                            })}
+                                                                            <Box sx={{ maxWidth: isExpanded ? 500 : 'auto' }}>
+                                                                                <Chip
+                                                                                    label={
+                                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                                            <GroupIcon sx={{ fontSize: 14 }} />
+                                                                                            <span>{seg?.displayName || segName}</span>
+                                                                                            <IconButton
+                                                                                                size="small"
+                                                                                                onClick={(e) => {
+                                                                                                    e.stopPropagation();
+                                                                                                    const key = `${index}-${segName}`;
+                                                                                                    setExpandedSegments(prev => {
+                                                                                                        const next = new Set(prev);
+                                                                                                        if (next.has(key)) next.delete(key);
+                                                                                                        else next.add(key);
+                                                                                                        return next;
+                                                                                                    });
+                                                                                                }}
+                                                                                                sx={{ p: 0, ml: 0.5, color: 'inherit' }}
+                                                                                            >
+                                                                                                {isExpanded ? <VisibilityOffIcon sx={{ fontSize: 14 }} /> : <VisibilityIcon sx={{ fontSize: 14 }} />}
+                                                                                            </IconButton>
+                                                                                        </Box>
+                                                                                    }
+                                                                                    size="small"
+                                                                                    color={isEmpty ? 'warning' : 'default'}
+                                                                                    variant="outlined"
+                                                                                    onDelete={canManage ? () => {
+                                                                                        const strategies = [...(flag.strategies || [])];
+                                                                                        strategies[index] = {
+                                                                                            ...strategies[index],
+                                                                                            segments: (strategy.segments || []).filter((s: string) => s !== segName)
+                                                                                        };
+                                                                                        setFlag({ ...flag, strategies });
+                                                                                    } : undefined}
+                                                                                    sx={{
+                                                                                        borderWidth: isEmpty ? 2 : 1,
+                                                                                        '& .MuiChip-label': { pr: 0.5 }
+                                                                                    }}
+                                                                                />
 
-                                                            {/* Add segment selector - inline with chips */}
-                                                            <Autocomplete
-                                                                size="small"
-                                                                sx={{ minWidth: 200, flexShrink: 0 }}
-                                                                options={segments.filter((s: any) => !(strategy.segments || []).includes(s.segmentName))}
-                                                                getOptionLabel={(option: any) => option.displayName || option.segmentName}
-                                                                value={null}
-                                                                onChange={(_, selected) => {
-                                                                    if (selected) {
-                                                                        const strategies = [...(flag.strategies || [])];
-                                                                        strategies[index] = {
-                                                                            ...strategies[index],
-                                                                            segments: [...(strategy.segments || []), selected.segmentName]
-                                                                        };
-                                                                        setFlag({ ...flag, strategies });
-                                                                    }
-                                                                }}
-                                                                renderInput={(params) => (
-                                                                    <TextField {...params} placeholder={t('featureFlags.selectSegments')} size="small" />
-                                                                )}
-                                                                disabled={!canManage || segments.length === 0}
-                                                                noOptionsText={t('featureFlags.noSegments')}
-                                                                clearOnBlur
-                                                                blurOnSelect
-                                                            />
-                                                        </Box>
+                                                                                {/* Expanded segment details */}
+                                                                                {isExpanded && seg && (
+                                                                                    <Paper
+                                                                                        sx={{
+                                                                                            mt: 1,
+                                                                                            p: 2,
+                                                                                            bgcolor: 'background.default',
+                                                                                            border: 1,
+                                                                                            borderColor: isEmpty ? 'warning.main' : 'divider',
+                                                                                            borderRadius: 1
+                                                                                        }}
+                                                                                        elevation={0}
+                                                                                    >
+                                                                                        {isEmpty ? (
+                                                                                            <Alert severity="warning" icon={<WarningIcon />}>
+                                                                                                <Typography variant="body2">
+                                                                                                    {t('featureFlags.emptySegmentWarning', { name: seg.displayName || segName })}
+                                                                                                </Typography>
+                                                                                            </Alert>
+                                                                                        ) : (
+                                                                                            <Box>
+                                                                                                <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
+                                                                                                    📋 {t('featureFlags.segmentConditions')}
+                                                                                                </Typography>
+                                                                                                <ConstraintList constraints={seg.constraints} contextFields={contextFields} />
+                                                                                            </Box>
+                                                                                        )}
+                                                                                    </Paper>
+                                                                                )}
+                                                                            </Box>
+                                                                        </React.Fragment>
+                                                                    );
+                                                                })}
+                                                            </Box>
+                                                        )}
                                                     </Box>
 
                                                     {/* AND Indicator between segments and constraints */}
