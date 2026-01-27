@@ -706,8 +706,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     if (location.pathname === path) {
       return true;
     }
-    // /settings 경로들은 정확한 매칭만 사용 (prefix 매칭 안 함)
-    if (path.startsWith('/settings')) {
+    // /settings, /feature-flags 경로들은 정확한 매칭만 사용 (prefix 매칭 안 함)
+    if (path.startsWith('/settings') || path.startsWith('/feature-flags')) {
       return false;
     }
     // 하위 경로인 경우에만 true (단, 정확히 '/'로 구분되는 경우만)
