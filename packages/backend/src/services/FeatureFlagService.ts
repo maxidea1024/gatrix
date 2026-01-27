@@ -196,7 +196,7 @@ class FeatureFlagService {
             displayName: input.displayName,
             description: input.description,
             flagType: input.flagType || 'release',
-            isEnabled: input.isEnabled ?? true,
+            isEnabled: input.isEnabled ?? false,
             isArchived: false,
             impressionDataEnabled: input.impressionDataEnabled ?? false,
             staleAfterDays: input.staleAfterDays ?? 30,
