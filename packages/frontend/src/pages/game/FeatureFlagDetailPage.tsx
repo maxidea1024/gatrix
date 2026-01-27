@@ -693,12 +693,14 @@ const FeatureFlagDetailPage: React.FC = () => {
             // In edit mode, call API
             try {
                 // Map frontend field names to backend field names
+                // Use flag.variantType as the source of truth for payload type
+                const payloadType = flag.variantType === 'json' ? 'json' : (flag.variantType === 'number' ? 'string' : 'string');
                 const mappedVariants = (flag.variants || []).map(v => ({
                     variantName: v.name,
                     weight: v.weight,
                     stickiness: v.stickiness,
-                    payload: v.payload,
-                    payloadType: v.payload?.type || 'string',
+                    payload: v.payload ? { ...v.payload, type: payloadType } : undefined,
+                    payloadType: payloadType,
                     overrides: v.overrides,
                 }));
                 await api.put(`/admin/features/${flag.flagName}/variants`, {
