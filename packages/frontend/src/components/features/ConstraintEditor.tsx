@@ -657,7 +657,7 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
                 <Typography variant="subtitle2" color="text.secondary">
                     {t('featureFlags.constraintsList')}
                 </Typography>
-                {!disabled && (
+                {!disabled && constraints.length > 0 && (
                     <Button
                         size="small"
                         startIcon={<AddIcon />}
