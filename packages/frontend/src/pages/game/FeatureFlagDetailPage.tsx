@@ -1440,7 +1440,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                                                         {/* Selected Segments - displayed below selector */}
                                                         {(strategy.segments || []).length > 0 && (
-                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'flex-start' }}>
+                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
                                                                 {(strategy.segments || []).map((segName: string) => {
                                                                     const seg = segments.find((s: any) => s.segmentName === segName);
                                                                     const isExpanded = expandedSegments.has(`${index}-${segName}`);
@@ -1455,8 +1455,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                                     label="AND"
                                                                                     size="small"
                                                                                     sx={{
-                                                                                        height: 24,
-                                                                                        fontSize: '0.7rem',
+                                                                                        height: 28,
+                                                                                        fontSize: '0.75rem',
                                                                                         bgcolor: 'info.main',
                                                                                         color: 'info.contrastText',
                                                                                         fontWeight: 600
@@ -1500,7 +1500,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                                     sx={{
                                                                                         height: 36,
                                                                                         borderWidth: isEmpty ? 2 : 1,
-                                                                                        '& .MuiChip-label': { pr: 0.5, py: 1 }
+                                                                                        '& .MuiChip-label': { pr: 1.5, py: 1 }
                                                                                     }}
                                                                                 />
 
