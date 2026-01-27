@@ -1440,30 +1440,29 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                                                         {/* Selected Segments - displayed below selector */}
                                                         {(strategy.segments || []).length > 0 && (
-                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
-                                                                {(strategy.segments || []).map((segName: string) => {
-                                                                    const seg = segments.find((s: any) => s.segmentName === segName);
-                                                                    const isExpanded = expandedSegments.has(`${index}-${segName}`);
-                                                                    const isEmpty = !seg?.constraints || seg.constraints.length === 0;
+                                                            <>
+                                                                {/* Segment chips row */}
+                                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center', mb: 1 }}>
+                                                                    {(strategy.segments || []).map((segName: string, segIndex: number) => {
+                                                                        const seg = segments.find((s: any) => s.segmentName === segName);
+                                                                        const isExpanded = expandedSegments.has(`${index}-${segName}`);
+                                                                        const isEmpty = !seg?.constraints || seg.constraints.length === 0;
 
-                                                                    const segIndex = (strategy.segments || []).indexOf(segName);
-
-                                                                    return (
-                                                                        <React.Fragment key={segName}>
-                                                                            {segIndex > 0 && (
-                                                                                <Chip
-                                                                                    label="AND"
-                                                                                    size="small"
-                                                                                    sx={{
-                                                                                        height: 28,
-                                                                                        fontSize: '0.75rem',
-                                                                                        bgcolor: 'info.main',
-                                                                                        color: 'info.contrastText',
-                                                                                        fontWeight: 600
-                                                                                    }}
-                                                                                />
-                                                                            )}
-                                                                            <Box sx={{ maxWidth: isExpanded ? 500 : 'auto' }}>
+                                                                        return (
+                                                                            <React.Fragment key={segName}>
+                                                                                {segIndex > 0 && (
+                                                                                    <Chip
+                                                                                        label="AND"
+                                                                                        size="small"
+                                                                                        sx={{
+                                                                                            height: 28,
+                                                                                            fontSize: '0.75rem',
+                                                                                            bgcolor: 'info.main',
+                                                                                            color: 'info.contrastText',
+                                                                                            fontWeight: 600
+                                                                                        }}
+                                                                                    />
+                                                                                )}
                                                                                 <Chip
                                                                                     label={
                                                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
@@ -1500,44 +1499,54 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                                     sx={{
                                                                                         height: 36,
                                                                                         borderWidth: isEmpty ? 2 : 1,
+                                                                                        bgcolor: isExpanded ? 'action.selected' : 'transparent',
                                                                                         '& .MuiChip-label': { pr: 1.5, py: 1 }
                                                                                     }}
                                                                                 />
+                                                                            </React.Fragment>
+                                                                        );
+                                                                    })}
+                                                                </Box>
 
-                                                                                {/* Expanded segment details */}
-                                                                                {isExpanded && seg && (
-                                                                                    <Paper
-                                                                                        sx={{
-                                                                                            mt: 1,
-                                                                                            p: 2,
-                                                                                            bgcolor: 'background.default',
-                                                                                            border: 1,
-                                                                                            borderColor: isEmpty ? 'warning.main' : 'divider',
-                                                                                            borderRadius: 1
-                                                                                        }}
-                                                                                        elevation={0}
-                                                                                    >
-                                                                                        {isEmpty ? (
-                                                                                            <Alert severity="warning" icon={<WarningIcon />}>
-                                                                                                <Typography variant="body2">
-                                                                                                    {t('featureFlags.emptySegmentWarning', { name: seg.displayName || segName })}
-                                                                                                </Typography>
-                                                                                            </Alert>
-                                                                                        ) : (
-                                                                                            <Box>
-                                                                                                <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
-                                                                                                    📋 {t('featureFlags.segmentConditions')}
-                                                                                                </Typography>
-                                                                                                <ConstraintList constraints={seg.constraints} contextFields={contextFields} />
-                                                                                            </Box>
-                                                                                        )}
-                                                                                    </Paper>
+                                                                {/* Expanded segment details - separate section below chips */}
+                                                                <Stack spacing={1.5}>
+                                                                    {(strategy.segments || []).map((segName: string) => {
+                                                                        const seg = segments.find((s: any) => s.segmentName === segName);
+                                                                        const isExpanded = expandedSegments.has(`${index}-${segName}`);
+                                                                        const isEmpty = !seg?.constraints || seg.constraints.length === 0;
+
+                                                                        if (!isExpanded || !seg) return null;
+
+                                                                        return (
+                                                                            <Paper
+                                                                                key={`detail-${segName}`}
+                                                                                sx={{
+                                                                                    p: 2,
+                                                                                    bgcolor: 'background.default',
+                                                                                    border: 1,
+                                                                                    borderColor: isEmpty ? 'warning.main' : 'divider',
+                                                                                    borderRadius: 1
+                                                                                }}
+                                                                                elevation={0}
+                                                                            >
+                                                                                <Typography variant="subtitle2" sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                                    <GroupIcon sx={{ fontSize: 16 }} />
+                                                                                    {seg.displayName || segName}
+                                                                                </Typography>
+                                                                                {isEmpty ? (
+                                                                                    <Alert severity="warning" icon={<WarningIcon />}>
+                                                                                        <Typography variant="body2">
+                                                                                            {t('featureFlags.emptySegmentWarning', { name: seg.displayName || segName })}
+                                                                                        </Typography>
+                                                                                    </Alert>
+                                                                                ) : (
+                                                                                    <ConstraintList constraints={seg.constraints} contextFields={contextFields} />
                                                                                 )}
-                                                                            </Box>
-                                                                        </React.Fragment>
-                                                                    );
-                                                                })}
-                                                            </Box>
+                                                                            </Paper>
+                                                                        );
+                                                                    })}
+                                                                </Stack>
+                                                            </>
                                                         )}
                                                     </Box>
 
