@@ -1778,9 +1778,15 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         {t('featureFlags.variantTypes.json')}
                                     </MenuItem>
                                 </Select>
-                                <FormHelperText>{t('featureFlags.variantTypeHelp')}</FormHelperText>
                             </FormControl>
                         </Box>
+
+                        {/* Payload size warning - only for string/json types */}
+                        {(flag.variantType === 'string' || flag.variantType === 'json' || !flag.variantType) && (
+                            <Alert severity="warning" sx={{ mb: 2 }}>
+                                {t('featureFlags.variantPayloadWarning')}
+                            </Alert>
+                        )}
 
                         {/* Weight Distribution Info */}
                         {(flag.variants?.length || 0) > 1 && (() => {
@@ -2068,10 +2074,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                             </Stack>
                         )}
 
-                        {/* Payload size warning */}
-                        <Alert severity="warning" sx={{ mt: 2 }}>
-                            {t('featureFlags.variantPayloadWarning')}
-                        </Alert>
                     </CardContent>
                 </TabPanel>
 
