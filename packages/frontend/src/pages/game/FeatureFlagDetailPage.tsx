@@ -1111,17 +1111,17 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                         onChange={(e) => {
                                                             const strategyType = STRATEGY_TYPES.find(s => s.name === e.target.value);
                                                             const strategies = [...(flag.strategies || [])];
-                                                            // Preserve existing parameters but ensure rollout defaults to 100
+                                                            // When changing strategy type, reset rollout to 100
                                                             const existingParams = strategies[index].parameters || {};
                                                             strategies[index] = {
                                                                 ...strategies[index],
                                                                 name: e.target.value,
                                                                 title: strategyType?.titleKey ? t(strategyType.titleKey) : e.target.value,
                                                                 parameters: {
-                                                                    rollout: existingParams.rollout ?? 100,
+                                                                    ...existingParams,
                                                                     stickiness: existingParams.stickiness || 'default',
                                                                     groupId: existingParams.groupId || '',
-                                                                    ...existingParams,
+                                                                    rollout: 100, // Always reset to 100 when changing strategy type
                                                                 },
                                                             };
                                                             setFlag({ ...flag, strategies });
@@ -1693,7 +1693,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         };
                                         setFlag({ ...flag, strategies: [...(flag.strategies || []), newStrategy] });
                                     }}
-                                    sx={{ alignSelf: 'flex-start' }}
+                                    sx={{ alignSelf: 'flex-start', mt: 2 }}
                                 >
                                     {t('featureFlags.addStrategy')}
                                 </Button>
