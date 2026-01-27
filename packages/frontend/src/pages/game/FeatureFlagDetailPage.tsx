@@ -1398,46 +1398,72 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                                                 {/* IP Address Parameters */}
                                                 {strategy.name === 'remoteAddress' && (
-                                                    <TextField
-                                                        fullWidth
-                                                        size="small"
-                                                        multiline
-                                                        rows={2}
-                                                        label={t('featureFlags.ipAddresses')}
-                                                        value={strategy.parameters?.IPs || ''}
-                                                        onChange={(e) => {
-                                                            const strategies = [...(flag.strategies || [])];
-                                                            strategies[index] = {
-                                                                ...strategies[index],
-                                                                parameters: { ...strategies[index].parameters, IPs: e.target.value }
-                                                            };
-                                                            setFlag({ ...flag, strategies });
-                                                        }}
-                                                        disabled={!canManage}
-                                                        helperText={t('featureFlags.ipAddressesHelp')}
-                                                    />
+                                                    <Box>
+                                                        <Autocomplete
+                                                            multiple
+                                                            freeSolo
+                                                            size="small"
+                                                            options={[]}
+                                                            value={(strategy.parameters?.IPs || '').split(',').filter((ip: string) => ip.trim())}
+                                                            onChange={(_, newValue) => {
+                                                                const strategies = [...(flag.strategies || [])];
+                                                                strategies[index] = {
+                                                                    ...strategies[index],
+                                                                    parameters: { ...strategies[index].parameters, IPs: newValue.join(',') }
+                                                                };
+                                                                setFlag({ ...flag, strategies });
+                                                            }}
+                                                            renderTags={(value, getTagProps) =>
+                                                                value.map((option, idx) => (
+                                                                    <Chip size="small" label={option} {...getTagProps({ index: idx })} key={idx} />
+                                                                ))
+                                                            }
+                                                            renderInput={(params) => (
+                                                                <TextField
+                                                                    {...params}
+                                                                    label={t('featureFlags.ipAddresses')}
+                                                                    placeholder={t('featureFlags.typeAndPressEnter')}
+                                                                    helperText={t('featureFlags.ipAddressesHelpChip')}
+                                                                />
+                                                            )}
+                                                            disabled={!canManage}
+                                                        />
+                                                    </Box>
                                                 )}
 
                                                 {/* Hostname Parameters */}
                                                 {strategy.name === 'applicationHostname' && (
-                                                    <TextField
-                                                        fullWidth
-                                                        size="small"
-                                                        multiline
-                                                        rows={2}
-                                                        label={t('featureFlags.hostnames')}
-                                                        value={strategy.parameters?.hostNames || ''}
-                                                        onChange={(e) => {
-                                                            const strategies = [...(flag.strategies || [])];
-                                                            strategies[index] = {
-                                                                ...strategies[index],
-                                                                parameters: { ...strategies[index].parameters, hostNames: e.target.value }
-                                                            };
-                                                            setFlag({ ...flag, strategies });
-                                                        }}
-                                                        disabled={!canManage}
-                                                        helperText={t('featureFlags.hostnamesHelp')}
-                                                    />
+                                                    <Box>
+                                                        <Autocomplete
+                                                            multiple
+                                                            freeSolo
+                                                            size="small"
+                                                            options={[]}
+                                                            value={(strategy.parameters?.hostNames || '').split(',').filter((h: string) => h.trim())}
+                                                            onChange={(_, newValue) => {
+                                                                const strategies = [...(flag.strategies || [])];
+                                                                strategies[index] = {
+                                                                    ...strategies[index],
+                                                                    parameters: { ...strategies[index].parameters, hostNames: newValue.join(',') }
+                                                                };
+                                                                setFlag({ ...flag, strategies });
+                                                            }}
+                                                            renderTags={(value, getTagProps) =>
+                                                                value.map((option, idx) => (
+                                                                    <Chip size="small" label={option} {...getTagProps({ index: idx })} key={idx} />
+                                                                ))
+                                                            }
+                                                            renderInput={(params) => (
+                                                                <TextField
+                                                                    {...params}
+                                                                    label={t('featureFlags.hostnames')}
+                                                                    placeholder={t('featureFlags.typeAndPressEnter')}
+                                                                    helperText={t('featureFlags.hostnamesHelpChip')}
+                                                                />
+                                                            )}
+                                                            disabled={!canManage}
+                                                        />
+                                                    </Box>
                                                 )}
 
                                                 {/* Segment & Constraints Section - separated from strategy params */}
