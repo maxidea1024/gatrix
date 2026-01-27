@@ -1960,7 +1960,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 </Paper>
                             )}
                             {/* Save Button */}
-                            {canManage && (flag.variants?.length || 0) > 0 && !isCreating && (
+                            {canManage && !isCreating && (
                                 <Box sx={{ mt: 2 }}>
                                     <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSaveVariants} disabled={!hasVariantChanges()}>
                                         {t('featureFlags.saveVariants')}
