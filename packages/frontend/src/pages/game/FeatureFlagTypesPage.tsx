@@ -159,13 +159,11 @@ const FeatureFlagTypesPage: React.FC = () => {
                                                 {getTypeIcon(type.iconName)}
                                                 <Box>
                                                     <Typography fontWeight={500}>
-                                                        {type.displayName}
+                                                        {t(`featureFlags.flagTypes.${type.flagType}`, type.displayName)}
                                                     </Typography>
-                                                    {type.description && (
-                                                        <Typography variant="body2" color="text.secondary">
-                                                            {type.description}
-                                                        </Typography>
-                                                    )}
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        {t(`featureFlags.flagTypes.${type.flagType}.desc`, type.description || '')}
+                                                    </Typography>
                                                 </Box>
                                             </Box>
                                         </TableCell>
@@ -198,7 +196,7 @@ const FeatureFlagTypesPage: React.FC = () => {
             <ResizableDrawer
                 open={editDialogOpen}
                 onClose={() => setEditDialogOpen(false)}
-                title={`${t('common.edit')}: ${editingType?.displayName || ''}`}
+                title={`${t('common.edit')}: ${editingType ? t(`featureFlags.flagTypes.${editingType.flagType}`, editingType.displayName) : ''}`}
                 subtitle={t('featureFlags.editFlagTypeSubtitle')}
                 storageKey="featureFlagTypeDrawerWidth"
                 defaultWidth={400}
