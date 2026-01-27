@@ -605,7 +605,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                     strategies: strategiesForApi,
                 });
                 enqueueSnackbar(t('featureFlags.strategiesSaved'), { variant: 'success' });
-                loadFlag();
+                navigate('/feature-flags');
             } catch (error: any) {
                 enqueueSnackbar(parseApiErrorMessage(error, t('featureFlags.strategiesSaveFailed')), { variant: 'error' });
             }
@@ -711,10 +711,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                     variantType: flag.variantType || 'string',
                 });
                 enqueueSnackbar(t('featureFlags.variantsSaved'), { variant: 'success' });
-                // Update originalFlag to sync comparison baseline (disable save button)
-                setOriginalFlag(JSON.parse(JSON.stringify(flag)));
-                setVariantDialogOpen(false);
-                setEditingVariant(null);
+                navigate('/feature-flags');
             } catch (error: any) {
                 enqueueSnackbar(parseApiErrorMessage(error, t('featureFlags.variantsSaveFailed')), { variant: 'error' });
             }
