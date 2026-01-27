@@ -122,43 +122,87 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
         );
     }
 
+    // Get readable operator text
+    const getOperatorText = (op: string): string => {
+        const opTexts: Record<string, string> = {
+            'str_eq': 'equals',
+            'str_neq': 'not equals',
+            'str_contains': 'contains',
+            'str_starts_with': 'starts with',
+            'str_ends_with': 'ends with',
+            'str_in': 'is one of',
+            'str_not_in': 'is not one of',
+            'num_eq': 'equals',
+            'num_gt': 'greater than',
+            'num_gte': 'greater than or equals',
+            'num_lt': 'less than',
+            'num_lte': 'less than or equals',
+            'bool_is': 'is',
+            'date_gt': 'is after',
+            'date_gte': 'is on or after',
+            'date_lt': 'is before',
+            'date_lte': 'is on or before',
+            'semver_eq': 'equals',
+            'semver_gt': 'greater than',
+            'semver_gte': 'greater than or equals',
+            'semver_lt': 'less than',
+            'semver_lte': 'less than or equals',
+        };
+        return opTexts[op] || op;
+    };
+
     return (
         <Box
             sx={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 1,
-                p: 1.5,
+                gap: 1.5,
+                px: 2,
+                py: 1.25,
                 border: 1,
-                borderColor: 'divider',
-                borderRadius: 1,
-                bgcolor: 'background.paper',
-                flexWrap: 'wrap',
+                borderColor: 'grey.300',
+                borderRadius: 6,
+                bgcolor: 'grey.50',
             }}
         >
-            {/* Context Name - Blue chip */}
-            <Chip
-                label={constraint.contextName}
-                size="small"
+            {/* Constraint label */}
+            <Typography
+                variant="body2"
                 sx={{
-                    bgcolor: 'primary.main',
-                    color: 'primary.contrastText',
-                    fontWeight: 600,
+                    color: 'text.secondary',
                     fontSize: '0.8rem',
-                    height: 28,
+                    flexShrink: 0,
                 }}
-            />
+            >
+                Constraint
+            </Typography>
 
-            {/* Operator - Outlined chip */}
-            <Chip
-                label={getOperatorLabel(constraint.operator)}
-                size="small"
-                variant="outlined"
+            {/* Context Name - Bold text */}
+            <Typography
+                variant="body2"
                 sx={{
-                    height: 28,
-                    fontSize: '0.8rem',
-                    fontWeight: 500,
-                    minWidth: 32,
+                    fontWeight: 600,
+                    fontSize: '0.85rem',
+                    color: 'text.primary',
+                }}
+            >
+                {constraint.contextName}
+            </Typography>
+
+            {/* Operator - Rounded chip with light gray background */}
+            <Chip
+                label={getOperatorText(constraint.operator)}
+                size="small"
+                sx={{
+                    height: 24,
+                    fontSize: '0.75rem',
+                    fontWeight: 400,
+                    bgcolor: 'grey.200',
+                    color: 'text.secondary',
+                    borderRadius: 3,
+                    '& .MuiChip-label': {
+                        px: 1.5,
+                    },
                 }}
             />
 
@@ -170,34 +214,37 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                         size="small"
                         variant="outlined"
                         sx={{
-                            height: 28,
-                            fontSize: '0.75rem',
-                            minWidth: 36,
+                            height: 24,
+                            fontSize: '0.7rem',
+                            fontWeight: 500,
+                            minWidth: 32,
                             fontFamily: 'monospace',
+                            borderRadius: 3,
+                            borderColor: 'grey.400',
+                            color: 'text.secondary',
+                            '& .MuiChip-label': {
+                                px: 1,
+                            },
                         }}
                     />
                 </Tooltip>
             )}
 
-            {/* Value - Blue background */}
-            <Box
+            {/* Value - Bold text */}
+            <Typography
+                variant="body2"
                 sx={{
-                    px: 1.5,
-                    py: 0.5,
-                    bgcolor: 'primary.main',
-                    color: 'primary.contrastText',
-                    borderRadius: 0.5,
-                    fontFamily: 'monospace',
+                    fontWeight: 600,
                     fontSize: '0.85rem',
-                    fontWeight: 500,
-                    maxWidth: 400,
+                    color: 'text.primary',
+                    maxWidth: 300,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
                 }}
             >
                 {valueDisplay}
-            </Box>
+            </Typography>
         </Box>
     );
 };
@@ -235,11 +282,15 @@ export const ConstraintList: React.FC<ConstraintListProps> = ({ constraints, tit
                                 label="AND"
                                 size="small"
                                 sx={{
-                                    height: 22,
-                                    fontSize: '0.7rem',
+                                    height: 20,
+                                    fontSize: '0.65rem',
                                     bgcolor: 'grey.200',
                                     color: 'text.secondary',
                                     fontWeight: 600,
+                                    borderRadius: 2,
+                                    '& .MuiChip-label': {
+                                        px: 1,
+                                    },
                                 }}
                             />
                         </Box>
