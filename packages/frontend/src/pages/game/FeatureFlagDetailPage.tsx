@@ -86,6 +86,7 @@ import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { tagService, Tag } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
+import JsonEditor from '../../components/common/JsonEditor';
 
 // ==================== Types ====================
 
@@ -1908,24 +1909,19 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                         helperText={t('featureFlags.payloadHelp')}
                                                     />
                                                 ) : (flag.variantType || 'string') === 'json' ? (
-                                                    <TextField
-                                                        size="small"
-                                                        multiline
-                                                        rows={3}
+                                                    <JsonEditor
                                                         value={variant.payload?.value || ''}
-                                                        onChange={(e) => {
+                                                        onChange={(newValue) => {
                                                             const variants = [...(flag.variants || [])];
                                                             variants[index] = {
                                                                 ...variants[index],
-                                                                payload: { type: 'json', value: e.target.value }
+                                                                payload: { type: 'json', value: newValue }
                                                             };
                                                             setFlag({ ...flag, variants });
                                                         }}
-                                                        disabled={!canManage}
-                                                        fullWidth
+                                                        height={150}
+                                                        readOnly={!canManage}
                                                         placeholder='{"key": "value"}'
-                                                        sx={{ fontFamily: 'monospace' }}
-                                                        InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.875rem' } }}
                                                         helperText={t('featureFlags.payloadHelp')}
                                                     />
                                                 ) : (
