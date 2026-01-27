@@ -23,6 +23,7 @@ import {
     Autocomplete,
     Tooltip,
     FormHelperText,
+    Paper,
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -668,7 +669,7 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
             </Box>
 
             {constraints.length === 0 ? (
-                <Card variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
+                <Paper variant="outlined" sx={{ borderStyle: 'dashed', p: 3, textAlign: 'center' }}>
                     <Typography variant="body2" color="text.secondary">
                         {t('featureFlags.noConstraints')}
                     </Typography>
@@ -682,7 +683,7 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
                             {t('featureFlags.addFirstConstraint')}
                         </Button>
                     )}
-                </Card>
+                </Paper>
             ) : (
                 <DndContext
                     sensors={sensors}
