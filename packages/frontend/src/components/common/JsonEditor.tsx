@@ -38,9 +38,9 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
   const isUpdatingRef = useRef(false);
   const [internalError, setInternalError] = useState<string | null>(null);
 
-  // Real-time JSON5 validation
+  // Real-time JSON validation
   useEffect(() => {
-    if (json5Mode && onValidationError) {
+    if (onValidationError) {
       const trimmed = (value || '').trim();
       if (trimmed.length === 0) {
         onValidationError(null);
@@ -48,11 +48,15 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
         return;
       }
       try {
-        JSON5.parse(trimmed);
+        if (json5Mode) {
+          JSON5.parse(trimmed);
+        } else {
+          JSON.parse(trimmed);
+        }
         onValidationError(null);
         setInternalError(null);
       } catch (e: any) {
-        const errorMsg = e.message || 'Invalid JSON5';
+        const errorMsg = e.message || (json5Mode ? 'Invalid JSON5' : 'Invalid JSON');
         onValidationError(errorMsg);
         setInternalError(errorMsg);
       }
@@ -60,7 +64,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
   }, [value, json5Mode, onValidationError]);
 
   // Displayed error: external error takes priority, then internal validation error
-  const displayError = error || (json5Mode ? internalError : null);
+  const displayError = error || internalError;
 
   const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor;
@@ -228,31 +232,31 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
               scrollBeyondLastLine: false,
               wordWrap: 'on',
               automaticLayout: true,
-            formatOnPaste: false,
-            formatOnType: false,
-            tabSize: 2,
-            insertSpaces: true,
-            lineNumbers: 'on',
-            glyphMargin: false,
-            folding: true,
-            lineDecorationsWidth: 0,
-            lineNumbersMinChars: 3,
-            renderLineHighlight: 'line',
-            selectionHighlight: false,
-            occurrencesHighlight: false,
-            overviewRulerLanes: 0,
-            hideCursorInOverviewRuler: true,
-            overviewRulerBorder: false,
-            fixedOverflowWidgets: true,
-            padding: { top: 8, bottom: 8 },
-            scrollbar: {
-              vertical: 'auto',
-              horizontal: 'auto',
-              verticalScrollbarSize: 8,
-              horizontalScrollbarSize: 8
-            }
-          }}
-        />
+              formatOnPaste: false,
+              formatOnType: false,
+              tabSize: 2,
+              insertSpaces: true,
+              lineNumbers: 'on',
+              glyphMargin: false,
+              folding: true,
+              lineDecorationsWidth: 0,
+              lineNumbersMinChars: 3,
+              renderLineHighlight: 'line',
+              selectionHighlight: false,
+              occurrencesHighlight: false,
+              overviewRulerLanes: 0,
+              hideCursorInOverviewRuler: true,
+              overviewRulerBorder: false,
+              fixedOverflowWidgets: true,
+              padding: { top: 8, bottom: 8 },
+              scrollbar: {
+                vertical: 'auto',
+                horizontal: 'auto',
+                verticalScrollbarSize: 8,
+                horizontalScrollbarSize: 8
+              }
+            }}
+          />
         </Box>
       </Box>
 
