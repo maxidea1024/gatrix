@@ -1466,9 +1466,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                             <Box sx={{ maxWidth: isExpanded ? 500 : 'auto' }}>
                                                                                 <Chip
                                                                                     label={
-                                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                                            <GroupIcon sx={{ fontSize: 14 }} />
-                                                                                            <span>{seg?.displayName || segName}</span>
+                                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                                                                                            <GroupIcon sx={{ fontSize: 18 }} />
+                                                                                            <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{seg?.displayName || segName}</span>
                                                                                             <IconButton
                                                                                                 size="small"
                                                                                                 onClick={(e) => {
@@ -1483,11 +1483,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                                                 }}
                                                                                                 sx={{ p: 0, ml: 0.5, color: 'inherit' }}
                                                                                             >
-                                                                                                {isExpanded ? <VisibilityOffIcon sx={{ fontSize: 14 }} /> : <VisibilityIcon sx={{ fontSize: 14 }} />}
+                                                                                                {isExpanded ? <VisibilityOffIcon sx={{ fontSize: 18 }} /> : <VisibilityIcon sx={{ fontSize: 18 }} />}
                                                                                             </IconButton>
                                                                                         </Box>
                                                                                     }
-                                                                                    size="small"
                                                                                     color={isEmpty ? 'warning' : 'default'}
                                                                                     variant="outlined"
                                                                                     onDelete={canManage ? () => {
@@ -1499,8 +1498,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                                         setFlag({ ...flag, strategies });
                                                                                     } : undefined}
                                                                                     sx={{
+                                                                                        height: 36,
                                                                                         borderWidth: isEmpty ? 2 : 1,
-                                                                                        '& .MuiChip-label': { pr: 0.5 }
+                                                                                        '& .MuiChip-label': { pr: 0.5, py: 1 }
                                                                                     }}
                                                                                 />
 
