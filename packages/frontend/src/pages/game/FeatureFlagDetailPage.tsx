@@ -87,6 +87,7 @@ import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { tagService, Tag } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
 import JsonEditor from '../../components/common/JsonEditor';
+import EmptyState from '../../components/common/EmptyState';
 
 // ==================== Types ====================
 
@@ -1799,251 +1800,278 @@ const FeatureFlagDetailPage: React.FC = () => {
                             );
                         })()}
                         {/* Inline Variants Editor */}
-                        <Stack spacing={2}>
-                            {(flag.variants || []).map((variant, index) => {
-                                // Color palette for variant tips
-                                const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f97316', '#10b981', '#06b6d4', '#3b82f6', '#f59e0b'];
-                                const tipColor = colors[index % colors.length];
-
-                                return (
-                                    <Paper
-                                        key={index}
-                                        variant="outlined"
-                                        sx={{
-                                            p: 0,
-                                            overflow: 'hidden',
-                                            display: 'flex',
-                                        }}
-                                    >
-                                        {/* Left color tip */}
-                                        <Box sx={{ width: 6, bgcolor: tipColor, flexShrink: 0 }} />
-
-                                        {/* Content */}
-                                        <Box sx={{ flex: 1, p: 2.5 }}>
-                                            {/* Row 1: Label */}
-                                            <Box sx={{ mb: 1.5 }}>
-                                                <Typography variant="subtitle2" fontWeight={600}>
-                                                    {t('featureFlags.variantName')}
-                                                </Typography>
-                                                <Typography variant="caption" color="text.secondary">
-                                                    {t('featureFlags.variantNameHelp')}
-                                                </Typography>
-                                            </Box>
-
-                                            {/* Row 2: Name input + Delete + Switch + Weight input */}
-                                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                                                <TextField
-                                                    size="small"
-                                                    value={variant.name || ''}
-                                                    onChange={(e) => {
-                                                        const variants = [...(flag.variants || [])];
-                                                        variants[index] = { ...variants[index], name: e.target.value };
-                                                        setFlag({ ...flag, variants });
-                                                    }}
-                                                    disabled={!canManage}
-                                                    sx={{ flex: 1, maxWidth: 300 }}
-                                                    placeholder={`variant-${index + 1}`}
-                                                />
-                                                {canManage && (
-                                                    <IconButton
-                                                        size="small"
-                                                        onClick={() => handleDeleteVariant(variant.name)}
-                                                        sx={{ color: 'text.secondary' }}
-                                                    >
-                                                        <DeleteIcon fontSize="small" />
-                                                    </IconButton>
-                                                )}
-                                                {(flag.variants?.length || 0) > 1 && (
-                                                    <>
-                                                        <FormControlLabel
-                                                            control={
-                                                                <Switch
-                                                                    size="small"
-                                                                    checked={variant.weightLock || false}
-                                                                    onChange={(e) => {
-                                                                        const variants = [...(flag.variants || [])];
-                                                                        variants[index] = { ...variants[index], weightLock: e.target.checked };
-                                                                        distributeVariantWeights(variants);
-                                                                        setFlag({ ...flag, variants });
-                                                                    }}
-                                                                    disabled={!canManage}
-                                                                />
-                                                            }
-                                                            label={<Typography variant="body2">{t('featureFlags.customWeight')}</Typography>}
-                                                            labelPlacement="start"
-                                                            sx={{ ml: 0, mr: 0 }}
-                                                        />
-                                                        <TextField
-                                                            size="small"
-                                                            type="number"
-                                                            label={t('featureFlags.variantWeight')}
-                                                            value={variant.weight || 0}
-                                                            onChange={(e) => {
-                                                                const value = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
-                                                                const variants = [...(flag.variants || [])];
-                                                                variants[index] = { ...variants[index], weight: value };
-                                                                distributeVariantWeights(variants);
-                                                                setFlag({ ...flag, variants });
-                                                            }}
-                                                            disabled={!canManage || !variant.weightLock}
-                                                            InputProps={{
-                                                                endAdornment: <Typography variant="body2">%</Typography>,
-                                                                inputProps: { min: 0, max: 100 }
-                                                            }}
-                                                            sx={{ width: 130 }}
-                                                        />
-                                                    </>
-                                                )}
-                                            </Box>
-
-                                            {/* Row 3: Payload */}
-                                            <Box sx={{ mt: 2 }}>
-                                                <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-                                                    {t('featureFlags.payload')}
-                                                </Typography>
-                                                {(flag.variantType || 'string') === 'number' ? (
-                                                    <TextField
-                                                        size="small"
-                                                        type="number"
-                                                        value={variant.payload?.value || ''}
-                                                        onChange={(e) => {
-                                                            const variants = [...(flag.variants || [])];
-                                                            variants[index] = {
-                                                                ...variants[index],
-                                                                payload: { type: 'string', value: e.target.value }
-                                                            };
-                                                            setFlag({ ...flag, variants });
-                                                        }}
-                                                        disabled={!canManage}
-                                                        fullWidth
-                                                        placeholder="0"
-                                                        helperText={t('featureFlags.payloadHelp')}
-                                                    />
-                                                ) : (flag.variantType || 'string') === 'json' ? (
-                                                    <JsonEditor
-                                                        value={variant.payload?.value || '{}'}
-                                                        onChange={(newValue) => {
-                                                            const variants = [...(flag.variants || [])];
-                                                            variants[index] = {
-                                                                ...variants[index],
-                                                                payload: { type: 'json', value: newValue }
-                                                            };
-                                                            setFlag({ ...flag, variants });
-                                                        }}
-                                                        height={150}
-                                                        readOnly={!canManage}
-                                                        placeholder='{"key": "value"}'
-                                                        helperText={jsonPayloadErrors[index] || t('featureFlags.payloadHelp')}
-                                                        error={jsonPayloadErrors[index] || undefined}
-                                                        onValidationError={(error) => {
-                                                            setJsonPayloadErrors(prev => ({
-                                                                ...prev,
-                                                                [index]: error
-                                                            }));
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <TextField
-                                                        size="small"
-                                                        value={variant.payload?.value || ''}
-                                                        onChange={(e) => {
-                                                            const variants = [...(flag.variants || [])];
-                                                            variants[index] = {
-                                                                ...variants[index],
-                                                                payload: { type: 'string', value: e.target.value }
-                                                            };
-                                                            setFlag({ ...flag, variants });
-                                                        }}
-                                                        disabled={!canManage}
-                                                        fullWidth
-                                                        placeholder={t('featureFlags.payloadPlaceholder')}
-                                                        helperText={t('featureFlags.payloadHelp')}
-                                                    />
-                                                )}
-                                            </Box>
-                                        </Box>
-                                    </Paper>
-                                );
-                            })}
-
-                            {/* Add Variant Button */}
-                            {canManage && (
-                                <Button
-                                    variant="outlined"
-                                    startIcon={<AddIcon />}
-                                    onClick={() => {
+                        {(!flag.variants || flag.variants.length === 0) ? (
+                            <Paper variant="outlined" sx={{ borderStyle: 'dashed' }}>
+                                <EmptyState
+                                    message={t('featureFlags.noVariantsFound')}
+                                    onAddClick={canManage ? () => {
                                         const variantType = flag.variantType || 'string';
-                                        const defaultValue = variantType === 'number' ? '0' : '';
+                                        const defaultValue = variantType === 'number' ? '0' : variantType === 'json' ? '{}' : '';
                                         const newVariant: Variant = {
-                                            name: `variant-${(flag.variants?.length || 0) + 1}`,
-                                            weight: 0,
+                                            name: `variant-1`,
+                                            weight: 100,
                                             weightLock: false,
                                             payload: { type: variantType === 'json' ? 'json' : 'string', value: defaultValue },
                                             stickiness: 'default',
                                         };
-                                        const updatedVariants = [...(flag.variants || []), newVariant];
-                                        distributeVariantWeights(updatedVariants);
-                                        setFlag({ ...flag, variants: updatedVariants });
-                                    }}
-                                    sx={{ alignSelf: 'flex-start' }}
-                                >
-                                    {t('featureFlags.addVariant')}
-                                </Button>
-                            )}
+                                        setFlag({ ...flag, variants: [newVariant] });
+                                    } : undefined}
+                                    addButtonLabel={t('featureFlags.addFirstVariant')}
+                                    minHeight={150}
+                                />
+                            </Paper>
+                        ) : (
+                            <Stack spacing={2}>
+                                {(flag.variants || []).map((variant, index) => {
+                                    // Color palette for variant tips
+                                    const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f97316', '#10b981', '#06b6d4', '#3b82f6', '#f59e0b'];
+                                    const tipColor = colors[index % colors.length];
 
-                            {/* Weight Distribution Bar */}
-                            {(flag.variants?.length || 0) > 1 && (
-                                <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
-                                    <Typography variant="subtitle2" gutterBottom>
-                                        {t('featureFlags.flagVariants')} ({flag.variants?.length})
-                                    </Typography>
-                                    <Box sx={{ display: 'flex', width: '100%', height: 24, overflow: 'hidden' }}>
-                                        {(flag.variants || []).map((variant, index) => {
-                                            const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f97316', '#10b981', '#06b6d4', '#3b82f6', '#f59e0b'];
-                                            const barColor = colors[index % colors.length];
-                                            const weight = variant.weight || 0;
+                                    return (
+                                        <Paper
+                                            key={index}
+                                            variant="outlined"
+                                            sx={{
+                                                p: 0,
+                                                overflow: 'hidden',
+                                                display: 'flex',
+                                            }}
+                                        >
+                                            {/* Left color tip */}
+                                            <Box sx={{ width: 6, bgcolor: tipColor, flexShrink: 0 }} />
 
-                                            if (weight === 0) return null;
+                                            {/* Content */}
+                                            <Box sx={{ flex: 1, p: 2.5 }}>
+                                                {/* Row 1: Label */}
+                                                <Box sx={{ mb: 1.5 }}>
+                                                    <Typography variant="subtitle2" fontWeight={600}>
+                                                        {t('featureFlags.variantName')}
+                                                    </Typography>
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        {t('featureFlags.variantNameHelp')}
+                                                    </Typography>
+                                                </Box>
 
-                                            return (
-                                                <Tooltip
-                                                    key={index}
-                                                    title={`${variant.name}: ${weight}%`}
-                                                    arrow
-                                                >
-                                                    <Box
-                                                        sx={{
-                                                            width: `${weight}%`,
-                                                            bgcolor: barColor,
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
-                                                            color: 'white',
-                                                            fontSize: '0.75rem',
-                                                            fontWeight: 500,
-                                                            cursor: 'pointer',
-                                                            transition: 'opacity 0.2s',
-                                                            '&:hover': { opacity: 0.8 },
-                                                            borderRight: index < (flag.variants?.length || 0) - 1 ? '1px solid rgba(255,255,255,0.3)' : 'none',
+                                                {/* Row 2: Name input + Delete + Switch + Weight input */}
+                                                <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                                                    <TextField
+                                                        size="small"
+                                                        value={variant.name || ''}
+                                                        onChange={(e) => {
+                                                            const variants = [...(flag.variants || [])];
+                                                            variants[index] = { ...variants[index], name: e.target.value };
+                                                            setFlag({ ...flag, variants });
                                                         }}
-                                                    >
-                                                        {weight >= 10 ? `${weight}%` : ''}
-                                                    </Box>
-                                                </Tooltip>
-                                            );
-                                        })}
-                                    </Box>
-                                </Paper>
-                            )}
-                            {/* Save Button */}
-                            {canManage && !isCreating && (
-                                <Box sx={{ mt: 2 }}>
-                                    <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSaveVariants} disabled={!hasVariantChanges() || (flag.variantType === 'json' && Object.values(jsonPayloadErrors).some(e => e !== null))}>
-                                        {t('featureFlags.saveVariants')}
+                                                        disabled={!canManage}
+                                                        sx={{ flex: 1, maxWidth: 300 }}
+                                                        placeholder={`variant-${index + 1}`}
+                                                    />
+                                                    {canManage && (
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => handleDeleteVariant(variant.name)}
+                                                            sx={{ color: 'text.secondary' }}
+                                                        >
+                                                            <DeleteIcon fontSize="small" />
+                                                        </IconButton>
+                                                    )}
+                                                    {(flag.variants?.length || 0) > 1 && (
+                                                        <>
+                                                            <FormControlLabel
+                                                                control={
+                                                                    <Switch
+                                                                        size="small"
+                                                                        checked={variant.weightLock || false}
+                                                                        onChange={(e) => {
+                                                                            const variants = [...(flag.variants || [])];
+                                                                            variants[index] = { ...variants[index], weightLock: e.target.checked };
+                                                                            distributeVariantWeights(variants);
+                                                                            setFlag({ ...flag, variants });
+                                                                        }}
+                                                                        disabled={!canManage}
+                                                                    />
+                                                                }
+                                                                label={<Typography variant="body2">{t('featureFlags.customWeight')}</Typography>}
+                                                                labelPlacement="start"
+                                                                sx={{ ml: 0, mr: 0 }}
+                                                            />
+                                                            <TextField
+                                                                size="small"
+                                                                type="number"
+                                                                label={t('featureFlags.variantWeight')}
+                                                                value={variant.weight || 0}
+                                                                onChange={(e) => {
+                                                                    const value = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
+                                                                    const variants = [...(flag.variants || [])];
+                                                                    variants[index] = { ...variants[index], weight: value };
+                                                                    distributeVariantWeights(variants);
+                                                                    setFlag({ ...flag, variants });
+                                                                }}
+                                                                disabled={!canManage || !variant.weightLock}
+                                                                InputProps={{
+                                                                    endAdornment: <Typography variant="body2">%</Typography>,
+                                                                    inputProps: { min: 0, max: 100 }
+                                                                }}
+                                                                sx={{ width: 130 }}
+                                                            />
+                                                        </>
+                                                    )}
+                                                </Box>
+
+                                                {/* Row 3: Payload */}
+                                                <Box sx={{ mt: 2 }}>
+                                                    <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                                                        {t('featureFlags.payload')}
+                                                    </Typography>
+                                                    {(flag.variantType || 'string') === 'number' ? (
+                                                        <TextField
+                                                            size="small"
+                                                            type="number"
+                                                            value={variant.payload?.value || ''}
+                                                            onChange={(e) => {
+                                                                const variants = [...(flag.variants || [])];
+                                                                variants[index] = {
+                                                                    ...variants[index],
+                                                                    payload: { type: 'string', value: e.target.value }
+                                                                };
+                                                                setFlag({ ...flag, variants });
+                                                            }}
+                                                            disabled={!canManage}
+                                                            fullWidth
+                                                            placeholder="0"
+                                                            helperText={t('featureFlags.payloadHelp')}
+                                                        />
+                                                    ) : (flag.variantType || 'string') === 'json' ? (
+                                                        <JsonEditor
+                                                            value={variant.payload?.value || '{}'}
+                                                            onChange={(newValue) => {
+                                                                const variants = [...(flag.variants || [])];
+                                                                variants[index] = {
+                                                                    ...variants[index],
+                                                                    payload: { type: 'json', value: newValue }
+                                                                };
+                                                                setFlag({ ...flag, variants });
+                                                            }}
+                                                            height={150}
+                                                            readOnly={!canManage}
+                                                            placeholder='{"key": "value"}'
+                                                            helperText={jsonPayloadErrors[index] || t('featureFlags.payloadHelp')}
+                                                            error={jsonPayloadErrors[index] || undefined}
+                                                            onValidationError={(error) => {
+                                                                setJsonPayloadErrors(prev => ({
+                                                                    ...prev,
+                                                                    [index]: error
+                                                                }));
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <TextField
+                                                            size="small"
+                                                            value={variant.payload?.value || ''}
+                                                            onChange={(e) => {
+                                                                const variants = [...(flag.variants || [])];
+                                                                variants[index] = {
+                                                                    ...variants[index],
+                                                                    payload: { type: 'string', value: e.target.value }
+                                                                };
+                                                                setFlag({ ...flag, variants });
+                                                            }}
+                                                            disabled={!canManage}
+                                                            fullWidth
+                                                            placeholder={t('featureFlags.payloadPlaceholder')}
+                                                            helperText={t('featureFlags.payloadHelp')}
+                                                        />
+                                                    )}
+                                                </Box>
+                                            </Box>
+                                        </Paper>
+                                    );
+                                })}
+
+                                {/* Add Variant Button */}
+                                {canManage && (
+                                    <Button
+                                        variant="outlined"
+                                        startIcon={<AddIcon />}
+                                        onClick={() => {
+                                            const variantType = flag.variantType || 'string';
+                                            const defaultValue = variantType === 'number' ? '0' : '';
+                                            const newVariant: Variant = {
+                                                name: `variant-${(flag.variants?.length || 0) + 1}`,
+                                                weight: 0,
+                                                weightLock: false,
+                                                payload: { type: variantType === 'json' ? 'json' : 'string', value: defaultValue },
+                                                stickiness: 'default',
+                                            };
+                                            const updatedVariants = [...(flag.variants || []), newVariant];
+                                            distributeVariantWeights(updatedVariants);
+                                            setFlag({ ...flag, variants: updatedVariants });
+                                        }}
+                                        sx={{ alignSelf: 'flex-start' }}
+                                    >
+                                        {t('featureFlags.addVariant')}
                                     </Button>
-                                </Box>
-                            )}
-                        </Stack>
+                                )}
+
+                                {/* Weight Distribution Bar */}
+                                {(flag.variants?.length || 0) > 1 && (
+                                    <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
+                                        <Typography variant="subtitle2" gutterBottom>
+                                            {t('featureFlags.flagVariants')} ({flag.variants?.length})
+                                        </Typography>
+                                        <Box sx={{ display: 'flex', width: '100%', height: 24, overflow: 'hidden' }}>
+                                            {(flag.variants || []).map((variant, index) => {
+                                                const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f97316', '#10b981', '#06b6d4', '#3b82f6', '#f59e0b'];
+                                                const barColor = colors[index % colors.length];
+                                                const weight = variant.weight || 0;
+
+                                                if (weight === 0) return null;
+
+                                                return (
+                                                    <Tooltip
+                                                        key={index}
+                                                        title={`${variant.name}: ${weight}%`}
+                                                        arrow
+                                                    >
+                                                        <Box
+                                                            sx={{
+                                                                width: `${weight}%`,
+                                                                bgcolor: barColor,
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                color: 'white',
+                                                                fontSize: '0.75rem',
+                                                                fontWeight: 500,
+                                                                cursor: 'pointer',
+                                                                transition: 'opacity 0.2s',
+                                                                '&:hover': { opacity: 0.8 },
+                                                                borderRight: index < (flag.variants?.length || 0) - 1 ? '1px solid rgba(255,255,255,0.3)' : 'none',
+                                                            }}
+                                                        >
+                                                            {weight >= 10 ? `${weight}%` : ''}
+                                                        </Box>
+                                                    </Tooltip>
+                                                );
+                                            })}
+                                        </Box>
+                                    </Paper>
+                                )}
+                                {/* Save Button */}
+                                {canManage && !isCreating && (
+                                    <Box sx={{ mt: 2 }}>
+                                        <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSaveVariants} disabled={!hasVariantChanges() || (flag.variantType === 'json' && Object.values(jsonPayloadErrors).some(e => e !== null))}>
+                                            {t('featureFlags.saveVariants')}
+                                        </Button>
+                                    </Box>
+                                )}
+                            </Stack>
+                        )}
+
+                        {/* Payload size warning */}
+                        <Alert severity="warning" sx={{ mt: 2 }}>
+                            {t('featureFlags.variantPayloadWarning')}
+                        </Alert>
                     </CardContent>
                 </TabPanel>
 
