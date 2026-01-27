@@ -245,9 +245,9 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     adminOnly: true,
     children: [
       { text: 'sidebar.featureFlags', icon: 'Flag', path: '/feature-flags', permission: 'feature-flags' },
-      { text: 'sidebar.featureSegments', icon: 'People', path: '/feature-segments', permission: 'feature-flags' },
-      { text: 'sidebar.featureContextFields', icon: 'Settings', path: '/feature-context-fields', permission: 'feature-flags' },
-      { text: 'sidebar.featureFlagTypes', icon: 'Category', path: '/feature-flag-types', permission: 'feature-flags' },
+      { text: 'sidebar.featureSegments', icon: 'People', path: '/feature-flags/segments', permission: 'feature-flags' },
+      { text: 'sidebar.featureContextFields', icon: 'Settings', path: '/feature-flags/context-fields', permission: 'feature-flags' },
+      { text: 'sidebar.featureFlagTypes', icon: 'Category', path: '/feature-flags/types', permission: 'feature-flags' },
     ]
   },
 

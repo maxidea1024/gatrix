@@ -534,29 +534,11 @@ const AppContent: React.FC = () => {
                               <EnvironmentAwareLayout>
                                 <Routes>
                                   <Route index element={<FeatureFlagsPage />} />
+                                  <Route path="segments" element={<FeatureSegmentsPage />} />
+                                  <Route path="context-fields" element={<FeatureContextFieldsPage />} />
+                                  <Route path="types" element={<FeatureFlagTypesPage />} />
                                   <Route path=":flagName" element={<FeatureFlagDetailPage />} />
                                 </Routes>
-                              </EnvironmentAwareLayout>
-                            </ProtectedRoute>
-                          } />
-                          <Route path="/feature-segments" element={
-                            <ProtectedRoute requiredRoles={['admin']}>
-                              <EnvironmentAwareLayout>
-                                <FeatureSegmentsPage />
-                              </EnvironmentAwareLayout>
-                            </ProtectedRoute>
-                          } />
-                          <Route path="/feature-context-fields" element={
-                            <ProtectedRoute requiredRoles={['admin']}>
-                              <EnvironmentAwareLayout>
-                                <FeatureContextFieldsPage />
-                              </EnvironmentAwareLayout>
-                            </ProtectedRoute>
-                          } />
-                          <Route path="/feature-flag-types" element={
-                            <ProtectedRoute requiredRoles={['admin']}>
-                              <EnvironmentAwareLayout>
-                                <FeatureFlagTypesPage />
                               </EnvironmentAwareLayout>
                             </ProtectedRoute>
                           } />
