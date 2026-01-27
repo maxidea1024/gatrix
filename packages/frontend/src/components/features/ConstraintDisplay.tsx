@@ -185,12 +185,11 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                 <Chip
                     label={operatorInfo.text}
                     size="small"
-                    variant="outlined"
                     sx={{
                         height: 24,
                         fontSize: '0.75rem',
                         fontWeight: 400,
-                        borderColor: 'divider',
+                        bgcolor: 'action.selected',
                         color: 'text.secondary',
                         borderRadius: 3,
                         cursor: 'help',
@@ -239,7 +238,7 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                                 fontWeight: 500,
                                 bgcolor: 'primary.main',
                                 color: 'primary.contrastText',
-                                borderRadius: 4,
+                                borderRadius: '12px !important',
                                 '& .MuiChip-label': {
                                     px: 1.25,
                                 },
