@@ -223,6 +223,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     const [expandedSegments, setExpandedSegments] = useState<Set<string>>(new Set());
     const [allTags, setAllTags] = useState<Tag[]>([]);
     const [originalFlag, setOriginalFlag] = useState<FeatureFlag | null>(null);
+    const [jsonPayloadErrors, setJsonPayloadErrors] = useState<Record<string, string | null>>({});
 
     // Check if there are unsaved changes
     const hasChanges = (): boolean => {
@@ -1922,7 +1923,14 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                         height={150}
                                                         readOnly={!canManage}
                                                         placeholder='{"key": "value"}'
-                                                        helperText={t('featureFlags.payloadHelp')}
+                                                        helperText={jsonPayloadErrors[variant.name] || t('featureFlags.payloadHelp')}
+                                                        error={jsonPayloadErrors[variant.name] || undefined}
+                                                        onValidationError={(error) => {
+                                                            setJsonPayloadErrors(prev => ({
+                                                                ...prev,
+                                                                [variant.name]: error
+                                                            }));
+                                                        }}
                                                     />
                                                 ) : (
                                                     <TextField
@@ -2020,7 +2028,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                             {/* Save Button */}
                             {canManage && !isCreating && (
                                 <Box sx={{ mt: 2 }}>
-                                    <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSaveVariants} disabled={!hasVariantChanges()}>
+                                    <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSaveVariants} disabled={!hasVariantChanges() || Object.values(jsonPayloadErrors).some(e => e !== null)}>
                                         {t('featureFlags.saveVariants')}
                                     </Button>
                                 </Box>
