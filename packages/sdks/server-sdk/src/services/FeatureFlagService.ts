@@ -170,12 +170,184 @@ export class FeatureFlagService {
         return result.enabled;
     }
 
+    // ==================== FeatBit-Style Variation Methods ====================
+
+    /**
+     * Get boolean variation (FeatBit-style)
+     * Returns the flag's enabled state
+     */
+    boolVariation(
+        flagName: string,
+        context: EvaluationContext,
+        environment: string,
+        defaultValue: boolean = false
+    ): boolean {
+        return this.isEnabled(flagName, context, environment, defaultValue);
+    }
+
+    /**
+     * Get boolean variation with evaluation details (FeatBit-style)
+     */
+    boolVariationDetail(
+        flagName: string,
+        context: EvaluationContext,
+        environment: string,
+        defaultValue: boolean = false
+    ): { value: boolean; reason: EvaluationResult['reason']; flagName: string } {
+        const result = this.evaluate(flagName, context, environment);
+        return {
+            value: result.reason === 'not_found' ? defaultValue : result.enabled,
+            reason: result.reason,
+            flagName: result.flagName,
+        };
+    }
+
+    /**
+     * Get string variation from variant payload (FeatBit-style)
+     */
+    stringVariation(
+        flagName: string,
+        context: EvaluationContext,
+        environment: string,
+        defaultValue: string = ''
+    ): string {
+        const result = this.evaluate(flagName, context, environment);
+        if (!result.enabled || !result.variant?.payload) {
+            return defaultValue;
+        }
+        return String(result.variant.payload.value ?? result.variant.payload ?? defaultValue);
+    }
+
+    /**
+     * Get string variation with evaluation details (FeatBit-style)
+     */
+    stringVariationDetail(
+        flagName: string,
+        context: EvaluationContext,
+        environment: string,
+        defaultValue: string = ''
+    ): { value: string; reason: EvaluationResult['reason']; flagName: string; variantName?: string } {
+        const result = this.evaluate(flagName, context, environment);
+        const value = (!result.enabled || !result.variant?.payload)
+            ? defaultValue
+            : String(result.variant.payload.value ?? result.variant.payload ?? defaultValue);
+        return {
+            value,
+            reason: result.reason,
+            flagName: result.flagName,
+            variantName: result.variant?.name,
+        };
+    }
+
+    /**
+     * Get number variation from variant payload (FeatBit-style)
+     */
+    numberVariation(
+        flagName: string,
+        context: EvaluationContext,
+        environment: string,
+        defaultValue: number = 0
+    ): number {
+        const result = this.evaluate(flagName, context, environment);
+        if (!result.enabled || !result.variant?.payload) {
+            return defaultValue;
+        }
+        const rawValue = result.variant.payload.value ?? result.variant.payload;
+        const num = Number(rawValue);
+        return isNaN(num) ? defaultValue : num;
+    }
+
+    /**
+     * Get number variation with evaluation details (FeatBit-style)
+     */
+    numberVariationDetail(
+        flagName: string,
+        context: EvaluationContext,
+        environment: string,
+        defaultValue: number = 0
+    ): { value: number; reason: EvaluationResult['reason']; flagName: string; variantName?: string } {
+        const result = this.evaluate(flagName, context, environment);
+        let value = defaultValue;
+        if (result.enabled && result.variant?.payload) {
+            const rawValue = result.variant.payload.value ?? result.variant.payload;
+            const num = Number(rawValue);
+            value = isNaN(num) ? defaultValue : num;
+        }
+        return {
+            value,
+            reason: result.reason,
+            flagName: result.flagName,
+            variantName: result.variant?.name,
+        };
+    }
+
+    /**
+     * Get JSON variation from variant payload (FeatBit-style)
+     */
+    jsonVariation<T = any>(
+        flagName: string,
+        context: EvaluationContext,
+        environment: string,
+        defaultValue: T
+    ): T {
+        const result = this.evaluate(flagName, context, environment);
+        if (!result.enabled || !result.variant?.payload) {
+            return defaultValue;
+        }
+        const rawValue = result.variant.payload.value ?? result.variant.payload;
+        if (typeof rawValue === 'object') {
+            return rawValue as T;
+        }
+        if (typeof rawValue === 'string') {
+            try {
+                return JSON.parse(rawValue) as T;
+            } catch {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
+    }
+
+    /**
+     * Get JSON variation with evaluation details (FeatBit-style)
+     */
+    jsonVariationDetail<T = any>(
+        flagName: string,
+        context: EvaluationContext,
+        environment: string,
+        defaultValue: T
+    ): { value: T; reason: EvaluationResult['reason']; flagName: string; variantName?: string } {
+        const result = this.evaluate(flagName, context, environment);
+        let value = defaultValue;
+        if (result.enabled && result.variant?.payload) {
+            const rawValue = result.variant.payload.value ?? result.variant.payload;
+            if (typeof rawValue === 'object') {
+                value = rawValue as T;
+            } else if (typeof rawValue === 'string') {
+                try {
+                    value = JSON.parse(rawValue) as T;
+                } catch {
+                    // Keep defaultValue
+                }
+            }
+        }
+        return {
+            value,
+            reason: result.reason,
+            flagName: result.flagName,
+            variantName: result.variant?.name,
+        };
+    }
+
+    // ==================== Legacy Methods ====================
+
     /**
      * Get variant for a feature flag
      * @param flagName Name of the flag
      * @param context Evaluation context
      * @param environment Environment name
      * @param defaultVariant Default variant if flag not found or has no variants
+     * @deprecated Use stringVariation(), numberVariation(), or jsonVariation() instead
      */
     getVariant(
         flagName: string,
