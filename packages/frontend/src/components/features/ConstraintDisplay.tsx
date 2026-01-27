@@ -191,6 +191,8 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                         fontWeight: 400,
                         bgcolor: 'action.selected',
                         color: 'text.secondary',
+                        border: 1,
+                        borderColor: 'divider',
                         borderRadius: 3,
                         cursor: 'help',
                         '& .MuiChip-label': {
@@ -215,6 +217,8 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                             borderRadius: 3,
                             bgcolor: 'action.selected',
                             color: 'text.secondary',
+                            border: 1,
+                            borderColor: 'divider',
                             '& .MuiChip-label': {
                                 px: 1,
                             },
