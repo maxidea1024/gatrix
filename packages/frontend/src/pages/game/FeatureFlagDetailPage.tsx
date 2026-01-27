@@ -1111,10 +1111,18 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                         onChange={(e) => {
                                                             const strategyType = STRATEGY_TYPES.find(s => s.name === e.target.value);
                                                             const strategies = [...(flag.strategies || [])];
+                                                            // Preserve existing parameters but ensure rollout defaults to 100
+                                                            const existingParams = strategies[index].parameters || {};
                                                             strategies[index] = {
                                                                 ...strategies[index],
                                                                 name: e.target.value,
                                                                 title: strategyType?.titleKey ? t(strategyType.titleKey) : e.target.value,
+                                                                parameters: {
+                                                                    rollout: existingParams.rollout ?? 100,
+                                                                    stickiness: existingParams.stickiness || 'default',
+                                                                    groupId: existingParams.groupId || '',
+                                                                    ...existingParams,
+                                                                },
                                                             };
                                                             setFlag({ ...flag, strategies });
                                                         }}
