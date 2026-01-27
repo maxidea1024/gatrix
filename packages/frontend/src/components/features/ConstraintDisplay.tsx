@@ -223,7 +223,7 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                 </Tooltip>
             )}
 
-            {/* Values - Display as chips for multi-value, or bold text for single value */}
+            {/* Values - Always display as chips */}
             {isMultiValue ? (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'center' }}>
                     {constraint.values!.map((val, idx) => (
@@ -246,20 +246,21 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                     ))}
                 </Box>
             ) : (
-                <Typography
-                    variant="body2"
+                <Chip
+                    label={getSingleValueDisplay()}
+                    size="small"
                     sx={{
-                        fontWeight: 600,
-                        fontSize: '0.85rem',
-                        color: 'text.primary',
-                        maxWidth: 300,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
+                        height: 22,
+                        fontSize: '0.75rem',
+                        fontWeight: 500,
+                        bgcolor: 'primary.main',
+                        color: 'primary.contrastText',
+                        borderRadius: '12px !important',
+                        '& .MuiChip-label': {
+                            px: 1.25,
+                        },
                     }}
-                >
-                    {getSingleValueDisplay()}
-                </Typography>
+                />
             )}
         </Box>
     );

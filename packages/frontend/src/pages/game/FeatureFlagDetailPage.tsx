@@ -80,6 +80,7 @@ import { parseApiErrorMessage } from '../../utils/errorUtils';
 import api from '../../services/api';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import ConstraintEditor, { Constraint, ContextField } from '../../components/features/ConstraintEditor';
+import { ConstraintList } from '../../components/features/ConstraintDisplay';
 import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
@@ -1418,49 +1419,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                 const isExpanded = expandedSegments.has(`${index}-${segName}`);
                                                                 const isEmpty = !seg?.constraints || seg.constraints.length === 0;
 
-                                                                // Format operator for display - universal symbols
-                                                                const getOperatorLabel = (op: string): string => {
-                                                                    const opLabels: Record<string, string> = {
-                                                                        'str_eq': '=',
-                                                                        'str_neq': '≠',
-                                                                        'str_contains': 'contains',
-                                                                        'str_starts_with': 'starts with',
-                                                                        'str_ends_with': 'ends with',
-                                                                        'str_in': 'is one of',
-                                                                        'str_not_in': 'is not one of',
-                                                                        'num_eq': '=',
-                                                                        'num_gt': '>',
-                                                                        'num_gte': '≥',
-                                                                        'num_lt': '<',
-                                                                        'num_lte': '≤',
-                                                                        'bool_is': '=',
-                                                                        'date_gt': '>',
-                                                                        'date_gte': '≥',
-                                                                        'date_lt': '<',
-                                                                        'date_lte': '≤',
-                                                                        'semver_eq': '=',
-                                                                        'semver_gt': '>',
-                                                                        'semver_gte': '≥',
-                                                                        'semver_lt': '<',
-                                                                        'semver_lte': '≤',
-                                                                    };
-                                                                    return opLabels[op] || op;
-                                                                };
-
-                                                                // Get constraint value display
-                                                                const getValueDisplay = (c: any): string => {
-                                                                    if (c.values && c.values.length > 0) {
-                                                                        return c.values.join(', ');
-                                                                    }
-                                                                    if (c.value !== undefined && c.value !== null) {
-                                                                        if (typeof c.value === 'boolean') {
-                                                                            return c.value ? 'True' : 'False';
-                                                                        }
-                                                                        return String(c.value);
-                                                                    }
-                                                                    return '-';
-                                                                };
-
                                                                 const segIndex = (strategy.segments || []).indexOf(segName);
 
                                                                 return (
@@ -1543,93 +1501,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                                             <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
                                                                                                 📋 {t('featureFlags.segmentConditions')}
                                                                                             </Typography>
-                                                                                            <Stack spacing={1}>
-                                                                                                {seg.constraints.map((c: any, ci: number) => (
-                                                                                                    <React.Fragment key={ci}>
-                                                                                                        {ci > 0 && (
-                                                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-                                                                                                                <Divider sx={{ flexGrow: 1 }} />
-                                                                                                                <Chip
-                                                                                                                    label="AND"
-                                                                                                                    size="small"
-                                                                                                                    sx={{
-                                                                                                                        height: 22,
-                                                                                                                        fontSize: '0.7rem',
-                                                                                                                        bgcolor: 'action.selected',
-                                                                                                                        fontWeight: 600
-                                                                                                                    }}
-                                                                                                                />
-                                                                                                                <Divider sx={{ flexGrow: 1 }} />
-                                                                                                            </Box>
-                                                                                                        )}
-                                                                                                        {/* Unleash-style constraint row */}
-                                                                                                        <Box
-                                                                                                            sx={{
-                                                                                                                display: 'flex',
-                                                                                                                alignItems: 'center',
-                                                                                                                gap: 1,
-                                                                                                                p: 1,
-                                                                                                                border: 1,
-                                                                                                                borderColor: 'primary.main',
-                                                                                                                borderRadius: 1,
-                                                                                                                bgcolor: 'background.paper'
-                                                                                                            }}
-                                                                                                        >
-                                                                                                            {/* Field Name */}
-                                                                                                            <Box
-                                                                                                                sx={{
-                                                                                                                    px: 1.5,
-                                                                                                                    py: 0.5,
-                                                                                                                    bgcolor: 'primary.main',
-                                                                                                                    color: 'primary.contrastText',
-                                                                                                                    borderRadius: 0.5
-                                                                                                                }}
-                                                                                                            >
-                                                                                                                <Typography variant="body2" fontWeight={600}>
-                                                                                                                    {c.contextName}
-                                                                                                                </Typography>
-                                                                                                            </Box>
-
-                                                                                                            {/* Operator Chip */}
-                                                                                                            <Chip
-                                                                                                                label={getOperatorLabel(c.operator)}
-                                                                                                                size="small"
-                                                                                                                variant="outlined"
-                                                                                                                sx={{ fontWeight: 500, fontSize: '0.75rem' }}
-                                                                                                            />
-
-                                                                                                            {/* Case sensitivity indicator for string operators */}
-                                                                                                            {c.operator?.startsWith('str_') && (
-                                                                                                                <Chip
-                                                                                                                    label={c.caseInsensitive ? 'Aa' : 'AA'}
-                                                                                                                    size="small"
-                                                                                                                    variant="outlined"
-                                                                                                                    sx={{
-                                                                                                                        height: 22,
-                                                                                                                        fontSize: '0.7rem',
-                                                                                                                        minWidth: 32
-                                                                                                                    }}
-                                                                                                                />
-                                                                                                            )}
-
-                                                                                                            {/* Value */}
-                                                                                                            <Box
-                                                                                                                sx={{
-                                                                                                                    px: 1.5,
-                                                                                                                    py: 0.5,
-                                                                                                                    bgcolor: 'primary.main',
-                                                                                                                    color: 'primary.contrastText',
-                                                                                                                    borderRadius: 0.5
-                                                                                                                }}
-                                                                                                            >
-                                                                                                                <Typography variant="body2" fontWeight={600}>
-                                                                                                                    {getValueDisplay(c)}
-                                                                                                                </Typography>
-                                                                                                            </Box>
-                                                                                                        </Box>
-                                                                                                    </React.Fragment>
-                                                                                                ))}
-                                                                                            </Stack>
+                                                                                            <ConstraintList constraints={seg.constraints} contextFields={contextFields} />
                                                                                         </Box>
                                                                                     )}
                                                                                 </Paper>
