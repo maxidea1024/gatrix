@@ -4,7 +4,8 @@
  */
 import React from 'react';
 import { Box, Typography, Chip, Paper, Stack, Tooltip } from '@mui/material';
-import { getStoredTimezone } from '../../utils/dateFormat';
+import { FilterList as ConstraintIcon } from '@mui/icons-material';
+import { formatDateTime } from '../../utils/dateFormat';
 
 export interface ConstraintValue {
     contextName: string;
@@ -15,9 +16,17 @@ export interface ConstraintValue {
     caseInsensitive?: boolean;
 }
 
+export interface ContextFieldInfo {
+    fieldName: string;
+    displayName?: string;
+    description?: string;
+    fieldType?: string;
+}
+
 interface ConstraintDisplayProps {
     constraint: ConstraintValue;
     compact?: boolean;
+    contextFields?: ContextFieldInfo[];
 }
 
 // Get operator display label
@@ -49,25 +58,11 @@ const getOperatorLabel = (op: string): string => {
     return opLabels[op] || op;
 };
 
-// Format date with timezone
-const formatDateValue = (value: string, timezone?: string): string => {
+// Format date using utility function
+const formatDateValueDisplay = (value: string): string => {
     if (!value) return value;
     try {
-        const date = new Date(value);
-        if (isNaN(date.getTime())) return value;
-
-        // Format with timezone if available
-        const options: Intl.DateTimeFormatOptions = {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            timeZone: timezone || 'UTC',
-            timeZoneName: 'short'
-        };
-        return new Intl.DateTimeFormat('ko-KR', options).format(date);
+        return formatDateTime(value);
     } catch {
         return value;
     }
@@ -81,75 +76,74 @@ const isDateOperator = (op: string): boolean => {
 /**
  * Single constraint display row - Unleash style
  */
-export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint, compact = false }) => {
-    // Get user's configured timezone from settings
-    const timezone = getStoredTimezone();
+export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint, compact = false, contextFields = [] }) => {
 
-    // Get constraint value display
-    const getValueDisplay = (): string => {
-        let value = '';
-        if (constraint.values && constraint.values.length > 0) {
-            value = constraint.values.join(', ');
-        } else if (constraint.value !== undefined && constraint.value !== null) {
+    // Find context field info for tooltip
+    const contextFieldInfo = contextFields.find(f => f.fieldName === constraint.contextName);
+    const contextFieldDescription = contextFieldInfo?.description || contextFieldInfo?.displayName || '';
+
+    // Get constraint value display (for single values)
+    const getSingleValueDisplay = (): string => {
+        if (constraint.value !== undefined && constraint.value !== null) {
             if (typeof constraint.value === 'boolean') {
                 return constraint.value ? 'true' : 'false';
             }
-            value = String(constraint.value);
-        } else {
-            return '-';
+            const value = String(constraint.value);
+            // Format date values
+            if (isDateOperator(constraint.operator)) {
+                return formatDateValueDisplay(value);
+            }
+            return value;
         }
-
-        // Format date values with timezone
-        if (isDateOperator(constraint.operator)) {
-            return formatDateValue(value, timezone);
-        }
-
-        return value;
+        return '-';
     };
 
-    const valueDisplay = getValueDisplay();
+    const isMultiValue = constraint.values && constraint.values.length > 0;
     const showCaseSensitivity = constraint.operator?.startsWith('str_');
 
     if (compact) {
+        const displayValue = isMultiValue ? constraint.values!.join(', ') : getSingleValueDisplay();
         return (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <Typography variant="caption" fontWeight={500}>{constraint.contextName}</Typography>
                 <Typography variant="caption" color="text.secondary">
                     {getOperatorLabel(constraint.operator)}
                 </Typography>
-                <Typography variant="caption" fontWeight={500}>{valueDisplay}</Typography>
+                <Typography variant="caption" fontWeight={500}>{displayValue}</Typography>
             </Box>
         );
     }
 
-    // Get readable operator text
-    const getOperatorText = (op: string): string => {
-        const opTexts: Record<string, string> = {
-            'str_eq': 'equals',
-            'str_neq': 'not equals',
-            'str_contains': 'contains',
-            'str_starts_with': 'starts with',
-            'str_ends_with': 'ends with',
-            'str_in': 'is one of',
-            'str_not_in': 'is not one of',
-            'num_eq': 'equals',
-            'num_gt': 'greater than',
-            'num_gte': 'greater than or equals',
-            'num_lt': 'less than',
-            'num_lte': 'less than or equals',
-            'bool_is': 'is',
-            'date_gt': 'is after',
-            'date_gte': 'is on or after',
-            'date_lt': 'is before',
-            'date_lte': 'is on or before',
-            'semver_eq': 'equals',
-            'semver_gt': 'greater than',
-            'semver_gte': 'greater than or equals',
-            'semver_lt': 'less than',
-            'semver_lte': 'less than or equals',
+    // Get readable operator text and description for tooltip
+    const getOperatorInfo = (op: string): { text: string; description: string } => {
+        const opInfo: Record<string, { text: string; description: string }> = {
+            'str_eq': { text: 'equals', description: 'String equals (exact match)' },
+            'str_neq': { text: 'not equals', description: 'String not equals' },
+            'str_contains': { text: 'contains', description: 'String contains substring' },
+            'str_starts_with': { text: 'starts with', description: 'String starts with prefix' },
+            'str_ends_with': { text: 'ends with', description: 'String ends with suffix' },
+            'str_in': { text: 'is one of', description: 'Value matches one of the listed values' },
+            'str_not_in': { text: 'is not one of', description: 'Value does not match any of the listed values' },
+            'num_eq': { text: 'equals', description: 'Number equals' },
+            'num_gt': { text: 'greater than', description: 'Number is greater than' },
+            'num_gte': { text: 'greater or equal', description: 'Number is greater than or equal to' },
+            'num_lt': { text: 'less than', description: 'Number is less than' },
+            'num_lte': { text: 'less or equal', description: 'Number is less than or equal to' },
+            'bool_is': { text: 'is', description: 'Boolean equals' },
+            'date_gt': { text: 'is after', description: 'Date is after the specified time' },
+            'date_gte': { text: 'is on or after', description: 'Date is on or after the specified time' },
+            'date_lt': { text: 'is before', description: 'Date is before the specified time' },
+            'date_lte': { text: 'is on or before', description: 'Date is on or before the specified time' },
+            'semver_eq': { text: 'equals', description: 'Semantic version equals' },
+            'semver_gt': { text: 'greater than', description: 'Semantic version is greater than' },
+            'semver_gte': { text: 'greater or equal', description: 'Semantic version is greater than or equal to' },
+            'semver_lt': { text: 'less than', description: 'Semantic version is less than' },
+            'semver_lte': { text: 'less or equal', description: 'Semantic version is less than or equal to' },
         };
-        return opTexts[op] || op;
+        return opInfo[op] || { text: op, description: op };
     };
+
+    const operatorInfo = getOperatorInfo(constraint.operator);
 
     return (
         <Box
@@ -160,51 +154,52 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                 px: 2,
                 py: 1.25,
                 border: 1,
-                borderColor: 'grey.300',
+                borderColor: 'divider',
                 borderRadius: 6,
-                bgcolor: 'grey.50',
+                bgcolor: 'action.hover',
+                flexWrap: 'wrap',
             }}
         >
-            {/* Constraint label */}
-            <Typography
-                variant="body2"
-                sx={{
-                    color: 'text.secondary',
-                    fontSize: '0.8rem',
-                    flexShrink: 0,
-                }}
-            >
-                Constraint
-            </Typography>
+            {/* Constraint icon */}
+            <Tooltip title="Constraint condition">
+                <ConstraintIcon sx={{ fontSize: 18, color: 'text.secondary', flexShrink: 0 }} />
+            </Tooltip>
 
-            {/* Context Name - Bold text */}
-            <Typography
-                variant="body2"
-                sx={{
-                    fontWeight: 600,
-                    fontSize: '0.85rem',
-                    color: 'text.primary',
-                }}
-            >
-                {constraint.contextName}
-            </Typography>
+            {/* Context Name - Bold text with tooltip for description */}
+            <Tooltip title={contextFieldDescription} arrow placement="top" disableHoverListener={!contextFieldDescription}>
+                <Typography
+                    variant="body2"
+                    sx={{
+                        fontWeight: 600,
+                        fontSize: '0.85rem',
+                        color: 'text.primary',
+                        cursor: contextFieldDescription ? 'help' : 'default',
+                    }}
+                >
+                    {constraint.contextName}
+                </Typography>
+            </Tooltip>
 
-            {/* Operator - Rounded chip with light gray background */}
-            <Chip
-                label={getOperatorText(constraint.operator)}
-                size="small"
-                sx={{
-                    height: 24,
-                    fontSize: '0.75rem',
-                    fontWeight: 400,
-                    bgcolor: 'grey.200',
-                    color: 'text.secondary',
-                    borderRadius: 3,
-                    '& .MuiChip-label': {
-                        px: 1.5,
-                    },
-                }}
-            />
+            {/* Operator - Rounded chip with tooltip description */}
+            <Tooltip title={operatorInfo.description} arrow>
+                <Chip
+                    label={operatorInfo.text}
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                        height: 24,
+                        fontSize: '0.75rem',
+                        fontWeight: 400,
+                        borderColor: 'divider',
+                        color: 'text.secondary',
+                        borderRadius: 3,
+                        cursor: 'help',
+                        '& .MuiChip-label': {
+                            px: 1.5,
+                        },
+                    }}
+                />
+            </Tooltip>
 
             {/* Case sensitivity indicator for string operators */}
             {showCaseSensitivity && (
@@ -220,7 +215,7 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                             minWidth: 32,
                             fontFamily: 'monospace',
                             borderRadius: 3,
-                            borderColor: 'grey.400',
+                            borderColor: 'divider',
                             color: 'text.secondary',
                             '& .MuiChip-label': {
                                 px: 1,
@@ -230,21 +225,44 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                 </Tooltip>
             )}
 
-            {/* Value - Bold text */}
-            <Typography
-                variant="body2"
-                sx={{
-                    fontWeight: 600,
-                    fontSize: '0.85rem',
-                    color: 'text.primary',
-                    maxWidth: 300,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                }}
-            >
-                {valueDisplay}
-            </Typography>
+            {/* Values - Display as chips for multi-value, or bold text for single value */}
+            {isMultiValue ? (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'center' }}>
+                    {constraint.values!.map((val, idx) => (
+                        <Chip
+                            key={idx}
+                            label={val}
+                            size="small"
+                            sx={{
+                                height: 22,
+                                fontSize: '0.75rem',
+                                fontWeight: 500,
+                                bgcolor: 'primary.main',
+                                color: 'primary.contrastText',
+                                borderRadius: 4,
+                                '& .MuiChip-label': {
+                                    px: 1.25,
+                                },
+                            }}
+                        />
+                    ))}
+                </Box>
+            ) : (
+                <Typography
+                    variant="body2"
+                    sx={{
+                        fontWeight: 600,
+                        fontSize: '0.85rem',
+                        color: 'text.primary',
+                        maxWidth: 300,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                    }}
+                >
+                    {getSingleValueDisplay()}
+                </Typography>
+            )}
         </Box>
     );
 };
@@ -252,12 +270,13 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
 interface ConstraintListProps {
     constraints: ConstraintValue[];
     title?: string;
+    contextFields?: ContextFieldInfo[];
 }
 
 /**
  * List of constraints with AND separators
  */
-export const ConstraintList: React.FC<ConstraintListProps> = ({ constraints, title }) => {
+export const ConstraintList: React.FC<ConstraintListProps> = ({ constraints, title, contextFields = [] }) => {
     if (!constraints || constraints.length === 0) {
         return (
             <Typography variant="caption" color="text.secondary" fontStyle="italic">
@@ -275,16 +294,17 @@ export const ConstraintList: React.FC<ConstraintListProps> = ({ constraints, tit
             )}
             {constraints.map((c, i) => (
                 <React.Fragment key={i}>
-                    <ConstraintDisplay constraint={c} />
+                    <ConstraintDisplay constraint={c} contextFields={contextFields} />
                     {i < constraints.length - 1 && (
                         <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.5 }}>
                             <Chip
                                 label="AND"
                                 size="small"
+                                variant="outlined"
                                 sx={{
                                     height: 20,
                                     fontSize: '0.65rem',
-                                    bgcolor: 'grey.200',
+                                    borderColor: 'divider',
                                     color: 'text.secondary',
                                     fontWeight: 600,
                                     borderRadius: 2,

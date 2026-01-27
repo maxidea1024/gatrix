@@ -424,7 +424,7 @@ const FeatureSegmentsPage: React.FC = () => {
                                                             </Box>
                                                             {expandedConstraints.has(segment.id) && (
                                                                 <Box sx={{ mt: 1 }}>
-                                                                    <ConstraintList constraints={segment.constraints} />
+                                                                    <ConstraintList constraints={segment.constraints} contextFields={contextFields} />
                                                                 </Box>
                                                             )}
                                                         </Box>
