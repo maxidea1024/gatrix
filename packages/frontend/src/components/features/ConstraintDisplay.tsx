@@ -206,7 +206,6 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                     <Chip
                         label={constraint.caseInsensitive ? 'Aa' : 'AA'}
                         size="small"
-                        variant="outlined"
                         sx={{
                             height: 24,
                             fontSize: '0.7rem',
@@ -214,7 +213,7 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                             minWidth: 32,
                             fontFamily: 'monospace',
                             borderRadius: 3,
-                            borderColor: 'divider',
+                            bgcolor: 'action.selected',
                             color: 'text.secondary',
                             '& .MuiChip-label': {
                                 px: 1,
