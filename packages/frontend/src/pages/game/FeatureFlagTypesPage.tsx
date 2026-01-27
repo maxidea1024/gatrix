@@ -147,7 +147,7 @@ const FeatureFlagTypesPage: React.FC = () => {
                             <TableHead>
                                 <TableRow>
                                     <TableCell>{t('common.name')}</TableCell>
-                                    <TableCell align="right">{t('featureFlags.lifetime')}</TableCell>
+                                    <TableCell align="center">{t('featureFlags.lifetime')}</TableCell>
                                     {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                                 </TableRow>
                             </TableHead>
@@ -167,7 +167,7 @@ const FeatureFlagTypesPage: React.FC = () => {
                                                 </Box>
                                             </Box>
                                         </TableCell>
-                                        <TableCell align="right">
+                                        <TableCell align="center">
                                             <Typography
                                                 variant="body2"
                                                 color={type.lifetimeDays === null ? 'text.secondary' : 'text.primary'}
