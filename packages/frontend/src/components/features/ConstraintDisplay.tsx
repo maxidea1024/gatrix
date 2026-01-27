@@ -180,6 +180,27 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                 </Typography>
             </Tooltip>
 
+            {/* Inverted indicator - shows NOT when constraint is inverted */}
+            {constraint.inverted && (
+                <Tooltip title="This condition is inverted (NOT)">
+                    <Chip
+                        label="NOT"
+                        size="small"
+                        sx={{
+                            height: 22,
+                            fontSize: '0.7rem',
+                            fontWeight: 600,
+                            bgcolor: 'error.main',
+                            color: 'error.contrastText',
+                            borderRadius: 3,
+                            '& .MuiChip-label': {
+                                px: 0.75,
+                            },
+                        }}
+                    />
+                </Tooltip>
+            )}
+
             {/* Operator - Rounded chip with tooltip description */}
             <Tooltip title={operatorInfo.description} arrow>
                 <Chip
