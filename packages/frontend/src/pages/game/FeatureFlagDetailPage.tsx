@@ -1193,24 +1193,37 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                 )}
 
                                                 {strategy.name === 'userWithId' && (
-                                                    <TextField
-                                                        fullWidth
-                                                        size="small"
-                                                        multiline
-                                                        rows={2}
-                                                        label={t('featureFlags.userIds')}
-                                                        value={strategy.parameters?.userIds || ''}
-                                                        onChange={(e) => {
-                                                            const strategies = [...(flag.strategies || [])];
-                                                            strategies[index] = {
-                                                                ...strategies[index],
-                                                                parameters: { ...strategies[index].parameters, userIds: e.target.value }
-                                                            };
-                                                            setFlag({ ...flag, strategies });
-                                                        }}
-                                                        disabled={!canManage}
-                                                        helperText={t('featureFlags.userIdsHelp')}
-                                                    />
+                                                    <Box>
+                                                        <Autocomplete
+                                                            multiple
+                                                            freeSolo
+                                                            size="small"
+                                                            options={[]}
+                                                            value={(strategy.parameters?.userIds || '').split(',').filter((id: string) => id.trim())}
+                                                            onChange={(_, newValue) => {
+                                                                const strategies = [...(flag.strategies || [])];
+                                                                strategies[index] = {
+                                                                    ...strategies[index],
+                                                                    parameters: { ...strategies[index].parameters, userIds: newValue.join(',') }
+                                                                };
+                                                                setFlag({ ...flag, strategies });
+                                                            }}
+                                                            renderTags={(value, getTagProps) =>
+                                                                value.map((option, idx) => (
+                                                                    <Chip size="small" label={option} {...getTagProps({ index: idx })} key={idx} />
+                                                                ))
+                                                            }
+                                                            renderInput={(params) => (
+                                                                <TextField
+                                                                    {...params}
+                                                                    label={t('featureFlags.userIds')}
+                                                                    placeholder={t('featureFlags.typeAndPressEnter')}
+                                                                    helperText={t('featureFlags.userIdsHelp')}
+                                                                />
+                                                            )}
+                                                            disabled={!canManage}
+                                                        />
+                                                    </Box>
                                                 )}
 
                                                 {/* Gradual Rollout (Sticky) Parameters */}
@@ -2053,17 +2066,28 @@ const FeatureFlagDetailPage: React.FC = () => {
                         )}
 
                         {editingStrategy?.name === 'userWithId' && (
-                            <TextField
-                                fullWidth
-                                multiline
-                                rows={3}
-                                label={t('featureFlags.userIds')}
-                                value={editingStrategy.parameters?.userIds || ''}
-                                onChange={(e) => setEditingStrategy({
+                            <Autocomplete
+                                multiple
+                                freeSolo
+                                options={[]}
+                                value={(editingStrategy.parameters?.userIds || '').split(',').filter((id: string) => id.trim())}
+                                onChange={(_, newValue) => setEditingStrategy({
                                     ...editingStrategy,
-                                    parameters: { ...editingStrategy.parameters, userIds: e.target.value }
+                                    parameters: { ...editingStrategy.parameters, userIds: newValue.join(',') }
                                 })}
-                                helperText={t('featureFlags.userIdsHelp')}
+                                renderTags={(value, getTagProps) =>
+                                    value.map((option, idx) => (
+                                        <Chip size="small" label={option} {...getTagProps({ index: idx })} key={idx} />
+                                    ))
+                                }
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label={t('featureFlags.userIds')}
+                                        placeholder={t('featureFlags.typeAndPressEnter')}
+                                        helperText={t('featureFlags.userIdsHelp')}
+                                    />
+                                )}
                             />
                         )}
 
