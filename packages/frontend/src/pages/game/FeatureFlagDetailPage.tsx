@@ -1734,7 +1734,19 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 <InputLabel>{t('featureFlags.variantType')}</InputLabel>
                                 <Select
                                     value={flag.variantType || 'string'}
-                                    onChange={(e) => setFlag({ ...flag, variantType: e.target.value as FeatureFlag['variantType'] })}
+                                    onChange={(e) => {
+                                        const newType = e.target.value as FeatureFlag['variantType'];
+                                        // Reset all variant payloads to default value for new type
+                                        const defaultValue = newType === 'number' ? '0' : newType === 'json' ? '{}' : '';
+                                        const payloadType = newType === 'json' ? 'json' : 'string';
+                                        const updatedVariants = (flag.variants || []).map(v => ({
+                                            ...v,
+                                            payload: { type: payloadType, value: defaultValue }
+                                        }));
+                                        // Clear JSON validation errors when type changes
+                                        setJsonPayloadErrors({});
+                                        setFlag({ ...flag, variantType: newType, variants: updatedVariants });
+                                    }}
                                     label={t('featureFlags.variantType')}
                                     disabled={!canManage}
                                     renderValue={(selected) => {
