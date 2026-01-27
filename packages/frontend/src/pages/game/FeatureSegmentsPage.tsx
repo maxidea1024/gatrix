@@ -49,6 +49,7 @@ import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import api from '../../services/api';
 import ConstraintEditor, { Constraint, ContextField } from '../../components/features/ConstraintEditor';
+import { ConstraintList } from '../../components/features/ConstraintDisplay';
 import { tagService } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
 
@@ -422,12 +423,8 @@ const FeatureSegmentsPage: React.FC = () => {
                                                                 {expandedConstraints.has(segment.id) ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
                                                             </Box>
                                                             {expandedConstraints.has(segment.id) && (
-                                                                <Box sx={{ mt: 1, pl: 1, borderLeft: 2, borderColor: 'divider' }}>
-                                                                    {segment.constraints.map((c, idx) => (
-                                                                        <Typography key={idx} variant="caption" sx={{ display: 'block', mb: 0.5 }}>
-                                                                            {c.contextName} {c.operator} {c.values?.join(', ') || c.value}
-                                                                        </Typography>
-                                                                    ))}
+                                                                <Box sx={{ mt: 1 }}>
+                                                                    <ConstraintList constraints={segment.constraints} />
                                                                 </Box>
                                                             )}
                                                         </Box>

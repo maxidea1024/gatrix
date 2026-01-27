@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { Box, Typography, Chip, Paper, Stack, Tooltip } from '@mui/material';
-import { useSettings } from '../../contexts/SettingsContext';
+import { getStoredTimezone } from '../../utils/dateFormat';
 
 export interface ConstraintValue {
     contextName: string;
@@ -82,8 +82,8 @@ const isDateOperator = (op: string): boolean => {
  * Single constraint display row - Unleash style
  */
 export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint, compact = false }) => {
-    const { settings } = useSettings();
-    const timezone = settings?.timezone;
+    // Get user's configured timezone from settings
+    const timezone = getStoredTimezone();
 
     // Get constraint value display
     const getValueDisplay = (): string => {
