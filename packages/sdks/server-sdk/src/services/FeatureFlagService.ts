@@ -22,7 +22,7 @@ import {
     Constraint,
     FlagMetric,
 } from '../types/featureFlags';
-import { createHash } from 'crypto';
+import murmurhash from 'murmurhash';
 
 export class FeatureFlagService {
     private apiClient: ApiClient;
@@ -627,6 +627,7 @@ export class FeatureFlagService {
 
     /**
      * Calculate a consistent percentage (0-100) based on context and stickiness
+     * Uses MurmurHash3 for consistency with backend
      */
     private calculatePercentage(context: EvaluationContext, stickiness: string, groupId: string): number {
         let stickinessValue: string;
@@ -645,13 +646,11 @@ export class FeatureFlagService {
                 stickinessValue = context.userId || context.sessionId || Math.random().toString();
         }
 
-        const hash = createHash('sha256')
-            .update(`${groupId}:${stickinessValue}`)
-            .digest('hex');
+        const seed = `${groupId}:${stickinessValue}`;
+        const hash = murmurhash.v3(seed);
 
-        // Use first 8 hex chars (32 bits) for percentage calculation
-        const hashValue = parseInt(hash.substring(0, 8), 16);
-        return (hashValue / 0xFFFFFFFF) * 100;
+        // Normalize to 0-100
+        return (hash % 10000) / 100;
     }
 
     /**

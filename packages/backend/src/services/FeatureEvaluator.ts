@@ -3,7 +3,7 @@
  * Handles feature flag evaluation logic including constraints, rollout, and variants
  */
 
-import { createHash } from 'crypto';
+import murmurhash from 'murmurhash';
 import logger from '../config/logger';
 import {
     FeatureFlagAttributes,
@@ -366,17 +366,14 @@ export class FeatureEvaluator {
 
     /**
      * Generate normalized hash (0-100) for consistent bucketing
-     * Uses MurmurHash3-like algorithm
+     * Uses MurmurHash3 algorithm for consistency with server-sdk
      */
     private normalizedHash(groupId: string, stickinessValue: string): number {
         const seed = `${groupId}:${stickinessValue}`;
-        const hash = createHash('md5').update(seed).digest();
-
-        // Take first 4 bytes as unsigned int
-        const value = hash.readUInt32LE(0);
+        const hash = murmurhash.v3(seed);
 
         // Normalize to 0-100
-        return (value % 10000) / 100;
+        return (hash % 10000) / 100;
     }
 
     /**
