@@ -1822,31 +1822,17 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                                         {/* Content */}
                                         <Box sx={{ flex: 1, p: 2.5 }}>
-                                            {/* Row 1: Header - Label left, Delete right */}
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                                                {/* Left: Label + Help */}
-                                                <Box>
-                                                    <Typography variant="subtitle2" fontWeight={600}>
-                                                        {t('featureFlags.variantName')}
-                                                    </Typography>
-                                                    <Typography variant="caption" color="text.secondary">
-                                                        {t('featureFlags.variantNameHelp')}
-                                                    </Typography>
-                                                </Box>
-
-                                                {/* Right: Delete only */}
-                                                {canManage && (
-                                                    <IconButton
-                                                        size="small"
-                                                        onClick={() => handleDeleteVariant(variant.name)}
-                                                        sx={{ color: 'text.secondary' }}
-                                                    >
-                                                        <DeleteIcon fontSize="small" />
-                                                    </IconButton>
-                                                )}
+                                            {/* Row 1: Label */}
+                                            <Box sx={{ mb: 1.5 }}>
+                                                <Typography variant="subtitle2" fontWeight={600}>
+                                                    {t('featureFlags.variantName')}
+                                                </Typography>
+                                                <Typography variant="caption" color="text.secondary">
+                                                    {t('featureFlags.variantNameHelp')}
+                                                </Typography>
                                             </Box>
 
-                                            {/* Row 2: Name input + Switch + Weight input */}
+                                            {/* Row 2: Name input + Delete + Switch + Weight input */}
                                             <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
                                                 <TextField
                                                     size="small"
@@ -1857,9 +1843,18 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                         setFlag({ ...flag, variants });
                                                     }}
                                                     disabled={!canManage}
-                                                    sx={{ flex: 1 }}
+                                                    sx={{ flex: 1, maxWidth: 300 }}
                                                     placeholder={`variant-${index + 1}`}
                                                 />
+                                                {canManage && (
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleDeleteVariant(variant.name)}
+                                                        sx={{ color: 'text.secondary' }}
+                                                    >
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                )}
                                                 {(flag.variants?.length || 0) > 1 && (
                                                     <>
                                                         <FormControlLabel
