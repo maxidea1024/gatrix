@@ -244,10 +244,10 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     icon: 'Flag',
     adminOnly: true,
     children: [
-      { text: 'sidebar.featureFlags', icon: 'Flag', path: '/game/feature-flags', permission: 'feature-flags' },
-      { text: 'sidebar.featureSegments', icon: 'People', path: '/game/feature-segments', permission: 'feature-flags' },
-      { text: 'sidebar.featureContextFields', icon: 'Settings', path: '/game/feature-context-fields', permission: 'feature-flags' },
-      { text: 'sidebar.featureFlagTypes', icon: 'Category', path: '/game/feature-flag-types', permission: 'feature-flags' },
+      { text: 'sidebar.featureFlags', icon: 'Flag', path: '/feature-flags', permission: 'feature-flags' },
+      { text: 'sidebar.featureSegments', icon: 'People', path: '/feature-segments', permission: 'feature-flags' },
+      { text: 'sidebar.featureContextFields', icon: 'Settings', path: '/feature-context-fields', permission: 'feature-flags' },
+      { text: 'sidebar.featureFlagTypes', icon: 'Category', path: '/feature-flag-types', permission: 'feature-flags' },
     ]
   },
 

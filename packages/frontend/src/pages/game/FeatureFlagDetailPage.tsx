@@ -315,7 +315,7 @@ const FeatureFlagDetailPage: React.FC = () => {
             setOriginalFlag(loadedFlag ? JSON.parse(JSON.stringify(loadedFlag)) : null);
         } catch (error: any) {
             enqueueSnackbar(parseApiErrorMessage(error, t('featureFlags.loadFailed')), { variant: 'error' });
-            navigate('/game/feature-flags');
+            navigate('/feature-flags');
         } finally {
             setLoading(false);
         }
@@ -441,7 +441,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                 });
                 enqueueSnackbar(t('featureFlags.createSuccess'), { variant: 'success' });
                 // Navigate back to list page
-                navigate('/game/feature-flags');
+                navigate('/feature-flags');
             } else {
                 // Update existing flag
                 const response = await api.put(`/admin/features/${flag.flagName}`, {
@@ -453,7 +453,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                 setFlag(response.data?.flag || flag);
                 setOriginalFlag(response.data?.flag || flag);
                 enqueueSnackbar(t('featureFlags.updateSuccess'), { variant: 'success' });
-                navigate('/game/feature-flags');
+                navigate('/feature-flags');
             }
         } catch (error: any) {
             enqueueSnackbar(parseApiErrorMessage(error, isCreating ? t('featureFlags.createFailed') : t('featureFlags.updateFailed')), { variant: 'error' });
@@ -482,7 +482,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         try {
             await api.delete(`/admin/features/${flag.flagName}`);
             enqueueSnackbar(t('featureFlags.deleteSuccess'), { variant: 'success' });
-            navigate('/game/feature-flags');
+            navigate('/feature-flags');
         } catch (error: any) {
             enqueueSnackbar(parseApiErrorMessage(error, t('featureFlags.deleteFailed')), { variant: 'error' });
         } finally {
@@ -739,7 +739,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         <Box sx={{ p: 3 }}>
             {/* Header */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                <IconButton onClick={() => navigate('/game/feature-flags')}>
+                <IconButton onClick={() => navigate('/feature-flags')}>
                     <ArrowBackIcon />
                 </IconButton>
                 <Box sx={{ flex: 1 }}>

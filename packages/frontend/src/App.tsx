@@ -522,14 +522,42 @@ const AppContent: React.FC = () => {
                                     <Route path="live-event" element={<LiveEventPage />} />
                                     <Route path="planning-data" element={<PlanningDataPage />} />
                                     <Route path="planning-data-history" element={<PlanningDataHistoryPage />} />
-                                    <Route path="feature-flags" element={<FeatureFlagsPage />} />
-                                    <Route path="feature-flags/:flagName" element={<FeatureFlagDetailPage />} />
-                                    <Route path="feature-segments" element={<FeatureSegmentsPage />} />
-                                    <Route path="feature-context-fields" element={<FeatureContextFieldsPage />} />
-                                    <Route path="feature-flag-types" element={<FeatureFlagTypesPage />} />
                                   </Routes>
                                 </EnvironmentAwareLayout>
                               </PlanningDataProvider>
+                            </ProtectedRoute>
+                          } />
+
+                          {/* Feature Flags Routes - Independent from /game */}
+                          <Route path="/feature-flags/*" element={
+                            <ProtectedRoute requiredRoles={['admin']}>
+                              <EnvironmentAwareLayout>
+                                <Routes>
+                                  <Route index element={<FeatureFlagsPage />} />
+                                  <Route path=":flagName" element={<FeatureFlagDetailPage />} />
+                                </Routes>
+                              </EnvironmentAwareLayout>
+                            </ProtectedRoute>
+                          } />
+                          <Route path="/feature-segments" element={
+                            <ProtectedRoute requiredRoles={['admin']}>
+                              <EnvironmentAwareLayout>
+                                <FeatureSegmentsPage />
+                              </EnvironmentAwareLayout>
+                            </ProtectedRoute>
+                          } />
+                          <Route path="/feature-context-fields" element={
+                            <ProtectedRoute requiredRoles={['admin']}>
+                              <EnvironmentAwareLayout>
+                                <FeatureContextFieldsPage />
+                              </EnvironmentAwareLayout>
+                            </ProtectedRoute>
+                          } />
+                          <Route path="/feature-flag-types" element={
+                            <ProtectedRoute requiredRoles={['admin']}>
+                              <EnvironmentAwareLayout>
+                                <FeatureFlagTypesPage />
+                              </EnvironmentAwareLayout>
                             </ProtectedRoute>
                           } />
 

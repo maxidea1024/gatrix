@@ -256,7 +256,7 @@ const FeatureFlagsPage: React.FC = () => {
                 </Box>
                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                     {canManage && (
-                        <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/game/feature-flags/new')}>
+                        <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/feature-flags/new')}>
                             {t('featureFlags.createFlag')}
                         </Button>
                     )}
@@ -331,7 +331,7 @@ const FeatureFlagsPage: React.FC = () => {
                     ) : flags.length === 0 ? (
                         <EmptyState
                             message={t('featureFlags.noFlagsFound')}
-                            onAddClick={canManage ? () => navigate('/game/feature-flags/new') : undefined}
+                            onAddClick={canManage ? () => navigate('/feature-flags/new') : undefined}
                             addButtonLabel={t('featureFlags.createFlag')}
                             subtitle={canManage ? t('common.addFirstItem') : undefined}
                         />
@@ -377,7 +377,7 @@ const FeatureFlagsPage: React.FC = () => {
                                                         <Typography
                                                             fontWeight={500}
                                                             sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
-                                                            onClick={() => navigate(`/game/feature-flags/${flag.flagName}`)}
+                                                            onClick={() => navigate(`/feature-flags/${flag.flagName}`)}
                                                         >
                                                             {flag.flagName}
                                                         </Typography>
@@ -396,7 +396,7 @@ const FeatureFlagsPage: React.FC = () => {
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                         <Typography
                                                             sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
-                                                            onClick={() => navigate(`/game/feature-flags/${flag.flagName}`)}
+                                                            onClick={() => navigate(`/feature-flags/${flag.flagName}`)}
                                                         >
                                                             {flag.displayName || '-'}
                                                         </Typography>
