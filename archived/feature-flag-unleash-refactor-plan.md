@@ -2,6 +2,7 @@
 
 ## Schema Changes (Migration 028)
 - [x] Create migration file
+- [x] Migration successfully applied (segments now global)
 
 ## New Schema Structure
 
@@ -33,20 +34,28 @@
 ## Backend Changes Required
 
 ### 1. Models (packages/backend/src/models/FeatureFlag.ts)
-- [ ] Update FeatureFlagAttributes - remove environment
-- [ ] Add FeatureFlagEnvironmentAttributes interface
-- [ ] Update FeatureStrategyAttributes - add environment
-- [ ] Update FeatureVariantAttributes - add environment
-- [ ] Update FeatureSegmentAttributes - remove environment
-- [ ] Update FeatureFlagModel methods:
-  - findAll: now returns global flags with per-env enabled status
-  - findByName: takes flagName only, returns with all env settings
+- [x] Update FeatureFlagAttributes - remove environment
+- [x] Add FeatureFlagEnvironmentAttributes interface
+- [x] Update FeatureStrategyAttributes - add environment
+- [x] Update FeatureVariantAttributes - add environment
+- [x] Update FeatureSegmentAttributes - remove environment
+- [x] Add FeatureFlagEnvironmentModel class
+- [x] Update FeatureFlagModel methods:
+  - findAll: now returns global flags with per-env enabled status (JOIN)
+  - findByName: takes flagName only, returns with env settings
   - create: creates global flag, then env settings
-  - etc.
+  - findById: accepts optional environment param
+- [x] Add FeatureStrategyModel.findByFlagIdAndEnvironment
+- [x] Add FeatureVariantModel.findByFlagIdAndEnvironment
+- [x] Update FeatureSegmentModel - remove environment from findAll, findByName, create
 
 ### 2. Services
-- [ ] FeatureFlagService.ts - major refactor
-- [ ] FeatureEvaluator.ts - adjust for new schema
+- [ ] FeatureFlagService.ts - partially done, need more edits
+  - [x] listSegments - remove environment param
+  - [x] createSegment - remove environment
+  - [x] CreateSegmentInput - remove environment
+  - [ ] Other methods using segments
+- [ ] FeatureEvaluator.ts - needs isEnabled handling fix
 
 ### 3. Controllers
 - [ ] FeatureFlagController.ts

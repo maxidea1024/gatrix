@@ -5,6 +5,7 @@
 
 import {
     FeatureFlagModel,
+    FeatureFlagEnvironmentModel,
     FeatureStrategyModel,
     FeatureVariantModel,
     FeatureSegmentModel,
@@ -80,7 +81,6 @@ export interface CreateVariantInput {
 }
 
 export interface CreateSegmentInput {
-    environment: string;
     segmentName: string;
     displayName?: string;
     description?: string;
@@ -161,7 +161,7 @@ class FeatureFlagService {
     async markFlagAsSeen(environment: string, flagName: string): Promise<void> {
         const flag = await this.getFlag(environment, flagName);
         if (flag) {
-            await FeatureFlagModel.updateLastSeenAt(flag.id);
+            await FeatureFlagModel.updateLastSeenAt(flag.id, environment);
         }
     }
 
@@ -210,6 +210,7 @@ class FeatureFlagService {
                 const strategyInput = input.strategies[i];
                 await FeatureStrategyModel.create({
                     flagId: flag.id,
+                    environment: input.environment,
                     strategyName: strategyInput.strategyName,
                     parameters: strategyInput.parameters,
                     constraints: strategyInput.constraints,
@@ -225,6 +226,7 @@ class FeatureFlagService {
             for (const variantInput of input.variants) {
                 await FeatureVariantModel.create({
                     flagId: flag.id,
+                    environment: input.environment,
                     variantName: variantInput.variantName,
                     weight: variantInput.weight,
                     payload: variantInput.payload,
@@ -261,10 +263,23 @@ class FeatureFlagService {
             throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
         }
 
-        const updated = await FeatureFlagModel.update(flag.id, {
-            ...input,
-            updatedBy: userId,
-        });
+        // Separate isEnabled from other properties (isEnabled is per-environment)
+        const { isEnabled, ...globalUpdates } = input;
+
+        // Update global flag properties if any
+        if (Object.keys(globalUpdates).length > 0) {
+            await FeatureFlagModel.update(flag.id, {
+                ...globalUpdates,
+                updatedBy: userId,
+            });
+        }
+
+        // Update environment-specific isEnabled
+        if (isEnabled !== undefined) {
+            await FeatureFlagEnvironmentModel.updateIsEnabled(flag.id, environment, isEnabled);
+        }
+
+        const updated = await this.getFlag(environment, flagName);
 
         // Audit log
         await AuditLogModel.create({
@@ -279,7 +294,7 @@ class FeatureFlagService {
         // Invalidate cache
         await this.invalidateCache(environment);
 
-        return updated;
+        return updated!;
     }
 
     /**
@@ -301,9 +316,11 @@ class FeatureFlagService {
         const updated = await FeatureFlagModel.update(flag.id, {
             isArchived: true,
             archivedAt: new Date(),
-            isEnabled: false,
             updatedBy: userId,
         });
+
+        // Also disable the flag in this environment
+        await FeatureFlagEnvironmentModel.updateIsEnabled(flag.id, environment, false);
 
         await AuditLogModel.create({
             action: 'feature_flag.archive',
@@ -385,6 +402,7 @@ class FeatureFlagService {
 
         const strategy = await FeatureStrategyModel.create({
             flagId: flag.id,
+            environment,
             strategyName: input.strategyName,
             parameters: input.parameters,
             constraints: input.constraints,
@@ -432,8 +450,8 @@ class FeatureFlagService {
             throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
         }
 
-        // Delete existing strategies (CASCADE will delete segment links)
-        const existingStrategies = await FeatureStrategyModel.findByFlagId(flag.id);
+        // Delete existing strategies for this environment
+        const existingStrategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(flag.id, environment);
         for (const strategy of existingStrategies) {
             await FeatureStrategyModel.delete(strategy.id);
         }
@@ -444,6 +462,7 @@ class FeatureFlagService {
             const input = strategies[i];
             const strategy = await FeatureStrategyModel.create({
                 flagId: flag.id,
+                environment,
                 strategyName: input.strategyName,
                 parameters: input.parameters,
                 constraints: input.constraints,
@@ -455,8 +474,8 @@ class FeatureFlagService {
             // Save segment links if provided
             if (input.segments && input.segments.length > 0) {
                 for (const segmentName of input.segments) {
-                    // Find segment by name in same environment
-                    const segment = await FeatureSegmentModel.findByName(environment, segmentName);
+                    // Find segment by name (segments are now global)
+                    const segment = await FeatureSegmentModel.findByName(segmentName);
                     if (segment) {
                         await this.linkStrategySegment(strategy.id, segment.id);
                     }
@@ -507,14 +526,15 @@ class FeatureFlagService {
             });
         }
 
-        // Delete existing variants
-        await FeatureVariantModel.deleteByFlagId(flag.id);
+        // Delete existing variants for this environment
+        await FeatureVariantModel.deleteByFlagIdAndEnvironment(flag.id, environment);
 
         // Insert new variants
         const createdVariants: FeatureVariantAttributes[] = [];
         for (const variant of variants) {
             const created = await FeatureVariantModel.create({
                 flagId: flag.id,
+                environment,
                 variantName: variant.variantName,
                 weight: variant.weight,
                 payload: variant.payload,
@@ -534,8 +554,8 @@ class FeatureFlagService {
     /**
      * List segments
      */
-    async listSegments(environment: string, search?: string): Promise<FeatureSegmentAttributes[]> {
-        return FeatureSegmentModel.findAll(environment, search);
+    async listSegments(search?: string): Promise<FeatureSegmentAttributes[]> {
+        return FeatureSegmentModel.findAll(search);
     }
 
     /**
@@ -549,14 +569,13 @@ class FeatureFlagService {
      * Create a segment
      */
     async createSegment(input: CreateSegmentInput, userId: number): Promise<FeatureSegmentAttributes> {
-        const segments = await FeatureSegmentModel.findAll(input.environment);
-        const existing = segments.find(s => s.segmentName === input.segmentName);
+        // Check if segment name already exists (segments are now global)
+        const existing = await FeatureSegmentModel.findByName(input.segmentName);
         if (existing) {
             throw new GatrixError(`Segment '${input.segmentName}' already exists`, 409, true, ErrorCodes.DUPLICATE_ENTRY);
         }
 
         return FeatureSegmentModel.create({
-            environment: input.environment,
             segmentName: input.segmentName,
             displayName: input.displayName,
             description: input.description,
@@ -671,10 +690,10 @@ class FeatureFlagService {
     async recordMetrics(environment: string, flagName: string, enabled: boolean, variantName?: string): Promise<void> {
         await FeatureMetricsModel.recordMetrics(environment, flagName, enabled, variantName);
 
-        // Update lastSeenAt on the flag
+        // Update lastSeenAt on the flag environment settings
         const flag = await FeatureFlagModel.findByName(environment, flagName);
         if (flag) {
-            await FeatureFlagModel.updateLastSeenAt(flag.id);
+            await FeatureFlagModel.updateLastSeenAt(flag.id, environment);
         }
     }
 

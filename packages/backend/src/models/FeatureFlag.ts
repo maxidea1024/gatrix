@@ -42,18 +42,16 @@ export interface VariantOverride {
 
 // ==================== Interfaces ====================
 
+// Feature Flag - Now GLOBAL (no environment column)
 export interface FeatureFlagAttributes {
     id: string;
-    environment: string;
     flagName: string;
     displayName?: string;
     description?: string;
     flagType: FlagType;
-    isEnabled: boolean;
     isArchived: boolean;
     archivedAt?: Date;
     impressionDataEnabled: boolean;
-    lastSeenAt?: Date;
     staleAfterDays: number;
     tags?: string[];
     variantType?: 'string' | 'number' | 'json';
@@ -61,14 +59,30 @@ export interface FeatureFlagAttributes {
     updatedBy?: number;
     createdAt?: Date;
     updatedAt?: Date;
-    // Relations
+    // Environment-specific fields (joined from g_feature_flag_environments)
+    lastSeenAt?: Date;
+    // Relations - loaded per environment when needed
+    environments?: FeatureFlagEnvironmentAttributes[];
     strategies?: FeatureStrategyAttributes[];
     variants?: FeatureVariantAttributes[];
 }
 
+// NEW: Per-environment flag settings
+export interface FeatureFlagEnvironmentAttributes {
+    id: string;
+    flagId: string;
+    environment: string;
+    isEnabled: boolean;
+    lastSeenAt?: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+// Strategy - now includes environment
 export interface FeatureStrategyAttributes {
     id: string;
     flagId: string;
+    environment: string;
     strategyName: string;
     parameters?: StrategyParameters;
     constraints?: Constraint[];
@@ -82,9 +96,11 @@ export interface FeatureStrategyAttributes {
     segments?: FeatureSegmentAttributes[];
 }
 
+// Variant - now includes environment
 export interface FeatureVariantAttributes {
     id: string;
     flagId: string;
+    environment: string;
     variantName: string;
     weight: number;
     payload?: any;
@@ -97,9 +113,9 @@ export interface FeatureVariantAttributes {
     updatedAt?: Date;
 }
 
+// Segment - Now GLOBAL (no environment column)
 export interface FeatureSegmentAttributes {
     id: string;
-    environment: string;
     segmentName: string;
     displayName?: string;
     description?: string;
@@ -153,6 +169,10 @@ function parseJsonField<T>(value: any): T | undefined {
 // ==================== Feature Flag Model ====================
 
 export class FeatureFlagModel {
+    /**
+     * Find all flags with environment-specific enabled status
+     * Flags are global, isEnabled comes from g_feature_flag_environments
+     */
     static async findAll(filters: {
         environment: string;
         search?: string;
@@ -164,34 +184,45 @@ export class FeatureFlagModel {
         offset?: number;
         sortBy?: string;
         sortOrder?: 'asc' | 'desc';
-    }): Promise<{ flags: FeatureFlagAttributes[]; total: number }> {
+    }): Promise<{ flags: (FeatureFlagAttributes & { isEnabled: boolean })[]; total: number }> {
         try {
             const { environment, search, flagType, isEnabled, isArchived, tags, limit = 50, offset = 0, sortBy = 'createdAt', sortOrder = 'desc' } = filters;
 
-            const baseQuery = () => db('g_feature_flags').where('environment', environment);
+            // Join flags with environment-specific settings
+            const baseQuery = () => db('g_feature_flags as f')
+                .leftJoin('g_feature_flag_environments as e', function () {
+                    this.on('f.id', '=', 'e.flagId').andOn('e.environment', '=', db.raw('?', [environment]));
+                })
+                .select('f.*', 'e.isEnabled', 'e.lastSeenAt');
 
             const applyFilters = (query: any) => {
                 if (search) {
                     query.where((qb: any) => {
-                        qb.where('flagName', 'like', `%${search}%`)
-                            .orWhere('displayName', 'like', `%${search}%`)
-                            .orWhere('description', 'like', `%${search}%`);
+                        qb.where('f.flagName', 'like', `%${search}%`)
+                            .orWhere('f.displayName', 'like', `%${search}%`)
+                            .orWhere('f.description', 'like', `%${search}%`);
                     });
                 }
-                if (flagType) query.where('flagType', flagType);
-                if (typeof isEnabled === 'boolean') query.where('isEnabled', isEnabled);
-                if (typeof isArchived === 'boolean') query.where('isArchived', isArchived);
+                if (flagType) query.where('f.flagType', flagType);
+                if (typeof isEnabled === 'boolean') query.where('e.isEnabled', isEnabled);
+                if (typeof isArchived === 'boolean') query.where('f.isArchived', isArchived);
                 if (tags && tags.length > 0) {
                     for (const tag of tags) {
-                        query.whereRaw('JSON_CONTAINS(tags, ?)', [JSON.stringify(tag)]);
+                        query.whereRaw('JSON_CONTAINS(f.tags, ?)', [JSON.stringify(tag)]);
                     }
                 }
                 return query;
             };
 
-            const countResult = await applyFilters(baseQuery()).count('* as total').first();
+            const countResult = await applyFilters(
+                db('g_feature_flags as f')
+                    .leftJoin('g_feature_flag_environments as e', function () {
+                        this.on('f.id', '=', 'e.flagId').andOn('e.environment', '=', db.raw('?', [environment]));
+                    })
+            ).count('f.id as total').first();
+
             const flags = await applyFilters(baseQuery())
-                .orderBy(sortBy, sortOrder)
+                .orderBy(`f.${sortBy}`, sortOrder)
                 .limit(limit)
                 .offset(offset);
 
@@ -204,29 +235,39 @@ export class FeatureFlagModel {
                 tags: parseJsonField<string[]>(f.tags) || [],
             }));
 
-            return { flags: parsedFlags, total: countResult?.total || 0 };
+            return { flags: parsedFlags, total: Number(countResult?.total) || 0 };
         } catch (error) {
             logger.error('Error finding feature flags:', error);
             throw error;
         }
     }
 
-    static async findByName(environment: string, flagName: string): Promise<FeatureFlagAttributes | null> {
+    /**
+     * Find flag by name with environment-specific strategies and variants
+     */
+    static async findByName(environment: string, flagName: string): Promise<(FeatureFlagAttributes & { isEnabled: boolean }) | null> {
         try {
+            // Get global flag
             const flag = await db('g_feature_flags')
-                .where('environment', environment)
                 .where('flagName', flagName)
                 .first();
 
             if (!flag) return null;
 
-            // Load strategies and variants
-            const strategies = await FeatureStrategyModel.findByFlagId(flag.id);
-            const variants = await FeatureVariantModel.findByFlagId(flag.id);
+            // Get environment-specific settings
+            const envSettings = await db('g_feature_flag_environments')
+                .where('flagId', flag.id)
+                .where('environment', environment)
+                .first();
+
+            // Load strategies and variants for this environment
+            const strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(flag.id, environment);
+            const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(flag.id, environment);
 
             return {
                 ...flag,
-                isEnabled: Boolean(flag.isEnabled),
+                isEnabled: Boolean(envSettings?.isEnabled),
+                lastSeenAt: envSettings?.lastSeenAt,
                 isArchived: Boolean(flag.isArchived),
                 impressionDataEnabled: Boolean(flag.impressionDataEnabled),
                 tags: parseJsonField<string[]>(flag.tags) || [],
@@ -239,22 +280,38 @@ export class FeatureFlagModel {
         }
     }
 
-    static async findById(id: string): Promise<FeatureFlagAttributes | null> {
+    static async findById(id: string, environment?: string): Promise<FeatureFlagAttributes | null> {
         try {
             const flag = await db('g_feature_flags').where('id', id).first();
             if (!flag) return null;
 
-            const strategies = await FeatureStrategyModel.findByFlagId(id);
-            const variants = await FeatureVariantModel.findByFlagId(id);
+            let envSettings = null;
+            let strategies: FeatureStrategyAttributes[] = [];
+            let variants: FeatureVariantAttributes[] = [];
+
+            if (environment) {
+                envSettings = await db('g_feature_flag_environments')
+                    .where('flagId', id)
+                    .where('environment', environment)
+                    .first();
+                strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(id, environment);
+                variants = await FeatureVariantModel.findByFlagIdAndEnvironment(id, environment);
+            }
 
             return {
                 ...flag,
-                isEnabled: Boolean(flag.isEnabled),
                 isArchived: Boolean(flag.isArchived),
                 impressionDataEnabled: Boolean(flag.impressionDataEnabled),
                 tags: parseJsonField<string[]>(flag.tags) || [],
                 strategies,
                 variants,
+                environments: envSettings ? [{
+                    id: envSettings.id,
+                    flagId: id,
+                    environment,
+                    isEnabled: Boolean(envSettings.isEnabled),
+                    lastSeenAt: envSettings.lastSeenAt,
+                }] : [],
             };
         } catch (error) {
             logger.error('Error finding feature flag by ID:', error);
@@ -262,17 +319,18 @@ export class FeatureFlagModel {
         }
     }
 
-    static async create(data: Omit<FeatureFlagAttributes, 'id' | 'createdAt' | 'updatedAt'>): Promise<FeatureFlagAttributes> {
+    /**
+     * Create a new global flag and optionally initialize environment settings
+     */
+    static async create(data: Omit<FeatureFlagAttributes, 'id' | 'createdAt' | 'updatedAt'> & { environment?: string; isEnabled?: boolean }): Promise<FeatureFlagAttributes> {
         try {
             const id = ulid();
             await db('g_feature_flags').insert({
                 id,
-                environment: data.environment,
                 flagName: data.flagName,
                 displayName: data.displayName || data.flagName,
                 description: data.description || null,
                 flagType: data.flagType || 'release',
-                isEnabled: data.isEnabled ?? true,
                 isArchived: false,
                 impressionDataEnabled: data.impressionDataEnabled ?? false,
                 staleAfterDays: data.staleAfterDays ?? 30,
@@ -283,15 +341,25 @@ export class FeatureFlagModel {
                 updatedAt: new Date(),
             });
 
-            // Note: Default strategy is created by frontend, not here
+            // If environment provided, create environment settings
+            if (data.environment) {
+                await FeatureFlagEnvironmentModel.create({
+                    flagId: id,
+                    environment: data.environment,
+                    isEnabled: data.isEnabled ?? true,
+                });
+            }
 
-            return this.findById(id) as Promise<FeatureFlagAttributes>;
+            return this.findById(id, data.environment) as Promise<FeatureFlagAttributes>;
         } catch (error) {
             logger.error('Error creating feature flag:', error);
             throw error;
         }
     }
 
+    /**
+     * Update global flag properties (not environment-specific)
+     */
     static async update(id: string, data: Partial<FeatureFlagAttributes>): Promise<FeatureFlagAttributes> {
         try {
             const updateData: any = { updatedAt: new Date() };
@@ -299,7 +367,6 @@ export class FeatureFlagModel {
             if (data.displayName !== undefined) updateData.displayName = data.displayName;
             if (data.description !== undefined) updateData.description = data.description;
             if (data.flagType !== undefined) updateData.flagType = data.flagType;
-            if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
             if (data.isArchived !== undefined) updateData.isArchived = data.isArchived;
             if (data.archivedAt !== undefined) updateData.archivedAt = data.archivedAt;
             if (data.impressionDataEnabled !== undefined) updateData.impressionDataEnabled = data.impressionDataEnabled;
@@ -326,11 +393,98 @@ export class FeatureFlagModel {
         }
     }
 
-    static async updateLastSeenAt(id: string): Promise<void> {
+    static async updateLastSeenAt(flagId: string, environment: string): Promise<void> {
         try {
-            await db('g_feature_flags').where('id', id).update({ lastSeenAt: new Date() });
+            await db('g_feature_flag_environments')
+                .where('flagId', flagId)
+                .where('environment', environment)
+                .update({ lastSeenAt: new Date() });
         } catch (error) {
             logger.error('Error updating lastSeenAt:', error);
+        }
+    }
+}
+
+// ==================== Feature Flag Environment Model (NEW) ====================
+
+export class FeatureFlagEnvironmentModel {
+    static async findByFlagId(flagId: string): Promise<FeatureFlagEnvironmentAttributes[]> {
+        try {
+            const envs = await db('g_feature_flag_environments').where('flagId', flagId);
+            return envs.map((e: any) => ({
+                ...e,
+                isEnabled: Boolean(e.isEnabled),
+            }));
+        } catch (error) {
+            logger.error('Error finding flag environments:', error);
+            throw error;
+        }
+    }
+
+    static async findByFlagIdAndEnvironment(flagId: string, environment: string): Promise<FeatureFlagEnvironmentAttributes | null> {
+        try {
+            const env = await db('g_feature_flag_environments')
+                .where('flagId', flagId)
+                .where('environment', environment)
+                .first();
+            if (!env) return null;
+            return {
+                ...env,
+                isEnabled: Boolean(env.isEnabled),
+            };
+        } catch (error) {
+            logger.error('Error finding flag environment:', error);
+            throw error;
+        }
+    }
+
+    static async create(data: Omit<FeatureFlagEnvironmentAttributes, 'id' | 'createdAt' | 'updatedAt'>): Promise<FeatureFlagEnvironmentAttributes> {
+        try {
+            const id = ulid();
+            await db('g_feature_flag_environments').insert({
+                id,
+                flagId: data.flagId,
+                environment: data.environment,
+                isEnabled: data.isEnabled ?? false,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
+            return this.findByFlagIdAndEnvironment(data.flagId, data.environment) as Promise<FeatureFlagEnvironmentAttributes>;
+        } catch (error) {
+            logger.error('Error creating flag environment:', error);
+            throw error;
+        }
+    }
+
+    static async updateIsEnabled(flagId: string, environment: string, isEnabled: boolean): Promise<FeatureFlagEnvironmentAttributes> {
+        try {
+            // Upsert - create if not exists
+            const existing = await this.findByFlagIdAndEnvironment(flagId, environment);
+            if (!existing) {
+                return this.create({ flagId, environment, isEnabled });
+            }
+
+            await db('g_feature_flag_environments')
+                .where('flagId', flagId)
+                .where('environment', environment)
+                .update({ isEnabled, updatedAt: new Date() });
+
+            return this.findByFlagIdAndEnvironment(flagId, environment) as Promise<FeatureFlagEnvironmentAttributes>;
+        } catch (error) {
+            logger.error('Error updating flag environment:', error);
+            throw error;
+        }
+    }
+
+    static async delete(flagId: string, environment: string): Promise<void> {
+        try {
+            await db('g_feature_flag_environments')
+                .where('flagId', flagId)
+                .where('environment', environment)
+                .del();
+        } catch (error) {
+            logger.error('Error deleting flag environment:', error);
+            throw error;
         }
     }
 }
@@ -338,43 +492,65 @@ export class FeatureFlagModel {
 // ==================== Feature Strategy Model ====================
 
 export class FeatureStrategyModel {
+    /**
+     * Find all strategies for a flag (backward compatibility)
+     */
     static async findByFlagId(flagId: string): Promise<FeatureStrategyAttributes[]> {
         try {
             const strategies = await db('g_feature_strategies')
                 .where('flagId', flagId)
                 .orderBy('sortOrder', 'asc');
 
-            // Load segments for each strategy
-            const result = [];
-            for (const s of strategies) {
-                const segmentLinks = await db('g_feature_flag_segments')
-                    .where('strategyId', s.id)
-                    .select('segmentId');
-
-                const segmentNames: string[] = [];
-                for (const link of segmentLinks) {
-                    const segment = await db('g_feature_segments')
-                        .where('id', link.segmentId)
-                        .first();
-                    if (segment) {
-                        segmentNames.push(segment.segmentName);
-                    }
-                }
-
-                result.push({
-                    ...s,
-                    isEnabled: Boolean(s.isEnabled),
-                    parameters: parseJsonField<StrategyParameters>(s.parameters),
-                    constraints: parseJsonField<Constraint[]>(s.constraints) || [],
-                    segments: segmentNames,
-                });
-            }
-
-            return result;
+            return this.enrichStrategiesWithSegments(strategies);
         } catch (error) {
             logger.error('Error finding strategies by flag ID:', error);
             throw error;
         }
+    }
+
+    /**
+     * Find strategies for a flag in a specific environment
+     */
+    static async findByFlagIdAndEnvironment(flagId: string, environment: string): Promise<FeatureStrategyAttributes[]> {
+        try {
+            const strategies = await db('g_feature_strategies')
+                .where('flagId', flagId)
+                .where('environment', environment)
+                .orderBy('sortOrder', 'asc');
+
+            return this.enrichStrategiesWithSegments(strategies);
+        } catch (error) {
+            logger.error('Error finding strategies by flag ID and environment:', error);
+            throw error;
+        }
+    }
+
+    private static async enrichStrategiesWithSegments(strategies: any[]): Promise<FeatureStrategyAttributes[]> {
+        const result = [];
+        for (const s of strategies) {
+            const segmentLinks = await db('g_feature_flag_segments')
+                .where('strategyId', s.id)
+                .select('segmentId');
+
+            const segmentNames: string[] = [];
+            for (const link of segmentLinks) {
+                const segment = await db('g_feature_segments')
+                    .where('id', link.segmentId)
+                    .first();
+                if (segment) {
+                    segmentNames.push(segment.segmentName);
+                }
+            }
+
+            result.push({
+                ...s,
+                isEnabled: Boolean(s.isEnabled),
+                parameters: parseJsonField<StrategyParameters>(s.parameters),
+                constraints: parseJsonField<Constraint[]>(s.constraints) || [],
+                segments: segmentNames,
+            });
+        }
+        return result;
     }
 
     static async findById(id: string): Promise<FeatureStrategyAttributes | null> {
@@ -400,6 +576,7 @@ export class FeatureStrategyModel {
             await db('g_feature_strategies').insert({
                 id,
                 flagId: data.flagId,
+                environment: data.environment,
                 strategyName: data.strategyName,
                 parameters: data.parameters ? JSON.stringify(data.parameters) : null,
                 constraints: data.constraints ? JSON.stringify(data.constraints) : '[]',
@@ -465,12 +642,30 @@ export class FeatureVariantModel {
         }
     }
 
+    static async findByFlagIdAndEnvironment(flagId: string, environment: string): Promise<FeatureVariantAttributes[]> {
+        try {
+            const variants = await db('g_feature_variants')
+                .where('flagId', flagId)
+                .where('environment', environment);
+
+            return variants.map((v: any) => ({
+                ...v,
+                payload: parseJsonField(v.payload),
+                overrides: parseJsonField<VariantOverride[]>(v.overrides),
+            }));
+        } catch (error) {
+            logger.error('Error finding variants by flag ID and environment:', error);
+            throw error;
+        }
+    }
+
     static async create(data: Omit<FeatureVariantAttributes, 'id' | 'createdAt' | 'updatedAt'>): Promise<FeatureVariantAttributes> {
         try {
             const id = ulid();
             await db('g_feature_variants').insert({
                 id,
                 flagId: data.flagId,
+                environment: data.environment,
                 variantName: data.variantName,
                 weight: data.weight,
                 payload: data.payload ? JSON.stringify(data.payload) : null,
@@ -502,14 +697,29 @@ export class FeatureVariantModel {
             throw error;
         }
     }
+
+    static async deleteByFlagIdAndEnvironment(flagId: string, environment: string): Promise<void> {
+        try {
+            await db('g_feature_variants')
+                .where('flagId', flagId)
+                .where('environment', environment)
+                .del();
+        } catch (error) {
+            logger.error('Error deleting variants:', error);
+            throw error;
+        }
+    }
 }
 
 // ==================== Feature Segment Model ====================
 
 export class FeatureSegmentModel {
-    static async findAll(environment: string, search?: string): Promise<FeatureSegmentAttributes[]> {
+    /**
+     * Find all segments (now global, no environment filter)
+     */
+    static async findAll(search?: string): Promise<FeatureSegmentAttributes[]> {
         try {
-            let query = db('g_feature_segments').where('environment', environment);
+            let query = db('g_feature_segments');
 
             if (search) {
                 query = query.where((qb: any) => {
@@ -550,10 +760,12 @@ export class FeatureSegmentModel {
         }
     }
 
-    static async findByName(environment: string, segmentName: string): Promise<FeatureSegmentAttributes | null> {
+    /**
+     * Find segment by name (now global, no environment filter)
+     */
+    static async findByName(segmentName: string): Promise<FeatureSegmentAttributes | null> {
         try {
             const segment = await db('g_feature_segments')
-                .where('environment', environment)
                 .where('segmentName', segmentName)
                 .first();
             if (!segment) return null;
@@ -575,7 +787,6 @@ export class FeatureSegmentModel {
             const id = ulid();
             await db('g_feature_segments').insert({
                 id,
-                environment: data.environment,
                 segmentName: data.segmentName,
                 displayName: data.displayName || data.segmentName,
                 description: data.description || null,
