@@ -15,6 +15,9 @@ import {
 
 // ==================== Types ====================
 
+// Extended flag type that includes environment-specific isEnabled
+export type EvaluatableFlagAttributes = FeatureFlagAttributes & { isEnabled: boolean };
+
 export interface EvaluationContext {
     userId?: string;
     sessionId?: string;
@@ -23,10 +26,7 @@ export interface EvaluationContext {
     appVersion?: string;
     country?: string;
     city?: string;
-    ip?: string;
-    userAgent?: string;
-    currentTime?: string;
-    [key: string]: any;
+    [key: string]: string | number | boolean | undefined;
 }
 
 export interface EvaluationResult {
@@ -53,7 +53,7 @@ export class FeatureEvaluator {
      * Evaluate a feature flag for a given context
      */
     evaluate(
-        flag: FeatureFlagAttributes | null,
+        flag: EvaluatableFlagAttributes | null,
         context: EvaluationContext
     ): EvaluationResult {
         // Flag not found
@@ -140,7 +140,7 @@ export class FeatureEvaluator {
         if (params?.rollout !== undefined && params.rollout < 100) {
             const stickiness = params.stickiness || 'userId';
             const groupId = params.groupId || strategy.id;
-            const stickinessValue = context[stickiness] || context.sessionId || context.userId || '';
+            const stickinessValue = String(context[stickiness] || context.sessionId || context.userId || '');
 
             const hash = this.normalizedHash(groupId, stickinessValue);
             if (hash > params.rollout) {
@@ -308,7 +308,7 @@ export class FeatureEvaluator {
 
         // Calculate variant based on stickiness
         const stickiness = flag.variants[0]?.stickiness || 'userId';
-        const stickinessValue = context[stickiness] || context.sessionId || context.userId || '';
+        const stickinessValue = String(context[stickiness] || context.sessionId || context.userId || '');
         const seed = `${flag.id}:${stickinessValue}`;
         const hash = this.normalizedHash(flag.id, stickinessValue);
 

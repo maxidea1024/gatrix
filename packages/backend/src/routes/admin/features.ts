@@ -33,14 +33,13 @@ router.put(
 
 // ==================== Segments (MUST be before /:flagName routes) ====================
 
-// List segments
+// List segments (segments are now global)
 router.get(
     '/segments',
     asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment || 'development';
         const { search } = req.query;
 
-        const segments = await featureFlagService.listSegments(environment, search as string);
+        const segments = await featureFlagService.listSegments(search as string);
 
         res.json({ success: true, data: { segments } });
     })
@@ -60,15 +59,14 @@ router.get(
     })
 );
 
-// Create a segment
+// Create a segment (segments are now global)
 router.post(
     '/segments',
     asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment || 'development';
         const userId = req.user?.id;
 
         const segment = await featureFlagService.createSegment(
-            { ...req.body, environment },
+            req.body,
             userId!
         );
 
