@@ -5,24 +5,35 @@ import api from './api';
 export type FlagType = 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission';
 export type FlagStatus = 'enabled' | 'disabled' | 'archived';
 
+// Per-environment settings
+export interface FeatureFlagEnvironment {
+    id: string;
+    flagId: string;
+    environment: string;
+    isEnabled: boolean;
+    lastSeenAt?: string;
+}
+
 export interface FeatureFlag {
     id: string;
-    environment: string;
     flagName: string;
     displayName?: string;
     description?: string;
     flagType: FlagType;
-    isEnabled: boolean;
     isArchived: boolean;
     impressionDataEnabled: boolean;
     staleAfterDays?: number;
     tags?: string[];
-    lastSeenAt?: string;
     archivedAt?: string;
     createdBy?: number;
     updatedBy?: number;
     createdAt: string;
     updatedAt?: string;
+    // Per-environment settings
+    environments?: FeatureFlagEnvironment[];
+    // Legacy: for backward compatibility (current env's value)
+    isEnabled?: boolean;
+    lastSeenAt?: string;
 }
 
 export interface FeatureFlagListParams {
@@ -105,10 +116,10 @@ export async function updateFeatureFlag(flagName: string, data: UpdateFeatureFla
 }
 
 /**
- * Toggle a feature flag
+ * Toggle a feature flag for a specific environment
  */
-export async function toggleFeatureFlag(flagName: string, isEnabled: boolean): Promise<FeatureFlag> {
-    const response = await api.post(`/admin/features/${flagName}/toggle`, { isEnabled });
+export async function toggleFeatureFlag(flagName: string, isEnabled: boolean, environment?: string): Promise<FeatureFlag> {
+    const response = await api.post(`/admin/features/${flagName}/toggle`, { isEnabled, environment });
     return response.data.flag;
 }
 

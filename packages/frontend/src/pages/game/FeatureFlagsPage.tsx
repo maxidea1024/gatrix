@@ -20,11 +20,11 @@ import {
     Card,
     CardContent,
     TableSortLabel,
-    Switch,
     FormControl,
     Select,
     MenuItem,
     InputLabel,
+    Switch,
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -49,6 +49,8 @@ import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { tagService, Tag } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
+import { environmentService, Environment } from '../../services/environmentService';
+import FeatureSwitch from '../../components/common/FeatureSwitch';
 import api from '../../services/api';
 
 interface FlagTypeInfo {
@@ -77,6 +79,7 @@ const FeatureFlagsPage: React.FC = () => {
     const [deletingFlag, setDeletingFlag] = useState<FeatureFlag | null>(null);
     const [allTags, setAllTags] = useState<Tag[]>([]);
     const [flagTypes, setFlagTypes] = useState<FlagTypeInfo[]>([]);
+    const [environments, setEnvironments] = useState<Environment[]>([]);
 
     // Sorting state
     const [orderBy, setOrderBy] = useState<string>(() => {
@@ -140,7 +143,18 @@ const FeatureFlagsPage: React.FC = () => {
     useEffect(() => {
         loadTags();
         loadFlagTypes();
+        loadEnvironments();
     }, []);
+
+    const loadEnvironments = async () => {
+        try {
+            const envs = await environmentService.getEnvironments();
+            // Filter only visible environments and sort by displayOrder
+            setEnvironments(envs.filter(e => !e.isHidden).sort((a, b) => a.displayOrder - b.displayOrder));
+        } catch {
+            setEnvironments([]);
+        }
+    };
 
     const loadFlagTypes = async () => {
         try {
@@ -175,18 +189,28 @@ const FeatureFlagsPage: React.FC = () => {
         setPage(0);
     };
 
-    // Toggle flag
-    const handleToggle = async (flag: FeatureFlag) => {
+    // Toggle flag for a specific environment
+    const handleToggle = async (flag: FeatureFlag, environment: string, currentEnabled: boolean) => {
         try {
-            await featureFlagService.toggleFeatureFlag(flag.flagName, !flag.isEnabled);
+            await featureFlagService.toggleFeatureFlag(flag.flagName, !currentEnabled, environment);
             enqueueSnackbar(
-                t(flag.isEnabled ? 'featureFlags.disableSuccess' : 'featureFlags.enableSuccess'),
+                t(currentEnabled ? 'featureFlags.disableSuccess' : 'featureFlags.enableSuccess'),
                 { variant: 'success' }
             );
             loadFlags();
         } catch (error: any) {
             enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.toggleFailed'), { variant: 'error' });
         }
+    };
+
+    // Get environment-specific enabled state
+    const getEnvEnabled = (flag: FeatureFlag, envName: string): boolean => {
+        if (flag.environments) {
+            const envData = flag.environments.find(e => e.environment === envName);
+            return envData?.isEnabled ?? false;
+        }
+        // Fallback to legacy isEnabled
+        return flag.isEnabled ?? false;
     };
 
     // Archive/Revive flag
@@ -348,7 +372,28 @@ const FeatureFlagsPage: React.FC = () => {
                                             </TableCell>
                                             <TableCell>{t('featureFlags.displayName')}</TableCell>
                                             <TableCell>{t('featureFlags.type')}</TableCell>
-                                            <TableCell>{t('featureFlags.enabled')}</TableCell>
+                                            {environments.map(env => (
+                                                <TableCell key={env.environment} align="center" sx={{ minWidth: 70, maxWidth: 100, px: 0.5 }}>
+                                                    <Tooltip title={`${env.displayName} (${env.environment})`}>
+                                                        <Chip
+                                                            label={env.displayName}
+                                                            size="small"
+                                                            sx={{
+                                                                bgcolor: env.color || '#888',
+                                                                color: getContrastColor(env.color || '#888'),
+                                                                fontSize: '0.7rem',
+                                                                height: 20,
+                                                                maxWidth: 90,
+                                                                '& .MuiChip-label': {
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis',
+                                                                    whiteSpace: 'nowrap',
+                                                                },
+                                                            }}
+                                                        />
+                                                    </Tooltip>
+                                                </TableCell>
+                                            ))}
                                             <TableCell>
                                                 <TableSortLabel active={orderBy === 'createdAt'} direction={orderBy === 'createdAt' ? order : 'asc'} onClick={() => handleSort('createdAt')}>
                                                     {t('featureFlags.createdAt')}
@@ -416,15 +461,29 @@ const FeatureFlagsPage: React.FC = () => {
                                                 <TableCell>
                                                     <Chip label={t(`featureFlags.types.${flag.flagType}`)} size="small" color={getTypeColor(flag.flagType)} />
                                                 </TableCell>
-                                                <TableCell>
-                                                    <Switch
-                                                        size="small"
-                                                        checked={flag.isEnabled}
-                                                        onChange={() => handleToggle(flag)}
-                                                        disabled={flag.isArchived || !canManage}
-                                                        onClick={(e) => e.stopPropagation()}
-                                                    />
-                                                </TableCell>
+                                                {environments.map(env => {
+                                                    const isEnabled = getEnvEnabled(flag, env.environment);
+                                                    const tooltipText = `${t('featureFlags.toggleTooltip', { env: env.displayName })}\n${isEnabled ? t('featureFlags.toggleTooltipEnabled') : t('featureFlags.toggleTooltipDisabled')}`;
+                                                    return (
+                                                        <TableCell key={env.environment} align="center">
+                                                            <Tooltip
+                                                                title={<span style={{ whiteSpace: 'pre-line' }}>{tooltipText}</span>}
+                                                                arrow
+                                                                placement="top"
+                                                            >
+                                                                <span>
+                                                                    <FeatureSwitch
+                                                                        size="small"
+                                                                        checked={isEnabled}
+                                                                        onChange={() => handleToggle(flag, env.environment, isEnabled)}
+                                                                        disabled={flag.isArchived || !canManage}
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    />
+                                                                </span>
+                                                            </Tooltip>
+                                                        </TableCell>
+                                                    );
+                                                })}
                                                 <TableCell>
                                                     <Tooltip title={formatDateTimeDetailed(flag.createdAt)}>
                                                         <span>{formatRelativeTime(flag.createdAt)}</span>

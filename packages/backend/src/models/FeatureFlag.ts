@@ -226,14 +226,32 @@ export class FeatureFlagModel {
                 .limit(limit)
                 .offset(offset);
 
-            // Parse JSON fields
-            const parsedFlags = flags.map((f: any) => ({
-                ...f,
-                isEnabled: Boolean(f.isEnabled),
-                isArchived: Boolean(f.isArchived),
-                impressionDataEnabled: Boolean(f.impressionDataEnabled),
-                tags: parseJsonField<string[]>(f.tags) || [],
-            }));
+            // Get all environment states for these flags
+            const flagIds = flags.map((f: any) => f.id);
+            let allEnvStates: any[] = [];
+            if (flagIds.length > 0) {
+                allEnvStates = await db('g_feature_flag_environments')
+                    .whereIn('flagId', flagIds);
+            }
+
+            // Parse JSON fields and attach environments
+            const parsedFlags = flags.map((f: any) => {
+                const envStates = allEnvStates.filter(e => e.flagId === f.id);
+                return {
+                    ...f,
+                    isEnabled: Boolean(f.isEnabled),
+                    isArchived: Boolean(f.isArchived),
+                    impressionDataEnabled: Boolean(f.impressionDataEnabled),
+                    tags: parseJsonField<string[]>(f.tags) || [],
+                    environments: envStates.map(e => ({
+                        id: e.id,
+                        flagId: e.flagId,
+                        environment: e.environment,
+                        isEnabled: Boolean(e.isEnabled),
+                        lastSeenAt: e.lastSeenAt,
+                    })),
+                };
+            });
 
             return { flags: parsedFlags, total: Number(countResult?.total) || 0 };
         } catch (error) {

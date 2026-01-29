@@ -234,7 +234,8 @@ router.put(
 router.post(
     '/:flagName/toggle',
     asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment || 'development';
+        // Allow environment from body, otherwise use request environment (header)
+        const environment = req.body.environment || req.environment || 'development';
         const userId = req.user?.id;
         const { isEnabled } = req.body;
 

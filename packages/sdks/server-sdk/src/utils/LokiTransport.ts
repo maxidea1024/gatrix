@@ -60,6 +60,9 @@ export class LokiTransport {
      * Flush buffered logs to Loki
      */
     async flush() {
+        // Skip flush if not enabled
+        if (!this.config.enabled) return;
+
         if (this.timer) {
             clearTimeout(this.timer);
             this.timer = null;
