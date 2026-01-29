@@ -109,6 +109,14 @@ interface Variant {
     }[];
 }
 
+interface FeatureFlagEnvironment {
+    id: string;
+    flagId: string;
+    environment: string;
+    isEnabled: boolean;
+    lastSeenAt?: string;
+}
+
 interface FeatureFlag {
     id: string;
     environment: string;
@@ -124,6 +132,7 @@ interface FeatureFlag {
     strategies?: Strategy[];
     variants?: Variant[];
     variantType?: 'string' | 'json' | 'number';
+    environments?: FeatureFlagEnvironment[];
     lastSeenAt?: string;
     archivedAt?: string;
     createdBy?: number;
@@ -243,7 +252,7 @@ const FeatureFlagDetailPage: React.FC = () => {
             setOriginalFlag(JSON.parse(JSON.stringify(data)));
         } catch (error: any) {
             enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.loadFailed'), { variant: 'error' });
-            navigate('/game/feature-flags');
+            navigate('/feature-flags');
         } finally {
             setLoading(false);
         }
@@ -306,7 +315,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         }
 
         try {
-            await api.put(`/admin/features/${flag.flagName}/toggle`, { isEnabled: !flag.isEnabled });
+            await api.post(`/admin/features/${flag.flagName}/toggle`, { isEnabled: !flag.isEnabled });
             setFlag({ ...flag, isEnabled: !flag.isEnabled });
             enqueueSnackbar(t(`featureFlags.${!flag.isEnabled ? 'enabled' : 'disabled'}`), { variant: 'success' });
         } catch (error: any) {
@@ -317,7 +326,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     const handleEnvToggle = async (envKey: string, currentEnabled: boolean) => {
         if (!flag || !canManage) return;
         try {
-            await api.put(`/admin/features/${flag.flagName}/toggle`, {
+            await api.post(`/admin/features/${flag.flagName}/toggle`, {
                 isEnabled: !currentEnabled,
                 environment: envKey,
             });
@@ -368,7 +377,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         try {
             await api.delete(`/admin/features/${flag.flagName}`);
             enqueueSnackbar(t('featureFlags.deleteSuccess'), { variant: 'success' });
-            navigate('/game/feature-flags');
+            navigate('/feature-flags');
         } catch (error: any) {
             enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.deleteFailed'), { variant: 'error' });
         }
@@ -786,8 +795,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     <Box sx={{ flex: 1 }}>
                         <Stack spacing={2}>
                             {environments.map(env => {
-                                // In the future, this should come from environment-specific data
-                                const isEnabled = flag.isEnabled; // For now, using global flag state
+                                // Get environment-specific isEnabled from flag.environments
+                                const envSettings = flag.environments?.find(e => e.environment === env.environment);
+                                const isEnabled = envSettings?.isEnabled ?? false;
                                 const strategies = flag.strategies || [];
                                 const strategiesCount = strategies.length;
                                 const isExpanded = expandedEnvs.has(env.environment);
@@ -993,6 +1003,56 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                         )}
                                                     </Stack>
                                                 )}
+
+                                                {/* Variants Section */}
+                                                <Divider sx={{ my: 2 }} />
+                                                <Box>
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                                                        <Typography variant="subtitle2" fontWeight={600}>
+                                                            {t('featureFlags.variants')} ({(flag.variants || []).length})
+                                                        </Typography>
+                                                        {canManage && (
+                                                            <Button
+                                                                variant="outlined"
+                                                                startIcon={<AddIcon />}
+                                                                onClick={handleAddVariant}
+                                                                size="small"
+                                                            >
+                                                                {t('featureFlags.addVariant')}
+                                                            </Button>
+                                                        )}
+                                                    </Box>
+                                                    {(flag.variants || []).length === 0 ? (
+                                                        <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+                                                            {t('featureFlags.noVariantsFound')}
+                                                        </Typography>
+                                                    ) : (
+                                                        <Stack spacing={1}>
+                                                            {(flag.variants || []).map((variant, vIndex) => (
+                                                                <Paper key={variant.name || vIndex} variant="outlined" sx={{ p: 1.5 }}>
+                                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                        <Box>
+                                                                            <Typography fontWeight={500}>{variant.name}</Typography>
+                                                                            <Typography variant="caption" color="text.secondary">
+                                                                                {t('featureFlags.weight')}: {variant.weight}%
+                                                                            </Typography>
+                                                                        </Box>
+                                                                        {canManage && (
+                                                                            <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                                                                <IconButton size="small" onClick={() => handleEditVariant(variant)}>
+                                                                                    <EditIcon fontSize="small" />
+                                                                                </IconButton>
+                                                                                <IconButton size="small" onClick={() => handleDeleteVariant(vIndex)}>
+                                                                                    <DeleteIcon fontSize="small" />
+                                                                                </IconButton>
+                                                                            </Box>
+                                                                        )}
+                                                                    </Box>
+                                                                </Paper>
+                                                            ))}
+                                                        </Stack>
+                                                    )}
+                                                </Box>
                                             </AccordionDetails>
                                         </Accordion>
                                     </Paper>
@@ -1067,7 +1127,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                             <FormControl fullWidth>
                                 <InputLabel>{t('featureFlags.strategyType')}</InputLabel>
                                 <Select
-                                    value={editingStrategy.name}
+                                    value={editingStrategy.name || 'flexibleRollout'}
                                     onChange={(e) => setEditingStrategy({ ...editingStrategy, name: e.target.value })}
                                     label={t('featureFlags.strategyType')}
                                 >
@@ -1121,7 +1181,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 <ConstraintEditor
                                     constraints={editingStrategy.constraints || []}
                                     onChange={(constraints) => setEditingStrategy({ ...editingStrategy, constraints })}
-                                    contextFields={contextFields}
+                                    contextFields={Array.isArray(contextFields) ? contextFields : []}
                                 />
                             </Box>
                         </Stack>
