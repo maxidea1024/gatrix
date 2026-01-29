@@ -54,6 +54,7 @@ export interface FeatureFlagAttributes {
     impressionDataEnabled: boolean;
     staleAfterDays: number;
     tags?: string[];
+    links?: { url: string; title?: string }[];
     variantType?: 'string' | 'number' | 'json';
     createdBy: number;
     updatedBy?: number;
@@ -292,6 +293,7 @@ export class FeatureFlagModel {
                 isArchived: Boolean(flag.isArchived),
                 impressionDataEnabled: Boolean(flag.impressionDataEnabled),
                 tags: parseJsonField<string[]>(flag.tags) || [],
+                links: parseJsonField<{ url: string; title?: string }[]>(flag.links) || [],
                 strategies,
                 variants,
                 environments: allEnvSettings.map(e => ({

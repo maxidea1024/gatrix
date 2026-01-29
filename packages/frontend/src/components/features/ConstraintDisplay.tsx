@@ -78,8 +78,9 @@ const isDateOperator = (op: string): boolean => {
  */
 export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint, compact = false, contextFields = [] }) => {
 
-    // Find context field info for tooltip
-    const contextFieldInfo = contextFields.find(f => f.fieldName === constraint.contextName);
+    // Find context field info for tooltip (ensure contextFields is an array)
+    const fieldsArray = Array.isArray(contextFields) ? contextFields : [];
+    const contextFieldInfo = fieldsArray.find(f => f.fieldName === constraint.contextName);
     const contextFieldDescription = contextFieldInfo?.description || contextFieldInfo?.displayName || '';
 
     // Get constraint value display (for single values)

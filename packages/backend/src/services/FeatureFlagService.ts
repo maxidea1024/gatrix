@@ -52,6 +52,7 @@ export interface UpdateFlagInput {
     impressionDataEnabled?: boolean;
     staleAfterDays?: number;
     tags?: string[];
+    links?: { url: string; title?: string }[];
 }
 
 export interface CreateStrategyInput {

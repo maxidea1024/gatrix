@@ -66,13 +66,17 @@ class ApiService {
         }
 
         // Add environment header for multi-environment support
-        // Read the actual environment name from localStorage (not displayName)
-        const environment = typeof window !== 'undefined'
-          ? localStorage.getItem('gatrix_selected_environment')
-          : null;
-        if (environment) {
-          // The backend expects X-Environment header with environment name
-          config.headers['X-Environment'] = environment;
+        // Only set from localStorage if not explicitly provided in the request config
+        // Check both lowercase and uppercase header names (HTTP headers are case-insensitive)
+        const hasEnvironmentHeader = config.headers['x-environment'] || config.headers['X-Environment'];
+        if (!hasEnvironmentHeader) {
+          const environment = typeof window !== 'undefined'
+            ? localStorage.getItem('gatrix_selected_environment')
+            : null;
+          if (environment) {
+            // The backend expects X-Environment header with environment name
+            config.headers['X-Environment'] = environment;
+          }
         }
 
         return config;

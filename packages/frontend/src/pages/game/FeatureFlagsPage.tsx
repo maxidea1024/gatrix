@@ -301,23 +301,14 @@ const FeatureFlagsPage: React.FC = () => {
 
         setCreating(true);
         try {
-            // Create flag with default flexible rollout strategy for each environment
-            const defaultStrategy = {
-                strategyName: 'flexibleRollout',
-                parameters: { rollout: 100, stickiness: 'default', groupId: newFlag.flagName },
-                constraints: [],
-                segments: [],
-                sortOrder: 0,
-                disabled: false,
-            };
-
+            // Create flag with empty strategies - user can add strategies manually
             await api.post('/admin/features', {
                 flagName: newFlag.flagName.trim(),
                 description: newFlag.description.trim(),
                 flagType: newFlag.flagType,
                 tags: newFlag.tags,
                 impressionDataEnabled: newFlag.impressionDataEnabled,
-                strategies: [defaultStrategy],
+                strategies: [],
             });
 
             enqueueSnackbar(t('featureFlags.createSuccess'), { variant: 'success' });
@@ -569,6 +560,7 @@ const FeatureFlagsPage: React.FC = () => {
                                                                             onChange={() => handleToggle(flag, env.environment, isEnabled)}
                                                                             disabled={flag.isArchived || !canManage}
                                                                             onClick={(e) => e.stopPropagation()}
+                                                                            color={env.color}
                                                                         />
                                                                     </span>
                                                                 </Tooltip>
