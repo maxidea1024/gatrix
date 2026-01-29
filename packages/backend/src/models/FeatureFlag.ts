@@ -274,11 +274,12 @@ export class FeatureFlagModel {
 
             if (!flag) return null;
 
-            // Get environment-specific settings
-            const envSettings = await db('g_feature_flag_environments')
-                .where('flagId', flag.id)
-                .where('environment', environment)
-                .first();
+            // Get ALL environment settings for this flag (for detail page)
+            const allEnvSettings = await db('g_feature_flag_environments')
+                .where('flagId', flag.id);
+
+            // Get current environment settings
+            const envSettings = allEnvSettings.find(e => e.environment === environment);
 
             // Load strategies and variants for this environment
             const strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(flag.id, environment);
@@ -293,6 +294,13 @@ export class FeatureFlagModel {
                 tags: parseJsonField<string[]>(flag.tags) || [],
                 strategies,
                 variants,
+                environments: allEnvSettings.map(e => ({
+                    id: e.id,
+                    flagId: e.flagId,
+                    environment: e.environment,
+                    isEnabled: Boolean(e.isEnabled),
+                    lastSeenAt: e.lastSeenAt,
+                })),
             };
         } catch (error) {
             logger.error('Error finding feature flag by name:', error);
