@@ -14,41 +14,44 @@ const SwitchContainer = styled(Box, {
 })<{ checked: boolean; disabled?: boolean; switchSize: 'small' | 'medium' | 'large' }>(
     ({ theme, checked, disabled, switchSize }) => {
         const sizes = {
-            small: { width: 36, height: 20, thumbSize: 16 },
-            medium: { width: 44, height: 24, thumbSize: 20 },
-            large: { width: 52, height: 28, thumbSize: 24 },
+            small: { width: 32, height: 18, thumbSize: 14 },
+            medium: { width: 40, height: 22, thumbSize: 18 },
+            large: { width: 48, height: 26, thumbSize: 22 },
         };
-        const { width, height, thumbSize } = sizes[switchSize];
-        const padding = (height - thumbSize) / 2;
+        const { width, height } = sizes[switchSize];
 
         return {
             position: 'relative',
             width,
             height,
-            borderRadius: height / 2,
+            borderRadius: 0,
             cursor: disabled ? 'not-allowed' : 'pointer',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'all 0.2s ease',
             background: checked
                 ? disabled
                     ? theme.palette.mode === 'dark' ? '#3d6b3d' : '#a5d6a7'
-                    : 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)'
+                    : theme.palette.mode === 'dark'
+                        ? 'linear-gradient(135deg, #43a047 0%, #2e7d32 100%)'
+                        : 'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)'
                 : disabled
                     ? theme.palette.mode === 'dark' ? '#444' : '#e0e0e0'
                     : theme.palette.mode === 'dark'
-                        ? 'linear-gradient(135deg, #616161 0%, #424242 100%)'
+                        ? 'linear-gradient(135deg, #555 0%, #333 100%)'
                         : 'linear-gradient(135deg, #bdbdbd 0%, #9e9e9e 100%)',
             boxShadow: checked
-                ? '0 2px 8px rgba(76, 175, 80, 0.4), inset 0 1px 2px rgba(255,255,255,0.2)'
+                ? 'inset 0 1px 2px rgba(0,0,0,0.1), 0 1px 3px rgba(76, 175, 80, 0.3)'
                 : 'inset 0 1px 3px rgba(0,0,0,0.2)',
+            border: checked
+                ? '1px solid rgba(46, 125, 50, 0.3)'
+                : '1px solid rgba(0,0,0,0.1)',
             opacity: disabled ? 0.6 : 1,
             '&:hover': disabled ? {} : {
-                transform: 'scale(1.05)',
                 boxShadow: checked
-                    ? '0 4px 12px rgba(76, 175, 80, 0.5), inset 0 1px 2px rgba(255,255,255,0.2)'
+                    ? 'inset 0 1px 2px rgba(0,0,0,0.1), 0 2px 6px rgba(76, 175, 80, 0.4)'
                     : '0 2px 8px rgba(0,0,0,0.2), inset 0 1px 3px rgba(0,0,0,0.2)',
             },
             '&:active': disabled ? {} : {
-                transform: 'scale(0.98)',
+                transform: 'scale(0.97)',
             },
         };
     }
@@ -57,35 +60,34 @@ const SwitchContainer = styled(Box, {
 const SwitchThumb = styled(Box, {
     shouldForwardProp: (prop) => !['checked', 'switchSize'].includes(prop as string),
 })<{ checked: boolean; switchSize: 'small' | 'medium' | 'large' }>(
-    ({ theme, checked, switchSize }) => {
+    ({ checked, switchSize }) => {
         const sizes = {
-            small: { width: 36, height: 20, thumbSize: 16 },
-            medium: { width: 44, height: 24, thumbSize: 20 },
-            large: { width: 52, height: 28, thumbSize: 24 },
+            small: { width: 32, height: 18, thumbSize: 14 },
+            medium: { width: 40, height: 22, thumbSize: 18 },
+            large: { width: 48, height: 26, thumbSize: 22 },
         };
-        const { width, height, thumbSize } = sizes[switchSize];
-        const padding = (height - thumbSize) / 2;
+        const { width, thumbSize } = sizes[switchSize];
+        const padding = 2;
 
         return {
             position: 'absolute',
-            top: padding,
-            left: checked ? width - thumbSize - padding : padding,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            left: checked ? width - thumbSize - padding - 2 : padding,
             width: thumbSize,
             height: thumbSize,
-            borderRadius: '50%',
+            borderRadius: 0,
             background: checked
-                ? 'linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%)'
-                : 'linear-gradient(180deg, #ffffff 0%, #e0e0e0 100%)',
-            boxShadow: checked
-                ? '0 2px 6px rgba(0,0,0,0.3), 0 0 0 1px rgba(76,175,80,0.2)'
-                : '0 2px 4px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05)',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                ? 'linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%)'
+                : 'linear-gradient(180deg, #ffffff 0%, #e8e8e8 100%)',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+            transition: 'all 0.2s ease',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             '&::after': {
                 content: checked ? '"✓"' : '""',
-                fontSize: switchSize === 'small' ? 10 : switchSize === 'medium' ? 12 : 14,
+                fontSize: switchSize === 'small' ? 9 : switchSize === 'medium' ? 11 : 13,
                 color: checked ? '#2e7d32' : '#9e9e9e',
                 fontWeight: 'bold',
             },
@@ -93,45 +95,15 @@ const SwitchThumb = styled(Box, {
     }
 );
 
-const StatusIndicator = styled(Box, {
-    shouldForwardProp: (prop) => !['checked', 'switchSize'].includes(prop as string),
-})<{ checked: boolean; switchSize: 'small' | 'medium' | 'large' }>(
-    ({ checked, switchSize }) => {
-        const iconSize = switchSize === 'small' ? 8 : switchSize === 'medium' ? 10 : 12;
-        const position = switchSize === 'small' ? 6 : switchSize === 'medium' ? 7 : 8;
-
-        return {
-            position: 'absolute',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            left: checked ? position : 'auto',
-            right: checked ? 'auto' : position,
-            width: iconSize,
-            height: iconSize,
-            borderRadius: '50%',
-            background: checked
-                ? 'rgba(255,255,255,0.9)'
-                : 'rgba(255,255,255,0.4)',
-            transition: 'all 0.3s ease',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: iconSize - 2,
-            color: checked ? '#2e7d32' : '#757575',
-            fontWeight: 'bold',
-        };
-    }
-);
-
 /**
- * FeatureSwitch - A beautifully designed toggle switch for feature flags
+ * FeatureSwitch - A modern rectangular toggle switch for feature flags
  * 
  * Features:
+ * - Clean rectangular design that matches modern UI
  * - Clear visual distinction between ON/OFF states
  * - Smooth animations
  * - Green gradient when enabled, gray when disabled
  * - Checkmark indicator when enabled
- * - Hover and active states
  * - Three sizes: small, medium, large
  */
 const FeatureSwitch: React.FC<FeatureSwitchProps> = ({

@@ -25,7 +25,6 @@ import {
     Autocomplete,
     Stack,
     FormHelperText,
-    Switch,
     FormControlLabel,
     Checkbox,
 } from '@mui/material';
@@ -51,6 +50,7 @@ import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import api from '../../services/api';
 import { tagService } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
+import FeatureSwitch from '../../components/common/FeatureSwitch';
 
 interface FeatureContextField {
     id: string;
@@ -294,14 +294,22 @@ const FeatureContextFieldsPage: React.FC = () => {
                                         {fields.map((field) => (
                                             <TableRow key={field.id} hover>
                                                 <TableCell>
-                                                    <Switch
+                                                    <FeatureSwitch
                                                         size="small"
                                                         checked={field.isEnabled !== false}
                                                         onChange={async () => {
+                                                            const newEnabled = !field.isEnabled;
+                                                            // Optimistic update
+                                                            setFields(prev => prev.map(f =>
+                                                                f.id === field.id ? { ...f, isEnabled: newEnabled } : f
+                                                            ));
                                                             try {
-                                                                await api.put(`/admin/features/context-fields/${field.id}`, { isEnabled: !field.isEnabled });
-                                                                loadFields();
+                                                                await api.put(`/admin/features/context-fields/${field.fieldName}`, { isEnabled: newEnabled });
                                                             } catch (error: any) {
+                                                                // Rollback on error
+                                                                setFields(prev => prev.map(f =>
+                                                                    f.id === field.id ? { ...f, isEnabled: !newEnabled } : f
+                                                                ));
                                                                 enqueueSnackbar(parseApiErrorMessage(error, t('common.saveFailed')), { variant: 'error' });
                                                             }
                                                         }}

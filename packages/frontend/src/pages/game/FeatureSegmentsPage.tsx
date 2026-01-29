@@ -22,7 +22,6 @@ import {
     Stack,
     FormHelperText,
     Autocomplete,
-    Switch,
     FormControlLabel,
     Checkbox,
 } from '@mui/material';
@@ -52,6 +51,7 @@ import ConstraintEditor, { Constraint, ContextField } from '../../components/fea
 import { ConstraintList } from '../../components/features/ConstraintDisplay';
 import { tagService } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
+import FeatureSwitch from '../../components/common/FeatureSwitch';
 
 interface FeatureSegment {
     id: string;
@@ -360,14 +360,22 @@ const FeatureSegmentsPage: React.FC = () => {
                                         {segments.map((segment) => (
                                             <TableRow key={segment.id} hover>
                                                 <TableCell>
-                                                    <Switch
+                                                    <FeatureSwitch
                                                         size="small"
                                                         checked={segment.isActive !== false}
                                                         onChange={async () => {
+                                                            const newActive = !segment.isActive;
+                                                            // Optimistic update
+                                                            setSegments(prev => prev.map(s =>
+                                                                s.id === segment.id ? { ...s, isActive: newActive } : s
+                                                            ));
                                                             try {
-                                                                await api.put(`/admin/features/segments/${segment.id}`, { isActive: !segment.isActive });
-                                                                loadSegments();
+                                                                await api.put(`/admin/features/segments/${segment.id}`, { isActive: newActive });
                                                             } catch (error: any) {
+                                                                // Rollback on error
+                                                                setSegments(prev => prev.map(s =>
+                                                                    s.id === segment.id ? { ...s, isActive: !newActive } : s
+                                                                ));
                                                                 enqueueSnackbar(parseApiErrorMessage(error, t('common.saveFailed')), { variant: 'error' });
                                                             }
                                                         }}

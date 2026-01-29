@@ -131,11 +131,13 @@ export interface FeatureSegmentAttributes {
 export interface FeatureContextFieldAttributes {
     id: string;
     fieldName: string;
+    displayName?: string;
     fieldType: FieldType;
     description?: string;
     legalValues?: string[];
     tags?: string[];
     stickiness: boolean;
+    isEnabled?: boolean;
     sortOrder: number;
     createdBy?: number;
     updatedBy?: number;
@@ -937,11 +939,13 @@ export class FeatureContextFieldModel {
             const updateData: any = { updatedAt: new Date() };
 
             if (data.fieldType !== undefined) updateData.fieldType = data.fieldType;
+            if (data.displayName !== undefined) updateData.displayName = data.displayName;
             if (data.description !== undefined) updateData.description = data.description;
             if (data.legalValues !== undefined) updateData.legalValues = JSON.stringify(data.legalValues);
             if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
             if (data.stickiness !== undefined) updateData.stickiness = data.stickiness;
             if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder;
+            if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
             if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
             await db('g_feature_context_fields').where('fieldName', fieldName).update(updateData);
