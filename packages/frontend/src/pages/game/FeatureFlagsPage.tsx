@@ -210,16 +210,31 @@ const FeatureFlagsPage: React.FC = () => {
     // Toggle flag for a specific environment
     const handleToggle = async (flag: FeatureFlag, environment: string, currentEnabled: boolean) => {
         const newEnabled = !currentEnabled;
-        // Optimistic update
+
+        // Optimistic update - ensure environments array exists
         setFlags(prev => prev.map(f => {
             if (f.flagName !== flag.flagName) return f;
+
+            // If environments array doesn't exist, create it with the toggled environment
+            const existingEnvs = f.environments || [];
+            const envExists = existingEnvs.some(e => e.environment === environment);
+
+            let updatedEnvs;
+            if (envExists) {
+                updatedEnvs = existingEnvs.map(e =>
+                    e.environment === environment ? { ...e, isEnabled: newEnabled } : e
+                );
+            } else {
+                // Add new environment entry
+                updatedEnvs = [...existingEnvs, { environment, isEnabled: newEnabled }];
+            }
+
             return {
                 ...f,
-                environments: f.environments?.map(e =>
-                    e.environment === environment ? { ...e, isEnabled: newEnabled } : e
-                ),
+                environments: updatedEnvs,
             };
         }));
+
         try {
             await featureFlagService.toggleFeatureFlag(flag.flagName, newEnabled, environment);
             enqueueSnackbar(
@@ -230,11 +245,15 @@ const FeatureFlagsPage: React.FC = () => {
             // Rollback on error
             setFlags(prev => prev.map(f => {
                 if (f.flagName !== flag.flagName) return f;
+
+                const existingEnvs = f.environments || [];
+                const updatedEnvs = existingEnvs.map(e =>
+                    e.environment === environment ? { ...e, isEnabled: currentEnabled } : e
+                );
+
                 return {
                     ...f,
-                    environments: f.environments?.map(e =>
-                        e.environment === environment ? { ...e, isEnabled: !newEnabled } : e
-                    ),
+                    environments: updatedEnvs,
                 };
             }));
             enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.toggleFailed'), { variant: 'error' });
@@ -555,6 +574,7 @@ const FeatureFlagsPage: React.FC = () => {
                                                                 >
                                                                     <span>
                                                                         <FeatureSwitch
+                                                                            key={`${flag.flagName}-${env.environment}-${isEnabled}`}
                                                                             size="small"
                                                                             checked={isEnabled}
                                                                             onChange={() => handleToggle(flag, env.environment, isEnabled)}
