@@ -349,10 +349,21 @@ const FeatureFlagDetailPage: React.FC = () => {
                 });
                 const data = response.data?.flag || response.data;
 
-                const strategies = (data.strategies || []).map((s: any) => ({
+                // Get variants from flag level (they're stored at flag level, not strategy level)
+                const flagVariants = (data.variants || []).map((v: any) => ({
+                    name: v.variantName || v.name,
+                    weight: v.weight,
+                    payload: v.payload,
+                    stickiness: v.stickiness || 'default',
+                    weightLock: v.weightLock || false,
+                }));
+
+                const strategies = (data.strategies || []).map((s: any, index: number) => ({
                     ...s,
                     name: s.strategyName || s.name,
                     disabled: s.isEnabled === false,
+                    // Attach variants to the first strategy (for UI editing purposes)
+                    variants: index === 0 ? flagVariants : [],
                 }));
                 strategiesMap[env.environment] = strategies;
             } catch {
@@ -688,13 +699,30 @@ const FeatureFlagDetailPage: React.FC = () => {
                     parameters: s.parameters,
                     constraints: s.constraints,
                     segments: s.segments,
-                    variants: s.variants,
                     sortOrder: s.sortOrder,
                     isEnabled: !s.disabled,
                 }));
                 await api.put(`/admin/features/${flag.flagName}/strategies`, { strategies: apiStrategies }, {
                     headers: { 'x-environment': editingEnv }
                 });
+
+                // Save variants separately if the current strategy has variants
+                if (editingStrategy.variants && editingStrategy.variants.length > 0) {
+                    const apiVariants = editingStrategy.variants.map(v => ({
+                        variantName: v.name,
+                        weight: v.weight,
+                        payload: v.payload,
+                        stickiness: v.stickiness || 'default',
+                        weightLock: v.weightLock,
+                    }));
+                    await api.put(`/admin/features/${flag.flagName}/variants`, {
+                        variants: apiVariants,
+                        variantType: flag.variantType || 'string',
+                    }, {
+                        headers: { 'x-environment': editingEnv }
+                    });
+                }
+
                 // Reload strategies from server after save to ensure sync
                 await loadEnvStrategies(environments, flag.flagName);
             } else {
@@ -2467,7 +2495,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                         <Paper key={index} variant="outlined" sx={{ p: 2 }}>
                                                             {/* Row 1: Name, Fixed Weight Checkbox, Weight, Delete */}
                                                             <Grid container spacing={2} alignItems="center">
-                                                                <Grid item xs={4}>
+                                                                <Grid size={4}>
                                                                     <TextField
                                                                         fullWidth
                                                                         size="small"
@@ -2480,7 +2508,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                         }}
                                                                     />
                                                                 </Grid>
-                                                                <Grid item xs={3}>
+                                                                <Grid size={3}>
                                                                     <FormControlLabel
                                                                         control={
                                                                             <Checkbox
@@ -2492,7 +2520,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                         label={<Typography variant="body2">{t('featureFlags.fixedWeight')}</Typography>}
                                                                     />
                                                                 </Grid>
-                                                                <Grid item xs={3}>
+                                                                <Grid size={3}>
                                                                     <TextField
                                                                         fullWidth
                                                                         size="small"
@@ -2511,7 +2539,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                         }}
                                                                     />
                                                                 </Grid>
-                                                                <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                                                <Grid size={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                                                                     <IconButton
                                                                         size="small"
                                                                         color="error"
