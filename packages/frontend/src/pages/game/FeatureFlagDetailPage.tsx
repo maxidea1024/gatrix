@@ -723,22 +723,20 @@ const FeatureFlagDetailPage: React.FC = () => {
                     headers: { 'x-environment': editingEnv }
                 });
 
-                // Save variants separately if the current strategy has variants
-                if (editingStrategy.variants && editingStrategy.variants.length > 0) {
-                    const apiVariants = editingStrategy.variants.map(v => ({
-                        variantName: v.name,
-                        weight: v.weight,
-                        payload: v.payload,
-                        stickiness: v.stickiness || 'default',
-                        weightLock: v.weightLock,
-                    }));
-                    await api.put(`/admin/features/${flag.flagName}/variants`, {
-                        variants: apiVariants,
-                        variantType: flag.variantType || 'string',
-                    }, {
-                        headers: { 'x-environment': editingEnv }
-                    });
-                }
+                // Save variants (including empty array to clear all variants)
+                const apiVariants = (editingStrategy.variants || []).map(v => ({
+                    variantName: v.name,
+                    weight: v.weight,
+                    payload: v.payload,
+                    stickiness: v.stickiness || 'default',
+                    weightLock: v.weightLock,
+                }));
+                await api.put(`/admin/features/${flag.flagName}/variants`, {
+                    variants: apiVariants,
+                    variantType: flag.variantType || 'string',
+                }, {
+                    headers: { 'x-environment': editingEnv }
+                });
 
                 // Reload strategies from server after save to ensure sync
                 await loadEnvStrategies(environments, flag.flagName);
@@ -2528,7 +2526,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                                 };
                                                                                 setEditingStrategy({ ...editingStrategy, variants: updated });
                                                                             }}
-                                                                            placeholder={t('featureFlags.optional')}
                                                                         />
                                                                     )}
                                                                     {payloadType === 'number' && (
@@ -2546,7 +2543,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                                 };
                                                                                 setEditingStrategy({ ...editingStrategy, variants: updated });
                                                                             }}
-                                                                            placeholder={t('featureFlags.optional')}
                                                                         />
                                                                     )}
                                                                     {payloadType === 'json' && (
