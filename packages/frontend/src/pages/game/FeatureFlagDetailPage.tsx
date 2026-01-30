@@ -2342,6 +2342,16 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                 value={flag?.variantType || 'string'}
                                                 onChange={(e) => {
                                                     const newType = e.target.value as 'string' | 'json' | 'number';
+                                                    // Determine default value based on type
+                                                    const defaultValue = newType === 'number' ? '0' : newType === 'json' ? '{}' : '';
+                                                    // Reset all variant payload values when type changes
+                                                    if (editingStrategy?.variants) {
+                                                        const updatedVariants = editingStrategy.variants.map(v => ({
+                                                            ...v,
+                                                            payload: v.payload ? { ...v.payload, value: defaultValue } : { type: 'string', value: defaultValue }
+                                                        }));
+                                                        setEditingStrategy({ ...editingStrategy, variants: updatedVariants });
+                                                    }
                                                     setFlag(prev => prev ? { ...prev, variantType: newType } : prev);
                                                 }}
                                                 renderValue={(value) => (
