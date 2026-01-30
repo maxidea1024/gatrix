@@ -439,5 +439,122 @@ router.get(
         res.json({ success: true, data: { metrics } });
     })
 );
+// ==================== Import ====================
+
+// Import feature flags from JSON
+router.post(
+    '/import',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const environment = requireEnvironment(req, res);
+        if (!environment) return;
+
+        const userId = req.user?.id;
+        const { segments = [], flags = [] } = req.body;
+
+        const result = {
+            segments: { created: 0, skipped: 0, skippedNames: [] as string[] },
+            flags: { created: 0, skipped: 0, skippedNames: [] as string[], errors: [] as string[] },
+        };
+
+        // 1. Import segments (global, skip if exists)
+        for (const segmentData of segments) {
+            try {
+                // Check if segment exists by name
+                const existingSegments = await featureFlagService.listSegments(segmentData.segmentName);
+                const exists = existingSegments.some(s => s.segmentName === segmentData.segmentName);
+
+                if (exists) {
+                    result.segments.skipped++;
+                    result.segments.skippedNames.push(segmentData.segmentName);
+                    continue;
+                }
+
+                // Create new segment
+                await featureFlagService.createSegment({
+                    segmentName: segmentData.segmentName,
+                    displayName: segmentData.displayName,
+                    description: segmentData.description,
+                    constraints: segmentData.constraints || [],
+                    isActive: true,
+                    tags: segmentData.tags,
+                }, userId!);
+
+                result.segments.created++;
+            } catch (error: any) {
+                // If duplicate error, count as skipped
+                if (error.code === 'DUPLICATE_ENTRY') {
+                    result.segments.skipped++;
+                    result.segments.skippedNames.push(segmentData.segmentName);
+                }
+            }
+        }
+
+        // 2. Import flags (environment-specific, skip if exists)
+        for (const flagData of flags) {
+            try {
+                // Check if flag exists
+                const existingFlag = await featureFlagService.getFlag(environment, flagData.flagName);
+
+                if (existingFlag) {
+                    result.flags.skipped++;
+                    result.flags.skippedNames.push(flagData.flagName);
+                    continue;
+                }
+
+                // Create new flag with strategies and variants
+                await featureFlagService.createFlag({
+                    environment,
+                    flagName: flagData.flagName,
+                    displayName: flagData.displayName,
+                    description: flagData.description,
+                    flagType: flagData.flagType || 'release',
+                    isEnabled: flagData.enabled ?? false,
+                    impressionDataEnabled: flagData.impressionDataEnabled ?? false,
+                    tags: flagData.tags,
+                    strategies: (flagData.strategies || []).map((s: any) => ({
+                        strategyName: s.strategyName,
+                        parameters: s.parameters,
+                        constraints: s.constraints,
+                        segments: s.segments,
+                        sortOrder: s.sortOrder,
+                        isEnabled: s.isEnabled ?? true,
+                    })),
+                    variants: (flagData.variants || []).map((v: any) => ({
+                        variantName: v.variantName,
+                        weight: v.weight,
+                        payload: v.payload,
+                        payloadType: v.payloadType || 'json',
+                        weightLock: v.weightLock ?? false,
+                        overrides: v.overrides,
+                    })),
+                }, userId!);
+
+                result.flags.created++;
+            } catch (error: any) {
+                // If duplicate error, count as skipped
+                if (error.code === 'DUPLICATE_ENTRY') {
+                    result.flags.skipped++;
+                    result.flags.skippedNames.push(flagData.flagName);
+                } else {
+                    result.flags.errors.push(`${flagData.flagName}: ${error.message}`);
+                }
+            }
+        }
+
+        res.json({
+            success: true,
+            data: {
+                summary: {
+                    segmentsCreated: result.segments.created,
+                    segmentsSkipped: result.segments.skipped,
+                    flagsCreated: result.flags.created,
+                    flagsSkipped: result.flags.skipped,
+                    errors: result.flags.errors.length,
+                },
+                details: result,
+            },
+        });
+    })
+);
 
 export default router;

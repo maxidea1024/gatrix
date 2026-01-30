@@ -77,7 +77,6 @@ export interface CreateVariantInput {
     weight: number;
     payload?: any;
     payloadType?: 'string' | 'number' | 'boolean' | 'json';
-    stickiness?: string;
     weightLock?: boolean;
     overrides?: { contextName: string; values: string[] }[];
 }
@@ -233,7 +232,6 @@ class FeatureFlagService {
                     weight: variantInput.weight,
                     payload: variantInput.payload,
                     payloadType: variantInput.payloadType || 'json',
-                    stickiness: variantInput.stickiness || 'default',
                     overrides: variantInput.overrides,
                     createdBy: userId,
                 });
@@ -541,7 +539,6 @@ class FeatureFlagService {
                 weight: variant.weight,
                 payload: variant.payload,
                 payloadType: variant.payloadType || 'json',
-                stickiness: variant.stickiness || 'default',
                 weightLock: variant.weightLock || false,
                 overrides: variant.overrides,
                 createdBy: userId,

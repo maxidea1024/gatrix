@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { PERMISSIONS } from '../../types/permissions';
@@ -25,14 +25,18 @@ import {
     MenuItem,
     InputLabel,
     Switch,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
     Autocomplete,
     Stack,
     CircularProgress,
     Checkbox,
+    Divider,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Menu,
+    ListItemIcon,
+    ListItemText,
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -48,6 +52,9 @@ import {
     Science as ExperimentIcon,
     Build as OperationalIcon,
     Security as PermissionIcon,
+    ViewColumn as ViewColumnIcon,
+    FileUpload as ImportIcon,
+    FileDownload as ExportIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -55,6 +62,8 @@ import { parseApiErrorMessage } from '../../utils/errorUtils';
 import featureFlagService, { FeatureFlag, FlagType } from '../../services/featureFlagService';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyState from '../../components/common/EmptyState';
+import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
+import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
@@ -86,8 +95,7 @@ const FeatureFlagsPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [isInitialLoad, setIsInitialLoad] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [flagTypeFilter, setFlagTypeFilter] = useState<FlagType | ''>('');
-    const [showArchived, setShowArchived] = useState(false);
+    const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [deletingFlag, setDeletingFlag] = useState<FeatureFlag | null>(null);
     const [allTags, setAllTags] = useState<Tag[]>([]);
@@ -117,18 +125,119 @@ const FeatureFlagsPage: React.FC = () => {
         return (saved as 'asc' | 'desc') || 'desc';
     });
 
+    // Export/Import state
+    const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
+    const [importDialogOpen, setImportDialogOpen] = useState(false);
+    const [importData, setImportData] = useState<string>('');
+    const [importing, setImporting] = useState(false);
+
+    // Column settings state
+    const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+    const defaultColumns: ColumnConfig[] = [
+        { id: 'flagName', labelKey: 'featureFlags.flagName', visible: true },
+        { id: 'displayName', labelKey: 'featureFlags.displayName', visible: true },
+        { id: 'status', labelKey: 'featureFlags.status', visible: true },
+        { id: 'createdAt', labelKey: 'featureFlags.createdAt', visible: true },
+        { id: 'lastSeenAt', labelKey: 'featureFlags.lastSeenAt', visible: true },
+        { id: 'tags', labelKey: 'featureFlags.tags', visible: true },
+    ];
+    const [columns, setColumns] = useState<ColumnConfig[]>(() => {
+        const saved = localStorage.getItem('featureFlagsColumns');
+        if (saved) {
+            try {
+                const savedColumns = JSON.parse(saved);
+                const mergedColumns = savedColumns.map((savedCol: ColumnConfig) => {
+                    const defaultCol = defaultColumns.find(c => c.id === savedCol.id);
+                    return defaultCol ? { ...defaultCol, ...savedCol } : savedCol;
+                });
+                const savedIds = new Set(savedColumns.map((c: ColumnConfig) => c.id));
+                const newColumns = defaultColumns.filter(c => !savedIds.has(c.id));
+                return [...mergedColumns, ...newColumns];
+            } catch {
+                return defaultColumns;
+            }
+        }
+        return defaultColumns;
+    });
+
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+    // Extract filter values with useMemo
+    const flagTypeFilter = useMemo(() => {
+        const filter = activeFilters.find(f => f.key === 'flagType');
+        return filter?.value as string | undefined;
+    }, [activeFilters]);
+
+    const statusFilter = useMemo(() => {
+        const filter = activeFilters.find(f => f.key === 'status');
+        return filter?.value as string | undefined;
+    }, [activeFilters]);
+
+    const tagFilter = useMemo(() => {
+        const filter = activeFilters.find(f => f.key === 'tag');
+        return filter?.value as string[] | undefined;
+    }, [activeFilters]);
+
+    // Filter definitions
+    const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
+        {
+            key: 'status',
+            label: t('featureFlags.status'),
+            type: 'select',
+            options: [
+                { value: 'active', label: t('featureFlags.statusActive') },
+                { value: 'archived', label: t('featureFlags.statusArchived') },
+                { value: 'stale', label: t('featureFlags.statusStale') },
+                { value: 'potentiallyStale', label: t('featureFlags.statusPotentiallyStale') },
+            ],
+        },
+        {
+            key: 'flagType',
+            label: t('featureFlags.flagType'),
+            type: 'select',
+            options: [
+                { value: 'release', label: t('featureFlags.types.release') },
+                { value: 'experiment', label: t('featureFlags.types.experiment') },
+                { value: 'operational', label: t('featureFlags.types.operational') },
+                { value: 'permission', label: t('featureFlags.types.permission') },
+            ],
+        },
+        {
+            key: 'tag',
+            label: t('featureFlags.tags'),
+            type: 'multiselect',
+            operator: 'any_of',
+            allowOperatorToggle: true,
+            options: allTags.map(tag => ({ value: tag.name, label: tag.name })),
+        },
+    ], [t, allTags]);
+
+    // Visible columns
+    const visibleColumns = useMemo(() => columns.filter(col => col.visible), [columns]);
 
     // Load flags
     const loadFlags = async () => {
         setLoading(true);
         try {
+            // Determine isArchived and status based on statusFilter
+            let isArchived: boolean | undefined = undefined;
+            let status: string | undefined = undefined;
+
+            if (statusFilter === 'archived') {
+                isArchived = true;
+            } else if (statusFilter === 'active') {
+                isArchived = false;
+            } else if (statusFilter === 'stale' || statusFilter === 'potentiallyStale') {
+                isArchived = false;
+                status = statusFilter;
+            }
+
             const result = await featureFlagService.getFeatureFlags({
                 page: page + 1,
                 limit: rowsPerPage,
                 search: debouncedSearchTerm || undefined,
-                flagType: flagTypeFilter || undefined,
-                isArchived: showArchived,
+                flagType: (flagTypeFilter as FlagType) || undefined,
+                isArchived,
                 sortBy: orderBy,
                 sortOrder: order,
             });
@@ -162,9 +271,243 @@ const FeatureFlagsPage: React.FC = () => {
         }
     };
 
+    // Filter handlers
+    const handleFilterAdd = (filter: ActiveFilter) => {
+        setActiveFilters([...activeFilters, filter]);
+        setPage(0);
+    };
+
+    const handleFilterRemove = (filterKey: string) => {
+        setActiveFilters(activeFilters.filter(f => f.key !== filterKey));
+        setPage(0);
+    };
+
+    const handleFilterChange = (filterKey: string, value: any) => {
+        const newFilters = activeFilters.map(f =>
+            f.key === filterKey ? { ...f, value } : f
+        );
+        setActiveFilters(newFilters);
+        setPage(0);
+    };
+
+    const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
+        const newFilters = activeFilters.map(f =>
+            f.key === filterKey ? { ...f, operator } : f
+        );
+        setActiveFilters(newFilters);
+    };
+
+    // Column handlers
+    const handleColumnsChange = (newColumns: ColumnConfig[]) => {
+        setColumns(newColumns);
+        localStorage.setItem('featureFlagsColumns', JSON.stringify(newColumns));
+    };
+
+    const handleResetColumns = () => {
+        setColumns(defaultColumns);
+        localStorage.setItem('featureFlagsColumns', JSON.stringify(defaultColumns));
+    };
+
+    // Export/Import handlers
+    const handleExport = async (environment: string) => {
+        try {
+            // Get list of all flags first
+            const result = await featureFlagService.getFeatureFlags({
+                page: 1,
+                limit: 10000, // Get all flags
+                isArchived: false,
+            });
+
+            if (result && result.flags && result.flags.length > 0) {
+                // Fetch detailed info for each flag (includes strategies)
+                const detailedFlags = await Promise.all(
+                    result.flags.map(async (flag) => {
+                        try {
+                            return await featureFlagService.getFeatureFlag(flag.flagName);
+                        } catch {
+                            return flag; // Fallback to basic info if detail fetch fails
+                        }
+                    })
+                );
+
+                // Collect all used segment names from strategies
+                const usedSegmentNames = new Set<string>();
+                detailedFlags.forEach(flag => {
+                    // Strategies are on the flag level (already filtered by env from getFeatureFlag)
+                    (flag as any).strategies?.forEach((strategy: any) => {
+                        strategy.segments?.forEach((segmentName: string) => {
+                            usedSegmentNames.add(segmentName);
+                        });
+                    });
+                });
+
+                // Fetch all segments and filter used ones
+                let segments: any[] = [];
+                if (usedSegmentNames.size > 0) {
+                    try {
+                        const response = await api.get('/admin/features/segments');
+                        const allSegments = response.data?.segments || [];
+                        segments = allSegments
+                            .filter((seg: any) => usedSegmentNames.has(seg.segmentName))
+                            .map((seg: any) => ({
+                                segmentName: seg.segmentName,
+                                description: seg.description,
+                                constraints: seg.constraints,
+                            }));
+                    } catch {
+                        // Continue without segments if fetch fails
+                    }
+                }
+
+                const exportData = {
+                    exportedAt: new Date().toISOString(),
+                    environment,
+                    segments,
+                    flags: detailedFlags.map(flag => {
+                        // Strategies/variants are already filtered by environment in getFeatureFlag
+                        const envData = flag.environments?.find((env: any) => env.environment === environment);
+
+                        // Clean strategies - remove unnecessary metadata
+                        const strategies = ((flag as any).strategies ?? []).map((s: any) => ({
+                            strategyName: s.strategyName,
+                            parameters: s.parameters,
+                            constraints: s.constraints,
+                            segments: s.segments,
+                            sortOrder: s.sortOrder,
+                            isEnabled: s.isEnabled,
+                        }));
+
+                        // Clean variants - remove unnecessary metadata
+                        const variants = ((flag as any).variants ?? []).map((v: any) => ({
+                            variantName: v.variantName,
+                            weight: v.weight,
+                            payload: v.payload ?? null,
+                            payloadType: v.payloadType,
+                            weightLock: Boolean(v.weightLock),
+                            overrides: v.overrides ?? null,
+                        }));
+
+                        return {
+                            flagName: flag.flagName,
+                            displayName: flag.displayName,
+                            description: flag.description,
+                            flagType: flag.flagType,
+                            tags: flag.tags,
+                            impressionDataEnabled: flag.impressionDataEnabled,
+                            enabled: envData?.isEnabled ?? false,
+                            strategies,
+                            variants,
+                        };
+                    }),
+                };
+
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `feature-flags-${environment}-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                enqueueSnackbar(t('featureFlags.exportSuccess', { count: detailedFlags.length }), { variant: 'success' });
+            } else {
+                enqueueSnackbar(t('featureFlags.exportNoFlags'), { variant: 'info' });
+            }
+        } catch (error: any) {
+            enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.exportFailed'), { variant: 'error' });
+        }
+        setExportMenuAnchor(null);
+    };
+
+    const handleImport = async () => {
+        if (!importData.trim()) {
+            enqueueSnackbar(t('featureFlags.importNoData'), { variant: 'warning' });
+            return;
+        }
+
+        setImporting(true);
+        try {
+            const data = JSON.parse(importData);
+
+            if (!data.flags || !Array.isArray(data.flags)) {
+                enqueueSnackbar(t('featureFlags.importInvalidFormat'), { variant: 'error' });
+                setImporting(false);
+                return;
+            }
+
+            // Call backend import API
+            const response = await api.post('/admin/features/import', {
+                segments: data.segments || [],
+                flags: data.flags,
+            });
+
+            const result = response.data;
+            const summary = result.summary;
+
+            // Show result
+            if (summary.flagsCreated > 0 || summary.segmentsCreated > 0) {
+                let msg = '';
+                if (summary.flagsCreated > 0) {
+                    msg += t('featureFlags.importFlagsCreated', { count: summary.flagsCreated });
+                }
+                if (summary.segmentsCreated > 0) {
+                    if (msg) msg += ', ';
+                    msg += t('featureFlags.importSegmentsCreated', { count: summary.segmentsCreated });
+                }
+                enqueueSnackbar(msg, { variant: 'success' });
+                loadFlags();
+            }
+
+            if (summary.flagsSkipped > 0 || summary.segmentsSkipped > 0) {
+                let msg = '';
+                if (summary.flagsSkipped > 0) {
+                    msg += t('featureFlags.importFlagsSkipped', { count: summary.flagsSkipped });
+                }
+                if (summary.segmentsSkipped > 0) {
+                    if (msg) msg += ', ';
+                    msg += t('featureFlags.importSegmentsSkipped', { count: summary.segmentsSkipped });
+                }
+                enqueueSnackbar(msg, { variant: 'info' });
+            }
+
+            if (summary.errors > 0) {
+                enqueueSnackbar(t('featureFlags.importPartialError', { count: summary.errors }), { variant: 'warning' });
+            }
+
+            if (summary.flagsCreated === 0 && summary.segmentsCreated === 0) {
+                enqueueSnackbar(t('featureFlags.importNothingNew'), { variant: 'info' });
+            }
+
+            setImportDialogOpen(false);
+            setImportData('');
+        } catch (error: any) {
+            if (error instanceof SyntaxError) {
+                enqueueSnackbar(t('featureFlags.importInvalidJson'), { variant: 'error' });
+            } else {
+                enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.importFailed'), { variant: 'error' });
+            }
+        } finally {
+            setImporting(false);
+        }
+    };
+
+    const handleImportFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target?.result as string;
+                setImportData(content);
+            };
+            reader.readAsText(file);
+        }
+    };
+
     useEffect(() => {
         loadFlags();
-    }, [page, rowsPerPage, debouncedSearchTerm, orderBy, order, flagTypeFilter, showArchived]);
+    }, [page, rowsPerPage, debouncedSearchTerm, orderBy, order, flagTypeFilter, statusFilter, tagFilter]);
 
     useEffect(() => {
         loadTags();
@@ -387,6 +730,27 @@ const FeatureFlagsPage: React.FC = () => {
         }
     };
 
+    // Get flag status for display
+    const getFlagStatus = (flag: FeatureFlag): { status: string; color: 'default' | 'primary' | 'warning' | 'error' | 'success' } => {
+        if (flag.isArchived) {
+            return { status: 'archived', color: 'default' };
+        }
+        if (flag.stale) {
+            return { status: 'stale', color: 'error' };
+        }
+        // Check potentially stale based on lastSeenAt and flag type lifetime
+        const flagTypeInfo = flagTypes.find(ft => ft.flagType === flag.flagType);
+        if (flagTypeInfo?.lifetimeDays && flag.lastSeenAt) {
+            const lastSeen = new Date(flag.lastSeenAt);
+            const now = new Date();
+            const daysSinceLastSeen = (now.getTime() - lastSeen.getTime()) / (1000 * 60 * 60 * 24);
+            if (daysSinceLastSeen > flagTypeInfo.lifetimeDays) {
+                return { status: 'potentiallyStale', color: 'warning' };
+            }
+        }
+        return { status: 'active', color: 'success' };
+    };
+
     return (
         <Box sx={{ p: 3 }}>
             {/* Header */}
@@ -406,22 +770,37 @@ const FeatureFlagsPage: React.FC = () => {
                             {t('featureFlags.createFlag')}
                         </Button>
                     )}
+                    <Divider orientation="vertical" sx={{ height: 32, mx: 0.5 }} />
+                    <Tooltip title={t('featureFlags.export')}>
+                        <IconButton onClick={(e) => setExportMenuAnchor(e.currentTarget)}>
+                            <ExportIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('featureFlags.import')}>
+                        <IconButton onClick={() => setImportDialogOpen(true)} disabled={!canManage}>
+                            <ImportIcon />
+                        </IconButton>
+                    </Tooltip>
                 </Box>
             </Box>
 
             {/* Search and Filters */}
-            <Card sx={{ mb: 3 }}>
+            <Card sx={{ mb: 2 }}>
                 <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'nowrap', flexGrow: 1, minWidth: 0 }}>
                             <TextField
                                 placeholder={t('featureFlags.searchPlaceholder')}
                                 value={searchTerm}
                                 onChange={(e) => { setSearchTerm(e.target.value); setPage(0); }}
                                 sx={{
-                                    minWidth: 200, flexGrow: 1, maxWidth: 320,
+                                    minWidth: 300,
+                                    flexGrow: 1,
+                                    maxWidth: 500,
                                     '& .MuiOutlinedInput-root': {
-                                        height: '40px', borderRadius: '20px', bgcolor: 'background.paper',
+                                        height: '40px',
+                                        borderRadius: '20px',
+                                        bgcolor: 'background.paper',
                                         transition: 'all 0.2s ease-in-out',
                                         '& fieldset': { borderColor: 'divider' },
                                         '&:hover': { bgcolor: 'action.hover', '& fieldset': { borderColor: 'primary.light' } },
@@ -432,36 +811,34 @@ const FeatureFlagsPage: React.FC = () => {
                                 InputProps={{ startAdornment: (<InputAdornment position="start"><SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} /></InputAdornment>) }}
                                 size="small"
                             />
-                            <FormControl size="small" sx={{ minWidth: 150 }}>
-                                <InputLabel>{t('featureFlags.typeFilter')}</InputLabel>
-                                <Select
-                                    value={flagTypeFilter}
-                                    label={t('featureFlags.typeFilter')}
-                                    onChange={(e) => { setFlagTypeFilter(e.target.value as FlagType | ''); setPage(0); }}
-                                >
-                                    <MenuItem value="">{t('common.all')}</MenuItem>
-                                    <MenuItem value="release">{t('featureFlags.types.release')}</MenuItem>
-                                    <MenuItem value="experiment">{t('featureFlags.types.experiment')}</MenuItem>
-                                    <MenuItem value="operational">{t('featureFlags.types.operational')}</MenuItem>
-                                    <MenuItem value="killSwitch">{t('featureFlags.types.killSwitch')}</MenuItem>
-                                    <MenuItem value="permission">{t('featureFlags.types.permission')}</MenuItem>
-                                </Select>
-                            </FormControl>
-                            <Tooltip title={t('featureFlags.showArchivedTooltip')}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                    <Switch
-                                        size="small"
-                                        checked={showArchived}
-                                        onChange={(e) => { setShowArchived(e.target.checked); setPage(0); }}
-                                    />
-                                    <Typography variant="body2">{t('featureFlags.showArchived')}</Typography>
-                                </Box>
-                            </Tooltip>
-                        </Box>
-                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                            <Tooltip title={t('common.refresh')}>
-                                <span><IconButton size="small" onClick={loadFlags} disabled={loading}><RefreshIcon /></IconButton></span>
-                            </Tooltip>
+
+                            {/* Dynamic Filter Bar */}
+                            <DynamicFilterBar
+                                availableFilters={availableFilterDefinitions}
+                                activeFilters={activeFilters}
+                                onFilterAdd={handleFilterAdd}
+                                onFilterRemove={handleFilterRemove}
+                                onFilterChange={handleFilterChange}
+                                onOperatorChange={handleOperatorChange}
+                                onRefresh={loadFlags}
+                                refreshDisabled={loading}
+                                noWrap={true}
+                                afterFilterAddActions={
+                                    <Tooltip title={t('common.columnSettings')}>
+                                        <IconButton
+                                            onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                                            sx={{
+                                                bgcolor: 'background.paper',
+                                                border: 1,
+                                                borderColor: 'divider',
+                                                '&:hover': { bgcolor: 'action.hover' },
+                                            }}
+                                        >
+                                            <ViewColumnIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                }
+                            />
                         </Box>
                     </Box>
                 </CardContent>
@@ -507,6 +884,7 @@ const FeatureFlagsPage: React.FC = () => {
                                                 </TableSortLabel>
                                             </TableCell>
                                             <TableCell>{t('featureFlags.displayName')}</TableCell>
+                                            <TableCell>{t('featureFlags.status')}</TableCell>
                                             {environments.map(env => (
                                                 <TableCell key={env.environment} align="center" sx={{ minWidth: 70, maxWidth: 100, px: 0.5 }}>
                                                     <Tooltip title={`${env.displayName} (${env.environment})`}>
@@ -613,6 +991,20 @@ const FeatureFlagsPage: React.FC = () => {
                                                             </Tooltip>
                                                         )}
                                                     </Box>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {(() => {
+                                                        const { status, color } = getFlagStatus(flag);
+                                                        return (
+                                                            <Chip
+                                                                label={t(`featureFlags.status${status.charAt(0).toUpperCase() + status.slice(1)}`)}
+                                                                size="small"
+                                                                color={color}
+                                                                variant={status === 'active' ? 'outlined' : 'filled'}
+                                                                sx={{ height: 20, fontSize: '0.75rem' }}
+                                                            />
+                                                        );
+                                                    })()}
                                                 </TableCell>
                                                 {environments.map(env => {
                                                     const isEnabled = getEnvEnabled(flag, env.environment);
@@ -836,6 +1228,89 @@ const FeatureFlagsPage: React.FC = () => {
                     </Button>
                 </Box>
             </ResizableDrawer>
+
+            {/* Column Settings Dialog */}
+            <ColumnSettingsDialog
+                open={Boolean(columnSettingsAnchor)}
+                anchorEl={columnSettingsAnchor}
+                columns={columns}
+                onColumnsChange={handleColumnsChange}
+                onReset={handleResetColumns}
+                onClose={() => setColumnSettingsAnchor(null)}
+            />
+
+            {/* Export Menu */}
+            <Menu
+                anchorEl={exportMenuAnchor}
+                open={Boolean(exportMenuAnchor)}
+                onClose={() => setExportMenuAnchor(null)}
+            >
+                {environments.map(env => (
+                    <MenuItem key={env.environment} onClick={() => handleExport(env.environment)}>
+                        <ListItemIcon>
+                            <Chip
+                                size="small"
+                                sx={{
+                                    bgcolor: env.color || '#888',
+                                    color: getContrastColor(env.color || '#888'),
+                                    width: 20,
+                                    height: 20,
+                                    '& .MuiChip-label': { display: 'none' },
+                                }}
+                            />
+                        </ListItemIcon>
+                        <ListItemText>{env.displayName}</ListItemText>
+                    </MenuItem>
+                ))}
+            </Menu>
+
+            {/* Import Dialog */}
+            <Dialog open={importDialogOpen} onClose={() => setImportDialogOpen(false)} maxWidth="md" fullWidth>
+                <DialogTitle>{t('featureFlags.import')}</DialogTitle>
+                <DialogContent>
+                    <Box sx={{ mb: 2, mt: 1 }}>
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                            {t('featureFlags.importDescription')}
+                        </Typography>
+                        <Button
+                            variant="outlined"
+                            component="label"
+                            startIcon={<ImportIcon />}
+                            sx={{ mt: 1 }}
+                        >
+                            {t('featureFlags.selectFile')}
+                            <input
+                                type="file"
+                                accept=".json"
+                                hidden
+                                onChange={handleImportFileChange}
+                            />
+                        </Button>
+                    </Box>
+                    <TextField
+                        multiline
+                        rows={10}
+                        fullWidth
+                        value={importData}
+                        onChange={(e) => setImportData(e.target.value)}
+                        placeholder={t('featureFlags.importPlaceholder')}
+                        sx={{ fontFamily: 'monospace' }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => { setImportDialogOpen(false); setImportData(''); }} disabled={importing}>
+                        {t('common.cancel')}
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleImport}
+                        disabled={importing || !importData.trim()}
+                        startIcon={importing ? <CircularProgress size={20} /> : undefined}
+                    >
+                        {t('featureFlags.import')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };

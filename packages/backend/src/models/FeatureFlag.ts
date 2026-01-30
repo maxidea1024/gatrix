@@ -107,7 +107,6 @@ export interface FeatureVariantAttributes {
     weight: number;
     payload?: any;
     payloadType: PayloadType;
-    stickiness: string;
     weightLock?: boolean;
     overrides?: VariantOverride[];
     createdBy: number;
@@ -715,7 +714,6 @@ export class FeatureVariantModel {
                 weight: data.weight,
                 payload: data.payload ? JSON.stringify(data.payload) : null,
                 payloadType: data.payloadType || 'json',
-                stickiness: data.stickiness || 'default',
                 weightLock: data.weightLock || false,
                 overrides: data.overrides ? JSON.stringify(data.overrides) : null,
                 createdBy: data.createdBy,

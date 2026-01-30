@@ -306,8 +306,8 @@ export class FeatureEvaluator {
             }
         }
 
-        // Calculate variant based on stickiness
-        const stickiness = flag.variants[0]?.stickiness || 'userId';
+        // Calculate variant based on stickiness (use default since stickiness is not per-variant)
+        const stickiness = 'userId';
         const stickinessValue = String(context[stickiness] || context.sessionId || context.userId || '');
         const seed = `${flag.id}:${stickinessValue}`;
         const hash = this.normalizedHash(flag.id, stickinessValue);
