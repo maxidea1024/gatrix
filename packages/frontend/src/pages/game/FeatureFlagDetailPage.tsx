@@ -1316,14 +1316,15 @@ const FeatureFlagDetailPage: React.FC = () => {
                             ) : null}
 
                             {canManage && (
-                                <Button
-                                    size="small"
-                                    startIcon={<AddIcon />}
-                                    onClick={handleOpenAddLink}
-                                    sx={{ mt: 1 }}
-                                >
-                                    {t('featureFlags.links.addLink')}
-                                </Button>
+                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                                    <Button
+                                        size="small"
+                                        startIcon={<AddIcon />}
+                                        onClick={handleOpenAddLink}
+                                    >
+                                        {t('featureFlags.links.addLink')}
+                                    </Button>
+                                </Box>
                             )}
                         </Paper>
                     </Box>
