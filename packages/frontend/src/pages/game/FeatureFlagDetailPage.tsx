@@ -1114,6 +1114,22 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     </Box>
                                 )}
 
+                                {/* Last Seen At */}
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {t('featureFlags.lastSeenAt')}
+                                    </Typography>
+                                    {flag.lastSeenAt ? (
+                                        <Tooltip title={formatDateTimeDetailed(flag.lastSeenAt)} arrow>
+                                            <Typography variant="body2">
+                                                {formatRelativeTime(flag.lastSeenAt)}
+                                            </Typography>
+                                        </Tooltip>
+                                    ) : (
+                                        <Typography variant="body2" color="text.secondary">-</Typography>
+                                    )}
+                                </Box>
+
                                 <Divider />
 
                                 {/* Tags */}
