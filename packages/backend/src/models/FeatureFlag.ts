@@ -416,6 +416,7 @@ export class FeatureFlagModel {
             if (data.impressionDataEnabled !== undefined) updateData.impressionDataEnabled = data.impressionDataEnabled;
             if (data.staleAfterDays !== undefined) updateData.staleAfterDays = data.staleAfterDays;
             if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
+            if (data.links !== undefined) updateData.links = JSON.stringify(data.links);
             if (data.variantType !== undefined) updateData.variantType = data.variantType;
             if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 

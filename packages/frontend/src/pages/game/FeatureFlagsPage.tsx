@@ -44,6 +44,10 @@ import {
     Delete as DeleteIcon,
     ContentCopy as CopyIcon,
     Warning as WarningIcon,
+    RocketLaunch as ReleaseIcon,
+    Science as ExperimentIcon,
+    Build as OperationalIcon,
+    Security as PermissionIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -58,6 +62,7 @@ import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { tagService, Tag } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
 import { environmentService, Environment } from '../../services/environmentService';
+import ResizableDrawer from '../../components/common/ResizableDrawer';
 import FeatureSwitch from '../../components/common/FeatureSwitch';
 import api from '../../services/api';
 
@@ -95,6 +100,7 @@ const FeatureFlagsPage: React.FC = () => {
     const [creating, setCreating] = useState(false);
     const [newFlag, setNewFlag] = useState({
         flagName: '',
+        displayName: '',
         description: '',
         flagType: 'release' as FlagType,
         tags: [] as string[],
@@ -325,6 +331,7 @@ const FeatureFlagsPage: React.FC = () => {
             // Create flag with empty strategies - user can add strategies manually
             await api.post('/admin/features', {
                 flagName: newFlag.flagName.trim(),
+                displayName: newFlag.displayName.trim() || undefined,
                 description: newFlag.description.trim(),
                 flagType: newFlag.flagType,
                 tags: newFlag.tags,
@@ -334,7 +341,7 @@ const FeatureFlagsPage: React.FC = () => {
 
             enqueueSnackbar(t('featureFlags.createSuccess'), { variant: 'success' });
             setCreateDialogOpen(false);
-            setNewFlag({ flagName: '', description: '', flagType: 'release', tags: [], impressionDataEnabled: false });
+            setNewFlag({ flagName: '', displayName: '', description: '', flagType: 'release', tags: [], impressionDataEnabled: false });
             loadFlags();
         } catch (error: any) {
             enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.createFailed'), { variant: 'error' });
@@ -348,6 +355,7 @@ const FeatureFlagsPage: React.FC = () => {
         const timestamp = Date.now().toString(36).slice(-4);
         setNewFlag({
             flagName: `new-feature-${timestamp}`,
+            displayName: '',
             description: '',
             flagType: 'release',
             tags: [],
@@ -364,6 +372,18 @@ const FeatureFlagsPage: React.FC = () => {
             case 'operational': return 'warning';
             case 'permission': return 'default';
             default: return 'default';
+        }
+    };
+
+    // Get icon for flag type
+    const getTypeIcon = (type: FlagType) => {
+        const iconProps = { sx: { fontSize: 18 } };
+        switch (type) {
+            case 'release': return <ReleaseIcon {...iconProps} color="primary" />;
+            case 'experiment': return <ExperimentIcon {...iconProps} color="secondary" />;
+            case 'operational': return <OperationalIcon {...iconProps} color="warning" />;
+            case 'permission': return <PermissionIcon {...iconProps} color="action" />;
+            default: return <FlagIcon {...iconProps} />;
         }
     };
 
@@ -487,7 +507,6 @@ const FeatureFlagsPage: React.FC = () => {
                                                 </TableSortLabel>
                                             </TableCell>
                                             <TableCell>{t('featureFlags.displayName')}</TableCell>
-                                            <TableCell>{t('featureFlags.type')}</TableCell>
                                             {environments.map(env => (
                                                 <TableCell key={env.environment} align="center" sx={{ minWidth: 70, maxWidth: 100, px: 0.5 }}>
                                                     <Tooltip title={`${env.displayName} (${env.environment})`}>
@@ -515,6 +534,7 @@ const FeatureFlagsPage: React.FC = () => {
                                                     {t('featureFlags.createdAt')}
                                                 </TableSortLabel>
                                             </TableCell>
+                                            <TableCell>{t('featureFlags.lastSeenAt')}</TableCell>
                                             <TableCell>{t('featureFlags.tags')}</TableCell>
                                             {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                                         </TableRow>
@@ -547,6 +567,9 @@ const FeatureFlagsPage: React.FC = () => {
                                                 </TableCell>
                                                 <TableCell>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                        <Tooltip title={t(`featureFlags.types.${flag.flagType}`)}>
+                                                            {getTypeIcon(flag.flagType)}
+                                                        </Tooltip>
                                                         {isStale(flag) && (
                                                             <Tooltip title={t('featureFlags.staleWarning')}>
                                                                 <WarningIcon sx={{ fontSize: 16, color: 'warning.main' }} />
@@ -591,9 +614,6 @@ const FeatureFlagsPage: React.FC = () => {
                                                         )}
                                                     </Box>
                                                 </TableCell>
-                                                <TableCell>
-                                                    <Chip label={t(`featureFlags.types.${flag.flagType}`)} size="small" color={getTypeColor(flag.flagType)} />
-                                                </TableCell>
                                                 {environments.map(env => {
                                                     const isEnabled = getEnvEnabled(flag, env.environment);
                                                     const tooltipText = `${t('featureFlags.toggleTooltip', { env: env.displayName })}\n${isEnabled ? t('featureFlags.toggleTooltipEnabled') : t('featureFlags.toggleTooltipDisabled')}`;
@@ -625,6 +645,15 @@ const FeatureFlagsPage: React.FC = () => {
                                                     <Tooltip title={formatDateTimeDetailed(flag.createdAt)}>
                                                         <span>{formatRelativeTime(flag.createdAt)}</span>
                                                     </Tooltip>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {flag.lastSeenAt ? (
+                                                        <Tooltip title={formatDateTimeDetailed(flag.lastSeenAt)}>
+                                                            <span>{formatRelativeTime(flag.lastSeenAt)}</span>
+                                                        </Tooltip>
+                                                    ) : (
+                                                        <Typography variant="body2" color="text.secondary">-</Typography>
+                                                    )}
                                                 </TableCell>
                                                 <TableCell>
                                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -690,20 +719,17 @@ const FeatureFlagsPage: React.FC = () => {
                 message={t('featureFlags.deleteConfirmMessage', { name: deletingFlag?.flagName || '' })}
             />
 
-            {/* Create Feature Flag Dialog */}
-            <Dialog
+            {/* Create Feature Flag Drawer */}
+            <ResizableDrawer
                 open={createDialogOpen}
                 onClose={() => setCreateDialogOpen(false)}
-                maxWidth="sm"
-                fullWidth
-                PaperProps={{ sx: { borderRadius: 2 } }}
+                title={t('featureFlags.createFlag')}
+                subtitle={t('featureFlags.createFlagSubtitle')}
+                storageKey="featureFlagCreateDrawerWidth"
+                defaultWidth={500}
             >
-                <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <FlagIcon color="primary" />
-                    {t('featureFlags.createFlag')}
-                </DialogTitle>
-                <DialogContent>
-                    <Stack spacing={3} sx={{ mt: 1 }}>
+                <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
+                    <Stack spacing={3}>
                         {/* Flag Name */}
                         <TextField
                             fullWidth
@@ -715,77 +741,88 @@ const FeatureFlagsPage: React.FC = () => {
                             inputProps={{ maxLength: 100 }}
                         />
 
+                        {/* Display Name */}
+                        <TextField
+                            fullWidth
+                            label={t('featureFlags.displayName')}
+                            value={newFlag.displayName || ''}
+                            onChange={(e) => setNewFlag({ ...newFlag, displayName: e.target.value })}
+                            helperText={t('featureFlags.displayNameHelp')}
+                        />
+
                         {/* Description */}
                         <TextField
                             fullWidth
                             multiline
-                            rows={2}
+                            rows={3}
                             label={t('featureFlags.description')}
-                            placeholder={t('featureFlags.descriptionPlaceholder')}
                             value={newFlag.description}
                             onChange={(e) => setNewFlag({ ...newFlag, description: e.target.value })}
+                            helperText={t('featureFlags.descriptionHelp')}
                         />
 
-                        {/* Chips row: Tags, Flag Type, Impression Data */}
-                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
-                            {/* Tags */}
-                            <Autocomplete
-                                multiple
-                                size="small"
-                                options={allTags.map(tag => tag.name)}
-                                value={newFlag.tags}
-                                onChange={(_, newValue) => setNewFlag({ ...newFlag, tags: newValue })}
-                                renderInput={(params) => (
-                                    <TextField {...params} label={t('featureFlags.tags')} sx={{ minWidth: 150 }} />
-                                )}
-                                renderTags={(value, getTagProps) =>
-                                    value.map((option, index) => {
-                                        const tag = allTags.find(t => t.name === option);
-                                        return (
-                                            <Chip
-                                                {...getTagProps({ index })}
-                                                key={option}
-                                                label={option}
-                                                size="small"
-                                                sx={{
-                                                    bgcolor: tag?.color || '#888',
-                                                    color: getContrastColor(tag?.color || '#888'),
-                                                }}
-                                            />
-                                        );
-                                    })
-                                }
-                                sx={{ flex: 1, minWidth: 150 }}
-                            />
+                        {/* Flag Type */}
+                        <FormControl fullWidth>
+                            <InputLabel>{t('featureFlags.flagType')}</InputLabel>
+                            <Select
+                                value={newFlag.flagType}
+                                label={t('featureFlags.flagType')}
+                                onChange={(e) => setNewFlag({ ...newFlag, flagType: e.target.value as FlagType })}
+                            >
+                                <MenuItem value="release">{t('featureFlags.types.release')}</MenuItem>
+                                <MenuItem value="experiment">{t('featureFlags.types.experiment')}</MenuItem>
+                                <MenuItem value="operational">{t('featureFlags.types.operational')}</MenuItem>
+                                <MenuItem value="permission">{t('featureFlags.types.permission')}</MenuItem>
+                            </Select>
+                        </FormControl>
 
-                            {/* Flag Type */}
-                            <FormControl size="small" sx={{ minWidth: 120 }}>
-                                <InputLabel>{t('featureFlags.flagType')}</InputLabel>
-                                <Select
-                                    value={newFlag.flagType}
-                                    label={t('featureFlags.flagType')}
-                                    onChange={(e) => setNewFlag({ ...newFlag, flagType: e.target.value as FlagType })}
-                                >
-                                    <MenuItem value="release">{t('featureFlags.types.release')}</MenuItem>
-                                    <MenuItem value="experiment">{t('featureFlags.types.experiment')}</MenuItem>
-                                    <MenuItem value="operational">{t('featureFlags.types.operational')}</MenuItem>
-                                    <MenuItem value="permission">{t('featureFlags.types.permission')}</MenuItem>
-                                </Select>
-                            </FormControl>
-
-                            {/* Impression Data */}
-                            <Chip
-                                icon={<FlagIcon fontSize="small" />}
-                                label={newFlag.impressionDataEnabled ? t('featureFlags.impressionDataOn') : t('featureFlags.impressionDataOff')}
-                                variant={newFlag.impressionDataEnabled ? 'filled' : 'outlined'}
-                                color={newFlag.impressionDataEnabled ? 'primary' : 'default'}
-                                onClick={() => setNewFlag({ ...newFlag, impressionDataEnabled: !newFlag.impressionDataEnabled })}
-                                sx={{ cursor: 'pointer' }}
-                            />
+                        {/* Impression Data */}
+                        <Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <Typography variant="body2">{t('featureFlags.impressionData')}</Typography>
+                                <Switch
+                                    checked={newFlag.impressionDataEnabled}
+                                    onChange={(e) => setNewFlag({ ...newFlag, impressionDataEnabled: e.target.checked })}
+                                />
+                            </Box>
+                            <Typography variant="caption" color="text.secondary">
+                                {t('featureFlags.impressionDataHelp')}
+                            </Typography>
                         </Box>
+
+                        {/* Tags */}
+                        <Autocomplete
+                            multiple
+                            size="small"
+                            options={allTags.map(tag => tag.name)}
+                            value={newFlag.tags}
+                            onChange={(_, newValue) => setNewFlag({ ...newFlag, tags: newValue })}
+                            renderInput={(params) => (
+                                <TextField {...params} label={t('featureFlags.tags')} placeholder={t('featureFlags.selectTags')} helperText={t('featureFlags.tagsHelp')} />
+                            )}
+                            renderTags={(value, getTagProps) =>
+                                value.map((option, index) => {
+                                    const tag = allTags.find(t => t.name === option);
+                                    return (
+                                        <Chip
+                                            {...getTagProps({ index })}
+                                            key={option}
+                                            label={option}
+                                            size="small"
+                                            sx={{
+                                                bgcolor: tag?.color || '#888',
+                                                color: getContrastColor(tag?.color || '#888'),
+                                            }}
+                                        />
+                                    );
+                                })
+                            }
+                        />
                     </Stack>
-                </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2 }}>
+                </Box>
+
+                {/* Footer Actions */}
+                <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider', display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                     <Button onClick={() => setCreateDialogOpen(false)} disabled={creating}>
                         {t('common.cancel')}
                     </Button>
@@ -797,8 +834,8 @@ const FeatureFlagsPage: React.FC = () => {
                     >
                         {t('featureFlags.createFlag')}
                     </Button>
-                </DialogActions>
-            </Dialog>
+                </Box>
+            </ResizableDrawer>
         </Box>
     );
 };

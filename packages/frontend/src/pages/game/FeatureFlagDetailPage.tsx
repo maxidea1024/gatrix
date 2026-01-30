@@ -73,6 +73,10 @@ import {
     Abc as StringIcon,
     Numbers as NumberIcon,
     DataObject as JsonIcon,
+    RocketLaunch as ReleaseIcon,
+    Science as ExperimentIcon,
+    Build as OperationalIcon,
+    Security as PermissionIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { PERMISSIONS } from '../../types/permissions';
@@ -183,6 +187,18 @@ const FLAG_TYPES = [
     { value: 'operational', labelKey: 'featureFlags.types.operational' },
     { value: 'permission', labelKey: 'featureFlags.types.permission' },
 ];
+
+// Get icon for flag type
+const getTypeIcon = (type: string, size: number = 16) => {
+    const iconProps = { sx: { fontSize: size } };
+    switch (type) {
+        case 'release': return <ReleaseIcon {...iconProps} color="primary" />;
+        case 'experiment': return <ExperimentIcon {...iconProps} color="secondary" />;
+        case 'operational': return <OperationalIcon {...iconProps} color="warning" />;
+        case 'permission': return <PermissionIcon {...iconProps} color="action" />;
+        default: return null;
+    }
+};
 
 // ==================== Components ====================
 
@@ -1042,15 +1058,21 @@ const FeatureFlagDetailPage: React.FC = () => {
                                             >
                                                 {FLAG_TYPES.map(type => (
                                                     <MenuItem key={type.value} value={type.value}>
-                                                        {t(type.labelKey)}
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                            {getTypeIcon(type.value)}
+                                                            {t(type.labelKey)}
+                                                        </Box>
                                                     </MenuItem>
                                                 ))}
                                             </Select>
                                         </FormControl>
                                     ) : (
-                                        <Typography variant="body2">
-                                            {t(`featureFlags.types.${flag.flagType}`)}
-                                        </Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            {getTypeIcon(flag.flagType)}
+                                            <Typography variant="body2">
+                                                {t(`featureFlags.types.${flag.flagType}`)}
+                                            </Typography>
+                                        </Box>
                                     )}
                                 </Box>
 
@@ -1889,6 +1911,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                 open={editFlagDialogOpen}
                 onClose={() => setEditFlagDialogOpen(false)}
                 title={t('featureFlags.editFlagSettings')}
+                subtitle={t('featureFlags.editFlagSettingsSubtitle')}
                 storageKey="featureFlagEditDrawerWidth"
                 defaultWidth={500}
             >
@@ -1902,6 +1925,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     label={t('featureFlags.flagName')}
                                     value={flag?.flagName || ''}
                                     InputProps={{ readOnly: true }}
+                                    helperText={t('featureFlags.flagNameHelp')}
                                     sx={{
                                         '& .MuiInputBase-input': {
                                             color: 'text.secondary',
@@ -1914,6 +1938,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     label={t('featureFlags.displayName')}
                                     value={editingFlagData.displayName}
                                     onChange={(e) => setEditingFlagData({ ...editingFlagData, displayName: e.target.value })}
+                                    helperText={t('featureFlags.displayNameHelp')}
                                 />
                                 <TextField
                                     fullWidth
@@ -1922,16 +1947,22 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     label={t('featureFlags.description')}
                                     value={editingFlagData.description}
                                     onChange={(e) => setEditingFlagData({ ...editingFlagData, description: e.target.value })}
+                                    helperText={t('featureFlags.descriptionHelp')}
                                 />
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            checked={editingFlagData.impressionDataEnabled}
-                                            onChange={(e) => setEditingFlagData({ ...editingFlagData, impressionDataEnabled: e.target.checked })}
-                                        />
-                                    }
-                                    label={t('featureFlags.impressionData')}
-                                />
+                                <Box>
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={editingFlagData.impressionDataEnabled}
+                                                onChange={(e) => setEditingFlagData({ ...editingFlagData, impressionDataEnabled: e.target.checked })}
+                                            />
+                                        }
+                                        label={t('featureFlags.impressionData')}
+                                    />
+                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', ml: 6 }}>
+                                        {t('featureFlags.impressionDataHelp')}
+                                    </Typography>
+                                </Box>
                                 <Autocomplete
                                     multiple
                                     size="small"
@@ -1939,7 +1970,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     value={editingFlagData.tags || []}
                                     onChange={(_, newValue) => setEditingFlagData({ ...editingFlagData, tags: newValue })}
                                     renderInput={(params) => (
-                                        <TextField {...params} label={t('featureFlags.tags')} placeholder={t('featureFlags.selectTags')} />
+                                        <TextField {...params} label={t('featureFlags.tags')} placeholder={t('featureFlags.selectTags')} helperText={t('featureFlags.tagsHelp')} />
                                     )}
                                     renderTags={(value, getTagProps) =>
                                         value.map((option, index) => {
