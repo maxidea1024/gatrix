@@ -1896,6 +1896,19 @@ const FeatureFlagDetailPage: React.FC = () => {
                     <>
                         <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
                             <Stack spacing={3}>
+                                {/* Flag Name (read-only) */}
+                                <TextField
+                                    fullWidth
+                                    label={t('featureFlags.flagName')}
+                                    value={flag?.flagName || ''}
+                                    InputProps={{ readOnly: true }}
+                                    sx={{
+                                        '& .MuiInputBase-input': {
+                                            color: 'text.secondary',
+                                            cursor: 'default'
+                                        }
+                                    }}
+                                />
                                 <TextField
                                     fullWidth
                                     label={t('featureFlags.displayName')}
