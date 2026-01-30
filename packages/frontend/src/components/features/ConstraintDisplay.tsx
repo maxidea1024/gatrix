@@ -4,7 +4,6 @@
  */
 import React from 'react';
 import { Box, Typography, Chip, Paper, Stack, Tooltip } from '@mui/material';
-import { FilterList as ConstraintIcon } from '@mui/icons-material';
 import { formatDateTime } from '../../utils/dateFormat';
 
 export interface ConstraintValue {
@@ -27,6 +26,7 @@ interface ConstraintDisplayProps {
     constraint: ConstraintValue;
     compact?: boolean;
     contextFields?: ContextFieldInfo[];
+    noBorder?: boolean;
 }
 
 // Get operator display label
@@ -76,7 +76,7 @@ const isDateOperator = (op: string): boolean => {
 /**
  * Single constraint display row - Unleash style
  */
-export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint, compact = false, contextFields = [] }) => {
+export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint, compact = false, contextFields = [], noBorder = false }) => {
 
     // Find context field info for tooltip (ensure contextFields is an array)
     const fieldsArray = Array.isArray(contextFields) ? contextFields : [];
@@ -152,19 +152,15 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1.5,
-                px: 2,
-                py: 1.25,
-                border: 1,
+                px: noBorder ? 0 : 2,
+                py: noBorder ? 0 : 1.25,
+                border: noBorder ? 0 : 1,
                 borderColor: 'divider',
-                borderRadius: 6,
-                bgcolor: 'action.hover',
+                borderRadius: noBorder ? 0 : 6,
+                bgcolor: noBorder ? 'transparent' : 'action.hover',
                 flexWrap: 'wrap',
             }}
         >
-            {/* Constraint icon */}
-            <Tooltip title="Constraint condition">
-                <ConstraintIcon sx={{ fontSize: 18, color: 'text.secondary', flexShrink: 0 }} />
-            </Tooltip>
 
             {/* Context Name - Bold text with tooltip for description */}
             <Tooltip title={contextFieldDescription} arrow placement="top" disableHoverListener={!contextFieldDescription}>

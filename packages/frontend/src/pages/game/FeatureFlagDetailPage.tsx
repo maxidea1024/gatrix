@@ -1557,15 +1557,17 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                                 </Box>
                                                                             )}
 
-                                                                            {/* Constraints Section - Individual constraints without box */}
+                                                                            {/* Constraints Section - Individual constraints with outer box, no inner box */}
                                                                             {strategy.constraints && strategy.constraints.length > 0 && strategy.constraints.map((constraint: ConstraintValue, cIdx: number) => (
                                                                                 <Box key={cIdx} sx={{ position: 'relative' }}>
-                                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 1 }}>
-                                                                                        <Typography variant="body2" color="warning.main" sx={{ fontWeight: 600, minWidth: 80 }}>
-                                                                                            {t('featureFlags.constraint')}
-                                                                                        </Typography>
-                                                                                        <ConstraintDisplay constraint={constraint} contextFields={contextFields} />
-                                                                                    </Box>
+                                                                                    <Paper variant="outlined" sx={{ p: 1.5 }}>
+                                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                                            <Typography variant="body2" color="warning.main" sx={{ fontWeight: 600, minWidth: 80 }}>
+                                                                                                {t('featureFlags.constraint')}
+                                                                                            </Typography>
+                                                                                            <ConstraintDisplay constraint={constraint} contextFields={contextFields} noBorder />
+                                                                                        </Box>
+                                                                                    </Paper>
                                                                                     {/* AND marker after constraint */}
                                                                                     {cIdx < strategy.constraints.length - 1 && (
                                                                                         <Box sx={{ display: 'flex', alignItems: 'center', ml: 2, my: -0.5, position: 'relative', zIndex: 2 }}>
