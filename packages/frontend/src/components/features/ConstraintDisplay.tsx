@@ -260,10 +260,10 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                             sx={{
                                 height: 22,
                                 fontSize: '0.75rem',
-                                fontWeight: 600,
-                                bgcolor: 'action.hover',
+                                fontWeight: 500,
+                                bgcolor: 'action.selected',
                                 color: 'text.primary',
-                                borderRadius: '12px !important',
+                                borderRadius: '16px',
                                 '& .MuiChip-label': {
                                     px: 1.25,
                                 },
@@ -278,10 +278,10 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({ constraint
                     sx={{
                         height: 22,
                         fontSize: '0.75rem',
-                        fontWeight: 600,
-                        bgcolor: 'action.hover',
+                        fontWeight: 500,
+                        bgcolor: 'action.selected',
                         color: 'text.primary',
-                        borderRadius: '12px !important',
+                        borderRadius: '16px',
                         '& .MuiChip-label': {
                             px: 1.25,
                         },
@@ -319,27 +319,27 @@ export const ConstraintList: React.FC<ConstraintListProps> = ({ constraints, tit
             )}
             {constraints.map((c, i) => (
                 <React.Fragment key={i}>
-                    <ConstraintDisplay constraint={c} contextFields={contextFields} />
-                    {i < constraints.length - 1 && (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.5 }}>
+                    {i > 0 && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', ml: 1, my: -0.5, position: 'relative', zIndex: 2 }}>
                             <Chip
                                 label="AND"
                                 size="small"
-                                variant="outlined"
                                 sx={{
-                                    height: 20,
-                                    fontSize: '0.65rem',
-                                    borderColor: 'divider',
+                                    height: 18,
+                                    fontSize: '0.6rem',
+                                    fontWeight: 700,
+                                    bgcolor: 'background.paper',
                                     color: 'text.secondary',
-                                    fontWeight: 600,
-                                    borderRadius: 2,
+                                    border: 1,
+                                    borderColor: 'divider',
                                     '& .MuiChip-label': {
-                                        px: 1,
+                                        px: 0.75,
                                     },
                                 }}
                             />
                         </Box>
                     )}
+                    <ConstraintDisplay constraint={c} contextFields={contextFields} />
                 </React.Fragment>
             ))}
         </Stack>

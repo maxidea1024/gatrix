@@ -46,6 +46,7 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
+    Collapse,
 } from '@mui/material';
 import {
     ArrowBack as ArrowBackIcon,
@@ -81,7 +82,7 @@ import { parseApiErrorMessage } from '../../utils/errorUtils';
 import api from '../../services/api';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import ConstraintEditor, { Constraint, ContextField } from '../../components/features/ConstraintEditor';
-import { ConstraintList } from '../../components/features/ConstraintDisplay';
+import { ConstraintList, ConstraintDisplay, ConstraintValue } from '../../components/features/ConstraintDisplay';
 import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
@@ -241,7 +242,8 @@ const FeatureFlagDetailPage: React.FC = () => {
     const [editingVariant, setEditingVariant] = useState<Variant | null>(null);
     const [contextFields, setContextFields] = useState<ContextField[]>([]);
     const [segments, setSegments] = useState<any[]>([]);
-    const [expandedSegments, setExpandedSegments] = useState<Set<string>>(new Set());
+    const [expandedSegments, setExpandedSegments] = useState<Set<string>>(new Set()); // For environment cards
+    const [expandedSegmentsDialog, setExpandedSegmentsDialog] = useState<Set<string>>(new Set()); // For strategy editor dialog
     const [expandedConstraints, setExpandedConstraints] = useState<Set<string>>(new Set());
     const [allTags, setAllTags] = useState<Tag[]>([]);
     const [originalFlag, setOriginalFlag] = useState<FeatureFlag | null>(null);
@@ -736,6 +738,7 @@ const FeatureFlagDetailPage: React.FC = () => {
             setEditingStrategy(null);
             setEditingEnv(null);
             setIsAddingStrategy(false);
+            setExpandedSegmentsDialog(new Set()); // Reset dialog-specific segment expansion
             enqueueSnackbar(t('common.saveSuccess'), { variant: 'success' });
         } catch (error: any) {
             enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), { variant: 'error' });
@@ -1435,359 +1438,260 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                             </Box>
                                                                         </Box>
 
-                                                                        {/* Strategy Body */}
-                                                                        <Box sx={{ p: 2 }}>
-                                                                            {/* Segments */}
+                                                                        {/* Strategy Body - Clean Layout */}
+                                                                        <Box sx={{ px: 2, pt: 2, pb: 2 }}>
+                                                                            {/* Segments Section */}
                                                                             {strategy.segments && strategy.segments.length > 0 && (
-                                                                                <Box sx={{ mb: 1.5 }}>
-                                                                                    <Box
-                                                                                        sx={{
-                                                                                            display: 'inline-flex',
-                                                                                            alignItems: 'center',
-                                                                                            gap: 1,
-                                                                                            px: 1.5,
-                                                                                            py: 0.75,
-                                                                                            border: 1,
-                                                                                            borderColor: 'divider',
-                                                                                            borderRadius: '4px',
-                                                                                            flexWrap: 'wrap',
-                                                                                        }}
-                                                                                    >
-                                                                                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                                                                                            {t('featureFlags.segment')}
-                                                                                        </Typography>
-                                                                                        {strategy.segments.map((segmentName: string) => {
-                                                                                            const segmentData = segments.find(s => s.segmentName === segmentName);
-                                                                                            const isExpanded = expandedSegments.has(segmentName);
-                                                                                            return (
-                                                                                                <Chip
-                                                                                                    key={segmentName}
-                                                                                                    label={segmentData?.displayName || segmentName}
-                                                                                                    size="small"
-                                                                                                    onClick={() => {
-                                                                                                        const newSet = new Set(expandedSegments);
-                                                                                                        if (isExpanded) {
-                                                                                                            newSet.delete(segmentName);
-                                                                                                        } else {
-                                                                                                            newSet.add(segmentName);
-                                                                                                        }
-                                                                                                        setExpandedSegments(newSet);
-                                                                                                    }}
-                                                                                                    sx={{
-                                                                                                        bgcolor: 'primary.main',
-                                                                                                        color: 'primary.contrastText',
-                                                                                                        fontWeight: 500,
-                                                                                                        cursor: 'pointer',
-                                                                                                        '&:hover': { bgcolor: 'primary.dark' },
-                                                                                                    }}
-                                                                                                />
-                                                                                            );
-                                                                                        })}
-                                                                                    </Box>
-                                                                                    {/* Segment preview (expanded) */}
-                                                                                    {strategy.segments.map((segmentName: string) => {
+                                                                                <Box>
+                                                                                    {strategy.segments.map((segmentName: string, segIdx: number) => {
                                                                                         const segmentData = segments.find(s => s.segmentName === segmentName);
-                                                                                        if (!expandedSegments.has(segmentName) || !segmentData) return null;
+                                                                                        const isExpanded = expandedSegments.has(segmentName);
                                                                                         return (
-                                                                                            <Paper
-                                                                                                key={`preview-${segmentName}`}
-                                                                                                variant="outlined"
-                                                                                                sx={{
-                                                                                                    p: 1.5,
-                                                                                                    mt: 1,
-                                                                                                    bgcolor: 'action.hover',
-                                                                                                    borderColor: 'primary.light',
-                                                                                                }}
-                                                                                            >
-                                                                                                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>
-                                                                                                    {segmentData.displayName || segmentName}
-                                                                                                </Typography>
-                                                                                                {segmentData.description && (
-                                                                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                                                                                                        {segmentData.description}
-                                                                                                    </Typography>
+                                                                                            <Box key={segmentName} sx={{ position: 'relative' }}>
+                                                                                                {/* Segment Box */}
+                                                                                                <Paper
+                                                                                                    variant="outlined"
+                                                                                                    sx={{
+                                                                                                        p: 1.5,
+                                                                                                        bgcolor: 'background.paper',
+                                                                                                    }}
+                                                                                                >
+                                                                                                    {/* Segment Header */}
+                                                                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                                                            <Typography variant="body2" color="primary.main" sx={{ fontWeight: 600, minWidth: 80 }}>
+                                                                                                                {t('featureFlags.segment')}
+                                                                                                            </Typography>
+                                                                                                            <Chip
+                                                                                                                label={segmentData?.displayName || segmentName}
+                                                                                                                size="small"
+                                                                                                                sx={{
+                                                                                                                    bgcolor: 'action.selected',
+                                                                                                                    color: 'text.primary',
+                                                                                                                    fontWeight: 500,
+                                                                                                                    borderRadius: '16px',
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </Box>
+                                                                                                        <Button
+                                                                                                            variant="outlined"
+                                                                                                            size="small"
+                                                                                                            onClick={() => {
+                                                                                                                const newSet = new Set(expandedSegments);
+                                                                                                                if (isExpanded) {
+                                                                                                                    newSet.delete(segmentName);
+                                                                                                                } else {
+                                                                                                                    newSet.add(segmentName);
+                                                                                                                }
+                                                                                                                setExpandedSegments(newSet);
+                                                                                                            }}
+                                                                                                            sx={{ textTransform: 'none', fontWeight: 500, minWidth: 70 }}
+                                                                                                        >
+                                                                                                            {isExpanded ? t('featureFlags.hide') : t('featureFlags.preview')}
+                                                                                                        </Button>
+                                                                                                    </Box>
+                                                                                                    {/* Segment Preview (inside the box) with animation */}
+                                                                                                    <Collapse in={isExpanded && !!segmentData} timeout={200}>
+                                                                                                        <Box sx={{ mt: 1.5, pt: 1.5, borderTop: 1, borderColor: 'divider' }}>
+                                                                                                            <Typography variant="body2" fontWeight={600} sx={{ mb: 0.5 }}>
+                                                                                                                {segmentData?.displayName || segmentName}
+                                                                                                            </Typography>
+                                                                                                            {segmentData?.description && (
+                                                                                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                                                                                                                    {segmentData.description}
+                                                                                                                </Typography>
+                                                                                                            )}
+                                                                                                            <Box sx={{ pl: 2 }}>
+                                                                                                                <ConstraintList
+                                                                                                                    constraints={segmentData?.constraints || []}
+                                                                                                                    contextFields={contextFields}
+                                                                                                                />
+                                                                                                            </Box>
+                                                                                                        </Box>
+                                                                                                    </Collapse>
+                                                                                                </Paper>
+                                                                                                {/* AND marker after segment */}
+                                                                                                {segIdx < strategy.segments.length - 1 && (
+                                                                                                    <Box sx={{ display: 'flex', alignItems: 'center', ml: 2, my: -0.5, position: 'relative', zIndex: 2 }}>
+                                                                                                        <Chip label="AND" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, bgcolor: 'background.paper', color: 'text.secondary', border: 1, borderColor: 'divider' }} />
+                                                                                                    </Box>
                                                                                                 )}
-                                                                                                <ConstraintList
-                                                                                                    constraints={segmentData.constraints || []}
-                                                                                                    contextFields={contextFields}
-                                                                                                />
-                                                                                            </Paper>
+                                                                                            </Box>
                                                                                         );
                                                                                     })}
                                                                                 </Box>
                                                                             )}
 
-                                                                            {/* AND divider (between segments and rollout) */}
-                                                                            {strategy.segments && strategy.segments.length > 0 && strategy.parameters?.rollout !== undefined && (
-                                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 1 }}>
-                                                                                    <Box
-                                                                                        sx={{
-                                                                                            px: 1,
-                                                                                            py: 0.25,
-                                                                                            border: 1,
-                                                                                            borderColor: 'divider',
-                                                                                            borderRadius: '4px',
-                                                                                            bgcolor: 'background.paper',
-                                                                                        }}
-                                                                                    >
-                                                                                        <Typography variant="caption" fontWeight={600}>AND</Typography>
-                                                                                    </Box>
+                                                                            {/* AND marker between segments and constraints */}
+                                                                            {strategy.segments && strategy.segments.length > 0 && strategy.constraints && strategy.constraints.length > 0 && (
+                                                                                <Box sx={{ display: 'flex', alignItems: 'center', ml: 2, my: -0.5, position: 'relative', zIndex: 2 }}>
+                                                                                    <Chip label="AND" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, bgcolor: 'background.paper', color: 'text.secondary', border: 1, borderColor: 'divider' }} />
                                                                                 </Box>
                                                                             )}
+
+                                                                            {/* Constraints Section - Each constraint as individual box */}
+                                                                            {strategy.constraints && strategy.constraints.length > 0 && strategy.constraints.map((constraint: ConstraintValue, cIdx: number) => (
+                                                                                <Box key={cIdx} sx={{ position: 'relative' }}>
+                                                                                    <Paper variant="outlined" sx={{ p: 1.5 }}>
+                                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                                            <Typography variant="body2" color="warning.main" sx={{ fontWeight: 600, minWidth: 80 }}>
+                                                                                                {t('featureFlags.constraint')}
+                                                                                            </Typography>
+                                                                                            <ConstraintDisplay constraint={constraint} contextFields={contextFields} />
+                                                                                        </Box>
+                                                                                    </Paper>
+                                                                                    {/* AND marker after constraint */}
+                                                                                    {cIdx < strategy.constraints.length - 1 && (
+                                                                                        <Box sx={{ display: 'flex', alignItems: 'center', ml: 2, my: -0.5, position: 'relative', zIndex: 2 }}>
+                                                                                            <Chip label="AND" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, bgcolor: 'background.paper', color: 'text.secondary', border: 1, borderColor: 'divider' }} />
+                                                                                        </Box>
+                                                                                    )}
+                                                                                </Box>
+                                                                            ))}
+
+                                                                            {/* AND marker before rollout */}
+                                                                            {((strategy.segments && strategy.segments.length > 0) || (strategy.constraints && strategy.constraints.length > 0)) &&
+                                                                                (strategy.name === 'flexibleRollout' || strategy.name === 'gradualRolloutRandom' || strategy.name === 'gradualRolloutUserId') &&
+                                                                                strategy.parameters?.rollout !== undefined && (
+                                                                                    <Box sx={{ display: 'flex', alignItems: 'center', ml: 2, my: -0.5, position: 'relative', zIndex: 2 }}>
+                                                                                        <Chip label="AND" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, bgcolor: 'background.paper', color: 'text.secondary', border: 1, borderColor: 'divider' }} />
+                                                                                    </Box>
+                                                                                )}
+
+                                                                            {/* Rollout % Section */}
+                                                                            {(strategy.name === 'flexibleRollout' || strategy.name === 'gradualRolloutRandom' || strategy.name === 'gradualRolloutUserId') && strategy.parameters?.rollout !== undefined && (
+                                                                                <Box sx={{ mb: 1.5 }}>
+                                                                                    <Paper variant="outlined" sx={{ p: 1.5 }}>
+                                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                                            <Typography variant="body2" color="info.main" sx={{ fontWeight: 600 }}>
+                                                                                                {t('featureFlags.rollout')}
+                                                                                            </Typography>
+                                                                                            <Chip
+                                                                                                label={`${strategy.parameters.rollout}%`}
+                                                                                                size="small"
+                                                                                                sx={{ bgcolor: 'action.selected', fontWeight: 600 }}
+                                                                                            />
+                                                                                            <Typography variant="body2" color="text.secondary">
+                                                                                                {t('featureFlags.ofYourBaseMatching')}
+                                                                                            </Typography>
+                                                                                        </Box>
+                                                                                    </Paper>
+                                                                                </Box>
+                                                                            )}
+
+                                                                            {/* AND marker before userIds */}
+                                                                            {((strategy.segments && strategy.segments.length > 0) || (strategy.constraints && strategy.constraints.length > 0)) &&
+                                                                                strategy.name === 'userWithId' && strategy.parameters?.userIds?.length > 0 && (
+                                                                                    <Box sx={{ display: 'flex', alignItems: 'center', ml: 2, my: -0.5, position: 'relative', zIndex: 2 }}>
+                                                                                        <Chip label="AND" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, bgcolor: 'background.paper', color: 'text.secondary', border: 1, borderColor: 'divider' }} />
+                                                                                    </Box>
+                                                                                )}
 
                                                                             {/* User IDs for userWithId strategy */}
                                                                             {strategy.name === 'userWithId' && strategy.parameters?.userIds?.length > 0 && (
                                                                                 <Box sx={{ mb: 1.5 }}>
-                                                                                    <Box
-                                                                                        sx={{
-                                                                                            display: 'inline-flex',
-                                                                                            alignItems: 'center',
-                                                                                            gap: 1,
-                                                                                            px: 1.5,
-                                                                                            py: 0.75,
-                                                                                            border: 1,
-                                                                                            borderColor: 'divider',
-                                                                                            borderRadius: '4px',
-                                                                                            flexWrap: 'wrap',
-                                                                                        }}
-                                                                                    >
-                                                                                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                                                                                            {t('featureFlags.userIds')}
-                                                                                        </Typography>
-                                                                                        {strategy.parameters.userIds.map((userId: string) => (
-                                                                                            <Chip
-                                                                                                key={userId}
-                                                                                                label={userId}
-                                                                                                size="small"
-                                                                                                sx={{
-                                                                                                    bgcolor: 'primary.main',
-                                                                                                    color: 'primary.contrastText',
-                                                                                                    fontWeight: 500,
-                                                                                                }}
-                                                                                            />
-                                                                                        ))}
-                                                                                    </Box>
+                                                                                    <Paper variant="outlined" sx={{ p: 1.5 }}>
+                                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+                                                                                            <Typography variant="body2" color="warning.main" sx={{ fontWeight: 600, minWidth: 80 }}>
+                                                                                                {t('featureFlags.userIds')}
+                                                                                            </Typography>
+                                                                                            {strategy.parameters.userIds.map((userId: string) => (
+                                                                                                <Chip key={userId} label={userId} size="small" sx={{ bgcolor: 'action.selected', color: 'text.primary', fontWeight: 500, borderRadius: '16px' }} />
+                                                                                            ))}
+                                                                                        </Box>
+                                                                                    </Paper>
                                                                                 </Box>
                                                                             )}
+
+                                                                            {/* AND marker before IPs */}
+                                                                            {((strategy.segments && strategy.segments.length > 0) || (strategy.constraints && strategy.constraints.length > 0)) &&
+                                                                                strategy.name === 'remoteAddress' && strategy.parameters?.IPs?.length > 0 && (
+                                                                                    <Box sx={{ display: 'flex', alignItems: 'center', ml: 2, my: -0.5, position: 'relative', zIndex: 2 }}>
+                                                                                        <Chip label="AND" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, bgcolor: 'background.paper', color: 'text.secondary', border: 1, borderColor: 'divider' }} />
+                                                                                    </Box>
+                                                                                )}
 
                                                                             {/* IP Addresses for remoteAddress strategy */}
                                                                             {strategy.name === 'remoteAddress' && strategy.parameters?.IPs?.length > 0 && (
                                                                                 <Box sx={{ mb: 1.5 }}>
-                                                                                    <Box
-                                                                                        sx={{
-                                                                                            display: 'inline-flex',
-                                                                                            alignItems: 'center',
-                                                                                            gap: 1,
-                                                                                            px: 1.5,
-                                                                                            py: 0.75,
-                                                                                            border: 1,
-                                                                                            borderColor: 'divider',
-                                                                                            borderRadius: '4px',
-                                                                                            flexWrap: 'wrap',
-                                                                                        }}
-                                                                                    >
-                                                                                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                                                                                            {t('featureFlags.remoteAddresses')}
-                                                                                        </Typography>
-                                                                                        {strategy.parameters.IPs.map((ip: string) => (
-                                                                                            <Chip
-                                                                                                key={ip}
-                                                                                                label={ip}
-                                                                                                size="small"
-                                                                                                sx={{
-                                                                                                    bgcolor: 'warning.main',
-                                                                                                    color: 'warning.contrastText',
-                                                                                                    fontWeight: 500,
-                                                                                                }}
-                                                                                            />
-                                                                                        ))}
-                                                                                    </Box>
+                                                                                    <Paper variant="outlined" sx={{ p: 1.5 }}>
+                                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+                                                                                            <Typography variant="body2" color="warning.main" sx={{ fontWeight: 600, minWidth: 80 }}>
+                                                                                                {t('featureFlags.remoteAddresses')}
+                                                                                            </Typography>
+                                                                                            {strategy.parameters.IPs.map((ip: string) => (
+                                                                                                <Chip key={ip} label={ip} size="small" sx={{ bgcolor: 'action.selected', color: 'text.primary', fontWeight: 500, borderRadius: '16px' }} />
+                                                                                            ))}
+                                                                                        </Box>
+                                                                                    </Paper>
                                                                                 </Box>
                                                                             )}
+
+                                                                            {/* AND marker before hostnames */}
+                                                                            {((strategy.segments && strategy.segments.length > 0) || (strategy.constraints && strategy.constraints.length > 0)) &&
+                                                                                strategy.name === 'applicationHostname' && strategy.parameters?.hostNames?.length > 0 && (
+                                                                                    <Box sx={{ display: 'flex', alignItems: 'center', ml: 2, my: -0.5, position: 'relative', zIndex: 2 }}>
+                                                                                        <Chip label="AND" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, bgcolor: 'background.paper', color: 'text.secondary', border: 1, borderColor: 'divider' }} />
+                                                                                    </Box>
+                                                                                )}
 
                                                                             {/* Hostnames for applicationHostname strategy */}
                                                                             {strategy.name === 'applicationHostname' && strategy.parameters?.hostNames?.length > 0 && (
                                                                                 <Box sx={{ mb: 1.5 }}>
-                                                                                    <Box
-                                                                                        sx={{
-                                                                                            display: 'inline-flex',
-                                                                                            alignItems: 'center',
-                                                                                            gap: 1,
-                                                                                            px: 1.5,
-                                                                                            py: 0.75,
-                                                                                            border: 1,
-                                                                                            borderColor: 'divider',
-                                                                                            borderRadius: '4px',
-                                                                                            flexWrap: 'wrap',
-                                                                                        }}
-                                                                                    >
-                                                                                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                                                                                            {t('featureFlags.hostnames')}
-                                                                                        </Typography>
-                                                                                        {strategy.parameters.hostNames.map((hostname: string) => (
-                                                                                            <Chip
-                                                                                                key={hostname}
-                                                                                                label={hostname}
-                                                                                                size="small"
-                                                                                                sx={{
-                                                                                                    bgcolor: 'info.main',
-                                                                                                    color: 'info.contrastText',
-                                                                                                    fontWeight: 500,
-                                                                                                }}
-                                                                                            />
-                                                                                        ))}
-                                                                                    </Box>
-                                                                                </Box>
-                                                                            )}
-
-                                                                            {/* Rollout % - only for rollout strategies */}
-                                                                            {(strategy.name === 'flexibleRollout' || strategy.name === 'gradualRolloutRandom' || strategy.name === 'gradualRolloutUserId') && strategy.parameters?.rollout !== undefined && (
-                                                                                <Box sx={{ mb: 1.5 }}>
-                                                                                    <Box
-                                                                                        sx={{
-                                                                                            display: 'inline-flex',
-                                                                                            alignItems: 'center',
-                                                                                            gap: 2,
-                                                                                            px: 1.5,
-                                                                                            py: 0.75,
-                                                                                            border: 1,
-                                                                                            borderColor: 'divider',
-                                                                                            borderRadius: '4px',
-                                                                                        }}
-                                                                                    >
-                                                                                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                                                                                            {t('featureFlags.rollout')}
-                                                                                        </Typography>
-                                                                                        <Chip
-                                                                                            label={`${strategy.parameters.rollout}%`}
-                                                                                            size="small"
-                                                                                            sx={{
-                                                                                                bgcolor: 'action.selected',
-                                                                                                fontWeight: 600,
-                                                                                                height: 24,
-                                                                                            }}
-                                                                                        />
-                                                                                        <Typography variant="body2" color="text.secondary">
-                                                                                            {t('featureFlags.ofYourBase')}
-                                                                                        </Typography>
-                                                                                    </Box>
-                                                                                </Box>
-                                                                            )}
-
-                                                                            {/* AND divider (between strategy parameters and constraints) */}
-                                                                            {strategy.constraints && strategy.constraints.length > 0 && (
-                                                                                // Show AND if there are segments, userIds, IPs, hostNames, or rollout
-                                                                                (strategy.segments?.length > 0 ||
-                                                                                    strategy.name === 'userWithId' && strategy.parameters?.userIds?.length > 0 ||
-                                                                                    strategy.name === 'remoteAddress' && strategy.parameters?.IPs?.length > 0 ||
-                                                                                    strategy.name === 'applicationHostname' && strategy.parameters?.hostNames?.length > 0 ||
-                                                                                    (strategy.name === 'flexibleRollout' || strategy.name === 'gradualRolloutRandom' || strategy.name === 'gradualRolloutUserId') && strategy.parameters?.rollout !== undefined
-                                                                                ) && (
-                                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 1 }}>
-                                                                                        <Box
-                                                                                            sx={{
-                                                                                                px: 1,
-                                                                                                py: 0.25,
-                                                                                                border: 1,
-                                                                                                borderColor: 'divider',
-                                                                                                borderRadius: '4px',
-                                                                                                bgcolor: 'background.paper',
-                                                                                            }}
-                                                                                        >
-                                                                                            <Typography variant="caption" fontWeight={600}>AND</Typography>
+                                                                                    <Paper variant="outlined" sx={{ p: 1.5 }}>
+                                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+                                                                                            <Typography variant="body2" color="warning.main" sx={{ fontWeight: 600, minWidth: 80 }}>
+                                                                                                {t('featureFlags.hostnames')}
+                                                                                            </Typography>
+                                                                                            {strategy.parameters.hostNames.map((hostname: string) => (
+                                                                                                <Chip key={hostname} label={hostname} size="small" sx={{ bgcolor: 'action.selected', color: 'text.primary', fontWeight: 500, borderRadius: '16px' }} />
+                                                                                            ))}
                                                                                         </Box>
-                                                                                    </Box>
-                                                                                )
+                                                                                    </Paper>
+                                                                                </Box>
                                                                             )}
-
-                                                                            {/* Constraints */}
-                                                                            {strategy.constraints && strategy.constraints.length > 0 && (() => {
-                                                                                const constraintKey = `${strategy.id || index}-constraints`;
-                                                                                const isExpanded = expandedConstraints.has(constraintKey);
-                                                                                return (
-                                                                                    <Box sx={{ mb: 1.5 }}>
-                                                                                        <Chip
-                                                                                            label={`+${strategy.constraints.length} ${t('featureFlags.constraint')}`}
-                                                                                            size="small"
-                                                                                            onClick={() => {
-                                                                                                const newSet = new Set(expandedConstraints);
-                                                                                                if (isExpanded) {
-                                                                                                    newSet.delete(constraintKey);
-                                                                                                } else {
-                                                                                                    newSet.add(constraintKey);
-                                                                                                }
-                                                                                                setExpandedConstraints(newSet);
-                                                                                            }}
-                                                                                            sx={{
-                                                                                                bgcolor: isExpanded ? 'warning.main' : 'warning.light',
-                                                                                                color: isExpanded ? 'warning.contrastText' : 'warning.dark',
-                                                                                                fontWeight: 500,
-                                                                                                cursor: 'pointer',
-                                                                                                '&:hover': { bgcolor: 'warning.main', color: 'warning.contrastText' },
-                                                                                            }}
-                                                                                        />
-                                                                                        {isExpanded && (
-                                                                                            <Paper
-                                                                                                variant="outlined"
-                                                                                                sx={{
-                                                                                                    p: 1.5,
-                                                                                                    mt: 1,
-                                                                                                    bgcolor: 'action.hover',
-                                                                                                    borderColor: 'warning.light',
-                                                                                                }}
-                                                                                            >
-                                                                                                <ConstraintList
-                                                                                                    constraints={strategy.constraints}
-                                                                                                    contextFields={contextFields}
-                                                                                                />
-                                                                                            </Paper>
-                                                                                        )}
-                                                                                    </Box>
-                                                                                );
-                                                                            })()}
 
                                                                             {/* Variants Bar */}
                                                                             {strategy.variants && strategy.variants.length > 0 && (
-                                                                                <Box
-                                                                                    sx={{
-                                                                                        mt: 1.5,
-                                                                                        p: 1.5,
-                                                                                        border: 1,
-                                                                                        borderColor: 'divider',
-                                                                                        borderRadius: '4px',
-                                                                                    }}
-                                                                                >
-                                                                                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500, mb: 0.5 }}>
-                                                                                        {t('featureFlags.variants')} ({strategy.variants.length})
-                                                                                    </Typography>
-                                                                                    <Box sx={{ height: 24, display: 'flex', borderRadius: '4px', overflow: 'hidden', bgcolor: 'grey.300' }}>
-                                                                                        {strategy.variants.map((variant, vIdx) => {
-                                                                                            const colors = ['#7C4DFF', '#448AFF', '#00BFA5', '#FF6D00', '#FF4081', '#536DFE'];
-                                                                                            return (
-                                                                                                <Tooltip key={vIdx} title={`${variant.name}: ${variant.weight}%`}>
-                                                                                                    <Box
-                                                                                                        sx={{
-                                                                                                            width: `${variant.weight}%`,
-                                                                                                            bgcolor: colors[vIdx % colors.length],
-                                                                                                            display: 'flex',
-                                                                                                            alignItems: 'center',
-                                                                                                            justifyContent: 'center',
-                                                                                                            color: 'white',
-                                                                                                            fontSize: '0.75rem',
-                                                                                                            fontWeight: 500,
-                                                                                                        }}
-                                                                                                    >
-                                                                                                        {variant.weight > 20 && (
-                                                                                                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1.2 }}>
-                                                                                                                <span style={{ fontSize: '0.65rem' }}>{variant.weight}%</span>
-                                                                                                                <span>{variant.name}</span>
-                                                                                                            </Box>
-                                                                                                        )}
-                                                                                                    </Box>
-                                                                                                </Tooltip>
-                                                                                            );
-                                                                                        })}
-                                                                                    </Box>
+                                                                                <Box sx={{ mb: 1 }}>
+                                                                                    <Paper variant="outlined" sx={{ p: 1.5 }}>
+                                                                                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500, mb: 0.5 }}>
+                                                                                            {t('featureFlags.variants')} ({strategy.variants.length})
+                                                                                        </Typography>
+                                                                                        <Box sx={{
+                                                                                            height: 28,
+                                                                                            display: 'flex',
+                                                                                            overflow: 'hidden',
+                                                                                        }}>
+                                                                                            {strategy.variants.map((variant, vIdx) => {
+                                                                                                const colors = ['#5E35B1', '#1E88E5', '#00897B', '#F4511E', '#D81B60', '#3949AB'];
+                                                                                                return (
+                                                                                                    <Tooltip key={vIdx} title={`${variant.name}: ${variant.weight}%`}>
+                                                                                                        <Box
+                                                                                                            sx={{
+                                                                                                                width: `${variant.weight}%`,
+                                                                                                                bgcolor: colors[vIdx % colors.length],
+                                                                                                                display: 'flex',
+                                                                                                                alignItems: 'center',
+                                                                                                                justifyContent: 'center',
+                                                                                                                color: 'white',
+                                                                                                                fontSize: '0.75rem',
+                                                                                                                fontWeight: 600,
+                                                                                                                textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            {variant.weight > 15 && (
+                                                                                                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1.2 }}>
+                                                                                                                    <span style={{ fontSize: '0.65rem' }}>{variant.weight}%</span>
+                                                                                                                    <span>{variant.name}</span>
+                                                                                                                </Box>
+                                                                                                            )}
+                                                                                                        </Box>
+                                                                                                    </Tooltip>
+                                                                                                );
+                                                                                            })}
+                                                                                        </Box>
+                                                                                    </Paper>
                                                                                 </Box>
                                                                             )}
                                                                         </Box>
@@ -2303,7 +2207,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                 <IconButton
                                                                     size="small"
                                                                     onClick={() => {
-                                                                        setExpandedSegments(prev => {
+                                                                        setExpandedSegmentsDialog(prev => {
                                                                             const next = new Set(prev);
                                                                             if (next.has(segmentName)) {
                                                                                 next.delete(segmentName);
@@ -2314,7 +2218,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                         });
                                                                     }}
                                                                 >
-                                                                    {expandedSegments.has(segmentName) ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                                                                    {expandedSegmentsDialog.has(segmentName) ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                                                                 </IconButton>
                                                             </Box>
                                                             {segment.description && (
@@ -2322,7 +2226,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                     {segment.description}
                                                                 </Typography>
                                                             )}
-                                                            {expandedSegments.has(segmentName) && segment.constraints && segment.constraints.length > 0 && (
+                                                            {expandedSegmentsDialog.has(segmentName) && segment.constraints && segment.constraints.length > 0 && (
                                                                 <Box sx={{ pl: 1, borderLeft: 2, borderColor: 'primary.main' }}>
                                                                     <ConstraintList
                                                                         constraints={segment.constraints}
@@ -2330,7 +2234,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                     />
                                                                 </Box>
                                                             )}
-                                                            {expandedSegments.has(segmentName) && (!segment.constraints || segment.constraints.length === 0) && (
+                                                            {expandedSegmentsDialog.has(segmentName) && (!segment.constraints || segment.constraints.length === 0) && (
                                                                 <Typography variant="caption" color="text.secondary">
                                                                     {t('featureFlags.noConstraintsInSegment')}
                                                                 </Typography>
@@ -2346,7 +2250,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     {(editingStrategy.segments?.length || 0) > 0 && (
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <Divider sx={{ flex: 1 }} />
-                                            <Chip label="AND" size="small" variant="outlined" />
+                                            <Chip label="AND" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700, bgcolor: 'background.paper', color: 'text.secondary', border: 1, borderColor: 'divider' }} />
                                             <Divider sx={{ flex: 1 }} />
                                         </Box>
                                     )}
@@ -2641,13 +2545,15 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                         {/* Footer */}
                         <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider', display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                            <Button onClick={() => setStrategyDialogOpen(false)}>{t('common.cancel')}</Button>
+                            <Button onClick={() => { setStrategyDialogOpen(false); setExpandedSegmentsDialog(new Set()); }}>{t('common.cancel')}</Button>
                             <Button
                                 variant="contained"
                                 onClick={handleSaveStrategy}
                                 disabled={(() => {
-                                    // When editing, require changes to be made
-                                    if (!isAddingStrategy && JSON.stringify(editingStrategy) === JSON.stringify(originalEditingStrategy)) {
+                                    // When editing, require changes to be made (check both strategy and variantType)
+                                    const strategyUnchanged = JSON.stringify(editingStrategy) === JSON.stringify(originalEditingStrategy);
+                                    const variantTypeUnchanged = flag?.variantType === originalFlag?.variantType;
+                                    if (!isAddingStrategy && strategyUnchanged && variantTypeUnchanged) {
                                         return true;
                                     }
                                     // Disable if any JSON errors

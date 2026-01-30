@@ -157,11 +157,23 @@ router.delete(
 
 // ==================== Feature Flags ====================
 
+// Helper function to validate environment
+const requireEnvironment = (req: AuthenticatedRequest, res: Response): string | null => {
+    const environment = req.environment;
+    if (!environment) {
+        res.status(400).json({ success: false, error: 'Environment is required (x-environment header)' });
+        return null;
+    }
+    return environment;
+};
+
 // List feature flags
 router.get(
     '/',
     asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment;
+        const environment = requireEnvironment(req, res);
+        if (!environment) return;
+
         const { search, flagType, isEnabled, isArchived, tags, page, limit, sortBy, sortOrder } = req.query;
 
         const result = await featureFlagService.listFlags({
@@ -185,7 +197,9 @@ router.get(
 router.post(
     '/',
     asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment;
+        const environment = requireEnvironment(req, res);
+        if (!environment) return;
+
         const userId = req.user?.id;
 
         const flag = await featureFlagService.createFlag(
@@ -201,11 +215,8 @@ router.post(
 router.get(
     '/:flagName',
     asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment;
-
-        if (!environment) {
-            return res.status(400).json({ success: false, error: 'Environment is required (x-environment header)' });
-        }
+        const environment = requireEnvironment(req, res);
+        if (!environment) return;
 
         const flag = await featureFlagService.getFlag(environment, req.params.flagName);
 
@@ -221,7 +232,9 @@ router.get(
 router.put(
     '/:flagName',
     asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment;
+        const environment = requireEnvironment(req, res);
+        if (!environment) return;
+
         const userId = req.user?.id;
 
         const flag = await featureFlagService.updateFlag(
@@ -259,7 +272,9 @@ router.post(
 router.post(
     '/:flagName/archive',
     asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment;
+        const environment = requireEnvironment(req, res);
+        if (!environment) return;
+
         const userId = req.user?.id;
 
         const flag = await featureFlagService.archiveFlag(
@@ -276,7 +291,9 @@ router.post(
 router.post(
     '/:flagName/revive',
     asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment;
+        const environment = requireEnvironment(req, res);
+        if (!environment) return;
+
         const userId = req.user?.id;
 
         const flag = await featureFlagService.reviveFlag(
@@ -293,7 +310,9 @@ router.post(
 router.delete(
     '/:flagName',
     asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment;
+        const environment = requireEnvironment(req, res);
+        if (!environment) return;
+
         const userId = req.user?.id;
 
         await featureFlagService.deleteFlag(
@@ -312,7 +331,9 @@ router.delete(
 router.post(
     '/:flagName/strategies',
     asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment;
+        const environment = requireEnvironment(req, res);
+        if (!environment) return;
+
         const userId = req.user?.id;
 
         const strategy = await featureFlagService.addStrategy(
@@ -330,7 +351,9 @@ router.post(
 router.put(
     '/:flagName/strategies',
     asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment;
+        const environment = requireEnvironment(req, res);
+        if (!environment) return;
+
         const userId = req.user?.id;
 
         const strategies = await featureFlagService.updateStrategies(
@@ -378,7 +401,9 @@ router.delete(
 router.put(
     '/:flagName/variants',
     asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment;
+        const environment = requireEnvironment(req, res);
+        if (!environment) return;
+
         const userId = req.user?.id;
 
         const variants = await featureFlagService.updateVariants(
@@ -399,7 +424,9 @@ router.put(
 router.get(
     '/:flagName/metrics',
     asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-        const environment = req.environment;
+        const environment = requireEnvironment(req, res);
+        if (!environment) return;
+
         const { startDate, endDate } = req.query;
 
         const metrics = await featureFlagService.getMetrics(
