@@ -32,6 +32,7 @@ import {
     Autocomplete,
     Stack,
     CircularProgress,
+    Checkbox,
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -87,6 +88,7 @@ const FeatureFlagsPage: React.FC = () => {
     const [allTags, setAllTags] = useState<Tag[]>([]);
     const [flagTypes, setFlagTypes] = useState<FlagTypeInfo[]>([]);
     const [environments, setEnvironments] = useState<Environment[]>([]);
+    const [selectedFlags, setSelectedFlags] = useState<Set<string>>(new Set());
 
     // Create dialog state
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -465,6 +467,20 @@ const FeatureFlagsPage: React.FC = () => {
                                 <Table>
                                     <TableHead>
                                         <TableRow>
+                                            <TableCell padding="checkbox" sx={{ width: 48 }}>
+                                                <Checkbox
+                                                    indeterminate={selectedFlags.size > 0 && selectedFlags.size < flags.length}
+                                                    checked={flags.length > 0 && selectedFlags.size === flags.length}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setSelectedFlags(new Set(flags.map(f => f.flagName)));
+                                                        } else {
+                                                            setSelectedFlags(new Set());
+                                                        }
+                                                    }}
+                                                    size="small"
+                                                />
+                                            </TableCell>
                                             <TableCell>
                                                 <TableSortLabel active={orderBy === 'flagName'} direction={orderBy === 'flagName' ? order : 'asc'} onClick={() => handleSort('flagName')}>
                                                     {t('featureFlags.flagName')}
@@ -508,10 +524,27 @@ const FeatureFlagsPage: React.FC = () => {
                                             <TableRow
                                                 key={flag.id}
                                                 hover
+                                                selected={selectedFlags.has(flag.flagName)}
                                                 sx={{
                                                     ...(flag.isArchived ? { opacity: 0.6 } : {})
                                                 }}
                                             >
+                                                <TableCell padding="checkbox">
+                                                    <Checkbox
+                                                        checked={selectedFlags.has(flag.flagName)}
+                                                        onChange={(e) => {
+                                                            const newSelected = new Set(selectedFlags);
+                                                            if (e.target.checked) {
+                                                                newSelected.add(flag.flagName);
+                                                            } else {
+                                                                newSelected.delete(flag.flagName);
+                                                            }
+                                                            setSelectedFlags(newSelected);
+                                                        }}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        size="small"
+                                                    />
+                                                </TableCell>
                                                 <TableCell>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                         {isStale(flag) && (
