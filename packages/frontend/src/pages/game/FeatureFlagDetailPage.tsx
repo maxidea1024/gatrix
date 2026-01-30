@@ -587,12 +587,25 @@ const FeatureFlagDetailPage: React.FC = () => {
     // Helper function to add a new variant with auto weight distribution
     const addVariantWithAutoDistribution = () => {
         const currentVariants = editingStrategy?.variants || [];
+        const lastVariant = currentVariants[currentVariants.length - 1];
+        const variantType = flag?.variantType || 'string';
+
+        // Determine default payload value based on type and existing variants
+        let defaultPayload: { type: string; value: string } | undefined = undefined;
+        if (lastVariant?.payload?.value !== undefined) {
+            // Copy last variant's payload
+            defaultPayload = { type: lastVariant.payload.type || 'string', value: String(lastVariant.payload.value) };
+        } else if (variantType === 'number') {
+            // Default to '0' for number type
+            defaultPayload = { type: 'string', value: '0' };
+        }
+
         const newVariant: Variant = {
             name: `variant-${currentVariants.length + 1}`,
             weight: 0, // Will be recalculated
             weightLock: false,
             stickiness: 'default',
-            payload: undefined,
+            payload: defaultPayload,
         };
         const updatedVariants = distributeWeights([...currentVariants, newVariant]);
         setEditingStrategy({
@@ -2426,8 +2439,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                     // Use flag's variantType for all variants
                                                     const payloadType = flag?.variantType || 'string';
                                                     const hasJsonError = strategyJsonErrors[index] !== undefined && strategyJsonErrors[index] !== null;
+                                                    const colors = ['#7C4DFF', '#448AFF', '#00BFA5', '#FF6D00', '#FF4081', '#536DFE'];
+                                                    const variantColor = colors[index % colors.length];
                                                     return (
-                                                        <Paper key={index} variant="outlined" sx={{ p: 2 }}>
+                                                        <Paper key={index} variant="outlined" sx={{ p: 2, borderLeft: 4, borderLeftColor: variantColor }}>
                                                             {/* Row 1: Name, Fixed Weight Checkbox, Weight, Delete */}
                                                             <Grid container spacing={2} alignItems="center">
                                                                 <Grid size={4}>
