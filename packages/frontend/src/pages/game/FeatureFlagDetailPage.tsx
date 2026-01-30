@@ -92,6 +92,7 @@ import JsonEditor from '../../components/common/JsonEditor';
 import EmptyState from '../../components/common/EmptyState';
 import { environmentService, Environment } from '../../services/environmentService';
 import FeatureSwitch from '../../components/common/FeatureSwitch';
+import FeatureFlagMetrics from '../../components/features/FeatureFlagMetrics';
 
 // ==================== Types ====================
 
@@ -155,6 +156,7 @@ interface FeatureFlag {
     lastSeenAt?: string;
     archivedAt?: string;
     createdBy?: number;
+    createdByName?: string;
     updatedBy?: number;
     createdAt: string;
     updatedAt?: string;
@@ -781,11 +783,25 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     // Variant handlers (simplified)
     const handleAddVariant = () => {
+        const variants = flag?.variants || [];
+        const lastVariant = variants[variants.length - 1];
+        const variantType = flag?.variantType || 'string';
+
+        // Determine default value based on type and existing variants
+        let defaultValue = '';
+        if (lastVariant?.payload?.value !== undefined) {
+            // Copy last variant's value
+            defaultValue = String(lastVariant.payload.value);
+        } else if (variantType === 'number') {
+            // Default to '0' for number type
+            defaultValue = '0';
+        }
+
         setEditingVariant({
             name: '',
             weight: 50,
             stickiness: 'userId',
-            payload: { type: flag?.variantType === 'json' ? 'json' : 'string', value: '' },
+            payload: { type: variantType === 'json' ? 'json' : 'string', value: defaultValue },
         });
         setVariantDialogOpen(true);
     };
@@ -949,6 +965,18 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         </Typography>
                                     )}
                                 </Box>
+
+                                {/* Created By */}
+                                {flag.createdByName && (
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {t('featureFlags.createdBy')}
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            {flag.createdByName}
+                                        </Typography>
+                                    </Box>
+                                )}
 
                                 {/* Created At */}
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -1529,17 +1557,15 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                                 </Box>
                                                                             )}
 
-                                                                            {/* Constraints Section - Each constraint as individual box */}
+                                                                            {/* Constraints Section - Individual constraints without box */}
                                                                             {strategy.constraints && strategy.constraints.length > 0 && strategy.constraints.map((constraint: ConstraintValue, cIdx: number) => (
                                                                                 <Box key={cIdx} sx={{ position: 'relative' }}>
-                                                                                    <Paper variant="outlined" sx={{ p: 1.5 }}>
-                                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                                                            <Typography variant="body2" color="warning.main" sx={{ fontWeight: 600, minWidth: 80 }}>
-                                                                                                {t('featureFlags.constraint')}
-                                                                                            </Typography>
-                                                                                            <ConstraintDisplay constraint={constraint} contextFields={contextFields} />
-                                                                                        </Box>
-                                                                                    </Paper>
+                                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 1 }}>
+                                                                                        <Typography variant="body2" color="warning.main" sx={{ fontWeight: 600, minWidth: 80 }}>
+                                                                                            {t('featureFlags.constraint')}
+                                                                                        </Typography>
+                                                                                        <ConstraintDisplay constraint={constraint} contextFields={contextFields} />
+                                                                                    </Box>
                                                                                     {/* AND marker after constraint */}
                                                                                     {cIdx < strategy.constraints.length - 1 && (
                                                                                         <Box sx={{ display: 'flex', alignItems: 'center', ml: 2, my: -0.5, position: 'relative', zIndex: 2 }}>
@@ -1563,7 +1589,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                                 <Box sx={{ mb: 1.5 }}>
                                                                                     <Paper variant="outlined" sx={{ p: 1.5 }}>
                                                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                                                            <Typography variant="body2" color="info.main" sx={{ fontWeight: 600 }}>
+                                                                                            <Typography variant="body2" color="info.main" sx={{ fontWeight: 600, minWidth: 80 }}>
                                                                                                 {t('featureFlags.rollout')}
                                                                                             </Typography>
                                                                                             <Chip
@@ -1727,7 +1753,11 @@ const FeatureFlagDetailPage: React.FC = () => {
 
             {/* Metrics Tab */}
             <TabPanel value={tabValue} index={1}>
-                <Alert severity="info">{t('featureFlags.metricsComingSoon')}</Alert>
+                <FeatureFlagMetrics
+                    flagName={flag.flagName}
+                    environments={(flag.environments || []).map(e => ({ environment: e.environment, isEnabled: e.isEnabled }))}
+                    currentEnvironment={flag.environments?.[0]?.environment || 'production'}
+                />
             </TabPanel>
 
             {/* Delete Confirmation Dialog */}
@@ -2004,7 +2034,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     {editingStrategy.name === 'userWithId' && (
                                         <Paper variant="outlined" sx={{ p: 2 }}>
                                             <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                {t('featureFlags.userIds')}
+                                                {t('featureFlags.userIds')} <Typography component="span" color="error.main">*</Typography>
                                                 <Tooltip title={t('featureFlags.userIdsTooltip')}>
                                                     <HelpOutlineIcon fontSize="small" color="action" />
                                                 </Tooltip>
@@ -2022,6 +2052,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                     <TextField
                                                         {...params}
                                                         size="small"
+                                                        required
+                                                        error={!(editingStrategy.parameters?.userIds?.length > 0)}
                                                         placeholder={t('featureFlags.userIdsPlaceholder')}
                                                         helperText={t('featureFlags.userIdsHelp')}
                                                     />
@@ -2044,7 +2076,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     {editingStrategy.name === 'remoteAddress' && (
                                         <Paper variant="outlined" sx={{ p: 2 }}>
                                             <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                {t('featureFlags.remoteAddresses')}
+                                                {t('featureFlags.remoteAddresses')} <Typography component="span" color="error.main">*</Typography>
                                                 <Tooltip title={t('featureFlags.remoteAddressesTooltip')}>
                                                     <HelpOutlineIcon fontSize="small" color="action" />
                                                 </Tooltip>
@@ -2062,6 +2094,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                     <TextField
                                                         {...params}
                                                         size="small"
+                                                        required
+                                                        error={!(editingStrategy.parameters?.IPs?.length > 0)}
                                                         placeholder={t('featureFlags.remoteAddressesPlaceholder')}
                                                         helperText={t('featureFlags.remoteAddressesHelp')}
                                                     />
@@ -2084,7 +2118,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     {editingStrategy.name === 'applicationHostname' && (
                                         <Paper variant="outlined" sx={{ p: 2 }}>
                                             <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                {t('featureFlags.hostnames')}
+                                                {t('featureFlags.hostnames')} <Typography component="span" color="error.main">*</Typography>
                                                 <Tooltip title={t('featureFlags.hostnamesTooltip')}>
                                                     <HelpOutlineIcon fontSize="small" color="action" />
                                                 </Tooltip>
@@ -2102,6 +2136,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                     <TextField
                                                         {...params}
                                                         size="small"
+                                                        required
+                                                        error={!(editingStrategy.parameters?.hostNames?.length > 0)}
                                                         placeholder={t('featureFlags.hostnamesPlaceholder')}
                                                         helperText={t('featureFlags.hostnamesHelp')}
                                                     />
@@ -2335,17 +2371,10 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                                     {/* Variants List */}
                                     <Box>
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                                        <Box sx={{ mb: 2 }}>
                                             <Typography variant="subtitle2">
                                                 {t('featureFlags.variants')} ({editingStrategy.variants?.length || 0})
                                             </Typography>
-                                            <Button
-                                                size="small"
-                                                startIcon={<AddIcon />}
-                                                onClick={addVariantWithAutoDistribution}
-                                            >
-                                                {t('featureFlags.addVariant')}
-                                            </Button>
                                         </Box>
 
                                         {(!editingStrategy.variants || editingStrategy.variants.length === 0) ? (
@@ -2536,6 +2565,17 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                     }
                                                     return null;
                                                 })()}
+
+                                                {/* Add Variant Button at bottom */}
+                                                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                                    <Button
+                                                        size="small"
+                                                        startIcon={<AddIcon />}
+                                                        onClick={addVariantWithAutoDistribution}
+                                                    >
+                                                        {t('featureFlags.addVariant')}
+                                                    </Button>
+                                                </Box>
                                             </Stack>
                                         )}
                                     </Box>

@@ -57,6 +57,7 @@ export interface FeatureFlagAttributes {
     links?: { url: string; title?: string }[];
     variantType?: 'string' | 'number' | 'json';
     createdBy: number;
+    createdByName?: string; // Joined from g_users
     updatedBy?: number;
     createdAt?: Date;
     updatedAt?: Date;
@@ -269,9 +270,14 @@ export class FeatureFlagModel {
      */
     static async findByName(environment: string, flagName: string): Promise<(FeatureFlagAttributes & { isEnabled: boolean }) | null> {
         try {
-            // Get global flag
-            const flag = await db('g_feature_flags')
-                .where('flagName', flagName)
+            // Get global flag with creator name
+            const flag = await db('g_feature_flags as f')
+                .select(
+                    'f.*',
+                    'creator.name as createdByName',
+                )
+                .leftJoin('g_users as creator', 'f.createdBy', 'creator.id')
+                .where('f.flagName', flagName)
                 .first();
 
             if (!flag) return null;
@@ -313,7 +319,14 @@ export class FeatureFlagModel {
 
     static async findById(id: string, environment?: string): Promise<FeatureFlagAttributes | null> {
         try {
-            const flag = await db('g_feature_flags').where('id', id).first();
+            const flag = await db('g_feature_flags as f')
+                .select(
+                    'f.*',
+                    'creator.name as createdByName',
+                )
+                .leftJoin('g_users as creator', 'f.createdBy', 'creator.id')
+                .where('f.id', id)
+                .first();
             if (!flag) return null;
 
             let envSettings = null;
