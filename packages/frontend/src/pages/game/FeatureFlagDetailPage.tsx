@@ -8,7 +8,7 @@
  * Tabs: Overview, Metrics, Settings, Event Log
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
     Box,
     Card,
@@ -243,6 +243,7 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({ id, childre
 const FeatureFlagDetailPage: React.FC = () => {
     const { flagName } = useParams<{ flagName: string }>();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { t } = useTranslation();
     const { enqueueSnackbar } = useSnackbar();
     const { hasPermission } = useAuth();
@@ -253,6 +254,20 @@ const FeatureFlagDetailPage: React.FC = () => {
     const generateDefaultFlagName = () => {
         const timestamp = Date.now().toString(36).slice(-4);
         return `new-feature-${timestamp}`;
+    };
+
+    // Get tab from URL query parameter, default to 0 (overview)
+    const tabParam = searchParams.get('tab');
+    const tabValue = tabParam === 'metrics' ? 1 : 0;
+
+    const setTabValue = (newValue: number) => {
+        const newParams = new URLSearchParams(searchParams);
+        if (newValue === 1) {
+            newParams.set('tab', 'metrics');
+        } else {
+            newParams.delete('tab');
+        }
+        setSearchParams(newParams, { replace: true });
     };
 
     // State
@@ -274,7 +289,6 @@ const FeatureFlagDetailPage: React.FC = () => {
     } : null);
     const [loading, setLoading] = useState(!isCreating);
     const [saving, setSaving] = useState(false);
-    const [tabValue, setTabValue] = useState(0);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [strategyDialogOpen, setStrategyDialogOpen] = useState(false);
     const [strategyTabValue, setStrategyTabValue] = useState(0);

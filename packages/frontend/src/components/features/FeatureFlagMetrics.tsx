@@ -76,8 +76,10 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     const { t } = useTranslation();
     const theme = useTheme();
 
-    // Multi-select environments - default to current environment
-    const [selectedEnvs, setSelectedEnvs] = useState<string[]>([currentEnvironment]);
+    // Multi-select environments - default to all environments
+    const [selectedEnvs, setSelectedEnvs] = useState<string[]>(
+        environments.map(e => e.environment)
+    );
     const [period, setPeriod] = useState<PeriodOption>('48h');
     const [metrics, setMetrics] = useState<MetricsBucket[]>([]);
     const [loading, setLoading] = useState(false);
