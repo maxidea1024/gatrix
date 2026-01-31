@@ -164,6 +164,31 @@ async function main() {
     });
     logger.info('Service registered with ID', { instanceId, hostname, internalAddress, externalAddress });
 
+    // Auto-evaluate feature flags periodically to generate metrics
+    const AUTO_EVAL_INTERVAL = 10000; // 10 seconds
+    const autoEvalInterval = setInterval(() => {
+      const flags = sdk.featureFlag.getCached(targetEnvironment);
+      let evalCount = 0;
+      for (const flag of flags) {
+        // Evaluate each flag with a random user
+        const userId = `auto-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+        sdk.featureFlag.evaluate(flag.name, { userId }, targetEnvironment);
+        evalCount++;
+      }
+      logger.debug('Auto-evaluated feature flags', { count: evalCount, environment: targetEnvironment });
+    }, AUTO_EVAL_INTERVAL);
+
+    // Clean up interval on shutdown
+    const originalShutdown = handleShutdown;
+    const handleShutdownWithCleanup = async () => {
+      clearInterval(autoEvalInterval);
+      await originalShutdown();
+    };
+    metricsServer.app.post('/shutdown', async (_req, res) => {
+      res.json({ success: true, message: 'Shutting down...' });
+      await handleShutdownWithCleanup();
+    });
+
     // Listen to SDK events
     logger.info('Setting up event listeners...');
 
