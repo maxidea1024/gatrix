@@ -8,7 +8,6 @@ import {
     Box,
     Paper,
     Typography,
-    ToggleButtonGroup,
     ToggleButton,
     FormControl,
     Select,
@@ -77,14 +76,15 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     const { t } = useTranslation();
     const theme = useTheme();
 
-    const [selectedEnv, setSelectedEnv] = useState<string>(currentEnvironment);
+    // Multi-select environments - default to current environment
+    const [selectedEnvs, setSelectedEnvs] = useState<string[]>([currentEnvironment]);
     const [period, setPeriod] = useState<PeriodOption>('48h');
     const [metrics, setMetrics] = useState<MetricsBucket[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const fetchMetrics = useCallback(async () => {
-        if (!flagName || !selectedEnv) return;
+        if (!flagName || selectedEnvs.length === 0) return;
 
         setLoading(true);
         setError(null);
@@ -95,36 +95,48 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
             const endDate = new Date();
             const startDate = new Date(endDate.getTime() - hours * 60 * 60 * 1000);
 
-            const response = await api.get<{ metrics: MetricsBucket[] }>(
-                `/admin/features/${flagName}/metrics`,
-                {
-                    params: {
-                        startDate: startDate.toISOString(),
-                        endDate: endDate.toISOString(),
-                    },
-                    headers: {
-                        'x-environment': selectedEnv,
-                    },
-                }
+            // Fetch metrics from all selected environments in parallel
+            const metricsPromises = selectedEnvs.map(env =>
+                api.get<{ metrics: MetricsBucket[] }>(
+                    `/admin/features/${flagName}/metrics`,
+                    {
+                        params: {
+                            startDate: startDate.toISOString(),
+                            endDate: endDate.toISOString(),
+                        },
+                        headers: {
+                            'x-environment': env,
+                        },
+                    }
+                ).then(response =>
+                    (response.data.metrics || []).map(m => ({ ...m, environment: env }))
+                )
             );
 
-            setMetrics(response.data.metrics || []);
+            const allMetrics = await Promise.all(metricsPromises);
+            setMetrics(allMetrics.flat());
         } catch (err) {
             console.error('Failed to fetch metrics:', err);
             setError(t('featureFlags.metrics.loadFailed'));
         } finally {
             setLoading(false);
         }
-    }, [flagName, selectedEnv, period, t]);
+    }, [flagName, selectedEnvs, period, t]);
 
     useEffect(() => {
         fetchMetrics();
     }, [fetchMetrics]);
 
-    const handleEnvChange = (_event: React.MouseEvent<HTMLElement>, newEnv: string | null) => {
-        if (newEnv) {
-            setSelectedEnv(newEnv);
-        }
+    // Toggle environment selection (multi-select)
+    const handleEnvToggle = (env: string) => {
+        setSelectedEnvs(prev => {
+            if (prev.includes(env)) {
+                // Don't allow deselecting all environments
+                if (prev.length === 1) return prev;
+                return prev.filter(e => e !== env);
+            }
+            return [...prev, env];
+        });
     };
 
     const handlePeriodChange = (event: SelectChangeEvent<PeriodOption>) => {
@@ -278,32 +290,35 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
                         {t('featureFlags.metrics.environments')}
                     </Typography>
-                    <ToggleButtonGroup
-                        value={selectedEnv}
-                        exclusive
-                        onChange={handleEnvChange}
-                        size="small"
-                    >
-                        {environments.map((env) => (
-                            <ToggleButton
-                                key={env.environment}
-                                value={env.environment}
-                                sx={{
-                                    textTransform: 'none',
-                                    px: 2,
-                                    '&.Mui-selected': {
-                                        bgcolor: theme.palette.primary.main,
-                                        color: theme.palette.primary.contrastText,
-                                        '&:hover': {
-                                            bgcolor: theme.palette.primary.dark,
+                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                        {environments.map((env) => {
+                            const isSelected = selectedEnvs.includes(env.environment);
+                            return (
+                                <ToggleButton
+                                    key={env.environment}
+                                    value={env.environment}
+                                    selected={isSelected}
+                                    onClick={() => handleEnvToggle(env.environment)}
+                                    size="small"
+                                    sx={{
+                                        textTransform: 'none',
+                                        px: 2,
+                                        borderRadius: 1,
+                                        border: `1px solid ${theme.palette.divider}`,
+                                        '&.Mui-selected': {
+                                            bgcolor: theme.palette.primary.main,
+                                            color: theme.palette.primary.contrastText,
+                                            '&:hover': {
+                                                bgcolor: theme.palette.primary.dark,
+                                            },
                                         },
-                                    },
-                                }}
-                            >
-                                {env.environment}
-                            </ToggleButton>
-                        ))}
-                    </ToggleButtonGroup>
+                                    }}
+                                >
+                                    {env.environment}
+                                </ToggleButton>
+                            );
+                        })}
+                    </Box>
                 </Paper>
 
                 {/* Period Selector */}
