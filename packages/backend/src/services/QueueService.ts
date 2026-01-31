@@ -43,6 +43,10 @@ export class QueueService {
       await this.createQueue('cleanup', this.processCleanupJob.bind(this));
       await this.createQueue('scheduler', this.processSchedulerJob.bind(this));
 
+      // Initialize feature metrics queue
+      const { featureMetricsService } = await import('./FeatureMetricsService');
+      await featureMetricsService.initialize();
+
       // Register repeatable scheduler jobs (idempotent)
       try {
         const repeatables = await this.listRepeatable('scheduler');

@@ -65,6 +65,7 @@ import EmptyState from '../../components/common/EmptyState';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
@@ -91,7 +92,7 @@ const FeatureFlagsPage: React.FC = () => {
     const [flags, setFlags] = useState<FeatureFlag[]>([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
     const [loading, setLoading] = useState(false);
     const [isInitialLoad, setIsInitialLoad] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -135,8 +136,8 @@ const FeatureFlagsPage: React.FC = () => {
     const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
     const defaultColumns: ColumnConfig[] = [
         { id: 'flagName', labelKey: 'featureFlags.flagName', visible: true },
-        { id: 'displayName', labelKey: 'featureFlags.displayName', visible: true },
         { id: 'status', labelKey: 'featureFlags.status', visible: true },
+        { id: 'createdBy', labelKey: 'common.createdBy', visible: true },
         { id: 'createdAt', labelKey: 'featureFlags.createdAt', visible: true },
         { id: 'lastSeenAt', labelKey: 'featureFlags.lastSeenAt', visible: true },
         { id: 'tags', labelKey: 'featureFlags.tags', visible: true },
@@ -883,7 +884,6 @@ const FeatureFlagsPage: React.FC = () => {
                                                     {t('featureFlags.flagName')}
                                                 </TableSortLabel>
                                             </TableCell>
-                                            <TableCell>{t('featureFlags.displayName')}</TableCell>
                                             <TableCell>{t('featureFlags.status')}</TableCell>
                                             {environments.map(env => (
                                                 <TableCell key={env.environment} align="center" sx={{ minWidth: 70, maxWidth: 100, px: 0.5 }}>
@@ -907,6 +907,7 @@ const FeatureFlagsPage: React.FC = () => {
                                                     </Tooltip>
                                                 </TableCell>
                                             ))}
+                                            <TableCell>{t('common.createdBy')}</TableCell>
                                             <TableCell>
                                                 <TableSortLabel active={orderBy === 'createdAt'} direction={orderBy === 'createdAt' ? order : 'asc'} onClick={() => handleSort('createdAt')}>
                                                     {t('featureFlags.createdAt')}
@@ -944,51 +945,37 @@ const FeatureFlagsPage: React.FC = () => {
                                                     />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                        <Tooltip title={t(`featureFlags.types.${flag.flagType}`)}>
-                                                            {getTypeIcon(flag.flagType)}
-                                                        </Tooltip>
-                                                        {isStale(flag) && (
-                                                            <Tooltip title={t('featureFlags.staleWarning')}>
-                                                                <WarningIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                                                    <Box>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                            <Tooltip title={t(`featureFlags.types.${flag.flagType}`)}>
+                                                                {getTypeIcon(flag.flagType)}
                                                             </Tooltip>
-                                                        )}
-                                                        <Typography
-                                                            fontWeight={500}
-                                                            sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
-                                                            onClick={() => navigate(`/feature-flags/${flag.flagName}`)}
-                                                        >
-                                                            {flag.flagName}
-                                                        </Typography>
-                                                        <Tooltip title={t('common.copy')}>
-                                                            <IconButton
-                                                                size="small"
-                                                                onClick={(e) => { e.stopPropagation(); copyToClipboardWithNotification(flag.flagName, enqueueSnackbar, t); }}
-                                                                sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
+                                                            {isStale(flag) && (
+                                                                <Tooltip title={t('featureFlags.staleWarning')}>
+                                                                    <WarningIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                                                                </Tooltip>
+                                                            )}
+                                                            <Typography
+                                                                fontWeight={500}
+                                                                sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                                                                onClick={() => navigate(`/feature-flags/${flag.flagName}`)}
                                                             >
-                                                                <CopyIcon sx={{ fontSize: 14 }} />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                        <Typography
-                                                            sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
-                                                            onClick={() => navigate(`/feature-flags/${flag.flagName}`)}
-                                                        >
-                                                            {flag.displayName || '-'}
-                                                        </Typography>
-                                                        {flag.displayName && (
+                                                                {flag.flagName}
+                                                            </Typography>
                                                             <Tooltip title={t('common.copy')}>
                                                                 <IconButton
                                                                     size="small"
-                                                                    onClick={(e) => { e.stopPropagation(); copyToClipboardWithNotification(flag.displayName!, enqueueSnackbar, t); }}
+                                                                    onClick={(e) => { e.stopPropagation(); copyToClipboardWithNotification(flag.flagName, enqueueSnackbar, t); }}
                                                                     sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
                                                                 >
                                                                     <CopyIcon sx={{ fontSize: 14 }} />
                                                                 </IconButton>
                                                             </Tooltip>
+                                                        </Box>
+                                                        {flag.displayName && flag.displayName !== flag.flagName && (
+                                                            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                                                                {flag.displayName}
+                                                            </Typography>
                                                         )}
                                                     </Box>
                                                 </TableCell>
@@ -1033,6 +1020,18 @@ const FeatureFlagsPage: React.FC = () => {
                                                         </TableCell>
                                                     );
                                                 })}
+                                                <TableCell>
+                                                    <Box>
+                                                        <Typography variant="body2" fontWeight={500}>
+                                                            {flag.createdByName || '-'}
+                                                        </Typography>
+                                                        {flag.createdByEmail && (
+                                                            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                                                                {flag.createdByEmail}
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
+                                                </TableCell>
                                                 <TableCell>
                                                     <Tooltip title={formatDateTimeDetailed(flag.createdAt)}>
                                                         <span>{formatRelativeTime(flag.createdAt)}</span>

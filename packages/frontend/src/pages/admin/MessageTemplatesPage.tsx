@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import { useAuth } from '@/hooks/useAuth';
 import { PERMISSIONS } from '@/types/permissions';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import {
   Box,
   Card,
@@ -186,7 +187,7 @@ const MessageTemplatesPage: React.FC = () => {
 
   // 페이지네이션
   const [page, setPage] = useState(0); // SimplePagination은 0-based
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
 
   // 필터
   const [searchQuery, setSearchQuery] = useState('');

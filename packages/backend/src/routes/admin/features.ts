@@ -439,6 +439,29 @@ router.get(
         res.json({ success: true, data: { metrics } });
     })
 );
+
+// Record metrics for a flag evaluation
+router.post(
+    '/:flagName/metrics',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const environment = requireEnvironment(req, res);
+        if (!environment) return;
+
+        const { enabled, variantName } = req.body;
+
+        await featureFlagService.recordMetrics(
+            environment,
+            req.params.flagName,
+            enabled,
+            variantName
+        );
+
+        // Also update lastSeenAt for this flag
+        await featureFlagService.updateLastSeenAt(req.params.flagName, environment);
+
+        res.json({ success: true });
+    })
+);
 // ==================== Import ====================
 
 // Import feature flags from JSON

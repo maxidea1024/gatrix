@@ -36,7 +36,11 @@ export type StandardEventType =
   | 'store_product.deleted'
   | 'store_product.bulk_updated'
   | 'environment.created'
-  | 'environment.deleted';
+  | 'environment.deleted'
+  | 'feature_flag.changed'
+  | 'feature_flag.created'
+  | 'feature_flag.updated'
+  | 'feature_flag.deleted';
 
 export interface StandardEventData {
   id?: number | string; // Optional for bulk events that don't have a single id

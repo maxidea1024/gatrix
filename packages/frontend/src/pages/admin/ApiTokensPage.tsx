@@ -94,6 +94,7 @@ import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/c
 import { useI18n } from '@/contexts/I18nContext';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { useAuth } from '@/hooks/useAuth';
+import { useGlobalPageSize } from '@/hooks/useGlobalPageSize';
 import { PERMISSIONS } from '@/types/permissions';
 
 interface CreateTokenData {
@@ -201,7 +202,7 @@ const ApiTokensPage: React.FC = () => {
   const [tokens, setTokens] = useState<ApiAccessToken[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');

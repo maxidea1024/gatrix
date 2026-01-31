@@ -11,6 +11,7 @@ import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 import { getActionLabel } from '../../utils/changeRequestToast';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useGlobalPageSize } from '@/hooks/useGlobalPageSize';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import SimplePagination from '@/components/common/SimplePagination';
 import { couponService, CouponSetting, CouponStatus, CouponType, IssuedCouponCode } from '@/services/couponService';
@@ -48,7 +49,7 @@ const CouponSettingsPage: React.FC = () => {
   const [items, setItems] = useState<CouponSetting[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [loading, setLoading] = useState(false);
 
 

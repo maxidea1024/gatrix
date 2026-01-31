@@ -58,6 +58,7 @@ import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/Colu
 import { formatDateTime, formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useI18n } from '../../contexts/I18nContext';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
@@ -74,7 +75,7 @@ const ServiceNoticesPage: React.FC = () => {
   const [notices, setNotices] = useState<ServiceNotice[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

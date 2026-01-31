@@ -322,6 +322,9 @@ const FeatureFlagDetailPage: React.FC = () => {
     const [editingLink, setEditingLink] = useState<FlagLink>({ url: '', title: '' });
     const [editingLinkIndex, setEditingLinkIndex] = useState<number | null>(null);
 
+    // Environment metrics for summary display in environment cards
+    const [envMetrics, setEnvMetrics] = useState<Record<string, { totalYes: number; totalNo: number; total: number }>>({});
+
     // ==================== Data Loading ====================
 
     const loadFlag = useCallback(async () => {
@@ -390,6 +393,46 @@ const FeatureFlagDetailPage: React.FC = () => {
         }
     }, []);
 
+    // Load metrics summary for each environment (24h period for quick summary)
+    const loadEnvMetrics = useCallback(async (targetFlagName: string, envList: Environment[]) => {
+        if (!targetFlagName || envList.length === 0) return;
+
+        const metricsMap: Record<string, { totalYes: number; totalNo: number; total: number }> = {};
+        const endDate = new Date();
+        const startDate = new Date(endDate.getTime() - 24 * 60 * 60 * 1000); // Last 24 hours
+
+        for (const env of envList) {
+            try {
+                const response = await api.get<{ metrics: Array<{ yesCount: number; noCount: number }> }>(
+                    `/admin/features/${targetFlagName}/metrics`,
+                    {
+                        params: {
+                            startDate: startDate.toISOString(),
+                            endDate: endDate.toISOString(),
+                        },
+                        headers: {
+                            'x-environment': env.environment,
+                        },
+                    }
+                );
+                const metrics = response.data?.metrics || [];
+                const aggregated = metrics.reduce(
+                    (acc, m) => ({
+                        totalYes: acc.totalYes + (m.yesCount || 0),
+                        totalNo: acc.totalNo + (m.noCount || 0),
+                        total: acc.total + (m.yesCount || 0) + (m.noCount || 0),
+                    }),
+                    { totalYes: 0, totalNo: 0, total: 0 }
+                );
+                metricsMap[env.environment] = aggregated;
+            } catch {
+                metricsMap[env.environment] = { totalYes: 0, totalNo: 0, total: 0 };
+            }
+        }
+
+        setEnvMetrics(metricsMap);
+    }, []);
+
     // Load strategies for all environments
     const loadEnvStrategies = useCallback(async (envList: Environment[], targetFlagName: string) => {
         if (!targetFlagName || envList.length === 0) return;
@@ -443,6 +486,13 @@ const FeatureFlagDetailPage: React.FC = () => {
             loadEnvStrategies(environments, flag.flagName);
         }
     }, [isCreating, flag?.flagName, environments, loadEnvStrategies]);
+
+    // Load environment metrics for summary display in environment cards
+    useEffect(() => {
+        if (!isCreating && flag?.flagName && environments.length > 0) {
+            loadEnvMetrics(flag.flagName, environments);
+        }
+    }, [isCreating, flag?.flagName, environments, loadEnvMetrics]);
 
     // ==================== Handlers ====================
 
@@ -1455,10 +1505,73 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                             </Box>
                                                         </Box>
 
-                                                        {/* Metrics placeholder */}
-                                                        <Typography variant="caption" color="text.secondary" sx={{ minWidth: 120, textAlign: 'right' }}>
-                                                            {t('featureFlags.noMetricsYet')}
-                                                        </Typography>
+                                                        {/* Metrics mini pie chart */}
+                                                        {(() => {
+                                                            const metrics = envMetrics[env.environment];
+                                                            // Only show chart if we have actual metrics data
+                                                            if (metrics && metrics.total > 0) {
+                                                                const yesPercent = Math.round((metrics.totalYes / metrics.total) * 100);
+                                                                const noPercent = 100 - yesPercent;
+
+                                                                // SVG-based mini pie chart
+                                                                const radius = 16;
+                                                                const circumference = 2 * Math.PI * radius;
+                                                                const yesArc = (yesPercent / 100) * circumference;
+
+                                                                return (
+                                                                    <Tooltip
+                                                                        title={`${t('featureFlags.metrics.exposedTrue')}: ${metrics.totalYes} (${yesPercent}%) / ${t('featureFlags.metrics.exposedFalse')}: ${metrics.totalNo} (${noPercent}%)`}
+                                                                        arrow
+                                                                    >
+                                                                        <Box sx={{
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            gap: 1,
+                                                                        }}>
+                                                                            <svg width="40" height="40" viewBox="0 0 40 40">
+                                                                                {/* Background circle (No) */}
+                                                                                <circle
+                                                                                    cx="20"
+                                                                                    cy="20"
+                                                                                    r={radius}
+                                                                                    fill="none"
+                                                                                    stroke="#ef5350"
+                                                                                    strokeWidth="8"
+                                                                                />
+                                                                                {/* Foreground arc (Yes) - starts from top */}
+                                                                                <circle
+                                                                                    cx="20"
+                                                                                    cy="20"
+                                                                                    r={radius}
+                                                                                    fill="none"
+                                                                                    stroke="#4caf50"
+                                                                                    strokeWidth="8"
+                                                                                    strokeDasharray={`${yesArc} ${circumference}`}
+                                                                                    transform="rotate(-90 20 20)"
+                                                                                />
+                                                                                {/* Center text */}
+                                                                                <text
+                                                                                    x="20"
+                                                                                    y="20"
+                                                                                    textAnchor="middle"
+                                                                                    dominantBaseline="central"
+                                                                                    fontSize="10"
+                                                                                    fontWeight="600"
+                                                                                    fill="currentColor"
+                                                                                >
+                                                                                    {yesPercent}%
+                                                                                </text>
+                                                                            </svg>
+                                                                        </Box>
+                                                                    </Tooltip>
+                                                                );
+                                                            }
+                                                            return (
+                                                                <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'right' }}>
+                                                                    {t('featureFlags.noMetricsYet')}
+                                                                </Typography>
+                                                            );
+                                                        })()}
                                                     </AccordionSummary>
 
                                                     <AccordionDetails sx={{ px: 2, pt: 0, pb: 2 }}>
@@ -1761,15 +1874,15 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                                                         )}
 
                                                                                                     {/* User IDs for userWithId strategy */}
-                                                                                                    {strategy.name === 'userWithId' && strategy.parameters?.userIds?.length > 0 && (
+                                                                                                    {strategy.name === 'userWithId' && strategy.parameters?.userIds && (Array.isArray(strategy.parameters.userIds) ? strategy.parameters.userIds : String(strategy.parameters.userIds).split(',')).length > 0 && (
                                                                                                         <Box sx={{ mb: 1.5 }}>
                                                                                                             <Paper variant="outlined" sx={{ p: 1.5 }}>
                                                                                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
                                                                                                                     <Typography variant="body2" color="warning.main" sx={{ fontWeight: 600, minWidth: 80 }}>
                                                                                                                         {t('featureFlags.userIds')}
                                                                                                                     </Typography>
-                                                                                                                    {strategy.parameters.userIds.map((userId: string) => (
-                                                                                                                        <Chip key={userId} label={userId} size="small" sx={{ bgcolor: 'action.selected', color: 'text.primary', fontWeight: 500, borderRadius: '16px' }} />
+                                                                                                                    {(Array.isArray(strategy.parameters.userIds) ? strategy.parameters.userIds : String(strategy.parameters.userIds).split(',')).filter((id: string) => id.trim()).map((userId: string) => (
+                                                                                                                        <Chip key={userId} label={userId.trim()} size="small" sx={{ bgcolor: 'action.selected', color: 'text.primary', fontWeight: 500, borderRadius: '16px' }} />
                                                                                                                     ))}
                                                                                                                 </Box>
                                                                                                             </Paper>

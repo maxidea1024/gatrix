@@ -35,7 +35,7 @@ import {
     Numbers as NumberIcon,
     ToggleOn as BooleanIcon,
     Schedule as DateTimeIcon,
-    Tag as SemverIcon,
+    LocalOffer as SemverIcon,
     HelpOutline as MissingIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -130,6 +130,40 @@ const OPERATORS_BY_TYPE: Record<string, { value: string; label: string }[]> = {
         { value: 'semver_lt', label: '<' },
         { value: 'semver_lte', label: '<=' },
     ],
+};
+
+// Inverted operator labels (shown when constraint.inverted is true)
+const INVERTED_OPERATOR_LABELS: Record<string, string> = {
+    'str_eq': 'does not equal',
+    'str_neq': 'equals',
+    'str_contains': 'does not contain',
+    'str_starts_with': 'does not start with',
+    'str_ends_with': 'does not end with',
+    'str_in': 'not in list',
+    'str_not_in': 'in list',
+    'num_eq': '≠',
+    'num_gt': '≤',
+    'num_gte': '<',
+    'num_lt': '≥',
+    'num_lte': '>',
+    'bool_is': 'is not',
+    'date_gt': 'on or before',
+    'date_gte': 'before',
+    'date_lt': 'on or after',
+    'date_lte': 'after',
+    'semver_eq': '≠',
+    'semver_gt': '≤',
+    'semver_gte': '<',
+    'semver_lt': '≥',
+    'semver_lte': '>',
+};
+
+// Get operator label based on inverted state
+const getOperatorLabel = (operator: string, inverted: boolean, operators: { value: string; label: string }[]): string => {
+    if (inverted && INVERTED_OPERATOR_LABELS[operator]) {
+        return INVERTED_OPERATOR_LABELS[operator];
+    }
+    return operators.find(op => op.value === operator)?.label || operator;
 };
 
 // Check if operator expects multiple values
@@ -326,6 +360,21 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                         value={validOperator}
                         onChange={(e) => handleConstraintChange(index, 'operator', e.target.value)}
                         disabled={disabled}
+                        renderValue={(selected) => {
+                            const label = getOperatorLabel(selected as string, constraint.inverted || false, operators);
+                            return (
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    {constraint.inverted && (
+                                        <Typography component="span" sx={{ color: 'warning.main', fontWeight: 600 }}>
+                                            NOT
+                                        </Typography>
+                                    )}
+                                    <Typography component="span">
+                                        {t(`featureFlags.operators.${selected}${constraint.inverted ? '_inverted' : ''}`, label)}
+                                    </Typography>
+                                </Box>
+                            );
+                        }}
                     >
                         {operators.map((op) => (
                             <MenuItem key={op.value} value={op.value}>
@@ -476,6 +525,7 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
                 operator: defaultOperators[0].value as ConstraintOperator,
                 value: '',
                 values: [],
+                caseInsensitive: true, // Default to case insensitive
             },
         ]);
     };

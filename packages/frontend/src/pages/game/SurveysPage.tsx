@@ -42,6 +42,7 @@ import SimplePagination from '../../components/common/SimplePagination';
 import EmptyState from '../../components/common/EmptyState';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import SurveyFormDialog from '../../components/game/SurveyFormDialog';
 import SurveyConfigDialog from '../../components/game/SurveyConfigDialog';
@@ -62,7 +63,7 @@ const SurveysPage: React.FC = () => {
   const [surveys, setSurveys] = useState<Survey[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [loading, setLoading] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

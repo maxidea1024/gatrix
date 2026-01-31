@@ -20,6 +20,20 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    ArcElement,
+    Title,
+    Tooltip,
+    Legend,
+} from 'chart.js';
+import { Bar, Doughnut } from 'react-chartjs-2';
+
+// Register Chart.js components
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 interface FeatureFlagMetricsProps {
     flagName: string;
@@ -82,7 +96,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
             const startDate = new Date(endDate.getTime() - hours * 60 * 60 * 1000);
 
             const response = await api.get<{ metrics: MetricsBucket[] }>(
-                `/admin/feature-flags/${flagName}/metrics`,
+                `/admin/features/${flagName}/metrics`,
                 {
                     params: {
                         startDate: startDate.toISOString(),
@@ -137,6 +151,108 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     );
 
     const hasMetrics = metrics.length > 0 && aggregatedMetrics.total > 0;
+
+    // Prepare chart data - sorted by time
+    const sortedMetrics = [...metrics].sort(
+        (a, b) => new Date(a.metricsBucket).getTime() - new Date(b.metricsBucket).getTime()
+    );
+
+    const formatDateTime = (dateStr: string): string => {
+        const date = new Date(dateStr);
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${month}/${day} ${hours}:${minutes}`;
+    };
+
+    // Determine if this flag has variants
+    const hasVariants = Object.keys(aggregatedMetrics.variantCounts).length > 0;
+
+    // Get all unique variant names across all buckets
+    const allVariantNames = new Set<string>();
+    sortedMetrics.forEach(m => {
+        if (m.variantCounts) {
+            Object.keys(m.variantCounts).forEach(v => allVariantNames.add(v));
+        }
+    });
+    const variantNamesList = Array.from(allVariantNames);
+
+    // Variant colors for consistent coloring
+    const variantColors = [
+        theme.palette.primary.main,
+        theme.palette.secondary.main,
+        theme.palette.info.main,
+        theme.palette.warning.main,
+        '#9c27b0', // purple
+        '#00bcd4', // cyan
+        '#ff9800', // orange
+        '#795548', // brown
+    ];
+
+    // Chart.js data for enabled/disabled (default)
+    const chartData = {
+        labels: sortedMetrics.map(m => formatDateTime(m.metricsBucket)),
+        datasets: [
+            {
+                label: t('featureFlags.metrics.exposedTrue'),
+                data: sortedMetrics.map(m => m.yesCount),
+                backgroundColor: theme.palette.success.main,
+                borderRadius: 4,
+            },
+            {
+                label: t('featureFlags.metrics.exposedFalse'),
+                data: sortedMetrics.map(m => m.noCount),
+                backgroundColor: theme.palette.error.main,
+                borderRadius: 4,
+            },
+        ],
+    };
+
+    // Chart.js data for variants time series
+    const variantChartData = {
+        labels: sortedMetrics.map(m => formatDateTime(m.metricsBucket)),
+        datasets: variantNamesList.map((variantName, idx) => ({
+            label: variantName,
+            data: sortedMetrics.map(m => (m.variantCounts?.[variantName] || 0)),
+            backgroundColor: variantColors[idx % variantColors.length],
+            borderRadius: 4,
+        })),
+    };
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom' as const,
+                labels: {
+                    usePointStyle: true,
+                    pointStyle: 'rect',
+                },
+            },
+            tooltip: {
+                mode: 'index' as const,
+                intersect: false,
+            },
+        },
+        scales: {
+            x: {
+                stacked: true,
+                grid: {
+                    display: false,
+                },
+            },
+            y: {
+                stacked: true,
+                beginAtZero: true,
+                grid: {
+                    color: theme.palette.divider,
+                },
+            },
+        },
+    };
+
 
     return (
         <Box sx={{ p: 3 }}>
@@ -229,7 +345,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
             ) : (
                 <Paper variant="outlined" sx={{ p: 3, borderRadius: 1 }}>
                     {/* Summary Stats */}
-                    <Box sx={{ display: 'flex', gap: 4, mb: 3 }}>
+                    <Box sx={{ display: 'flex', gap: 4, mb: 4 }}>
                         <Box>
                             <Typography variant="h4" fontWeight={600} color="success.main">
                                 {aggregatedMetrics.totalYes.toLocaleString()}
@@ -256,26 +372,125 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                         </Box>
                     </Box>
 
-                    {/* Variant Counts */}
-                    {Object.keys(aggregatedMetrics.variantCounts).length > 0 && (
+                    {/* Time Series Stacked Bar Chart */}
+                    {sortedMetrics.length > 0 && (
                         <Box sx={{ mt: 3 }}>
                             <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
-                                {t('featureFlags.metrics.variantDistribution')}
+                                {t('featureFlags.metrics.timeSeriesChart')}
                             </Typography>
-                            <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-                                {Object.entries(aggregatedMetrics.variantCounts).map(([variant, count]) => (
-                                    <Box key={variant}>
-                                        <Typography variant="h5" fontWeight={600}>
-                                            {count.toLocaleString()}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            {variant}
-                                        </Typography>
-                                    </Box>
-                                ))}
+                            <Box sx={{ height: 300 }}>
+                                <Bar data={chartData} options={chartOptions} />
                             </Box>
                         </Box>
                     )}
+
+                    {/* Variant Time Series Chart (if flag has variants) */}
+                    {hasVariants && sortedMetrics.length > 0 && variantNamesList.length > 0 && (
+                        <Box sx={{ mt: 4 }}>
+                            <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
+                                {t('featureFlags.metrics.variantTimeSeriesChart')}
+                            </Typography>
+                            <Box sx={{ height: 300 }}>
+                                <Bar data={variantChartData} options={chartOptions} />
+                            </Box>
+                        </Box>
+                    )}
+
+                    {/* Variant Counts */}
+                    {Object.keys(aggregatedMetrics.variantCounts).length > 0 && (() => {
+                        const variantEntries = Object.entries(aggregatedMetrics.variantCounts);
+                        const totalVariantCount = variantEntries.reduce((sum, [, count]) => sum + count, 0);
+
+                        // Doughnut chart data
+                        const doughnutData = {
+                            labels: variantEntries.map(([variant]) => variant),
+                            datasets: [{
+                                data: variantEntries.map(([, count]) => count),
+                                backgroundColor: variantColors,
+                                borderWidth: 2,
+                                borderColor: theme.palette.background.paper,
+                            }],
+                        };
+
+                        const doughnutOptions = {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '60%',
+                            plugins: {
+                                legend: {
+                                    display: false, // We'll show custom legend
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: (context: any) => {
+                                            const value = context.raw;
+                                            const percentage = ((value / totalVariantCount) * 100).toFixed(1);
+                                            return `${context.label}: ${value.toLocaleString()} (${percentage}%)`;
+                                        },
+                                    },
+                                },
+                            },
+                        };
+
+                        return (
+                            <Box sx={{ mt: 4 }}>
+                                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
+                                    {t('featureFlags.metrics.variantDistribution')}
+                                </Typography>
+
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                    {/* Doughnut Chart */}
+                                    <Box sx={{ width: 200, height: 200, position: 'relative' }}>
+                                        <Doughnut data={doughnutData} options={doughnutOptions} />
+                                        {/* Center text */}
+                                        <Box
+                                            sx={{
+                                                position: 'absolute',
+                                                top: '50%',
+                                                left: '50%',
+                                                transform: 'translate(-50%, -50%)',
+                                                textAlign: 'center',
+                                            }}
+                                        >
+                                            <Typography variant="h6" fontWeight={700}>
+                                                {totalVariantCount.toLocaleString()}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {t('featureFlags.metrics.totalRequests')}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+
+                                    {/* Legend with details */}
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                        {variantEntries.map(([variant, count], idx) => {
+                                            const percentage = (count / totalVariantCount) * 100;
+                                            return (
+                                                <Box key={variant} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                    <Box
+                                                        sx={{
+                                                            width: 12,
+                                                            height: 12,
+                                                            borderRadius: 0.5,
+                                                            bgcolor: variantColors[idx % variantColors.length],
+                                                        }}
+                                                    />
+                                                    <Box>
+                                                        <Typography variant="body2" fontWeight={600}>
+                                                            {variant}
+                                                        </Typography>
+                                                        <Typography variant="caption" color="text.secondary">
+                                                            {count.toLocaleString()} ({percentage.toFixed(1)}%)
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                            );
+                                        })}
+                                    </Box>
+                                </Box>
+                            </Box>
+                        );
+                    })()}
                 </Paper>
             )}
         </Box>

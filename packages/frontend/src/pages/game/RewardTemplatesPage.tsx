@@ -42,6 +42,7 @@ import SimplePagination from '../../components/common/SimplePagination';
 import EmptyState from '../../components/common/EmptyState';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import RewardTemplateFormDialog from '../../components/game/RewardTemplateFormDialog';
@@ -60,7 +61,7 @@ const RewardTemplatesPage: React.FC = () => {
   const [allRegistryTags, setAllRegistryTags] = useState<any[]>([]); // All registry tags for filter options
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [loading, setLoading] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

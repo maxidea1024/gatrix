@@ -410,6 +410,30 @@ export class CacheManager {
         }
       }
 
+      // Feature flags - requires explicit opt-in
+      if (this.features.featureFlag === true && this.featureFlagService) {
+        if (isMultiEnvMode) {
+          if (envList.length > 0) {
+            promises.push(
+              this.featureFlagService.listByEnvironments(envList).catch((error) => {
+                this.logger.warn('Failed to load feature flags', { error: error.message });
+                return [];
+              })
+            );
+            featureTypes.push('featureFlag');
+          }
+        } else {
+          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          promises.push(
+            this.featureFlagService.listByEnvironment(defaultEnv).catch((error) => {
+              this.logger.warn('Failed to load feature flags', { error: error.message });
+              return [];
+            })
+          );
+          featureTypes.push('featureFlag');
+        }
+      }
+
       // Load all enabled features in parallel
       await Promise.all(promises);
 
@@ -849,6 +873,28 @@ export class CacheManager {
             })
           );
           refreshedTypes.push('storeProduct');
+        }
+      }
+
+      // Feature flags - requires explicit opt-in
+      if (this.features.featureFlag === true && this.featureFlagService) {
+        if (isMultiEnvMode) {
+          if (envList.length > 0) {
+            promises.push(
+              this.featureFlagService.listByEnvironments(envList).catch((error) => {
+                this.logger.warn('Failed to refresh feature flags', { error: error.message });
+              })
+            );
+            refreshedTypes.push('featureFlag');
+          }
+        } else {
+          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          promises.push(
+            this.featureFlagService.refreshByEnvironment(defaultEnv).catch((error) => {
+              this.logger.warn('Failed to refresh feature flags', { error: error.message });
+            })
+          );
+          refreshedTypes.push('featureFlag');
         }
       }
 

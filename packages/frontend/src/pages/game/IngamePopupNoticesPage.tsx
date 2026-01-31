@@ -52,6 +52,7 @@ import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/Colu
 import { formatDateTime, formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useI18n } from '../../contexts/I18nContext';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import dayjs from 'dayjs';
 
 const IngamePopupNoticesPage: React.FC = () => {
@@ -66,7 +67,7 @@ const IngamePopupNoticesPage: React.FC = () => {
   const [notices, setNotices] = useState<IngamePopupNotice[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

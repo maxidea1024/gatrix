@@ -74,33 +74,49 @@ export interface VariantOverride {
 
 export interface Variant {
     name: string;
+    weight: number;
     payload?: any;
     payloadType?: PayloadType;
-    weight: number;
-    stickiness?: string;
+}
+
+// ==================== Segment ====================
+
+/**
+ * Feature Segment - reusable set of constraints
+ * Segments are global (not environment-specific)
+ * Contains only data fields required for runtime evaluation
+ */
+export interface FeatureSegment {
+    name: string;
+    constraints: Constraint[];
+    isActive: boolean;
 }
 
 // ==================== Strategy ====================
 
+/**
+ * Feature Strategy - targeting rule
+ * Contains only data fields required for runtime evaluation
+ * Strategies are already sorted by backend, no need for sortOrder
+ */
 export interface FeatureStrategy {
-    id: string;
     name: string;
     parameters?: StrategyParameters;
     constraints?: Constraint[];
-    sortOrder: number;
+    segments?: string[];  // Segment names (references, not objects)
     isEnabled: boolean;
 }
 
 // ==================== Feature Flag ====================
 
+/**
+ * Feature Flag - core flag definition
+ * Contains only data fields required for runtime evaluation
+ */
 export interface FeatureFlag {
-    id: string;
     name: string;
-    displayName?: string;
-    description?: string;
-    type: FlagType;
     isEnabled: boolean;
-    impressionDataEnabled: boolean;
+    impressionDataEnabled: boolean;  // Whether to emit impression events
     strategies: FeatureStrategy[];
     variants: Variant[];
 }
@@ -142,6 +158,7 @@ export interface FeatureFlagResponse {
 // ==================== Metrics ====================
 
 export interface FlagMetric {
+    environment: string;
     flagName: string;
     enabled: boolean;
     variantName?: string;

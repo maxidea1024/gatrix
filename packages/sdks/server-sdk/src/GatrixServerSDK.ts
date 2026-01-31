@@ -495,6 +495,15 @@ export class GatrixServerSDK {
         this.logger.info('Metrics server started');
       }
 
+      // Auto-start feature flag metrics collection if enabled
+      if (this.config.features?.featureFlag !== false) {
+        const featureFlagService = this.cacheManager?.getFeatureFlagService();
+        if (featureFlagService && featureFlagService.getMetricsConfig().enabled) {
+          featureFlagService.startMetricsCollection();
+          this.logger.info('Feature flag metrics collection started automatically');
+        }
+      }
+
       this.logger.info('GatrixServerSDK initialized successfully');
     } catch (error: any) {
       this.logger.error('Failed to initialize SDK', { error: error.message });

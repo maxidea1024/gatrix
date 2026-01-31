@@ -7,7 +7,8 @@
  * - All methods that access cached data MUST receive environment explicitly
  * - Environment resolution is delegated to EnvironmentResolver
  * - Evaluations are performed locally using cached flags
- * - Metrics are batched and sent periodically
+ * - Segments are cached separately and referenced by name for efficiency
+ * - Metrics are batched and sent periodically (default: 1 minute)
  */
 
 import { ApiClient } from '../client/ApiClient';
@@ -15,6 +16,7 @@ import { Logger } from '../utils/logger';
 import { EnvironmentResolver } from '../utils/EnvironmentResolver';
 import {
     FeatureFlag,
+    FeatureSegment,
     EvaluationContext,
     EvaluationResult,
     Variant,
@@ -28,18 +30,83 @@ export class FeatureFlagService {
     private apiClient: ApiClient;
     private logger: Logger;
     private envResolver: EnvironmentResolver;
-    // Multi-environment cache: Map<environment, FeatureFlag[]>
-    private cachedFlagsByEnv: Map<string, FeatureFlag[]> = new Map();
+    // Multi-environment flag cache: Map<environment, Map<flagName, FeatureFlag>>
+    // Using nested Map for O(1) flag lookup by name
+    private cachedFlagsByEnv: Map<string, Map<string, FeatureFlag>> = new Map();
+    // Segment cache: Map<segmentName, FeatureSegment> (global, not per-environment)
+    private cachedSegments: Map<string, FeatureSegment> = new Map();
     // Metrics buffer for batching
     private metricsBuffer: FlagMetric[] = [];
     private metricsFlushInterval: NodeJS.Timeout | null = null;
     // Whether this feature is enabled
     private featureEnabled: boolean = true;
+    // Static context (default context merged with per-evaluation context)
+    private staticContext: EvaluationContext = {};
+    // Metrics configuration
+    private metricsConfig = {
+        enabled: true,
+        flushIntervalMs: 60000,    // Default: 1 minute
+        maxBufferSize: 1000,       // Auto-flush threshold
+        maxRetryBufferSize: 10000, // Max buffer size to prevent memory issues
+    };
 
     constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
         this.apiClient = apiClient;
         this.logger = logger;
         this.envResolver = envResolver;
+    }
+
+    /**
+     * Set static context (default context merged with per-evaluation context)
+     * Static context is applied to all evaluations, with per-evaluation context taking precedence
+     */
+    setStaticContext(context: EvaluationContext): void {
+        this.staticContext = context;
+        this.logger.debug('Static context set', { keys: Object.keys(context) });
+    }
+
+    /**
+     * Get static context
+     */
+    getStaticContext(): EvaluationContext {
+        return { ...this.staticContext };
+    }
+
+    /**
+     * Merge static context with per-evaluation context
+     * Per-evaluation context takes precedence over static context
+     */
+    private mergeContext(context: EvaluationContext): EvaluationContext {
+        // Static context first, then per-evaluation context (for precedence)
+        return {
+            ...this.staticContext,
+            ...context,
+            // Merge properties separately
+            properties: {
+                ...this.staticContext.properties,
+                ...context.properties,
+            },
+        };
+    }
+
+    /**
+     * Configure metrics collection options
+     */
+    setMetricsConfig(config: {
+        enabled?: boolean;
+        flushIntervalMs?: number;
+        maxBufferSize?: number;
+        maxRetryBufferSize?: number;
+    }): void {
+        this.metricsConfig = { ...this.metricsConfig, ...config };
+        this.logger.debug('Metrics config updated', { config: this.metricsConfig });
+    }
+
+    /**
+     * Get current metrics configuration
+     */
+    getMetricsConfig() {
+        return { ...this.metricsConfig };
     }
 
     /**
@@ -58,15 +125,24 @@ export class FeatureFlagService {
 
     /**
      * Start metrics collection
-     * @param flushIntervalMs Interval in milliseconds to flush metrics (default: 60000)
+     * Uses configured flushIntervalMs if not provided
      */
-    startMetricsCollection(flushIntervalMs: number = 60000): void {
+    startMetricsCollection(flushIntervalMs?: number): void {
+        if (!this.metricsConfig.enabled) {
+            this.logger.debug('Metrics collection is disabled');
+            return;
+        }
+
+        const interval = flushIntervalMs ?? this.metricsConfig.flushIntervalMs;
+
         if (this.metricsFlushInterval) {
             clearInterval(this.metricsFlushInterval);
         }
         this.metricsFlushInterval = setInterval(() => {
             this.flushMetrics();
-        }, flushIntervalMs);
+        }, interval);
+
+        this.logger.info('Metrics collection started', { flushIntervalMs: interval });
     }
 
     /**
@@ -86,20 +162,35 @@ export class FeatureFlagService {
     /**
      * Fetch all flags for a specific environment
      * GET /api/v1/server/:env/features
+     * Also caches referenced segments returned by the backend
      */
     async listByEnvironment(environment: string): Promise<FeatureFlag[]> {
         const endpoint = `/api/v1/server/${encodeURIComponent(environment)}/features`;
 
         this.logger.debug('Fetching feature flags', { environment });
 
-        const response = await this.apiClient.get<{ flags: FeatureFlag[] }>(endpoint);
+        const response = await this.apiClient.get<{ flags: FeatureFlag[]; segments: FeatureSegment[] }>(endpoint);
 
         if (!response.success || !response.data) {
             throw new Error(response.error?.message || 'Failed to fetch feature flags');
         }
 
-        const { flags } = response.data;
-        this.cachedFlagsByEnv.set(environment, flags);
+        const { flags, segments } = response.data;
+
+        // Cache flags by name for O(1) lookup
+        const flagMap = new Map<string, FeatureFlag>();
+        for (const flag of flags) {
+            flagMap.set(flag.name, flag);
+        }
+        this.cachedFlagsByEnv.set(environment, flagMap);
+
+        // Cache segments (global, not per-environment)
+        if (segments && segments.length > 0) {
+            for (const segment of segments) {
+                this.cachedSegments.set(segment.name, segment);
+            }
+            this.logger.info('Feature segments cached', { count: segments.length });
+        }
 
         this.logger.info('Feature flags fetched', { count: flags.length, environment });
 
@@ -118,17 +209,60 @@ export class FeatureFlagService {
     }
 
     /**
-     * Get cached flags
-     * @param environment Environment name (required)
+     * Fetch and cache feature flags for multiple environments (multi-environment mode)
+     * Used by Edge server to handle multiple environments
      */
-    getCached(environment: string): FeatureFlag[] {
-        return this.cachedFlagsByEnv.get(environment) || [];
+    async listByEnvironments(environments: string[]): Promise<FeatureFlag[]> {
+        const allFlags: FeatureFlag[] = [];
+
+        for (const environment of environments) {
+            try {
+                const flags = await this.listByEnvironment(environment);
+                allFlags.push(...flags);
+            } catch (error: any) {
+                this.logger.warn('Failed to load feature flags for environment', {
+                    environment,
+                    error: error.message
+                });
+            }
+        }
+
+        this.logger.info('Feature flags loaded for multiple environments', {
+            environments: environments.length,
+            totalFlags: allFlags.length
+        });
+
+        return allFlags;
     }
 
     /**
-     * Get all cached flags (all environments)
+     * Get a single flag by name from cache (O(1) lookup)
      */
-    getAllCached(): Map<string, FeatureFlag[]> {
+    getFlagByName(environment: string, flagName: string): FeatureFlag | undefined {
+        const envCache = this.cachedFlagsByEnv.get(environment);
+        return envCache?.get(flagName);
+    }
+
+    /**
+     * Get all cached flags as array
+     * @param environment Environment name (required)
+     */
+    getCached(environment: string): FeatureFlag[] {
+        const envCache = this.cachedFlagsByEnv.get(environment);
+        return envCache ? Array.from(envCache.values()) : [];
+    }
+
+    /**
+     * Get cached flag count for environment
+     */
+    getCachedCount(environment: string): number {
+        return this.cachedFlagsByEnv.get(environment)?.size ?? 0;
+    }
+
+    /**
+     * Get all cached flags (all environments) - returns the internal Map structure
+     */
+    getAllCached(): Map<string, Map<string, FeatureFlag>> {
         return this.cachedFlagsByEnv;
     }
 
@@ -146,6 +280,82 @@ export class FeatureFlagService {
     clearCacheForEnvironment(environment: string): void {
         this.cachedFlagsByEnv.delete(environment);
         this.logger.debug('Feature flags cache cleared for environment', { environment });
+    }
+
+    // ==================== Segment Methods ====================
+
+    /**
+     * Fetch all segments (global, not per-environment)
+     * GET /api/v1/server/segments
+     */
+    async fetchSegments(): Promise<FeatureSegment[]> {
+        const endpoint = '/api/v1/server/segments';
+
+        this.logger.debug('Fetching feature segments');
+
+        const response = await this.apiClient.get<{ segments: FeatureSegment[] }>(endpoint);
+
+        if (!response.success || !response.data) {
+            throw new Error(response.error?.message || 'Failed to fetch segments');
+        }
+
+        const { segments } = response.data;
+
+        // Cache segments by name for efficient lookup
+        this.cachedSegments.clear();
+        for (const segment of segments) {
+            this.cachedSegments.set(segment.name, segment);
+        }
+
+        this.logger.info('Feature segments fetched', { count: segments.length });
+
+        return segments;
+    }
+
+    /**
+     * Refresh segments cache
+     */
+    async refreshSegments(): Promise<FeatureSegment[]> {
+        this.logger.info('Refreshing feature segments cache');
+        return await this.fetchSegments();
+    }
+
+    /**
+     * Get a segment by name from cache
+     */
+    getSegment(segmentName: string): FeatureSegment | undefined {
+        return this.cachedSegments.get(segmentName);
+    }
+
+    /**
+     * Get all cached segments
+     */
+    getAllSegments(): Map<string, FeatureSegment> {
+        return this.cachedSegments;
+    }
+
+    /**
+     * Clear segments cache
+     */
+    clearSegmentsCache(): void {
+        this.cachedSegments.clear();
+        this.logger.debug('Feature segments cache cleared');
+    }
+
+    /**
+     * Update a single segment in cache (for real-time sync)
+     */
+    updateSegmentInCache(segment: FeatureSegment): void {
+        this.cachedSegments.set(segment.name, segment);
+        this.logger.debug('Segment updated in cache', { segmentName: segment.name });
+    }
+
+    /**
+     * Remove a segment from cache (for real-time sync)
+     */
+    removeSegmentFromCache(segmentName: string): void {
+        this.cachedSegments.delete(segmentName);
+        this.logger.debug('Segment removed from cache', { segmentName });
     }
 
     // ==================== Evaluation Methods ====================
@@ -365,12 +575,15 @@ export class FeatureFlagService {
     /**
      * Evaluate a feature flag
      * @param flagName Name of the flag
-     * @param context Evaluation context
+     * @param context Evaluation context (merged with static context)
      * @param environment Environment name
      */
     evaluate(flagName: string, context: EvaluationContext, environment: string): EvaluationResult {
-        const flags = this.getCached(environment);
-        const flag = flags.find(f => f.name === flagName);
+        // Merge static context with per-evaluation context
+        const mergedContext = this.mergeContext(context);
+
+        // O(1) lookup from cached Map
+        const flag = this.getFlagByName(environment, flagName);
 
         if (!flag) {
             return {
@@ -390,12 +603,12 @@ export class FeatureFlagService {
             };
         }
 
-        // Evaluate strategies
-        const strategyResult = this.evaluateStrategies(flag.strategies, context, flag);
+        // Evaluate strategies with merged context
+        const strategyResult = this.evaluateStrategies(flag.strategies, mergedContext, flag);
 
         if (strategyResult.enabled) {
-            // Select variant if applicable
-            const variant = this.selectVariant(flag, context);
+            // Select variant using matched strategy's stickiness
+            const variant = this.selectVariant(flag, mergedContext, strategyResult.matchedStrategy);
             this.recordMetric(environment, flagName, true, variant?.name);
             return {
                 flagName,
@@ -415,16 +628,15 @@ export class FeatureFlagService {
 
     /**
      * Evaluate all strategies for a flag
+     * Returns matched strategy for stickiness-based variant selection
      */
     private evaluateStrategies(
         strategies: FeatureStrategy[],
         context: EvaluationContext,
         flag: FeatureFlag
-    ): { enabled: boolean; reason: EvaluationResult['reason'] } {
-        // Sort by sortOrder and filter enabled strategies
-        const enabledStrategies = strategies
-            .filter(s => s.isEnabled)
-            .sort((a, b) => a.sortOrder - b.sortOrder);
+    ): { enabled: boolean; reason: EvaluationResult['reason']; matchedStrategy?: FeatureStrategy } {
+        // Filter enabled strategies (already sorted by backend)
+        const enabledStrategies = strategies.filter(s => s.isEnabled);
 
         // If no strategies, flag is enabled by default (if globally enabled)
         if (enabledStrategies.length === 0) {
@@ -435,7 +647,7 @@ export class FeatureFlagService {
         for (const strategy of enabledStrategies) {
             const result = this.evaluateStrategy(strategy, context, flag);
             if (result) {
-                return { enabled: true, reason: 'strategy_match' };
+                return { enabled: true, reason: 'strategy_match', matchedStrategy: strategy };
             }
         }
 
@@ -446,7 +658,28 @@ export class FeatureFlagService {
      * Evaluate a single strategy
      */
     private evaluateStrategy(strategy: FeatureStrategy, context: EvaluationContext, flag: FeatureFlag): boolean {
-        // Check constraints
+        // Check segment constraints first (all referenced segments must pass)
+        if (strategy.segments && strategy.segments.length > 0) {
+            for (const segmentName of strategy.segments) {
+                const segment = this.cachedSegments.get(segmentName);
+                if (!segment) {
+                    // Segment not found in cache - skip this segment check
+                    this.logger.warn('Segment not found in cache', { segmentName, flagName: flag.name });
+                    continue;
+                }
+                if (!segment.isActive) {
+                    // Inactive segment - skip
+                    continue;
+                }
+                // All segment constraints must pass
+                const segmentPass = segment.constraints.every(c => this.evaluateConstraint(c, context));
+                if (!segmentPass) {
+                    return false;
+                }
+            }
+        }
+
+        // Check strategy constraints
         if (strategy.constraints && strategy.constraints.length > 0) {
             const allConstraintsPass = strategy.constraints.every(c => this.evaluateConstraint(c, context));
             if (!allConstraintsPass) {
@@ -655,22 +888,36 @@ export class FeatureFlagService {
 
     /**
      * Select a variant based on context and weights
+     * Uses matched strategy's stickiness for consistent variant assignment
      * Weights are on a 0-100 scale (percentage)
      */
-    private selectVariant(flag: FeatureFlag, context: EvaluationContext): Variant | undefined {
+    private selectVariant(
+        flag: FeatureFlag,
+        context: EvaluationContext,
+        matchedStrategy?: FeatureStrategy
+    ): Variant | undefined {
         if (!flag.variants || flag.variants.length === 0) {
             return undefined;
         }
 
-        // Use stickiness from first variant, or 'default' as fallback
-        const stickiness = flag.variants[0].stickiness || 'default';
+        // Calculate total weight
+        const totalWeight = flag.variants.reduce((sum, v) => sum + v.weight, 0);
+        if (totalWeight <= 0) {
+            return undefined;
+        }
+
+        // Use strategy's stickiness, fallback to 'default'
+        const stickiness = matchedStrategy?.parameters?.stickiness || 'default';
         const percentage = this.calculatePercentage(context, stickiness, `${flag.name}-variant`);
 
-        // Weights are on 0-100 scale, percentage is also 0-100
+        // Normalize percentage to total weight scale
+        const targetWeight = (percentage / 100) * totalWeight;
+
+        // Select variant based on cumulative weight
         let cumulativeWeight = 0;
         for (const variant of flag.variants) {
             cumulativeWeight += variant.weight;
-            if (percentage <= cumulativeWeight) {
+            if (targetWeight <= cumulativeWeight) {
                 return variant;
             }
         }
@@ -686,6 +933,7 @@ export class FeatureFlagService {
      */
     private recordMetric(environment: string, flagName: string, enabled: boolean, variantName?: string): void {
         this.metricsBuffer.push({
+            environment,
             flagName,
             enabled,
             variantName,
@@ -700,6 +948,7 @@ export class FeatureFlagService {
 
     /**
      * Flush metrics buffer to the server
+     * Aggregates metrics before sending for efficiency
      */
     private async flushMetrics(): Promise<void> {
         if (this.metricsBuffer.length === 0) {
@@ -710,14 +959,56 @@ export class FeatureFlagService {
         this.metricsBuffer = [];
 
         try {
-            // Send batched metrics - this would be implemented when needed
-            this.logger.debug('Flushing feature flag metrics', { count: metricsToSend.length });
-            // TODO: Implement actual metrics sending to backend
-            // await this.apiClient.post('/api/v1/server/features/metrics', { metrics: metricsToSend });
+            // Group metrics by environment first
+            const byEnvironment = new Map<string, typeof metricsToSend>();
+            for (const metric of metricsToSend) {
+                const envMetrics = byEnvironment.get(metric.environment) || [];
+                envMetrics.push(metric);
+                byEnvironment.set(metric.environment, envMetrics);
+            }
+
+            // Process each environment separately
+            for (const [environment, envMetrics] of byEnvironment) {
+                // Aggregate metrics by flagName + enabled + variantName
+                const aggregated = new Map<string, { flagName: string; enabled: boolean; variantName?: string; count: number }>();
+
+                for (const metric of envMetrics) {
+                    const key = `${metric.flagName}:${metric.enabled}:${metric.variantName || ''}`;
+                    const existing = aggregated.get(key);
+                    if (existing) {
+                        existing.count++;
+                    } else {
+                        aggregated.set(key, {
+                            flagName: metric.flagName,
+                            enabled: metric.enabled,
+                            variantName: metric.variantName,
+                            count: 1,
+                        });
+                    }
+                }
+
+                const aggregatedMetrics = Array.from(aggregated.values());
+
+                this.logger.debug('Flushing feature flag metrics', {
+                    environment,
+                    rawCount: envMetrics.length,
+                    aggregatedCount: aggregatedMetrics.length,
+                });
+
+                // Send aggregated metrics to backend (per environment)
+                await this.apiClient.post(`/api/v1/server/${environment}/features/metrics`, {
+                    metrics: aggregatedMetrics,
+                    timestamp: new Date().toISOString(),
+                });
+            }
+
+            this.logger.debug('Feature flag metrics sent successfully');
         } catch (error) {
             this.logger.error('Failed to flush feature flag metrics', { error });
-            // Re-add failed metrics back to buffer
-            this.metricsBuffer.unshift(...metricsToSend);
+            // Re-add failed metrics back to buffer (limit to prevent memory issues)
+            if (this.metricsBuffer.length < 10000) {
+                this.metricsBuffer.unshift(...metricsToSend);
+            }
         }
     }
 
@@ -740,9 +1031,7 @@ export class FeatureFlagService {
             }
 
             // Fetch updated flag from server
-            const response = await this.apiClient.get<{ flag: FeatureFlag }>(
-                `/api/v1/server/${encodeURIComponent(environment)}/features/${encodeURIComponent(flagName)}`
-            );
+            const response = await this.apiClient.get<{ flag: FeatureFlag }>(`/api/v1/server/${encodeURIComponent(environment)}/features/${encodeURIComponent(flagName)}`);
 
             if (!response.success || !response.data) {
                 this.logger.debug('Flag not found or not active, removing from cache', { flagName, environment });
@@ -751,20 +1040,17 @@ export class FeatureFlagService {
             }
 
             const updatedFlag = response.data.flag;
-            const currentFlags = this.cachedFlagsByEnv.get(environment) || [];
-            const existsInCache = currentFlags.some(f => f.name === flagName);
 
-            if (existsInCache) {
-                // Update existing flag
-                const newFlags = currentFlags.map(f => f.name === flagName ? updatedFlag : f);
-                this.cachedFlagsByEnv.set(environment, newFlags);
-                this.logger.debug('Single flag updated in cache', { flagName, environment });
-            } else {
-                // Add new flag
-                const newFlags = [...currentFlags, updatedFlag];
-                this.cachedFlagsByEnv.set(environment, newFlags);
-                this.logger.debug('Single flag added to cache', { flagName, environment });
+            // Get or create environment cache Map
+            let envCache = this.cachedFlagsByEnv.get(environment);
+            if (!envCache) {
+                envCache = new Map<string, FeatureFlag>();
+                this.cachedFlagsByEnv.set(environment, envCache);
             }
+
+            // Add or update flag in cache (O(1))
+            envCache.set(flagName, updatedFlag);
+            this.logger.debug('Single flag updated in cache', { flagName, environment });
         } catch (error: any) {
             this.logger.error('Failed to update single flag in cache', { flagName, environment, error: error.message });
             // Fall back to full refresh
@@ -773,14 +1059,15 @@ export class FeatureFlagService {
     }
 
     /**
-     * Remove a flag from cache
+     * Remove a flag from cache (O(1))
      */
     removeFlag(flagName: string, environment: string): void {
         this.logger.debug('Removing flag from cache', { flagName, environment });
 
-        const currentFlags = this.cachedFlagsByEnv.get(environment) || [];
-        const newFlags = currentFlags.filter(f => f.name !== flagName);
-        this.cachedFlagsByEnv.set(environment, newFlags);
+        const envCache = this.cachedFlagsByEnv.get(environment);
+        if (envCache) {
+            envCache.delete(flagName);
+        }
 
         this.logger.debug('Flag removed from cache', { flagName, environment });
     }

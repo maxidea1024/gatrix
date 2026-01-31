@@ -52,6 +52,7 @@ async function main() {
       serviceNotice: true,
       banner: true,
       storeProduct: true,
+      featureFlag: true,  // Enable feature flags
     },
 
     // Logger configuration
@@ -106,6 +107,34 @@ async function main() {
       res.json({ success: true, message: 'Shutting down...' });
       // Delay to allow response to be sent
       setTimeout(() => handleShutdown(), 100);
+    });
+
+    // Add flush-metrics endpoint for testing
+    metricsServer.app.post('/flush-metrics', async (_req, res) => {
+      logger.info('Received flush metrics request via HTTP');
+      try {
+        sdk.featureFlag.stopMetricsCollection(); // This will flush remaining metrics
+        sdk.featureFlag.startMetricsCollection(); // Restart collection
+        res.json({ success: true, message: 'Metrics flushed' });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+
+    // Add test-evaluate endpoint for testing
+    metricsServer.app.post('/test-evaluate', async (_req, res) => {
+      logger.info('Received test evaluate request via HTTP');
+      const results: any[] = [];
+      const flags = sdk.featureFlag.getCached(targetEnvironment);
+      for (const flag of flags) {
+        // Use 100 random users per flag for better statistical distribution
+        for (let i = 0; i < 100; i++) {
+          const userId = `user-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+          const result = sdk.featureFlag.evaluate(flag.name, { userId }, targetEnvironment);
+          results.push({ flag: flag.name, enabled: result.enabled, variant: result.variant?.name });
+        }
+      }
+      res.json({ success: true, evaluations: results.length });
     });
 
     // Register service
@@ -255,9 +284,76 @@ async function main() {
       printCachedData();
     });
 
+    // Feature Flag Events
+    sdk.on('feature_flag.updated', (event) => {
+      logger.info('FEATURE FLAG UPDATED', event.data);
+      printFeatureFlags();
+      testFeatureFlagEvaluation();
+    });
+
+    sdk.on('feature_flag.created', (event) => {
+      logger.info('FEATURE FLAG CREATED', event.data);
+      printFeatureFlags();
+    });
+
+    sdk.on('feature_flag.deleted', (event) => {
+      logger.info('FEATURE FLAG DELETED', event.data);
+      printFeatureFlags();
+    });
+
+    // Feature flag test function
+    function testFeatureFlagEvaluation() {
+      logger.info('=== Feature Flag Evaluation Test ===');
+      const flags = sdk.featureFlag.getCached(targetEnvironment);
+
+      if (flags.length === 0) {
+        logger.info('No feature flags available for testing');
+        return;
+      }
+
+      const testContexts = [
+        { userId: 'user-001', sessionId: 'session-001' },
+        { userId: 'user-002', sessionId: 'session-002' },
+        { userId: 'admin-001', role: 'admin' },
+        { userId: 'premium-user', plan: 'premium' },
+      ];
+
+      for (const flag of flags.slice(0, 3)) {
+        logger.info(`Testing flag: ${flag.name}`);
+        for (const ctx of testContexts) {
+          const result = sdk.featureFlag.evaluate(flag.name, ctx, targetEnvironment);
+          logger.info(`  ${ctx.userId} => enabled=${result.enabled}, reason=${result.reason}${result.variant ? ', variant=' + result.variant.name : ''}`);
+        }
+
+        // Test stickiness: same user should get same result
+        const stickyCtx = { userId: 'sticky-test-user' };
+        const results = [];
+        for (let i = 0; i < 5; i++) {
+          results.push(sdk.featureFlag.evaluate(flag.name, stickyCtx, targetEnvironment).enabled);
+        }
+        const allSame = results.every(r => r === results[0]);
+        logger.info(`  Stickiness test: ${allSame ? 'PASS' : 'FAIL'} [${results.join(', ')}]`);
+      }
+    }
+
+    // Print feature flags helper
+    function printFeatureFlags() {
+      const flags = sdk.featureFlag.getCached(targetEnvironment);
+      logger.info('FEATURE FLAGS:', {
+        count: flags.length,
+        flags: flags.map(f => ({
+          name: f.name,
+          isEnabled: f.isEnabled,
+          strategies: f.strategies.length,
+          variants: f.variants?.length || 0,
+        })),
+      });
+    }
+
     // Helper function to print cached data
     // In multi-environment mode, use targetEnvironment for environment-specific data
     function printCachedData() {
+      const featureFlags = sdk.featureFlag.getCached(targetEnvironment);
       const cachedData = {
         gameWorlds: sdk.getGameWorlds(targetEnvironment),
         popupNotices: sdk.getPopupNotices(targetEnvironment),
@@ -268,6 +364,7 @@ async function main() {
         clientVersions: sdk.getClientVersions(targetEnvironment),
         serviceNotices: sdk.getServiceNotices(targetEnvironment),
         storeProducts: sdk.getStoreProducts(targetEnvironment),
+        featureFlags: featureFlags.length,
         timestamp: new Date().toISOString(),
       };
 
@@ -277,8 +374,46 @@ async function main() {
     // Print initial cached data
     logger.info('Initial cached data:');
     printCachedData();
+    printFeatureFlags();
+    testFeatureFlagEvaluation();
 
-    logger.info('Idle server is running and listening to events...');
+    // Continuous metrics generation for testing
+    let continuousEvalEnabled = true;
+    const EVAL_INTERVAL_MS = 10000; // Evaluate every 10 seconds
+    const FLUSH_INTERVAL_MS = 60000; // Flush every 60 seconds
+
+    async function continuousEvaluation() {
+      while (continuousEvalEnabled) {
+        const flags = sdk.featureFlag.getCached(targetEnvironment);
+        let evalCount = 0;
+
+        for (const flag of flags) {
+          // Simulate multiple users evaluating each flag
+          const userCount = Math.floor(Math.random() * 20) + 5; // 5-25 users
+          for (let i = 0; i < userCount; i++) {
+            const userId = `user-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+            sdk.featureFlag.evaluate(flag.name, { userId }, targetEnvironment);
+            evalCount++;
+          }
+        }
+
+        logger.info(`Continuous evaluation: ${evalCount} evaluations for ${flags.length} flags`);
+        await new Promise(resolve => setTimeout(resolve, EVAL_INTERVAL_MS));
+      }
+    }
+
+    // Start continuous evaluation in background
+    continuousEvaluation();
+
+    // Periodic metrics flush
+    setInterval(() => {
+      logger.info('Periodic metrics flush...');
+      sdk.featureFlag.stopMetricsCollection();
+      sdk.featureFlag.startMetricsCollection();
+    }, FLUSH_INTERVAL_MS);
+
+    logger.info('Idle server is running with continuous metrics generation...');
+    logger.info(`Evaluating every ${EVAL_INTERVAL_MS / 1000}s, flushing every ${FLUSH_INTERVAL_MS / 1000}s`);
     logger.info('Press Ctrl+C to stop or POST to /shutdown endpoint');
 
     // Handle graceful shutdown via signals

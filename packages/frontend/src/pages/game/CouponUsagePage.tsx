@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import SimplePagination from '@/components/common/SimplePagination';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useGlobalPageSize } from '@/hooks/useGlobalPageSize';
 import DynamicFilterBar, { ActiveFilter, FilterDefinition } from '@/components/common/DynamicFilterBar';
 import EmptyState from '@/components/common/EmptyState';
 import { couponService, CouponSetting, UsageRecord } from '@/services/couponService';
@@ -26,7 +27,7 @@ const CouponUsagePage: React.FC = () => {
   const [records, setRecords] = useState<UsageRecord[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [loading, setLoading] = useState(false);
 
   // export state

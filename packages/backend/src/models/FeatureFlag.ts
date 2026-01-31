@@ -94,8 +94,8 @@ export interface FeatureStrategyAttributes {
     updatedBy?: number;
     createdAt?: Date;
     updatedAt?: Date;
-    // Relations
-    segments?: FeatureSegmentAttributes[];
+    // Relations - segment names returned from enrichStrategiesWithSegments
+    segments?: string[];
 }
 
 // Variant - now includes environment
@@ -192,12 +192,13 @@ export class FeatureFlagModel {
         try {
             const { environment, search, flagType, isEnabled, isArchived, tags, limit = 50, offset = 0, sortBy = 'createdAt', sortOrder = 'desc' } = filters;
 
-            // Join flags with environment-specific settings
+            // Join flags with environment-specific settings and creator info
             const baseQuery = () => db('g_feature_flags as f')
                 .leftJoin('g_feature_flag_environments as e', function () {
                     this.on('f.id', '=', 'e.flagId').andOn('e.environment', '=', db.raw('?', [environment]));
                 })
-                .select('f.*', 'e.isEnabled', 'e.lastSeenAt');
+                .leftJoin('g_users as u', 'f.createdBy', 'u.id')
+                .select('f.*', 'e.isEnabled', 'e.lastSeenAt', 'u.name as createdByName', 'u.email as createdByEmail');
 
             const applyFilters = (query: any) => {
                 if (search) {
@@ -763,17 +764,23 @@ export class FeatureSegmentModel {
      */
     static async findAll(search?: string): Promise<FeatureSegmentAttributes[]> {
         try {
-            let query = db('g_feature_segments');
+            let query = db('g_feature_segments')
+                .select(
+                    'g_feature_segments.*',
+                    'g_users.name as createdByName',
+                    'g_users.email as createdByEmail'
+                )
+                .leftJoin('g_users', 'g_feature_segments.createdBy', 'g_users.id');
 
             if (search) {
                 query = query.where((qb: any) => {
-                    qb.where('segmentName', 'like', `%${search}%`)
-                        .orWhere('displayName', 'like', `%${search}%`)
-                        .orWhere('description', 'like', `%${search}%`);
+                    qb.where('g_feature_segments.segmentName', 'like', `%${search}%`)
+                        .orWhere('g_feature_segments.displayName', 'like', `%${search}%`)
+                        .orWhere('g_feature_segments.description', 'like', `%${search}%`);
                 });
             }
 
-            const segments = await query.orderBy('createdAt', 'desc');
+            const segments = await query.orderBy('g_feature_segments.createdAt', 'desc');
 
             return segments.map((s: any) => ({
                 ...s,
@@ -822,6 +829,28 @@ export class FeatureSegmentModel {
             };
         } catch (error) {
             logger.error('Error finding segment by name:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Find segments by names (for bulk fetch)
+     */
+    static async findByNames(segmentNames: string[]): Promise<FeatureSegmentAttributes[]> {
+        try {
+            if (segmentNames.length === 0) return [];
+
+            const segments = await db('g_feature_segments')
+                .whereIn('segmentName', segmentNames);
+
+            return segments.map((s: any) => ({
+                ...s,
+                isActive: Boolean(s.isActive),
+                constraints: parseJsonField<Constraint[]>(s.constraints) || [],
+                tags: parseJsonField<string[]>(s.tags) || [],
+            }));
+        } catch (error) {
+            logger.error('Error finding segments by names:', error);
             throw error;
         }
     }
@@ -894,16 +923,22 @@ export class FeatureSegmentModel {
 export class FeatureContextFieldModel {
     static async findAll(search?: string): Promise<FeatureContextFieldAttributes[]> {
         try {
-            let query = db('g_feature_context_fields');
+            let query = db('g_feature_context_fields')
+                .select(
+                    'g_feature_context_fields.*',
+                    'g_users.name as createdByName',
+                    'g_users.email as createdByEmail'
+                )
+                .leftJoin('g_users', 'g_feature_context_fields.createdBy', 'g_users.id');
 
             if (search) {
                 query = query.where((qb: any) => {
-                    qb.where('fieldName', 'like', `%${search}%`)
-                        .orWhere('description', 'like', `%${search}%`);
+                    qb.where('g_feature_context_fields.fieldName', 'like', `%${search}%`)
+                        .orWhere('g_feature_context_fields.description', 'like', `%${search}%`);
                 });
             }
 
-            const fields = await query.orderBy('sortOrder', 'asc');
+            const fields = await query.orderBy('g_feature_context_fields.sortOrder', 'asc');
 
             return fields.map((f: any) => ({
                 ...f,

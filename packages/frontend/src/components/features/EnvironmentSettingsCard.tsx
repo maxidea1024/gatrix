@@ -20,6 +20,7 @@ import {
     Stack,
     Divider,
     Tooltip,
+    CircularProgress,
 } from '@mui/material';
 import {
     ExpandMore as ExpandMoreIcon,
@@ -43,6 +44,12 @@ export interface Strategy {
     disabled?: boolean;
 }
 
+export interface EnvironmentMetrics {
+    totalYes: number;
+    totalNo: number;
+    total: number;
+}
+
 export interface EnvironmentData {
     environment: string;
     displayName: string;
@@ -58,6 +65,7 @@ interface EnvironmentSettingsCardProps {
     segments: any[];
     isArchived?: boolean;
     canManage: boolean;
+    metrics?: EnvironmentMetrics;
     onToggle: () => void;
     onEditClick: () => void;
     onAddStrategy: () => void;
@@ -72,6 +80,7 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
     segments,
     isArchived,
     canManage,
+    metrics,
     onToggle,
     onEditClick,
     onAddStrategy,
@@ -142,11 +151,63 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                         />
                     </Box>
 
-                    {/* Right side: metrics placeholder + toggle */}
+                    {/* Right side: metrics gauge + toggle */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }} onClick={(e) => e.stopPropagation()}>
-                        <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'right' }}>
-                            {t('featureFlags.noMetricsYet')}
-                        </Typography>
+                        {metrics && metrics.total > 0 ? (() => {
+                            const yesPercent = Math.round((metrics.totalYes / metrics.total) * 100);
+                            const noPercent = 100 - yesPercent;
+                            const radius = 16;
+                            const circumference = 2 * Math.PI * radius;
+                            const yesArc = (yesPercent / 100) * circumference;
+
+                            return (
+                                <Tooltip
+                                    title={`${t('featureFlags.metrics.exposedTrue')}: ${metrics.totalYes} (${yesPercent}%) / ${t('featureFlags.metrics.exposedFalse')}: ${metrics.totalNo} (${noPercent}%)`}
+                                    arrow
+                                >
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <svg width="40" height="40" viewBox="0 0 40 40">
+                                            {/* Background circle (No) */}
+                                            <circle
+                                                cx="20"
+                                                cy="20"
+                                                r={radius}
+                                                fill="none"
+                                                stroke="#ef5350"
+                                                strokeWidth="8"
+                                            />
+                                            {/* Foreground arc (Yes) - starts from top */}
+                                            <circle
+                                                cx="20"
+                                                cy="20"
+                                                r={radius}
+                                                fill="none"
+                                                stroke="#4caf50"
+                                                strokeWidth="8"
+                                                strokeDasharray={`${yesArc} ${circumference}`}
+                                                transform="rotate(-90 20 20)"
+                                            />
+                                            {/* Center text */}
+                                            <text
+                                                x="20"
+                                                y="20"
+                                                textAnchor="middle"
+                                                dominantBaseline="central"
+                                                fontSize="10"
+                                                fontWeight="600"
+                                                fill="currentColor"
+                                            >
+                                                {yesPercent}%
+                                            </text>
+                                        </svg>
+                                    </Box>
+                                </Tooltip>
+                            );
+                        })() : (
+                            <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'right' }}>
+                                {t('featureFlags.noMetricsYet')}
+                            </Typography>
+                        )}
                         <FeatureSwitch
                             size="small"
                             checked={envData.isEnabled}

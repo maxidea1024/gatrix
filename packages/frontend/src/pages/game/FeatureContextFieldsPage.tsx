@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { PERMISSIONS } from '../../types/permissions';
 import {
@@ -33,17 +33,25 @@ import {
     Add as AddIcon,
     Search as SearchIcon,
     SettingsSuggest as ContextIcon,
-    Refresh as RefreshIcon,
     Edit as EditIcon,
     Delete as DeleteIcon,
     ContentCopy as CopyIcon,
+    ViewColumn as ViewColumnIcon,
+    Abc as StringIcon,
+    Numbers as NumberIcon,
+    ToggleOn as BooleanIcon,
+    Schedule as DateTimeIcon,
+    LocalOffer as SemverIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyState from '../../components/common/EmptyState';
+import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
+import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
@@ -74,12 +82,13 @@ const FeatureContextFieldsPage: React.FC = () => {
     const canManage = hasPermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]);
 
     // State
-    const [fields, setFields] = useState<FeatureContextField[]>([]);
+    const [allFields, setAllFields] = useState<FeatureContextField[]>([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [deletingField, setDeletingField] = useState<FeatureContextField | null>(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -87,6 +96,31 @@ const FeatureContextFieldsPage: React.FC = () => {
     const [originalField, setOriginalField] = useState<Partial<FeatureContextField> | null>(null);
     const [expandedLegalValues, setExpandedLegalValues] = useState<Set<string>>(new Set());
     const [allTags, setAllTags] = useState<{ id: number; name: string; color: string; description?: string }[]>([]);
+    const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+
+    // Column settings
+    const defaultColumns: ColumnConfig[] = [
+        { id: 'visibility', labelKey: 'featureFlags.visibility', visible: true },
+        { id: 'fieldName', labelKey: 'featureFlags.fieldName', visible: true },
+        { id: 'description', labelKey: 'featureFlags.description', visible: true },
+        { id: 'legalValues', labelKey: 'featureFlags.legalValuesColumn', visible: true },
+        { id: 'tags', labelKey: 'featureFlags.tags', visible: true },
+        { id: 'createdBy', labelKey: 'common.createdBy', visible: true },
+        { id: 'createdAt', labelKey: 'featureFlags.createdAt', visible: true },
+    ];
+    const [columns, setColumns] = useState<ColumnConfig[]>(() => {
+        const saved = localStorage.getItem('contextFieldsColumns');
+        if (saved) {
+            try {
+                const savedColumns = JSON.parse(saved);
+                return savedColumns;
+            } catch {
+                return defaultColumns;
+            }
+        }
+        return defaultColumns;
+    });
+    const visibleColumns = useMemo(() => columns.filter(col => col.visible), [columns]);
 
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -96,25 +130,63 @@ const FeatureContextFieldsPage: React.FC = () => {
         try {
             const result = await api.get('/admin/features/context-fields', {
                 params: {
-                    page: page + 1,
-                    limit: rowsPerPage,
                     search: debouncedSearchTerm || undefined,
                 }
             });
-            setFields(result.data?.contextFields || []);
-            setTotal(result.data?.total || 0);
+            const allData = result.data?.contextFields || [];
+            setAllFields(allData);
+            setTotal(allData.length);
         } catch (error: any) {
             enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.loadFailed'), { variant: 'error' });
-            setFields([]);
+            setAllFields([]);
             setTotal(0);
         } finally {
             setLoading(false);
         }
     };
 
+    // Client-side pagination
+    const fields = useMemo(() => {
+        const start = page * rowsPerPage;
+        return allFields.slice(start, start + rowsPerPage);
+    }, [allFields, page, rowsPerPage]);
+
+    // Extract filter values
+    const typeFilter = useMemo(() => {
+        const filter = activeFilters.find(f => f.key === 'fieldType');
+        return filter?.value as string | undefined;
+    }, [activeFilters]);
+
+    const tagFilter = useMemo(() => {
+        const filter = activeFilters.find(f => f.key === 'tag');
+        return filter?.value as string[] | undefined;
+    }, [activeFilters]);
+
+    // Filter definitions
+    const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
+        {
+            key: 'fieldType',
+            label: t('featureFlags.fieldType'),
+            type: 'select',
+            options: [
+                { value: 'string', label: t('featureFlags.fieldTypes.string') },
+                { value: 'number', label: t('featureFlags.fieldTypes.number') },
+                { value: 'boolean', label: t('featureFlags.fieldTypes.boolean') },
+                { value: 'datetime', label: t('featureFlags.fieldTypes.datetime') },
+                { value: 'semver', label: t('featureFlags.fieldTypes.semver') },
+            ],
+        },
+        {
+            key: 'tag',
+            label: t('featureFlags.tags'),
+            type: 'multiselect',
+            options: allTags.map(tag => ({ value: tag.name, label: tag.name })),
+        },
+    ], [t, allTags]);
+
     useEffect(() => {
         loadFields();
-    }, [page, rowsPerPage, debouncedSearchTerm]);
+    }, [debouncedSearchTerm, typeFilter, tagFilter]);
 
     // Load tags for selection
     useEffect(() => {
@@ -128,6 +200,49 @@ const FeatureContextFieldsPage: React.FC = () => {
         };
         loadTags();
     }, []);
+
+    // Filter handlers
+    const handleFilterAdd = (filter: ActiveFilter) => {
+        setActiveFilters([...activeFilters, filter]);
+        setPage(0);
+    };
+
+    const handleFilterRemove = (filterKey: string) => {
+        setActiveFilters(activeFilters.filter(f => f.key !== filterKey));
+        setPage(0);
+    };
+
+    const handleFilterChange = (filterKey: string, value: any) => {
+        const newFilters = activeFilters.map(f =>
+            f.key === filterKey ? { ...f, value } : f
+        );
+        setActiveFilters(newFilters);
+        setPage(0);
+    };
+
+    // Column handlers
+    const handleColumnsChange = (newColumns: ColumnConfig[]) => {
+        setColumns(newColumns);
+        localStorage.setItem('contextFieldsColumns', JSON.stringify(newColumns));
+    };
+
+    const handleResetColumns = () => {
+        setColumns(defaultColumns);
+        localStorage.setItem('contextFieldsColumns', JSON.stringify(defaultColumns));
+    };
+
+    // Get type icon
+    const getTypeIcon = (type: string) => {
+        const iconProps = { sx: { fontSize: 16, mr: 0.5 } };
+        switch (type) {
+            case 'string': return <StringIcon {...iconProps} color="info" />;
+            case 'number': return <NumberIcon {...iconProps} color="success" />;
+            case 'boolean': return <BooleanIcon {...iconProps} color="warning" />;
+            case 'datetime': return <DateTimeIcon {...iconProps} color="secondary" />;
+            case 'semver': return <SemverIcon {...iconProps} color="primary" />;
+            default: return <StringIcon {...iconProps} color="disabled" />;
+        }
+    };
 
     // Handlers
     const handleEdit = (field: FeatureContextField) => {
@@ -241,21 +356,61 @@ const FeatureContextFieldsPage: React.FC = () => {
                 </Box>
             </Box>
 
-            {/* Search */}
-            <Card sx={{ mb: 3 }}>
+            {/* Search and Filters */}
+            <Card sx={{ mb: 2 }}>
                 <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'space-between' }}>
-                        <TextField
-                            placeholder={t('common.search')}
-                            value={searchTerm}
-                            onChange={(e) => { setSearchTerm(e.target.value); setPage(0); }}
-                            sx={{ minWidth: 300 }}
-                            InputProps={{ startAdornment: (<InputAdornment position="start"><SearchIcon /></InputAdornment>) }}
-                            size="small"
-                        />
-                        <Tooltip title={t('common.refresh')}>
-                            <span><IconButton size="small" onClick={loadFields} disabled={loading}><RefreshIcon /></IconButton></span>
-                        </Tooltip>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'nowrap', flexGrow: 1, minWidth: 0 }}>
+                            <TextField
+                                placeholder={t('common.search')}
+                                value={searchTerm}
+                                onChange={(e) => { setSearchTerm(e.target.value); setPage(0); }}
+                                sx={{
+                                    minWidth: 300,
+                                    flexGrow: 1,
+                                    maxWidth: 500,
+                                    '& .MuiOutlinedInput-root': {
+                                        height: '40px',
+                                        borderRadius: '20px',
+                                        bgcolor: 'background.paper',
+                                        transition: 'all 0.2s ease-in-out',
+                                        '& fieldset': { borderColor: 'divider' },
+                                        '&:hover': { bgcolor: 'action.hover', '& fieldset': { borderColor: 'primary.light' } },
+                                        '&.Mui-focused': { bgcolor: 'background.paper', boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)', '& fieldset': { borderColor: 'primary.main', borderWidth: '1px' } }
+                                    },
+                                    '& .MuiInputBase-input': { fontSize: '0.875rem' }
+                                }}
+                                InputProps={{ startAdornment: (<InputAdornment position="start"><SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} /></InputAdornment>) }}
+                                size="small"
+                            />
+
+                            {/* Dynamic Filter Bar */}
+                            <DynamicFilterBar
+                                availableFilters={availableFilterDefinitions}
+                                activeFilters={activeFilters}
+                                onFilterAdd={handleFilterAdd}
+                                onFilterRemove={handleFilterRemove}
+                                onFilterChange={handleFilterChange}
+                                onRefresh={loadFields}
+                                refreshDisabled={loading}
+                                noWrap={true}
+                                afterFilterAddActions={
+                                    <Tooltip title={t('common.columnSettings')}>
+                                        <IconButton
+                                            onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                                            sx={{
+                                                bgcolor: 'background.paper',
+                                                border: 1,
+                                                borderColor: 'divider',
+                                                '&:hover': { bgcolor: 'action.hover' },
+                                            }}
+                                        >
+                                            <ViewColumnIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                }
+                            />
+                        </Box>
                     </Box>
                 </CardContent>
             </Card>
@@ -279,147 +434,171 @@ const FeatureContextFieldsPage: React.FC = () => {
                                 <Table>
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell>{t('featureFlags.visibility')}</TableCell>
-                                            <TableCell>{t('featureFlags.fieldName')}</TableCell>
-                                            <TableCell>{t('featureFlags.displayName')}</TableCell>
-                                            <TableCell>{t('featureFlags.description')}</TableCell>
-                                            <TableCell>{t('featureFlags.fieldType')}</TableCell>
-                                            <TableCell>{t('featureFlags.legalValuesColumn')}</TableCell>
-                                            <TableCell>{t('featureFlags.tags')}</TableCell>
-                                            <TableCell>{t('featureFlags.createdAt')}</TableCell>
+                                            {visibleColumns.map((col) => (
+                                                <TableCell key={col.id}>{t(col.labelKey)}</TableCell>
+                                            ))}
                                             {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {fields.map((field) => (
                                             <TableRow key={field.id} hover>
-                                                <TableCell>
-                                                    <FeatureSwitch
-                                                        size="small"
-                                                        checked={field.isEnabled !== false}
-                                                        onChange={async () => {
-                                                            const newEnabled = !field.isEnabled;
-                                                            // Optimistic update
-                                                            setFields(prev => prev.map(f =>
-                                                                f.id === field.id ? { ...f, isEnabled: newEnabled } : f
-                                                            ));
-                                                            try {
-                                                                await api.put(`/admin/features/context-fields/${field.fieldName}`, { isEnabled: newEnabled });
-                                                            } catch (error: any) {
-                                                                // Rollback on error
-                                                                setFields(prev => prev.map(f =>
-                                                                    f.id === field.id ? { ...f, isEnabled: !newEnabled } : f
-                                                                ));
-                                                                enqueueSnackbar(parseApiErrorMessage(error, t('common.saveFailed')), { variant: 'error' });
-                                                            }
-                                                        }}
-                                                        disabled={!canManage}
-                                                    />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                        <Typography
-                                                            fontWeight={500}
-                                                            sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
-                                                            onClick={() => handleEdit(field)}
-                                                        >
-                                                            {field.fieldName}
-                                                        </Typography>
-                                                        <Tooltip title={t('common.copy')}>
-                                                            <IconButton
-                                                                size="small"
-                                                                onClick={(e) => { e.stopPropagation(); copyToClipboardWithNotification(field.fieldName, enqueueSnackbar, t); }}
-                                                                sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
-                                                            >
-                                                                <CopyIcon sx={{ fontSize: 14 }} />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                        <Typography
-                                                            sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
-                                                            onClick={() => handleEdit(field)}
-                                                        >
-                                                            {field.displayName || field.fieldName}
-                                                        </Typography>
-                                                        <Tooltip title={t('common.copy')}>
-                                                            <IconButton
-                                                                size="small"
-                                                                onClick={(e) => { e.stopPropagation(); copyToClipboardWithNotification(field.displayName || field.fieldName, enqueueSnackbar, t); }}
-                                                                sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
-                                                            >
-                                                                <CopyIcon sx={{ fontSize: 14 }} />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                        {field.description || '-'}
-                                                    </Typography>
-                                                </TableCell>
-                                                <TableCell><Chip label={getFieldTypeLabel(field.fieldType)} size="small" /></TableCell>
-                                                <TableCell>
-                                                    {field.legalValues && field.legalValues.length > 0 ? (
-                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'center' }}>
-                                                            {(expandedLegalValues.has(field.id) ? field.legalValues : field.legalValues.slice(0, 3)).map((value, idx) => (
-                                                                <Chip key={idx} label={value} size="small" variant="outlined" sx={{ fontSize: '0.75rem' }} />
-                                                            ))}
-                                                            {field.legalValues.length > 3 && (
-                                                                <Typography
-                                                                    variant="caption"
-                                                                    sx={{ cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' } }}
-                                                                    onClick={() => {
-                                                                        setExpandedLegalValues(prev => {
-                                                                            const newSet = new Set(prev);
-                                                                            if (newSet.has(field.id)) {
-                                                                                newSet.delete(field.id);
-                                                                            } else {
-                                                                                newSet.add(field.id);
+                                                {visibleColumns.map((col) => {
+                                                    switch (col.id) {
+                                                        case 'visibility':
+                                                            return (
+                                                                <TableCell key={col.id}>
+                                                                    <FeatureSwitch
+                                                                        size="small"
+                                                                        checked={field.isEnabled !== false}
+                                                                        onChange={async () => {
+                                                                            const newEnabled = !field.isEnabled;
+                                                                            setFields(prev => prev.map(f =>
+                                                                                f.id === field.id ? { ...f, isEnabled: newEnabled } : f
+                                                                            ));
+                                                                            try {
+                                                                                await api.put(`/admin/features/context-fields/${field.fieldName}`, { isEnabled: newEnabled });
+                                                                            } catch (error: any) {
+                                                                                setFields(prev => prev.map(f =>
+                                                                                    f.id === field.id ? { ...f, isEnabled: !newEnabled } : f
+                                                                                ));
+                                                                                enqueueSnackbar(parseApiErrorMessage(error, t('common.saveFailed')), { variant: 'error' });
                                                                             }
-                                                                            return newSet;
-                                                                        });
-                                                                    }}
-                                                                >
-                                                                    {expandedLegalValues.has(field.id)
-                                                                        ? t('featureFlags.showLess')
-                                                                        : t('featureFlags.showMore', { count: field.legalValues.length - 3 })
-                                                                    }
-                                                                </Typography>
-                                                            )}
-                                                        </Box>
-                                                    ) : (
-                                                        <Typography variant="body2" color="text.disabled">-</Typography>
-                                                    )}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {field.tags && field.tags.length > 0 ? (
-                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                            {field.tags.map((tagName, idx) => {
-                                                                const tagData = allTags.find(t => t.name === tagName);
-                                                                const color = tagData?.color || '#888888';
-                                                                return (
-                                                                    <Tooltip key={idx} title={tagData?.description || ''} arrow>
-                                                                        <Chip
-                                                                            label={tagName}
-                                                                            size="small"
-                                                                            sx={{ bgcolor: color, color: getContrastColor(color), fontSize: '0.75rem' }}
-                                                                        />
+                                                                        }}
+                                                                        disabled={!canManage}
+                                                                    />
+                                                                </TableCell>
+                                                            );
+                                                        case 'fieldName':
+                                                            return (
+                                                                <TableCell key={col.id}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                                        <Tooltip title={getFieldTypeLabel(field.fieldType)}>
+                                                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>{getTypeIcon(field.fieldType)}</Box>
+                                                                        </Tooltip>
+                                                                        <Box>
+                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                                <Typography
+                                                                                    fontWeight={500}
+                                                                                    sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                                                                                    onClick={() => handleEdit(field)}
+                                                                                >
+                                                                                    {field.fieldName}
+                                                                                </Typography>
+                                                                                <Tooltip title={t('common.copy')}>
+                                                                                    <IconButton
+                                                                                        size="small"
+                                                                                        onClick={(e) => { e.stopPropagation(); copyToClipboardWithNotification(field.fieldName, enqueueSnackbar, t); }}
+                                                                                        sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
+                                                                                    >
+                                                                                        <CopyIcon sx={{ fontSize: 14 }} />
+                                                                                    </IconButton>
+                                                                                </Tooltip>
+                                                                            </Box>
+                                                                            {field.displayName && field.displayName !== field.fieldName && (
+                                                                                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                                                                                    {field.displayName}
+                                                                                </Typography>
+                                                                            )}
+                                                                        </Box>
+                                                                    </Box>
+                                                                </TableCell>
+                                                            );
+                                                        case 'description':
+                                                            return (
+                                                                <TableCell key={col.id}>
+                                                                    <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                                        {field.description || '-'}
+                                                                    </Typography>
+                                                                </TableCell>
+                                                            );
+                                                        case 'legalValues':
+                                                            return (
+                                                                <TableCell key={col.id}>
+                                                                    {field.legalValues && field.legalValues.length > 0 ? (
+                                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'center' }}>
+                                                                            {(expandedLegalValues.has(field.id) ? field.legalValues : field.legalValues.slice(0, 3)).map((value, idx) => (
+                                                                                <Chip key={idx} label={value} size="small" variant="outlined" sx={{ fontSize: '0.75rem' }} />
+                                                                            ))}
+                                                                            {field.legalValues.length > 3 && (
+                                                                                <Typography
+                                                                                    variant="caption"
+                                                                                    sx={{ cursor: 'pointer', color: 'primary.main', '&:hover': { textDecoration: 'underline' } }}
+                                                                                    onClick={() => {
+                                                                                        setExpandedLegalValues(prev => {
+                                                                                            const newSet = new Set(prev);
+                                                                                            if (newSet.has(field.id)) {
+                                                                                                newSet.delete(field.id);
+                                                                                            } else {
+                                                                                                newSet.add(field.id);
+                                                                                            }
+                                                                                            return newSet;
+                                                                                        });
+                                                                                    }}
+                                                                                >
+                                                                                    {expandedLegalValues.has(field.id)
+                                                                                        ? t('featureFlags.showLess')
+                                                                                        : t('featureFlags.showMore', { count: field.legalValues.length - 3 })
+                                                                                    }
+                                                                                </Typography>
+                                                                            )}
+                                                                        </Box>
+                                                                    ) : (
+                                                                        <Typography variant="body2" color="text.disabled">-</Typography>
+                                                                    )}
+                                                                </TableCell>
+                                                            );
+                                                        case 'tags':
+                                                            return (
+                                                                <TableCell key={col.id}>
+                                                                    {field.tags && field.tags.length > 0 ? (
+                                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                                            {field.tags.map((tagName, idx) => {
+                                                                                const tagData = allTags.find(t => t.name === tagName);
+                                                                                const color = tagData?.color || '#888888';
+                                                                                return (
+                                                                                    <Tooltip key={idx} title={tagData?.description || ''} arrow>
+                                                                                        <Chip
+                                                                                            label={tagName}
+                                                                                            size="small"
+                                                                                            sx={{ bgcolor: color, color: getContrastColor(color), fontSize: '0.75rem' }}
+                                                                                        />
+                                                                                    </Tooltip>
+                                                                                );
+                                                                            })}
+                                                                        </Box>
+                                                                    ) : (
+                                                                        <Typography variant="body2" color="text.disabled">-</Typography>
+                                                                    )}
+                                                                </TableCell>
+                                                            );
+                                                        case 'createdBy':
+                                                            return (
+                                                                <TableCell key={col.id}>
+                                                                    <Box>
+                                                                        <Typography variant="body2" fontWeight={500}>
+                                                                            {field.createdByName || '-'}
+                                                                        </Typography>
+                                                                        {field.createdByEmail && (
+                                                                            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                                                                                {field.createdByEmail}
+                                                                            </Typography>
+                                                                        )}
+                                                                    </Box>
+                                                                </TableCell>
+                                                            );
+                                                        case 'createdAt':
+                                                            return (
+                                                                <TableCell key={col.id}>
+                                                                    <Tooltip title={formatDateTimeDetailed(field.createdAt)}>
+                                                                        <span>{formatRelativeTime(field.createdAt)}</span>
                                                                     </Tooltip>
-                                                                );
-                                                            })}
-                                                        </Box>
-                                                    ) : (
-                                                        <Typography variant="body2" color="text.disabled">-</Typography>
-                                                    )}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Tooltip title={formatDateTimeDetailed(field.createdAt)}>
-                                                        <span>{formatRelativeTime(field.createdAt)}</span>
-                                                    </Tooltip>
-                                                </TableCell>
+                                                                </TableCell>
+                                                            );
+                                                        default:
+                                                            return <TableCell key={col.id}>-</TableCell>;
+                                                    }
+                                                })}
                                                 {canManage && (
                                                     <TableCell align="center">
                                                         <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
@@ -495,12 +674,18 @@ const FeatureContextFieldsPage: React.FC = () => {
                                 label={t('featureFlags.fieldType')}
                                 onChange={(e) => setEditingField(prev => ({ ...prev, fieldType: e.target.value as any }))}
                                 disabled={!!editingField?.id}
+                                renderValue={(value) => (
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        {getTypeIcon(value as string)}
+                                        <span>{t(`featureFlags.fieldTypes.${value}`)}</span>
+                                    </Box>
+                                )}
                             >
-                                <MenuItem value="string">{t('featureFlags.fieldTypes.string')}</MenuItem>
-                                <MenuItem value="number">{t('featureFlags.fieldTypes.number')}</MenuItem>
-                                <MenuItem value="boolean">{t('featureFlags.fieldTypes.boolean')}</MenuItem>
-                                <MenuItem value="datetime">{t('featureFlags.fieldTypes.datetime')}</MenuItem>
-                                <MenuItem value="semver">{t('featureFlags.fieldTypes.semver')}</MenuItem>
+                                <MenuItem value="string"><Box sx={{ display: 'flex', alignItems: 'center' }}>{getTypeIcon('string')}{t('featureFlags.fieldTypes.string')}</Box></MenuItem>
+                                <MenuItem value="number"><Box sx={{ display: 'flex', alignItems: 'center' }}>{getTypeIcon('number')}{t('featureFlags.fieldTypes.number')}</Box></MenuItem>
+                                <MenuItem value="boolean"><Box sx={{ display: 'flex', alignItems: 'center' }}>{getTypeIcon('boolean')}{t('featureFlags.fieldTypes.boolean')}</Box></MenuItem>
+                                <MenuItem value="datetime"><Box sx={{ display: 'flex', alignItems: 'center' }}>{getTypeIcon('datetime')}{t('featureFlags.fieldTypes.datetime')}</Box></MenuItem>
+                                <MenuItem value="semver"><Box sx={{ display: 'flex', alignItems: 'center' }}>{getTypeIcon('semver')}{t('featureFlags.fieldTypes.semver')}</Box></MenuItem>
                             </Select>
                             <FormHelperText>{t('featureFlags.fieldTypeHelp')}</FormHelperText>
                         </FormControl>
@@ -619,6 +804,15 @@ const FeatureContextFieldsPage: React.FC = () => {
                 onConfirm={handleDeleteConfirm}
                 title={t('featureFlags.deleteConfirmTitle')}
                 message={t('featureFlags.deleteConfirmMessage', { name: deletingField?.fieldName || '' })}
+            />
+
+            {/* Column Settings Dialog */}
+            <ColumnSettingsDialog
+                anchorEl={columnSettingsAnchor}
+                onClose={() => setColumnSettingsAnchor(null)}
+                columns={columns}
+                onColumnsChange={handleColumnsChange}
+                onReset={handleResetColumns}
             />
         </Box>
     );

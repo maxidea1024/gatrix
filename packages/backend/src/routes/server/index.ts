@@ -140,4 +140,10 @@ router.get('/:env/store-products/:id', authenticateServerApiToken, resolveEnviro
 // Planning data upload route (for external CLI uploads)
 router.post('/:env/planning-data/upload', authenticateServerApiToken as any, resolveEnvironment as any, upload.any() as any, PlanningDataController.uploadPlanningData as any);
 
+// Feature flag routes
+import ServerFeatureFlagController from '../../controllers/ServerFeatureFlagController';
+router.get('/:env/features', authenticateServerApiToken as any, resolveEnvironment as any, ServerFeatureFlagController.getFeatureFlags as any);
+router.get('/:env/features/:flagName', authenticateServerApiToken as any, resolveEnvironment as any, ServerFeatureFlagController.getFeatureFlag as any);
+router.post('/:env/features/metrics', authenticateServerApiToken as any, resolveEnvironment as any, ServerFeatureFlagController.receiveMetrics as any);
+
 export default router;

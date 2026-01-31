@@ -665,6 +665,32 @@ export class EventListener {
       // Note: maintenance.started and maintenance.ended are NOT handled here
       // They are local events emitted by MaintenanceWatcher based on cache state changes
 
+      case 'feature_flag.changed':
+      case 'feature_flag.created':
+      case 'feature_flag.updated':
+      case 'feature_flag.deleted': {
+        if (features.featureFlag !== true) {
+          this.logger.debug('Feature flag event ignored - feature is disabled', { event: event.type });
+          break;
+        }
+        const ffEnv = event.data.environment as string;
+        if (!ffEnv) {
+          this.logger.warn('Feature flag event missing environment', { event: event.type });
+          break;
+        }
+        this.logger.info('Feature flag event received, refreshing feature flags cache', {
+          type: event.type,
+          environment: ffEnv
+        });
+        try {
+          await this.cacheManager.getFeatureFlagService()?.refreshByEnvironment(ffEnv);
+          this.logger.info('Feature flags cache refreshed successfully');
+        } catch (error: any) {
+          this.logger.error('Failed to refresh feature flags cache', { error: error.message });
+        }
+        break;
+      }
+
       default:
         this.logger.warn('Unknown standard event type', { type: event.type });
     }
