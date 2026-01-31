@@ -1086,10 +1086,13 @@ export class FeatureMetricsModel {
                 .where('flagName', flagName)
                 .whereBetween('metricsBucket', [startDate, endDate]);
 
-            // Group variant metrics by bucket
+            // Group variant metrics by bucket (convert to ISO string for consistent key)
             const variantsByBucket: Record<string, Record<string, number>> = {};
             for (const vm of variantMetrics) {
-                const bucket = vm.metricsBucket;
+                // Convert bucket to ISO string for consistent comparison
+                const bucket = vm.metricsBucket instanceof Date
+                    ? vm.metricsBucket.toISOString()
+                    : String(vm.metricsBucket);
                 if (!variantsByBucket[bucket]) {
                     variantsByBucket[bucket] = {};
                 }
@@ -1097,10 +1100,15 @@ export class FeatureMetricsModel {
             }
 
             // Merge variant counts into main metrics
-            return metrics.map((m: any) => ({
-                ...m,
-                variantCounts: variantsByBucket[m.metricsBucket] || {},
-            }));
+            return metrics.map((m: any) => {
+                const bucket = m.metricsBucket instanceof Date
+                    ? m.metricsBucket.toISOString()
+                    : String(m.metricsBucket);
+                return {
+                    ...m,
+                    variantCounts: variantsByBucket[bucket] || {},
+                };
+            });
         } catch (error) {
             logger.error('Error getting metrics:', error);
             throw error;
