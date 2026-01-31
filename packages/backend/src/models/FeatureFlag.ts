@@ -1073,15 +1073,33 @@ export class FeatureMetricsModel {
         endDate: Date
     ): Promise<FeatureMetricsAttributes[]> {
         try {
+            // Get main metrics
             const metrics = await db('g_feature_metrics')
                 .where('environment', environment)
                 .where('flagName', flagName)
                 .whereBetween('metricsBucket', [startDate, endDate])
                 .orderBy('metricsBucket', 'asc');
 
+            // Get variant metrics for the same period
+            const variantMetrics = await db('g_feature_variant_metrics')
+                .where('environment', environment)
+                .where('flagName', flagName)
+                .whereBetween('metricsBucket', [startDate, endDate]);
+
+            // Group variant metrics by bucket
+            const variantsByBucket: Record<string, Record<string, number>> = {};
+            for (const vm of variantMetrics) {
+                const bucket = vm.metricsBucket;
+                if (!variantsByBucket[bucket]) {
+                    variantsByBucket[bucket] = {};
+                }
+                variantsByBucket[bucket][vm.variantName] = vm.count;
+            }
+
+            // Merge variant counts into main metrics
             return metrics.map((m: any) => ({
                 ...m,
-                variantCounts: parseJsonField<Record<string, number>>(m.variantCounts),
+                variantCounts: variantsByBucket[m.metricsBucket] || {},
             }));
         } catch (error) {
             logger.error('Error getting metrics:', error);

@@ -135,7 +135,7 @@ class FeatureMetricsService {
     }
 
     /**
-     * Upsert a single metric into the aggregation table
+     * Upsert a single metric into the aggregation tables
      */
     private async upsertMetric(
         environment: string,
@@ -144,34 +144,45 @@ class FeatureMetricsService {
     ): Promise<void> {
         const { flagName, enabled, variantName, count } = metric;
 
+        // Format hour bucket for MySQL DATETIME (YYYY-MM-DD HH:00:00)
+        const bucketDateTime = hourBucket.toISOString().slice(0, 13).replace('T', ' ') + ':00:00';
+
         // Update yesCount or noCount based on enabled value
         const yesIncrement = enabled ? count : 0;
         const noIncrement = enabled ? 0 : count;
 
-        // Update variantCounts if a variant was returned
-        const variantCountsJson = variantName ? JSON.stringify({ [variantName]: count }) : null;
-
-        // Upsert with ON DUPLICATE KEY UPDATE for efficiency
+        // Upsert main metrics (yesCount, noCount)
         await db.raw(`
-            INSERT INTO g_feature_metrics (id, environment, flagName, metricsBucket, yesCount, noCount, variantCounts, createdAt)
-            VALUES (?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())
+            INSERT INTO g_feature_metrics (id, environment, flagName, metricsBucket, yesCount, noCount, createdAt)
+            VALUES (?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())
             ON DUPLICATE KEY UPDATE 
                 yesCount = yesCount + VALUES(yesCount), 
-                noCount = noCount + VALUES(noCount),
-                variantCounts = CASE 
-                    WHEN VALUES(variantCounts) IS NOT NULL THEN 
-                        JSON_MERGE_PATCH(COALESCE(variantCounts, '{}'), VALUES(variantCounts))
-                    ELSE variantCounts 
-                END
+                noCount = noCount + VALUES(noCount)
         `, [
-            require('ulid').ulid(), // Generate unique ID
+            require('ulid').ulid(),
             environment,
             flagName,
-            hourBucket,
+            bucketDateTime,
             yesIncrement,
             noIncrement,
-            variantCountsJson
         ]);
+
+        // If there's a variant, upsert to variant metrics table
+        if (variantName) {
+            await db.raw(`
+                INSERT INTO g_feature_variant_metrics (id, environment, flagName, metricsBucket, variantName, count, createdAt)
+                VALUES (?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())
+                ON DUPLICATE KEY UPDATE 
+                    count = count + VALUES(count)
+            `, [
+                require('ulid').ulid(),
+                environment,
+                flagName,
+                bucketDateTime,
+                variantName,
+                count,
+            ]);
+        }
     }
 
     /**

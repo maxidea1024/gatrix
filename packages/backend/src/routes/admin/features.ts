@@ -456,9 +456,6 @@ router.post(
             variantName
         );
 
-        // Also update lastSeenAt for this flag
-        await featureFlagService.updateLastSeenAt(req.params.flagName, environment);
-
         res.json({ success: true });
     })
 );
