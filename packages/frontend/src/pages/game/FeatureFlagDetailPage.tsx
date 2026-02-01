@@ -77,6 +77,7 @@ import {
     Science as ExperimentIcon,
     Build as OperationalIcon,
     Security as PermissionIcon,
+    PowerOff as KillSwitchIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { PERMISSIONS } from '../../types/permissions';
@@ -182,10 +183,11 @@ const STRATEGY_TYPES = [
 ];
 
 const FLAG_TYPES = [
-    { value: 'release', labelKey: 'featureFlags.types.release' },
-    { value: 'experiment', labelKey: 'featureFlags.types.experiment' },
-    { value: 'operational', labelKey: 'featureFlags.types.operational' },
-    { value: 'permission', labelKey: 'featureFlags.types.permission' },
+    { value: 'release', labelKey: 'featureFlags.types.release', descKey: 'featureFlags.flagTypes.release.desc' },
+    { value: 'experiment', labelKey: 'featureFlags.types.experiment', descKey: 'featureFlags.flagTypes.experiment.desc' },
+    { value: 'operational', labelKey: 'featureFlags.types.operational', descKey: 'featureFlags.flagTypes.operational.desc' },
+    { value: 'killSwitch', labelKey: 'featureFlags.types.killSwitch', descKey: 'featureFlags.flagTypes.killSwitch.desc' },
+    { value: 'permission', labelKey: 'featureFlags.types.permission', descKey: 'featureFlags.flagTypes.permission.desc' },
 ];
 
 // Get icon for flag type
@@ -195,6 +197,7 @@ const getTypeIcon = (type: string, size: number = 16) => {
         case 'release': return <ReleaseIcon {...iconProps} color="primary" />;
         case 'experiment': return <ExperimentIcon {...iconProps} color="secondary" />;
         case 'operational': return <OperationalIcon {...iconProps} color="warning" />;
+        case 'killSwitch': return <KillSwitchIcon {...iconProps} color="error" />;
         case 'permission': return <PermissionIcon {...iconProps} color="action" />;
         default: return null;
     }
@@ -1100,7 +1103,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                     {/* Left Sidebar - Flag Details */}
                     <Box sx={{ width: { xs: '100%', md: 320 }, flexShrink: 0 }}>
                         {/* Flag Details Card */}
-                        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+                        <Paper variant="outlined" sx={{ p: 2, mb: 2, borderRadius: 1, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
                             <Typography variant="subtitle2" fontWeight={600} gutterBottom>
                                 {t('featureFlags.flagDetails')}
                             </Typography>
@@ -1115,16 +1118,23 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         {t('featureFlags.flagType')}
                                     </Typography>
                                     {isCreating ? (
-                                        <FormControl size="small" sx={{ minWidth: 120 }}>
+                                        <FormControl size="small" sx={{ minWidth: 200 }}>
                                             <Select
                                                 value={flag.flagType}
                                                 onChange={(e) => setFlag({ ...flag, flagType: e.target.value as any })}
                                             >
                                                 {FLAG_TYPES.map(type => (
                                                     <MenuItem key={type.value} value={type.value}>
-                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                            {getTypeIcon(type.value)}
-                                                            {t(type.labelKey)}
+                                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                                                            <Box sx={{ mt: 0.3 }}>{getTypeIcon(type.value)}</Box>
+                                                            <Box>
+                                                                <Typography variant="body2" fontWeight={500}>
+                                                                    {t(type.labelKey)}
+                                                                </Typography>
+                                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                                    {t(type.descKey)}
+                                                                </Typography>
+                                                            </Box>
                                                         </Box>
                                                     </MenuItem>
                                                 ))}
@@ -1356,7 +1366,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                         )}
 
                         {/* Links Section */}
-                        <Paper variant="outlined" sx={{ p: 2 }}>
+                        <Paper variant="outlined" sx={{ p: 2, borderRadius: 1, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
                             <Typography variant="subtitle2" color="text.secondary" gutterBottom>
                                 {t('featureFlags.links.title')}
                             </Typography>
@@ -1448,7 +1458,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         {envIndex > 0 && (
                                             <Divider sx={{ borderStyle: 'dashed', my: 1 }} />
                                         )}
-                                        <Box sx={{ display: 'flex', border: 1, borderColor: 'divider', overflow: 'hidden' }}>
+                                        <Box sx={{ display: 'flex', border: 1, borderColor: 'divider', overflow: 'hidden', borderRadius: 1, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
                                             {/* Color indicator bar */}
                                             <Box sx={{ width: 4, bgcolor: env.color || '#888', flexShrink: 0 }} />
                                             {/* Content */}
@@ -1527,10 +1537,24 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                 const yesPercent = Math.round((metrics.totalYes / metrics.total) * 100);
                                                                 const noPercent = 100 - yesPercent;
 
-                                                                // SVG-based mini pie chart
-                                                                const radius = 16;
-                                                                const circumference = 2 * Math.PI * radius;
-                                                                const yesArc = (yesPercent / 100) * circumference;
+                                                                // SVG-based mini pie chart - filled style
+                                                                const radius = 24;
+                                                                const cx = 26;
+                                                                const cy = 26;
+
+                                                                // Calculate arc path for pie chart
+                                                                const getArcPath = (startAngle: number, endAngle: number, r: number) => {
+                                                                    const startRad = (startAngle - 90) * Math.PI / 180;
+                                                                    const endRad = (endAngle - 90) * Math.PI / 180;
+                                                                    const x1 = cx + r * Math.cos(startRad);
+                                                                    const y1 = cy + r * Math.sin(startRad);
+                                                                    const x2 = cx + r * Math.cos(endRad);
+                                                                    const y2 = cy + r * Math.sin(endRad);
+                                                                    const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+                                                                    return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+                                                                };
+
+                                                                const yesAngle = (yesPercent / 100) * 360;
 
                                                                 return (
                                                                     <Tooltip
@@ -1542,36 +1566,40 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                             alignItems: 'center',
                                                                             gap: 1,
                                                                         }}>
-                                                                            <svg width="40" height="40" viewBox="0 0 40 40">
-                                                                                {/* Background circle (No) */}
+                                                                            <svg width="52" height="52" viewBox="0 0 52 52">
+                                                                                {/* No (red) - full circle background */}
                                                                                 <circle
-                                                                                    cx="20"
-                                                                                    cy="20"
+                                                                                    cx={cx}
+                                                                                    cy={cy}
                                                                                     r={radius}
-                                                                                    fill="none"
-                                                                                    stroke="#ef5350"
-                                                                                    strokeWidth="8"
+                                                                                    fill="#ef5350"
                                                                                 />
-                                                                                {/* Foreground arc (Yes) - starts from top */}
-                                                                                <circle
-                                                                                    cx="20"
-                                                                                    cy="20"
-                                                                                    r={radius}
-                                                                                    fill="none"
-                                                                                    stroke="#4caf50"
-                                                                                    strokeWidth="8"
-                                                                                    strokeDasharray={`${yesArc} ${circumference}`}
-                                                                                    transform="rotate(-90 20 20)"
-                                                                                />
+                                                                                {/* Yes (green) - pie slice */}
+                                                                                {yesPercent > 0 && yesPercent < 100 && (
+                                                                                    <path
+                                                                                        d={getArcPath(0, yesAngle, radius)}
+                                                                                        fill="#4caf50"
+                                                                                    />
+                                                                                )}
+                                                                                {yesPercent >= 100 && (
+                                                                                    <circle
+                                                                                        cx={cx}
+                                                                                        cy={cy}
+                                                                                        r={radius}
+                                                                                        fill="#4caf50"
+                                                                                    />
+                                                                                )}
                                                                                 {/* Center text */}
                                                                                 <text
-                                                                                    x="20"
-                                                                                    y="20"
+                                                                                    x={cx}
+                                                                                    y={cy}
                                                                                     textAnchor="middle"
                                                                                     dominantBaseline="central"
-                                                                                    fontSize="10"
-                                                                                    fontWeight="600"
-                                                                                    fill="currentColor"
+                                                                                    fontSize="14"
+                                                                                    fontWeight="700"
+                                                                                    fill="white"
+                                                                                    stroke="#333"
+                                                                                    strokeWidth="0.3"
                                                                                 >
                                                                                     {yesPercent}%
                                                                                 </text>

@@ -525,7 +525,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     const hasVariants = Object.keys(aggregatedMetrics.variantCounts).length > 0;
 
     return (
-        <Box sx={{ p: 3 }}>
+        <Box>
             {/* Controls Row - Unleash style */}
             <Box sx={{ display: 'flex', gap: 3, mb: 3, flexWrap: 'wrap', alignItems: 'flex-start' }}>
                 {/* Environment Toggle */}

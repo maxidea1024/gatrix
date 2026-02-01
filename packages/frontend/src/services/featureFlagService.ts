@@ -21,8 +21,10 @@ export interface FeatureFlag {
     description?: string;
     flagType: FlagType;
     isArchived: boolean;
+    isFavorite?: boolean;
     impressionDataEnabled: boolean;
     staleAfterDays?: number;
+    stale?: boolean;
     tags?: string[];
     archivedAt?: string;
     createdBy?: number;
@@ -140,6 +142,14 @@ export async function reviveFeatureFlag(flagName: string): Promise<FeatureFlag> 
 }
 
 /**
+ * Toggle favorite status
+ */
+export async function toggleFavorite(flagName: string, isFavorite: boolean): Promise<FeatureFlag> {
+    const response = await api.post(`/admin/features/${flagName}/favorite`, { isFavorite });
+    return response.data.flag;
+}
+
+/**
  * Delete a feature flag
  */
 export async function deleteFeatureFlag(flagName: string): Promise<void> {
@@ -154,6 +164,7 @@ const featureFlagService = {
     toggleFeatureFlag,
     archiveFeatureFlag,
     reviveFeatureFlag,
+    toggleFavorite,
     deleteFeatureFlag,
 };
 

@@ -19,6 +19,7 @@ import {
     Tooltip,
     Card,
     CardContent,
+    Paper,
     TableSortLabel,
     FormControl,
     Select,
@@ -37,6 +38,7 @@ import {
     Menu,
     ListItemIcon,
     ListItemText,
+    ClickAwayListener,
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -52,9 +54,18 @@ import {
     Science as ExperimentIcon,
     Build as OperationalIcon,
     Security as PermissionIcon,
+    PowerOff as KillSwitchIcon,
     ViewColumn as ViewColumnIcon,
     FileUpload as ImportIcon,
     FileDownload as ExportIcon,
+    CheckCircle as CheckCircleIcon,
+    MoreVert as MoreVertIcon,
+    FileCopy as CloneIcon,
+    ReportProblem as StaleIcon,
+    Cancel as CancelIcon,
+    Close as CloseIcon,
+    Star as StarIcon,
+    StarBorder as StarBorderIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -132,6 +143,14 @@ const FeatureFlagsPage: React.FC = () => {
     const [importData, setImportData] = useState<string>('');
     const [importing, setImporting] = useState(false);
 
+    // Action menu state
+    const [actionMenuAnchor, setActionMenuAnchor] = useState<null | HTMLElement>(null);
+    const [actionMenuFlag, setActionMenuFlag] = useState<FeatureFlag | null>(null);
+
+    // Bulk action menu state
+    const [envMenuAnchor, setEnvMenuAnchor] = useState<null | HTMLElement>(null);
+    const [staleMenuAnchor, setStaleMenuAnchor] = useState<null | HTMLElement>(null);
+
     // Column settings state
     const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
     const defaultColumns: ColumnConfig[] = [
@@ -163,15 +182,15 @@ const FeatureFlagsPage: React.FC = () => {
 
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-    // Extract filter values with useMemo
+    // Extract filter values with useMemo (as string[] for multiselect)
     const flagTypeFilter = useMemo(() => {
         const filter = activeFilters.find(f => f.key === 'flagType');
-        return filter?.value as string | undefined;
+        return filter?.value as string[] | undefined;
     }, [activeFilters]);
 
     const statusFilter = useMemo(() => {
         const filter = activeFilters.find(f => f.key === 'status');
-        return filter?.value as string | undefined;
+        return filter?.value as string[] | undefined;
     }, [activeFilters]);
 
     const tagFilter = useMemo(() => {
@@ -179,28 +198,53 @@ const FeatureFlagsPage: React.FC = () => {
         return filter?.value as string[] | undefined;
     }, [activeFilters]);
 
+    // Icon helpers for filter options
+    const getStatusIcon = (status: string) => {
+        const iconProps = { sx: { fontSize: 16 } };
+        switch (status) {
+            case 'active': return <CheckCircleIcon {...iconProps} color="success" />;
+            case 'archived': return <ArchiveIcon {...iconProps} color="disabled" />;
+            case 'stale': return <WarningIcon {...iconProps} color="error" />;
+            case 'potentiallyStale': return <WarningIcon {...iconProps} color="warning" />;
+            default: return null;
+        }
+    };
+
+    const getTypeIconSmall = (type: string) => {
+        const iconProps = { sx: { fontSize: 16 } };
+        switch (type) {
+            case 'release': return <ReleaseIcon {...iconProps} color="primary" />;
+            case 'experiment': return <ExperimentIcon {...iconProps} color="secondary" />;
+            case 'operational': return <OperationalIcon {...iconProps} color="warning" />;
+            case 'killSwitch': return <KillSwitchIcon {...iconProps} color="error" />;
+            case 'permission': return <PermissionIcon {...iconProps} color="action" />;
+            default: return <FlagIcon {...iconProps} />;
+        }
+    };
+
     // Filter definitions
     const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
         {
             key: 'status',
             label: t('featureFlags.status'),
-            type: 'select',
+            type: 'multiselect',
             options: [
-                { value: 'active', label: t('featureFlags.statusActive') },
-                { value: 'archived', label: t('featureFlags.statusArchived') },
-                { value: 'stale', label: t('featureFlags.statusStale') },
-                { value: 'potentiallyStale', label: t('featureFlags.statusPotentiallyStale') },
+                { value: 'active', label: t('featureFlags.statusActive'), icon: getStatusIcon('active') },
+                { value: 'archived', label: t('featureFlags.statusArchived'), icon: getStatusIcon('archived') },
+                { value: 'stale', label: t('featureFlags.statusStale'), icon: getStatusIcon('stale') },
+                { value: 'potentiallyStale', label: t('featureFlags.statusPotentiallyStale'), icon: getStatusIcon('potentiallyStale') },
             ],
         },
         {
             key: 'flagType',
             label: t('featureFlags.flagType'),
-            type: 'select',
+            type: 'multiselect',
             options: [
-                { value: 'release', label: t('featureFlags.types.release') },
-                { value: 'experiment', label: t('featureFlags.types.experiment') },
-                { value: 'operational', label: t('featureFlags.types.operational') },
-                { value: 'permission', label: t('featureFlags.types.permission') },
+                { value: 'release', label: t('featureFlags.types.release'), icon: getTypeIconSmall('release') },
+                { value: 'experiment', label: t('featureFlags.types.experiment'), icon: getTypeIconSmall('experiment') },
+                { value: 'operational', label: t('featureFlags.types.operational'), icon: getTypeIconSmall('operational') },
+                { value: 'killSwitch', label: t('featureFlags.types.killSwitch'), icon: getTypeIconSmall('killSwitch') },
+                { value: 'permission', label: t('featureFlags.types.permission'), icon: getTypeIconSmall('permission') },
             ],
         },
         {
@@ -220,31 +264,80 @@ const FeatureFlagsPage: React.FC = () => {
     const loadFlags = async () => {
         setLoading(true);
         try {
-            // Determine isArchived and status based on statusFilter
+            // Determine isArchived and status based on statusFilter (multiselect)
             let isArchived: boolean | undefined = undefined;
             let status: string | undefined = undefined;
 
-            if (statusFilter === 'archived') {
-                isArchived = true;
-            } else if (statusFilter === 'active') {
-                isArchived = false;
-            } else if (statusFilter === 'stale' || statusFilter === 'potentiallyStale') {
-                isArchived = false;
-                status = statusFilter;
+            // For multiselect, if only specific statuses are selected, apply them
+            if (statusFilter && statusFilter.length > 0) {
+                // If only archived is selected
+                if (statusFilter.length === 1 && statusFilter[0] === 'archived') {
+                    isArchived = true;
+                }
+                // If only active is selected
+                else if (statusFilter.length === 1 && statusFilter[0] === 'active') {
+                    isArchived = false;
+                }
+                // If stale or potentiallyStale is selected without archived
+                else if (!statusFilter.includes('archived') && (statusFilter.includes('stale') || statusFilter.includes('potentiallyStale'))) {
+                    isArchived = false;
+                    if (statusFilter.length === 1) {
+                        status = statusFilter[0];
+                    }
+                }
             }
+
+            // For multiselect flagType, take the first value or undefined
+            // TODO: Backend should support multiple flag types in the future
+            const selectedFlagType = flagTypeFilter && flagTypeFilter.length > 0
+                ? flagTypeFilter[0] as FlagType
+                : undefined;
 
             const result = await featureFlagService.getFeatureFlags({
                 page: page + 1,
                 limit: rowsPerPage,
                 search: debouncedSearchTerm || undefined,
-                flagType: (flagTypeFilter as FlagType) || undefined,
+                flagType: selectedFlagType,
                 isArchived,
                 sortBy: orderBy,
                 sortOrder: order,
             });
 
             if (result && typeof result === 'object' && 'flags' in result && Array.isArray(result.flags)) {
-                setFlags(result.flags);
+                // Apply client-side filtering for multiselect values that server doesn't support
+                let filteredFlags = result.flags;
+
+                // Filter by flagType (if any selected)
+                if (flagTypeFilter && flagTypeFilter.length > 0) {
+                    filteredFlags = filteredFlags.filter(f => flagTypeFilter.includes(f.flagType));
+                }
+
+                // Filter by status (if any selected)
+                if (statusFilter && statusFilter.length > 0) {
+                    filteredFlags = filteredFlags.filter(f => {
+                        // Determine the flag's status
+                        let flagStatus: string;
+                        if (f.isArchived) {
+                            flagStatus = 'archived';
+                        } else if (f.stale) {
+                            flagStatus = 'stale';
+                        } else if (f.potentiallyStale) {
+                            flagStatus = 'potentiallyStale';
+                        } else {
+                            flagStatus = 'active';
+                        }
+                        return statusFilter.includes(flagStatus);
+                    });
+                }
+
+                // Filter by tag
+                if (tagFilter && tagFilter.length > 0) {
+                    filteredFlags = filteredFlags.filter(f =>
+                        tagFilter.some(tag => f.tags?.includes(tag))
+                    );
+                }
+
+                setFlags(filteredFlags);
                 const validTotal = typeof result.total === 'number' && !isNaN(result.total) ? result.total : 0;
                 setTotal(validTotal);
             } else {
@@ -663,6 +756,200 @@ const FeatureFlagsPage: React.FC = () => {
         setDeletingFlag(null);
     };
 
+    // Action menu handlers
+    const handleActionMenuOpen = (event: React.MouseEvent<HTMLElement>, flag: FeatureFlag) => {
+        event.stopPropagation();
+        setActionMenuAnchor(event.currentTarget);
+        setActionMenuFlag(flag);
+    };
+
+    const handleActionMenuClose = () => {
+        setActionMenuAnchor(null);
+        setActionMenuFlag(null);
+    };
+
+    // Copy flag name to clipboard
+    const handleCopyName = () => {
+        if (actionMenuFlag) {
+            copyToClipboardWithNotification(actionMenuFlag.flagName, t, enqueueSnackbar);
+        }
+        handleActionMenuClose();
+    };
+
+    // Clone flag - navigate to detail page with clone mode
+    const handleClone = () => {
+        if (actionMenuFlag) {
+            navigate(`/game/feature-flags/${actionMenuFlag.flagName}?clone=true`);
+        }
+        handleActionMenuClose();
+    };
+
+    // Toggle stale status
+    const handleStaleToggle = async () => {
+        if (!actionMenuFlag) return;
+        try {
+            const newStale = !actionMenuFlag.stale;
+            await api.put(`/admin/features/${actionMenuFlag.flagName}`, { stale: newStale });
+            enqueueSnackbar(
+                newStale ? t('featureFlags.markStaleSuccess') : t('featureFlags.clearStaleSuccess'),
+                { variant: 'success' }
+            );
+            loadFlags();
+        } catch (error: any) {
+            enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.updateFailed'), { variant: 'error' });
+        } finally {
+            handleActionMenuClose();
+        }
+    };
+
+    // Toggle favorite status
+    const handleFavoriteToggle = async (flag: FeatureFlag) => {
+        try {
+            const newFavorite = !flag.isFavorite;
+            await featureFlagService.toggleFavorite(flag.flagName, newFavorite);
+            enqueueSnackbar(
+                newFavorite ? t('featureFlags.addFavoriteSuccess') : t('featureFlags.removeFavoriteSuccess'),
+                { variant: 'success' }
+            );
+            loadFlags();
+        } catch (error: any) {
+            enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.updateFailed'), { variant: 'error' });
+        }
+    };
+
+    // Archive from action menu
+    const handleArchiveFromMenu = () => {
+        if (actionMenuFlag) {
+            handleArchiveToggle(actionMenuFlag);
+        }
+        handleActionMenuClose();
+    };
+
+    // Delete from action menu
+    const handleDeleteFromMenu = () => {
+        if (actionMenuFlag) {
+            handleDelete(actionMenuFlag);
+        }
+        handleActionMenuClose();
+    };
+
+    // Bulk action handlers
+    const handleBulkArchive = async () => {
+        const flagNames = Array.from(selectedFlags);
+        const nonArchivedFlags = flags.filter(f => flagNames.includes(f.flagName) && !f.isArchived);
+
+        if (nonArchivedFlags.length === 0) {
+            enqueueSnackbar(t('featureFlags.noFlagsToArchive'), { variant: 'warning' });
+            return;
+        }
+
+        try {
+            for (const flag of nonArchivedFlags) {
+                await featureFlagService.archiveFeatureFlag(flag.flagName);
+            }
+            enqueueSnackbar(t('featureFlags.bulkArchiveSuccess', { count: nonArchivedFlags.length }), { variant: 'success' });
+            setSelectedFlags(new Set());
+            loadFlags();
+        } catch (error: any) {
+            enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.bulkArchiveFailed'), { variant: 'error' });
+        }
+    };
+
+    const handleBulkRevive = async () => {
+        const flagNames = Array.from(selectedFlags);
+        const archivedFlags = flags.filter(f => flagNames.includes(f.flagName) && f.isArchived);
+
+        if (archivedFlags.length === 0) {
+            enqueueSnackbar(t('featureFlags.noFlagsToRevive'), { variant: 'warning' });
+            return;
+        }
+
+        try {
+            for (const flag of archivedFlags) {
+                await featureFlagService.reviveFeatureFlag(flag.flagName);
+            }
+            enqueueSnackbar(t('featureFlags.bulkReviveSuccess', { count: archivedFlags.length }), { variant: 'success' });
+            setSelectedFlags(new Set());
+            loadFlags();
+        } catch (error: any) {
+            enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.bulkReviveFailed'), { variant: 'error' });
+        }
+    };
+
+    const handleBulkStale = async (markAsStale: boolean) => {
+        const flagNames = Array.from(selectedFlags);
+        const targetFlags = flags.filter(f =>
+            flagNames.includes(f.flagName) &&
+            !f.isArchived &&
+            f.stale !== markAsStale
+        );
+
+        if (targetFlags.length === 0) {
+            enqueueSnackbar(t('featureFlags.noFlagsToUpdate'), { variant: 'warning' });
+            return;
+        }
+
+        try {
+            for (const flag of targetFlags) {
+                await api.put(`/admin/features/${flag.flagName}`, { stale: markAsStale });
+            }
+            enqueueSnackbar(
+                markAsStale
+                    ? t('featureFlags.bulkMarkStaleSuccess', { count: targetFlags.length })
+                    : t('featureFlags.bulkClearStaleSuccess', { count: targetFlags.length }),
+                { variant: 'success' }
+            );
+            setSelectedFlags(new Set());
+            loadFlags();
+        } catch (error: any) {
+            enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.bulkUpdateFailed'), { variant: 'error' });
+        }
+    };
+
+    const handleBulkEnable = async (environment: string, enable: boolean) => {
+        const flagNames = Array.from(selectedFlags);
+        const targetFlags = flags.filter(f => flagNames.includes(f.flagName) && !f.isArchived);
+
+        if (targetFlags.length === 0) {
+            enqueueSnackbar(t('featureFlags.noFlagsToUpdate'), { variant: 'warning' });
+            return;
+        }
+
+        try {
+            for (const flag of targetFlags) {
+                await featureFlagService.toggleFeatureFlag(flag.flagName, enable, environment);
+            }
+            enqueueSnackbar(
+                enable
+                    ? t('featureFlags.bulkEnableSuccess', { count: targetFlags.length, env: environment })
+                    : t('featureFlags.bulkDisableSuccess', { count: targetFlags.length, env: environment }),
+                { variant: 'success' }
+            );
+            setSelectedFlags(new Set());
+            loadFlags();
+        } catch (error: any) {
+            enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.bulkToggleFailed'), { variant: 'error' });
+        }
+    };
+
+    const handleSelectAll = (checked: boolean) => {
+        if (checked) {
+            setSelectedFlags(new Set(flags.map(f => f.flagName)));
+        } else {
+            setSelectedFlags(new Set());
+        }
+    };
+
+    const handleSelectFlag = (flagName: string, checked: boolean) => {
+        const newSelected = new Set(selectedFlags);
+        if (checked) {
+            newSelected.add(flagName);
+        } else {
+            newSelected.delete(flagName);
+        }
+        setSelectedFlags(newSelected);
+    };
+
     // Create flag handler
     const handleCreateFlag = async () => {
         if (!newFlag.flagName.trim()) {
@@ -709,11 +996,12 @@ const FeatureFlagsPage: React.FC = () => {
     };
 
     // Flag type chip color
-    const getTypeColor = (type: FlagType): 'default' | 'primary' | 'secondary' | 'warning' => {
+    const getTypeColor = (type: FlagType): 'default' | 'primary' | 'secondary' | 'warning' | 'error' => {
         switch (type) {
             case 'release': return 'primary';
             case 'experiment': return 'secondary';
             case 'operational': return 'warning';
+            case 'killSwitch': return 'error';
             case 'permission': return 'default';
             default: return 'default';
         }
@@ -726,6 +1014,7 @@ const FeatureFlagsPage: React.FC = () => {
             case 'release': return <ReleaseIcon {...iconProps} color="primary" />;
             case 'experiment': return <ExperimentIcon {...iconProps} color="secondary" />;
             case 'operational': return <OperationalIcon {...iconProps} color="warning" />;
+            case 'killSwitch': return <KillSwitchIcon {...iconProps} color="error" />;
             case 'permission': return <PermissionIcon {...iconProps} color="action" />;
             default: return <FlagIcon {...iconProps} />;
         }
@@ -879,6 +1168,17 @@ const FeatureFlagsPage: React.FC = () => {
                                                     size="small"
                                                 />
                                             </TableCell>
+                                            <TableCell padding="checkbox" sx={{ width: 40 }}>
+                                                <Tooltip title={t('featureFlags.sortByFavorite')}>
+                                                    <TableSortLabel
+                                                        active={orderBy === 'isFavorite'}
+                                                        direction={orderBy === 'isFavorite' ? order : 'desc'}
+                                                        onClick={() => handleSort('isFavorite')}
+                                                    >
+                                                        <StarIcon fontSize="small" />
+                                                    </TableSortLabel>
+                                                </Tooltip>
+                                            </TableCell>
                                             <TableCell>
                                                 <TableSortLabel active={orderBy === 'flagName'} direction={orderBy === 'flagName' ? order : 'asc'} onClick={() => handleSort('flagName')}>
                                                     {t('featureFlags.flagName')}
@@ -943,6 +1243,15 @@ const FeatureFlagsPage: React.FC = () => {
                                                         onClick={(e) => e.stopPropagation()}
                                                         size="small"
                                                     />
+                                                </TableCell>
+                                                <TableCell padding="checkbox" sx={{ width: 40 }}>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={(e) => { e.stopPropagation(); handleFavoriteToggle(flag); }}
+                                                        sx={{ color: flag.isFavorite ? 'warning.main' : 'action.disabled' }}
+                                                    >
+                                                        {flag.isFavorite ? <StarIcon fontSize="small" /> : <StarBorderIcon fontSize="small" />}
+                                                    </IconButton>
                                                 </TableCell>
                                                 <TableCell>
                                                     <Box>
@@ -1068,23 +1377,14 @@ const FeatureFlagsPage: React.FC = () => {
                                                 </TableCell>
                                                 {canManage && (
                                                     <TableCell align="center">
-                                                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                                                            <Tooltip title={flag.isArchived ? t('featureFlags.revive') : t('featureFlags.archive')}>
-                                                                <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleArchiveToggle(flag); }}>
-                                                                    {flag.isArchived ? <UnarchiveIcon fontSize="small" /> : <ArchiveIcon fontSize="small" />}
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                            {flag.isArchived && (
-                                                                <Tooltip title={t('common.delete')}>
-                                                                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleDelete(flag); }}>
-                                                                        <DeleteIcon fontSize="small" />
-                                                                    </IconButton>
-                                                                </Tooltip>
-                                                            )}
-                                                        </Box>
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={(e) => handleActionMenuOpen(e, flag)}
+                                                        >
+                                                            <MoreVertIcon fontSize="small" />
+                                                        </IconButton>
                                                     </TableCell>
-                                                )}
-                                            </TableRow>
+                                                )}</TableRow>
                                         ))}
                                     </TableBody>
                                 </Table>
@@ -1100,6 +1400,166 @@ const FeatureFlagsPage: React.FC = () => {
                     )}
                 </CardContent>
             </Card>
+
+            {/* Bulk Action Bar */}
+            {selectedFlags.size > 0 && canManage && (
+                <ClickAwayListener onClickAway={() => setSelectedFlags(new Set())}>
+                    <Paper
+                        elevation={8}
+                        sx={{
+                            position: 'fixed',
+                            bottom: 24,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            px: 3,
+                            py: 1.5,
+                            borderRadius: 3,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 2,
+                            zIndex: 1000,
+                            bgcolor: 'background.paper',
+                        }}
+                    >
+                        <Chip
+                            label={`${selectedFlags.size} ${t('common.selected')}`}
+                            color="primary"
+                            size="small"
+                        />
+                        <Divider orientation="vertical" flexItem />
+
+                        {/* Environment Enable/Disable Dropdown */}
+                        <Box>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                onClick={(e) => setEnvMenuAnchor(e.currentTarget)}
+                            >
+                                {t('common.enable')} / {t('common.disable')}
+                            </Button>
+                            <Menu
+                                anchorEl={envMenuAnchor}
+                                open={Boolean(envMenuAnchor)}
+                                onClose={() => setEnvMenuAnchor(null)}
+                            >
+                                {environments.map(env => (
+                                    <Box key={env.environment}>
+                                        <MenuItem onClick={() => { handleBulkEnable(env.environment, true); setEnvMenuAnchor(null); }}>
+                                            <ListItemIcon><CheckCircleIcon fontSize="small" color="success" /></ListItemIcon>
+                                            <ListItemText>{t('common.enable')} - {env.displayName}</ListItemText>
+                                        </MenuItem>
+                                        <MenuItem onClick={() => { handleBulkEnable(env.environment, false); setEnvMenuAnchor(null); }}>
+                                            <ListItemIcon><CancelIcon fontSize="small" color="error" /></ListItemIcon>
+                                            <ListItemText>{t('common.disable')} - {env.displayName}</ListItemText>
+                                        </MenuItem>
+                                    </Box>
+                                ))}
+                            </Menu>
+                        </Box>
+
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            startIcon={<ArchiveIcon />}
+                            onClick={handleBulkArchive}
+                        >
+                            {t('featureFlags.archive')}
+                        </Button>
+
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            startIcon={<UnarchiveIcon />}
+                            onClick={handleBulkRevive}
+                        >
+                            {t('featureFlags.revive')}
+                        </Button>
+
+                        {/* Stale Actions Dropdown */}
+                        <Box>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                onClick={(e) => setStaleMenuAnchor(e.currentTarget)}
+                                startIcon={<StaleIcon />}
+                            >
+                                Stale
+                            </Button>
+                            <Menu
+                                anchorEl={staleMenuAnchor}
+                                open={Boolean(staleMenuAnchor)}
+                                onClose={() => setStaleMenuAnchor(null)}
+                            >
+                                <MenuItem onClick={() => { handleBulkStale(true); setStaleMenuAnchor(null); }}>
+                                    <ListItemIcon><StaleIcon fontSize="small" color="warning" /></ListItemIcon>
+                                    <ListItemText>{t('featureFlags.markStale')}</ListItemText>
+                                </MenuItem>
+                                <MenuItem onClick={() => { handleBulkStale(false); setStaleMenuAnchor(null); }}>
+                                    <ListItemIcon><CheckCircleIcon fontSize="small" /></ListItemIcon>
+                                    <ListItemText>{t('featureFlags.clearStale')}</ListItemText>
+                                </MenuItem>
+                            </Menu>
+                        </Box>
+
+                        <Divider orientation="vertical" flexItem />
+
+                        <IconButton size="small" onClick={() => setSelectedFlags(new Set())}>
+                            <CloseIcon fontSize="small" />
+                        </IconButton>
+                    </Paper>
+                </ClickAwayListener>
+            )}
+            {/* Action Menu */}
+            <Menu
+                anchorEl={actionMenuAnchor}
+                open={Boolean(actionMenuAnchor)}
+                onClose={handleActionMenuClose}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <MenuItem onClick={handleCopyName}>
+                    <ListItemIcon>
+                        <CopyIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>{t('featureFlags.copyName')}</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={handleClone} disabled={!actionMenuFlag || actionMenuFlag.isArchived}>
+                    <ListItemIcon>
+                        <CloneIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>{t('featureFlags.clone')}</ListItemText>
+                </MenuItem>
+                <Divider />
+                <MenuItem onClick={handleStaleToggle} disabled={!actionMenuFlag || actionMenuFlag.isArchived}>
+                    <ListItemIcon>
+                        <StaleIcon fontSize="small" color={actionMenuFlag?.stale ? 'warning' : 'inherit'} />
+                    </ListItemIcon>
+                    <ListItemText>
+                        {actionMenuFlag?.stale ? t('featureFlags.clearStale') : t('featureFlags.markStale')}
+                    </ListItemText>
+                </MenuItem>
+                <MenuItem
+                    onClick={handleArchiveFromMenu}
+                    disabled={!actionMenuFlag}
+                >
+                    <ListItemIcon>
+                        {actionMenuFlag?.isArchived ? <UnarchiveIcon fontSize="small" /> : <ArchiveIcon fontSize="small" />}
+                    </ListItemIcon>
+                    <ListItemText>
+                        {actionMenuFlag?.isArchived ? t('featureFlags.revive') : t('featureFlags.archive')}
+                    </ListItemText>
+                </MenuItem>
+                {actionMenuFlag?.isArchived && (
+                    <>
+                        <Divider />
+                        <MenuItem onClick={handleDeleteFromMenu} sx={{ color: 'error.main' }}>
+                            <ListItemIcon>
+                                <DeleteIcon fontSize="small" color="error" />
+                            </ListItemIcon>
+                            <ListItemText>{t('common.delete')}</ListItemText>
+                        </MenuItem>
+                    </>
+                )}
+            </Menu>
 
             {/* Delete Confirmation Dialog */}
             <ConfirmDeleteDialog
@@ -1160,10 +1620,51 @@ const FeatureFlagsPage: React.FC = () => {
                                 label={t('featureFlags.flagType')}
                                 onChange={(e) => setNewFlag({ ...newFlag, flagType: e.target.value as FlagType })}
                             >
-                                <MenuItem value="release">{t('featureFlags.types.release')}</MenuItem>
-                                <MenuItem value="experiment">{t('featureFlags.types.experiment')}</MenuItem>
-                                <MenuItem value="operational">{t('featureFlags.types.operational')}</MenuItem>
-                                <MenuItem value="permission">{t('featureFlags.types.permission')}</MenuItem>
+                                <MenuItem value="release">
+                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                                        <Box sx={{ mt: 0.3 }}><ReleaseIcon sx={{ fontSize: 18 }} color="primary" /></Box>
+                                        <Box>
+                                            <Typography variant="body2" fontWeight={500}>{t('featureFlags.types.release')}</Typography>
+                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>{t('featureFlags.flagTypes.release.desc')}</Typography>
+                                        </Box>
+                                    </Box>
+                                </MenuItem>
+                                <MenuItem value="experiment">
+                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                                        <Box sx={{ mt: 0.3 }}><ExperimentIcon sx={{ fontSize: 18 }} color="secondary" /></Box>
+                                        <Box>
+                                            <Typography variant="body2" fontWeight={500}>{t('featureFlags.types.experiment')}</Typography>
+                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>{t('featureFlags.flagTypes.experiment.desc')}</Typography>
+                                        </Box>
+                                    </Box>
+                                </MenuItem>
+                                <MenuItem value="operational">
+                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                                        <Box sx={{ mt: 0.3 }}><OperationalIcon sx={{ fontSize: 18 }} color="warning" /></Box>
+                                        <Box>
+                                            <Typography variant="body2" fontWeight={500}>{t('featureFlags.types.operational')}</Typography>
+                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>{t('featureFlags.flagTypes.operational.desc')}</Typography>
+                                        </Box>
+                                    </Box>
+                                </MenuItem>
+                                <MenuItem value="killSwitch">
+                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                                        <Box sx={{ mt: 0.3 }}><KillSwitchIcon sx={{ fontSize: 18 }} color="error" /></Box>
+                                        <Box>
+                                            <Typography variant="body2" fontWeight={500}>{t('featureFlags.types.killSwitch')}</Typography>
+                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>{t('featureFlags.flagTypes.killSwitch.desc')}</Typography>
+                                        </Box>
+                                    </Box>
+                                </MenuItem>
+                                <MenuItem value="permission">
+                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                                        <Box sx={{ mt: 0.3 }}><PermissionIcon sx={{ fontSize: 18 }} color="action" /></Box>
+                                        <Box>
+                                            <Typography variant="body2" fontWeight={500}>{t('featureFlags.types.permission')}</Typography>
+                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>{t('featureFlags.flagTypes.permission.desc')}</Typography>
+                                        </Box>
+                                    </Box>
+                                </MenuItem>
                             </Select>
                         </FormControl>
 

@@ -51,6 +51,7 @@ export interface UpdateFlagInput {
     isEnabled?: boolean;
     impressionDataEnabled?: boolean;
     staleAfterDays?: number;
+    stale?: boolean;
     tags?: string[];
     links?: { url: string; title?: string }[];
 }
@@ -354,6 +355,32 @@ class FeatureFlagService {
 
         // Invalidate cache
         await this.invalidateCache(environment);
+
+        return updated;
+    }
+
+    /**
+     * Toggle favorite status
+     */
+    async toggleFavorite(environment: string, flagName: string, isFavorite: boolean, userId: number): Promise<FeatureFlagAttributes> {
+        const flag = await this.getFlag(environment, flagName);
+        if (!flag) {
+            throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
+        }
+
+        const updated = await FeatureFlagModel.update(flag.id, {
+            isFavorite,
+            updatedBy: userId,
+        });
+
+        await AuditLogModel.create({
+            action: isFavorite ? 'feature_flag.favorite' : 'feature_flag.unfavorite',
+            resourceType: 'FeatureFlag',
+            resourceId: flag.id,
+            userId,
+            oldValues: { isFavorite: !isFavorite },
+            newValues: { isFavorite },
+        });
 
         return updated;
     }

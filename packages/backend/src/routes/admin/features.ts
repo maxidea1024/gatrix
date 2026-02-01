@@ -306,6 +306,27 @@ router.post(
     })
 );
 
+// Toggle favorite status
+router.post(
+    '/:flagName/favorite',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const environment = requireEnvironment(req, res);
+        if (!environment) return;
+
+        const userId = req.user?.id;
+        const { isFavorite } = req.body;
+
+        const flag = await featureFlagService.toggleFavorite(
+            environment,
+            req.params.flagName,
+            isFavorite,
+            userId!
+        );
+
+        res.json({ success: true, data: { flag } });
+    })
+);
+
 // Delete a flag
 router.delete(
     '/:flagName',

@@ -29,7 +29,7 @@ export interface FilterDefinition {
   key: string;
   label: string;
   type: 'text' | 'select' | 'multiselect' | 'number' | 'tags';
-  options?: { value: any; label: string; color?: string; description?: string }[];
+  options?: { value: any; label: string; color?: string; description?: string; icon?: React.ReactNode }[];
   placeholder?: string;
   operator?: 'any_of' | 'include_all'; // For multiselect and tags - default is any_of
   allowOperatorToggle?: boolean; // If false, operator toggle is disabled (default: true for tags, false for multiselect)
@@ -834,6 +834,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                       checked={Array.isArray(filter.value) && filter.value.indexOf(option.value) > -1}
                       size="small"
                     />
+                    {option.icon && <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>{option.icon}</Box>}
                     <ListItemText primary={option.label} />
                   </MenuItem>
                 ))}

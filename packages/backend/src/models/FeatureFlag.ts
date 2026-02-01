@@ -50,9 +50,11 @@ export interface FeatureFlagAttributes {
     description?: string;
     flagType: FlagType;
     isArchived: boolean;
+    isFavorite?: boolean;
     archivedAt?: Date;
     impressionDataEnabled: boolean;
     staleAfterDays: number;
+    stale?: boolean;
     tags?: string[];
     links?: { url: string; title?: string }[];
     variantType?: 'string' | 'number' | 'json';
@@ -246,6 +248,8 @@ export class FeatureFlagModel {
                     ...f,
                     isEnabled: Boolean(f.isEnabled),
                     isArchived: Boolean(f.isArchived),
+                    isFavorite: Boolean(f.isFavorite),
+                    stale: Boolean(f.stale),
                     impressionDataEnabled: Boolean(f.impressionDataEnabled),
                     tags: parseJsonField<string[]>(f.tags) || [],
                     environments: envStates.map(e => ({
@@ -298,6 +302,8 @@ export class FeatureFlagModel {
                 isEnabled: Boolean(envSettings?.isEnabled),
                 lastSeenAt: envSettings?.lastSeenAt,
                 isArchived: Boolean(flag.isArchived),
+                isFavorite: Boolean(flag.isFavorite),
+                stale: Boolean(flag.stale),
                 impressionDataEnabled: Boolean(flag.impressionDataEnabled),
                 tags: parseJsonField<string[]>(flag.tags) || [],
                 links: parseJsonField<{ url: string; title?: string }[]>(flag.links) || [],
@@ -345,6 +351,8 @@ export class FeatureFlagModel {
             return {
                 ...flag,
                 isArchived: Boolean(flag.isArchived),
+                isFavorite: Boolean(flag.isFavorite),
+                stale: Boolean(flag.stale),
                 impressionDataEnabled: Boolean(flag.impressionDataEnabled),
                 tags: parseJsonField<string[]>(flag.tags) || [],
                 strategies,
@@ -412,9 +420,11 @@ export class FeatureFlagModel {
             if (data.description !== undefined) updateData.description = data.description;
             if (data.flagType !== undefined) updateData.flagType = data.flagType;
             if (data.isArchived !== undefined) updateData.isArchived = data.isArchived;
+            if (data.isFavorite !== undefined) updateData.isFavorite = data.isFavorite;
             if (data.archivedAt !== undefined) updateData.archivedAt = data.archivedAt;
             if (data.impressionDataEnabled !== undefined) updateData.impressionDataEnabled = data.impressionDataEnabled;
             if (data.staleAfterDays !== undefined) updateData.staleAfterDays = data.staleAfterDays;
+            if (data.stale !== undefined) updateData.stale = data.stale;
             if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
             if (data.links !== undefined) updateData.links = JSON.stringify(data.links);
             if (data.variantType !== undefined) updateData.variantType = data.variantType;

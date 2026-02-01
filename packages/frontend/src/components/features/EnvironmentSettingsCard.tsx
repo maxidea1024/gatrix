@@ -156,9 +156,23 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                         {metrics && metrics.total > 0 ? (() => {
                             const yesPercent = Math.round((metrics.totalYes / metrics.total) * 100);
                             const noPercent = 100 - yesPercent;
-                            const radius = 16;
-                            const circumference = 2 * Math.PI * radius;
-                            const yesArc = (yesPercent / 100) * circumference;
+                            const radius = 18;
+                            const cx = 20;
+                            const cy = 20;
+
+                            // Calculate arc path for pie chart
+                            const getArcPath = (startAngle: number, endAngle: number, r: number) => {
+                                const startRad = (startAngle - 90) * Math.PI / 180;
+                                const endRad = (endAngle - 90) * Math.PI / 180;
+                                const x1 = cx + r * Math.cos(startRad);
+                                const y1 = cy + r * Math.sin(startRad);
+                                const x2 = cx + r * Math.cos(endRad);
+                                const y2 = cy + r * Math.sin(endRad);
+                                const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+                                return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+                            };
+
+                            const yesAngle = (yesPercent / 100) * 360;
 
                             return (
                                 <Tooltip
@@ -167,35 +181,39 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                                 >
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         <svg width="40" height="40" viewBox="0 0 40 40">
-                                            {/* Background circle (No) */}
+                                            {/* No (red) - full circle background */}
                                             <circle
-                                                cx="20"
-                                                cy="20"
+                                                cx={cx}
+                                                cy={cy}
                                                 r={radius}
-                                                fill="none"
-                                                stroke="#ef5350"
-                                                strokeWidth="8"
+                                                fill="#ef5350"
                                             />
-                                            {/* Foreground arc (Yes) - starts from top */}
-                                            <circle
-                                                cx="20"
-                                                cy="20"
-                                                r={radius}
-                                                fill="none"
-                                                stroke="#4caf50"
-                                                strokeWidth="8"
-                                                strokeDasharray={`${yesArc} ${circumference}`}
-                                                transform="rotate(-90 20 20)"
-                                            />
+                                            {/* Yes (green) - pie slice */}
+                                            {yesPercent > 0 && yesPercent < 100 && (
+                                                <path
+                                                    d={getArcPath(0, yesAngle, radius)}
+                                                    fill="#4caf50"
+                                                />
+                                            )}
+                                            {yesPercent >= 100 && (
+                                                <circle
+                                                    cx={cx}
+                                                    cy={cy}
+                                                    r={radius}
+                                                    fill="#4caf50"
+                                                />
+                                            )}
                                             {/* Center text */}
                                             <text
-                                                x="20"
-                                                y="20"
+                                                x={cx}
+                                                y={cy}
                                                 textAnchor="middle"
                                                 dominantBaseline="central"
-                                                fontSize="10"
-                                                fontWeight="600"
-                                                fill="currentColor"
+                                                fontSize="9"
+                                                fontWeight="700"
+                                                fill="white"
+                                                stroke="#333"
+                                                strokeWidth="0.3"
                                             >
                                                 {yesPercent}%
                                             </text>

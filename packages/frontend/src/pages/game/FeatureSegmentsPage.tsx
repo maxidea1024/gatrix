@@ -166,11 +166,47 @@ const FeatureSegmentsPage: React.FC = () => {
         }
     };
 
-    // Client-side pagination
+    // Filter definitions
+    const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
+        {
+            key: 'tag',
+            label: t('featureFlags.tags'),
+            type: 'multiselect',
+            options: allTags.map(tag => ({ value: tag.name, label: tag.name })),
+        },
+    ], [t, allTags]);
+
+    // Extract filter values (must be before segments useMemo)
+    const tagFilter = useMemo(() => {
+        const filter = activeFilters.find(f => f.key === 'tag');
+        return filter?.value as string[] | undefined;
+    }, [activeFilters]);
+
+    // Client-side pagination with tag filtering
     const segments = useMemo(() => {
+        let filtered = allSegments;
+
+        // Apply tag filter
+        if (tagFilter && tagFilter.length > 0) {
+            filtered = filtered.filter(s =>
+                tagFilter.some(tag => s.tags?.includes(tag))
+            );
+        }
+
         const start = page * rowsPerPage;
-        return allSegments.slice(start, start + rowsPerPage);
-    }, [allSegments, page, rowsPerPage]);
+        return filtered.slice(start, start + rowsPerPage);
+    }, [allSegments, page, rowsPerPage, tagFilter]);
+
+    // Update total when filters change
+    const filteredTotal = useMemo(() => {
+        let filtered = allSegments;
+        if (tagFilter && tagFilter.length > 0) {
+            filtered = filtered.filter(s =>
+                tagFilter.some(tag => s.tags?.includes(tag))
+            );
+        }
+        return filtered.length;
+    }, [allSegments, tagFilter]);
 
     useEffect(() => {
         loadContextFields();
@@ -188,22 +224,6 @@ const FeatureSegmentsPage: React.FC = () => {
         };
         loadTags();
     }, []);
-
-    // Filter definitions
-    const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
-        {
-            key: 'tag',
-            label: t('featureFlags.tags'),
-            type: 'multiselect',
-            options: allTags.map(tag => ({ value: tag.name, label: tag.name })),
-        },
-    ], [t, allTags]);
-
-    // Extract filter values
-    const tagFilter = useMemo(() => {
-        const filter = activeFilters.find(f => f.key === 'tag');
-        return filter?.value as string[] | undefined;
-    }, [activeFilters]);
 
     useEffect(() => {
         loadSegments();
@@ -485,13 +505,13 @@ const FeatureSegmentsPage: React.FC = () => {
                                                                         checked={segment.isActive !== false}
                                                                         onChange={async () => {
                                                                             const newActive = !segment.isActive;
-                                                                            setSegments(prev => prev.map(s =>
+                                                                            setAllSegments(prev => prev.map(s =>
                                                                                 s.id === segment.id ? { ...s, isActive: newActive } : s
                                                                             ));
                                                                             try {
                                                                                 await api.put(`/admin/features/segments/${segment.id}`, { isActive: newActive });
                                                                             } catch (error: any) {
-                                                                                setSegments(prev => prev.map(s =>
+                                                                                setAllSegments(prev => prev.map(s =>
                                                                                     s.id === segment.id ? { ...s, isActive: !newActive } : s
                                                                                 ));
                                                                                 enqueueSnackbar(parseApiErrorMessage(error, t('common.saveFailed')), { variant: 'error' });
@@ -631,7 +651,7 @@ const FeatureSegmentsPage: React.FC = () => {
                             <SimplePagination
                                 page={page}
                                 rowsPerPage={rowsPerPage}
-                                count={total}
+                                count={filteredTotal}
                                 onPageChange={(_, newPage) => setPage(newPage)}
                                 onRowsPerPageChange={(e) => { setRowsPerPage(Number(e.target.value)); setPage(0); }}
                             />

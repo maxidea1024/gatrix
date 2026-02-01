@@ -145,16 +145,10 @@ const FeatureContextFieldsPage: React.FC = () => {
         }
     };
 
-    // Client-side pagination
-    const fields = useMemo(() => {
-        const start = page * rowsPerPage;
-        return allFields.slice(start, start + rowsPerPage);
-    }, [allFields, page, rowsPerPage]);
-
-    // Extract filter values
+    // Extract filter values first
     const typeFilter = useMemo(() => {
         const filter = activeFilters.find(f => f.key === 'fieldType');
-        return filter?.value as string | undefined;
+        return filter?.value as string[] | undefined;
     }, [activeFilters]);
 
     const tagFilter = useMemo(() => {
@@ -162,18 +156,64 @@ const FeatureContextFieldsPage: React.FC = () => {
         return filter?.value as string[] | undefined;
     }, [activeFilters]);
 
+    // Client-side pagination with filtering
+    const fields = useMemo(() => {
+        let filtered = allFields;
+
+        // Apply type filter (multiselect)
+        if (typeFilter && typeFilter.length > 0) {
+            filtered = filtered.filter(f => typeFilter.includes(f.fieldType));
+        }
+
+        // Apply tag filter
+        if (tagFilter && tagFilter.length > 0) {
+            filtered = filtered.filter(f =>
+                tagFilter.some(tag => f.tags?.includes(tag))
+            );
+        }
+
+        const start = page * rowsPerPage;
+        return filtered.slice(start, start + rowsPerPage);
+    }, [allFields, page, rowsPerPage, typeFilter, tagFilter]);
+
+    // Update total when filters change
+    const filteredTotal = useMemo(() => {
+        let filtered = allFields;
+        if (typeFilter && typeFilter.length > 0) {
+            filtered = filtered.filter(f => typeFilter.includes(f.fieldType));
+        }
+        if (tagFilter && tagFilter.length > 0) {
+            filtered = filtered.filter(f =>
+                tagFilter.some(tag => f.tags?.includes(tag))
+            );
+        }
+        return filtered.length;
+    }, [allFields, typeFilter, tagFilter]);
+
+    // Field type icon helper for filter options
+    const getFieldTypeIcon = (type: string) => {
+        switch (type) {
+            case 'string': return <StringIcon sx={{ fontSize: 16 }} color="info" />;
+            case 'number': return <NumberIcon sx={{ fontSize: 16 }} color="success" />;
+            case 'boolean': return <BooleanIcon sx={{ fontSize: 16 }} color="warning" />;
+            case 'datetime': return <DateTimeIcon sx={{ fontSize: 16 }} color="secondary" />;
+            case 'semver': return <SemverIcon sx={{ fontSize: 16 }} color="primary" />;
+            default: return <StringIcon sx={{ fontSize: 16 }} color="disabled" />;
+        }
+    };
+
     // Filter definitions
     const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
         {
             key: 'fieldType',
             label: t('featureFlags.fieldType'),
-            type: 'select',
+            type: 'multiselect',
             options: [
-                { value: 'string', label: t('featureFlags.fieldTypes.string') },
-                { value: 'number', label: t('featureFlags.fieldTypes.number') },
-                { value: 'boolean', label: t('featureFlags.fieldTypes.boolean') },
-                { value: 'datetime', label: t('featureFlags.fieldTypes.datetime') },
-                { value: 'semver', label: t('featureFlags.fieldTypes.semver') },
+                { value: 'string', label: t('featureFlags.fieldTypes.string'), icon: getFieldTypeIcon('string') },
+                { value: 'number', label: t('featureFlags.fieldTypes.number'), icon: getFieldTypeIcon('number') },
+                { value: 'boolean', label: t('featureFlags.fieldTypes.boolean'), icon: getFieldTypeIcon('boolean') },
+                { value: 'datetime', label: t('featureFlags.fieldTypes.datetime'), icon: getFieldTypeIcon('datetime') },
+                { value: 'semver', label: t('featureFlags.fieldTypes.semver'), icon: getFieldTypeIcon('semver') },
             ],
         },
         {
@@ -453,13 +493,13 @@ const FeatureContextFieldsPage: React.FC = () => {
                                                                         checked={field.isEnabled !== false}
                                                                         onChange={async () => {
                                                                             const newEnabled = !field.isEnabled;
-                                                                            setFields(prev => prev.map(f =>
+                                                                            setAllFields(prev => prev.map(f =>
                                                                                 f.id === field.id ? { ...f, isEnabled: newEnabled } : f
                                                                             ));
                                                                             try {
                                                                                 await api.put(`/admin/features/context-fields/${field.fieldName}`, { isEnabled: newEnabled });
                                                                             } catch (error: any) {
-                                                                                setFields(prev => prev.map(f =>
+                                                                                setAllFields(prev => prev.map(f =>
                                                                                     f.id === field.id ? { ...f, isEnabled: !newEnabled } : f
                                                                                 ));
                                                                                 enqueueSnackbar(parseApiErrorMessage(error, t('common.saveFailed')), { variant: 'error' });
@@ -615,7 +655,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                             <SimplePagination
                                 page={page}
                                 rowsPerPage={rowsPerPage}
-                                count={total}
+                                count={filteredTotal}
                                 onPageChange={(_, newPage) => setPage(newPage)}
                                 onRowsPerPageChange={(e) => { setRowsPerPage(Number(e.target.value)); setPage(0); }}
                             />

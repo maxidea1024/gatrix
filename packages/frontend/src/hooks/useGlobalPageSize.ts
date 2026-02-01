@@ -6,7 +6,7 @@ import { useState, useCallback, useEffect } from 'react';
 
 const STORAGE_KEY = 'globalPageSize';
 const DEFAULT_PAGE_SIZE = 10;
-const VALID_PAGE_SIZES = [10, 25, 50, 100];
+const VALID_PAGE_SIZES = [5, 10, 20, 25, 50, 100];
 
 export function useGlobalPageSize(): [number, (size: number) => void] {
     const [pageSize, setPageSizeState] = useState<number>(() => {
