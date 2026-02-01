@@ -532,6 +532,7 @@ const FeatureNetworkPage: React.FC = () => {
         maintainAspectRatio: false,
         plugins: {
             legend: {
+                display: chartGroupBy !== 'all',
                 position: 'top' as const,
             },
             tooltip: {
@@ -562,7 +563,7 @@ const FeatureNetworkPage: React.FC = () => {
             axis: 'x' as const,
             intersect: false,
         },
-    }), []);
+    }), [chartGroupBy]);
 
     // Evaluation chart data - per app or env breakdown
     const evaluationChartData = useMemo(() => {
