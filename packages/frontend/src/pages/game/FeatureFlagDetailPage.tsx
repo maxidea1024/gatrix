@@ -1614,20 +1614,20 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                     arrow
                                                                 >
                                                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                                        <svg width="40" height="40" viewBox="0 0 40 40">
+                                                                        <svg width="52" height="52" viewBox="0 0 52 52">
                                                                             {/* Empty light circle for no metrics */}
                                                                             <circle
-                                                                                cx={20}
-                                                                                cy={20}
-                                                                                r={18}
+                                                                                cx={26}
+                                                                                cy={26}
+                                                                                r={24}
                                                                                 fill="#e0e0e0"
                                                                             />
                                                                             <text
-                                                                                x={20}
-                                                                                y={20}
+                                                                                x={26}
+                                                                                y={26}
                                                                                 textAnchor="middle"
                                                                                 dominantBaseline="central"
-                                                                                fontSize="9"
+                                                                                fontSize="12"
                                                                                 fontWeight="700"
                                                                                 fill="#999"
                                                                             >
