@@ -22,6 +22,7 @@ interface AggregatedMetric {
 
 interface MetricsJobPayload {
     environment: string;
+    appName?: string;
     metrics: AggregatedMetric[];
     reportedAt: string;
 }
@@ -65,7 +66,8 @@ class FeatureMetricsService {
     async processAggregatedMetrics(
         environment: string,
         metrics: AggregatedMetric[],
-        timestamp?: string
+        timestamp?: string,
+        appName?: string
     ): Promise<void> {
         if (!metrics || metrics.length === 0) {
             return;
@@ -79,6 +81,7 @@ class FeatureMetricsService {
             'aggregate-metrics',
             {
                 environment,
+                appName,
                 metrics,
                 reportedAt,
             } as MetricsJobPayload
@@ -86,6 +89,7 @@ class FeatureMetricsService {
 
         logger.debug('Feature metrics queued for processing', {
             environment,
+            appName,
             count: metrics.length,
         });
     }
@@ -94,7 +98,7 @@ class FeatureMetricsService {
      * Process metrics job from queue
      */
     private async processMetricsJob(job: Job<{ type: string; payload: MetricsJobPayload; timestamp: number }>): Promise<void> {
-        const { environment, metrics, reportedAt } = job.data.payload;
+        const { environment, appName, metrics, reportedAt } = job.data.payload;
 
         const reportedDate = new Date(reportedAt);
         const hourBucket = new Date(reportedDate);
@@ -106,7 +110,7 @@ class FeatureMetricsService {
 
             // Batch upsert metrics
             for (const metric of metrics) {
-                await this.upsertMetric(environment, metric, hourBucket);
+                await this.upsertMetric(environment, appName, metric, hourBucket);
                 uniqueFlagNames.add(metric.flagName);
             }
 
@@ -139,6 +143,7 @@ class FeatureMetricsService {
      */
     private async upsertMetric(
         environment: string,
+        appName: string | undefined,
         metric: AggregatedMetric,
         hourBucket: Date
     ): Promise<void> {
@@ -151,32 +156,34 @@ class FeatureMetricsService {
         const yesIncrement = enabled ? count : 0;
         const noIncrement = enabled ? 0 : count;
 
-        // Upsert main metrics (yesCount, noCount)
+        // Upsert main metrics (yesCount, noCount) with appName
         await db.raw(`
-            INSERT INTO g_feature_metrics (id, environment, flagName, metricsBucket, yesCount, noCount, createdAt)
-            VALUES (?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())
+            INSERT INTO g_feature_metrics (id, environment, appName, flagName, metricsBucket, yesCount, noCount, createdAt)
+            VALUES (?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())
             ON DUPLICATE KEY UPDATE 
                 yesCount = yesCount + VALUES(yesCount), 
                 noCount = noCount + VALUES(noCount)
         `, [
             require('ulid').ulid(),
             environment,
+            appName || null,
             flagName,
             bucketDateTime,
             yesIncrement,
             noIncrement,
         ]);
 
-        // If there's a variant, upsert to variant metrics table
+        // If there's a variant, upsert to variant metrics table with appName
         if (variantName) {
             await db.raw(`
-                INSERT INTO g_feature_variant_metrics (id, environment, flagName, metricsBucket, variantName, count, createdAt)
-                VALUES (?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())
+                INSERT INTO g_feature_variant_metrics (id, environment, appName, flagName, metricsBucket, variantName, count, createdAt)
+                VALUES (?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())
                 ON DUPLICATE KEY UPDATE 
                     count = count + VALUES(count)
             `, [
                 require('ulid').ulid(),
                 environment,
+                appName || null,
                 flagName,
                 bucketDateTime,
                 variantName,

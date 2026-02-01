@@ -73,6 +73,7 @@ interface MetricsBucket {
     yesCount: number;
     noCount: number;
     variantCounts?: Record<string, number>;
+    appName?: string;
 }
 
 interface AggregatedMetrics {
@@ -88,6 +89,7 @@ interface TimeSeriesPoint {
     exposed: number;
     notExposed: number;
     total: number;
+    appName?: string;
 }
 
 type PeriodOption = '1h' | '6h' | '24h' | '48h' | '7d' | '30d';
@@ -118,6 +120,55 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     const [error, setError] = useState<string | null>(null);
     const [showTable, setShowTable] = useState(false);
 
+    // App filter state
+    const [availableApps, setAvailableApps] = useState<string[]>([]);
+    const [selectedApps, setSelectedApps] = useState<string[]>([]);
+    const [loadingApps, setLoadingApps] = useState(false);
+
+    // Fetch available app names for the current period
+    const fetchAppNames = useCallback(async () => {
+        if (!flagName || selectedEnvs.length === 0) return;
+
+        setLoadingApps(true);
+        try {
+            const periodConfig = PERIOD_OPTIONS.find(p => p.value === period);
+            const hours = periodConfig?.hours || 24;
+            const endDate = new Date();
+            const startDate = new Date(endDate.getTime() - hours * 60 * 60 * 1000);
+
+            // Fetch app names from all selected environments
+            const appPromises = selectedEnvs.map(env =>
+                api.get<{ appNames: string[] }>(
+                    `/admin/features/${flagName}/metrics/apps`,
+                    {
+                        params: {
+                            startDate: startDate.toISOString(),
+                            endDate: endDate.toISOString(),
+                        },
+                        headers: {
+                            'x-environment': env,
+                        },
+                    }
+                ).then(response => response.data.appNames || [])
+            );
+
+            const allApps = await Promise.all(appPromises);
+            const uniqueApps = [...new Set(allApps.flat())].sort();
+            setAvailableApps(uniqueApps);
+            // Default: select all apps
+            setSelectedApps(uniqueApps);
+        } catch (err) {
+            console.error('Failed to fetch app names:', err);
+        } finally {
+            setLoadingApps(false);
+        }
+    }, [flagName, selectedEnvs, period]);
+
+    // Fetch app names when environment or period changes
+    useEffect(() => {
+        fetchAppNames();
+    }, [fetchAppNames]);
+
     const fetchMetrics = useCallback(async () => {
         if (!flagName || selectedEnvs.length === 0) return;
 
@@ -131,22 +182,55 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
             const startDate = new Date(endDate.getTime() - hours * 60 * 60 * 1000);
 
             // Fetch metrics from all selected environments in parallel
-            const metricsPromises = selectedEnvs.map(env =>
-                api.get<{ metrics: MetricsBucket[] }>(
-                    `/admin/features/${flagName}/metrics`,
-                    {
-                        params: {
-                            startDate: startDate.toISOString(),
-                            endDate: endDate.toISOString(),
-                        },
-                        headers: {
-                            'x-environment': env,
-                        },
+            const metricsPromises: Promise<MetricsBucket[]>[] = [];
+
+            for (const env of selectedEnvs) {
+                // If no apps available, or all apps are selected, fetch all without filter
+                const shouldFetchAll = availableApps.length === 0 ||
+                    selectedApps.length === 0 ||
+                    selectedApps.length === availableApps.length;
+
+                if (shouldFetchAll) {
+                    // Fetch all metrics (no app filter)
+                    metricsPromises.push(
+                        api.get<{ metrics: MetricsBucket[] }>(
+                            `/admin/features/${flagName}/metrics`,
+                            {
+                                params: {
+                                    startDate: startDate.toISOString(),
+                                    endDate: endDate.toISOString(),
+                                },
+                                headers: {
+                                    'x-environment': env,
+                                },
+                            }
+                        ).then(response =>
+                            (response.data.metrics || []).map(m => ({ ...m, environment: env }))
+                        )
+                    );
+                } else {
+                    // Fetch only for selected apps
+                    for (const appName of selectedApps) {
+                        metricsPromises.push(
+                            api.get<{ metrics: MetricsBucket[] }>(
+                                `/admin/features/${flagName}/metrics`,
+                                {
+                                    params: {
+                                        startDate: startDate.toISOString(),
+                                        endDate: endDate.toISOString(),
+                                        appName,
+                                    },
+                                    headers: {
+                                        'x-environment': env,
+                                    },
+                                }
+                            ).then(response =>
+                                (response.data.metrics || []).map(m => ({ ...m, environment: env, appName }))
+                            )
+                        );
                     }
-                ).then(response =>
-                    (response.data.metrics || []).map(m => ({ ...m, environment: env }))
-                )
-            );
+                }
+            }
 
             const allMetrics = await Promise.all(metricsPromises);
             setMetrics(allMetrics.flat());
@@ -156,7 +240,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         } finally {
             setLoading(false);
         }
-    }, [flagName, selectedEnvs, period, t]);
+    }, [flagName, selectedEnvs, selectedApps, availableApps.length, period, t]);
 
     useEffect(() => {
         fetchMetrics();
@@ -171,6 +255,18 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 return prev.filter(e => e !== env);
             }
             return [...prev, env];
+        });
+    };
+
+    // Toggle app selection (multi-select)
+    const handleAppToggle = (app: string) => {
+        setSelectedApps(prev => {
+            if (prev.includes(app)) {
+                // Don't allow deselecting all apps
+                if (prev.length === 1) return prev;
+                return prev.filter(a => a !== app);
+            }
+            return [...prev, app];
         });
     };
 
@@ -205,7 +301,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         ? ((aggregatedMetrics.totalYes / aggregatedMetrics.total) * 100).toFixed(0)
         : '0';
 
-    // Prepare time series data - aggregate by time bucket across environments
+    // Prepare time series data - aggregate by time bucket across environments (for chart)
     const timeSeriesData: TimeSeriesPoint[] = useMemo(() => {
         const bucketMap = new Map<string, TimeSeriesPoint>();
 
@@ -232,7 +328,66 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
             .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
     }, [metrics]);
 
-    // Line chart data - Unleash style
+    // Prepare table data - includes appName for detailed breakdown
+    const tableData: TimeSeriesPoint[] = useMemo(() => {
+        // If we have app filter enabled and apps available, group by time+app
+        if (availableApps.length > 0 && selectedApps.length > 0) {
+            const bucketMap = new Map<string, TimeSeriesPoint>();
+
+            metrics.forEach(m => {
+                const key = `${m.metricsBucket}|${m.appName || ''}`;
+                const existing = bucketMap.get(key);
+                if (existing) {
+                    existing.exposed += m.yesCount;
+                    existing.notExposed += m.noCount;
+                    existing.total += m.yesCount + m.noCount;
+                } else {
+                    const displayTime = formatWith(m.metricsBucket, 'MM/DD HH:mm');
+                    bucketMap.set(key, {
+                        time: m.metricsBucket,
+                        displayTime,
+                        exposed: m.yesCount,
+                        notExposed: m.noCount,
+                        total: m.yesCount + m.noCount,
+                        appName: m.appName,
+                    });
+                }
+            });
+
+            return Array.from(bucketMap.values())
+                .sort((a, b) => {
+                    const timeCompare = new Date(a.time).getTime() - new Date(b.time).getTime();
+                    if (timeCompare !== 0) return timeCompare;
+                    return (a.appName || '').localeCompare(b.appName || '');
+                });
+        }
+
+        // Otherwise use the same aggregated data as chart
+        return timeSeriesData;
+    }, [metrics, availableApps.length, selectedApps.length, timeSeriesData]);
+
+    // Check if last data point is the current (incomplete) hour
+    const isLastPointIncomplete = useMemo(() => {
+        if (timeSeriesData.length === 0) return false;
+        const lastBucket = new Date(timeSeriesData[timeSeriesData.length - 1].time);
+        const now = new Date();
+        // If the last bucket's hour matches the current hour, it's incomplete
+        return lastBucket.getUTCHours() === now.getUTCHours() &&
+            lastBucket.getUTCDate() === now.getUTCDate() &&
+            lastBucket.getUTCMonth() === now.getUTCMonth() &&
+            lastBucket.getUTCFullYear() === now.getUTCFullYear();
+    }, [timeSeriesData]);
+
+    // Segment styling for incomplete last hour - makes the line to last point dashed
+    const segmentStyle = useCallback((ctx: any) => {
+        // If this segment goes to the last point and it's incomplete, use dashed line
+        if (isLastPointIncomplete && ctx.p1DataIndex === timeSeriesData.length - 1) {
+            return [5, 5];
+        }
+        return undefined; // Solid line
+    }, [isLastPointIncomplete, timeSeriesData.length]);
+
+    // Line chart data - Unleash style with segment styling for incomplete hours
     const lineChartData = {
         labels: timeSeriesData.map(d => d.displayTime),
         datasets: [
@@ -242,10 +397,22 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 borderColor: theme.palette.success.main,
                 backgroundColor: 'transparent',
                 borderWidth: 2,
-                borderDash: [5, 5], // Dashed line for exposed
                 tension: 0.3,
-                pointRadius: 4,
-                pointBackgroundColor: theme.palette.success.main,
+                pointRadius: timeSeriesData.map((_, i) =>
+                    isLastPointIncomplete && i === timeSeriesData.length - 1 ? 6 : 4
+                ),
+                pointBackgroundColor: timeSeriesData.map((_, i) =>
+                    isLastPointIncomplete && i === timeSeriesData.length - 1
+                        ? 'transparent'
+                        : theme.palette.success.main
+                ),
+                pointBorderColor: theme.palette.success.main,
+                pointBorderWidth: timeSeriesData.map((_, i) =>
+                    isLastPointIncomplete && i === timeSeriesData.length - 1 ? 2 : 0
+                ),
+                segment: {
+                    borderDash: (ctx: any) => segmentStyle(ctx),
+                },
             },
             {
                 label: t('featureFlags.metrics.notExposed'),
@@ -254,8 +421,21 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 backgroundColor: 'transparent',
                 borderWidth: 2,
                 tension: 0.3,
-                pointRadius: 4,
-                pointBackgroundColor: theme.palette.error.main,
+                pointRadius: timeSeriesData.map((_, i) =>
+                    isLastPointIncomplete && i === timeSeriesData.length - 1 ? 6 : 4
+                ),
+                pointBackgroundColor: timeSeriesData.map((_, i) =>
+                    isLastPointIncomplete && i === timeSeriesData.length - 1
+                        ? 'transparent'
+                        : theme.palette.error.main
+                ),
+                pointBorderColor: theme.palette.error.main,
+                pointBorderWidth: timeSeriesData.map((_, i) =>
+                    isLastPointIncomplete && i === timeSeriesData.length - 1 ? 2 : 0
+                ),
+                segment: {
+                    borderDash: (ctx: any) => segmentStyle(ctx),
+                },
             },
             {
                 label: t('featureFlags.metrics.totalRequests'),
@@ -264,8 +444,21 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 backgroundColor: 'transparent',
                 borderWidth: 2,
                 tension: 0.3,
-                pointRadius: 4,
-                pointBackgroundColor: theme.palette.primary.main,
+                pointRadius: timeSeriesData.map((_, i) =>
+                    isLastPointIncomplete && i === timeSeriesData.length - 1 ? 6 : 4
+                ),
+                pointBackgroundColor: timeSeriesData.map((_, i) =>
+                    isLastPointIncomplete && i === timeSeriesData.length - 1
+                        ? 'transparent'
+                        : theme.palette.primary.main
+                ),
+                pointBorderColor: theme.palette.primary.main,
+                pointBorderWidth: timeSeriesData.map((_, i) =>
+                    isLastPointIncomplete && i === timeSeriesData.length - 1 ? 2 : 0
+                ),
+                segment: {
+                    borderDash: (ctx: any) => segmentStyle(ctx),
+                },
             },
         ],
     };
@@ -283,8 +476,9 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 align: 'end' as const,
                 labels: {
                     usePointStyle: true,
-                    pointStyle: 'line',
-                    boxWidth: 30,
+                    pointStyle: 'rect',
+                    boxWidth: 12,
+                    boxHeight: 12,
                 },
             },
             tooltip: {
@@ -369,6 +563,47 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                         })}
                     </Box>
                 </Paper>
+
+                {/* Application Selector - only show if apps are available */}
+                {availableApps.length > 0 && (
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 1, flex: 1, minWidth: 200 }}>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                            {t('featureFlags.metrics.applications')}
+                            {loadingApps && (
+                                <CircularProgress size={12} sx={{ ml: 1 }} />
+                            )}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                            {availableApps.map((app) => {
+                                const isSelected = selectedApps.includes(app);
+                                return (
+                                    <ToggleButton
+                                        key={app}
+                                        value={app}
+                                        selected={isSelected}
+                                        onClick={() => handleAppToggle(app)}
+                                        size="small"
+                                        sx={{
+                                            textTransform: 'none',
+                                            px: 2,
+                                            borderRadius: 1,
+                                            border: `1px solid ${theme.palette.divider}`,
+                                            '&.Mui-selected': {
+                                                bgcolor: theme.palette.info.main,
+                                                color: theme.palette.info.contrastText,
+                                                '&:hover': {
+                                                    bgcolor: theme.palette.info.dark,
+                                                },
+                                            },
+                                        }}
+                                    >
+                                        {app}
+                                    </ToggleButton>
+                                );
+                            })}
+                        </Box>
+                    </Paper>
+                )}
 
                 {/* Period Selector */}
                 <Paper variant="outlined" sx={{ p: 2, borderRadius: 1, minWidth: 180 }}>
@@ -511,6 +746,9 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                     <TableHead>
                                         <TableRow>
                                             <TableCell>{t('featureFlags.metrics.time')}</TableCell>
+                                            {availableApps.length > 0 && (
+                                                <TableCell>{t('featureFlags.metrics.applications')}</TableCell>
+                                            )}
                                             <TableCell align="right">{t('featureFlags.metrics.exposed')}</TableCell>
                                             <TableCell align="right">{t('featureFlags.metrics.notExposed')}</TableCell>
                                             <TableCell align="right">{t('featureFlags.metrics.total')}</TableCell>
@@ -518,13 +756,31 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {timeSeriesData.map((row) => {
+                                        {tableData.map((row, index) => {
                                             const rate = row.total > 0
                                                 ? ((row.exposed / row.total) * 100).toFixed(1)
                                                 : '0.0';
                                             return (
-                                                <TableRow key={row.time}>
+                                                <TableRow key={`${row.time}-${row.appName || index}`}>
                                                     <TableCell>{row.displayTime}</TableCell>
+                                                    {availableApps.length > 0 && (
+                                                        <TableCell>
+                                                            <Typography
+                                                                variant="body2"
+                                                                sx={{
+                                                                    bgcolor: 'info.main',
+                                                                    color: 'info.contrastText',
+                                                                    px: 1,
+                                                                    py: 0.25,
+                                                                    borderRadius: 1,
+                                                                    display: 'inline-block',
+                                                                    fontSize: '0.75rem',
+                                                                }}
+                                                            >
+                                                                {row.appName || '-'}
+                                                            </Typography>
+                                                        </TableCell>
+                                                    )}
                                                     <TableCell align="right" sx={{ color: 'success.main' }}>
                                                         {row.exposed.toLocaleString()}
                                                     </TableCell>
@@ -640,8 +896,9 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                         );
                     })()}
                 </>
-            )}
-        </Box>
+            )
+            }
+        </Box >
     );
 };
 

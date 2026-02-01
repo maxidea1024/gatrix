@@ -1070,21 +1070,42 @@ export class FeatureMetricsModel {
         environment: string,
         flagName: string,
         startDate: Date,
-        endDate: Date
+        endDate: Date,
+        appName?: string | null
     ): Promise<FeatureMetricsAttributes[]> {
         try {
-            // Get main metrics
-            const metrics = await db('g_feature_metrics')
-                .where('environment', environment)
-                .where('flagName', flagName)
-                .whereBetween('metricsBucket', [startDate, endDate])
-                .orderBy('metricsBucket', 'asc');
-
-            // Get variant metrics for the same period
-            const variantMetrics = await db('g_feature_variant_metrics')
+            // Build base query for main metrics
+            let metricsQuery = db('g_feature_metrics')
                 .where('environment', environment)
                 .where('flagName', flagName)
                 .whereBetween('metricsBucket', [startDate, endDate]);
+
+            // Filter by appName if provided (null means show only records with null appName)
+            if (appName !== undefined) {
+                if (appName === null) {
+                    metricsQuery = metricsQuery.whereNull('appName');
+                } else {
+                    metricsQuery = metricsQuery.where('appName', appName);
+                }
+            }
+
+            const metrics = await metricsQuery.orderBy('metricsBucket', 'asc');
+
+            // Build variant metrics query with same appName filter
+            let variantQuery = db('g_feature_variant_metrics')
+                .where('environment', environment)
+                .where('flagName', flagName)
+                .whereBetween('metricsBucket', [startDate, endDate]);
+
+            if (appName !== undefined) {
+                if (appName === null) {
+                    variantQuery = variantQuery.whereNull('appName');
+                } else {
+                    variantQuery = variantQuery.where('appName', appName);
+                }
+            }
+
+            const variantMetrics = await variantQuery;
 
             // Group variant metrics by bucket (convert to ISO string for consistent key)
             const variantsByBucket: Record<string, Record<string, number>> = {};
@@ -1111,6 +1132,31 @@ export class FeatureMetricsModel {
             });
         } catch (error) {
             logger.error('Error getting metrics:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get distinct app names used in metrics for a flag
+     */
+    static async getAppNames(
+        environment: string,
+        flagName: string,
+        startDate: Date,
+        endDate: Date
+    ): Promise<string[]> {
+        try {
+            const result = await db('g_feature_metrics')
+                .where('environment', environment)
+                .where('flagName', flagName)
+                .whereBetween('metricsBucket', [startDate, endDate])
+                .whereNotNull('appName')
+                .distinct('appName')
+                .orderBy('appName', 'asc');
+
+            return result.map((r: any) => r.appName);
+        } catch (error) {
+            logger.error('Error getting app names:', error);
             throw error;
         }
     }

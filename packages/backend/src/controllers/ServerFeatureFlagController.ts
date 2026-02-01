@@ -224,14 +224,16 @@ export default class ServerFeatureFlagController {
         try {
             const { metrics, timestamp } = req.body;
             const environment = req.params.env || 'production';
+            // Get appName from X-Application-Name header
+            const appName = req.headers['x-application-name'] as string | undefined;
 
             if (!Array.isArray(metrics)) {
                 res.status(400).json({ success: false, error: 'metrics must be an array' });
                 return;
             }
 
-            // Process aggregated metrics via queue
-            await featureMetricsService.processAggregatedMetrics(environment, metrics, timestamp);
+            // Process aggregated metrics via queue with appName
+            await featureMetricsService.processAggregatedMetrics(environment, metrics, timestamp, appName);
 
             res.json({ success: true });
         } catch (error: any) {

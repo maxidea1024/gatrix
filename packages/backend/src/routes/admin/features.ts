@@ -427,16 +427,45 @@ router.get(
         const environment = requireEnvironment(req, res);
         if (!environment) return;
 
-        const { startDate, endDate } = req.query;
+        const { startDate, endDate, appName } = req.query;
+
+        // Parse appName: undefined = all apps, 'null' = only null appName, otherwise specific app
+        let appNameFilter: string | null | undefined;
+        if (appName === 'null') {
+            appNameFilter = null;
+        } else if (appName && typeof appName === 'string') {
+            appNameFilter = appName;
+        }
 
         const metrics = await featureFlagService.getMetrics(
+            environment,
+            req.params.flagName,
+            new Date(startDate as string || Date.now() - 7 * 24 * 60 * 60 * 1000),
+            new Date(endDate as string || Date.now()),
+            appNameFilter
+        );
+
+        res.json({ success: true, data: { metrics } });
+    })
+);
+
+// Get app names used in metrics for a flag
+router.get(
+    '/:flagName/metrics/apps',
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+        const environment = requireEnvironment(req, res);
+        if (!environment) return;
+
+        const { startDate, endDate } = req.query;
+
+        const appNames = await featureFlagService.getMetricsAppNames(
             environment,
             req.params.flagName,
             new Date(startDate as string || Date.now() - 7 * 24 * 60 * 60 * 1000),
             new Date(endDate as string || Date.now())
         );
 
-        res.json({ success: true, data: { metrics } });
+        res.json({ success: true, data: { appNames } });
     })
 );
 

@@ -700,8 +700,15 @@ class FeatureFlagService {
     /**
      * Get metrics for a flag
      */
-    async getMetrics(environment: string, flagName: string, startDate: Date, endDate: Date): Promise<FeatureMetricsAttributes[]> {
-        return FeatureMetricsModel.getMetrics(environment, flagName, startDate, endDate);
+    async getMetrics(environment: string, flagName: string, startDate: Date, endDate: Date, appName?: string | null): Promise<FeatureMetricsAttributes[]> {
+        return FeatureMetricsModel.getMetrics(environment, flagName, startDate, endDate, appName);
+    }
+
+    /**
+     * Get distinct app names used in metrics
+     */
+    async getMetricsAppNames(environment: string, flagName: string, startDate: Date, endDate: Date): Promise<string[]> {
+        return FeatureMetricsModel.getAppNames(environment, flagName, startDate, endDate);
     }
 
     /**
