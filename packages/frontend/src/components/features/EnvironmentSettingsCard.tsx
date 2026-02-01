@@ -222,9 +222,33 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                                 </Tooltip>
                             );
                         })() : (
-                            <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'right' }}>
-                                {t('featureFlags.noMetricsYet')}
-                            </Typography>
+                            <Tooltip
+                                title={t('featureFlags.noMetricsYet')}
+                                arrow
+                            >
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <svg width="40" height="40" viewBox="0 0 40 40">
+                                        {/* Empty light circle for no metrics */}
+                                        <circle
+                                            cx={20}
+                                            cy={20}
+                                            r={18}
+                                            fill="#e0e0e0"
+                                        />
+                                        <text
+                                            x={20}
+                                            y={20}
+                                            textAnchor="middle"
+                                            dominantBaseline="central"
+                                            fontSize="9"
+                                            fontWeight="700"
+                                            fill="#999"
+                                        >
+                                            -
+                                        </text>
+                                    </svg>
+                                </Box>
+                            </Tooltip>
                         )}
                         <FeatureSwitch
                             size="small"
