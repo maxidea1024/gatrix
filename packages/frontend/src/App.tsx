@@ -123,6 +123,7 @@ import FeatureFlagDetailPage from './pages/game/FeatureFlagDetailPage';
 import FeatureSegmentsPage from './pages/game/FeatureSegmentsPage';
 import FeatureContextFieldsPage from './pages/game/FeatureContextFieldsPage';
 import FeatureFlagTypesPage from './pages/game/FeatureFlagTypesPage';
+import FeatureNetworkPage from './pages/game/FeatureNetworkPage';
 
 // Conditional Landing Page Component - Simplified since FirstVisitGuard handles first-visit logic
 const ConditionalLandingPage: React.FC = () => {
@@ -537,6 +538,7 @@ const AppContent: React.FC = () => {
                                   <Route path="segments" element={<FeatureSegmentsPage />} />
                                   <Route path="context-fields" element={<FeatureContextFieldsPage />} />
                                   <Route path="types" element={<FeatureFlagTypesPage />} />
+                                  <Route path="network" element={<FeatureNetworkPage />} />
                                   <Route path=":flagName" element={<FeatureFlagDetailPage />} />
                                 </Routes>
                               </EnvironmentAwareLayout>

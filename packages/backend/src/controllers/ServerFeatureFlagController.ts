@@ -15,6 +15,7 @@ import {
     FeatureVariantAttributes,
 } from '../models/FeatureFlag';
 import { featureMetricsService } from '../services/FeatureMetricsService';
+import { networkTrafficService } from '../services/NetworkTrafficService';
 
 // Type for minimal flag data needed for runtime evaluation
 interface EvaluationFlag {
@@ -62,6 +63,10 @@ export default class ServerFeatureFlagController {
                 res.status(400).json({ success: false, error: 'Environment is required' });
                 return;
             }
+
+            // Record network traffic (fire-and-forget)
+            const appName = req.headers['x-application-name'] as string || 'unknown';
+            networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => { });
 
             // Get all enabled, non-archived flags for this environment
             const result = await FeatureFlagModel.findAll({
@@ -197,6 +202,11 @@ export default class ServerFeatureFlagController {
      */
     static async getSegments(req: Request, res: Response): Promise<void> {
         try {
+            // Record network traffic (fire-and-forget)
+            const appName = req.headers['x-application-name'] as string || 'unknown';
+            const environment = req.params.env || 'global';
+            networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => { });
+
             const rawSegments = await FeatureSegmentModel.findAll();
 
             // Transform to minimal evaluation format

@@ -352,7 +352,7 @@ async function main() {
 
         // Test stickiness: same user should get same result
         const stickyCtx = { userId: 'sticky-test-user' };
-        const results = [];
+        const results: boolean[] = [];
         for (let i = 0; i < 5; i++) {
           results.push(sdk.featureFlag.evaluate(flag.name, stickyCtx, targetEnvironment).enabled);
         }

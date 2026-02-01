@@ -145,5 +145,6 @@ import ServerFeatureFlagController from '../../controllers/ServerFeatureFlagCont
 router.get('/:env/features', authenticateServerApiToken as any, resolveEnvironment as any, ServerFeatureFlagController.getFeatureFlags as any);
 router.get('/:env/features/:flagName', authenticateServerApiToken as any, resolveEnvironment as any, ServerFeatureFlagController.getFeatureFlag as any);
 router.post('/:env/features/metrics', authenticateServerApiToken as any, resolveEnvironment as any, ServerFeatureFlagController.receiveMetrics as any);
+router.get('/:env/segments', authenticateServerApiToken as any, resolveEnvironment as any, ServerFeatureFlagController.getSegments as any);
 
 export default router;
