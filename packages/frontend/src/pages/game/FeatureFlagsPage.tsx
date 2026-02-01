@@ -1207,14 +1207,22 @@ const FeatureFlagsPage: React.FC = () => {
                                                     </Tooltip>
                                                 </TableCell>
                                             ))}
-                                            <TableCell>{t('common.createdBy')}</TableCell>
-                                            <TableCell>
-                                                <TableSortLabel active={orderBy === 'createdAt'} direction={orderBy === 'createdAt' ? order : 'asc'} onClick={() => handleSort('createdAt')}>
-                                                    {t('featureFlags.createdAt')}
-                                                </TableSortLabel>
-                                            </TableCell>
-                                            <TableCell>{t('featureFlags.lastSeenAt')}</TableCell>
-                                            <TableCell>{t('featureFlags.tags')}</TableCell>
+                                            {visibleColumns.some(c => c.id === 'createdBy') && (
+                                                <TableCell>{t('common.createdBy')}</TableCell>
+                                            )}
+                                            {visibleColumns.some(c => c.id === 'createdAt') && (
+                                                <TableCell>
+                                                    <TableSortLabel active={orderBy === 'createdAt'} direction={orderBy === 'createdAt' ? order : 'asc'} onClick={() => handleSort('createdAt')}>
+                                                        {t('featureFlags.createdAt')}
+                                                    </TableSortLabel>
+                                                </TableCell>
+                                            )}
+                                            {visibleColumns.some(c => c.id === 'lastSeenAt') && (
+                                                <TableCell>{t('featureFlags.lastSeenAt')}</TableCell>
+                                            )}
+                                            {visibleColumns.some(c => c.id === 'tags') && (
+                                                <TableCell>{t('featureFlags.tags')}</TableCell>
+                                            )}
                                             {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                                         </TableRow>
                                     </TableHead>
@@ -1329,52 +1337,60 @@ const FeatureFlagsPage: React.FC = () => {
                                                         </TableCell>
                                                     );
                                                 })}
-                                                <TableCell>
-                                                    <Box>
-                                                        <Typography variant="body2" fontWeight={500}>
-                                                            {flag.createdByName || '-'}
-                                                        </Typography>
-                                                        {flag.createdByEmail && (
-                                                            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-                                                                {flag.createdByEmail}
+                                                {visibleColumns.some(c => c.id === 'createdBy') && (
+                                                    <TableCell>
+                                                        <Box>
+                                                            <Typography variant="body2" fontWeight={500}>
+                                                                {flag.createdByName || '-'}
                                                             </Typography>
-                                                        )}
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Tooltip title={formatDateTimeDetailed(flag.createdAt)}>
-                                                        <span>{formatRelativeTime(flag.createdAt)}</span>
-                                                    </Tooltip>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {flag.lastSeenAt ? (
-                                                        <Tooltip title={formatDateTimeDetailed(flag.lastSeenAt)}>
-                                                            <span>{formatRelativeTime(flag.lastSeenAt)}</span>
+                                                            {flag.createdByEmail && (
+                                                                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                                                                    {flag.createdByEmail}
+                                                                </Typography>
+                                                            )}
+                                                        </Box>
+                                                    </TableCell>
+                                                )}
+                                                {visibleColumns.some(c => c.id === 'createdAt') && (
+                                                    <TableCell>
+                                                        <Tooltip title={formatDateTimeDetailed(flag.createdAt)}>
+                                                            <span>{formatRelativeTime(flag.createdAt)}</span>
                                                         </Tooltip>
-                                                    ) : (
-                                                        <Typography variant="body2" color="text.secondary">-</Typography>
-                                                    )}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                        {flag.tags?.slice(0, 3).map((tagName) => {
-                                                            const tagData = allTags.find(t => t.name === tagName);
-                                                            const color = tagData?.color || '#888888';
-                                                            return (
-                                                                <Tooltip key={tagName} title={tagData?.description || ''} arrow>
-                                                                    <Chip
-                                                                        label={tagName}
-                                                                        size="small"
-                                                                        sx={{ height: 20, bgcolor: color, color: getContrastColor(color) }}
-                                                                    />
-                                                                </Tooltip>
-                                                            );
-                                                        })}
-                                                        {flag.tags && flag.tags.length > 3 && (
-                                                            <Chip label={`+${flag.tags.length - 3}`} size="small" sx={{ height: 20 }} />
+                                                    </TableCell>
+                                                )}
+                                                {visibleColumns.some(c => c.id === 'lastSeenAt') && (
+                                                    <TableCell>
+                                                        {flag.lastSeenAt ? (
+                                                            <Tooltip title={formatDateTimeDetailed(flag.lastSeenAt)}>
+                                                                <span>{formatRelativeTime(flag.lastSeenAt)}</span>
+                                                            </Tooltip>
+                                                        ) : (
+                                                            <Typography variant="body2" color="text.secondary">-</Typography>
                                                         )}
-                                                    </Box>
-                                                </TableCell>
+                                                    </TableCell>
+                                                )}
+                                                {visibleColumns.some(c => c.id === 'tags') && (
+                                                    <TableCell>
+                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                            {flag.tags?.slice(0, 3).map((tagName) => {
+                                                                const tagData = allTags.find(t => t.name === tagName);
+                                                                const color = tagData?.color || '#888888';
+                                                                return (
+                                                                    <Tooltip key={tagName} title={tagData?.description || ''} arrow>
+                                                                        <Chip
+                                                                            label={tagName}
+                                                                            size="small"
+                                                                            sx={{ height: 20, bgcolor: color, color: getContrastColor(color) }}
+                                                                        />
+                                                                    </Tooltip>
+                                                                );
+                                                            })}
+                                                            {flag.tags && flag.tags.length > 3 && (
+                                                                <Chip label={`+${flag.tags.length - 3}`} size="small" sx={{ height: 20 }} />
+                                                            )}
+                                                        </Box>
+                                                    </TableCell>
+                                                )}
                                                 {canManage && (
                                                     <TableCell align="center">
                                                         <IconButton
