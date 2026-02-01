@@ -450,49 +450,119 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         const allDisplayTimes = [...new Set(timeSeriesData.map(d => d.displayTime))];
 
         if (chartGroupBy === 'app') {
-            // Group by application
+            // Group by application - show exposed/notExposed/total for each app
             const apps = [...new Set(metrics.map(m => m.appName || 'unknown'))];
-            const datasets = apps.map((app, idx) => {
-                const appMetrics = new Map<string, number>();
+            const datasets: any[] = [];
+
+            apps.forEach((app, idx) => {
+                const exposedMetrics = new Map<string, number>();
+                const notExposedMetrics = new Map<string, number>();
+                const totalMetrics = new Map<string, number>();
+
                 metrics.filter(m => (m.appName || 'unknown') === app).forEach(m => {
                     const displayTime = formatWith(m.metricsBucket, 'MM/DD HH:mm');
-                    appMetrics.set(displayTime, (appMetrics.get(displayTime) || 0) + m.yesCount + m.noCount);
+                    exposedMetrics.set(displayTime, (exposedMetrics.get(displayTime) || 0) + m.yesCount);
+                    notExposedMetrics.set(displayTime, (notExposedMetrics.get(displayTime) || 0) + m.noCount);
+                    totalMetrics.set(displayTime, (totalMetrics.get(displayTime) || 0) + m.yesCount + m.noCount);
                 });
+
                 const color = groupColors[idx % groupColors.length];
-                return {
-                    label: app,
-                    data: allDisplayTimes.map(time => appMetrics.get(time) || 0),
-                    borderColor: color.border,
-                    backgroundColor: color.bg,
+
+                datasets.push({
+                    label: `${app} - ${t('featureFlags.metrics.exposed')}`,
+                    data: allDisplayTimes.map(time => exposedMetrics.get(time) || 0),
+                    borderColor: theme.palette.success.main,
+                    backgroundColor: 'transparent',
                     borderWidth: 2,
+                    borderDash: apps.length > 1 ? [idx * 2 + 5, idx * 2 + 2] : undefined,
                     tension: 0.3,
                     pointRadius: 3,
                     pointHoverRadius: 4,
-                };
+                });
+
+                datasets.push({
+                    label: `${app} - ${t('featureFlags.metrics.notExposed')}`,
+                    data: allDisplayTimes.map(time => notExposedMetrics.get(time) || 0),
+                    borderColor: theme.palette.error.main,
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: apps.length > 1 ? [idx * 2 + 5, idx * 2 + 2] : undefined,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointHoverRadius: 4,
+                });
+
+                datasets.push({
+                    label: `${app} - ${t('featureFlags.metrics.totalRequests')}`,
+                    data: allDisplayTimes.map(time => totalMetrics.get(time) || 0),
+                    borderColor: color.border,
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: apps.length > 1 ? [idx * 2 + 5, idx * 2 + 2] : undefined,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointHoverRadius: 4,
+                });
             });
+
             return { labels: allDisplayTimes, datasets };
 
         } else if (chartGroupBy === 'env') {
-            // Group by environment
+            // Group by environment - show exposed/notExposed/total for each env
             const envs = [...new Set(metrics.map(m => m.environment))];
-            const datasets = envs.map((env, idx) => {
-                const envMetrics = new Map<string, number>();
+            const datasets: any[] = [];
+
+            envs.forEach((env, idx) => {
+                const exposedMetrics = new Map<string, number>();
+                const notExposedMetrics = new Map<string, number>();
+                const totalMetrics = new Map<string, number>();
+
                 metrics.filter(m => m.environment === env).forEach(m => {
                     const displayTime = formatWith(m.metricsBucket, 'MM/DD HH:mm');
-                    envMetrics.set(displayTime, (envMetrics.get(displayTime) || 0) + m.yesCount + m.noCount);
+                    exposedMetrics.set(displayTime, (exposedMetrics.get(displayTime) || 0) + m.yesCount);
+                    notExposedMetrics.set(displayTime, (notExposedMetrics.get(displayTime) || 0) + m.noCount);
+                    totalMetrics.set(displayTime, (totalMetrics.get(displayTime) || 0) + m.yesCount + m.noCount);
                 });
+
                 const color = groupColors[idx % groupColors.length];
-                return {
-                    label: env,
-                    data: allDisplayTimes.map(time => envMetrics.get(time) || 0),
-                    borderColor: color.border,
-                    backgroundColor: color.bg,
+
+                datasets.push({
+                    label: `${env} - ${t('featureFlags.metrics.exposed')}`,
+                    data: allDisplayTimes.map(time => exposedMetrics.get(time) || 0),
+                    borderColor: theme.palette.success.main,
+                    backgroundColor: 'transparent',
                     borderWidth: 2,
+                    borderDash: envs.length > 1 ? [idx * 2 + 5, idx * 2 + 2] : undefined,
                     tension: 0.3,
                     pointRadius: 3,
                     pointHoverRadius: 4,
-                };
+                });
+
+                datasets.push({
+                    label: `${env} - ${t('featureFlags.metrics.notExposed')}`,
+                    data: allDisplayTimes.map(time => notExposedMetrics.get(time) || 0),
+                    borderColor: theme.palette.error.main,
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: envs.length > 1 ? [idx * 2 + 5, idx * 2 + 2] : undefined,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointHoverRadius: 4,
+                });
+
+                datasets.push({
+                    label: `${env} - ${t('featureFlags.metrics.totalRequests')}`,
+                    data: allDisplayTimes.map(time => totalMetrics.get(time) || 0),
+                    borderColor: color.border,
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: envs.length > 1 ? [idx * 2 + 5, idx * 2 + 2] : undefined,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointHoverRadius: 4,
+                });
             });
+
             return { labels: allDisplayTimes, datasets };
 
         } else {
