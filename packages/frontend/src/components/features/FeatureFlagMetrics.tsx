@@ -9,6 +9,7 @@ import {
     Paper,
     Typography,
     ToggleButton,
+    ToggleButtonGroup,
     FormControl,
     Select,
     MenuItem,
@@ -24,12 +25,15 @@ import {
     TableRow,
     Collapse,
     IconButton,
+    Chip,
+    Divider,
 } from '@mui/material';
 import {
     KeyboardArrowDown as ExpandIcon,
     KeyboardArrowUp as CollapseIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import { formatWith } from '../../utils/dateFormat';
 import {
@@ -109,16 +113,29 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
 }) => {
     const { t } = useTranslation();
     const theme = useTheme();
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    // Multi-select environments - default to all environments
-    const [selectedEnvs, setSelectedEnvs] = useState<string[]>(
-        environments.map(e => e.environment)
-    );
-    const [period, setPeriod] = useState<PeriodOption>('24h');
+    // Initialize state from URL params
+    const [selectedEnvs, setSelectedEnvs] = useState<string[]>(() => {
+        const envParam = searchParams.get('envs');
+        if (envParam) {
+            return envParam.split(',').filter(e => environments.some(env => env.environment === e));
+        }
+        return environments.map(e => e.environment);
+    });
+    const [period, setPeriod] = useState<PeriodOption>(() => {
+        const periodParam = searchParams.get('period') as PeriodOption;
+        return PERIOD_OPTIONS.some(p => p.value === periodParam) ? periodParam : '24h';
+    });
     const [metrics, setMetrics] = useState<MetricsBucket[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [showTable, setShowTable] = useState(false);
+    const [showTable, setShowTable] = useState(true); // Default expanded
+    const [chartGroupBy, setChartGroupBy] = useState<'all' | 'app' | 'env'>(() => {
+        const groupParam = searchParams.get('groupBy');
+        if (groupParam === 'app' || groupParam === 'env') return groupParam;
+        return 'all';
+    });
 
     // App filter state
     const [availableApps, setAvailableApps] = useState<string[]>([]);
@@ -245,6 +262,35 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     useEffect(() => {
         fetchMetrics();
     }, [fetchMetrics]);
+
+    // Sync state to URL params
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams);
+
+        // Environment filter
+        const allEnvs = environments.map(e => e.environment);
+        if (selectedEnvs.length !== allEnvs.length || !selectedEnvs.every(e => allEnvs.includes(e))) {
+            params.set('envs', selectedEnvs.join(','));
+        } else {
+            params.delete('envs');
+        }
+
+        // Period
+        if (period !== '24h') {
+            params.set('period', period);
+        } else {
+            params.delete('period');
+        }
+
+        // Group by
+        if (chartGroupBy !== 'all') {
+            params.set('groupBy', chartGroupBy);
+        } else {
+            params.delete('groupBy');
+        }
+
+        setSearchParams(params, { replace: true });
+    }, [selectedEnvs, period, chartGroupBy, environments, searchParams, setSearchParams]);
 
     // Toggle environment selection (multi-select)
     const handleEnvToggle = (env: string) => {
@@ -387,81 +433,146 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         return undefined; // Solid line
     }, [isLastPointIncomplete, timeSeriesData.length]);
 
-    // Line chart data - Unleash style with segment styling for incomplete hours
-    const lineChartData = {
-        labels: timeSeriesData.map(d => d.displayTime),
-        datasets: [
-            {
-                label: t('featureFlags.metrics.exposed'),
-                data: timeSeriesData.map(d => d.exposed),
-                borderColor: theme.palette.success.main,
-                backgroundColor: 'transparent',
-                borderWidth: 2,
-                tension: 0.3,
-                pointRadius: timeSeriesData.map((_, i) =>
-                    isLastPointIncomplete && i === timeSeriesData.length - 1 ? 6 : 4
-                ),
-                pointBackgroundColor: timeSeriesData.map((_, i) =>
-                    isLastPointIncomplete && i === timeSeriesData.length - 1
-                        ? 'transparent'
-                        : theme.palette.success.main
-                ),
-                pointBorderColor: theme.palette.success.main,
-                pointBorderWidth: timeSeriesData.map((_, i) =>
-                    isLastPointIncomplete && i === timeSeriesData.length - 1 ? 2 : 0
-                ),
-                segment: {
-                    borderDash: (ctx: any) => segmentStyle(ctx),
-                },
-            },
-            {
-                label: t('featureFlags.metrics.notExposed'),
-                data: timeSeriesData.map(d => d.notExposed),
-                borderColor: theme.palette.error.main,
-                backgroundColor: 'transparent',
-                borderWidth: 2,
-                tension: 0.3,
-                pointRadius: timeSeriesData.map((_, i) =>
-                    isLastPointIncomplete && i === timeSeriesData.length - 1 ? 6 : 4
-                ),
-                pointBackgroundColor: timeSeriesData.map((_, i) =>
-                    isLastPointIncomplete && i === timeSeriesData.length - 1
-                        ? 'transparent'
-                        : theme.palette.error.main
-                ),
-                pointBorderColor: theme.palette.error.main,
-                pointBorderWidth: timeSeriesData.map((_, i) =>
-                    isLastPointIncomplete && i === timeSeriesData.length - 1 ? 2 : 0
-                ),
-                segment: {
-                    borderDash: (ctx: any) => segmentStyle(ctx),
-                },
-            },
-            {
-                label: t('featureFlags.metrics.totalRequests'),
-                data: timeSeriesData.map(d => d.total),
-                borderColor: theme.palette.primary.main,
-                backgroundColor: 'transparent',
-                borderWidth: 2,
-                tension: 0.3,
-                pointRadius: timeSeriesData.map((_, i) =>
-                    isLastPointIncomplete && i === timeSeriesData.length - 1 ? 6 : 4
-                ),
-                pointBackgroundColor: timeSeriesData.map((_, i) =>
-                    isLastPointIncomplete && i === timeSeriesData.length - 1
-                        ? 'transparent'
-                        : theme.palette.primary.main
-                ),
-                pointBorderColor: theme.palette.primary.main,
-                pointBorderWidth: timeSeriesData.map((_, i) =>
-                    isLastPointIncomplete && i === timeSeriesData.length - 1 ? 2 : 0
-                ),
-                segment: {
-                    borderDash: (ctx: any) => segmentStyle(ctx),
-                },
-            },
-        ],
-    };
+    // Line chart data - dynamic based on chartGroupBy
+    const lineChartData = useMemo(() => {
+        // Colors for grouping
+        const groupColors = [
+            { border: theme.palette.primary.main, bg: 'rgba(25, 118, 210, 0.1)' },
+            { border: theme.palette.secondary.main, bg: 'rgba(156, 39, 176, 0.1)' },
+            { border: theme.palette.success.main, bg: 'rgba(76, 175, 80, 0.1)' },
+            { border: theme.palette.warning.main, bg: 'rgba(255, 152, 0, 0.1)' },
+            { border: theme.palette.error.main, bg: 'rgba(244, 67, 54, 0.1)' },
+            { border: '#00bcd4', bg: 'rgba(0, 188, 212, 0.1)' },
+            { border: '#9c27b0', bg: 'rgba(156, 39, 176, 0.1)' },
+            { border: '#ff5722', bg: 'rgba(255, 87, 34, 0.1)' },
+        ];
+
+        const allDisplayTimes = [...new Set(timeSeriesData.map(d => d.displayTime))];
+
+        if (chartGroupBy === 'app') {
+            // Group by application
+            const apps = [...new Set(metrics.map(m => m.appName || 'unknown'))];
+            const datasets = apps.map((app, idx) => {
+                const appMetrics = new Map<string, number>();
+                metrics.filter(m => (m.appName || 'unknown') === app).forEach(m => {
+                    const displayTime = formatWith(m.metricsBucket, 'MM/DD HH:mm');
+                    appMetrics.set(displayTime, (appMetrics.get(displayTime) || 0) + m.yesCount + m.noCount);
+                });
+                const color = groupColors[idx % groupColors.length];
+                return {
+                    label: app,
+                    data: allDisplayTimes.map(time => appMetrics.get(time) || 0),
+                    borderColor: color.border,
+                    backgroundColor: color.bg,
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointHoverRadius: 4,
+                };
+            });
+            return { labels: allDisplayTimes, datasets };
+
+        } else if (chartGroupBy === 'env') {
+            // Group by environment
+            const envs = [...new Set(metrics.map(m => m.environment))];
+            const datasets = envs.map((env, idx) => {
+                const envMetrics = new Map<string, number>();
+                metrics.filter(m => m.environment === env).forEach(m => {
+                    const displayTime = formatWith(m.metricsBucket, 'MM/DD HH:mm');
+                    envMetrics.set(displayTime, (envMetrics.get(displayTime) || 0) + m.yesCount + m.noCount);
+                });
+                const color = groupColors[idx % groupColors.length];
+                return {
+                    label: env,
+                    data: allDisplayTimes.map(time => envMetrics.get(time) || 0),
+                    borderColor: color.border,
+                    backgroundColor: color.bg,
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointHoverRadius: 4,
+                };
+            });
+            return { labels: allDisplayTimes, datasets };
+
+        } else {
+            // 'all' - Show exposed / not exposed / total lines
+            return {
+                labels: timeSeriesData.map(d => d.displayTime),
+                datasets: [
+                    {
+                        label: t('featureFlags.metrics.exposed'),
+                        data: timeSeriesData.map(d => d.exposed),
+                        borderColor: theme.palette.success.main,
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: timeSeriesData.map((_, i) =>
+                            isLastPointIncomplete && i === timeSeriesData.length - 1 ? 6 : 4
+                        ),
+                        pointBackgroundColor: timeSeriesData.map((_, i) =>
+                            isLastPointIncomplete && i === timeSeriesData.length - 1
+                                ? 'transparent'
+                                : theme.palette.success.main
+                        ),
+                        pointBorderColor: theme.palette.success.main,
+                        pointBorderWidth: timeSeriesData.map((_, i) =>
+                            isLastPointIncomplete && i === timeSeriesData.length - 1 ? 2 : 0
+                        ),
+                        segment: {
+                            borderDash: (ctx: any) => segmentStyle(ctx),
+                        },
+                    },
+                    {
+                        label: t('featureFlags.metrics.notExposed'),
+                        data: timeSeriesData.map(d => d.notExposed),
+                        borderColor: theme.palette.error.main,
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: timeSeriesData.map((_, i) =>
+                            isLastPointIncomplete && i === timeSeriesData.length - 1 ? 6 : 4
+                        ),
+                        pointBackgroundColor: timeSeriesData.map((_, i) =>
+                            isLastPointIncomplete && i === timeSeriesData.length - 1
+                                ? 'transparent'
+                                : theme.palette.error.main
+                        ),
+                        pointBorderColor: theme.palette.error.main,
+                        pointBorderWidth: timeSeriesData.map((_, i) =>
+                            isLastPointIncomplete && i === timeSeriesData.length - 1 ? 2 : 0
+                        ),
+                        segment: {
+                            borderDash: (ctx: any) => segmentStyle(ctx),
+                        },
+                    },
+                    {
+                        label: t('featureFlags.metrics.totalRequests'),
+                        data: timeSeriesData.map(d => d.total),
+                        borderColor: theme.palette.primary.main,
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: timeSeriesData.map((_, i) =>
+                            isLastPointIncomplete && i === timeSeriesData.length - 1 ? 6 : 4
+                        ),
+                        pointBackgroundColor: timeSeriesData.map((_, i) =>
+                            isLastPointIncomplete && i === timeSeriesData.length - 1
+                                ? 'transparent'
+                                : theme.palette.primary.main
+                        ),
+                        pointBorderColor: theme.palette.primary.main,
+                        pointBorderWidth: timeSeriesData.map((_, i) =>
+                            isLastPointIncomplete && i === timeSeriesData.length - 1 ? 2 : 0
+                        ),
+                        segment: {
+                            borderDash: (ctx: any) => segmentStyle(ctx),
+                        },
+                    },
+                ],
+            };
+        }
+    }, [chartGroupBy, metrics, timeSeriesData, isLastPointIncomplete, segmentStyle, t, theme.palette]);
 
     const lineChartOptions = {
         responsive: true,
@@ -526,48 +637,40 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
 
     return (
         <Box>
-            {/* Controls Row - Unleash style */}
-            <Box sx={{ display: 'flex', gap: 3, mb: 3, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-                {/* Environment Toggle */}
-                <Paper variant="outlined" sx={{ p: 2, borderRadius: 1 }}>
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+            {/* Controls Row - Network page style with Chips and Dividers */}
+            <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap', alignItems: 'center' }}>
+                {/* Environment Filter */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>
                         {t('featureFlags.metrics.environments')}
                     </Typography>
                     <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
                         {environments.map((env) => {
                             const isSelected = selectedEnvs.includes(env.environment);
                             return (
-                                <ToggleButton
+                                <Chip
                                     key={env.environment}
-                                    value={env.environment}
-                                    selected={isSelected}
+                                    label={env.environment}
                                     onClick={() => handleEnvToggle(env.environment)}
+                                    color={isSelected ? 'primary' : 'default'}
+                                    variant={isSelected ? 'filled' : 'outlined'}
                                     size="small"
-                                    sx={{
-                                        textTransform: 'none',
-                                        px: 2,
-                                        borderRadius: 1,
-                                        border: `1px solid ${theme.palette.divider}`,
-                                        '&.Mui-selected': {
-                                            bgcolor: theme.palette.primary.main,
-                                            color: theme.palette.primary.contrastText,
-                                            '&:hover': {
-                                                bgcolor: theme.palette.primary.dark,
-                                            },
-                                        },
-                                    }}
-                                >
-                                    {env.environment}
-                                </ToggleButton>
+                                    sx={{ borderRadius: '16px' }}
+                                />
                             );
                         })}
                     </Box>
-                </Paper>
+                </Box>
 
-                {/* Application Selector - only show if apps are available */}
+                {/* Divider */}
                 {availableApps.length > 0 && (
-                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 1, flex: 1, minWidth: 200 }}>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                    <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+                )}
+
+                {/* Application Filter - only show if apps are available */}
+                {availableApps.length > 0 && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>
                             {t('featureFlags.metrics.applications')}
                             {loadingApps && (
                                 <CircularProgress size={12} sx={{ ml: 1 }} />
@@ -577,52 +680,42 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                             {availableApps.map((app) => {
                                 const isSelected = selectedApps.includes(app);
                                 return (
-                                    <ToggleButton
+                                    <Chip
                                         key={app}
-                                        value={app}
-                                        selected={isSelected}
+                                        label={app}
                                         onClick={() => handleAppToggle(app)}
+                                        color={isSelected ? 'primary' : 'default'}
+                                        variant={isSelected ? 'filled' : 'outlined'}
                                         size="small"
-                                        sx={{
-                                            textTransform: 'none',
-                                            px: 2,
-                                            borderRadius: 1,
-                                            border: `1px solid ${theme.palette.divider}`,
-                                            '&.Mui-selected': {
-                                                bgcolor: theme.palette.info.main,
-                                                color: theme.palette.info.contrastText,
-                                                '&:hover': {
-                                                    bgcolor: theme.palette.info.dark,
-                                                },
-                                            },
-                                        }}
-                                    >
-                                        {app}
-                                    </ToggleButton>
+                                        sx={{ borderRadius: '16px' }}
+                                    />
                                 );
                             })}
                         </Box>
-                    </Paper>
+                    </Box>
                 )}
 
+                {/* Divider */}
+                <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+
                 {/* Period Selector */}
-                <Paper variant="outlined" sx={{ p: 2, borderRadius: 1, minWidth: 180 }}>
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="caption" color="text.secondary">
                         {t('featureFlags.metrics.period')}
                     </Typography>
-                    <FormControl size="small" fullWidth>
-                        <Select
-                            value={period}
-                            onChange={handlePeriodChange}
-                        >
-                            {PERIOD_OPTIONS.map((option) => (
-                                <MenuItem key={option.value} value={option.value}>
-                                    {t(option.labelKey)}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Paper>
+                    <ToggleButtonGroup
+                        size="small"
+                        value={period}
+                        exclusive
+                        onChange={(_, value) => value && setPeriod(value)}
+                    >
+                        {PERIOD_OPTIONS.map((option) => (
+                            <ToggleButton key={option.value} value={option.value}>
+                                {t(option.labelKey)}
+                            </ToggleButton>
+                        ))}
+                    </ToggleButtonGroup>
+                </Box>
             </Box>
 
             {/* Metrics Content */}
@@ -643,19 +736,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 </Paper>
             ) : (
                 <>
-                    {/* Line Chart - Unleash style */}
-                    <Paper variant="outlined" sx={{ p: 3, borderRadius: 1, mb: 3 }}>
-                        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
-                            {t('featureFlags.metrics.requestsInPeriod', {
-                                period: t(PERIOD_OPTIONS.find(p => p.value === period)?.labelKey || '')
-                            })}
-                        </Typography>
-                        <Box sx={{ height: 300 }}>
-                            <Line data={lineChartData} options={lineChartOptions} />
-                        </Box>
-                    </Paper>
-
-                    {/* Summary Cards - Unleash style (bottom) */}
+                    {/* Summary Cards - Top (above chart) */}
                     <Box sx={{ display: 'flex', gap: 3, mb: 3 }}>
                         <Paper
                             variant="outlined"
@@ -721,85 +802,114 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                         </Paper>
                     </Box>
 
-                    {/* Hourly Metrics Table */}
-                    <Paper variant="outlined" sx={{ borderRadius: 1 }}>
-                        <Box
-                            sx={{
-                                p: 2,
-                                display: 'flex',
-                                alignItems: 'center',
-                                cursor: 'pointer',
-                                '&:hover': { bgcolor: 'action.hover' },
-                            }}
-                            onClick={() => setShowTable(!showTable)}
-                        >
-                            <IconButton size="small">
-                                {showTable ? <CollapseIcon /> : <ExpandIcon />}
-                            </IconButton>
-                            <Typography variant="subtitle2" sx={{ ml: 1 }}>
-                                {t('featureFlags.metrics.hourlyBreakdown')}
+                    {/* Chart + Table combined in one Paper */}
+                    <Paper variant="outlined" sx={{ p: 3, borderRadius: 1, mb: 3 }}>
+                        {/* Chart Header */}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                            <Typography variant="subtitle2" color="text.secondary">
+                                {t('featureFlags.metrics.requestsInPeriod', {
+                                    period: t(PERIOD_OPTIONS.find(p => p.value === period)?.labelKey || '')
+                                })}
                             </Typography>
+                            <ToggleButtonGroup
+                                size="small"
+                                value={chartGroupBy}
+                                exclusive
+                                onChange={(_, value) => value && setChartGroupBy(value)}
+                            >
+                                <ToggleButton value="all">{t('network.groupByAll')}</ToggleButton>
+                                <ToggleButton value="app">{t('network.groupByApp')}</ToggleButton>
+                                <ToggleButton value="env">{t('network.groupByEnv')}</ToggleButton>
+                            </ToggleButtonGroup>
                         </Box>
-                        <Collapse in={showTable}>
-                            <TableContainer>
-                                <Table size="small">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>{t('featureFlags.metrics.time')}</TableCell>
-                                            {availableApps.length > 0 && (
-                                                <TableCell>{t('featureFlags.metrics.applications')}</TableCell>
-                                            )}
-                                            <TableCell align="right">{t('featureFlags.metrics.exposed')}</TableCell>
-                                            <TableCell align="right">{t('featureFlags.metrics.notExposed')}</TableCell>
-                                            <TableCell align="right">{t('featureFlags.metrics.total')}</TableCell>
-                                            <TableCell align="right">{t('featureFlags.metrics.exposureRate')}</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {tableData.map((row, index) => {
-                                            const rate = row.total > 0
-                                                ? ((row.exposed / row.total) * 100).toFixed(1)
-                                                : '0.0';
-                                            return (
-                                                <TableRow key={`${row.time}-${row.appName || index}`}>
-                                                    <TableCell>{row.displayTime}</TableCell>
-                                                    {availableApps.length > 0 && (
-                                                        <TableCell>
-                                                            <Typography
-                                                                variant="body2"
-                                                                sx={{
-                                                                    bgcolor: 'info.main',
-                                                                    color: 'info.contrastText',
-                                                                    px: 1,
-                                                                    py: 0.25,
-                                                                    borderRadius: 1,
-                                                                    display: 'inline-block',
-                                                                    fontSize: '0.75rem',
-                                                                }}
-                                                            >
-                                                                {row.appName || '-'}
-                                                            </Typography>
+
+                        {/* Chart */}
+                        <Box sx={{ height: 300 }}>
+                            <Line data={lineChartData} options={lineChartOptions} />
+                        </Box>
+
+                        {/* Hourly Breakdown Table (inside chart Paper) */}
+                        <Box sx={{ mt: 3, borderTop: `1px solid ${theme.palette.divider}`, pt: 2 }}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    cursor: 'pointer',
+                                    '&:hover': { bgcolor: 'action.hover' },
+                                    py: 1,
+                                    px: 0.5,
+                                    borderRadius: 1,
+                                }}
+                                onClick={() => setShowTable(!showTable)}
+                            >
+                                <IconButton size="small">
+                                    {showTable ? <CollapseIcon /> : <ExpandIcon />}
+                                </IconButton>
+                                <Typography variant="subtitle2" sx={{ ml: 1 }}>
+                                    {t('featureFlags.metrics.hourlyBreakdown')}
+                                </Typography>
+                            </Box>
+                            <Collapse in={showTable}>
+                                <TableContainer>
+                                    <Table size="small">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell>{t('featureFlags.metrics.time')}</TableCell>
+                                                {availableApps.length > 0 && (
+                                                    <TableCell>{t('featureFlags.metrics.applications')}</TableCell>
+                                                )}
+                                                <TableCell align="right">{t('featureFlags.metrics.exposed')}</TableCell>
+                                                <TableCell align="right">{t('featureFlags.metrics.notExposed')}</TableCell>
+                                                <TableCell align="right">{t('featureFlags.metrics.total')}</TableCell>
+                                                <TableCell align="right">{t('featureFlags.metrics.exposureRate')}</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {tableData.map((row, index) => {
+                                                const rate = row.total > 0
+                                                    ? ((row.exposed / row.total) * 100).toFixed(1)
+                                                    : '0.0';
+                                                return (
+                                                    <TableRow key={`${row.time}-${row.appName || index}`}>
+                                                        <TableCell>{row.displayTime}</TableCell>
+                                                        {availableApps.length > 0 && (
+                                                            <TableCell>
+                                                                <Typography
+                                                                    variant="body2"
+                                                                    sx={{
+                                                                        bgcolor: 'info.main',
+                                                                        color: 'info.contrastText',
+                                                                        px: 1,
+                                                                        py: 0.25,
+                                                                        borderRadius: 1,
+                                                                        display: 'inline-block',
+                                                                        fontSize: '0.75rem',
+                                                                    }}
+                                                                >
+                                                                    {row.appName || '-'}
+                                                                </Typography>
+                                                            </TableCell>
+                                                        )}
+                                                        <TableCell align="right" sx={{ color: 'success.main' }}>
+                                                            {row.exposed.toLocaleString()}
                                                         </TableCell>
-                                                    )}
-                                                    <TableCell align="right" sx={{ color: 'success.main' }}>
-                                                        {row.exposed.toLocaleString()}
-                                                    </TableCell>
-                                                    <TableCell align="right" sx={{ color: 'error.main' }}>
-                                                        {row.notExposed.toLocaleString()}
-                                                    </TableCell>
-                                                    <TableCell align="right">
-                                                        {row.total.toLocaleString()}
-                                                    </TableCell>
-                                                    <TableCell align="right">
-                                                        {rate}%
-                                                    </TableCell>
-                                                </TableRow>
-                                            );
-                                        })}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Collapse>
+                                                        <TableCell align="right" sx={{ color: 'error.main' }}>
+                                                            {row.notExposed.toLocaleString()}
+                                                        </TableCell>
+                                                        <TableCell align="right">
+                                                            {row.total.toLocaleString()}
+                                                        </TableCell>
+                                                        <TableCell align="right">
+                                                            {rate}%
+                                                        </TableCell>
+                                                    </TableRow>
+                                                );
+                                            })}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Collapse>
+                        </Box>
                     </Paper>
 
                     {/* Variant Distribution (if flag has variants) */}
