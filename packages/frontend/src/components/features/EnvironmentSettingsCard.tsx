@@ -223,7 +223,7 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                             );
                         })() : (
                             <Tooltip
-                                title={t('featureFlags.noMetricsYet')}
+                                title={t('featureFlags.noMetricsYetHint')}
                                 arrow
                             >
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -235,17 +235,6 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                                             r={18}
                                             fill="#e0e0e0"
                                         />
-                                        <text
-                                            x={20}
-                                            y={20}
-                                            textAnchor="middle"
-                                            dominantBaseline="central"
-                                            fontSize="9"
-                                            fontWeight="700"
-                                            fill="#999"
-                                        >
-                                            -
-                                        </text>
                                     </svg>
                                 </Box>
                             </Tooltip>

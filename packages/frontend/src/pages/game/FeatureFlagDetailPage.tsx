@@ -1610,7 +1610,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                             }
                                                             return (
                                                                 <Tooltip
-                                                                    title={t('featureFlags.noMetricsYet')}
+                                                                    title={t('featureFlags.noMetricsYetHint')}
                                                                     arrow
                                                                 >
                                                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -1622,17 +1622,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                                 r={24}
                                                                                 fill="#e0e0e0"
                                                                             />
-                                                                            <text
-                                                                                x={26}
-                                                                                y={26}
-                                                                                textAnchor="middle"
-                                                                                dominantBaseline="central"
-                                                                                fontSize="12"
-                                                                                fontWeight="700"
-                                                                                fill="#999"
-                                                                            >
-                                                                                -
-                                                                            </text>
                                                                         </svg>
                                                                     </Box>
                                                                 </Tooltip>
