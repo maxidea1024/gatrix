@@ -3482,6 +3482,13 @@ const FeatureFlagDetailPage: React.FC = () => {
                     </MenuItem>
                   </Select>
                 </FormControl>
+
+                {/* Warning when type is changed */}
+                {flag.variantType !== originalFlag?.variantType && (
+                  <Alert severity="warning" sx={{ mt: 1 }}>
+                    {t("featureFlags.variantTypeChangeWarning")}
+                  </Alert>
+                )}
               </Box>
 
               {/* Baseline Payload */}
@@ -3526,7 +3533,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                       onValidation={(isValid, error) => {
                         setBaselinePayloadJsonError(isValid ? null : (error || "Invalid JSON"));
                       }}
-                      height={200}
+                      height={300}
                     />
                     {baselinePayloadJsonError && (
                       <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
@@ -3572,10 +3579,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                     if (!flag) return;
                     try {
                       setSaving(true);
+                      const variantTypeChanged = flag.variantType !== originalFlag?.variantType;
                       await api.put(`/admin/features/${flag.flagName}/variants`, {
                         variants: [],
                         variantType: flag.variantType || "string",
                         baselinePayload: flag.baselinePayload,
+                        clearVariantPayloads: variantTypeChanged,
                       });
                       setOriginalFlag((prev) =>
                         prev
@@ -3586,6 +3595,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                           }
                           : prev
                       );
+                      // If variant type changed, reload strategies to reflect payload reset
+                      if (variantTypeChanged) {
+                        await loadStrategiesForEnvironment(editingEnv || selectedEnv);
+                      }
                       enqueueSnackbar(t("common.saveSuccess"), {
                         variant: "success",
                       });
@@ -4555,21 +4568,34 @@ const FeatureFlagDetailPage: React.FC = () => {
                           <HelpOutlineIcon fontSize="small" color="action" />
                         </Tooltip>
                       </Typography>
-                      <Box
-                        sx={{
-                          p: 1.5,
-                          bgcolor: "action.hover",
-                          borderRadius: 1,
-                          fontFamily: "monospace",
-                          fontSize: "0.875rem",
-                          whiteSpace: "pre-wrap",
-                          wordBreak: "break-word",
-                        }}
-                      >
-                        {typeof flag?.baselinePayload === "object"
-                          ? JSON.stringify(flag?.baselinePayload, null, 2)
-                          : String(flag?.baselinePayload)}
-                      </Box>
+                      {flag?.variantType === "json" ? (
+                        <JsonEditor
+                          value={
+                            typeof flag?.baselinePayload === "object"
+                              ? JSON.stringify(flag?.baselinePayload, null, 2)
+                              : String(flag?.baselinePayload || "{}")
+                          }
+                          onChange={() => { }}
+                          readOnly
+                          height={100}
+                        />
+                      ) : (
+                        <Box
+                          sx={{
+                            p: 1.5,
+                            bgcolor: "action.hover",
+                            borderRadius: 1,
+                            fontFamily: "monospace",
+                            fontSize: "0.875rem",
+                            whiteSpace: "pre-wrap",
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {typeof flag?.baselinePayload === "object"
+                            ? JSON.stringify(flag?.baselinePayload, null, 2)
+                            : String(flag?.baselinePayload)}
+                        </Box>
+                      )}
                     </Box>
                   )}
 
@@ -4853,7 +4879,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         }));
                                       }}
                                       height={150}
-                                      label={t("featureFlags.payload")}
                                     />
                                     {hasJsonError && (
                                       <Typography

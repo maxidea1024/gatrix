@@ -674,8 +674,6 @@ class FeatureFlagService {
     });
   }
 
-  // ==================== Variants ====================
-
   /**
    * Update variants for a flag (bulk replace)
    */
@@ -686,6 +684,7 @@ class FeatureFlagService {
     userId: number,
     variantType?: "string" | "number" | "json",
     baselinePayload?: any,
+    clearVariantPayloads?: boolean,
   ): Promise<FeatureVariantAttributes[]> {
     const flag = await this.getFlag(environment, flagName);
     if (!flag) {
@@ -716,6 +715,29 @@ class FeatureFlagService {
       await FeatureFlagModel.update(flag.id, updateData);
     }
 
+    // If clearVariantPayloads is true, reset payload for all existing variants across all environments
+    if (clearVariantPayloads) {
+      // Get all variants for this flag (all environments)
+      const allVariants = await db("g_feature_flag_variants")
+        .where("flagId", flag.id)
+        .select("*");
+
+      // Reset payloads based on new variant type
+      const defaultPayload = variantType === "number" ? { type: "number", value: "" }
+        : variantType === "json" ? { type: "json", value: "{}" }
+          : { type: "string", value: "" };
+
+      for (const variant of allVariants) {
+        await db("g_feature_flag_variants")
+          .where("id", variant.id)
+          .update({
+            payload: JSON.stringify(defaultPayload),
+            updatedBy: userId,
+            updatedAt: new Date(),
+          });
+      }
+    }
+
     // Delete existing variants for this environment
     await FeatureVariantModel.deleteByFlagIdAndEnvironment(
       flag.id,
@@ -738,6 +760,9 @@ class FeatureFlagService {
       });
       createdVariants.push(created);
     }
+
+    // Invalidate cache after variants update
+    await this.invalidateCache(environment);
 
     return createdVariants;
   }

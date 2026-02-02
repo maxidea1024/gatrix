@@ -662,6 +662,7 @@ router.put(
       userId!,
       req.body.variantType, // Pass variantType to service
       req.body.baselinePayload, // Pass baselinePayload to service
+      req.body.clearVariantPayloads, // Pass flag to clear existing variant payloads
     );
 
     res.json({ success: true, data: { variants } });

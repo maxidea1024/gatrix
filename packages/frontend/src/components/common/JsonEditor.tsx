@@ -18,6 +18,8 @@ interface JsonEditorProps {
   json5Mode?: boolean;
   /** Callback for real-time validation error (JSON5 mode only) */
   onValidationError?: (error: string | null) => void;
+  /** Callback for validation (isValid, errorMessage) - alias for onValidationError */
+  onValidation?: (isValid: boolean, error?: string | null) => void;
 }
 
 const JsonEditor: React.FC<JsonEditorProps> = ({
@@ -31,6 +33,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
   helperText,
   json5Mode = false,
   onValidationError,
+  onValidation,
 }) => {
   const theme = useTheme();
   const editorRef = useRef<any>(null);
@@ -40,29 +43,30 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
 
   // Real-time JSON validation
   useEffect(() => {
-    if (onValidationError) {
-      const trimmed = (value || "").trim();
-      if (trimmed.length === 0) {
-        onValidationError(null);
-        setInternalError(null);
-        return;
-      }
-      try {
-        if (json5Mode) {
-          JSON5.parse(trimmed);
-        } else {
-          JSON.parse(trimmed);
-        }
-        onValidationError(null);
-        setInternalError(null);
-      } catch (e: any) {
-        const errorMsg =
-          e.message || (json5Mode ? "Invalid JSON5" : "Invalid JSON");
-        onValidationError(errorMsg);
-        setInternalError(errorMsg);
-      }
+    const trimmed = (value || "").trim();
+    if (trimmed.length === 0) {
+      if (onValidationError) onValidationError(null);
+      if (onValidation) onValidation(true, null);
+      setInternalError(null);
+      return;
     }
-  }, [value, json5Mode, onValidationError]);
+    try {
+      if (json5Mode) {
+        JSON5.parse(trimmed);
+      } else {
+        JSON.parse(trimmed);
+      }
+      if (onValidationError) onValidationError(null);
+      if (onValidation) onValidation(true, null);
+      setInternalError(null);
+    } catch (e: any) {
+      const errorMsg =
+        e.message || (json5Mode ? "Invalid JSON5" : "Invalid JSON");
+      if (onValidationError) onValidationError(errorMsg);
+      if (onValidation) onValidation(false, errorMsg);
+      setInternalError(errorMsg);
+    }
+  }, [value, json5Mode, onValidationError, onValidation]);
 
   // Displayed error: external error takes priority, then internal validation error
   const displayError = error || internalError;
