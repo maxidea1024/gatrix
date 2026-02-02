@@ -795,7 +795,7 @@ class FeatureFlagService {
     // If clearVariantPayloads is true, reset payload for all existing variants across all environments
     if (clearVariantPayloads) {
       // Get all variants for this flag (all environments)
-      const allVariants = await db("g_feature_flag_variants")
+      const allVariants = await db("g_feature_variants")
         .where("flagId", flag.id)
         .select("*");
 
@@ -805,7 +805,7 @@ class FeatureFlagService {
           : { type: "string", value: "" };
 
       for (const variant of allVariants) {
-        await db("g_feature_flag_variants")
+        await db("g_feature_variants")
           .where("id", variant.id)
           .update({
             payload: JSON.stringify(defaultPayload),

@@ -361,6 +361,14 @@ const FeatureFlagDetailPage: React.FC = () => {
   const tabValue = tabParam === "payload" ? 1 : tabParam === "metrics" ? 2 : 0;
 
   const setTabValue = (newValue: number) => {
+    // Reset payload changes when leaving payload tab (tab 1)
+    if (tabValue === 1 && newValue !== 1 && originalFlag) {
+      setFlag((prev) => prev ? {
+        ...prev,
+        variantType: originalFlag.variantType,
+        baselinePayload: originalFlag.baselinePayload,
+      } : prev);
+    }
     const newParams = new URLSearchParams(searchParams);
     if (newValue === 1) {
       newParams.set("tab", "payload");
@@ -3728,8 +3736,28 @@ const FeatureFlagDetailPage: React.FC = () => {
                 </Box>
               )}
 
-              {/* Save Button */}
-              <Box sx={{ display: "flex", justifyContent: "flex-end", pt: 2 }}>
+              {/* Action Buttons */}
+              <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, pt: 2 }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    if (originalFlag) {
+                      setFlag((prev) => prev ? {
+                        ...prev,
+                        variantType: originalFlag.variantType,
+                        baselinePayload: originalFlag.baselinePayload,
+                      } : prev);
+                    }
+                  }}
+                  disabled={
+                    saving ||
+                    (flag.variantType === originalFlag?.variantType &&
+                      JSON.stringify(flag.baselinePayload) ===
+                      JSON.stringify(originalFlag?.baselinePayload))
+                  }
+                >
+                  {t("common.cancel")}
+                </Button>
                 <Button
                   variant="contained"
                   onClick={async () => {
