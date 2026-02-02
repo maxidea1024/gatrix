@@ -733,7 +733,7 @@ const FeatureNetworkPage: React.FC = () => {
     ], [evaluations, summary, t, timeRange, selectedEnvironments]);
 
     return (
-        <Box sx={{ p: 3, maxWidth: 1400, mx: 'auto' }}>
+        <Box sx={{ p: 3 }}>
             {/* Page Header */}
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
