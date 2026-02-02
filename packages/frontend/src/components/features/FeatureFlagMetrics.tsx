@@ -772,7 +772,8 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         scales: {
             x: {
                 grid: {
-                    display: false,
+                    display: true,
+                    color: theme.palette.divider,
                 },
                 ticks: {
                     maxRotation: 45,
@@ -1239,7 +1240,8 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                                     scales: {
                                                         x: {
                                                             grid: {
-                                                                display: false,
+                                                                display: true,
+                                                                color: theme.palette.divider,
                                                             },
                                                             ticks: {
                                                                 maxRotation: 45,
