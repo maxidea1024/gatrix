@@ -1279,8 +1279,8 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                                         <TableHead>
                                                             <TableRow sx={{ '& th': { bgcolor: 'background.paper', zIndex: 1 } }}>
                                                                 <TableCell>{t('featureFlags.metrics.time')}</TableCell>
-                                                                {variantTimeSeriesData.variants.map((variant, idx) => (
-                                                                    <TableCell key={variant} align="right">
+                                                                {(variantGroupBy === 'all' ? variantTimeSeriesData.variants : Object.keys(variantTimeSeriesData.data)).map((key, idx) => (
+                                                                    <TableCell key={key} align="right">
                                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'flex-end' }}>
                                                                             <Box
                                                                                 sx={{
@@ -1290,7 +1290,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                                                                     bgcolor: variantColors[idx % variantColors.length],
                                                                                 }}
                                                                             />
-                                                                            {variant}
+                                                                            {key}
                                                                         </Box>
                                                                     </TableCell>
                                                                 ))}
@@ -1299,16 +1299,17 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                                         </TableHead>
                                                         <TableBody>
                                                             {variantTimeSeriesData.labels.map((label, rowIdx) => {
-                                                                const rowTotal = variantTimeSeriesData.variants.reduce(
-                                                                    (sum, v) => sum + (variantTimeSeriesData.data[v][rowIdx] || 0),
+                                                                const dataKeys = variantGroupBy === 'all' ? variantTimeSeriesData.variants : Object.keys(variantTimeSeriesData.data);
+                                                                const rowTotal = dataKeys.reduce(
+                                                                    (sum, k) => sum + (variantTimeSeriesData.data[k]?.[rowIdx] || 0),
                                                                     0
                                                                 );
                                                                 return (
                                                                     <TableRow key={label} hover>
                                                                         <TableCell>{label}</TableCell>
-                                                                        {variantTimeSeriesData.variants.map(variant => (
-                                                                            <TableCell key={variant} align="right">
-                                                                                {(variantTimeSeriesData.data[variant][rowIdx] || 0).toLocaleString()}
+                                                                        {dataKeys.map(key => (
+                                                                            <TableCell key={key} align="right">
+                                                                                {(variantTimeSeriesData.data[key]?.[rowIdx] || 0).toLocaleString()}
                                                                             </TableCell>
                                                                         ))}
                                                                         <TableCell align="right" sx={{ fontWeight: 600 }}>
