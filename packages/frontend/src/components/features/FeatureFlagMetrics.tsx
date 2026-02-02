@@ -138,6 +138,11 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         if (groupParam === 'app' || groupParam === 'env') return groupParam;
         return 'all';
     });
+    const [variantGroupBy, setVariantGroupBy] = useState<'all' | 'app' | 'env'>(() => {
+        const groupParam = searchParams.get('variantGroupBy');
+        if (groupParam === 'app' || groupParam === 'env') return groupParam;
+        return 'all';
+    });
 
     // App filter state
     const [availableApps, setAvailableApps] = useState<string[]>([]);
@@ -300,8 +305,15 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
             params.delete('groupBy');
         }
 
+        // Variant group by
+        if (variantGroupBy !== 'all') {
+            params.set('variantGroupBy', variantGroupBy);
+        } else {
+            params.delete('variantGroupBy');
+        }
+
         setSearchParams(params, { replace: true });
-    }, [selectedEnvs, period, chartGroupBy, environments, searchParams, setSearchParams]);
+    }, [selectedEnvs, period, chartGroupBy, variantGroupBy, environments, searchParams, setSearchParams]);
 
     // Toggle environment selection (multi-select)
     const handleEnvToggle = (env: string) => {
@@ -445,22 +457,37 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
             }
         });
 
-        if (allVariants.size === 0) return { labels: [], variants: [], data: {} };
+        if (allVariants.size === 0) return { labels: [], variants: [], data: {}, groups: [] };
 
-        // Aggregate by time bucket
-        const bucketMap = new Map<string, { displayTime: string; counts: Record<string, number> }>();
+        // Generate group key based on variantGroupBy
+        const getGroupKey = (m: MetricsBucket): string => {
+            if (variantGroupBy === 'app') return m.appName || 'unknown';
+            if (variantGroupBy === 'env') return m.environment || 'unknown';
+            return 'all';
+        };
+
+        // Aggregate by time bucket and group
+        const bucketMap = new Map<string, { displayTime: string; counts: Record<string, Record<string, number>> }>();
+        const allGroups = new Set<string>();
+
         metrics.forEach(m => {
             if (!m.variantCounts) return;
+            const group = getGroupKey(m);
+            allGroups.add(group);
+
             const existing = bucketMap.get(m.metricsBucket);
             if (existing) {
+                if (!existing.counts[group]) {
+                    existing.counts[group] = {};
+                }
                 Object.entries(m.variantCounts).forEach(([v, count]) => {
-                    existing.counts[v] = (existing.counts[v] || 0) + count;
+                    existing.counts[group][v] = (existing.counts[group][v] || 0) + count;
                 });
             } else {
                 const displayTime = formatWith(m.metricsBucket, 'MM/DD HH:mm');
                 bucketMap.set(m.metricsBucket, {
                     displayTime,
-                    counts: { ...m.variantCounts },
+                    counts: { [group]: { ...m.variantCounts } },
                 });
             }
         });
@@ -471,14 +498,32 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
 
         const labels = sortedBuckets.map(([, v]) => v.displayTime);
         const variants = Array.from(allVariants);
+        const groups = Array.from(allGroups).sort();
         const data: Record<string, number[]> = {};
 
-        variants.forEach(variant => {
-            data[variant] = sortedBuckets.map(([, v]) => v.counts[variant] || 0);
-        });
+        // For 'all' mode, aggregate all groups
+        if (variantGroupBy === 'all') {
+            variants.forEach(variant => {
+                data[variant] = sortedBuckets.map(([, v]) => {
+                    let total = 0;
+                    Object.values(v.counts).forEach(groupCounts => {
+                        total += groupCounts[variant] || 0;
+                    });
+                    return total;
+                });
+            });
+        } else {
+            // For app/env mode, create dataset per group+variant combination
+            groups.forEach(group => {
+                variants.forEach(variant => {
+                    const key = `${group} - ${variant}`;
+                    data[key] = sortedBuckets.map(([, v]) => v.counts[group]?.[variant] || 0);
+                });
+            });
+        }
 
-        return { labels, variants, data };
-    }, [metrics]);
+        return { labels, variants, data, groups };
+    }, [metrics, variantGroupBy]);
 
     // Segment styling for incomplete last hour - makes the line to last point dashed
     const segmentStyle = useCallback((ctx: any) => {
@@ -1120,24 +1165,48 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                 {variantTimeSeriesData.labels.length > 0 && (
                                     <Box sx={{ mt: 3 }}>
                                         <Divider sx={{ mb: 2 }} />
-                                        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
-                                            {t('featureFlags.metrics.variantTimeSeriesChart')}
-                                        </Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                                            <Typography variant="subtitle2" color="text.secondary">
+                                                {t('featureFlags.metrics.variantTimeSeriesChart')}
+                                            </Typography>
+                                            <ToggleButtonGroup
+                                                value={variantGroupBy}
+                                                exclusive
+                                                onChange={(_, value) => value && setVariantGroupBy(value)}
+                                                size="small"
+                                            >
+                                                <ToggleButton value="all">{t('network.groupByAll')}</ToggleButton>
+                                                <ToggleButton value="app">{t('network.groupByApp')}</ToggleButton>
+                                                <ToggleButton value="env">{t('network.groupByEnv')}</ToggleButton>
+                                            </ToggleButtonGroup>
+                                        </Box>
                                         <Box sx={{ height: 250 }}>
                                             <Line
                                                 data={{
                                                     labels: variantTimeSeriesData.labels,
-                                                    datasets: variantTimeSeriesData.variants.map((variant, idx) => ({
-                                                        label: variant,
-                                                        data: variantTimeSeriesData.data[variant],
-                                                        borderColor: variantColors[idx % variantColors.length],
-                                                        backgroundColor: variantColors[idx % variantColors.length] + '20',
-                                                        borderWidth: 2,
-                                                        fill: false,
-                                                        tension: 0.3,
-                                                        pointRadius: 3,
-                                                        pointHoverRadius: 5,
-                                                    })),
+                                                    datasets: variantGroupBy === 'all'
+                                                        ? variantTimeSeriesData.variants.map((variant, idx) => ({
+                                                            label: variant,
+                                                            data: variantTimeSeriesData.data[variant],
+                                                            borderColor: variantColors[idx % variantColors.length],
+                                                            backgroundColor: variantColors[idx % variantColors.length] + '20',
+                                                            borderWidth: 2,
+                                                            fill: false,
+                                                            tension: 0.3,
+                                                            pointRadius: 3,
+                                                            pointHoverRadius: 5,
+                                                        }))
+                                                        : Object.keys(variantTimeSeriesData.data).map((key, idx) => ({
+                                                            label: key,
+                                                            data: variantTimeSeriesData.data[key],
+                                                            borderColor: variantColors[idx % variantColors.length],
+                                                            backgroundColor: variantColors[idx % variantColors.length] + '20',
+                                                            borderWidth: 2,
+                                                            fill: false,
+                                                            tension: 0.3,
+                                                            pointRadius: 3,
+                                                            pointHoverRadius: 5,
+                                                        })),
                                                 }}
                                                 options={{
                                                     responsive: true,
