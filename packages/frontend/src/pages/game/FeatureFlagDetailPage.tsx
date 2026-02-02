@@ -3593,15 +3593,17 @@ const FeatureFlagDetailPage: React.FC = () => {
                   </Alert>
                 )}
 
-                {/* Additional warning when changing to 'none' and there are variants */}
-                {flag.variantType === "none" && originalFlag?.variantType !== "none" && (flag.variants?.length ?? 0) > 0 && (
+                {/* Additional warning when changing to 'none' from other type */}
+                {flag.variantType === "none" && originalFlag?.variantType && originalFlag.variantType !== "none" && (
                   <Alert severity="error" sx={{ mt: 1 }}>
                     <Typography variant="body2" fontWeight={500}>
                       {t("featureFlags.variantTypeNoneWarning")}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
-                      {t("featureFlags.variantsToBeRemoved")}: {flag.variants?.map(v => v.variantName).join(", ")}
-                    </Typography>
+                    {(flag.variants?.length ?? 0) > 0 && (
+                      <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
+                        {t("featureFlags.variantsToBeRemoved")}: {flag.variants?.map(v => v.variantName).join(", ")}
+                      </Typography>
+                    )}
                   </Alert>
                 )}
               </Box>
