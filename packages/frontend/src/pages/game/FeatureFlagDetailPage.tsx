@@ -388,6 +388,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         tags: [],
         strategies: [],
         variants: [],
+        variantType: "none",
         createdAt: new Date().toISOString(),
       }
       : null,
@@ -3579,105 +3580,107 @@ const FeatureFlagDetailPage: React.FC = () => {
                 )}
               </Box>
 
-              {/* Baseline Payload */}
-              <Box>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}
-                >
-                  {t("featureFlags.baselinePayload")}
-                  <Tooltip title={t("featureFlags.baselinePayloadHelp")}>
-                    <HelpOutlineIcon fontSize="small" color="action" />
-                  </Tooltip>
-                </Typography>
-                {flag.variantType === "json" ? (
-                  <>
-                    <JsonEditor
-                      value={(() => {
-                        if (flag.baselinePayload === null || flag.baselinePayload === undefined) {
-                          return "{}";
-                        }
-                        if (typeof flag.baselinePayload === "object") {
-                          return JSON.stringify(flag.baselinePayload, null, 2);
-                        }
-                        if (typeof flag.baselinePayload === "string") {
-                          return flag.baselinePayload;
-                        }
-                        return String(flag.baselinePayload);
-                      })()}
-                      onChange={(value) => {
-                        let parsedValue: any = value;
-                        try {
-                          parsedValue = JSON.parse(value);
-                          setBaselinePayloadJsonError(null);
-                        } catch (e: any) {
-                          // Keep as string if invalid JSON
-                          setBaselinePayloadJsonError(e.message || "Invalid JSON");
-                        }
-                        setFlag((prev) =>
-                          prev ? { ...prev, baselinePayload: parsedValue } : prev
-                        );
-                      }}
-                      onValidation={(isValid, error) => {
-                        setBaselinePayloadJsonError(isValid ? null : (error || "Invalid JSON"));
-                      }}
-                      height={350}
-                    />
-                    {baselinePayloadJsonError && (
-                      <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
-                        {t("featureFlags.jsonError")}
-                      </Typography>
-                    )}
-                    {!baselinePayloadJsonError && (
-                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
-                        {t("featureFlags.payloadSize")}: {new TextEncoder().encode(
-                          typeof flag.baselinePayload === "object"
-                            ? JSON.stringify(flag.baselinePayload)
-                            : String(flag.baselinePayload || "")
-                        ).length} bytes
-                      </Typography>
-                    )}
-                  </>
-                ) : flag.variantType === "number" ? (
-                  <TextField
-                    fullWidth
-                    size="small"
-                    type="number"
-                    placeholder="0"
-                    value={flag.baselinePayload ?? ""}
-                    onChange={(e) => {
-                      const numValue =
-                        e.target.value === "" ? undefined : Number(e.target.value);
-                      setFlag((prev) =>
-                        prev ? { ...prev, baselinePayload: numValue } : prev
-                      );
-                    }}
-                  />
-                ) : (
-                  <>
+              {/* Baseline Payload - only show when variantType is not 'none' */}
+              {flag.variantType !== "none" && (
+                <Box>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}
+                  >
+                    {t("featureFlags.baselinePayload")}
+                    <Tooltip title={t("featureFlags.baselinePayloadHelp")}>
+                      <HelpOutlineIcon fontSize="small" color="action" />
+                    </Tooltip>
+                  </Typography>
+                  {flag.variantType === "json" ? (
+                    <>
+                      <JsonEditor
+                        value={(() => {
+                          if (flag.baselinePayload === null || flag.baselinePayload === undefined) {
+                            return "{}";
+                          }
+                          if (typeof flag.baselinePayload === "object") {
+                            return JSON.stringify(flag.baselinePayload, null, 2);
+                          }
+                          if (typeof flag.baselinePayload === "string") {
+                            return flag.baselinePayload;
+                          }
+                          return String(flag.baselinePayload);
+                        })()}
+                        onChange={(value) => {
+                          let parsedValue: any = value;
+                          try {
+                            parsedValue = JSON.parse(value);
+                            setBaselinePayloadJsonError(null);
+                          } catch (e: any) {
+                            // Keep as string if invalid JSON
+                            setBaselinePayloadJsonError(e.message || "Invalid JSON");
+                          }
+                          setFlag((prev) =>
+                            prev ? { ...prev, baselinePayload: parsedValue } : prev
+                          );
+                        }}
+                        onValidation={(isValid, error) => {
+                          setBaselinePayloadJsonError(isValid ? null : (error || "Invalid JSON"));
+                        }}
+                        height={350}
+                      />
+                      {baselinePayloadJsonError && (
+                        <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
+                          {t("featureFlags.jsonError")}
+                        </Typography>
+                      )}
+                      {!baselinePayloadJsonError && (
+                        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+                          {t("featureFlags.payloadSize")}: {new TextEncoder().encode(
+                            typeof flag.baselinePayload === "object"
+                              ? JSON.stringify(flag.baselinePayload)
+                              : String(flag.baselinePayload || "")
+                          ).length} bytes
+                        </Typography>
+                      )}
+                    </>
+                  ) : flag.variantType === "number" ? (
                     <TextField
                       fullWidth
                       size="small"
-                      placeholder={t("featureFlags.baselinePayloadPlaceholder")}
+                      type="number"
+                      placeholder="0"
                       value={flag.baselinePayload ?? ""}
                       onChange={(e) => {
+                        const numValue =
+                          e.target.value === "" ? undefined : Number(e.target.value);
                         setFlag((prev) =>
-                          prev ? { ...prev, baselinePayload: e.target.value } : prev
+                          prev ? { ...prev, baselinePayload: numValue } : prev
                         );
                       }}
                     />
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
-                      {t("featureFlags.payloadSize")}: {new TextEncoder().encode(String(flag.baselinePayload || "")).length} bytes
-                    </Typography>
-                  </>
-                )}
-              </Box>
+                  ) : (
+                    <>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        placeholder={t("featureFlags.baselinePayloadPlaceholder")}
+                        value={flag.baselinePayload ?? ""}
+                        onChange={(e) => {
+                          setFlag((prev) =>
+                            prev ? { ...prev, baselinePayload: e.target.value } : prev
+                          );
+                        }}
+                      />
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+                        {t("featureFlags.payloadSize")}: {new TextEncoder().encode(String(flag.baselinePayload || "")).length} bytes
+                      </Typography>
+                    </>
+                  )}
 
-              {/* Baseline Payload Required Warning */}
-              {(flag.baselinePayload === undefined || flag.baselinePayload === null || flag.baselinePayload === "") && (
-                <Alert severity="info" sx={{ mt: 2 }}>
-                  {t("featureFlags.baselinePayloadRequired")}
-                </Alert>
+                  {/* Baseline Payload Required Warning */}
+                  {(flag.baselinePayload === undefined || flag.baselinePayload === null || flag.baselinePayload === "") && (
+                    <Alert severity="info" sx={{ mt: 2 }}>
+                      {t("featureFlags.baselinePayloadRequired")}
+                    </Alert>
+                  )}
+                </Box>
               )}
 
               {/* Save Button */}
