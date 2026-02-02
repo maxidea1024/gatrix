@@ -661,6 +661,7 @@ router.put(
       req.body.variants || [],
       userId!,
       req.body.variantType, // Pass variantType to service
+      req.body.baselinePayload, // Pass baselinePayload to service
     );
 
     res.json({ success: true, data: { variants } });
@@ -913,6 +914,8 @@ router.post(
             isEnabled: flagData.enabled ?? false,
             impressionDataEnabled: flagData.impressionDataEnabled ?? false,
             tags: flagData.tags,
+            variantType: flagData.variantType,
+            baselinePayload: flagData.baselinePayload,
             strategies: (flagData.strategies || []).map((s: any) => ({
               strategyName: s.strategyName,
               parameters: s.parameters,

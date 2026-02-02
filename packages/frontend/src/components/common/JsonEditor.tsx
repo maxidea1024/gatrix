@@ -195,10 +195,6 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
           overflow: "hidden",
           position: "relative",
           transition: "border-color 0.2s ease-in-out",
-          "&:focus-within": {
-            borderColor: error ? "error.main" : "primary.main",
-            borderWidth: "2px",
-          },
           "& .monaco-editor": {
             "& .margin": {
               backgroundColor: "transparent",

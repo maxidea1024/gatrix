@@ -35,15 +35,17 @@ export interface CreateFlagInput {
   displayName?: string;
   description?: string;
   flagType?:
-    | "release"
-    | "experiment"
-    | "operational"
-    | "permission"
-    | "killSwitch";
+  | "release"
+  | "experiment"
+  | "operational"
+  | "permission"
+  | "killSwitch";
   isEnabled?: boolean;
   impressionDataEnabled?: boolean;
   staleAfterDays?: number;
   tags?: string[];
+  variantType?: "string" | "number" | "json";
+  baselinePayload?: any;
   // Optional: create strategies and variants along with the flag
   strategies?: CreateStrategyInput[];
   variants?: CreateVariantInput[];
@@ -53,11 +55,11 @@ export interface UpdateFlagInput {
   displayName?: string;
   description?: string;
   flagType?:
-    | "release"
-    | "experiment"
-    | "operational"
-    | "permission"
-    | "killSwitch";
+  | "release"
+  | "experiment"
+  | "operational"
+  | "permission"
+  | "killSwitch";
   isEnabled?: boolean;
   impressionDataEnabled?: boolean;
   staleAfterDays?: number;
@@ -230,6 +232,8 @@ class FeatureFlagService {
       impressionDataEnabled: input.impressionDataEnabled ?? false,
       staleAfterDays: input.staleAfterDays ?? 30,
       tags: input.tags,
+      variantType: input.variantType,
+      baselinePayload: input.baselinePayload,
       createdBy: userId,
     });
 
@@ -681,6 +685,7 @@ class FeatureFlagService {
     variants: CreateVariantInput[],
     userId: number,
     variantType?: "string" | "number" | "json",
+    baselinePayload?: any,
   ): Promise<FeatureVariantAttributes[]> {
     const flag = await this.getFlag(environment, flagName);
     if (!flag) {
@@ -703,12 +708,12 @@ class FeatureFlagService {
       );
     }
 
-    // Update variantType on the flag if provided
-    if (variantType) {
-      await FeatureFlagModel.update(flag.id, {
-        variantType,
-        updatedBy: userId,
-      });
+    // Update variantType and baselinePayload on the flag if provided
+    if (variantType || baselinePayload !== undefined) {
+      const updateData: any = { updatedBy: userId };
+      if (variantType) updateData.variantType = variantType;
+      if (baselinePayload !== undefined) updateData.baselinePayload = baselinePayload;
+      await FeatureFlagModel.update(flag.id, updateData);
     }
 
     // Delete existing variants for this environment

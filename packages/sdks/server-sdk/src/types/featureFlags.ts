@@ -156,6 +156,8 @@ export interface FeatureFlag {
   impressionDataEnabled: boolean; // Whether to emit impression events
   strategies: FeatureStrategy[];
   variants: Variant[];
+  variantType?: PayloadType; // Type of variant payload
+  baselinePayload?: any; // Payload value when flag evaluates to false
 }
 
 // ==================== Evaluation Result ====================

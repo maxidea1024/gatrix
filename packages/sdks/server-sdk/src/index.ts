@@ -57,6 +57,9 @@ export {
   detectCloudMetadata,
 } from "./utils/cloudMetadata";
 
+// Export Feature Flag Evaluator
+export { FeatureFlagEvaluator } from "./utils/FeatureFlagEvaluator";
+
 // Export SDK version
 export { SDK_VERSION } from "./version";
 

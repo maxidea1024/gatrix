@@ -80,6 +80,7 @@ export interface FeatureFlagAttributes {
   tags?: string[];
   links?: { url: string; title?: string }[];
   variantType?: "string" | "number" | "json";
+  baselinePayload?: any; // Payload value when flag evaluates to false
   createdBy: number;
   createdByName?: string; // Joined from g_users
   updatedBy?: number;
@@ -435,14 +436,14 @@ export class FeatureFlagModel {
         variants,
         environments: envSettings
           ? [
-              {
-                id: envSettings.id,
-                flagId: id,
-                environment,
-                isEnabled: Boolean(envSettings.isEnabled),
-                lastSeenAt: envSettings.lastSeenAt,
-              },
-            ]
+            {
+              id: envSettings.id,
+              flagId: id,
+              environment,
+              isEnabled: Boolean(envSettings.isEnabled),
+              lastSeenAt: envSettings.lastSeenAt,
+            },
+          ]
           : [],
       };
     } catch (error) {
@@ -473,6 +474,7 @@ export class FeatureFlagModel {
         staleAfterDays: data.staleAfterDays ?? 30,
         tags: data.tags ? JSON.stringify(data.tags) : null,
         variantType: data.variantType || "string",
+        baselinePayload: data.baselinePayload !== undefined ? JSON.stringify(data.baselinePayload) : null,
         createdBy: data.createdBy,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -528,6 +530,8 @@ export class FeatureFlagModel {
         updateData.links = JSON.stringify(data.links);
       if (data.variantType !== undefined)
         updateData.variantType = data.variantType;
+      if (data.baselinePayload !== undefined)
+        updateData.baselinePayload = JSON.stringify(data.baselinePayload);
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
       await db("g_feature_flags").where("id", id).update(updateData);

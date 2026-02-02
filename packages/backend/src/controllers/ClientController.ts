@@ -15,6 +15,8 @@ import VarsModel from "../models/Vars";
 import { IpWhitelistService } from "../services/IpWhitelistService";
 import { SDKRequest } from "../middleware/apiTokenAuth";
 import { resolvePassiveData } from "../utils/passiveDataUtils";
+import { FeatureFlagModel, FeatureSegmentModel } from "../models/FeatureFlag";
+import { FeatureFlagEvaluator, FeatureFlag, FeatureSegment, EvaluationContext } from "@gatrix/server-sdk";
 
 export class ClientController {
   /**
@@ -355,4 +357,161 @@ export class ClientController {
       });
     },
   );
+
+  /**
+   * Evaluate feature flags (Server-side evaluation)
+   * POST /api/v1/client/features/evaluate
+   * GET /api/v1/client/features/evaluate
+   */
+  static evaluateFlags = asyncHandler(async (req: SDKRequest, res: Response) => {
+    const environment = req.environment;
+    if (!environment) {
+      return res.status(400).json({ success: false, message: "Environment is required" });
+    }
+
+    let context: EvaluationContext = {};
+
+    let flagNames: string[] | undefined;
+
+    // 1. Extract context and keys
+    if (req.method === "POST") {
+      context = req.body.context || {};
+      flagNames = req.body.flagNames;
+    } else {
+      // GET: context from x-gatrix-feature-context header (Base64 encoded JSON)
+      const contextHeader = req.headers["x-gatrix-feature-context"] as string;
+      if (contextHeader) {
+        try {
+          const jsonStr = Buffer.from(contextHeader, "base64").toString("utf-8");
+          context = JSON.parse(jsonStr);
+        } catch (error) {
+          // If parsing fails, use empty context or error? SDK usually handles graceful degradation.
+          logger.warn("Failed to parse x-gatrix-feature-context header", { error });
+        }
+      }
+
+      const flagNamesParam = req.query.flagNames as string;
+      if (flagNamesParam) {
+        flagNames = flagNamesParam.split(",");
+      }
+    }
+
+    // Default context values from request if not provided
+    if (!context.ip) context.ip = ClientController.getClientIp(req);
+    context.environmentName = environment;
+
+    // 2. Fetch all flags and segments (with caching)
+    // We cache the *definitions* for a short time (e.g. 60s) to avoid DB spam
+    const definitionsCacheKey = `feature_flags:definitions:${environment}`;
+    let definitions = await cacheService.get<any>(definitionsCacheKey);
+
+    if (!definitions) {
+      // Fetch from DB
+      // We need ALL flags to evaluate, and ALL segments
+      // Using FeatureFlagModel directly to get raw data
+      const [flagsData, segmentsList] = await Promise.all([
+        FeatureFlagModel.findAll({ environment, limit: 10000 }),
+        FeatureSegmentModel.findAll(),
+      ]);
+
+      definitions = {
+        flags: flagsData.flags,
+        segments: segmentsList
+      };
+
+      await cacheService.set(definitionsCacheKey, definitions, 5 * 60 * 1000); // 5 minutes cache
+    }
+
+    const { flags, segments } = definitions;
+
+    // Map segments to SDK type
+    const segmentsMap = new Map<string, FeatureSegment>(
+      segments.map((s: any) => [
+        s.segmentName,
+        {
+          name: s.segmentName,
+          constraints: s.constraints,
+          isActive: s.isActive
+        }
+      ])
+    );
+
+    // 3. Evaluate
+    const results: Record<string, any> = {};
+    const evaluableFlags = flagNames
+      ? flags.filter((f: any) => flagNames!.includes(f.flagName))
+      : flags;
+
+    for (const dbFlag of evaluableFlags) {
+      // Map DB flag to SDK FeatureFlag type
+      const sdkFlag: FeatureFlag = {
+        name: dbFlag.flagName,
+        isEnabled: dbFlag.isEnabled,
+        impressionDataEnabled: dbFlag.impressionDataEnabled,
+        strategies: dbFlag.strategies?.map((s: any) => ({
+          name: s.strategyName,
+          parameters: s.parameters,
+          constraints: s.constraints,
+          segments: s.segments,
+          isEnabled: s.isEnabled
+        })) || [],
+        variants: dbFlag.variants?.map((v: any) => ({
+          name: v.variantName,
+          weight: v.weight,
+          payload: v.payload,
+          payloadType: dbFlag.variantType || v.payloadType
+        })) || []
+      };
+
+      const result = FeatureFlagEvaluator.evaluate(sdkFlag, context, segmentsMap);
+
+      let value: any = result.enabled;
+
+      if (result.enabled && result.variant) {
+        if (result.variant.payload) {
+          value = result.variant.payload.value ?? result.variant.payload;
+        }
+      }
+
+      results[dbFlag.flagName] = {
+        value,
+        variant: result.variant?.name,
+        variantPayload: result.variant?.payload,
+        reason: result.reason,
+        enabled: result.enabled
+      };
+
+      if (!result.enabled) {
+        // Use baselinePayload if defined, otherwise use default based on variantType
+        if (dbFlag.baselinePayload !== undefined && dbFlag.baselinePayload !== null) {
+          // Parse baselinePayload if it's a string (from JSON column)
+          let baselineValue = dbFlag.baselinePayload;
+          if (typeof baselineValue === 'string') {
+            try {
+              baselineValue = JSON.parse(baselineValue);
+            } catch {
+              // Keep as string if not valid JSON
+            }
+          }
+          results[dbFlag.flagName].value = baselineValue;
+        } else {
+          const type = dbFlag.variantType || "boolean";
+          let defaultVal: any = false;
+          if (type === 'string') defaultVal = "";
+          else if (type === 'number') defaultVal = 0;
+          else if (type === 'json') defaultVal = {};
+          results[dbFlag.flagName].value = defaultVal;
+        }
+      }
+    }
+
+    res.json({
+      success: true,
+      data: results,
+      meta: {
+        evaluatedAt: new Date().toISOString()
+      }
+    });
+
+  });
 }

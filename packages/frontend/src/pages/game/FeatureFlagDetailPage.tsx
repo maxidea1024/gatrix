@@ -189,6 +189,7 @@ interface FeatureFlag {
   strategies?: Strategy[];
   variants?: Variant[];
   variantType?: "string" | "json" | "number";
+  baselinePayload?: any; // Payload value when flag evaluates to false
   environments?: FeatureFlagEnvironment[];
   lastSeenAt?: string;
   archivedAt?: string;
@@ -354,11 +355,13 @@ const FeatureFlagDetailPage: React.FC = () => {
 
   // Get tab from URL query parameter, default to 0 (overview)
   const tabParam = searchParams.get("tab");
-  const tabValue = tabParam === "metrics" ? 1 : 0;
+  const tabValue = tabParam === "payload" ? 1 : tabParam === "metrics" ? 2 : 0;
 
   const setTabValue = (newValue: number) => {
     const newParams = new URLSearchParams(searchParams);
     if (newValue === 1) {
+      newParams.set("tab", "payload");
+    } else if (newValue === 2) {
       newParams.set("tab", "metrics");
     } else {
       newParams.delete("tab");
@@ -418,6 +421,7 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [jsonPayloadErrors, setJsonPayloadErrors] = useState<
     Record<number, string | null>
   >({});
+  const [baselinePayloadJsonError, setBaselinePayloadJsonError] = useState<string | null>(null);
   // Environment-specific strategies - key is environment name, value is array of strategies
   const [envStrategies, setEnvStrategies] = useState<
     Record<string, Strategy[]>
@@ -1081,7 +1085,6 @@ const FeatureFlagDetailPage: React.FC = () => {
           `/admin/features/${flag.flagName}/variants`,
           {
             variants: apiVariants,
-            variantType: flag.variantType || "string",
           },
           {
             headers: { "x-environment": editingEnv },
@@ -1397,6 +1400,7 @@ const FeatureFlagDetailPage: React.FC = () => {
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
         <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)}>
           <Tab label={t("featureFlags.overview")} />
+          <Tab label={t("featureFlags.payload")} disabled={isCreating} />
           <Tab label={t("featureFlags.metrics")} disabled={isCreating} />
         </Tabs>
       </Box>
@@ -1483,6 +1487,31 @@ const FeatureFlagDetailPage: React.FC = () => {
                     </Box>
                   )}
                 </Box>
+
+                {/* Payload Type */}
+                {!isCreating && (
+                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {t("featureFlags.variantType")}
+                    </Typography>
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                    >
+                      {flag.variantType === "string" && (
+                        <StringIcon sx={{ fontSize: 16, color: "info.main" }} />
+                      )}
+                      {flag.variantType === "number" && (
+                        <NumberIcon sx={{ fontSize: 16, color: "success.main" }} />
+                      )}
+                      {flag.variantType === "json" && (
+                        <JsonIcon sx={{ fontSize: 16, color: "warning.main" }} />
+                      )}
+                      <Typography variant="body2">
+                        {t(`featureFlags.variantTypes.${flag.variantType || "string"}`)}
+                      </Typography>
+                    </Box>
+                  </Box>
+                )}
 
                 {/* Created By */}
                 {flag.createdByName && (
@@ -3370,8 +3399,222 @@ const FeatureFlagDetailPage: React.FC = () => {
         </Box>
       </TabPanel>
 
-      {/* Metrics Tab */}
+      {/* Payload Tab */}
       <TabPanel value={tabValue} index={1}>
+        <Box sx={{ maxWidth: 800 }}>
+          <Paper
+            variant="outlined"
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            }}
+          >
+            <Typography variant="h6" gutterBottom>
+              {t("featureFlags.payloadSettings")}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              {t("featureFlags.payloadSettingsDescription")}
+            </Typography>
+
+            <Stack spacing={3}>
+              {/* Variant Type Selector */}
+              <Box>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}
+                >
+                  {t("featureFlags.variantType")}
+                  <Tooltip title={t("featureFlags.variantTypeHelp")}>
+                    <HelpOutlineIcon fontSize="small" color="action" />
+                  </Tooltip>
+                </Typography>
+                <FormControl size="small" sx={{ minWidth: 200 }}>
+                  <Select
+                    value={flag.variantType || "string"}
+                    onChange={(e) => {
+                      const newType = e.target.value as
+                        | "string"
+                        | "json"
+                        | "number";
+                      setFlag((prev) =>
+                        prev ? { ...prev, variantType: newType } : prev
+                      );
+                    }}
+                    renderValue={(value) => (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        {value === "string" && (
+                          <StringIcon sx={{ fontSize: 16, color: "info.main" }} />
+                        )}
+                        {value === "number" && (
+                          <NumberIcon sx={{ fontSize: 16, color: "success.main" }} />
+                        )}
+                        {value === "json" && (
+                          <JsonIcon sx={{ fontSize: 16, color: "warning.main" }} />
+                        )}
+                        {t(`featureFlags.variantTypes.${value}`)}
+                      </Box>
+                    )}
+                  >
+                    <MenuItem value="string">
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <StringIcon sx={{ fontSize: 16, color: "info.main" }} />
+                        {t("featureFlags.variantTypes.string")}
+                      </Box>
+                    </MenuItem>
+                    <MenuItem value="number">
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <NumberIcon sx={{ fontSize: 16, color: "success.main" }} />
+                        {t("featureFlags.variantTypes.number")}
+                      </Box>
+                    </MenuItem>
+                    <MenuItem value="json">
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <JsonIcon sx={{ fontSize: 16, color: "warning.main" }} />
+                        {t("featureFlags.variantTypes.json")}
+                      </Box>
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+
+              {/* Baseline Payload */}
+              <Box>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}
+                >
+                  {t("featureFlags.baselinePayload")}
+                  <Tooltip title={t("featureFlags.baselinePayloadHelp")}>
+                    <HelpOutlineIcon fontSize="small" color="action" />
+                  </Tooltip>
+                </Typography>
+                {flag.variantType === "json" ? (
+                  <>
+                    <JsonEditor
+                      value={(() => {
+                        if (flag.baselinePayload === null || flag.baselinePayload === undefined) {
+                          return "{}";
+                        }
+                        if (typeof flag.baselinePayload === "object") {
+                          return JSON.stringify(flag.baselinePayload, null, 2);
+                        }
+                        if (typeof flag.baselinePayload === "string") {
+                          return flag.baselinePayload;
+                        }
+                        return String(flag.baselinePayload);
+                      })()}
+                      onChange={(value) => {
+                        let parsedValue: any = value;
+                        try {
+                          parsedValue = JSON.parse(value);
+                          setBaselinePayloadJsonError(null);
+                        } catch (e: any) {
+                          // Keep as string if invalid JSON
+                          setBaselinePayloadJsonError(e.message || "Invalid JSON");
+                        }
+                        setFlag((prev) =>
+                          prev ? { ...prev, baselinePayload: parsedValue } : prev
+                        );
+                      }}
+                      onValidation={(isValid, error) => {
+                        setBaselinePayloadJsonError(isValid ? null : (error || "Invalid JSON"));
+                      }}
+                      height={200}
+                    />
+                    {baselinePayloadJsonError && (
+                      <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
+                        {t("featureFlags.jsonError")}
+                      </Typography>
+                    )}
+                  </>
+                ) : flag.variantType === "number" ? (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    type="number"
+                    placeholder="0"
+                    value={flag.baselinePayload ?? ""}
+                    onChange={(e) => {
+                      const numValue =
+                        e.target.value === "" ? undefined : Number(e.target.value);
+                      setFlag((prev) =>
+                        prev ? { ...prev, baselinePayload: numValue } : prev
+                      );
+                    }}
+                  />
+                ) : (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder={t("featureFlags.baselinePayloadPlaceholder")}
+                    value={flag.baselinePayload ?? ""}
+                    onChange={(e) => {
+                      setFlag((prev) =>
+                        prev ? { ...prev, baselinePayload: e.target.value } : prev
+                      );
+                    }}
+                  />
+                )}
+              </Box>
+
+              {/* Save Button */}
+              <Box sx={{ display: "flex", justifyContent: "flex-end", pt: 2 }}>
+                <Button
+                  variant="contained"
+                  onClick={async () => {
+                    if (!flag) return;
+                    try {
+                      setSaving(true);
+                      await api.put(`/admin/features/${flag.flagName}/variants`, {
+                        variants: [],
+                        variantType: flag.variantType || "string",
+                        baselinePayload: flag.baselinePayload,
+                      });
+                      setOriginalFlag((prev) =>
+                        prev
+                          ? {
+                            ...prev,
+                            variantType: flag.variantType,
+                            baselinePayload: flag.baselinePayload,
+                          }
+                          : prev
+                      );
+                      enqueueSnackbar(t("common.saveSuccess"), {
+                        variant: "success",
+                      });
+                    } catch (error: any) {
+                      enqueueSnackbar(parseApiErrorMessage(error, "common.saveFailed"), {
+                        variant: "error",
+                      });
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  disabled={
+                    saving ||
+                    (flag.variantType === "json" && baselinePayloadJsonError !== null) ||
+                    (flag.variantType === originalFlag?.variantType &&
+                      JSON.stringify(flag.baselinePayload) ===
+                      JSON.stringify(originalFlag?.baselinePayload))
+                  }
+                >
+                  {saving ? <CircularProgress size={20} /> : t("common.save")}
+                </Button>
+              </Box>
+            </Stack>
+          </Paper>
+        </Box>
+      </TabPanel>
+
+      {/* Metrics Tab */}
+      <TabPanel value={tabValue} index={2}>
         <FeatureFlagMetrics
           flagName={flag.flagName}
           environments={(flag.environments || []).map((e) => ({
@@ -4255,121 +4498,41 @@ const FeatureFlagDetailPage: React.FC = () => {
                     {t("featureFlags.variantsInfo")}
                   </Alert>
 
-                  {/* Variant Type Selector */}
+                  {/* Variant Type Display (read-only - edit in flag settings) */}
                   <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                     <Typography
                       variant="subtitle2"
                       sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
                       {t("featureFlags.variantType")}
-                      <Tooltip title={t("featureFlags.variantTypeHelp")}>
+                      <Tooltip title={t("featureFlags.variantTypeEditInSettings")}>
                         <HelpOutlineIcon fontSize="small" color="action" />
                       </Tooltip>
                     </Typography>
-                    <FormControl size="small" sx={{ minWidth: 150 }}>
-                      <Select
-                        value={flag?.variantType || "string"}
-                        onChange={(e) => {
-                          const newType = e.target.value as
-                            | "string"
-                            | "json"
-                            | "number";
-                          // Determine default value based on type
-                          const defaultValue =
-                            newType === "number"
-                              ? "0"
-                              : newType === "json"
-                                ? "{}"
-                                : "";
-                          // Reset all variant payload values when type changes
-                          if (editingStrategy?.variants) {
-                            const updatedVariants =
-                              editingStrategy.variants.map((v) => ({
-                                ...v,
-                                payload: v.payload
-                                  ? { ...v.payload, value: defaultValue }
-                                  : { type: "string", value: defaultValue },
-                              }));
-                            setEditingStrategy({
-                              ...editingStrategy,
-                              variants: updatedVariants,
-                            });
-                          }
-                          setFlag((prev) =>
-                            prev ? { ...prev, variantType: newType } : prev,
-                          );
-                        }}
-                        renderValue={(value) => (
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                            }}
-                          >
-                            {value === "string" && (
-                              <StringIcon
-                                sx={{ fontSize: 16, color: "info.main" }}
-                              />
-                            )}
-                            {value === "number" && (
-                              <NumberIcon
-                                sx={{ fontSize: 16, color: "success.main" }}
-                              />
-                            )}
-                            {value === "json" && (
-                              <JsonIcon
-                                sx={{ fontSize: 16, color: "warning.main" }}
-                              />
-                            )}
-                            {t(`featureFlags.variantTypes.${value}`)}
-                          </Box>
-                        )}
-                      >
-                        <MenuItem value="string">
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                            }}
-                          >
-                            <StringIcon
-                              sx={{ fontSize: 16, color: "info.main" }}
-                            />
-                            {t("featureFlags.variantTypes.string")}
-                          </Box>
-                        </MenuItem>
-                        <MenuItem value="number">
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                            }}
-                          >
-                            <NumberIcon
-                              sx={{ fontSize: 16, color: "success.main" }}
-                            />
-                            {t("featureFlags.variantTypes.number")}
-                          </Box>
-                        </MenuItem>
-                        <MenuItem value="json">
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                            }}
-                          >
-                            <JsonIcon
-                              sx={{ fontSize: 16, color: "warning.main" }}
-                            />
-                            {t("featureFlags.variantTypes.json")}
-                          </Box>
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        px: 1.5,
+                        py: 0.5,
+                        bgcolor: "action.hover",
+                        borderRadius: 1,
+                      }}
+                    >
+                      {flag?.variantType === "string" && (
+                        <StringIcon sx={{ fontSize: 16, color: "info.main" }} />
+                      )}
+                      {flag?.variantType === "number" && (
+                        <NumberIcon sx={{ fontSize: 16, color: "success.main" }} />
+                      )}
+                      {flag?.variantType === "json" && (
+                        <JsonIcon sx={{ fontSize: 16, color: "warning.main" }} />
+                      )}
+                      <Typography variant="body2">
+                        {t(`featureFlags.variantTypes.${flag?.variantType || "string"}`)}
+                      </Typography>
+                    </Box>
                   </Box>
 
                   {/* Payload Size Warning for string/json types */}
@@ -4379,6 +4542,36 @@ const FeatureFlagDetailPage: React.FC = () => {
                         {t("featureFlags.payloadSizeWarning")}
                       </Alert>
                     )}
+
+                  {/* Baseline Payload Display (read-only - edit in flag settings) */}
+                  {flag?.baselinePayload !== undefined && flag?.baselinePayload !== null && flag?.baselinePayload !== "" && (
+                    <Box>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}
+                      >
+                        {t("featureFlags.baselinePayload")}
+                        <Tooltip title={t("featureFlags.baselinePayloadEditInSettings")}>
+                          <HelpOutlineIcon fontSize="small" color="action" />
+                        </Tooltip>
+                      </Typography>
+                      <Box
+                        sx={{
+                          p: 1.5,
+                          bgcolor: "action.hover",
+                          borderRadius: 1,
+                          fontFamily: "monospace",
+                          fontSize: "0.875rem",
+                          whiteSpace: "pre-wrap",
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        {typeof flag?.baselinePayload === "object"
+                          ? JSON.stringify(flag?.baselinePayload, null, 2)
+                          : String(flag?.baselinePayload)}
+                      </Box>
+                    </Box>
+                  )}
 
                   {/* Variants List */}
                   <Box>
@@ -4668,7 +4861,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         color="error"
                                         sx={{ mt: 0.5, display: "block" }}
                                       >
-                                        {strategyJsonErrors[index]}
+                                        {t("featureFlags.jsonError")}
                                       </Typography>
                                     )}
                                   </Box>
@@ -4737,16 +4930,13 @@ const FeatureFlagDetailPage: React.FC = () => {
                 variant="contained"
                 onClick={handleSaveStrategy}
                 disabled={(() => {
-                  // When editing, require changes to be made (check both strategy and variantType)
+                  // When editing, require changes to be made (check strategy only, variantType/baselinePayload are in Payload tab)
                   const strategyUnchanged =
                     JSON.stringify(editingStrategy) ===
                     JSON.stringify(originalEditingStrategy);
-                  const variantTypeUnchanged =
-                    flag?.variantType === originalFlag?.variantType;
                   if (
                     !isAddingStrategy &&
-                    strategyUnchanged &&
-                    variantTypeUnchanged
+                    strategyUnchanged
                   ) {
                     return true;
                   }

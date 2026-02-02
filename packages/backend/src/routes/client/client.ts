@@ -378,7 +378,9 @@ router.post(
   ClientController.invalidateCache,
 );
 
-// Note: Remote config routes removed - will be reimplemented with new system
+// Feature Flag evaluation routes (Server-side)
+router.post("/features/evaluate", clientSDKAuth, ClientController.evaluateFlags);
+router.get("/features/evaluate", clientSDKAuth, ClientController.evaluateFlags);
 
 // Client SDK routes (with API token authentication)
 router.get("/test", clientSDKAuth, (req: any, res: any) => {
