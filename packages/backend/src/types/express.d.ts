@@ -1,11 +1,11 @@
-import { JwtPayload } from "./auth";
+import { JWTPayload } from "./auth";
 
 declare global {
   namespace Express {
     interface Request {
-      user?: JwtPayload;
+      user?: JWTPayload;
     }
   }
 }
 
-export {};
+export { };

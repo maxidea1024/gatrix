@@ -130,7 +130,7 @@ export class ContextFieldController {
    */
   static async createContextField(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).user?.id;
+      const userId = (req as any).user?.userId || (req as any).user?.id || 1;
       const {
         key,
         name,

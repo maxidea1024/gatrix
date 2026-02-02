@@ -80,6 +80,7 @@ import {
   Security as PermissionIcon,
   PowerOff as KillSwitchIcon,
   ReportProblem as StaleIcon,
+  Block as BlockIcon,
 } from "@mui/icons-material";
 import { useAuth } from "../../contexts/AuthContext";
 import { PERMISSIONS } from "../../types/permissions";
@@ -189,7 +190,7 @@ interface FeatureFlag {
   links?: FlagLink[];
   strategies?: Strategy[];
   variants?: Variant[];
-  variantType?: "string" | "json" | "number";
+  variantType?: "none" | "string" | "json" | "number";
   baselinePayload?: any; // Payload value when flag evaluates to false
   environments?: FeatureFlagEnvironment[];
   lastSeenAt?: string;
@@ -1469,13 +1470,13 @@ const FeatureFlagDetailPage: React.FC = () => {
         <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)}>
           <Tab label={t("featureFlags.overview")} />
           <Tooltip
-            title={!flag?.variantType ? t("featureFlags.payloadTabDisabledHint") : ""}
+            title={(!flag?.variantType || flag?.variantType === "none") ? t("featureFlags.payloadTabDisabledHint") : ""}
             placement="top"
           >
             <span>
               <Tab
                 label={t("featureFlags.payload")}
-                disabled={isCreating || !flag?.variantType}
+                disabled={isCreating || !flag?.variantType || flag?.variantType === "none"}
               />
             </span>
           </Tooltip>
@@ -3515,9 +3516,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                 </Typography>
                 <FormControl size="small" sx={{ minWidth: 200 }}>
                   <Select
-                    value={flag.variantType || "string"}
+                    value={flag.variantType || "none"}
                     onChange={(e) => {
                       const newType = e.target.value as
+                        | "none"
                         | "string"
                         | "json"
                         | "number";
@@ -3533,6 +3535,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                           gap: 1,
                         }}
                       >
+                        {value === "none" && (
+                          <BlockIcon sx={{ fontSize: 16, color: "text.disabled" }} />
+                        )}
                         {value === "string" && (
                           <StringIcon sx={{ fontSize: 16, color: "info.main" }} />
                         )}
@@ -3546,6 +3551,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                       </Box>
                     )}
                   >
+                    <MenuItem value="none">
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <BlockIcon sx={{ fontSize: 16, color: "text.disabled" }} />
+                        {t("featureFlags.variantTypes.none")}
+                      </Box>
+                    </MenuItem>
                     <MenuItem value="string">
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <StringIcon sx={{ fontSize: 16, color: "info.main" }} />
