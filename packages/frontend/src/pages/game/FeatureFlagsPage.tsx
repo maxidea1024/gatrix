@@ -120,6 +120,8 @@ const FeatureFlagsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
+  const [staleConfirmOpen, setStaleConfirmOpen] = useState(false);
   const [deletingFlag, setDeletingFlag] = useState<FeatureFlag | null>(null);
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [flagTypes, setFlagTypes] = useState<FlagTypeInfo[]>([]);
@@ -176,6 +178,7 @@ const FeatureFlagsPage: React.FC = () => {
   const defaultColumns: ColumnConfig[] = [
     { id: "flagName", labelKey: "featureFlags.flagName", visible: true },
     { id: "status", labelKey: "featureFlags.status", visible: true },
+    { id: "variantType", labelKey: "featureFlags.variantType", visible: true },
     { id: "createdBy", labelKey: "common.createdBy", visible: true },
     { id: "createdAt", labelKey: "featureFlags.createdAt", visible: true },
     { id: "lastSeenAt", labelKey: "featureFlags.lastSeenAt", visible: true },
@@ -322,6 +325,16 @@ const FeatureFlagsPage: React.FC = () => {
         operator: "any_of",
         allowOperatorToggle: true,
         options: allTags.map((tag) => ({ value: tag.name, label: tag.name })),
+      },
+      {
+        key: "variantType",
+        label: t("featureFlags.variantType"),
+        type: "multiselect",
+        options: [
+          { value: "string", label: t("featureFlags.variantTypes.string") },
+          { value: "number", label: t("featureFlags.variantTypes.number") },
+          { value: "json", label: t("featureFlags.variantTypes.json") },
+        ],
       },
     ],
     [t, allTags]
@@ -948,8 +961,17 @@ const FeatureFlagsPage: React.FC = () => {
     }
   };
 
-  // Toggle stale status
-  const handleStaleToggle = async () => {
+  // Toggle stale status - show confirmation
+  const handleStaleMenu = () => {
+    if (actionMenuFlag) {
+      setStaleConfirmOpen(true);
+    }
+    handleActionMenuClose();
+  };
+
+  // Stale confirmation handler
+  const handleStaleConfirm = async () => {
+    setStaleConfirmOpen(false);
     if (!actionMenuFlag) return;
     try {
       const newStale = !actionMenuFlag.stale;
@@ -965,8 +987,6 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.updateFailed"), {
         variant: "error",
       });
-    } finally {
-      handleActionMenuClose();
     }
   };
 
@@ -989,12 +1009,20 @@ const FeatureFlagsPage: React.FC = () => {
     }
   };
 
-  // Archive from action menu
+  // Archive from action menu - show confirmation
   const handleArchiveFromMenu = () => {
+    if (actionMenuFlag) {
+      setArchiveConfirmOpen(true);
+    }
+    handleActionMenuClose();
+  };
+
+  // Archive confirmation handler
+  const handleArchiveConfirm = () => {
+    setArchiveConfirmOpen(false);
     if (actionMenuFlag) {
       handleArchiveToggle(actionMenuFlag);
     }
-    handleActionMenuClose();
   };
 
   // Delete from action menu
@@ -1768,6 +1796,23 @@ const FeatureFlagsPage: React.FC = () => {
                                   )}
                                 </TableCell>
                               );
+                            case "variantType":
+                              return (
+                                <TableCell key={col.id}>
+                                  <Chip
+                                    label={t(`featureFlags.variantTypes.${flag.variantType || "string"}`)}
+                                    size="small"
+                                    variant="outlined"
+                                    color={
+                                      flag.variantType === "json"
+                                        ? "secondary"
+                                        : flag.variantType === "number"
+                                          ? "info"
+                                          : "default"
+                                    }
+                                  />
+                                </TableCell>
+                              );
                             case "tags":
                               return (
                                 <TableCell key={col.id}>
@@ -2028,7 +2073,7 @@ const FeatureFlagsPage: React.FC = () => {
         </MenuItem>
         <Divider />
         <MenuItem
-          onClick={handleStaleToggle}
+          onClick={handleStaleMenu}
           disabled={!actionMenuFlag || actionMenuFlag.isArchived}
         >
           <ListItemIcon>
@@ -2074,6 +2119,72 @@ const FeatureFlagsPage: React.FC = () => {
         })}
       />
 
+      {/* Archive Confirmation Dialog */}
+      <Dialog
+        open={archiveConfirmOpen}
+        onClose={() => setArchiveConfirmOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>
+          {actionMenuFlag?.isArchived
+            ? t("featureFlags.reviveConfirmTitle")
+            : t("featureFlags.archiveConfirmTitle")}
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            {actionMenuFlag?.isArchived
+              ? t("featureFlags.reviveConfirmMessage", { name: actionMenuFlag?.flagName })
+              : t("featureFlags.archiveConfirmMessage", { name: actionMenuFlag?.flagName })}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setArchiveConfirmOpen(false)}>
+            {t("common.cancel")}
+          </Button>
+          <Button
+            variant="contained"
+            color={actionMenuFlag?.isArchived ? "success" : "warning"}
+            onClick={handleArchiveConfirm}
+          >
+            {actionMenuFlag?.isArchived ? t("featureFlags.revive") : t("featureFlags.archive")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Stale Confirmation Dialog */}
+      <Dialog
+        open={staleConfirmOpen}
+        onClose={() => setStaleConfirmOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>
+          {actionMenuFlag?.stale
+            ? t("featureFlags.unmarkStaleConfirmTitle")
+            : t("featureFlags.markStaleConfirmTitle")}
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            {actionMenuFlag?.stale
+              ? t("featureFlags.unmarkStaleConfirmMessage", { name: actionMenuFlag?.flagName })
+              : t("featureFlags.markStaleConfirmMessage", { name: actionMenuFlag?.flagName })}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setStaleConfirmOpen(false)}>
+            {t("common.cancel")}
+          </Button>
+          <Button
+            variant="contained"
+            color={actionMenuFlag?.stale ? "info" : "secondary"}
+            onClick={handleStaleConfirm}
+          >
+            {actionMenuFlag?.stale ? t("featureFlags.unmarkStale") : t("featureFlags.markStale")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Clone Dialog */}
       <Dialog
         open={cloneDialogOpen}
@@ -2097,7 +2208,7 @@ const FeatureFlagsPage: React.FC = () => {
               value={cloneNewName}
               onChange={(e) => setCloneNewName(e.target.value.replace(/[^a-zA-Z0-9_.-]/g, ""))}
               placeholder="new-flag-name"
-              helperText={t("featureFlags.flagNameHelper")}
+              helperText={t("featureFlags.flagNameHelp")}
             />
           </Box>
         </DialogContent>
@@ -2573,7 +2684,7 @@ const FeatureFlagsPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Box >
   );
 };
 
