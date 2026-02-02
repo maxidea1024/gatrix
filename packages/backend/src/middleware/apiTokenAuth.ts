@@ -299,15 +299,16 @@ export const setSDKEnvironment = async (
       environmentName = req.environment;
     }
 
-    // Attempt to resolve from URL (specifically for server routes like /api/v1/server/:env/...)
+    // Attempt to resolve from URL (specifically for server routes like /api/v1/server/:env/...
+    // or client feature flag routes like /api/v1/client/features/:env/eval)
     if (!environmentName) {
-      let envParam = req.params?.env;
+      let envParam = req.params?.env || req.params?.environment;
 
       // Fallback: Manually parse URL if req.params is not populated (middleware order issue)
-      // Look for /api/v1/server/:env/ pattern
       if (!envParam) {
         const path = req.originalUrl || req.url;
-        const match = path.match(/\/api\/v1\/server\/([^\/]+)\//);
+        // Match /api/v1/server/:env/ pattern
+        let match = path.match(/\/api\/v1\/server\/([^\/]+)\//);
         if (
           match &&
           match[1] &&
@@ -316,6 +317,14 @@ export const setSDKEnvironment = async (
           match[1] !== "auth"
         ) {
           envParam = match[1];
+        }
+
+        // Match /api/v1/client/features/:env/eval pattern
+        if (!envParam) {
+          match = path.match(/\/api\/v1\/client\/features\/([^\/]+)\/eval/);
+          if (match && match[1]) {
+            envParam = match[1];
+          }
         }
       }
 

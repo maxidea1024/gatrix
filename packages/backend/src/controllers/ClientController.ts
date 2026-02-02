@@ -361,11 +361,12 @@ export class ClientController {
 
   /**
    * Evaluate feature flags (Server-side evaluation)
-   * POST /api/v1/client/features/evaluate
-   * GET /api/v1/client/features/evaluate
+   * POST /api/v1/client/features/:environment/eval
+   * GET /api/v1/client/features/:environment/eval
    */
   static evaluateFlags = asyncHandler(async (req: SDKRequest, res: Response) => {
-    const environment = req.environment;
+    // Environment from path parameter (preferred) or header (fallback)
+    const environment = req.params.environment || req.environment;
     if (!environment) {
       return res.status(400).json({ success: false, message: "Environment is required" });
     }

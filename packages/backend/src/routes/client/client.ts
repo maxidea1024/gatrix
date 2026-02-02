@@ -379,8 +379,9 @@ router.post(
 );
 
 // Feature Flag evaluation routes (Server-side)
-router.post("/features/evaluate", clientSDKAuth, ClientController.evaluateFlags);
-router.get("/features/evaluate", clientSDKAuth, ClientController.evaluateFlags);
+// Environment is specified in the path: /features/:environment/eval
+router.post("/features/:environment/eval", clientSDKAuth, ClientController.evaluateFlags);
+router.get("/features/:environment/eval", clientSDKAuth, ClientController.evaluateFlags);
 
 // Client SDK routes (with API token authentication)
 router.get("/test", clientSDKAuth, (req: any, res: any) => {
