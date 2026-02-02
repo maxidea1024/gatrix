@@ -545,7 +545,8 @@ const FeatureNetworkPage: React.FC = () => {
         scales: {
             x: {
                 grid: {
-                    display: false,
+                    display: true,
+                    color: 'rgba(0, 0, 0, 0.05)',
                 },
                 ticks: {
                     maxRotation: 45,
