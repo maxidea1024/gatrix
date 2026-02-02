@@ -21,6 +21,7 @@ import {
     Divider,
     Tooltip,
     CircularProgress,
+    useTheme,
 } from '@mui/material';
 import {
     ExpandMore as ExpandMoreIcon,
@@ -90,6 +91,7 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
     getStrategyTitle,
 }) => {
     const { t } = useTranslation();
+    const theme = useTheme();
 
     const strategies = envData.strategies || [];
     const strategiesCount = strategies.length;
@@ -233,7 +235,7 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                                             cx={20}
                                             cy={20}
                                             r={18}
-                                            fill="#e0e0e0"
+                                            fill={theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0'}
                                         />
                                     </svg>
                                 </Box>
