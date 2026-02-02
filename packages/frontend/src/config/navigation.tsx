@@ -465,6 +465,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         path: "/feature-flags/network",
         permission: "feature-flags",
       },
+      {
+        text: "sidebar.unknownFlags",
+        icon: "HelpOutline",
+        path: "/feature-flags/unknown",
+        permission: "feature-flags",
+      },
     ],
   },
 

@@ -327,6 +327,12 @@ router.post(
   resolveEnvironment as any,
   ServerFeatureFlagController.receiveMetrics as any,
 );
+router.post(
+  "/:env/features/unknown",
+  authenticateServerApiToken as any,
+  resolveEnvironment as any,
+  ServerFeatureFlagController.reportUnknownFlag as any,
+);
 router.get(
   "/:env/segments",
   authenticateServerApiToken as any,

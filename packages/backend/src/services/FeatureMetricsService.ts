@@ -25,6 +25,7 @@ interface MetricsJobPayload {
   appName?: string;
   metrics: AggregatedMetric[];
   reportedAt: string;
+  bucketStart?: string; // Start of metrics collection window for accurate hourBucket
 }
 
 class FeatureMetricsService {
@@ -62,12 +63,18 @@ class FeatureMetricsService {
   /**
    * Process aggregated metrics from SDK
    * Adds job to queue for async processing
+   * @param environment - Environment name
+   * @param metrics - Aggregated metrics array
+   * @param timestamp - Reported timestamp (bucket.stop or legacy timestamp)
+   * @param appName - Application name from header
+   * @param bucketStart - Start of the metrics collection window (for accurate hourBucket calculation)
    */
   async processAggregatedMetrics(
     environment: string,
     metrics: AggregatedMetric[],
     timestamp?: string,
     appName?: string,
+    bucketStart?: string,
   ): Promise<void> {
     if (!metrics || metrics.length === 0) {
       return;
@@ -81,12 +88,14 @@ class FeatureMetricsService {
       appName,
       metrics,
       reportedAt,
+      bucketStart, // Pass bucket start time for accurate hourBucket calculation
     } as MetricsJobPayload);
 
     logger.debug("Feature metrics queued for processing", {
       environment,
       appName,
       count: metrics.length,
+      bucketStart,
     });
   }
 
@@ -96,10 +105,12 @@ class FeatureMetricsService {
   private async processMetricsJob(
     job: Job<{ type: string; payload: MetricsJobPayload; timestamp: number }>,
   ): Promise<void> {
-    const { environment, appName, metrics, reportedAt } = job.data.payload;
+    const { environment, appName, metrics, reportedAt, bucketStart } = job.data.payload;
 
-    const reportedDate = new Date(reportedAt);
-    const hourBucket = new Date(reportedDate);
+    // Use bucketStart for more accurate hourBucket calculation (bucket window start)
+    // Fallback to reportedAt for backward compatibility
+    const bucketDate = bucketStart ? new Date(bucketStart) : new Date(reportedAt);
+    const hourBucket = new Date(bucketDate);
     hourBucket.setMinutes(0, 0, 0);
 
     try {

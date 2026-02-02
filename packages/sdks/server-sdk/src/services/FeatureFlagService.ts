@@ -38,6 +38,8 @@ export class FeatureFlagService {
   // Metrics buffer for batching
   private metricsBuffer: FlagMetric[] = [];
   private metricsFlushInterval: NodeJS.Timeout | null = null;
+  // Track when the current metrics bucket started (for accurate time window reporting)
+  private metricsBucketStartTime: Date = new Date();
   // Whether this feature is enabled
   private featureEnabled: boolean = true;
   // Static context (default context merged with per-evaluation context)
@@ -475,10 +477,10 @@ export class FeatureFlagService {
       !result.enabled || !result.variant?.payload
         ? defaultValue
         : String(
-            result.variant.payload.value ??
-              result.variant.payload ??
-              defaultValue,
-          );
+          result.variant.payload.value ??
+          result.variant.payload ??
+          defaultValue,
+        );
     return {
       value,
       reason: result.reason,
@@ -1122,15 +1124,24 @@ export class FeatureFlagService {
           aggregatedCount: aggregatedMetrics.length,
         });
 
-        // Send aggregated metrics to backend (per environment)
+        // Send aggregated metrics to backend (per environment) with time window
+        const bucketStop = new Date();
         await this.apiClient.post(
           `/api/v1/server/${environment}/features/metrics`,
           {
             metrics: aggregatedMetrics,
-            timestamp: new Date().toISOString(),
+            bucket: {
+              start: this.metricsBucketStartTime.toISOString(),
+              stop: bucketStop.toISOString(),
+            },
+            // Legacy field for backward compatibility
+            timestamp: bucketStop.toISOString(),
           },
         );
       }
+
+      // Reset bucket start time for next window
+      this.metricsBucketStartTime = new Date();
 
       this.logger.debug("Feature flag metrics sent successfully");
     } catch (error) {

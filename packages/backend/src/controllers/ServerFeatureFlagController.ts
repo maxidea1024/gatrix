@@ -71,7 +71,7 @@ export default class ServerFeatureFlagController {
         (req.headers["x-application-name"] as string) || "unknown";
       networkTrafficService
         .recordTraffic(environment, appName, "features")
-        .catch(() => {});
+        .catch(() => { });
 
       // Get all enabled, non-archived flags for this environment
       const result = await FeatureFlagModel.findAll({
@@ -250,7 +250,7 @@ export default class ServerFeatureFlagController {
       const environment = req.params.env || "global";
       networkTrafficService
         .recordTraffic(environment, appName, "segments")
-        .catch(() => {});
+        .catch(() => { });
 
       const rawSegments = await FeatureSegmentModel.findAll();
 
@@ -279,7 +279,7 @@ export default class ServerFeatureFlagController {
    */
   static async receiveMetrics(req: Request, res: Response): Promise<void> {
     try {
-      const { metrics, timestamp } = req.body;
+      const { metrics, timestamp, bucket } = req.body;
       const environment = req.params.env || "production";
       // Get appName from X-Application-Name header
       const appName = req.headers["x-application-name"] as string | undefined;
@@ -291,12 +291,18 @@ export default class ServerFeatureFlagController {
         return;
       }
 
-      // Process aggregated metrics via queue with appName
+      // Use bucket.stop if available, fallback to timestamp, then current time
+      const reportedAt = bucket?.stop || timestamp;
+      // bucket.start is used for more accurate hourBucket calculation
+      const bucketStart = bucket?.start;
+
+      // Process aggregated metrics via queue with appName and bucket info
       await featureMetricsService.processAggregatedMetrics(
         environment,
         metrics,
-        timestamp,
+        reportedAt,
         appName,
+        bucketStart,
       );
 
       res.json({ success: true });
@@ -305,6 +311,44 @@ export default class ServerFeatureFlagController {
       res
         .status(500)
         .json({ success: false, error: "Failed to process metrics" });
+    }
+  }
+
+  /**
+   * Report unknown flag access from SDK
+   * POST /api/v1/server/:env/features/unknown
+   */
+  static async reportUnknownFlag(req: Request, res: Response): Promise<void> {
+    try {
+      const { flagName } = req.body;
+      const environment = req.params.env || "production";
+      const appName = req.headers["x-application-name"] as string | undefined;
+      const sdkVersion = req.headers["x-sdk-version"] as string | undefined;
+
+      if (!flagName || typeof flagName !== "string") {
+        res
+          .status(400)
+          .json({ success: false, error: "flagName is required" });
+        return;
+      }
+
+      // Import and use unknown flag service
+      const { unknownFlagService } = await import(
+        "../services/UnknownFlagService"
+      );
+      await unknownFlagService.reportUnknownFlag({
+        flagName,
+        environment,
+        appName,
+        sdkVersion,
+      });
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error reporting unknown flag:", error);
+      res
+        .status(500)
+        .json({ success: false, error: "Failed to report unknown flag" });
     }
   }
 }

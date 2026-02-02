@@ -44,6 +44,7 @@ import serverLifecycleRoutes from "./serverLifecycle";
 import changeRequestRoutes from "./changeRequests";
 import featureRoutes from "./features";
 import platformDefaultsRoutes from "./platformDefaults";
+import unknownFlagsRoutes from "./unknownFlags";
 
 const router = express.Router();
 
@@ -346,6 +347,16 @@ router.use(
     PERMISSIONS.CLIENT_VERSIONS_MANAGE,
   ]) as any,
   platformDefaultsRoutes,
+);
+
+// Unknown Flags - requires feature-flags.view or feature-flags.manage permission
+router.use(
+  "/unknown-flags",
+  requirePermission([
+    PERMISSIONS.FEATURE_FLAGS_VIEW,
+    PERMISSIONS.FEATURE_FLAGS_MANAGE,
+  ]) as any,
+  unknownFlagsRoutes,
 );
 
 export default router;

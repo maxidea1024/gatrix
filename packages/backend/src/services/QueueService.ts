@@ -47,6 +47,8 @@ export class QueueService {
       const { featureMetricsService } = await import("./FeatureMetricsService");
       await featureMetricsService.initialize();
 
+      // Unknown flags now uses Redis buffering, no queue initialization needed
+
       // Register repeatable scheduler jobs (idempotent)
       try {
         const repeatables = await this.listRepeatable("scheduler");
@@ -99,6 +101,24 @@ export class QueueService {
           );
         } else {
           logger.info("Repeatable job already exists: change-request:cleanup");
+        }
+
+        // Register unknown flags flush job (every minute)
+        const unknownFlagsFlushExists = repeatables.some(
+          (r) => r.name === "unknown-flags:flush",
+        );
+        if (!unknownFlagsFlushExists) {
+          await this.addJob(
+            "scheduler",
+            "unknown-flags:flush",
+            {},
+            { repeat: { pattern: "* * * * *" } },
+          );
+          logger.info(
+            "Registered repeatable job: unknown-flags:flush (every minute)",
+          );
+        } else {
+          logger.info("Repeatable job already exists: unknown-flags:flush");
         }
       } catch (e) {
         logger.error("Failed to register repeatable scheduler jobs:", e);
@@ -603,6 +623,20 @@ export class QueueService {
             jobId: job.id,
             deleted: locksDeleted,
           });
+          break;
+        }
+        case "unknown-flags:flush": {
+          // Dynamic import to avoid circular dependency
+          const { processUnknownFlagsFlushJob } = await import(
+            "./UnknownFlagService"
+          );
+          const result = await processUnknownFlagsFlushJob();
+          if (result.flushed > 0 || result.errors > 0) {
+            logger.info("unknown-flags:flush completed", {
+              jobId: job.id,
+              ...result,
+            });
+          }
           break;
         }
         default: {
