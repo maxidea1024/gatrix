@@ -1470,13 +1470,13 @@ const FeatureFlagDetailPage: React.FC = () => {
         <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)}>
           <Tab label={t("featureFlags.overview")} />
           <Tooltip
-            title={(!flag?.variantType || flag?.variantType === "none") ? t("featureFlags.payloadTabDisabledHint") : ""}
+            title={flag?.variantType === "none" ? t("featureFlags.payloadTabDisabledHint") : ""}
             placement="top"
           >
             <span>
               <Tab
                 label={t("featureFlags.payload")}
-                disabled={isCreating || !flag?.variantType || flag?.variantType === "none"}
+                disabled={isCreating || flag?.variantType === "none"}
               />
             </span>
           </Tooltip>

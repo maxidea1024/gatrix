@@ -22,6 +22,7 @@ async function main() {
       flagName: "test-basic-enabled",
       displayName: "Test Basic Enabled",
       description: "A simple flag that is always enabled",
+      variantType: "none",
       strategies: [{ name: "flexibleRollout", parameters: { rollout: 0, stickiness: "default", groupId: "test-basic-enabled" }, isEnabled: true }],
     });
 
@@ -30,6 +31,7 @@ async function main() {
       flagName: "test-rollout-50",
       displayName: "Test 50% Rollout",
       description: "Flag with 50% gradual rollout for stickiness testing",
+      variantType: "none",
       strategies: [
         {
           name: "flexibleRollout",
@@ -48,6 +50,7 @@ async function main() {
       flagName: "test-admin-only",
       displayName: "Test Admin Only",
       description: "Flag enabled only for admin users",
+      variantType: "none",
       strategies: [
         {
           name: "flexibleRollout",
@@ -69,6 +72,7 @@ async function main() {
       flagName: "test-variants-ab",
       displayName: "Test A/B Variants",
       description: "Flag with multiple variants for A/B testing",
+      variantType: "json",
       strategies: [
         {
           name: "flexibleRollout",
@@ -101,6 +105,7 @@ async function main() {
       flagName: "test-multi-strategy",
       displayName: "Test Multiple Strategies",
       description: "Flag with multiple strategies (first match wins)",
+      variantType: "none",
       strategies: [
         {
           name: "userWithId",
@@ -127,6 +132,7 @@ async function main() {
       displayName: "Test Disabled Flag",
       description: "A flag that is globally disabled",
       isEnabled: false,
+      variantType: "none",
       strategies: [{ name: "flexibleRollout", parameters: { rollout: 0, stickiness: "default", groupId: "test-disabled" }, isEnabled: true }],
     });
 
@@ -146,6 +152,7 @@ interface FlagConfig {
   displayName: string;
   description: string;
   isEnabled?: boolean;
+  variantType?: "none" | "string" | "number" | "json";
   strategies: Array<{
     name: string;
     parameters: Record<string, any>;
@@ -185,6 +192,7 @@ async function createFlag(config: FlagConfig) {
     displayName: config.displayName,
     description: config.description,
     flagType: "release",
+    variantType: config.variantType || "none",
     isArchived: false,
     impressionDataEnabled: true,
     createdBy: CREATED_BY,
