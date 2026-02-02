@@ -3517,9 +3517,23 @@ const FeatureFlagDetailPage: React.FC = () => {
                         | "string"
                         | "json"
                         | "number";
+                      // Reset baselinePayload based on new type
+                      let newPayload: string | number | object | undefined;
+                      if (newType === "none") {
+                        newPayload = undefined;
+                      } else if (newType === "number") {
+                        newPayload = 0;
+                      } else if (newType === "json") {
+                        newPayload = {};
+                      } else {
+                        newPayload = "";
+                      }
                       setFlag((prev) =>
-                        prev ? { ...prev, variantType: newType } : prev
+                        prev ? { ...prev, variantType: newType, baselinePayload: newPayload } : prev
                       );
+                      if (newType !== "json") {
+                        setBaselinePayloadJsonError(null);
+                      }
                     }}
                     renderValue={(value) => (
                       <Box
@@ -3576,6 +3590,18 @@ const FeatureFlagDetailPage: React.FC = () => {
                 {flag.variantType !== originalFlag?.variantType && (
                   <Alert severity="warning" sx={{ mt: 1 }}>
                     {t("featureFlags.variantTypeChangeWarning")}
+                  </Alert>
+                )}
+
+                {/* Additional warning when changing to 'none' and there are variants */}
+                {flag.variantType === "none" && originalFlag?.variantType !== "none" && (flag.variants?.length ?? 0) > 0 && (
+                  <Alert severity="error" sx={{ mt: 1 }}>
+                    <Typography variant="body2" fontWeight={500}>
+                      {t("featureFlags.variantTypeNoneWarning")}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
+                      {t("featureFlags.variantsToBeRemoved")}: {flag.variants?.map(v => v.variantName).join(", ")}
+                    </Typography>
                   </Alert>
                 )}
               </Box>
