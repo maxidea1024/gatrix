@@ -140,7 +140,9 @@ const TIME_RANGE_OPTIONS = [
     { value: '1h', label: 'network.timeRange.1h', hours: 1 },
     { value: '6h', label: 'network.timeRange.6h', hours: 6 },
     { value: '24h', label: 'network.timeRange.24h', hours: 24 },
+    { value: '48h', label: 'network.timeRange.48h', hours: 48 },
     { value: '7d', label: 'network.timeRange.7d', hours: 24 * 7 },
+    { value: '30d', label: 'network.timeRange.30d', hours: 24 * 30 },
 ];
 
 // Fill missing hours with zero values
