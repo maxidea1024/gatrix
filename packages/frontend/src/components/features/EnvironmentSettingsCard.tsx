@@ -237,7 +237,7 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                                             cx={20}
                                             cy={20}
                                             r={18}
-                                            fill={theme.palette.mode === 'dark' ? '#333333' : '#e0e0e0'}
+                                            fill={theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}
                                         />
                                     </svg>
                                 </Box>
