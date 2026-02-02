@@ -47,6 +47,7 @@ import {
     DialogContent,
     DialogActions,
     Collapse,
+    useTheme,
 } from '@mui/material';
 import {
     ArrowBack as ArrowBackIcon,
@@ -248,6 +249,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const { t } = useTranslation();
+    const theme = useTheme();
     const { enqueueSnackbar } = useSnackbar();
     const { hasPermission } = useAuth();
     const canManage = hasPermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]);
@@ -1620,7 +1622,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                                 cx={26}
                                                                                 cy={26}
                                                                                 r={24}
-                                                                                fill="#e0e0e0"
+                                                                                fill={theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'}
                                                                             />
                                                                         </svg>
                                                                     </Box>
