@@ -2202,10 +2202,19 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 }}
                               >
                                 <Typography
+                                  variant="body1"
+                                  fontWeight="medium"
+                                  color="text.secondary"
+                                  sx={{ mb: 1 }}
+                                >
+                                  {t("featureFlags.noStrategiesTitle")}
+                                </Typography>
+                                <Typography
+                                  variant="body2"
                                   color="text.secondary"
                                   sx={{ mb: 2 }}
                                 >
-                                  {t("featureFlags.noStrategies")}
+                                  {t("featureFlags.noStrategiesDescription")}
                                 </Typography>
                                 {canManage && (
                                   <Button
