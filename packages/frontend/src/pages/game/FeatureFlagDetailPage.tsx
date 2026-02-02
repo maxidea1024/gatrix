@@ -79,6 +79,7 @@ import {
   Build as OperationalIcon,
   Security as PermissionIcon,
   PowerOff as KillSwitchIcon,
+  ReportProblem as StaleIcon,
 } from "@mui/icons-material";
 import { useAuth } from "../../contexts/AuthContext";
 import { PERMISSIONS } from "../../types/permissions";
@@ -394,6 +395,7 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
+  const [staleConfirmOpen, setStaleConfirmOpen] = useState(false);
   const [strategyDialogOpen, setStrategyDialogOpen] = useState(false);
   const [strategyTabValue, setStrategyTabValue] = useState(0);
   const [editingStrategy, setEditingStrategy] = useState<Strategy | null>(null);
@@ -804,6 +806,29 @@ const FeatureFlagDetailPage: React.FC = () => {
     } catch (error: any) {
       enqueueSnackbar(
         parseApiErrorMessage(error, "featureFlags.archiveFailed"),
+        { variant: "error" },
+      );
+    }
+  };
+
+  const handleStaleClick = () => {
+    setStaleConfirmOpen(true);
+  };
+
+  const handleStaleConfirm = async () => {
+    setStaleConfirmOpen(false);
+    if (!flag || !canManage) return;
+    try {
+      const endpoint = flag.stale ? "unmark-stale" : "mark-stale";
+      await api.post(`/admin/features/${flag.flagName}/${endpoint}`);
+      setFlag({ ...flag, stale: !flag.stale });
+      enqueueSnackbar(
+        t(`featureFlags.${!flag.stale ? "markedAsStale" : "unmarkedAsStale"}`),
+        { variant: "success" },
+      );
+    } catch (error: any) {
+      enqueueSnackbar(
+        parseApiErrorMessage(error, "featureFlags.staleToggleFailed"),
         { variant: "error" },
       );
     }
@@ -1704,6 +1729,18 @@ const FeatureFlagDetailPage: React.FC = () => {
                       {flag.isArchived
                         ? t("featureFlags.revive")
                         : t("featureFlags.archive")}
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color={flag.stale ? "info" : "secondary"}
+                      startIcon={<StaleIcon />}
+                      onClick={handleStaleClick}
+                      fullWidth
+                      size="small"
+                    >
+                      {flag.stale
+                        ? t("featureFlags.unmarkStale")
+                        : t("featureFlags.markStale")}
                     </Button>
                     <Button
                       variant="outlined"
@@ -5192,6 +5229,39 @@ const FeatureFlagDetailPage: React.FC = () => {
             onClick={handleArchiveConfirm}
           >
             {flag?.isArchived ? t("featureFlags.revive") : t("featureFlags.archive")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Stale Confirmation Dialog */}
+      <Dialog
+        open={staleConfirmOpen}
+        onClose={() => setStaleConfirmOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>
+          {flag?.stale
+            ? t("featureFlags.unmarkStaleConfirmTitle")
+            : t("featureFlags.markStaleConfirmTitle")}
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            {flag?.stale
+              ? t("featureFlags.unmarkStaleConfirmMessage", { name: flag?.flagName })
+              : t("featureFlags.markStaleConfirmMessage", { name: flag?.flagName })}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setStaleConfirmOpen(false)}>
+            {t("common.cancel")}
+          </Button>
+          <Button
+            variant="contained"
+            color={flag?.stale ? "info" : "secondary"}
+            onClick={handleStaleConfirm}
+          >
+            {flag?.stale ? t("featureFlags.unmarkStale") : t("featureFlags.markStale")}
           </Button>
         </DialogActions>
       </Dialog>

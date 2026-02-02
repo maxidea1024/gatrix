@@ -474,6 +474,82 @@ class FeatureFlagService {
   }
 
   /**
+   * Mark a flag as stale
+   */
+  async markAsStale(
+    environment: string,
+    flagName: string,
+    userId: number,
+  ): Promise<FeatureFlagAttributes> {
+    const flag = await this.getFlag(environment, flagName);
+    if (!flag) {
+      throw new GatrixError(
+        `Flag '${flagName}' not found`,
+        404,
+        true,
+        ErrorCodes.NOT_FOUND,
+      );
+    }
+
+    const updated = await FeatureFlagModel.update(flag.id, {
+      stale: true,
+      updatedBy: userId,
+    });
+
+    await AuditLogModel.create({
+      action: "feature_flag.mark_stale",
+      resourceType: "FeatureFlag",
+      resourceId: flag.id,
+      userId,
+      oldValues: { stale: false },
+      newValues: { stale: true },
+    });
+
+    // Invalidate cache
+    await this.invalidateCache(environment);
+
+    return updated;
+  }
+
+  /**
+   * Mark a flag as not stale
+   */
+  async markAsNotStale(
+    environment: string,
+    flagName: string,
+    userId: number,
+  ): Promise<FeatureFlagAttributes> {
+    const flag = await this.getFlag(environment, flagName);
+    if (!flag) {
+      throw new GatrixError(
+        `Flag '${flagName}' not found`,
+        404,
+        true,
+        ErrorCodes.NOT_FOUND,
+      );
+    }
+
+    const updated = await FeatureFlagModel.update(flag.id, {
+      stale: false,
+      updatedBy: userId,
+    });
+
+    await AuditLogModel.create({
+      action: "feature_flag.unmark_stale",
+      resourceType: "FeatureFlag",
+      resourceId: flag.id,
+      userId,
+      oldValues: { stale: true },
+      newValues: { stale: false },
+    });
+
+    // Invalidate cache
+    await this.invalidateCache(environment);
+
+    return updated;
+  }
+
+  /**
    * Delete a flag (permanently)
    */
   async deleteFlag(

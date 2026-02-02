@@ -555,6 +555,44 @@ router.post(
   }),
 );
 
+// Mark flag as stale
+router.post(
+  "/:flagName/mark-stale",
+  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environment = requireEnvironment(req, res);
+    if (!environment) return;
+
+    const userId = req.user?.id;
+
+    const flag = await featureFlagService.markAsStale(
+      environment,
+      req.params.flagName,
+      userId!,
+    );
+
+    res.json({ success: true, data: { flag } });
+  }),
+);
+
+// Unmark flag as stale
+router.post(
+  "/:flagName/unmark-stale",
+  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environment = requireEnvironment(req, res);
+    if (!environment) return;
+
+    const userId = req.user?.id;
+
+    const flag = await featureFlagService.markAsNotStale(
+      environment,
+      req.params.flagName,
+      userId!,
+    );
+
+    res.json({ success: true, data: { flag } });
+  }),
+);
+
 // Delete a flag
 router.delete(
   "/:flagName",
