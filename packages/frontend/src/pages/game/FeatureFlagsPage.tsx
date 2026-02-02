@@ -1217,7 +1217,7 @@ const FeatureFlagsPage: React.FC = () => {
         flagType: "release",
         tags: [],
         impressionDataEnabled: false,
-        variantType: "string",
+        variantType: "none",
         baselinePayload: "",
       });
       setNewFlagBaselinePayloadJsonError(null);
@@ -1241,7 +1241,7 @@ const FeatureFlagsPage: React.FC = () => {
       flagType: "release",
       tags: [],
       impressionDataEnabled: false,
-      variantType: "string",
+      variantType: "none",
       baselinePayload: "",
     });
     setNewFlagBaselinePayloadJsonError(null);
