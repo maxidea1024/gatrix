@@ -2463,7 +2463,7 @@ const FeatureFlagsPage: React.FC = () => {
                   </MenuItem>
                   <MenuItem value="json">
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <DataObjectIcon sx={{ fontSize: 16, color: "warning.main" }} />
+                      <JsonIcon sx={{ fontSize: 16, color: "warning.main" }} />
                       {t("featureFlags.variantTypes.json")}
                     </Box>
                   </MenuItem>
