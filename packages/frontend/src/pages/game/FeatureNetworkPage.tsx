@@ -940,8 +940,14 @@ const FeatureNetworkPage: React.FC = () => {
                                                 trafficData.slice().reverse().map((row, index) => (
                                                     <TableRow key={index} hover>
                                                         <TableCell>{row.displayTime}</TableCell>
-                                                        <TableCell>{row.environment}</TableCell>
-                                                        <TableCell>{row.appName || '-'}</TableCell>
+                                                        <TableCell>
+                                                            <Chip label={row.environment} size="small" color="primary" variant="outlined" />
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {row.appName ? (
+                                                                <Chip label={row.appName} size="small" color="info" />
+                                                            ) : '-'}
+                                                        </TableCell>
                                                         <TableCell align="right">{row.featuresCount.toLocaleString()}</TableCell>
                                                         <TableCell align="right">{row.segmentsCount.toLocaleString()}</TableCell>
                                                         <TableCell align="right">{row.totalCount.toLocaleString()}</TableCell>
@@ -1044,8 +1050,14 @@ const FeatureNetworkPage: React.FC = () => {
                                                 evaluationTimeSeriesByApp.slice().reverse().map((row, index) => (
                                                     <TableRow key={index} hover>
                                                         <TableCell>{row.displayTime}</TableCell>
-                                                        <TableCell>{row.environment}</TableCell>
-                                                        <TableCell>{row.appName || '-'}</TableCell>
+                                                        <TableCell>
+                                                            <Chip label={row.environment} size="small" color="primary" variant="outlined" />
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {row.appName ? (
+                                                                <Chip label={row.appName} size="small" color="info" />
+                                                            ) : '-'}
+                                                        </TableCell>
                                                         <TableCell align="right">{row.evaluations.toLocaleString()}</TableCell>
                                                     </TableRow>
                                                 ))
