@@ -203,9 +203,9 @@ interface FeatureFlag {
 
 const STRATEGY_TYPES = [
   {
-    name: "default",
-    titleKey: "featureFlags.strategies.default.title",
-    descKey: "featureFlags.strategies.default.desc",
+    name: "flexibleRollout",
+    titleKey: "featureFlags.strategies.flexibleRollout.title",
+    descKey: "featureFlags.strategies.flexibleRollout.desc",
   },
   {
     name: "userWithId",
@@ -221,11 +221,6 @@ const STRATEGY_TYPES = [
     name: "gradualRolloutUserId",
     titleKey: "featureFlags.strategies.gradualRolloutUserId.title",
     descKey: "featureFlags.strategies.gradualRolloutUserId.desc",
-  },
-  {
-    name: "flexibleRollout",
-    titleKey: "featureFlags.strategies.flexibleRollout.title",
-    descKey: "featureFlags.strategies.flexibleRollout.desc",
   },
   {
     name: "remoteAddress",
@@ -375,21 +370,21 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [flag, setFlag] = useState<FeatureFlag | null>(
     isCreating
       ? {
-          id: "",
-          environment: "",
-          flagName: generateDefaultFlagName(),
-          displayName: "",
-          description: "",
-          flagType: "release",
-          isEnabled: false,
-          isArchived: false,
-          impressionDataEnabled: false,
-          staleAfterDays: undefined,
-          tags: [],
-          strategies: [],
-          variants: [],
-          createdAt: new Date().toISOString(),
-        }
+        id: "",
+        environment: "",
+        flagName: generateDefaultFlagName(),
+        displayName: "",
+        description: "",
+        flagType: "release",
+        isEnabled: false,
+        isArchived: false,
+        impressionDataEnabled: false,
+        staleAfterDays: undefined,
+        tags: [],
+        strategies: [],
+        variants: [],
+        createdAt: new Date().toISOString(),
+      }
       : null,
   );
   const [loading, setLoading] = useState(!isCreating);
@@ -985,9 +980,17 @@ const FeatureFlagDetailPage: React.FC = () => {
     });
   };
 
-  // Helper function to toggle weight lock for a variant
+  // Helper function to toggle weight lock for a variant (only one can be locked)
   const toggleWeightLock = (index: number, locked: boolean) => {
     const currentVariants = [...(editingStrategy?.variants || [])];
+    // If locking this variant, unlock all others first
+    if (locked) {
+      currentVariants.forEach((v, i) => {
+        if (i !== index) {
+          currentVariants[i] = { ...v, weightLock: false };
+        }
+      });
+    }
     currentVariants[index] = {
       ...currentVariants[index],
       weightLock: locked,
@@ -1006,7 +1009,7 @@ const FeatureFlagDetailPage: React.FC = () => {
       id: `new-${Date.now()}`,
       name: "flexibleRollout",
       title: "",
-      parameters: { rollout: 100, stickiness: "default", groupId: "" },
+      parameters: { rollout: 0, stickiness: "default", groupId: "" },
       constraints: [],
       segments: [],
       sortOrder: envStrategyList.length,
@@ -2266,12 +2269,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                       {(strategy.name ===
                                                         "flexibleRollout" ||
                                                         strategy.name ===
-                                                          "gradualRolloutRandom" ||
+                                                        "gradualRolloutRandom" ||
                                                         strategy.name ===
-                                                          "gradualRolloutUserId") &&
+                                                        "gradualRolloutUserId") &&
                                                         strategy.parameters
                                                           ?.rollout !==
-                                                          undefined && (
+                                                        undefined && (
                                                           <Typography
                                                             component="span"
                                                             color="text.secondary"
@@ -2291,51 +2294,51 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                       {/* Show user count for userWithId strategy */}
                                                       {strategy.name ===
                                                         "userWithId" && (
-                                                        <Typography
-                                                          component="span"
-                                                          color="text.secondary"
-                                                        >
-                                                          :{" "}
-                                                          {strategy.parameters
-                                                            ?.userIds?.length ||
-                                                            0}{" "}
-                                                          {t(
-                                                            "featureFlags.users",
-                                                          )}
-                                                        </Typography>
-                                                      )}
+                                                          <Typography
+                                                            component="span"
+                                                            color="text.secondary"
+                                                          >
+                                                            :{" "}
+                                                            {strategy.parameters
+                                                              ?.userIds?.length ||
+                                                              0}{" "}
+                                                            {t(
+                                                              "featureFlags.users",
+                                                            )}
+                                                          </Typography>
+                                                        )}
                                                       {/* Show IP count for remoteAddress strategy */}
                                                       {strategy.name ===
                                                         "remoteAddress" && (
-                                                        <Typography
-                                                          component="span"
-                                                          color="text.secondary"
-                                                        >
-                                                          :{" "}
-                                                          {strategy.parameters
-                                                            ?.IPs?.length ||
-                                                            0}{" "}
-                                                          {t(
-                                                            "featureFlags.addresses",
-                                                          )}
-                                                        </Typography>
-                                                      )}
+                                                          <Typography
+                                                            component="span"
+                                                            color="text.secondary"
+                                                          >
+                                                            :{" "}
+                                                            {strategy.parameters
+                                                              ?.IPs?.length ||
+                                                              0}{" "}
+                                                            {t(
+                                                              "featureFlags.addresses",
+                                                            )}
+                                                          </Typography>
+                                                        )}
                                                       {/* Show hostname count for applicationHostname strategy */}
                                                       {strategy.name ===
                                                         "applicationHostname" && (
-                                                        <Typography
-                                                          component="span"
-                                                          color="text.secondary"
-                                                        >
-                                                          :{" "}
-                                                          {strategy.parameters
-                                                            ?.hostNames
-                                                            ?.length || 0}{" "}
-                                                          {t(
-                                                            "featureFlags.hosts",
-                                                          )}
-                                                        </Typography>
-                                                      )}
+                                                          <Typography
+                                                            component="span"
+                                                            color="text.secondary"
+                                                          >
+                                                            :{" "}
+                                                            {strategy.parameters
+                                                              ?.hostNames
+                                                              ?.length || 0}{" "}
+                                                            {t(
+                                                              "featureFlags.hosts",
+                                                            )}
+                                                          </Typography>
+                                                        )}
                                                     </Box>
                                                   </Box>
                                                   <Box
@@ -2385,13 +2388,13 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                         <Tooltip
                                                           title={
                                                             strategies.length ===
-                                                            1
+                                                              1
                                                               ? t(
-                                                                  "featureFlags.cannotDeleteLastStrategy",
-                                                                )
+                                                                "featureFlags.cannotDeleteLastStrategy",
+                                                              )
                                                               : t(
-                                                                  "common.delete",
-                                                                )
+                                                                "common.delete",
+                                                              )
                                                           }
                                                         >
                                                           <span>
@@ -2425,7 +2428,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                   {/* Segments Section */}
                                                   {strategy.segments &&
                                                     strategy.segments.length >
-                                                      0 && (
+                                                    0 && (
                                                       <Box>
                                                         {strategy.segments.map(
                                                           (
@@ -2542,11 +2545,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                     >
                                                                       {isExpanded
                                                                         ? t(
-                                                                            "featureFlags.hide",
-                                                                          )
+                                                                          "featureFlags.hide",
+                                                                        )
                                                                         : t(
-                                                                            "featureFlags.preview",
-                                                                          )}
+                                                                          "featureFlags.preview",
+                                                                        )}
                                                                     </Button>
                                                                   </Box>
                                                                   {/* Segment Preview (inside the box) with animation */}
@@ -2618,39 +2621,39 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                   strategy
                                                                     .segments
                                                                     .length -
-                                                                    1 && (
-                                                                  <Box
-                                                                    sx={{
-                                                                      display:
-                                                                        "flex",
-                                                                      alignItems:
-                                                                        "center",
-                                                                      ml: 2,
-                                                                      my: -0.5,
-                                                                      position:
-                                                                        "relative",
-                                                                      zIndex: 2,
-                                                                    }}
-                                                                  >
-                                                                    <Chip
-                                                                      label="AND"
-                                                                      size="small"
+                                                                  1 && (
+                                                                    <Box
                                                                       sx={{
-                                                                        height: 18,
-                                                                        fontSize:
-                                                                          "0.6rem",
-                                                                        fontWeight: 700,
-                                                                        bgcolor:
-                                                                          "background.paper",
-                                                                        color:
-                                                                          "text.secondary",
-                                                                        border: 1,
-                                                                        borderColor:
-                                                                          "divider",
+                                                                        display:
+                                                                          "flex",
+                                                                        alignItems:
+                                                                          "center",
+                                                                        ml: 2,
+                                                                        my: -0.5,
+                                                                        position:
+                                                                          "relative",
+                                                                        zIndex: 2,
                                                                       }}
-                                                                    />
-                                                                  </Box>
-                                                                )}
+                                                                    >
+                                                                      <Chip
+                                                                        label="AND"
+                                                                        size="small"
+                                                                        sx={{
+                                                                          height: 18,
+                                                                          fontSize:
+                                                                            "0.6rem",
+                                                                          fontWeight: 700,
+                                                                          bgcolor:
+                                                                            "background.paper",
+                                                                          color:
+                                                                            "text.secondary",
+                                                                          border: 1,
+                                                                          borderColor:
+                                                                            "divider",
+                                                                        }}
+                                                                      />
+                                                                    </Box>
+                                                                  )}
                                                               </Box>
                                                             );
                                                           },
@@ -2661,7 +2664,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                   {/* AND marker between segments and constraints */}
                                                   {strategy.segments &&
                                                     strategy.segments.length >
-                                                      0 &&
+                                                    0 &&
                                                     strategy.constraints &&
                                                     strategy.constraints
                                                       .length > 0 && (
@@ -2749,38 +2752,38 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                           {cIdx <
                                                             strategy.constraints
                                                               .length -
-                                                              1 && (
-                                                            <Box
-                                                              sx={{
-                                                                display: "flex",
-                                                                alignItems:
-                                                                  "center",
-                                                                ml: 2,
-                                                                my: -0.5,
-                                                                position:
-                                                                  "relative",
-                                                                zIndex: 2,
-                                                              }}
-                                                            >
-                                                              <Chip
-                                                                label="AND"
-                                                                size="small"
+                                                            1 && (
+                                                              <Box
                                                                 sx={{
-                                                                  height: 18,
-                                                                  fontSize:
-                                                                    "0.6rem",
-                                                                  fontWeight: 700,
-                                                                  bgcolor:
-                                                                    "background.paper",
-                                                                  color:
-                                                                    "text.secondary",
-                                                                  border: 1,
-                                                                  borderColor:
-                                                                    "divider",
+                                                                  display: "flex",
+                                                                  alignItems:
+                                                                    "center",
+                                                                  ml: 2,
+                                                                  my: -0.5,
+                                                                  position:
+                                                                    "relative",
+                                                                  zIndex: 2,
                                                                 }}
-                                                              />
-                                                            </Box>
-                                                          )}
+                                                              >
+                                                                <Chip
+                                                                  label="AND"
+                                                                  size="small"
+                                                                  sx={{
+                                                                    height: 18,
+                                                                    fontSize:
+                                                                      "0.6rem",
+                                                                    fontWeight: 700,
+                                                                    bgcolor:
+                                                                      "background.paper",
+                                                                    color:
+                                                                      "text.secondary",
+                                                                    border: 1,
+                                                                    borderColor:
+                                                                      "divider",
+                                                                  }}
+                                                                />
+                                                              </Box>
+                                                            )}
                                                         </Box>
                                                       ),
                                                     )}
@@ -2788,19 +2791,19 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                   {/* AND marker before rollout */}
                                                   {((strategy.segments &&
                                                     strategy.segments.length >
-                                                      0) ||
+                                                    0) ||
                                                     (strategy.constraints &&
                                                       strategy.constraints
                                                         .length > 0)) &&
                                                     (strategy.name ===
                                                       "flexibleRollout" ||
                                                       strategy.name ===
-                                                        "gradualRolloutRandom" ||
+                                                      "gradualRolloutRandom" ||
                                                       strategy.name ===
-                                                        "gradualRolloutUserId") &&
+                                                      "gradualRolloutUserId") &&
                                                     strategy.parameters
                                                       ?.rollout !==
-                                                      undefined && (
+                                                    undefined && (
                                                       <Box
                                                         sx={{
                                                           display: "flex",
@@ -2834,12 +2837,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                   {(strategy.name ===
                                                     "flexibleRollout" ||
                                                     strategy.name ===
-                                                      "gradualRolloutRandom" ||
+                                                    "gradualRolloutRandom" ||
                                                     strategy.name ===
-                                                      "gradualRolloutUserId") &&
+                                                    "gradualRolloutUserId") &&
                                                     strategy.parameters
                                                       ?.rollout !==
-                                                      undefined && (
+                                                    undefined && (
                                                       <Box sx={{ mb: 1.5 }}>
                                                         <Paper
                                                           variant="outlined"
@@ -2890,12 +2893,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                   {/* AND marker before userIds */}
                                                   {((strategy.segments &&
                                                     strategy.segments.length >
-                                                      0) ||
+                                                    0) ||
                                                     (strategy.constraints &&
                                                       strategy.constraints
                                                         .length > 0)) &&
                                                     strategy.name ===
-                                                      "userWithId" &&
+                                                    "userWithId" &&
                                                     strategy.parameters?.userIds
                                                       ?.length > 0 && (
                                                       <Box
@@ -2937,11 +2940,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                         .userIds,
                                                     )
                                                       ? strategy.parameters
-                                                          .userIds
+                                                        .userIds
                                                       : String(
-                                                          strategy.parameters
-                                                            .userIds,
-                                                        ).split(",")
+                                                        strategy.parameters
+                                                          .userIds,
+                                                      ).split(",")
                                                     ).length > 0 && (
                                                       <Box sx={{ mb: 1.5 }}>
                                                         <Paper
@@ -2975,13 +2978,13 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                 .userIds,
                                                             )
                                                               ? strategy
-                                                                  .parameters
-                                                                  .userIds
+                                                                .parameters
+                                                                .userIds
                                                               : String(
-                                                                  strategy
-                                                                    .parameters
-                                                                    .userIds,
-                                                                ).split(",")
+                                                                strategy
+                                                                  .parameters
+                                                                  .userIds,
+                                                              ).split(",")
                                                             )
                                                               .filter(
                                                                 (id: string) =>
@@ -3015,12 +3018,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                   {/* AND marker before IPs */}
                                                   {((strategy.segments &&
                                                     strategy.segments.length >
-                                                      0) ||
+                                                    0) ||
                                                     (strategy.constraints &&
                                                       strategy.constraints
                                                         .length > 0)) &&
                                                     strategy.name ===
-                                                      "remoteAddress" &&
+                                                    "remoteAddress" &&
                                                     strategy.parameters?.IPs
                                                       ?.length > 0 && (
                                                       <Box
@@ -3109,15 +3112,15 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                   {/* AND marker before hostnames */}
                                                   {((strategy.segments &&
                                                     strategy.segments.length >
-                                                      0) ||
+                                                    0) ||
                                                     (strategy.constraints &&
                                                       strategy.constraints
                                                         .length > 0)) &&
                                                     strategy.name ===
-                                                      "applicationHostname" &&
+                                                    "applicationHostname" &&
                                                     strategy.parameters
                                                       ?.hostNames?.length >
-                                                      0 && (
+                                                    0 && (
                                                       <Box
                                                         sx={{
                                                           display: "flex",
@@ -3152,7 +3155,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                     "applicationHostname" &&
                                                     strategy.parameters
                                                       ?.hostNames?.length >
-                                                      0 && (
+                                                    0 && (
                                                       <Box sx={{ mb: 1.5 }}>
                                                         <Paper
                                                           variant="outlined"
@@ -3209,7 +3212,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                   {/* Variants Bar */}
                                                   {strategy.variants &&
                                                     strategy.variants.length >
-                                                      0 && (
+                                                    0 && (
                                                       <Box sx={{ mb: 1 }}>
                                                         <Paper
                                                           variant="outlined"
@@ -3264,8 +3267,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                         width: `${variant.weight}%`,
                                                                         bgcolor:
                                                                           colors[
-                                                                            vIdx %
-                                                                              colors.length
+                                                                          vIdx %
+                                                                          colors.length
                                                                           ],
                                                                         display:
                                                                           "flex",
@@ -3284,35 +3287,35 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                     >
                                                                       {variant.weight >
                                                                         15 && (
-                                                                        <Box
-                                                                          sx={{
-                                                                            display:
-                                                                              "flex",
-                                                                            flexDirection:
-                                                                              "column",
-                                                                            alignItems:
-                                                                              "center",
-                                                                            lineHeight: 1.2,
-                                                                          }}
-                                                                        >
-                                                                          <span
-                                                                            style={{
-                                                                              fontSize:
-                                                                                "0.65rem",
+                                                                          <Box
+                                                                            sx={{
+                                                                              display:
+                                                                                "flex",
+                                                                              flexDirection:
+                                                                                "column",
+                                                                              alignItems:
+                                                                                "center",
+                                                                              lineHeight: 1.2,
                                                                             }}
                                                                           >
-                                                                            {
-                                                                              variant.weight
-                                                                            }
-                                                                            %
-                                                                          </span>
-                                                                          <span>
-                                                                            {
-                                                                              variant.name
-                                                                            }
-                                                                          </span>
-                                                                        </Box>
-                                                                      )}
+                                                                            <span
+                                                                              style={{
+                                                                                fontSize:
+                                                                                  "0.65rem",
+                                                                              }}
+                                                                            >
+                                                                              {
+                                                                                variant.weight
+                                                                              }
+                                                                              %
+                                                                            </span>
+                                                                            <span>
+                                                                              {
+                                                                                variant.name
+                                                                              }
+                                                                            </span>
+                                                                          </Box>
+                                                                        )}
                                                                     </Box>
                                                                   </Tooltip>
                                                                 );
@@ -3554,11 +3557,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                   saving ||
                   (editingFlagData?.displayName === (flag?.displayName || "") &&
                     editingFlagData?.description ===
-                      (flag?.description || "") &&
+                    (flag?.description || "") &&
                     editingFlagData?.impressionDataEnabled ===
-                      flag?.impressionDataEnabled &&
+                    flag?.impressionDataEnabled &&
                     JSON.stringify(editingFlagData?.tags || []) ===
-                      JSON.stringify(flag?.tags || []))
+                    JSON.stringify(flag?.tags || []))
                 }
               >
                 {saving ? <CircularProgress size={20} /> : t("common.save")}
@@ -3597,16 +3600,16 @@ const FeatureFlagDetailPage: React.FC = () => {
                       {(editingStrategy.segments?.length || 0) +
                         (editingStrategy.constraints?.length || 0) >
                         0 && (
-                        <Chip
-                          label={
-                            (editingStrategy.segments?.length || 0) +
-                            (editingStrategy.constraints?.length || 0)
-                          }
-                          size="small"
-                          color="primary"
-                          sx={{ height: 20, fontSize: "0.75rem" }}
-                        />
-                      )}
+                          <Chip
+                            label={
+                              (editingStrategy.segments?.length || 0) +
+                              (editingStrategy.constraints?.length || 0)
+                            }
+                            size="small"
+                            color="primary"
+                            sx={{ height: 20, fontSize: "0.75rem" }}
+                          />
+                        )}
                     </Box>
                   }
                 />
@@ -3679,152 +3682,156 @@ const FeatureFlagDetailPage: React.FC = () => {
                   {/* Rollout % for flexible rollout */}
                   {(editingStrategy.name === "flexibleRollout" ||
                     editingStrategy.name?.includes("Rollout")) && (
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                      <Typography
-                        variant="subtitle2"
-                        gutterBottom
-                        sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                      >
-                        {t("featureFlags.rollout")}
-                        <Tooltip title={t("featureFlags.rolloutTooltip")}>
-                          <HelpOutlineIcon fontSize="small" color="action" />
-                        </Tooltip>
-                      </Typography>
-                      <Box sx={{ px: 2, pt: 3 }}>
-                        <Slider
-                          value={editingStrategy.parameters?.rollout ?? 100}
-                          onChange={(_, value) =>
-                            setEditingStrategy({
-                              ...editingStrategy,
-                              parameters: {
-                                ...editingStrategy.parameters,
-                                rollout: value as number,
-                              },
-                            })
-                          }
-                          valueLabelDisplay="on"
-                          min={0}
-                          max={100}
-                          marks={[
-                            { value: 0, label: "0%" },
-                            { value: 25, label: "25%" },
-                            { value: 50, label: "50%" },
-                            { value: 75, label: "75%" },
-                            { value: 100, label: "100%" },
-                          ]}
-                        />
-                      </Box>
-
-                      {/* Stickiness & GroupId */}
-                      <Grid container spacing={2} sx={{ mt: 2 }}>
-                        <Grid item xs={6}>
-                          <FormControl fullWidth size="small">
-                            <InputLabel>
-                              {t("featureFlags.stickiness")}
-                            </InputLabel>
-                            <Select
-                              value={
-                                editingStrategy.parameters?.stickiness ||
-                                "default"
-                              }
-                              onChange={(e) =>
-                                setEditingStrategy({
-                                  ...editingStrategy,
-                                  parameters: {
-                                    ...editingStrategy.parameters,
-                                    stickiness: e.target.value,
-                                  },
-                                })
-                              }
-                              label={t("featureFlags.stickiness")}
-                            >
-                              <MenuItem value="default">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t("featureFlags.stickinessDefault")}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    {t("featureFlags.stickinessDefaultDesc")}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="userId">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t("featureFlags.stickinessUserId")}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    {t("featureFlags.stickinessUserIdDesc")}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="sessionId">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t("featureFlags.stickinessSessionId")}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    {t("featureFlags.stickinessSessionIdDesc")}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="random">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t("featureFlags.stickinessRandom")}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    {t("featureFlags.stickinessRandomDesc")}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                            </Select>
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                              sx={{ mt: 0.5 }}
-                            >
-                              {t("featureFlags.stickinessHelp")}
-                            </Typography>
-                          </FormControl>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label={t("featureFlags.groupId")}
-                            value={
-                              editingStrategy.parameters?.groupId ||
-                              flag?.flagName ||
-                              ""
-                            }
-                            onChange={(e) =>
+                      <Paper variant="outlined" sx={{ p: 2 }}>
+                        <Typography
+                          variant="subtitle2"
+                          gutterBottom
+                          sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                        >
+                          {t("featureFlags.rollout")}
+                          <Tooltip title={t("featureFlags.rolloutTooltip")}>
+                            <HelpOutlineIcon fontSize="small" color="action" />
+                          </Tooltip>
+                        </Typography>
+                        <Box sx={{ px: 2, pt: 3 }}>
+                          <Slider
+                            value={editingStrategy.parameters?.rollout ?? 100}
+                            onChange={(_, value) =>
                               setEditingStrategy({
                                 ...editingStrategy,
                                 parameters: {
                                   ...editingStrategy.parameters,
-                                  groupId: e.target.value,
+                                  rollout: value as number,
                                 },
                               })
                             }
-                            helperText={t("featureFlags.groupIdHelp")}
+                            valueLabelDisplay="on"
+                            min={0}
+                            max={100}
+                            marks={[
+                              { value: 0, label: "0%" },
+                              { value: 25, label: "25%" },
+                              { value: 50, label: "50%" },
+                              { value: 75, label: "75%" },
+                              { value: 100, label: "100%" },
+                            ]}
                           />
+                        </Box>
+
+                        {/* Stickiness & GroupId */}
+                        <Grid container spacing={2} sx={{ mt: 2 }}>
+                          <Grid item xs={6}>
+                            <FormControl fullWidth size="small">
+                              <InputLabel sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                                {t("featureFlags.stickiness")}
+                              </InputLabel>
+                              <Select
+                                value={
+                                  editingStrategy.parameters?.stickiness ||
+                                  "default"
+                                }
+                                onChange={(e) =>
+                                  setEditingStrategy({
+                                    ...editingStrategy,
+                                    parameters: {
+                                      ...editingStrategy.parameters,
+                                      stickiness: e.target.value,
+                                    },
+                                  })
+                                }
+                                label={t("featureFlags.stickiness")}
+                              >
+                                <MenuItem value="default">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t("featureFlags.stickinessDefault")}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      {t("featureFlags.stickinessDefaultDesc")}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                <MenuItem value="userId">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t("featureFlags.stickinessUserId")}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      {t("featureFlags.stickinessUserIdDesc")}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                <MenuItem value="sessionId">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t("featureFlags.stickinessSessionId")}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      {t("featureFlags.stickinessSessionIdDesc")}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                <MenuItem value="random">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t("featureFlags.stickinessRandom")}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      {t("featureFlags.stickinessRandomDesc")}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                              </Select>
+                              <Box sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
+                                <Tooltip title={t("featureFlags.stickinessHelp")}>
+                                  <HelpOutlineIcon fontSize="small" color="action" sx={{ cursor: "pointer" }} />
+                                </Tooltip>
+                              </Box>
+                            </FormControl>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Box>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                label={t("featureFlags.groupId")}
+                                value={
+                                  editingStrategy.parameters?.groupId ||
+                                  flag?.flagName ||
+                                  ""
+                                }
+                                onChange={(e) =>
+                                  setEditingStrategy({
+                                    ...editingStrategy,
+                                    parameters: {
+                                      ...editingStrategy.parameters,
+                                      groupId: e.target.value,
+                                    },
+                                  })
+                                }
+                              />
+                              <Box sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
+                                <Tooltip title={t("featureFlags.groupIdHelp")}>
+                                  <HelpOutlineIcon fontSize="small" color="action" sx={{ cursor: "pointer" }} />
+                                </Tooltip>
+                              </Box>
+                            </Box>
+                          </Grid>
                         </Grid>
-                      </Grid>
-                    </Paper>
-                  )}
+                      </Paper>
+                    )}
 
                   {/* User IDs input for userWithId strategy */}
                   {editingStrategy.name === "userWithId" && (
@@ -4368,10 +4375,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                   {/* Payload Size Warning for string/json types */}
                   {(flag?.variantType === "string" ||
                     flag?.variantType === "json") && (
-                    <Alert severity="warning" sx={{ borderRadius: 2 }}>
-                      {t("featureFlags.payloadSizeWarning")}
-                    </Alert>
-                  )}
+                      <Alert severity="warning" sx={{ borderRadius: 2 }}>
+                        {t("featureFlags.payloadSizeWarning")}
+                      </Alert>
+                    )}
 
                   {/* Variants List */}
                   <Box>
@@ -4383,7 +4390,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                     </Box>
 
                     {!editingStrategy.variants ||
-                    editingStrategy.variants.length === 0 ? (
+                      editingStrategy.variants.length === 0 ? (
                       <Paper
                         variant="outlined"
                         sx={{ p: 4, textAlign: "center" }}
@@ -4461,60 +4468,79 @@ const FeatureFlagDetailPage: React.FC = () => {
                             "#536DFE",
                           ];
                           const variantColor = colors[index % colors.length];
+                          const variantCount = editingStrategy.variants?.length || 0;
+                          const hasAnyLockedVariant = editingStrategy.variants?.some(v => v.weightLock);
+                          const isCurrentLocked = variant.weightLock;
+                          // Show weight controls only when more than 1 variant
+                          const showWeightControls = variantCount > 1;
+                          // Show fixed checkbox only if no other variant is locked, or this one is locked
+                          const showFixedCheckbox = showWeightControls && (!hasAnyLockedVariant || isCurrentLocked);
                           return (
-                            <Box
+                            <Paper
                               key={index}
+                              variant="outlined"
                               sx={{
-                                display: "flex",
-                                border: 1,
-                                borderColor: "divider",
-                                overflow: "hidden",
+                                p: 2,
+                                borderRadius: 2,
+                                borderLeft: 4,
+                                borderLeftColor: variantColor,
+                                bgcolor: "background.paper",
                               }}
                             >
-                              {/* Color indicator bar */}
-                              <Box
-                                sx={{
-                                  width: 4,
-                                  bgcolor: variantColor,
-                                  flexShrink: 0,
+                              {/* Header row: Title + Delete button */}
+                              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
+                                <Box>
+                                  <Typography variant="subtitle2" fontWeight={600}>
+                                    {t("featureFlags.variantName")}
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary">
+                                    {t("featureFlags.variantNameHelp")}
+                                  </Typography>
+                                </Box>
+                                <IconButton
+                                  size="small"
+                                  color="error"
+                                  onClick={() => removeVariantWithAutoDistribution(index)}
+                                  sx={{ opacity: 0.6, "&:hover": { opacity: 1 } }}
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </Box>
+
+                              {/* Variant Name Field */}
+                              <TextField
+                                fullWidth
+                                size="small"
+                                required
+                                placeholder={t("featureFlags.variantName") + " *"}
+                                value={variant.name}
+                                onChange={(e) => {
+                                  const updated = [
+                                    ...(editingStrategy.variants || []),
+                                  ];
+                                  updated[index] = {
+                                    ...updated[index],
+                                    name: e.target.value,
+                                  };
+                                  setEditingStrategy({
+                                    ...editingStrategy,
+                                    variants: updated,
+                                  });
                                 }}
+                                sx={{ mb: 2 }}
                               />
-                              {/* Content */}
-                              <Box sx={{ p: 2, flex: 1 }}>
-                                {/* Row 1: Name, Fixed Weight Checkbox, Weight, Delete */}
-                                <Grid container spacing={2} alignItems="center">
-                                  <Grid size={4}>
-                                    <TextField
-                                      fullWidth
-                                      size="small"
-                                      label={t("featureFlags.variantName")}
-                                      value={variant.name}
-                                      onChange={(e) => {
-                                        const updated = [
-                                          ...(editingStrategy.variants || []),
-                                        ];
-                                        updated[index] = {
-                                          ...updated[index],
-                                          name: e.target.value,
-                                        };
-                                        setEditingStrategy({
-                                          ...editingStrategy,
-                                          variants: updated,
-                                        });
-                                      }}
-                                    />
-                                  </Grid>
-                                  <Grid size={3}>
+
+                              {/* Weight Controls - only show when more than 1 variant */}
+                              {showWeightControls && (
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+                                  {showFixedCheckbox && (
                                     <FormControlLabel
                                       control={
                                         <Checkbox
                                           size="small"
                                           checked={variant.weightLock || false}
                                           onChange={(e) =>
-                                            toggleWeightLock(
-                                              index,
-                                              e.target.checked,
-                                            )
+                                            toggleWeightLock(index, e.target.checked)
                                           }
                                         />
                                       }
@@ -4524,142 +4550,131 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         </Typography>
                                       }
                                     />
-                                  </Grid>
-                                  <Grid size={3}>
-                                    <TextField
-                                      fullWidth
-                                      size="small"
-                                      type="number"
-                                      label={t("featureFlags.weight")}
-                                      value={variant.weight}
-                                      disabled={!variant.weightLock}
-                                      onChange={(e) => {
-                                        if (variant.weightLock) {
-                                          updateVariantWeight(
-                                            index,
-                                            parseInt(e.target.value) || 0,
-                                            true,
-                                          );
-                                        }
-                                      }}
-                                      InputProps={{
-                                        endAdornment: "%",
-                                        readOnly: !variant.weightLock,
-                                      }}
-                                    />
-                                  </Grid>
-                                  <Grid
-                                    size={2}
-                                    sx={{
-                                      display: "flex",
-                                      justifyContent: "flex-end",
-                                    }}
-                                  >
-                                    <IconButton
-                                      size="small"
-                                      color="error"
-                                      onClick={() =>
-                                        removeVariantWithAutoDistribution(index)
+                                  )}
+                                  <TextField
+                                    size="small"
+                                    type="number"
+                                    label={t("featureFlags.weight")}
+                                    value={variant.weight}
+                                    disabled={!variant.weightLock}
+                                    onChange={(e) => {
+                                      if (variant.weightLock) {
+                                        const newWeight = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
+                                        updateVariantWeight(index, newWeight, true);
                                       }
-                                    >
-                                      <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                  </Grid>
-                                </Grid>
-
-                                {/* Row 2: Payload Value Editor based on flag's variantType */}
-                                <Box sx={{ mt: 2 }}>
-                                  {payloadType === "string" && (
-                                    <TextField
-                                      fullWidth
-                                      size="small"
-                                      label={t("featureFlags.payload")}
-                                      value={variant.payload?.value || ""}
-                                      onChange={(e) => {
-                                        const updated = [
-                                          ...(editingStrategy.variants || []),
-                                        ];
-                                        updated[index] = {
-                                          ...updated[index],
-                                          payload: {
-                                            type: "string",
-                                            value: e.target.value,
-                                          },
-                                        };
-                                        setEditingStrategy({
-                                          ...editingStrategy,
-                                          variants: updated,
-                                        });
-                                      }}
-                                    />
-                                  )}
-                                  {payloadType === "number" && (
-                                    <TextField
-                                      fullWidth
-                                      size="small"
-                                      type="number"
-                                      label={t("featureFlags.payload")}
-                                      value={variant.payload?.value || ""}
-                                      onChange={(e) => {
-                                        const updated = [
-                                          ...(editingStrategy.variants || []),
-                                        ];
-                                        updated[index] = {
-                                          ...updated[index],
-                                          payload: {
-                                            type: "number",
-                                            value: e.target.value,
-                                          },
-                                        };
-                                        setEditingStrategy({
-                                          ...editingStrategy,
-                                          variants: updated,
-                                        });
-                                      }}
-                                    />
-                                  )}
-                                  {payloadType === "json" && (
-                                    <Box>
-                                      <JsonEditor
-                                        value={variant.payload?.value || "{}"}
-                                        onChange={(value) => {
-                                          const updated = [
-                                            ...(editingStrategy.variants || []),
-                                          ];
-                                          updated[index] = {
-                                            ...updated[index],
-                                            payload: { type: "json", value },
-                                          };
-                                          setEditingStrategy({
-                                            ...editingStrategy,
-                                            variants: updated,
-                                          });
-                                        }}
-                                        onValidation={(isValid, error) => {
-                                          setStrategyJsonErrors((prev) => ({
-                                            ...prev,
-                                            [index]: isValid
-                                              ? null
-                                              : error || "Invalid JSON",
-                                          }));
-                                        }}
-                                        height={150}
-                                        label={t("featureFlags.payload")}
-                                      />
-                                      {hasJsonError && (
-                                        <Typography
-                                          variant="caption"
-                                          color="error"
-                                          sx={{ mt: 0.5, display: "block" }}
-                                        >
-                                          {strategyJsonErrors[index]}
-                                        </Typography>
-                                      )}
-                                    </Box>
-                                  )}
+                                    }}
+                                    InputProps={{
+                                      endAdornment: "%",
+                                      readOnly: !variant.weightLock,
+                                      inputProps: { min: 0, max: 100 },
+                                    }}
+                                    sx={{ width: 120 }}
+                                  />
                                 </Box>
+                              )}
+
+                              {/* Payload Section */}
+                              <Box>
+                                <Typography
+                                  variant="subtitle2"
+                                  sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}
+                                >
+                                  {t("featureFlags.payload")}
+                                  <Tooltip title={t("featureFlags.payloadHelp")}>
+                                    <HelpOutlineIcon fontSize="small" color="action" />
+                                  </Tooltip>
+                                </Typography>
+
+                                {payloadType === "string" && (
+                                  <TextField
+                                    fullWidth
+                                    size="small"
+                                    placeholder={t("featureFlags.value")}
+                                    value={variant.payload?.value || ""}
+                                    onChange={(e) => {
+                                      const updated = [
+                                        ...(editingStrategy.variants || []),
+                                      ];
+                                      updated[index] = {
+                                        ...updated[index],
+                                        payload: {
+                                          type: "string",
+                                          value: e.target.value,
+                                        },
+                                      };
+                                      setEditingStrategy({
+                                        ...editingStrategy,
+                                        variants: updated,
+                                      });
+                                    }}
+                                  />
+                                )}
+                                {payloadType === "number" && (
+                                  <TextField
+                                    fullWidth
+                                    size="small"
+                                    type="number"
+                                    placeholder={t("featureFlags.value")}
+                                    value={variant.payload?.value || ""}
+                                    onChange={(e) => {
+                                      const updated = [
+                                        ...(editingStrategy.variants || []),
+                                      ];
+                                      updated[index] = {
+                                        ...updated[index],
+                                        payload: {
+                                          type: "number",
+                                          value: e.target.value,
+                                        },
+                                      };
+                                      setEditingStrategy({
+                                        ...editingStrategy,
+                                        variants: updated,
+                                      });
+                                    }}
+                                  />
+                                )}
+                                {payloadType === "json" && (
+                                  <Box>
+                                    <JsonEditor
+                                      value={variant.payload?.value || "{}"}
+                                      onChange={(value) => {
+                                        const updated = [
+                                          ...(editingStrategy.variants || []),
+                                        ];
+                                        updated[index] = {
+                                          ...updated[index],
+                                          payload: { type: "json", value },
+                                        };
+                                        setEditingStrategy({
+                                          ...editingStrategy,
+                                          variants: updated,
+                                        });
+                                      }}
+                                      onValidation={(isValid, error) => {
+                                        setStrategyJsonErrors((prev) => ({
+                                          ...prev,
+                                          [index]: isValid
+                                            ? null
+                                            : error || "Invalid JSON",
+                                        }));
+                                      }}
+                                      height={150}
+                                      label={t("featureFlags.payload")}
+                                    />
+                                    {hasJsonError && (
+                                      <Typography
+                                        variant="caption"
+                                        color="error"
+                                        sx={{ mt: 0.5, display: "block" }}
+                                      >
+                                        {strategyJsonErrors[index]}
+                                      </Typography>
+                                    )}
+                                  </Box>
+                                )}
                               </Box>
-                            </Box>
+                            </Paper>
                           );
                         })}
 

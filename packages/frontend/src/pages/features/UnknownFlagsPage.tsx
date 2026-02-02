@@ -43,7 +43,7 @@ import { useTranslation } from "react-i18next";
 import { useSnackbar } from "notistack";
 import { useEnvironment } from "../../contexts/EnvironmentContext";
 import { unknownFlagService, UnknownFlag } from "../../services/unknownFlagService";
-import { formatRelativeTime } from "../../utils/dateUtils";
+import RelativeTime from "../../components/common/RelativeTime";
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -54,7 +54,7 @@ import { copyToClipboardWithNotification } from "../../utils/clipboard";
 import { useDebounce } from "../../hooks/useDebounce";
 
 const UnknownFlagsPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { currentEnvironmentId } = useEnvironment();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -361,9 +361,9 @@ const UnknownFlagsPage: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 sx={{
-                  minWidth: 200,
+                  minWidth: 300,
                   flexGrow: 1,
-                  maxWidth: 300,
+                  maxWidth: 500,
                   "& .MuiOutlinedInput-root": {
                     height: "40px",
                     borderRadius: "20px",
@@ -521,7 +521,9 @@ const UnknownFlagsPage: React.FC = () => {
                           );
                         case "lastReportedAt":
                           return (
-                            <TableCell key={col.id}>{formatRelativeTime(flag.lastReportedAt)}</TableCell>
+                            <TableCell key={col.id}>
+                              <RelativeTime date={flag.lastReportedAt} />
+                            </TableCell>
                           );
                         case "status":
                           return (

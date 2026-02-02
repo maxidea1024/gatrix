@@ -22,7 +22,7 @@ async function main() {
       flagName: "test-basic-enabled",
       displayName: "Test Basic Enabled",
       description: "A simple flag that is always enabled",
-      strategies: [{ name: "default", parameters: {}, isEnabled: true }],
+      strategies: [{ name: "flexibleRollout", parameters: { rollout: 0, stickiness: "default", groupId: "test-basic-enabled" }, isEnabled: true }],
     });
 
     // 2. Rollout 50% flag (for stickiness testing)
@@ -50,8 +50,12 @@ async function main() {
       description: "Flag enabled only for admin users",
       strategies: [
         {
-          name: "default",
-          parameters: {},
+          name: "flexibleRollout",
+          parameters: {
+            rollout: 0,
+            stickiness: "default",
+            groupId: "test-admin-only",
+          },
           constraints: [
             { contextName: "role", operator: "str_eq", values: ["admin"] },
           ],
@@ -123,7 +127,7 @@ async function main() {
       displayName: "Test Disabled Flag",
       description: "A flag that is globally disabled",
       isEnabled: false,
-      strategies: [{ name: "default", parameters: {}, isEnabled: true }],
+      strategies: [{ name: "flexibleRollout", parameters: { rollout: 0, stickiness: "default", groupId: "test-disabled" }, isEnabled: true }],
     });
 
     console.log("\n" + "=".repeat(60));
