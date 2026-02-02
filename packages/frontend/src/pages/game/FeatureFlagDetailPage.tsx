@@ -3669,6 +3669,13 @@ const FeatureFlagDetailPage: React.FC = () => {
                 )}
               </Box>
 
+              {/* Baseline Payload Required Warning */}
+              {(flag.baselinePayload === undefined || flag.baselinePayload === null || flag.baselinePayload === "") && (
+                <Alert severity="info" sx={{ mt: 2 }}>
+                  {t("featureFlags.baselinePayloadRequired")}
+                </Alert>
+              )}
+
               {/* Save Button */}
               <Box sx={{ display: "flex", justifyContent: "flex-end", pt: 2 }}>
                 <Button
@@ -3711,6 +3718,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                   disabled={
                     saving ||
                     (flag.variantType === "json" && baselinePayloadJsonError !== null) ||
+                    (flag.baselinePayload === undefined || flag.baselinePayload === null || flag.baselinePayload === "") ||
                     (flag.variantType === originalFlag?.variantType &&
                       JSON.stringify(flag.baselinePayload) ===
                       JSON.stringify(originalFlag?.baselinePayload))
