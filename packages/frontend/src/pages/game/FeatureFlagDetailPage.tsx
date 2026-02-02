@@ -2216,7 +2216,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     }
                                     size="small"
                                   >
-                                    {t("featureFlags.addStrategy")}
+                                    {t("featureFlags.addFirstStrategy")}
                                   </Button>
                                 )}
                               </Box>
