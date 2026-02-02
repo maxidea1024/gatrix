@@ -393,6 +393,7 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(!isCreating);
   const [saving, setSaving] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
   const [strategyDialogOpen, setStrategyDialogOpen] = useState(false);
   const [strategyTabValue, setStrategyTabValue] = useState(0);
   const [editingStrategy, setEditingStrategy] = useState<Strategy | null>(null);
@@ -785,7 +786,12 @@ const FeatureFlagDetailPage: React.FC = () => {
     }
   };
 
-  const handleArchive = async () => {
+  const handleArchiveClick = () => {
+    setArchiveConfirmOpen(true);
+  };
+
+  const handleArchiveConfirm = async () => {
+    setArchiveConfirmOpen(false);
     if (!flag || !canManage) return;
     try {
       const endpoint = flag.isArchived ? "revive" : "archive";
@@ -1691,7 +1697,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                       variant="outlined"
                       color={flag.isArchived ? "success" : "warning"}
                       startIcon={<ArchiveIcon />}
-                      onClick={handleArchive}
+                      onClick={handleArchiveClick}
                       fullWidth
                       size="small"
                     >
@@ -5150,6 +5156,39 @@ const FeatureFlagDetailPage: React.FC = () => {
             disabled={!editingLink.url}
           >
             {t("common.save")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Archive/Revive Confirmation Dialog */}
+      <Dialog
+        open={archiveConfirmOpen}
+        onClose={() => setArchiveConfirmOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>
+          {flag?.isArchived
+            ? t("featureFlags.reviveConfirmTitle")
+            : t("featureFlags.archiveConfirmTitle")}
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            {flag?.isArchived
+              ? t("featureFlags.reviveConfirmMessage", { name: flag?.flagName })
+              : t("featureFlags.archiveConfirmMessage", { name: flag?.flagName })}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setArchiveConfirmOpen(false)}>
+            {t("common.cancel")}
+          </Button>
+          <Button
+            variant="contained"
+            color={flag?.isArchived ? "success" : "warning"}
+            onClick={handleArchiveConfirm}
+          >
+            {flag?.isArchived ? t("featureFlags.revive") : t("featureFlags.archive")}
           </Button>
         </DialogActions>
       </Dialog>
