@@ -97,6 +97,7 @@ import { getContrastColor } from '../../utils/colorUtils';
 import JsonEditor from '../../components/common/JsonEditor';
 import EmptyState from '../../components/common/EmptyState';
 import { environmentService, Environment } from '../../services/environmentService';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 import FeatureSwitch from '../../components/common/FeatureSwitch';
 import FeatureFlagMetrics from '../../components/features/FeatureFlagMetrics';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
@@ -252,6 +253,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     const theme = useTheme();
     const { enqueueSnackbar } = useSnackbar();
     const { hasPermission } = useAuth();
+    const { selectedEnvironment } = useEnvironment();
     const canManage = hasPermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]);
 
     const isCreating = flagName === 'new';
@@ -323,7 +325,10 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     // Environment states
     const [environments, setEnvironments] = useState<Environment[]>([]);
-    const [expandedEnvs, setExpandedEnvs] = useState<Set<string>>(new Set());
+    const [expandedEnvs, setExpandedEnvs] = useState<Set<string>>(() => {
+        // Auto-expand current selected environment
+        return selectedEnvironment ? new Set([selectedEnvironment]) : new Set();
+    });
     const [selectedEnvForEdit, setSelectedEnvForEdit] = useState<string | null>(null);
     const [envSettingsDrawerOpen, setEnvSettingsDrawerOpen] = useState(false);
 
@@ -2349,10 +2354,30 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                             })}
                                                             label={t('featureFlags.stickiness')}
                                                         >
-                                                            <MenuItem value="default">{t('featureFlags.stickinessDefault')}</MenuItem>
-                                                            <MenuItem value="userId">{t('featureFlags.stickinessUserId')}</MenuItem>
-                                                            <MenuItem value="sessionId">{t('featureFlags.stickinessSessionId')}</MenuItem>
-                                                            <MenuItem value="random">{t('featureFlags.stickinessRandom')}</MenuItem>
+                                                            <MenuItem value="default">
+                                                                <Box>
+                                                                    <Typography variant="body2">{t('featureFlags.stickinessDefault')}</Typography>
+                                                                    <Typography variant="caption" color="text.secondary">{t('featureFlags.stickinessDefaultDesc')}</Typography>
+                                                                </Box>
+                                                            </MenuItem>
+                                                            <MenuItem value="userId">
+                                                                <Box>
+                                                                    <Typography variant="body2">{t('featureFlags.stickinessUserId')}</Typography>
+                                                                    <Typography variant="caption" color="text.secondary">{t('featureFlags.stickinessUserIdDesc')}</Typography>
+                                                                </Box>
+                                                            </MenuItem>
+                                                            <MenuItem value="sessionId">
+                                                                <Box>
+                                                                    <Typography variant="body2">{t('featureFlags.stickinessSessionId')}</Typography>
+                                                                    <Typography variant="caption" color="text.secondary">{t('featureFlags.stickinessSessionIdDesc')}</Typography>
+                                                                </Box>
+                                                            </MenuItem>
+                                                            <MenuItem value="random">
+                                                                <Box>
+                                                                    <Typography variant="body2">{t('featureFlags.stickinessRandom')}</Typography>
+                                                                    <Typography variant="caption" color="text.secondary">{t('featureFlags.stickinessRandomDesc')}</Typography>
+                                                                </Box>
+                                                            </MenuItem>
                                                         </Select>
                                                         <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
                                                             {t('featureFlags.stickinessHelp')}
