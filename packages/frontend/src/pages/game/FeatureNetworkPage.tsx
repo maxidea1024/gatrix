@@ -548,9 +548,10 @@ const FeatureNetworkPage: React.FC = () => {
                     display: false,
                 },
                 ticks: {
-                    maxRotation: 0,
+                    maxRotation: 45,
+                    minRotation: 45,
                     autoSkip: true,
-                    maxTicksLimit: 10,
+                    maxTicksLimit: 12,
                 },
             },
             y: {
@@ -941,11 +942,11 @@ const FeatureNetworkPage: React.FC = () => {
                                                     <TableRow key={index} hover>
                                                         <TableCell>{row.displayTime}</TableCell>
                                                         <TableCell>
-                                                            <Chip label={row.environment} size="small" color="primary" variant="outlined" />
+                                                            <Chip label={row.environment} size="small" color="primary" variant="outlined" sx={{ borderRadius: '16px' }} />
                                                         </TableCell>
                                                         <TableCell>
                                                             {row.appName ? (
-                                                                <Chip label={row.appName} size="small" color="info" />
+                                                                <Chip label={row.appName} size="small" color="info" sx={{ borderRadius: '16px' }} />
                                                             ) : '-'}
                                                         </TableCell>
                                                         <TableCell align="right">{row.featuresCount.toLocaleString()}</TableCell>
@@ -1051,11 +1052,11 @@ const FeatureNetworkPage: React.FC = () => {
                                                     <TableRow key={index} hover>
                                                         <TableCell>{row.displayTime}</TableCell>
                                                         <TableCell>
-                                                            <Chip label={row.environment} size="small" color="primary" variant="outlined" />
+                                                            <Chip label={row.environment} size="small" color="primary" variant="outlined" sx={{ borderRadius: '16px' }} />
                                                         </TableCell>
                                                         <TableCell>
                                                             {row.appName ? (
-                                                                <Chip label={row.appName} size="small" color="info" />
+                                                                <Chip label={row.appName} size="small" color="info" sx={{ borderRadius: '16px' }} />
                                                             ) : '-'}
                                                         </TableCell>
                                                         <TableCell align="right">{row.evaluations.toLocaleString()}</TableCell>

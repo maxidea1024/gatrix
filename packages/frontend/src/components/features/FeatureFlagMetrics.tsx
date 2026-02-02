@@ -990,7 +990,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                                         <TableCell>{row.displayTime}</TableCell>
                                                         {availableApps.length > 0 && (
                                                             <TableCell>
-                                                                <Chip label={row.appName || '-'} size="small" color="info" />
+                                                                <Chip label={row.appName || '-'} size="small" color="info" sx={{ borderRadius: '16px' }} />
                                                             </TableCell>
                                                         )}
                                                         <TableCell align="right" sx={{ color: 'success.main' }}>
