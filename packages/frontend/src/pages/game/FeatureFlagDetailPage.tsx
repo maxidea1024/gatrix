@@ -1644,7 +1644,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                     bgcolor: 'action.hover',
                                                                 }}
                                                             >
-                                                                <Typography color="text.secondary" gutterBottom>
+                                                                <Typography color="text.secondary" sx={{ mb: 2 }}>
                                                                     {t('featureFlags.noStrategies')}
                                                                 </Typography>
                                                                 {canManage && (

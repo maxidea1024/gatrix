@@ -253,7 +253,7 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                 <AccordionDetails sx={{ px: 2, pt: 0, pb: 2 }}>
                     {strategies.length === 0 ? (
                         <Box sx={{ py: 3, textAlign: 'center' }}>
-                            <Typography color="text.secondary" gutterBottom>
+                            <Typography color="text.secondary" sx={{ mb: 2 }}>
                                 {t('featureFlags.noStrategies')}
                             </Typography>
                             {canManage && (
