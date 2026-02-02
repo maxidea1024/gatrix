@@ -2645,11 +2645,58 @@ const FeatureFlagsPage: React.FC = () => {
       >
         <DialogTitle>{t("featureFlags.import")}</DialogTitle>
         <DialogContent>
-          <Box sx={{ mb: 2, mt: 1 }}>
+          <Box
+            sx={{
+              mb: 2,
+              mt: 1,
+              p: 3,
+              border: "2px dashed",
+              borderColor: "divider",
+              borderRadius: 2,
+              textAlign: "center",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              "&:hover": {
+                borderColor: "primary.main",
+                bgcolor: "action.hover",
+              },
+              "&.drag-active": {
+                borderColor: "primary.main",
+                bgcolor: "primary.main",
+                opacity: 0.1,
+              },
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              e.currentTarget.classList.add("drag-active");
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              e.currentTarget.classList.remove("drag-active");
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              e.currentTarget.classList.remove("drag-active");
+              const file = e.dataTransfer.files[0];
+              if (file && file.name.endsWith(".json")) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                  setImportData(ev.target?.result as string);
+                };
+                reader.readAsText(file);
+              }
+            }}
+          >
             <Typography variant="body2" color="text.secondary" gutterBottom>
               {t("featureFlags.importDescription")}
             </Typography>
-            <Button variant="outlined" component="label" startIcon={<ImportIcon />} sx={{ mt: 1 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              {t("featureFlags.importDragDrop")}
+            </Typography>
+            <Button variant="outlined" component="label" startIcon={<ImportIcon />}>
               {t("featureFlags.selectFile")}
               <input type="file" accept=".json" hidden onChange={handleImportFileChange} />
             </Button>
