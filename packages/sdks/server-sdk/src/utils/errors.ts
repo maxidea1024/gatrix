@@ -16,6 +16,16 @@ export enum ErrorCode {
 }
 
 /**
+ * Feature flag specific error codes
+ */
+export enum FeatureFlagErrorCode {
+  FLAG_NOT_FOUND = "FLAG_NOT_FOUND",
+  FLAG_DISABLED = "FLAG_DISABLED",
+  NO_PAYLOAD = "NO_PAYLOAD",
+  INVALID_PAYLOAD_TYPE = "INVALID_PAYLOAD_TYPE",
+}
+
+/**
  * Coupon-specific error codes
  * These codes match backend CouponErrorCode for easy identification
  */
@@ -108,6 +118,43 @@ export class CouponRedeemError extends Error {
 }
 
 /**
+ * Feature flag specific error class
+ * Thrown by strict variation methods (*OrThrow)
+ */
+export class FeatureFlagError extends Error {
+  public readonly code: FeatureFlagErrorCode;
+  public readonly flagName: string;
+  public readonly environment?: string;
+
+  constructor(
+    code: FeatureFlagErrorCode,
+    message: string,
+    flagName: string,
+    environment?: string,
+  ) {
+    super(message);
+    this.name = "FeatureFlagError";
+    this.code = code;
+    this.flagName = flagName;
+    this.environment = environment;
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, FeatureFlagError);
+    }
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      code: this.code,
+      message: this.message,
+      flagName: this.flagName,
+      environment: this.environment,
+    };
+  }
+}
+
+/**
  * Helper function to create SDK errors
  */
 export function createError(
@@ -131,4 +178,11 @@ export function isGatrixSDKError(error: any): error is GatrixSDKError {
  */
 export function isCouponRedeemError(error: any): error is CouponRedeemError {
   return error instanceof CouponRedeemError;
+}
+
+/**
+ * Check if error is a FeatureFlagError
+ */
+export function isFeatureFlagError(error: any): error is FeatureFlagError {
+  return error instanceof FeatureFlagError;
 }

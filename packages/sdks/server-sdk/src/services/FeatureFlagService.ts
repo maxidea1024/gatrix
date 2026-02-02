@@ -24,6 +24,7 @@ import {
   Constraint,
   FlagMetric,
 } from "../types/featureFlags";
+import { FeatureFlagError, FeatureFlagErrorCode } from "../utils/errors";
 import murmurhash from "murmurhash";
 
 export class FeatureFlagService {
@@ -597,6 +598,206 @@ export class FeatureFlagService {
       flagName: result.flagName,
       variantName: result.variant?.name,
     };
+  }
+
+  // ==================== Strict Variation Methods (OrThrow) ====================
+
+  /**
+   * Get string variation or throw if not available
+   * Throws FeatureFlagError if flag not found, disabled, or no payload
+   * Use this when baselinePayload is required in server config
+   */
+  stringVariationOrThrow(
+    flagName: string,
+    context: EvaluationContext,
+    environment: string,
+  ): string {
+    const result = this.evaluate(flagName, context, environment);
+
+    if (result.reason === "not_found") {
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.FLAG_NOT_FOUND,
+        `Feature flag '${flagName}' not found in environment '${environment}'`,
+        flagName,
+        environment,
+      );
+    }
+
+    if (!result.enabled) {
+      // Flag disabled - check for baselinePayload
+      // Note: baselinePayload would be in result.variant if set
+      if (result.variant?.payload) {
+        const value = result.variant.payload.value ?? result.variant.payload;
+        return String(value);
+      }
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.FLAG_DISABLED,
+        `Feature flag '${flagName}' is disabled and has no baseline payload`,
+        flagName,
+        environment,
+      );
+    }
+
+    if (!result.variant?.payload) {
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.NO_PAYLOAD,
+        `Feature flag '${flagName}' has no variant payload`,
+        flagName,
+        environment,
+      );
+    }
+
+    return String(result.variant.payload.value ?? result.variant.payload);
+  }
+
+  /**
+   * Get number variation or throw if not available
+   * Throws FeatureFlagError if flag not found, disabled, no payload, or payload is not a valid number
+   */
+  numberVariationOrThrow(
+    flagName: string,
+    context: EvaluationContext,
+    environment: string,
+  ): number {
+    const result = this.evaluate(flagName, context, environment);
+
+    if (result.reason === "not_found") {
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.FLAG_NOT_FOUND,
+        `Feature flag '${flagName}' not found in environment '${environment}'`,
+        flagName,
+        environment,
+      );
+    }
+
+    if (!result.enabled) {
+      if (result.variant?.payload) {
+        const value = result.variant.payload.value ?? result.variant.payload;
+        const num = Number(value);
+        if (isNaN(num)) {
+          throw new FeatureFlagError(
+            FeatureFlagErrorCode.INVALID_PAYLOAD_TYPE,
+            `Feature flag '${flagName}' baseline payload is not a valid number`,
+            flagName,
+            environment,
+          );
+        }
+        return num;
+      }
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.FLAG_DISABLED,
+        `Feature flag '${flagName}' is disabled and has no baseline payload`,
+        flagName,
+        environment,
+      );
+    }
+
+    if (!result.variant?.payload) {
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.NO_PAYLOAD,
+        `Feature flag '${flagName}' has no variant payload`,
+        flagName,
+        environment,
+      );
+    }
+
+    const rawValue = result.variant.payload.value ?? result.variant.payload;
+    const num = Number(rawValue);
+    if (isNaN(num)) {
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.INVALID_PAYLOAD_TYPE,
+        `Feature flag '${flagName}' variant payload is not a valid number`,
+        flagName,
+        environment,
+      );
+    }
+    return num;
+  }
+
+  /**
+   * Get JSON variation or throw if not available
+   * Throws FeatureFlagError if flag not found, disabled, no payload, or payload is not valid JSON
+   */
+  jsonVariationOrThrow<T = any>(
+    flagName: string,
+    context: EvaluationContext,
+    environment: string,
+  ): T {
+    const result = this.evaluate(flagName, context, environment);
+
+    if (result.reason === "not_found") {
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.FLAG_NOT_FOUND,
+        `Feature flag '${flagName}' not found in environment '${environment}'`,
+        flagName,
+        environment,
+      );
+    }
+
+    if (!result.enabled) {
+      if (result.variant?.payload) {
+        const rawValue = result.variant.payload.value ?? result.variant.payload;
+        if (typeof rawValue === "object") {
+          return rawValue as T;
+        }
+        if (typeof rawValue === "string") {
+          try {
+            return JSON.parse(rawValue) as T;
+          } catch {
+            throw new FeatureFlagError(
+              FeatureFlagErrorCode.INVALID_PAYLOAD_TYPE,
+              `Feature flag '${flagName}' baseline payload is not valid JSON`,
+              flagName,
+              environment,
+            );
+          }
+        }
+        throw new FeatureFlagError(
+          FeatureFlagErrorCode.INVALID_PAYLOAD_TYPE,
+          `Feature flag '${flagName}' baseline payload type is not supported`,
+          flagName,
+          environment,
+        );
+      }
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.FLAG_DISABLED,
+        `Feature flag '${flagName}' is disabled and has no baseline payload`,
+        flagName,
+        environment,
+      );
+    }
+
+    if (!result.variant?.payload) {
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.NO_PAYLOAD,
+        `Feature flag '${flagName}' has no variant payload`,
+        flagName,
+        environment,
+      );
+    }
+
+    const rawValue = result.variant.payload.value ?? result.variant.payload;
+    if (typeof rawValue === "object") {
+      return rawValue as T;
+    }
+    if (typeof rawValue === "string") {
+      try {
+        return JSON.parse(rawValue) as T;
+      } catch {
+        throw new FeatureFlagError(
+          FeatureFlagErrorCode.INVALID_PAYLOAD_TYPE,
+          `Feature flag '${flagName}' variant payload is not valid JSON`,
+          flagName,
+          environment,
+        );
+      }
+    }
+    throw new FeatureFlagError(
+      FeatureFlagErrorCode.INVALID_PAYLOAD_TYPE,
+      `Feature flag '${flagName}' variant payload type is not supported`,
+      flagName,
+      environment,
+    );
   }
 
   // ==================== Legacy Methods ====================
