@@ -3998,9 +3998,15 @@ const FeatureFlagDetailPage: React.FC = () => {
                         <Grid container spacing={2} sx={{ mt: 2 }}>
                           <Grid item xs={6}>
                             <FormControl fullWidth size="small">
-                              <InputLabel sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                              <Typography
+                                variant="subtitle2"
+                                sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5 }}
+                              >
                                 {t("featureFlags.stickiness")}
-                              </InputLabel>
+                                <Tooltip title={t("featureFlags.stickinessHelp")}>
+                                  <HelpOutlineIcon fontSize="small" color="action" sx={{ cursor: "pointer" }} />
+                                </Tooltip>
+                              </Typography>
                               <Select
                                 value={
                                   editingStrategy.parameters?.stickiness ||
@@ -4015,7 +4021,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     },
                                   })
                                 }
-                                label={t("featureFlags.stickiness")}
                               >
                                 <MenuItem value="default">
                                   <Box>
@@ -4070,19 +4075,22 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   </Box>
                                 </MenuItem>
                               </Select>
-                              <Box sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
-                                <Tooltip title={t("featureFlags.stickinessHelp")}>
-                                  <HelpOutlineIcon fontSize="small" color="action" sx={{ cursor: "pointer" }} />
-                                </Tooltip>
-                              </Box>
                             </FormControl>
                           </Grid>
                           <Grid item xs={6}>
                             <Box>
+                              <Typography
+                                variant="subtitle2"
+                                sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5 }}
+                              >
+                                {t("featureFlags.groupId")}
+                                <Tooltip title={t("featureFlags.groupIdHelp")}>
+                                  <HelpOutlineIcon fontSize="small" color="action" sx={{ cursor: "pointer" }} />
+                                </Tooltip>
+                              </Typography>
                               <TextField
                                 fullWidth
                                 size="small"
-                                label={t("featureFlags.groupId")}
                                 value={
                                   editingStrategy.parameters?.groupId ||
                                   flag?.flagName ||
@@ -4098,11 +4106,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   })
                                 }
                               />
-                              <Box sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
-                                <Tooltip title={t("featureFlags.groupIdHelp")}>
-                                  <HelpOutlineIcon fontSize="small" color="action" sx={{ cursor: "pointer" }} />
-                                </Tooltip>
-                              </Box>
                             </Box>
                           </Grid>
                         </Grid>

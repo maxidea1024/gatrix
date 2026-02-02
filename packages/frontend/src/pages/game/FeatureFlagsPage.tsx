@@ -2125,11 +2125,16 @@ const FeatureFlagsPage: React.FC = () => {
         <Box sx={{ p: 3, flex: 1, overflow: "auto" }}>
           <Stack spacing={3}>
             {/* Flag Name */}
-            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5 }}>
+            <Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
+                <Typography variant="subtitle2">
+                  {t("featureFlags.flagName")} <Box component="span" sx={{ color: "error.main" }}>*</Box>
+                </Typography>
+                <NamingGuide type="flag" />
+              </Box>
               <TextField
                 fullWidth
-                required
-                label={t("featureFlags.flagName")}
+                size="small"
                 value={newFlag.flagName}
                 onChange={(e) =>
                   setNewFlag({
@@ -2140,7 +2145,6 @@ const FeatureFlagsPage: React.FC = () => {
                 helperText={t("featureFlags.flagNameHelp")}
                 inputProps={{ maxLength: 100 }}
               />
-              <NamingGuide type="flag" />
             </Box>
 
             {/* Display Name */}
