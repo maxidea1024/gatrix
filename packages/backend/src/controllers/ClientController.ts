@@ -379,16 +379,47 @@ export class ClientController {
       context = req.body.context || {};
       flagNames = req.body.flagNames;
     } else {
-      // GET: context from x-gatrix-feature-context header (Base64 encoded JSON)
+      // GET: context from parameters (Unleash Proxy style) or header
+
+      // 1. Try X-Gatrix-Feature-Context header (Base64 JSON)
       const contextHeader = req.headers["x-gatrix-feature-context"] as string;
       if (contextHeader) {
         try {
           const jsonStr = Buffer.from(contextHeader, "base64").toString("utf-8");
           context = JSON.parse(jsonStr);
         } catch (error) {
-          // If parsing fails, use empty context or error? SDK usually handles graceful degradation.
           logger.warn("Failed to parse x-gatrix-feature-context header", { error });
         }
+      }
+
+      // 2. Try 'context' query param (Base64 JSON) - if header didn't populate main fields
+      if (Object.keys(context).length === 0 && req.query.context) {
+        try {
+          const contextStr = req.query.context as string;
+          const jsonStr = Buffer.from(contextStr, "base64").toString("utf-8");
+          if (jsonStr.trim().startsWith("{")) {
+            context = JSON.parse(jsonStr);
+          } else {
+            context = JSON.parse(contextStr);
+          }
+        } catch (e) { /* ignore */ }
+      }
+
+      // 3. Fallback: Parse individual query parameters (Unleash Proxy standard)
+      // Only set if not already present
+      if (!context.userId && req.query.userId) context.userId = req.query.userId as string;
+      if (!context.sessionId && req.query.sessionId) context.sessionId = req.query.sessionId as string;
+      if (!context.ip && req.query.remoteAddress) context.ip = req.query.remoteAddress as string;
+      if (!context.appName && req.query.appName) context.appName = req.query.appName as string;
+
+      // Handle properties[key]=value
+      // Cast query to any to bypass strict type checking on ParsedQs
+      const query = req.query as any;
+      if (query.properties) {
+        context.properties = {
+          ...context.properties,
+          ...query.properties
+        };
       }
 
       const flagNamesParam = req.query.flagNames as string;
