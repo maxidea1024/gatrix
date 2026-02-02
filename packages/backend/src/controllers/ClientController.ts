@@ -537,9 +537,21 @@ export class ClientController {
           enabled: true,
         };
         if (result.variant.payload) {
-          variant.payload = typeof result.variant.payload.value === "string"
-            ? result.variant.payload.value
-            : JSON.stringify(result.variant.payload.value ?? result.variant.payload);
+          let payloadValue = result.variant.payload.value ?? result.variant.payload;
+
+          // If variant type is JSON, ensure converting to compact JSON string
+          if (dbFlag.variantType === "json" && typeof payloadValue === "string") {
+            try {
+              // Parse and re-stringify to remove whitespaces/newlines
+              payloadValue = JSON.stringify(JSON.parse(payloadValue));
+            } catch (e) {
+              // If not valid JSON, keep as is
+            }
+          } else if (typeof payloadValue !== "string") {
+            payloadValue = JSON.stringify(payloadValue);
+          }
+
+          variant.payload = payloadValue;
         }
       } else {
         // Disabled or no variant - fallback "disabled" variant with baselinePayload
