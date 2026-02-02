@@ -211,11 +211,13 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                                                 y={cy}
                                                 textAnchor="middle"
                                                 dominantBaseline="central"
-                                                fontSize="9"
-                                                fontWeight="700"
+                                                fontSize="10"
+                                                fontWeight="800"
+                                                fontFamily="Arial, sans-serif"
                                                 fill="white"
-                                                stroke="#333"
-                                                strokeWidth="0.3"
+                                                stroke="rgba(0,0,0,0.5)"
+                                                strokeWidth="0.5"
+                                                paintOrder="stroke"
                                             >
                                                 {yesPercent}%
                                             </text>
