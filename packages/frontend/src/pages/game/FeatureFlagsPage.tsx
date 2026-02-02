@@ -2451,13 +2451,13 @@ const FeatureFlagsPage: React.FC = () => {
                 >
                   <MenuItem value="string">
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <TextFieldsIcon sx={{ fontSize: 16, color: "info.main" }} />
+                      <StringIcon sx={{ fontSize: 16, color: "info.main" }} />
                       {t("featureFlags.variantTypes.string")}
                     </Box>
                   </MenuItem>
                   <MenuItem value="number">
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <NumbersIcon sx={{ fontSize: 16, color: "success.main" }} />
+                      <NumberIcon sx={{ fontSize: 16, color: "success.main" }} />
                       {t("featureFlags.variantTypes.number")}
                     </Box>
                   </MenuItem>

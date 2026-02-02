@@ -15,8 +15,9 @@ import VarsModel from "../models/Vars";
 import { IpWhitelistService } from "../services/IpWhitelistService";
 import { SDKRequest } from "../middleware/apiTokenAuth";
 import { resolvePassiveData } from "../utils/passiveDataUtils";
-import { FeatureFlagModel, FeatureSegmentModel } from "../models/FeatureFlag";
+import { FeatureFlagModel, FeatureSegmentModel, FeatureVariantModel } from "../models/FeatureFlag";
 import { FeatureFlagEvaluator, FeatureFlag, FeatureSegment, EvaluationContext } from "@gatrix/server-sdk";
+import db from "../config/knex";
 
 export class ClientController {
   /**
@@ -407,15 +408,35 @@ export class ClientController {
 
     if (!definitions) {
       // Fetch from DB
-      // We need ALL flags to evaluate, and ALL segments
-      // Using FeatureFlagModel directly to get raw data
+      // We need ALL flags to evaluate, and ALL segments, and ALL variants
       const [flagsData, segmentsList] = await Promise.all([
         FeatureFlagModel.findAll({ environment, limit: 10000 }),
         FeatureSegmentModel.findAll(),
       ]);
 
+      // Load variants for all flags
+      const flagIds = flagsData.flags.map((f: any) => f.id);
+      let allVariants: any[] = [];
+      if (flagIds.length > 0) {
+        allVariants = await db("g_feature_variants")
+          .whereIn("flagId", flagIds)
+          .where("environment", environment);
+      }
+
+      // Attach variants to each flag
+      const flagsWithVariants = flagsData.flags.map((f: any) => ({
+        ...f,
+        variants: allVariants
+          .filter((v: any) => v.flagId === f.id)
+          .map((v: any) => ({
+            variantName: v.variantName,
+            weight: v.weight,
+            payload: typeof v.payload === "string" ? JSON.parse(v.payload) : v.payload,
+          })),
+      }));
+
       definitions = {
-        flags: flagsData.flags,
+        flags: flagsWithVariants,
         segments: segmentsList
       };
 
@@ -438,6 +459,27 @@ export class ClientController {
 
     // 3. Evaluate
     const results: Record<string, any> = {};
+
+    // If specific flags are requested, check for not found ones
+    if (flagNames && flagNames.length > 0) {
+      const existingFlagNames = flags.map((f: any) => f.flagName);
+      for (const requestedName of flagNames) {
+        if (!existingFlagNames.includes(requestedName)) {
+          results[requestedName] = {
+            name: requestedName,
+            enabled: false,
+            variant: {
+              name: "disabled",
+              enabled: false,
+            },
+            variantType: "string",
+            impressionData: false,
+            reason: "not_found",
+          };
+        }
+      }
+    }
+
     const evaluableFlags = flagNames
       ? flags.filter((f: any) => flagNames!.includes(f.flagName))
       : flags;
@@ -465,50 +507,60 @@ export class ClientController {
 
       const result = FeatureFlagEvaluator.evaluate(sdkFlag, context, segmentsMap);
 
-      let value: any = result.enabled;
-
-      if (result.enabled && result.variant) {
-        if (result.variant.payload) {
-          value = result.variant.payload.value ?? result.variant.payload;
-        }
-      }
-
-      results[dbFlag.flagName] = {
-        value,
-        variant: result.variant?.name,
-        variantPayload: result.variant?.payload,
-        reason: result.reason,
-        enabled: result.enabled
+      // Build variant object according to Unleash client specification
+      let variant: {
+        name: string;
+        payload?: string;
+        enabled: boolean;
       };
 
-      if (!result.enabled) {
-        // Use baselinePayload if defined, otherwise use default based on variantType
+      if (result.enabled && result.variant) {
+        // Active variant
+        variant = {
+          name: result.variant.name,
+          enabled: true,
+        };
+        if (result.variant.payload) {
+          variant.payload = typeof result.variant.payload.value === "string"
+            ? result.variant.payload.value
+            : JSON.stringify(result.variant.payload.value ?? result.variant.payload);
+        }
+      } else {
+        // Disabled or no variant - fallback "disabled" variant with baselinePayload
+        variant = {
+          name: "disabled",
+          enabled: false,
+        };
+        // Add baselinePayload if defined
         if (dbFlag.baselinePayload !== undefined && dbFlag.baselinePayload !== null) {
-          // Parse baselinePayload if it's a string (from JSON column)
           let baselineValue = dbFlag.baselinePayload;
-          if (typeof baselineValue === 'string') {
+          if (typeof baselineValue === "string") {
             try {
               baselineValue = JSON.parse(baselineValue);
             } catch {
               // Keep as string if not valid JSON
             }
           }
-          results[dbFlag.flagName].value = baselineValue;
-        } else {
-          const type = dbFlag.variantType || "boolean";
-          let defaultVal: any = false;
-          if (type === 'string') defaultVal = "";
-          else if (type === 'number') defaultVal = 0;
-          else if (type === 'json') defaultVal = {};
-          results[dbFlag.flagName].value = defaultVal;
+          variant.payload = typeof baselineValue === "string"
+            ? baselineValue
+            : JSON.stringify(baselineValue);
         }
       }
+
+      results[dbFlag.flagName] = {
+        name: dbFlag.flagName,
+        enabled: result.enabled,
+        variant,
+        variantType: dbFlag.variantType || "string",
+        impressionData: dbFlag.impressionDataEnabled,
+      };
     }
 
     res.json({
       success: true,
       data: results,
       meta: {
+        environment,
         evaluatedAt: new Date().toISOString()
       }
     });
