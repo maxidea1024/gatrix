@@ -414,17 +414,24 @@ export class ClientController {
         FeatureSegmentModel.findAll(),
       ]);
 
-      // Load variants for all flags
+      // Load variants and strategies for all flags
       const flagIds = flagsData.flags.map((f: any) => f.id);
       let allVariants: any[] = [];
+      let allStrategies: any[] = [];
       if (flagIds.length > 0) {
-        allVariants = await db("g_feature_variants")
-          .whereIn("flagId", flagIds)
-          .where("environment", environment);
+        [allVariants, allStrategies] = await Promise.all([
+          db("g_feature_variants")
+            .whereIn("flagId", flagIds)
+            .where("environment", environment),
+          db("g_feature_strategies")
+            .whereIn("flagId", flagIds)
+            .where("environment", environment)
+            .orderBy("sortOrder", "asc"),
+        ]);
       }
 
-      // Attach variants to each flag
-      const flagsWithVariants = flagsData.flags.map((f: any) => ({
+      // Attach variants and strategies to each flag
+      const flagsWithData = flagsData.flags.map((f: any) => ({
         ...f,
         variants: allVariants
           .filter((v: any) => v.flagId === f.id)
@@ -433,10 +440,19 @@ export class ClientController {
             weight: v.weight,
             payload: typeof v.payload === "string" ? JSON.parse(v.payload) : v.payload,
           })),
+        strategies: allStrategies
+          .filter((s: any) => s.flagId === f.id)
+          .map((s: any) => ({
+            strategyName: s.strategyName,
+            parameters: typeof s.parameters === "string" ? JSON.parse(s.parameters) : s.parameters,
+            constraints: typeof s.constraints === "string" ? JSON.parse(s.constraints) : s.constraints,
+            segments: [], // TODO: Load segment links if needed
+            isEnabled: Boolean(s.isEnabled),
+          })),
       }));
 
       definitions = {
-        flags: flagsWithVariants,
+        flags: flagsWithData,
         segments: segmentsList
       };
 
@@ -552,7 +568,8 @@ export class ClientController {
         enabled: result.enabled,
         variant,
         variantType: dbFlag.variantType || "string",
-        impressionData: dbFlag.impressionDataEnabled,
+        version: dbFlag.version || 1,
+        ...(dbFlag.impressionDataEnabled && { impressionData: true }),
       };
     }
 

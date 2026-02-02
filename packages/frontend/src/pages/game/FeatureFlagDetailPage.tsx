@@ -2458,35 +2458,20 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                           </IconButton>
                                                         </Tooltip>
                                                         <Tooltip
-                                                          title={
-                                                            strategies.length ===
-                                                              1
-                                                              ? t(
-                                                                "featureFlags.cannotDeleteLastStrategy",
-                                                              )
-                                                              : t(
-                                                                "common.delete",
-                                                              )
-                                                          }
+                                                          title={t("common.delete")}
                                                         >
-                                                          <span>
-                                                            <IconButton
-                                                              size="small"
-                                                              onClick={() =>
-                                                                handleDeleteStrategy(
-                                                                  strategy.id,
-                                                                  index,
-                                                                  env.environment,
-                                                                )
-                                                              }
-                                                              disabled={
-                                                                strategies.length ===
-                                                                1
-                                                              }
-                                                            >
-                                                              <DeleteIcon fontSize="small" />
-                                                            </IconButton>
-                                                          </span>
+                                                          <IconButton
+                                                            size="small"
+                                                            onClick={() =>
+                                                              handleDeleteStrategy(
+                                                                strategy.id,
+                                                                index,
+                                                                env.environment,
+                                                              )
+                                                            }
+                                                          >
+                                                            <DeleteIcon fontSize="small" />
+                                                          </IconButton>
                                                         </Tooltip>
                                                       </Box>
                                                     )}

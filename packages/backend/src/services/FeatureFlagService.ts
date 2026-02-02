@@ -343,7 +343,8 @@ class FeatureFlagService {
       newValues: updated,
     });
 
-    // Invalidate cache
+    // Increment version and invalidate cache
+    await this.incrementFlagVersion(flag.id, environment);
     await this.invalidateCache(environment);
 
     return updated!;
@@ -837,7 +838,8 @@ class FeatureFlagService {
       createdVariants.push(created);
     }
 
-    // Invalidate cache after variants update
+    // Increment version and invalidate cache after variants update
+    await this.incrementFlagVersion(flag.id, environment);
     await this.invalidateCache(environment);
 
     return createdVariants;
@@ -1121,6 +1123,26 @@ class FeatureFlagService {
   }
 
   /**
+   * Increment flag version (called when flag or its components are modified)
+   */
+  async incrementFlagVersion(flagId: string, environment: string): Promise<void> {
+    try {
+      // Increment global flag version
+      await db("g_feature_flags")
+        .where("id", flagId)
+        .increment("version", 1);
+
+      // Increment environment-specific version
+      await db("g_feature_flag_environments")
+        .where("flagId", flagId)
+        .where("environment", environment)
+        .increment("version", 1);
+    } catch (error) {
+      logger.error("Error incrementing flag version:", error);
+    }
+  }
+
+  /**
    * Invalidate feature flags cache for an environment
    */
   async invalidateCache(environment: string): Promise<void> {
@@ -1131,6 +1153,11 @@ class FeatureFlagService {
       );
       await pubSubService.invalidateKey(
         `${ENV_SCOPED.SDK_ETAG.FEATURE_FLAGS}:${environment}`,
+      );
+
+      // Invalidate evaluate API definitions cache
+      await pubSubService.invalidateKey(
+        `feature_flags:definitions:${environment}`,
       );
 
       // Publish SDK event for real-time updates
