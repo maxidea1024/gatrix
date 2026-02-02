@@ -909,21 +909,21 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
             ) : (
                 <>
                     {/* Summary Cards - Top (above chart) */}
-                    <Box sx={{ display: 'flex', gap: 3, mb: 3 }}>
+                    <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
                         <Paper
                             variant="outlined"
                             sx={{
-                                p: 3,
+                                p: 2,
                                 borderRadius: 1,
                                 flex: 1,
                                 textAlign: 'center',
                                 borderLeft: `4px solid ${theme.palette.success.main}`,
                             }}
                         >
-                            <Typography variant="h3" fontWeight={600} color="success.main">
+                            <Typography variant="h4" fontWeight={600} color="success.main">
                                 {aggregatedMetrics.totalYes.toLocaleString()}
                             </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
                                 {t('featureFlags.metrics.exposure')}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
@@ -934,17 +934,17 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                         <Paper
                             variant="outlined"
                             sx={{
-                                p: 3,
+                                p: 2,
                                 borderRadius: 1,
                                 flex: 1,
                                 textAlign: 'center',
                                 borderLeft: `4px solid ${theme.palette.info.main}`,
                             }}
                         >
-                            <Typography variant="h3" fontWeight={600} color="info.main">
+                            <Typography variant="h4" fontWeight={600} color="info.main">
                                 {exposurePercentage}%
                             </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
                                 {t('featureFlags.metrics.exposurePercent')}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
@@ -955,17 +955,17 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                         <Paper
                             variant="outlined"
                             sx={{
-                                p: 3,
+                                p: 2,
                                 borderRadius: 1,
                                 flex: 1,
                                 textAlign: 'center',
                                 borderLeft: `4px solid ${theme.palette.primary.main}`,
                             }}
                         >
-                            <Typography variant="h3" fontWeight={600} color="primary.main">
+                            <Typography variant="h4" fontWeight={600} color="primary.main">
                                 {aggregatedMetrics.total.toLocaleString()}
                             </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
                                 {t('featureFlags.metrics.requests')}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
