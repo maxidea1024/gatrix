@@ -131,6 +131,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showTable, setShowTable] = useState(true); // Default expanded
+    const [showVariantTable, setShowVariantTable] = useState(false); // Default collapsed
     const [chartGroupBy, setChartGroupBy] = useState<'all' | 'app' | 'env'>(() => {
         const groupParam = searchParams.get('groupBy');
         if (groupParam === 'app' || groupParam === 'env') return groupParam;
@@ -1169,6 +1170,10 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                                             grid: {
                                                                 display: false,
                                                             },
+                                                            ticks: {
+                                                                maxRotation: 45,
+                                                                minRotation: 45,
+                                                            },
                                                         },
                                                         y: {
                                                             beginAtZero: true,
@@ -1179,6 +1184,76 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                                     },
                                                 }}
                                             />
+                                        </Box>
+
+                                        {/* Variant Time-Series Table */}
+                                        <Box sx={{ mt: 2 }}>
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    cursor: 'pointer',
+                                                    '&:hover': { bgcolor: 'action.hover' },
+                                                    borderRadius: 1,
+                                                    p: 0.5,
+                                                }}
+                                                onClick={() => setShowVariantTable(!showVariantTable)}
+                                            >
+                                                <IconButton size="small">
+                                                    {showVariantTable ? <CollapseIcon /> : <ExpandIcon />}
+                                                </IconButton>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    {t('featureFlags.metrics.hourlyDetail')}
+                                                </Typography>
+                                            </Box>
+                                            <Collapse in={showVariantTable}>
+                                                <TableContainer sx={{ maxHeight: 400, mt: 1 }}>
+                                                    <Table size="small" stickyHeader>
+                                                        <TableHead>
+                                                            <TableRow>
+                                                                <TableCell>{t('featureFlags.metrics.time')}</TableCell>
+                                                                {variantTimeSeriesData.variants.map((variant, idx) => (
+                                                                    <TableCell key={variant} align="right">
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'flex-end' }}>
+                                                                            <Box
+                                                                                sx={{
+                                                                                    width: 8,
+                                                                                    height: 8,
+                                                                                    borderRadius: '50%',
+                                                                                    bgcolor: variantColors[idx % variantColors.length],
+                                                                                }}
+                                                                            />
+                                                                            {variant}
+                                                                        </Box>
+                                                                    </TableCell>
+                                                                ))}
+                                                                <TableCell align="right">{t('featureFlags.metrics.total')}</TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {variantTimeSeriesData.labels.map((label, rowIdx) => {
+                                                                const rowTotal = variantTimeSeriesData.variants.reduce(
+                                                                    (sum, v) => sum + (variantTimeSeriesData.data[v][rowIdx] || 0),
+                                                                    0
+                                                                );
+                                                                return (
+                                                                    <TableRow key={label} hover>
+                                                                        <TableCell>{label}</TableCell>
+                                                                        {variantTimeSeriesData.variants.map(variant => (
+                                                                            <TableCell key={variant} align="right">
+                                                                                {(variantTimeSeriesData.data[variant][rowIdx] || 0).toLocaleString()}
+                                                                            </TableCell>
+                                                                        ))}
+                                                                        <TableCell align="right" sx={{ fontWeight: 600 }}>
+                                                                            {rowTotal.toLocaleString()}
+                                                                        </TableCell>
+                                                                    </TableRow>
+                                                                );
+                                                            })}
+                                                        </TableBody>
+                                                    </Table>
+                                                </TableContainer>
+                                            </Collapse>
                                         </Box>
                                     </Box>
                                 )}
