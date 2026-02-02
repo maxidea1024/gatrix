@@ -4975,6 +4975,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 required
                                 placeholder={t("featureFlags.variantName") + " *"}
                                 value={variant.name}
+                                error={variant.name.toLowerCase() === "disabled"}
+                                helperText={variant.name.toLowerCase() === "disabled" ? t("featureFlags.variantNameReserved") : undefined}
                                 onChange={(e) => {
                                   const updated = [
                                     ...(editingStrategy.variants || []),
@@ -5228,6 +5230,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                   // Disable if any JSON errors
                   if (
                     Object.values(strategyJsonErrors).some((e) => e !== null)
+                  ) {
+                    return true;
+                  }
+                  // Disable if any variant has reserved name 'disabled'
+                  if (
+                    editingStrategy.variants?.some((v) => v.name.toLowerCase() === "disabled")
                   ) {
                     return true;
                   }

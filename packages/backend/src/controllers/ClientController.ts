@@ -517,7 +517,7 @@ export class ClientController {
             name: requestedName,
             enabled: false,
             variant: {
-              name: "$none",
+              name: "disabled",
               enabled: false,
             },
             matchReason: "not_found",
@@ -586,7 +586,7 @@ export class ClientController {
       } else {
         // Disabled or no variant - fallback "$none" variant with baselinePayload
         variant = {
-          name: "$none",
+          name: "disabled",
           enabled: false,
         };
         // Add baselinePayload if defined
