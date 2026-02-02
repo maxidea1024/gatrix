@@ -3751,7 +3751,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                   disabled={
                     saving ||
                     (flag.variantType === "json" && baselinePayloadJsonError !== null) ||
-                    (flag.baselinePayload === undefined || flag.baselinePayload === null || flag.baselinePayload === "") ||
+                    // Only require payload if variantType is not 'none'
+                    (flag.variantType !== "none" && (flag.baselinePayload === undefined || flag.baselinePayload === null || flag.baselinePayload === "")) ||
+                    // Disable if nothing changed
                     (flag.variantType === originalFlag?.variantType &&
                       JSON.stringify(flag.baselinePayload) ===
                       JSON.stringify(originalFlag?.baselinePayload))
