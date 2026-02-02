@@ -3533,11 +3533,20 @@ const FeatureFlagDetailPage: React.FC = () => {
                       onValidation={(isValid, error) => {
                         setBaselinePayloadJsonError(isValid ? null : (error || "Invalid JSON"));
                       }}
-                      height={300}
+                      height={350}
                     />
                     {baselinePayloadJsonError && (
                       <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
                         {t("featureFlags.jsonError")}
+                      </Typography>
+                    )}
+                    {!baselinePayloadJsonError && (
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+                        {t("featureFlags.payloadSize")}: {new TextEncoder().encode(
+                          typeof flag.baselinePayload === "object"
+                            ? JSON.stringify(flag.baselinePayload)
+                            : String(flag.baselinePayload || "")
+                        ).length} bytes
                       </Typography>
                     )}
                   </>
@@ -3557,17 +3566,22 @@ const FeatureFlagDetailPage: React.FC = () => {
                     }}
                   />
                 ) : (
-                  <TextField
-                    fullWidth
-                    size="small"
-                    placeholder={t("featureFlags.baselinePayloadPlaceholder")}
-                    value={flag.baselinePayload ?? ""}
-                    onChange={(e) => {
-                      setFlag((prev) =>
-                        prev ? { ...prev, baselinePayload: e.target.value } : prev
-                      );
-                    }}
-                  />
+                  <>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      placeholder={t("featureFlags.baselinePayloadPlaceholder")}
+                      value={flag.baselinePayload ?? ""}
+                      onChange={(e) => {
+                        setFlag((prev) =>
+                          prev ? { ...prev, baselinePayload: e.target.value } : prev
+                        );
+                      }}
+                    />
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+                      {t("featureFlags.payloadSize")}: {new TextEncoder().encode(String(flag.baselinePayload || "")).length} bytes
+                    </Typography>
+                  </>
                 )}
               </Box>
 
@@ -4805,28 +4819,37 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 </Typography>
 
                                 {payloadType === "string" && (
-                                  <TextField
-                                    fullWidth
-                                    size="small"
-                                    placeholder={t("featureFlags.value")}
-                                    value={variant.payload?.value || ""}
-                                    onChange={(e) => {
-                                      const updated = [
-                                        ...(editingStrategy.variants || []),
-                                      ];
-                                      updated[index] = {
-                                        ...updated[index],
-                                        payload: {
-                                          type: "string",
-                                          value: e.target.value,
-                                        },
-                                      };
-                                      setEditingStrategy({
-                                        ...editingStrategy,
-                                        variants: updated,
-                                      });
-                                    }}
-                                  />
+                                  <>
+                                    <TextField
+                                      fullWidth
+                                      size="small"
+                                      placeholder={t("featureFlags.value")}
+                                      value={variant.payload?.value || ""}
+                                      onChange={(e) => {
+                                        const updated = [
+                                          ...(editingStrategy.variants || []),
+                                        ];
+                                        updated[index] = {
+                                          ...updated[index],
+                                          payload: {
+                                            type: "string",
+                                            value: e.target.value,
+                                          },
+                                        };
+                                        setEditingStrategy({
+                                          ...editingStrategy,
+                                          variants: updated,
+                                        });
+                                      }}
+                                    />
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                      sx={{ mt: 0.5, display: "block" }}
+                                    >
+                                      {t("featureFlags.payloadSize")}: {new TextEncoder().encode(variant.payload?.value || "").length} bytes
+                                    </Typography>
+                                  </>
                                 )}
                                 {payloadType === "number" && (
                                   <TextField
@@ -4887,6 +4910,15 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         sx={{ mt: 0.5, display: "block" }}
                                       >
                                         {t("featureFlags.jsonError")}
+                                      </Typography>
+                                    )}
+                                    {!hasJsonError && (
+                                      <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                        sx={{ mt: 0.5, display: "block" }}
+                                      >
+                                        {t("featureFlags.payloadSize")}: {new TextEncoder().encode(variant.payload?.value || "").length} bytes
                                       </Typography>
                                     )}
                                   </Box>

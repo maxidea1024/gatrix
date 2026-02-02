@@ -69,7 +69,12 @@ import {
   StarBorder as StarBorderIcon,
   OpenInNew as OpenInNewIcon,
   BarChart as MetricsIcon,
+  HelpOutline as HelpOutlineIcon,
+  TextFields as TextFieldsIcon,
+  Numbers as NumbersIcon,
+  DataObject as DataObjectIcon,
 } from "@mui/icons-material";
+import JsonEditor from "../../components/common/JsonEditor";
 import { useTranslation } from "react-i18next";
 import { useSnackbar } from "notistack";
 import { parseApiErrorMessage } from "../../utils/errorUtils";
@@ -131,6 +136,8 @@ const FeatureFlagsPage: React.FC = () => {
     flagType: "release" as FlagType,
     tags: [] as string[],
     impressionDataEnabled: false,
+    variantType: "string" as "string" | "number" | "json",
+    baselinePayload: "" as string | number | object,
   });
 
   // Sorting state
@@ -162,6 +169,7 @@ const FeatureFlagsPage: React.FC = () => {
   const [cloningFlag, setCloningFlag] = useState<FeatureFlag | null>(null);
   const [cloneNewName, setCloneNewName] = useState("");
   const [cloning, setCloning] = useState(false);
+  const [newFlagBaselinePayloadJsonError, setNewFlagBaselinePayloadJsonError] = useState<string | null>(null);
 
   // Column settings state
   const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
@@ -1075,11 +1083,11 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(
         markAsStale
           ? t("featureFlags.bulkMarkStaleSuccess", {
-              count: targetFlags.length,
-            })
+            count: targetFlags.length,
+          })
           : t("featureFlags.bulkClearStaleSuccess", {
-              count: targetFlags.length,
-            }),
+            count: targetFlags.length,
+          }),
         { variant: "success" }
       );
       setSelectedFlags(new Set());
@@ -1109,13 +1117,13 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(
         enable
           ? t("featureFlags.bulkEnableSuccess", {
-              count: targetFlags.length,
-              env: environment,
-            })
+            count: targetFlags.length,
+            env: environment,
+          })
           : t("featureFlags.bulkDisableSuccess", {
-              count: targetFlags.length,
-              env: environment,
-            }),
+            count: targetFlags.length,
+            env: environment,
+          }),
         { variant: "success" }
       );
       setSelectedFlags(new Set());
@@ -1164,6 +1172,8 @@ const FeatureFlagsPage: React.FC = () => {
         flagType: newFlag.flagType,
         tags: newFlag.tags,
         impressionDataEnabled: newFlag.impressionDataEnabled,
+        variantType: newFlag.variantType,
+        baselinePayload: newFlag.baselinePayload,
         strategies: [],
       });
 
@@ -1176,7 +1186,10 @@ const FeatureFlagsPage: React.FC = () => {
         flagType: "release",
         tags: [],
         impressionDataEnabled: false,
+        variantType: "string",
+        baselinePayload: "",
       });
+      setNewFlagBaselinePayloadJsonError(null);
       loadFlags();
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.createFailed"), {
@@ -1197,7 +1210,10 @@ const FeatureFlagsPage: React.FC = () => {
       flagType: "release",
       tags: [],
       impressionDataEnabled: false,
+      variantType: "string",
+      baselinePayload: "",
     });
+    setNewFlagBaselinePayloadJsonError(null);
     setCreateDialogOpen(true);
   };
 
@@ -2281,6 +2297,132 @@ const FeatureFlagsPage: React.FC = () => {
               </Typography>
             </Box>
 
+            {/* Variant Type */}
+            <Box>
+              <Typography
+                variant="subtitle2"
+                sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}
+              >
+                {t("featureFlags.variantType")}
+                <Tooltip title={t("featureFlags.variantTypeHelp")}>
+                  <HelpOutlineIcon fontSize="small" color="action" />
+                </Tooltip>
+              </Typography>
+              <FormControl size="small" sx={{ minWidth: 200 }}>
+                <Select
+                  value={newFlag.variantType}
+                  onChange={(e) => {
+                    const newType = e.target.value as "string" | "json" | "number";
+                    setNewFlag((prev) => ({
+                      ...prev,
+                      variantType: newType,
+                      baselinePayload: newType === "number" ? 0 : newType === "json" ? "{}" : "",
+                    }));
+                    if (newType !== "json") {
+                      setNewFlagBaselinePayloadJsonError(null);
+                    }
+                  }}
+                >
+                  <MenuItem value="string">
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <TextFieldsIcon sx={{ fontSize: 16, color: "info.main" }} />
+                      {t("featureFlags.variantTypes.string")}
+                    </Box>
+                  </MenuItem>
+                  <MenuItem value="number">
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <NumbersIcon sx={{ fontSize: 16, color: "success.main" }} />
+                      {t("featureFlags.variantTypes.number")}
+                    </Box>
+                  </MenuItem>
+                  <MenuItem value="json">
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <DataObjectIcon sx={{ fontSize: 16, color: "warning.main" }} />
+                      {t("featureFlags.variantTypes.json")}
+                    </Box>
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+
+            {/* Baseline Payload */}
+            <Box>
+              <Typography
+                variant="subtitle2"
+                sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}
+              >
+                {t("featureFlags.baselinePayload")}
+                <Tooltip title={t("featureFlags.baselinePayloadHelp")}>
+                  <HelpOutlineIcon fontSize="small" color="action" />
+                </Tooltip>
+              </Typography>
+              {newFlag.variantType === "json" ? (
+                <>
+                  <JsonEditor
+                    value={typeof newFlag.baselinePayload === "object"
+                      ? JSON.stringify(newFlag.baselinePayload, null, 2)
+                      : String(newFlag.baselinePayload || "{}")
+                    }
+                    onChange={(value) => {
+                      let parsedValue: any = value;
+                      try {
+                        parsedValue = JSON.parse(value);
+                        setNewFlagBaselinePayloadJsonError(null);
+                      } catch (e: any) {
+                        setNewFlagBaselinePayloadJsonError(e.message || "Invalid JSON");
+                      }
+                      setNewFlag((prev) => ({ ...prev, baselinePayload: parsedValue }));
+                    }}
+                    onValidation={(isValid, error) => {
+                      setNewFlagBaselinePayloadJsonError(isValid ? null : (error || "Invalid JSON"));
+                    }}
+                    height={200}
+                  />
+                  {newFlagBaselinePayloadJsonError && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
+                      {t("featureFlags.jsonError")}
+                    </Typography>
+                  )}
+                  {!newFlagBaselinePayloadJsonError && (
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+                      {t("featureFlags.payloadSize")}: {new TextEncoder().encode(
+                        typeof newFlag.baselinePayload === "object"
+                          ? JSON.stringify(newFlag.baselinePayload)
+                          : String(newFlag.baselinePayload || "")
+                      ).length} bytes
+                    </Typography>
+                  )}
+                </>
+              ) : newFlag.variantType === "number" ? (
+                <TextField
+                  fullWidth
+                  size="small"
+                  type="number"
+                  placeholder="0"
+                  value={newFlag.baselinePayload ?? ""}
+                  onChange={(e) => {
+                    const numValue = e.target.value === "" ? undefined : Number(e.target.value);
+                    setNewFlag((prev) => ({ ...prev, baselinePayload: numValue ?? 0 }));
+                  }}
+                />
+              ) : (
+                <>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder={t("featureFlags.baselinePayloadPlaceholder")}
+                    value={newFlag.baselinePayload ?? ""}
+                    onChange={(e) => {
+                      setNewFlag((prev) => ({ ...prev, baselinePayload: e.target.value }));
+                    }}
+                  />
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+                    {t("featureFlags.payloadSize")}: {new TextEncoder().encode(String(newFlag.baselinePayload || "")).length} bytes
+                  </Typography>
+                </>
+              )}
+            </Box>
+
             {/* Tags */}
             <Autocomplete
               multiple
@@ -2334,7 +2476,7 @@ const FeatureFlagsPage: React.FC = () => {
           <Button
             variant="contained"
             onClick={handleCreateFlag}
-            disabled={creating || !newFlag.flagName.trim()}
+            disabled={creating || !newFlag.flagName.trim() || (newFlag.variantType === "json" && newFlagBaselinePayloadJsonError !== null)}
             startIcon={creating ? <CircularProgress size={20} /> : undefined}
           >
             {t("featureFlags.createFlag")}
