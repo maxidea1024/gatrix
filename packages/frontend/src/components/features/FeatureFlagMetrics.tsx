@@ -313,7 +313,8 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         }
 
         setSearchParams(params, { replace: true });
-    }, [selectedEnvs, period, chartGroupBy, variantGroupBy, environments, searchParams, setSearchParams]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedEnvs, period, chartGroupBy, variantGroupBy, environments, setSearchParams]);
 
     // Toggle environment selection (multi-select)
     const handleEnvToggle = (env: string) => {
