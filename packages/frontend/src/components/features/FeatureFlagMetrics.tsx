@@ -424,6 +424,51 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
             lastBucket.getUTCFullYear() === now.getUTCFullYear();
     }, [timeSeriesData]);
 
+    // Prepare time series data for variants
+    const variantTimeSeriesData = useMemo(() => {
+        // Get all unique variants
+        const allVariants = new Set<string>();
+        metrics.forEach(m => {
+            if (m.variantCounts) {
+                Object.keys(m.variantCounts).forEach(v => allVariants.add(v));
+            }
+        });
+
+        if (allVariants.size === 0) return { labels: [], variants: [], data: {} };
+
+        // Aggregate by time bucket
+        const bucketMap = new Map<string, { displayTime: string; counts: Record<string, number> }>();
+        metrics.forEach(m => {
+            if (!m.variantCounts) return;
+            const existing = bucketMap.get(m.metricsBucket);
+            if (existing) {
+                Object.entries(m.variantCounts).forEach(([v, count]) => {
+                    existing.counts[v] = (existing.counts[v] || 0) + count;
+                });
+            } else {
+                const displayTime = formatWith(m.metricsBucket, 'MM/DD HH:mm');
+                bucketMap.set(m.metricsBucket, {
+                    displayTime,
+                    counts: { ...m.variantCounts },
+                });
+            }
+        });
+
+        // Sort by time
+        const sortedBuckets = Array.from(bucketMap.entries())
+            .sort((a, b) => new Date(a[0]).getTime() - new Date(b[0]).getTime());
+
+        const labels = sortedBuckets.map(([, v]) => v.displayTime);
+        const variants = Array.from(allVariants);
+        const data: Record<string, number[]> = {};
+
+        variants.forEach(variant => {
+            data[variant] = sortedBuckets.map(([, v]) => v.counts[variant] || 0);
+        });
+
+        return { labels, variants, data };
+    }, [metrics]);
+
     // Segment styling for incomplete last hour - makes the line to last point dashed
     const segmentStyle = useCallback((ctx: any) => {
         // If this segment goes to the last point and it's incomplete, use dashed line
@@ -1072,6 +1117,71 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                         })}
                                     </Box>
                                 </Box>
+
+                                {/* Variant Time-Series Line Chart */}
+                                {variantTimeSeriesData.labels.length > 0 && (
+                                    <Box sx={{ mt: 3 }}>
+                                        <Divider sx={{ mb: 2 }} />
+                                        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
+                                            {t('featureFlags.metrics.variantTimeSeriesChart')}
+                                        </Typography>
+                                        <Box sx={{ height: 250 }}>
+                                            <Line
+                                                data={{
+                                                    labels: variantTimeSeriesData.labels,
+                                                    datasets: variantTimeSeriesData.variants.map((variant, idx) => ({
+                                                        label: variant,
+                                                        data: variantTimeSeriesData.data[variant],
+                                                        borderColor: variantColors[idx % variantColors.length],
+                                                        backgroundColor: variantColors[idx % variantColors.length] + '20',
+                                                        borderWidth: 2,
+                                                        fill: false,
+                                                        tension: 0.3,
+                                                        pointRadius: 3,
+                                                        pointHoverRadius: 5,
+                                                    })),
+                                                }}
+                                                options={{
+                                                    responsive: true,
+                                                    maintainAspectRatio: false,
+                                                    interaction: {
+                                                        mode: 'index',
+                                                        intersect: false,
+                                                    },
+                                                    plugins: {
+                                                        legend: {
+                                                            display: true,
+                                                            position: 'top',
+                                                            labels: {
+                                                                usePointStyle: true,
+                                                                pointStyle: 'circle',
+                                                                boxWidth: 8,
+                                                                padding: 16,
+                                                            },
+                                                        },
+                                                        tooltip: {
+                                                            mode: 'index',
+                                                            intersect: false,
+                                                        },
+                                                    },
+                                                    scales: {
+                                                        x: {
+                                                            grid: {
+                                                                display: false,
+                                                            },
+                                                        },
+                                                        y: {
+                                                            beginAtZero: true,
+                                                            grid: {
+                                                                color: theme.palette.divider,
+                                                            },
+                                                        },
+                                                    },
+                                                }}
+                                            />
+                                        </Box>
+                                    </Box>
+                                )}
                             </Paper>
                         );
                     })()}
