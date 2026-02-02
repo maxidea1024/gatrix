@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import NamingGuide from "../../components/common/NamingGuide";
 import { useAuth } from "../../hooks/useAuth";
 import { PERMISSIONS } from "../../types/permissions";
 import {
@@ -52,15 +53,10 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from "../../components/common/DynamicFilterBar";
-import ColumnSettingsDialog, {
-  ColumnConfig,
-} from "../../components/common/ColumnSettingsDialog";
+import ColumnSettingsDialog, { ColumnConfig } from "../../components/common/ColumnSettingsDialog";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useGlobalPageSize } from "../../hooks/useGlobalPageSize";
-import {
-  formatDateTimeDetailed,
-  formatRelativeTime,
-} from "../../utils/dateFormat";
+import { formatDateTimeDetailed, formatRelativeTime } from "../../utils/dateFormat";
 import { copyToClipboardWithNotification } from "../../utils/clipboard";
 import ConfirmDeleteDialog from "../../components/common/ConfirmDeleteDialog";
 import api from "../../services/api";
@@ -98,21 +94,15 @@ const FeatureContextFieldsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [deletingField, setDeletingField] =
-    useState<FeatureContextField | null>(null);
+  const [deletingField, setDeletingField] = useState<FeatureContextField | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editingField, setEditingField] =
-    useState<Partial<FeatureContextField> | null>(null);
-  const [originalField, setOriginalField] =
-    useState<Partial<FeatureContextField> | null>(null);
-  const [expandedLegalValues, setExpandedLegalValues] = useState<Set<string>>(
-    new Set(),
-  );
+  const [editingField, setEditingField] = useState<Partial<FeatureContextField> | null>(null);
+  const [originalField, setOriginalField] = useState<Partial<FeatureContextField> | null>(null);
+  const [expandedLegalValues, setExpandedLegalValues] = useState<Set<string>>(new Set());
   const [allTags, setAllTags] = useState<
     { id: number; name: string; color: string; description?: string }[]
   >([]);
-  const [columnSettingsAnchor, setColumnSettingsAnchor] =
-    useState<null | HTMLElement>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
 
   // Column settings
   const defaultColumns: ColumnConfig[] = [
@@ -140,10 +130,7 @@ const FeatureContextFieldsPage: React.FC = () => {
     }
     return defaultColumns;
   });
-  const visibleColumns = useMemo(
-    () => columns.filter((col) => col.visible),
-    [columns],
-  );
+  const visibleColumns = useMemo(() => columns.filter((col) => col.visible), [columns]);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -192,9 +179,7 @@ const FeatureContextFieldsPage: React.FC = () => {
 
     // Apply tag filter
     if (tagFilter && tagFilter.length > 0) {
-      filtered = filtered.filter((f) =>
-        tagFilter.some((tag) => f.tags?.includes(tag)),
-      );
+      filtered = filtered.filter((f) => tagFilter.some((tag) => f.tags?.includes(tag)));
     }
 
     const start = page * rowsPerPage;
@@ -208,9 +193,7 @@ const FeatureContextFieldsPage: React.FC = () => {
       filtered = filtered.filter((f) => typeFilter.includes(f.fieldType));
     }
     if (tagFilter && tagFilter.length > 0) {
-      filtered = filtered.filter((f) =>
-        tagFilter.some((tag) => f.tags?.includes(tag)),
-      );
+      filtered = filtered.filter((f) => tagFilter.some((tag) => f.tags?.includes(tag)));
     }
     return filtered.length;
   }, [allFields, typeFilter, tagFilter]);
@@ -275,7 +258,7 @@ const FeatureContextFieldsPage: React.FC = () => {
         options: allTags.map((tag) => ({ value: tag.name, label: tag.name })),
       },
     ],
-    [t, allTags],
+    [t, allTags]
   );
 
   useEffect(() => {
@@ -307,9 +290,7 @@ const FeatureContextFieldsPage: React.FC = () => {
   };
 
   const handleFilterChange = (filterKey: string, value: any) => {
-    const newFilters = activeFilters.map((f) =>
-      f.key === filterKey ? { ...f, value } : f,
-    );
+    const newFilters = activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f));
     setActiveFilters(newFilters);
     setPage(0);
   };
@@ -322,15 +303,12 @@ const FeatureContextFieldsPage: React.FC = () => {
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem(
-      "contextFieldsColumns",
-      JSON.stringify(defaultColumns),
-    );
+    localStorage.setItem("contextFieldsColumns", JSON.stringify(defaultColumns));
   };
 
   // Get type icon
   const getTypeIcon = (type: string) => {
-    const iconProps = { sx: { fontSize: 16, mr: 0.5 } };
+    const iconProps = { sx: { fontSize: 20, mr: 1 } };
     switch (type) {
       case "string":
         return <StringIcon {...iconProps} color="info" />;
@@ -375,17 +353,14 @@ const FeatureContextFieldsPage: React.FC = () => {
     if (!originalField) return true; // New field always has "changes"
 
     // Compare each field explicitly to avoid JSON.stringify key order issues
-    const fieldNameChanged =
-      (editingField.fieldName || "") !== (originalField.fieldName || "");
+    const fieldNameChanged = (editingField.fieldName || "") !== (originalField.fieldName || "");
     const displayNameChanged =
       (editingField.displayName || "") !== (originalField.displayName || "");
     const descriptionChanged =
       (editingField.description || "") !== (originalField.description || "");
     const fieldTypeChanged =
-      (editingField.fieldType || "string") !==
-      (originalField.fieldType || "string");
-    const sortOrderChanged =
-      (editingField.sortOrder || 0) !== (originalField.sortOrder || 0);
+      (editingField.fieldType || "string") !== (originalField.fieldType || "string");
+    const sortOrderChanged = (editingField.sortOrder || 0) !== (originalField.sortOrder || 0);
 
     // Compare legalValues arrays
     const editingLegalValues = editingField.legalValues || [];
@@ -416,10 +391,7 @@ const FeatureContextFieldsPage: React.FC = () => {
     if (!editingField) return;
     try {
       if (editingField.id) {
-        await api.put(
-          `/admin/features/context-fields/${editingField.fieldName}`,
-          editingField,
-        );
+        await api.put(`/admin/features/context-fields/${editingField.fieldName}`, editingField);
         enqueueSnackbar(t("featureFlags.updateSuccess"), {
           variant: "success",
         });
@@ -447,16 +419,13 @@ const FeatureContextFieldsPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deletingField) return;
     try {
-      await api.delete(
-        `/admin/features/context-fields/${deletingField.fieldName}`,
-      );
+      await api.delete(`/admin/features/context-fields/${deletingField.fieldName}`);
       enqueueSnackbar(t("featureFlags.deleteSuccess"), { variant: "success" });
       loadFields();
     } catch (error: any) {
-      enqueueSnackbar(
-        parseApiErrorMessage(error, "featureFlags.deleteFailed"),
-        { variant: "error" },
-      );
+      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.deleteFailed"), {
+        variant: "error",
+      });
     } finally {
       setDeleteConfirmOpen(false);
       setDeletingField(null);
@@ -506,11 +475,7 @@ const FeatureContextFieldsPage: React.FC = () => {
         </Box>
         <Box sx={{ display: "flex", gap: 1 }}>
           {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
-            >
+            <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
               {t("featureFlags.addContextField")}
             </Button>
           )}
@@ -574,9 +539,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: "text.secondary", fontSize: 20 }}
-                      />
+                      <SearchIcon sx={{ color: "text.secondary", fontSize: 20 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -619,9 +582,7 @@ const FeatureContextFieldsPage: React.FC = () => {
         <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
           {loading ? (
             <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-              <Typography color="text.secondary">
-                {t("common.loadingData")}
-              </Typography>
+              <Typography color="text.secondary">{t("common.loadingData")}</Typography>
             </Box>
           ) : fields.length === 0 ? (
             <EmptyState
@@ -638,11 +599,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                       {visibleColumns.map((col) => (
                         <TableCell key={col.id}>{t(col.labelKey)}</TableCell>
                       ))}
-                      {canManage && (
-                        <TableCell align="center">
-                          {t("common.actions")}
-                        </TableCell>
-                      )}
+                      {canManage && <TableCell align="center">{t("common.actions")}</TableCell>}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -660,30 +617,23 @@ const FeatureContextFieldsPage: React.FC = () => {
                                       const newEnabled = !field.isEnabled;
                                       setAllFields((prev) =>
                                         prev.map((f) =>
-                                          f.id === field.id
-                                            ? { ...f, isEnabled: newEnabled }
-                                            : f,
-                                        ),
+                                          f.id === field.id ? { ...f, isEnabled: newEnabled } : f
+                                        )
                                       );
                                       try {
                                         await api.put(
                                           `/admin/features/context-fields/${field.fieldName}`,
-                                          { isEnabled: newEnabled },
+                                          { isEnabled: newEnabled }
                                         );
                                       } catch (error: any) {
                                         setAllFields((prev) =>
                                           prev.map((f) =>
-                                            f.id === field.id
-                                              ? { ...f, isEnabled: !newEnabled }
-                                              : f,
-                                          ),
+                                            f.id === field.id ? { ...f, isEnabled: !newEnabled } : f
+                                          )
                                         );
                                         enqueueSnackbar(
-                                          parseApiErrorMessage(
-                                            error,
-                                            t("common.saveFailed"),
-                                          ),
-                                          { variant: "error" },
+                                          parseApiErrorMessage(error, t("common.saveFailed")),
+                                          { variant: "error" }
                                         );
                                       }
                                     }}
@@ -700,9 +650,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                                       alignItems: "center",
                                     }}
                                   >
-                                    <Tooltip
-                                      title={getFieldTypeLabel(field.fieldType)}
-                                    >
+                                    <Tooltip title={getFieldTypeLabel(field.fieldType)}>
                                       <Box
                                         sx={{
                                           display: "flex",
@@ -740,7 +688,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                                               copyToClipboardWithNotification(
                                                 field.fieldName,
                                                 enqueueSnackbar,
-                                                t,
+                                                t
                                               );
                                             }}
                                             sx={{
@@ -753,8 +701,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                                         </Tooltip>
                                       </Box>
                                       {field.displayName &&
-                                        field.displayName !==
-                                          field.fieldName && (
+                                        field.displayName !== field.fieldName && (
                                           <Typography
                                             variant="body2"
                                             color="text.secondary"
@@ -787,8 +734,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                             case "legalValues":
                               return (
                                 <TableCell key={col.id}>
-                                  {field.legalValues &&
-                                  field.legalValues.length > 0 ? (
+                                  {field.legalValues && field.legalValues.length > 0 ? (
                                     <Box
                                       sx={{
                                         display: "flex",
@@ -834,17 +780,13 @@ const FeatureContextFieldsPage: React.FC = () => {
                                           {expandedLegalValues.has(field.id)
                                             ? t("featureFlags.showLess")
                                             : t("featureFlags.showMore", {
-                                                count:
-                                                  field.legalValues.length - 3,
+                                                count: field.legalValues.length - 3,
                                               })}
                                         </Typography>
                                       )}
                                     </Box>
                                   ) : (
-                                    <Typography
-                                      variant="body2"
-                                      color="text.disabled"
-                                    >
+                                    <Typography variant="body2" color="text.disabled">
                                       -
                                     </Typography>
                                   )}
@@ -862,11 +804,8 @@ const FeatureContextFieldsPage: React.FC = () => {
                                       }}
                                     >
                                       {field.tags.map((tagName, idx) => {
-                                        const tagData = allTags.find(
-                                          (t) => t.name === tagName,
-                                        );
-                                        const color =
-                                          tagData?.color || "#888888";
+                                        const tagData = allTags.find((t) => t.name === tagName);
+                                        const color = tagData?.color || "#888888";
                                         return (
                                           <Tooltip
                                             key={idx}
@@ -887,10 +826,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                                       })}
                                     </Box>
                                   ) : (
-                                    <Typography
-                                      variant="body2"
-                                      color="text.disabled"
-                                    >
+                                    <Typography variant="body2" color="text.disabled">
                                       -
                                     </Typography>
                                   )}
@@ -900,10 +836,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                               return (
                                 <TableCell key={col.id}>
                                   <Box>
-                                    <Typography
-                                      variant="body2"
-                                      fontWeight={500}
-                                    >
+                                    <Typography variant="body2" fontWeight={500}>
                                       {field.createdByName || "-"}
                                     </Typography>
                                     {field.createdByEmail && (
@@ -921,14 +854,8 @@ const FeatureContextFieldsPage: React.FC = () => {
                             case "createdAt":
                               return (
                                 <TableCell key={col.id}>
-                                  <Tooltip
-                                    title={formatDateTimeDetailed(
-                                      field.createdAt,
-                                    )}
-                                  >
-                                    <span>
-                                      {formatRelativeTime(field.createdAt)}
-                                    </span>
+                                  <Tooltip title={formatDateTimeDetailed(field.createdAt)}>
+                                    <span>{formatRelativeTime(field.createdAt)}</span>
                                   </Tooltip>
                                 </TableCell>
                               );
@@ -946,18 +873,12 @@ const FeatureContextFieldsPage: React.FC = () => {
                               }}
                             >
                               <Tooltip title={t("common.edit")}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleEdit(field)}
-                                >
+                                <IconButton size="small" onClick={() => handleEdit(field)}>
                                   <EditIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
                               <Tooltip title={t("common.delete")}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleDelete(field)}
-                                >
+                                <IconButton size="small" onClick={() => handleDelete(field)}>
                                   <DeleteIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
@@ -989,9 +910,7 @@ const FeatureContextFieldsPage: React.FC = () => {
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
         title={
-          editingField?.id
-            ? t("featureFlags.editContextField")
-            : t("featureFlags.addContextField")
+          editingField?.id ? t("featureFlags.editContextField") : t("featureFlags.addContextField")
         }
         subtitle={t("featureFlags.contextFieldsDescription")}
         storageKey="featureContextFieldDrawerWidth"
@@ -1019,21 +938,24 @@ const FeatureContextFieldsPage: React.FC = () => {
               </FormHelperText>
             </Box>
 
-            <TextField
-              fullWidth
-              required
-              label={t("featureFlags.fieldName")}
-              value={editingField?.fieldName || ""}
-              onChange={(e) =>
-                setEditingField((prev) => ({
-                  ...prev,
-                  fieldName: e.target.value.replace(/[^a-zA-Z0-9_]/g, ""),
-                }))
-              }
-              disabled={!!editingField?.id}
-              helperText={t("featureFlags.fieldNameHelp")}
-              placeholder="userId, deviceType, country..."
-            />
+            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5 }}>
+              <TextField
+                fullWidth
+                required
+                label={t("featureFlags.fieldName")}
+                value={editingField?.fieldName || ""}
+                onChange={(e) =>
+                  setEditingField((prev) => ({
+                    ...prev,
+                    fieldName: e.target.value.replace(/[^a-zA-Z0-9_]/g, ""),
+                  }))
+                }
+                disabled={!!editingField?.id}
+                helperText={t("featureFlags.fieldNameHelp")}
+                placeholder="userId, deviceType, country..."
+              />
+              {!editingField?.id && <NamingGuide type="contextField" />}
+            </Box>
 
             <TextField
               fullWidth
@@ -1117,8 +1039,7 @@ const FeatureContextFieldsPage: React.FC = () => {
             />
 
             {/* Legal Values - only show for string and number types */}
-            {(editingField?.fieldType === "string" ||
-              editingField?.fieldType === "number") && (
+            {(editingField?.fieldType === "string" || editingField?.fieldType === "number") && (
               <Autocomplete
                 multiple
                 freeSolo
@@ -1132,12 +1053,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                 }
                 renderTags={(value, getTagProps) =>
                   value.map((option, idx) => (
-                    <Chip
-                      size="small"
-                      label={option}
-                      {...getTagProps({ index: idx })}
-                      key={idx}
-                    />
+                    <Chip size="small" label={option} {...getTagProps({ index: idx })} key={idx} />
                   ))
                 }
                 renderInput={(params) => (
@@ -1155,13 +1071,10 @@ const FeatureContextFieldsPage: React.FC = () => {
             <Autocomplete
               multiple
               options={allTags}
-              getOptionLabel={(option) =>
-                typeof option === "string" ? option : option.name
-              }
+              getOptionLabel={(option) => (typeof option === "string" ? option : option.name)}
               filterSelectedOptions
               isOptionEqualToValue={(option, value) => {
-                const optName =
-                  typeof option === "string" ? option : option.name;
+                const optName = typeof option === "string" ? option : option.name;
                 const valName = typeof value === "string" ? value : value.name;
                 return optName === valName;
               }}
@@ -1170,18 +1083,14 @@ const FeatureContextFieldsPage: React.FC = () => {
                 return found || { id: 0, name: tagName, color: "#888888" };
               })}
               onChange={(_, newValue) => {
-                const tagNames = newValue.map((v) =>
-                  typeof v === "string" ? v : v.name,
-                );
+                const tagNames = newValue.map((v) => (typeof v === "string" ? v : v.name));
                 setEditingField((prev) => ({ ...prev, tags: tagNames }));
               }}
               renderTags={(value, getTagProps) =>
                 value.map((option, idx) => {
                   const { key, ...chipProps } = getTagProps({ index: idx });
                   const tagData =
-                    typeof option === "string"
-                      ? { name: option, color: "#888888" }
-                      : option;
+                    typeof option === "string" ? { name: option, color: "#888888" } : option;
                   return (
                     <Tooltip key={key} title={tagData.description || ""} arrow>
                       <Chip
@@ -1240,9 +1149,7 @@ const FeatureContextFieldsPage: React.FC = () => {
             justifyContent: "flex-end",
           }}
         >
-          <Button onClick={() => setEditDialogOpen(false)}>
-            {t("common.cancel")}
-          </Button>
+          <Button onClick={() => setEditDialogOpen(false)}>{t("common.cancel")}</Button>
           <Button
             variant="contained"
             onClick={handleSave}
