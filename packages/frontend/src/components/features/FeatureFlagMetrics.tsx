@@ -131,7 +131,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showTable, setShowTable] = useState(true); // Default expanded
-    const [showVariantTable, setShowVariantTable] = useState(false); // Default collapsed
+    const [showVariantTable, setShowVariantTable] = useState(true); // Default expanded
     const [chartGroupBy, setChartGroupBy] = useState<'all' | 'app' | 'env'>(() => {
         const groupParam = searchParams.get('groupBy');
         if (groupParam === 'app' || groupParam === 'env') return groupParam;
