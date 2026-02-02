@@ -47,6 +47,7 @@ import {
   DialogContent,
   DialogActions,
   Collapse,
+  Link as MuiLink,
   useTheme,
 } from "@mui/material";
 import {
@@ -4698,42 +4699,44 @@ const FeatureFlagDetailPage: React.FC = () => {
                     {t("featureFlags.variantsInfo")}
                   </Alert>
 
-                  {/* Variant Type Display (read-only - edit in flag settings) */}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                    >
-                      {t("featureFlags.variantType")}
-                      <Tooltip title={t("featureFlags.variantTypeEditInSettings")}>
-                        <HelpOutlineIcon fontSize="small" color="action" />
-                      </Tooltip>
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        px: 1.5,
-                        py: 0.5,
-                        bgcolor: "action.hover",
-                        borderRadius: 1,
-                      }}
-                    >
-                      {flag?.variantType === "string" && (
-                        <StringIcon sx={{ fontSize: 16, color: "info.main" }} />
-                      )}
-                      {flag?.variantType === "number" && (
-                        <NumberIcon sx={{ fontSize: 16, color: "success.main" }} />
-                      )}
-                      {flag?.variantType === "json" && (
-                        <JsonIcon sx={{ fontSize: 16, color: "warning.main" }} />
-                      )}
-                      <Typography variant="body2">
-                        {t(`featureFlags.variantTypes.${flag?.variantType || "string"}`)}
+                  {/* Variant Type Display (read-only - edit in flag settings) - hide when none */}
+                  {flag?.variantType !== "none" && (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                      >
+                        {t("featureFlags.variantType")}
+                        <Tooltip title={t("featureFlags.variantTypeEditInSettings")}>
+                          <HelpOutlineIcon fontSize="small" color="action" />
+                        </Tooltip>
                       </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          px: 1.5,
+                          py: 0.5,
+                          bgcolor: "action.hover",
+                          borderRadius: 1,
+                        }}
+                      >
+                        {flag?.variantType === "string" && (
+                          <StringIcon sx={{ fontSize: 16, color: "info.main" }} />
+                        )}
+                        {flag?.variantType === "number" && (
+                          <NumberIcon sx={{ fontSize: 16, color: "success.main" }} />
+                        )}
+                        {flag?.variantType === "json" && (
+                          <JsonIcon sx={{ fontSize: 16, color: "warning.main" }} />
+                        )}
+                        <Typography variant="body2">
+                          {t(`featureFlags.variantTypes.${flag?.variantType || "string"}`)}
+                        </Typography>
+                      </Box>
                     </Box>
-                  </Box>
+                  )}
 
                   {/* Payload Size Warning for string/json types */}
                   {(flag?.variantType === "string" ||
@@ -4788,15 +4791,39 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                   {/* Variants List */}
                   <Box>
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2">
-                        {t("featureFlags.variants")} (
-                        {editingStrategy.variants?.length || 0})
-                      </Typography>
-                    </Box>
-
-                    {!editingStrategy.variants ||
-                      editingStrategy.variants.length === 0 ? (
+                    {/* Hide variants count when variantType is none */}
+                    {flag?.variantType !== "none" && (
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="subtitle2">
+                          {t("featureFlags.variants")} (
+                          {editingStrategy.variants?.length || 0})
+                        </Typography>
+                      </Box>
+                    )}
+                    {/* Show message if variantType is none */}
+                    {flag?.variantType === "none" ? (
+                      <Paper
+                        variant="outlined"
+                        sx={{ p: 4, textAlign: "center" }}
+                      >
+                        <BlockIcon sx={{ fontSize: 48, color: "text.disabled", mb: 1 }} />
+                        <Typography color="text.secondary">
+                          {t("featureFlags.variantTypeNoneCannotAddVariantsText")}
+                          <MuiLink
+                            component="button"
+                            variant="body2"
+                            onClick={() => {
+                              setStrategyDialogOpen(false);
+                              setTabValue(1); // Switch to Payload tab
+                            }}
+                            sx={{ ml: 0.5 }}
+                          >
+                            {t("featureFlags.goToPayloadTab")}
+                          </MuiLink>
+                        </Typography>
+                      </Paper>
+                    ) : (!editingStrategy.variants ||
+                      editingStrategy.variants.length === 0) ? (
                       <Paper
                         variant="outlined"
                         sx={{ p: 4, textAlign: "center" }}

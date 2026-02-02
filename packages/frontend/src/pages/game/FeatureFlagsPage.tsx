@@ -1804,21 +1804,25 @@ const FeatureFlagsPage: React.FC = () => {
                                 <TableCell key={col.id}>
                                   <Chip
                                     icon={
-                                      flag.variantType === "json"
-                                        ? <JsonIcon fontSize="small" />
-                                        : flag.variantType === "number"
-                                          ? <NumberIcon fontSize="small" />
-                                          : <StringIcon fontSize="small" />
+                                      flag.variantType === "none"
+                                        ? <BlockIcon fontSize="small" />
+                                        : flag.variantType === "json"
+                                          ? <JsonIcon fontSize="small" />
+                                          : flag.variantType === "number"
+                                            ? <NumberIcon fontSize="small" />
+                                            : <StringIcon fontSize="small" />
                                     }
                                     label={t(`featureFlags.variantTypes.${flag.variantType || "string"}`)}
                                     size="small"
                                     variant="outlined"
                                     color={
-                                      flag.variantType === "json"
-                                        ? "secondary"
-                                        : flag.variantType === "number"
-                                          ? "info"
-                                          : "default"
+                                      flag.variantType === "none"
+                                        ? "default"
+                                        : flag.variantType === "json"
+                                          ? "secondary"
+                                          : flag.variantType === "number"
+                                            ? "info"
+                                            : "default"
                                     }
                                   />
                                 </TableCell>
