@@ -128,7 +128,8 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         return PERIOD_OPTIONS.some(p => p.value === periodParam) ? periodParam : '24h';
     });
     const [metrics, setMetrics] = useState<MetricsBucket[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true); // Start with true for initial load
+    const [isRefreshing, setIsRefreshing] = useState(false); // For subsequent loads
     const [error, setError] = useState<string | null>(null);
     const [showTable, setShowTable] = useState(true); // Default expanded
     const [showVariantTable, setShowVariantTable] = useState(true); // Default expanded
@@ -187,10 +188,17 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         fetchAppNames();
     }, [fetchAppNames]);
 
+    const hasLoadedOnce = React.useRef(false);
+
     const fetchMetrics = useCallback(async () => {
         if (!flagName || selectedEnvs.length === 0) return;
 
-        setLoading(true);
+        // Use isRefreshing for subsequent loads to avoid flickering
+        if (hasLoadedOnce.current) {
+            setIsRefreshing(true);
+        } else {
+            setLoading(true);
+        }
         setError(null);
 
         try {
@@ -252,11 +260,13 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
 
             const allMetrics = await Promise.all(metricsPromises);
             setMetrics(allMetrics.flat());
+            hasLoadedOnce.current = true;
         } catch (err) {
             console.error('Failed to fetch metrics:', err);
             setError(t('featureFlags.metrics.loadFailed'));
         } finally {
             setLoading(false);
+            setIsRefreshing(false);
         }
     }, [flagName, selectedEnvs, selectedApps, availableApps.length, period, t]);
 
