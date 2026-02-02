@@ -572,6 +572,8 @@ const FeatureFlagsPage: React.FC = () => {
               flagType: flag.flagType,
               tags: flag.tags,
               impressionDataEnabled: flag.impressionDataEnabled,
+              variantType: flag.variantType || "string",
+              baselinePayload: flag.baselinePayload,
               enabled: envData?.isEnabled ?? false,
               strategies,
               variants,
