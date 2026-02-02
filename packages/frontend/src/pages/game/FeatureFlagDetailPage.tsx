@@ -1598,10 +1598,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                                                     textAnchor="middle"
                                                                                     dominantBaseline="central"
                                                                                     fontSize="14"
-                                                                                    fontWeight="700"
+                                                                                    fontWeight="800"
+                                                                                    fontFamily="Arial, sans-serif"
                                                                                     fill="white"
-                                                                                    stroke="#333"
-                                                                                    strokeWidth="0.3"
+                                                                                    stroke="rgba(0,0,0,0.5)"
+                                                                                    strokeWidth="0.5"
+                                                                                    paintOrder="stroke"
                                                                                 >
                                                                                     {yesPercent}%
                                                                                 </text>
