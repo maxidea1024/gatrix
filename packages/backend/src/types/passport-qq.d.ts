@@ -1,5 +1,5 @@
-declare module 'passport-qq' {
-  import { Strategy as PassportStrategy } from 'passport-strategy';
+declare module "passport-qq" {
+  import { Strategy as PassportStrategy } from "passport-strategy";
 
   export interface Profile {
     id: string;
@@ -20,7 +20,7 @@ declare module 'passport-qq' {
     accessToken: string,
     refreshToken: string,
     profile: Profile,
-    done: (error: any, user?: any) => void
+    done: (error: any, user?: any) => void,
   ) => void;
 
   export class Strategy extends PassportStrategy {

@@ -1,5 +1,5 @@
-import { apiService } from './api';
-import { prodLogger } from '../utils/logger';
+import { apiService } from "./api";
+import { prodLogger } from "../utils/logger";
 
 export interface Whitelist {
   id: number;
@@ -72,7 +72,7 @@ export interface WhitelistTestRequest {
 export interface WhitelistTestResult {
   isAllowed: boolean;
   matchedRules: Array<{
-    type: 'account' | 'ip';
+    type: "account" | "ip";
     rule: string;
     reason: string;
   }>;
@@ -82,11 +82,13 @@ export class WhitelistService {
   static async getWhitelists(
     page: number = 1,
     limit: number = 10,
-    filters: WhitelistFilters = {}
+    filters: WhitelistFilters = {},
   ): Promise<WhitelistListResponse> {
     // Ensure page and limit are valid numbers
-    const validPage = typeof page === 'number' && !isNaN(page) && page > 0 ? page : 1;
-    const validLimit = typeof limit === 'number' && !isNaN(limit) && limit > 0 ? limit : 10;
+    const validPage =
+      typeof page === "number" && !isNaN(page) && page > 0 ? page : 1;
+    const validLimit =
+      typeof limit === "number" && !isNaN(limit) && limit > 0 ? limit : 10;
 
     const params = new URLSearchParams({
       page: validPage.toString(),
@@ -95,15 +97,19 @@ export class WhitelistService {
       _t: Date.now().toString(),
     });
 
-    if (filters.accountId) params.append('accountId', filters.accountId);
-    if (filters.ipAddress) params.append('ipAddress', filters.ipAddress);
-    if (filters.createdBy) params.append('createdBy', filters.createdBy.toString());
-    if (filters.search) params.append('search', filters.search);
+    if (filters.accountId) params.append("accountId", filters.accountId);
+    if (filters.ipAddress) params.append("ipAddress", filters.ipAddress);
+    if (filters.createdBy)
+      params.append("createdBy", filters.createdBy.toString());
+    if (filters.search) params.append("search", filters.search);
     if (filters.tags && filters.tags.length > 0) {
-      filters.tags.forEach(tag => params.append('tags', tag));
+      filters.tags.forEach((tag) => params.append("tags", tag));
     }
 
-    const response = await apiService.get<{ success: boolean; data: WhitelistListResponse }>(`/admin/whitelist?${params}`);
+    const response = await apiService.get<{
+      success: boolean;
+      data: WhitelistListResponse;
+    }>(`/admin/whitelist?${params}`);
 
     // ApiService.request()가 이미 response.data를 반환하므로
     if (response?.success && response?.data) {
@@ -111,7 +117,7 @@ export class WhitelistService {
     }
 
     // 응답이 올바르지 않은 경우 기본값 반환
-    prodLogger.warn('Unexpected getWhitelists response structure:', response);
+    prodLogger.warn("Unexpected getWhitelists response structure:", response);
     return {
       whitelists: [],
       total: 0,
@@ -122,7 +128,10 @@ export class WhitelistService {
   }
 
   static async getWhitelistById(id: number): Promise<Whitelist> {
-    const response = await apiService.get<{ success: boolean; data: { whitelist: Whitelist } }>(`/admin/whitelist/${id}`);
+    const response = await apiService.get<{
+      success: boolean;
+      data: { whitelist: Whitelist };
+    }>(`/admin/whitelist/${id}`);
 
     // ApiService.request()가 이미 response.data를 반환하므로
     if (response?.success && response?.data?.whitelist) {
@@ -131,15 +140,18 @@ export class WhitelistService {
       return response.whitelist;
     }
 
-    console.error('Unexpected getById response structure:', response);
-    throw new Error('Invalid response structure from server');
+    console.error("Unexpected getById response structure:", response);
+    throw new Error("Invalid response structure from server");
   }
 
   static async createWhitelist(data: CreateWhitelistData): Promise<Whitelist> {
-    const response = await apiService.post<{ success: boolean; data: { whitelist: Whitelist } }>('/admin/whitelist', data);
+    const response = await apiService.post<{
+      success: boolean;
+      data: { whitelist: Whitelist };
+    }>("/admin/whitelist", data);
 
-    console.log('Create whitelist response:', response);
-    console.log('Response structure:', JSON.stringify(response, null, 2));
+    console.log("Create whitelist response:", response);
+    console.log("Response structure:", JSON.stringify(response, null, 2));
 
     // ApiService.request()가 이미 response.data를 반환하므로
     // response는 백엔드에서 보낸 { success: true, data: { whitelist: ... }, message: ... } 구조
@@ -147,29 +159,35 @@ export class WhitelistService {
       return response.data.whitelist;
     } else if (response?.whitelist) {
       // 혹시 다른 구조일 경우
-      console.log('Using direct whitelist response structure');
+      console.log("Using direct whitelist response structure");
       return response.whitelist;
     }
 
-    console.error('Unexpected response structure:', response);
-    throw new Error('Invalid response structure from server');
+    console.error("Unexpected response structure:", response);
+    throw new Error("Invalid response structure from server");
   }
 
-  static async updateWhitelist(id: number, data: UpdateWhitelistData): Promise<Whitelist> {
-    const response = await apiService.put<{ success: boolean; data: { whitelist: Whitelist } }>(`/admin/whitelist/${id}`, data);
+  static async updateWhitelist(
+    id: number,
+    data: UpdateWhitelistData,
+  ): Promise<Whitelist> {
+    const response = await apiService.put<{
+      success: boolean;
+      data: { whitelist: Whitelist };
+    }>(`/admin/whitelist/${id}`, data);
 
-    console.log('Update whitelist response:', response);
+    console.log("Update whitelist response:", response);
 
     // ApiService.request()가 이미 response.data를 반환하므로
     if (response?.success && response?.data?.whitelist) {
       return response.data.whitelist;
     } else if (response?.whitelist) {
-      console.log('Using direct whitelist response structure for update');
+      console.log("Using direct whitelist response structure for update");
       return response.whitelist;
     }
 
-    console.error('Unexpected update response structure:', response);
-    throw new Error('Invalid response structure from server');
+    console.error("Unexpected update response structure:", response);
+    throw new Error("Invalid response structure from server");
   }
 
   static async deleteWhitelist(id: number): Promise<void> {
@@ -177,35 +195,48 @@ export class WhitelistService {
   }
 
   static async toggleWhitelistStatus(id: number): Promise<Whitelist> {
-    const response = await apiService.patch<{ success: boolean; data: Whitelist }>(`/admin/whitelist/${id}/toggle`);
+    const response = await apiService.patch<{
+      success: boolean;
+      data: Whitelist;
+    }>(`/admin/whitelist/${id}/toggle`);
 
     if (response?.success && response?.data) {
       return response.data;
     }
 
-    throw new Error('Failed to toggle whitelist status');
+    throw new Error("Failed to toggle whitelist status");
   }
 
-  static async bulkCreateWhitelists(entries: BulkCreateEntry[]): Promise<{ createdCount: number; requestedCount: number }> {
-    const response = await apiService.post<{ success: boolean; data: { createdCount: number; requestedCount: number } }>('/admin/whitelist/bulk', { entries });
+  static async bulkCreateWhitelists(
+    entries: BulkCreateEntry[],
+  ): Promise<{ createdCount: number; requestedCount: number }> {
+    const response = await apiService.post<{
+      success: boolean;
+      data: { createdCount: number; requestedCount: number };
+    }>("/admin/whitelist/bulk", { entries });
 
     // ApiService.request()가 이미 response.data를 반환하므로
     if (response?.success && response?.data) {
       return response.data;
     }
 
-    console.error('Unexpected bulkCreate response structure:', response);
-    throw new Error('Invalid response structure from server');
+    console.error("Unexpected bulkCreate response structure:", response);
+    throw new Error("Invalid response structure from server");
   }
 
-  static async testWhitelist(request: WhitelistTestRequest): Promise<WhitelistTestResult> {
-    const response = await apiService.post<{ success: boolean; data: WhitelistTestResult }>('/admin/whitelist/test', request);
+  static async testWhitelist(
+    request: WhitelistTestRequest,
+  ): Promise<WhitelistTestResult> {
+    const response = await apiService.post<{
+      success: boolean;
+      data: WhitelistTestResult;
+    }>("/admin/whitelist/test", request);
 
     if (response?.success && response?.data) {
       return response.data;
     }
 
-    console.error('Unexpected test response structure:', response);
-    throw new Error('Invalid response structure from server');
+    console.error("Unexpected test response structure:", response);
+    throw new Error("Invalid response structure from server");
   }
 }

@@ -1,8 +1,8 @@
-import { Response } from 'express';
-import Joi from 'joi';
-import { asyncHandler, GatrixError } from '../middleware/errorHandler';
-import { CouponRedeemService } from '../services/CouponRedeemService';
-import { EnvironmentRequest } from '../middleware/environmentResolver';
+import { Response } from "express";
+import Joi from "joi";
+import { asyncHandler, GatrixError } from "../middleware/errorHandler";
+import { CouponRedeemService } from "../services/CouponRedeemService";
+import { EnvironmentRequest } from "../middleware/environmentResolver";
 
 // Validation schema for redeem request
 const redeemSchema = Joi.object({
@@ -21,30 +21,36 @@ export class CouponRedeemController {
    * POST /api/v1/server/:env/coupons/:code/redeem
    * Requires: X-API-Token header (server SDK token)
    */
-  static redeem = asyncHandler(async (req: EnvironmentRequest, res: Response) => {
-    const { code } = req.params;
-    const environment = req.environment;
+  static redeem = asyncHandler(
+    async (req: EnvironmentRequest, res: Response) => {
+      const { code } = req.params;
+      const environment = req.environment;
 
-    if (!code) {
-      throw new GatrixError('Coupon code is required', 400);
-    }
+      if (!code) {
+        throw new GatrixError("Coupon code is required", 400);
+      }
 
-    if (!environment) {
-      throw new GatrixError('Environment is required', 400);
-    }
+      if (!environment) {
+        throw new GatrixError("Environment is required", 400);
+      }
 
-    // Validate request body
-    const { error, value } = redeemSchema.validate(req.body);
-    if (error) {
-      throw new GatrixError(error.message, 400);
-    }
+      // Validate request body
+      const { error, value } = redeemSchema.validate(req.body);
+      if (error) {
+        throw new GatrixError(error.message, 400);
+      }
 
-    // Redeem coupon
-    const result = await CouponRedeemService.redeemCoupon(code, value, environment);
+      // Redeem coupon
+      const result = await CouponRedeemService.redeemCoupon(
+        code,
+        value,
+        environment,
+      );
 
-    res.json({
-      success: true,
-      data: result,
-    });
-  });
+      res.json({
+        success: true,
+        data: result,
+      });
+    },
+  );
 }

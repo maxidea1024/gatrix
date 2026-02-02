@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -16,31 +16,36 @@ import {
   ListItemText,
   Tooltip,
   SelectChangeEvent,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Add as AddIcon,
   FilterList as FilterListIcon,
   Tune as TuneIcon,
   Refresh as RefreshIcon,
-} from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
+} from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 export interface FilterDefinition {
   key: string;
   label: string;
-  type: 'text' | 'select' | 'multiselect' | 'number' | 'tags';
-  options?: { value: any; label: string; color?: string; description?: string; icon?: React.ReactNode }[];
+  type: "text" | "select" | "multiselect" | "number" | "tags";
+  options?: {
+    value: any;
+    label: string;
+    color?: string;
+    description?: string;
+    icon?: React.ReactNode;
+  }[];
   placeholder?: string;
-  operator?: 'any_of' | 'include_all'; // For multiselect and tags - default is any_of
+  operator?: "any_of" | "include_all"; // For multiselect and tags - default is any_of
   allowOperatorToggle?: boolean; // If false, operator toggle is disabled (default: true for tags, false for multiselect)
 }
-
 
 export interface ActiveFilter {
   key: string;
   value: any;
   label: string;
-  operator?: 'any_of' | 'include_all'; // For multiselect and tags
+  operator?: "any_of" | "include_all"; // For multiselect and tags
 }
 
 interface DynamicFilterBarProps {
@@ -49,7 +54,10 @@ interface DynamicFilterBarProps {
   onFilterAdd: (filter: ActiveFilter) => void;
   onFilterRemove: (filterKey: string) => void;
   onFilterChange: (filterKey: string, value: any) => void;
-  onOperatorChange?: (filterKey: string, operator: 'any_of' | 'include_all') => void;
+  onOperatorChange?: (
+    filterKey: string,
+    operator: "any_of" | "include_all",
+  ) => void;
   onRefresh?: () => void; // Optional refresh callback
   refreshDisabled?: boolean; // Optional refresh button disabled state
   leftActions?: React.ReactNode; // Optional left-aligned actions (before filters)
@@ -75,7 +83,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
   const [editingFilter, setEditingFilter] = useState<string | null>(null);
   const [selectOpen, setSelectOpen] = useState<boolean>(false);
   const editContainerRef = React.useRef<HTMLDivElement>(null);
-  const [searchText, setSearchText] = useState<string>('');
+  const [searchText, setSearchText] = useState<string>("");
   const justAddedFilterRef = React.useRef<string | null>(null);
   const textInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -88,17 +96,27 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
   };
 
   const handleAddFilter = (filterDef: FilterDefinition) => {
-    const defaultValue = (filterDef.type === 'multiselect' || filterDef.type === 'tags') ? [] : undefined;
-    const defaultOperator = filterDef.operator || 'any_of';
+    const defaultValue =
+      filterDef.type === "multiselect" || filterDef.type === "tags"
+        ? []
+        : undefined;
+    const defaultOperator = filterDef.operator || "any_of";
     onFilterAdd({
       key: filterDef.key,
       value: defaultValue,
       label: filterDef.label,
-      operator: (filterDef.type === 'multiselect' || filterDef.type === 'tags') ? defaultOperator : undefined,
+      operator:
+        filterDef.type === "multiselect" || filterDef.type === "tags"
+          ? defaultOperator
+          : undefined,
     });
     setEditingFilter(filterDef.key);
     // Only open select dropdown for select/multiselect/tags types
-    if (filterDef.type === 'select' || filterDef.type === 'multiselect' || filterDef.type === 'tags') {
+    if (
+      filterDef.type === "select" ||
+      filterDef.type === "multiselect" ||
+      filterDef.type === "tags"
+    ) {
       setSelectOpen(true);
     }
     justAddedFilterRef.current = filterDef.key;
@@ -122,9 +140,13 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
       return;
     }
 
-    const filter = activeFilters.find(f => f.key === filterKey);
-    if (!filter || filter.value === undefined || filter.value === '' ||
-      (Array.isArray(filter.value) && filter.value.length === 0)) {
+    const filter = activeFilters.find((f) => f.key === filterKey);
+    if (
+      !filter ||
+      filter.value === undefined ||
+      filter.value === "" ||
+      (Array.isArray(filter.value) && filter.value.length === 0)
+    ) {
       handleRemoveFilter(filterKey);
     } else {
       setEditingFilter(null);
@@ -132,15 +154,15 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
   };
 
   const getFilterDefinition = (key: string): FilterDefinition | undefined => {
-    return availableFilters.find(f => f.key === key);
+    return availableFilters.find((f) => f.key === key);
   };
 
   const handleToggleOperator = (filterKey: string, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent chip click
-    const filter = activeFilters.find(f => f.key === filterKey);
+    const filter = activeFilters.find((f) => f.key === filterKey);
     if (!filter) return;
 
-    const newOperator = filter.operator === 'any_of' ? 'include_all' : 'any_of';
+    const newOperator = filter.operator === "any_of" ? "include_all" : "any_of";
     if (onOperatorChange) {
       onOperatorChange(filterKey, newOperator);
     }
@@ -149,10 +171,10 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
   // Focus text input when entering edit mode for text filters
   React.useEffect(() => {
     if (editingFilter) {
-      const filter = activeFilters.find(f => f.key === editingFilter);
+      const filter = activeFilters.find((f) => f.key === editingFilter);
       if (filter) {
         const filterDef = getFilterDefinition(editingFilter);
-        if (filterDef?.type === 'text' || filterDef?.type === 'number') {
+        if (filterDef?.type === "text" || filterDef?.type === "number") {
           // Use setTimeout to ensure the input is rendered before focusing
           setTimeout(() => {
             textInputRef.current?.focus();
@@ -167,8 +189,8 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!editingFilter) return;
 
-      if (event.key === 'Escape') {
-        console.log('[DynamicFilterBar] ESC pressed, canceling edit');
+      if (event.key === "Escape") {
+        console.log("[DynamicFilterBar] ESC pressed, canceling edit");
 
         // Close select if open
         if (selectOpen) {
@@ -176,13 +198,13 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
         }
 
         // Check if filter has a value
-        const filter = activeFilters.find(f => f.key === editingFilter);
+        const filter = activeFilters.find((f) => f.key === editingFilter);
         if (filter) {
           const filterDef = getFilterDefinition(editingFilter);
           const isEmpty =
-            (filterDef?.type === 'multiselect' || filterDef?.type === 'tags')
-              ? (!Array.isArray(filter.value) || filter.value.length === 0)
-              : (!filter.value || filter.value === '');
+            filterDef?.type === "multiselect" || filterDef?.type === "tags"
+              ? !Array.isArray(filter.value) || filter.value.length === 0
+              : !filter.value || filter.value === "";
 
           if (isEmpty) {
             // Remove filter if empty
@@ -195,9 +217,9 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [editingFilter, activeFilters, selectOpen]);
 
@@ -210,14 +232,22 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
 
       // Check if click is on MUI Menu/Popover (Select dropdown only)
       // Only check for Popover and Menu, NOT Paper (Paper is used everywhere)
-      const isMenuClick = (target as Element).closest('.MuiPopover-root, .MuiMenu-root');
+      const isMenuClick = (target as Element).closest(
+        ".MuiPopover-root, .MuiMenu-root",
+      );
       if (isMenuClick) {
         return; // Don't close if clicking on dropdown menu
       }
 
       // Check if click is outside the edit container
-      if (editContainerRef.current && !editContainerRef.current.contains(target)) {
-        console.log('[DynamicFilterBar] Click outside edit container, editingFilter:', editingFilter);
+      if (
+        editContainerRef.current &&
+        !editContainerRef.current.contains(target)
+      ) {
+        console.log(
+          "[DynamicFilterBar] Click outside edit container, editingFilter:",
+          editingFilter,
+        );
 
         // Don't remove filter if it was just added (give user time to type)
         if (justAddedFilterRef.current === editingFilter) {
@@ -226,17 +256,19 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
 
         // If Select is open, close it and exit edit mode
         if (selectOpen) {
-          console.log('[DynamicFilterBar] Select is open, closing it and exiting edit mode');
+          console.log(
+            "[DynamicFilterBar] Select is open, closing it and exiting edit mode",
+          );
           setSelectOpen(false);
 
           // Check if filter has a value before exiting
-          const filter = activeFilters.find(f => f.key === editingFilter);
+          const filter = activeFilters.find((f) => f.key === editingFilter);
           if (filter) {
             const filterDef = getFilterDefinition(editingFilter);
             const isEmpty =
-              (filterDef?.type === 'multiselect' || filterDef?.type === 'tags')
-                ? (!Array.isArray(filter.value) || filter.value.length === 0)
-                : (!filter.value || filter.value === '');
+              filterDef?.type === "multiselect" || filterDef?.type === "tags"
+                ? !Array.isArray(filter.value) || filter.value.length === 0
+                : !filter.value || filter.value === "";
 
             if (isEmpty) {
               // Remove filter if empty
@@ -250,35 +282,35 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
         }
 
         // Check if filter has a value
-        const filter = activeFilters.find(f => f.key === editingFilter);
-        console.log('[DynamicFilterBar] Current filter value:', filter);
+        const filter = activeFilters.find((f) => f.key === editingFilter);
+        console.log("[DynamicFilterBar] Current filter value:", filter);
 
         if (filter) {
           const filterDef = getFilterDefinition(editingFilter);
           const isEmpty =
-            (filterDef?.type === 'multiselect' || filterDef?.type === 'tags')
-              ? (!Array.isArray(filter.value) || filter.value.length === 0)
-              : (!filter.value || filter.value === '');
+            filterDef?.type === "multiselect" || filterDef?.type === "tags"
+              ? !Array.isArray(filter.value) || filter.value.length === 0
+              : !filter.value || filter.value === "";
 
-          console.log('[DynamicFilterBar] Filter isEmpty:', isEmpty);
+          console.log("[DynamicFilterBar] Filter isEmpty:", isEmpty);
 
           if (isEmpty) {
             // Remove filter if empty
-            console.log('[DynamicFilterBar] Removing empty filter');
+            console.log("[DynamicFilterBar] Removing empty filter");
             handleRemoveFilter(editingFilter);
           }
         }
 
         // Cancel editing
-        console.log('[DynamicFilterBar] Exiting edit mode');
+        console.log("[DynamicFilterBar] Exiting edit mode");
         setEditingFilter(null);
         setSelectOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [editingFilter, activeFilters, selectOpen]);
 
@@ -291,63 +323,94 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
     if (!isEditing) {
       // Display mode - show as chip or tag chips
       // Don't show filter if value is empty/undefined
-      if (filter.value === undefined || filter.value === null || filter.value === '') {
+      if (
+        filter.value === undefined ||
+        filter.value === null ||
+        filter.value === ""
+      ) {
         return null;
       }
 
       // Tags type - show selected tags as chips wrapped in a container chip
-      if (filterDef.type === 'tags' && filterDef.options) {
+      if (filterDef.type === "tags" && filterDef.options) {
         // Ensure value is an array
-        const valueArray = Array.isArray(filter.value) ? filter.value : (filter.value ? [filter.value] : []);
+        const valueArray = Array.isArray(filter.value)
+          ? filter.value
+          : filter.value
+            ? [filter.value]
+            : [];
         if (valueArray.length === 0) return null;
 
-        const selectedOptions = filterDef.options.filter(opt =>
-          valueArray.includes(opt.value)
+        const selectedOptions = filterDef.options.filter((opt) =>
+          valueArray.includes(opt.value),
         );
 
-        const operator = filter.operator || filterDef.operator || 'any_of';
+        const operator = filter.operator || filterDef.operator || "any_of";
         const isSingleSelection = selectedOptions.length === 1;
         const isMultipleSelection = selectedOptions.length > 1;
         const allowToggle = filterDef.allowOperatorToggle !== false; // Default to true if not specified
 
         // Determine operator text
-        let operatorText = '';
+        let operatorText = "";
         if (isSingleSelection) {
-          operatorText = 'is';
+          operatorText = "is";
         } else if (isMultipleSelection) {
-          operatorText = operator === 'include_all' ? 'include all of' : 'is any of';
+          operatorText =
+            operator === "include_all" ? "include all of" : "is any of";
         }
 
         return (
           <Chip
             label={
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap', py: 0.25 }}>
-                <Box sx={{
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  color: 'primary.main',
-                }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  flexWrap: "wrap",
+                  py: 0.25,
+                }}
+              >
+                <Box
+                  sx={{
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    color: "primary.main",
+                  }}
+                >
                   {filter.label}
                 </Box>
                 {operatorText && (
                   <Tooltip
-                    title={!allowToggle ? t('common.filter.operatorLocked') : ''}
+                    title={
+                      !allowToggle ? t("common.filter.operatorLocked") : ""
+                    }
                     arrow
                   >
                     <Box
-                      onClick={isMultipleSelection && onOperatorChange && allowToggle ? (e) => handleToggleOperator(filter.key, e) : undefined}
+                      onClick={
+                        isMultipleSelection && onOperatorChange && allowToggle
+                          ? (e) => handleToggleOperator(filter.key, e)
+                          : undefined
+                      }
                       sx={{
-                        fontSize: '0.7rem',
+                        fontSize: "0.7rem",
                         fontWeight: 500,
-                        color: allowToggle ? 'text.secondary' : 'text.disabled',
-                        fontStyle: 'italic',
-                        cursor: isMultipleSelection && onOperatorChange && allowToggle ? 'pointer' : 'not-allowed',
+                        color: allowToggle ? "text.secondary" : "text.disabled",
+                        fontStyle: "italic",
+                        cursor:
+                          isMultipleSelection && onOperatorChange && allowToggle
+                            ? "pointer"
+                            : "not-allowed",
                         px: 0.25,
                         opacity: allowToggle ? 1 : 0.6,
-                        '&:hover': isMultipleSelection && onOperatorChange && allowToggle ? {
-                          color: 'primary.main',
-                          textDecoration: 'underline',
-                        } : {},
+                        "&:hover":
+                          isMultipleSelection && onOperatorChange && allowToggle
+                            ? {
+                                color: "primary.main",
+                                textDecoration: "underline",
+                              }
+                            : {},
                       }}
                     >
                       {operatorText}
@@ -355,19 +418,23 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                   </Tooltip>
                 )}
                 {selectedOptions.map((option) => (
-                  <Tooltip key={option.value} title={option.description || ''} arrow>
+                  <Tooltip
+                    key={option.value}
+                    title={option.description || ""}
+                    arrow
+                  >
                     <Chip
                       label={option.label}
                       size="small"
                       sx={{
-                        height: '20px',
-                        bgcolor: option.color || 'primary.main',
-                        color: '#fff',
+                        height: "20px",
+                        bgcolor: option.color || "primary.main",
+                        color: "#fff",
                         fontWeight: 500,
-                        fontSize: '0.7rem',
-                        '& .MuiChip-label': {
+                        fontSize: "0.7rem",
+                        "& .MuiChip-label": {
                           px: 0.75,
-                        }
+                        },
                       }}
                     />
                   </Tooltip>
@@ -377,90 +444,117 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
             onClick={() => setEditingFilter(filter.key)}
             onDelete={() => handleRemoveFilter(filter.key)}
             sx={{
-              height: 'auto',
-              minHeight: '32px',
-              bgcolor: 'rgba(25, 118, 210, 0.08)',
-              border: '1.5px solid',
-              borderColor: 'primary.main',
+              height: "auto",
+              minHeight: "32px",
+              bgcolor: "rgba(25, 118, 210, 0.08)",
+              border: "1.5px solid",
+              borderColor: "primary.main",
               fontWeight: 500,
-              transition: 'all 0.2s',
-              cursor: 'pointer',
-              '&:hover': {
-                borderColor: 'primary.dark',
-                boxShadow: '0 2px 8px rgba(25, 118, 210, 0.25)',
-                transform: 'translateY(-1px)',
+              transition: "all 0.2s",
+              cursor: "pointer",
+              "&:hover": {
+                borderColor: "primary.dark",
+                boxShadow: "0 2px 8px rgba(25, 118, 210, 0.25)",
+                transform: "translateY(-1px)",
               },
-              '& .MuiChip-label': {
-                display: 'block',
-                whiteSpace: 'normal',
+              "& .MuiChip-label": {
+                display: "block",
+                whiteSpace: "normal",
                 py: 0.5,
-                color: 'primary.main',
+                color: "primary.main",
               },
-              '& .MuiChip-deleteIcon': {
-                color: 'primary.main',
-                '&:hover': {
-                  color: 'error.main',
-                  bgcolor: 'rgba(211, 47, 47, 0.1)',
-                }
-              }
+              "& .MuiChip-deleteIcon": {
+                color: "primary.main",
+                "&:hover": {
+                  color: "error.main",
+                  bgcolor: "rgba(211, 47, 47, 0.1)",
+                },
+              },
             }}
           />
         );
       }
 
       // Multiselect type - show selected items as chips wrapped in a container chip
-      if (filterDef.type === 'multiselect' && filterDef.options) {
+      if (filterDef.type === "multiselect" && filterDef.options) {
         // Ensure value is an array
-        const valueArray = Array.isArray(filter.value) ? filter.value : (filter.value ? [filter.value] : []);
+        const valueArray = Array.isArray(filter.value)
+          ? filter.value
+          : filter.value
+            ? [filter.value]
+            : [];
         if (valueArray.length === 0) return null;
 
-        const selectedOptions = filterDef.options.filter(opt =>
-          valueArray.includes(opt.value)
+        const selectedOptions = filterDef.options.filter((opt) =>
+          valueArray.includes(opt.value),
         );
 
-        const operator = filter.operator || filterDef.operator || 'any_of';
+        const operator = filter.operator || filterDef.operator || "any_of";
         const isSingleSelection = selectedOptions.length === 1;
         const isMultipleSelection = selectedOptions.length > 1;
         const allowToggle = filterDef.allowOperatorToggle !== false; // Default to true if not specified
 
         // Determine operator text
-        let operatorText = '';
+        let operatorText = "";
         if (isSingleSelection) {
-          operatorText = 'is';
+          operatorText = "is";
         } else if (isMultipleSelection) {
-          operatorText = operator === 'include_all' ? 'include all of' : 'is any of';
+          operatorText =
+            operator === "include_all" ? "include all of" : "is any of";
         }
 
         return (
           <Chip
             label={
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap', py: 0.25 }}>
-                <Box sx={{
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  color: 'primary.main',
-                }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  flexWrap: "wrap",
+                  py: 0.25,
+                }}
+              >
+                <Box
+                  sx={{
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    color: "primary.main",
+                  }}
+                >
                   {filter.label}
                 </Box>
                 {operatorText && (
                   <Tooltip
-                    title={!allowToggle ? t('common.filter.operatorLocked') : ''}
+                    title={
+                      !allowToggle ? t("common.filter.operatorLocked") : ""
+                    }
                     arrow
                   >
                     <Box
-                      onClick={isMultipleSelection && onOperatorChange && allowToggle ? (e) => handleToggleOperator(filter.key, e) : undefined}
+                      onClick={
+                        isMultipleSelection && onOperatorChange && allowToggle
+                          ? (e) => handleToggleOperator(filter.key, e)
+                          : undefined
+                      }
                       sx={{
-                        fontSize: '0.7rem',
+                        fontSize: "0.7rem",
                         fontWeight: 500,
-                        color: allowToggle ? 'text.secondary' : 'text.disabled',
-                        fontStyle: 'italic',
-                        cursor: isMultipleSelection && onOperatorChange && allowToggle ? 'pointer' : 'not-allowed',
+                        color: allowToggle ? "text.secondary" : "text.disabled",
+                        fontStyle: "italic",
+                        cursor:
+                          isMultipleSelection && onOperatorChange && allowToggle
+                            ? "pointer"
+                            : "not-allowed",
                         px: 0.25,
                         opacity: allowToggle ? 1 : 0.6,
-                        '&:hover': isMultipleSelection && onOperatorChange && allowToggle ? {
-                          color: 'primary.main',
-                          textDecoration: 'underline',
-                        } : {},
+                        "&:hover":
+                          isMultipleSelection && onOperatorChange && allowToggle
+                            ? {
+                                color: "primary.main",
+                                textDecoration: "underline",
+                              }
+                            : {},
                       }}
                     >
                       {operatorText}
@@ -473,16 +567,16 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                     label={option.label}
                     size="small"
                     sx={{
-                      height: '20px',
-                      bgcolor: 'rgba(25, 118, 210, 0.08)',
-                      color: 'primary.main',
-                      border: '1px solid',
-                      borderColor: 'primary.main',
+                      height: "20px",
+                      bgcolor: "rgba(25, 118, 210, 0.08)",
+                      color: "primary.main",
+                      border: "1px solid",
+                      borderColor: "primary.main",
                       fontWeight: 500,
-                      fontSize: '0.7rem',
-                      '& .MuiChip-label': {
+                      fontSize: "0.7rem",
+                      "& .MuiChip-label": {
                         px: 0.75,
-                      }
+                      },
                     }}
                   />
                 ))}
@@ -491,31 +585,31 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
             onDelete={() => handleRemoveFilter(filter.key)}
             onClick={() => setEditingFilter(filter.key)}
             sx={{
-              height: 'auto',
-              minHeight: '32px',
-              bgcolor: 'rgba(25, 118, 210, 0.04)',
-              border: '1.5px solid',
-              borderColor: 'primary.main',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              '& .MuiChip-label': {
-                display: 'block',
-                whiteSpace: 'normal',
+              height: "auto",
+              minHeight: "32px",
+              bgcolor: "rgba(25, 118, 210, 0.04)",
+              border: "1.5px solid",
+              borderColor: "primary.main",
+              cursor: "pointer",
+              transition: "all 0.2s",
+              "& .MuiChip-label": {
+                display: "block",
+                whiteSpace: "normal",
                 px: 1,
                 py: 0.5,
               },
-              '& .MuiChip-deleteIcon': {
-                fontSize: '18px',
-                color: 'text.secondary',
-                '&:hover': {
-                  color: 'error.main',
-                }
+              "& .MuiChip-deleteIcon": {
+                fontSize: "18px",
+                color: "text.secondary",
+                "&:hover": {
+                  color: "error.main",
+                },
               },
-              '&:hover': {
-                borderColor: 'primary.dark',
-                boxShadow: '0 2px 8px rgba(25, 118, 210, 0.15)',
-                transform: 'translateY(-1px)',
-              }
+              "&:hover": {
+                borderColor: "primary.dark",
+                boxShadow: "0 2px 8px rgba(25, 118, 210, 0.15)",
+                transform: "translateY(-1px)",
+              },
             }}
           />
         );
@@ -523,8 +617,10 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
 
       // Single select or text - show as single chip
       let displayValue = filter.value;
-      if (filterDef.type === 'select' && filterDef.options) {
-        const option = filterDef.options.find(opt => opt.value == filter.value); // Use == for type coercion
+      if (filterDef.type === "select" && filterDef.options) {
+        const option = filterDef.options.find(
+          (opt) => opt.value == filter.value,
+        ); // Use == for type coercion
         displayValue = option ? option.label : filter.value;
       }
 
@@ -532,38 +628,49 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
         <Chip
           icon={<FilterListIcon />}
           label={
-            <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+            <Box
+              sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}
+            >
               <Box component="span">{filter.label}</Box>
-              <Box component="span" sx={{ fontStyle: 'italic', fontWeight: 500, color: 'text.secondary' }}>is</Box>
+              <Box
+                component="span"
+                sx={{
+                  fontStyle: "italic",
+                  fontWeight: 500,
+                  color: "text.secondary",
+                }}
+              >
+                is
+              </Box>
               <Box component="span">{displayValue}</Box>
             </Box>
           }
           onClick={() => setEditingFilter(filter.key)}
           onDelete={() => handleRemoveFilter(filter.key)}
           sx={{
-            height: '32px',
-            bgcolor: 'rgba(25, 118, 210, 0.08)',
-            color: 'primary.main',
-            border: '1.5px solid',
-            borderColor: 'primary.main',
+            height: "32px",
+            bgcolor: "rgba(25, 118, 210, 0.08)",
+            color: "primary.main",
+            border: "1.5px solid",
+            borderColor: "primary.main",
             fontWeight: 600,
-            transition: 'all 0.2s',
-            cursor: 'pointer',
-            '&:hover': {
-              borderColor: 'primary.dark',
-              boxShadow: '0 2px 8px rgba(25, 118, 210, 0.25)',
-              transform: 'translateY(-1px)',
+            transition: "all 0.2s",
+            cursor: "pointer",
+            "&:hover": {
+              borderColor: "primary.dark",
+              boxShadow: "0 2px 8px rgba(25, 118, 210, 0.25)",
+              transform: "translateY(-1px)",
             },
-            '& .MuiChip-icon': {
-              color: 'primary.main',
+            "& .MuiChip-icon": {
+              color: "primary.main",
             },
-            '& .MuiChip-deleteIcon': {
-              color: 'primary.main',
-              '&:hover': {
-                color: 'error.main',
-                bgcolor: 'rgba(211, 47, 47, 0.1)',
-              }
-            }
+            "& .MuiChip-deleteIcon": {
+              color: "primary.main",
+              "&:hover": {
+                color: "error.main",
+                bgcolor: "rgba(211, 47, 47, 0.1)",
+              },
+            },
           }}
         />
       );
@@ -574,40 +681,42 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
       <Box
         ref={editContainerRef}
         sx={{
-          display: 'inline-flex',
-          alignItems: 'center',
+          display: "inline-flex",
+          alignItems: "center",
           px: 1.5,
           py: 0.75,
           gap: 1,
-          minHeight: '32px',
-          border: '1.5px solid',
-          borderColor: 'primary.main',
+          minHeight: "32px",
+          border: "1.5px solid",
+          borderColor: "primary.main",
           borderRadius: 0,
-          bgcolor: 'rgba(25, 118, 210, 0.08)',
+          bgcolor: "rgba(25, 118, 210, 0.08)",
         }}
       >
-        <Box sx={{
-          fontSize: '0.8125rem',
-          fontWeight: 600,
-          color: 'primary.main',
-          whiteSpace: 'nowrap',
-          lineHeight: 1
-        }}>
+        <Box
+          sx={{
+            fontSize: "0.8125rem",
+            fontWeight: 600,
+            color: "primary.main",
+            whiteSpace: "nowrap",
+            lineHeight: 1,
+          }}
+        >
           {filter.label}
         </Box>
 
-        {filterDef.type === 'text' && (
+        {filterDef.type === "text" && (
           <TextField
             size="small"
-            value={filter.value || ''}
+            value={filter.value || ""}
             onChange={(e) => onFilterChange(filter.key, e.target.value)}
             onBlur={() => {
               setTimeout(() => handleCloseEdit(filter.key), 150);
             }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 handleCloseEdit(filter.key);
-              } else if (e.key === 'Escape') {
+              } else if (e.key === "Escape") {
                 handleRemoveFilter(filter.key);
               }
             }}
@@ -616,35 +725,35 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
             autoFocus
             sx={{
               minWidth: 180,
-              '& .MuiInputBase-root': {
-                height: '28px',
-                fontSize: '0.8125rem',
-                bgcolor: 'background.paper',
+              "& .MuiInputBase-root": {
+                height: "28px",
+                fontSize: "0.8125rem",
+                bgcolor: "background.paper",
                 borderRadius: 0,
               },
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'rgba(0, 0, 0, 0.12)',
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: "rgba(0, 0, 0, 0.12)",
               },
-              '& .MuiInputBase-input': {
+              "& .MuiInputBase-input": {
                 py: 0.5,
-              }
+              },
             }}
           />
         )}
 
-        {filterDef.type === 'number' && (
+        {filterDef.type === "number" && (
           <TextField
             size="small"
             type="number"
-            value={filter.value || ''}
+            value={filter.value || ""}
             onChange={(e) => onFilterChange(filter.key, e.target.value)}
             onBlur={() => {
               setTimeout(() => handleCloseEdit(filter.key), 150);
             }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 handleCloseEdit(filter.key);
-              } else if (e.key === 'Escape') {
+              } else if (e.key === "Escape") {
                 handleRemoveFilter(filter.key);
               }
             }}
@@ -653,23 +762,23 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
             autoFocus
             sx={{
               minWidth: 120,
-              '& .MuiInputBase-root': {
-                height: '28px',
-                fontSize: '0.8125rem',
-                bgcolor: 'background.paper',
+              "& .MuiInputBase-root": {
+                height: "28px",
+                fontSize: "0.8125rem",
+                bgcolor: "background.paper",
                 borderRadius: 0,
               },
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'rgba(0, 0, 0, 0.12)',
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: "rgba(0, 0, 0, 0.12)",
               },
-              '& .MuiInputBase-input': {
+              "& .MuiInputBase-input": {
                 py: 0.5,
-              }
+              },
             }}
           />
         )}
 
-        {filterDef.type === 'select' && filterDef.options && (
+        {filterDef.type === "select" && filterDef.options && (
           <FormControl
             size="small"
             sx={{
@@ -677,7 +786,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
             }}
           >
             <Select
-              value={filter.value ?? ''}
+              value={filter.value ?? ""}
               open={selectOpen && editingFilter === filter.key}
               onOpen={() => setSelectOpen(true)}
               onClose={() => {
@@ -685,10 +794,11 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 setEditingFilter(null);
               }}
               onChange={(e) => {
-                const newValue = e.target.value === '' ? undefined : e.target.value;
+                const newValue =
+                  e.target.value === "" ? undefined : e.target.value;
                 onFilterChange(filter.key, newValue);
                 // Close immediately after selection
-                if (newValue !== undefined && newValue !== '') {
+                if (newValue !== undefined && newValue !== "") {
                   setSelectOpen(false);
                   setEditingFilter(null);
                 } else {
@@ -699,20 +809,23 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
               }}
               autoFocus
               sx={{
-                height: '28px',
-                fontSize: '0.8125rem',
-                bgcolor: 'background.paper',
+                height: "28px",
+                fontSize: "0.8125rem",
+                bgcolor: "background.paper",
                 borderRadius: 0,
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(0, 0, 0, 0.12)',
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "rgba(0, 0, 0, 0.12)",
                 },
-                '& .MuiSelect-select': {
+                "& .MuiSelect-select": {
                   py: 0.5,
-                }
+                },
               }}
             >
               {filterDef.options.map((option, idx) => (
-                <MenuItem key={`${filter.key}-${idx}-${option.value}`} value={option.value}>
+                <MenuItem
+                  key={`${filter.key}-${idx}-${option.value}`}
+                  value={option.value}
+                >
                   {option.label}
                 </MenuItem>
               ))}
@@ -720,7 +833,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
           </FormControl>
         )}
 
-        {filterDef.type === 'multiselect' && filterDef.options && (
+        {filterDef.type === "multiselect" && filterDef.options && (
           <FormControl
             size="small"
             sx={{
@@ -733,15 +846,20 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
               open={selectOpen && editingFilter === filter.key}
               onOpen={() => {
                 setSelectOpen(true);
-                setSearchText('');
+                setSearchText("");
               }}
               onClose={() => {
                 setSelectOpen(false);
-                setSearchText('');
+                setSearchText("");
 
                 // Immediately exit editing mode when Select closes
-                const currentFilter = activeFilters.find(f => f.key === filter.key);
-                const hasValue = currentFilter && Array.isArray(currentFilter.value) && currentFilter.value.length > 0;
+                const currentFilter = activeFilters.find(
+                  (f) => f.key === filter.key,
+                );
+                const hasValue =
+                  currentFilter &&
+                  Array.isArray(currentFilter.value) &&
+                  currentFilter.value.length > 0;
 
                 if (!hasValue) {
                   // Remove filter if no values selected
@@ -756,23 +874,26 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
               }}
               autoFocus
               renderValue={(selected) => {
-                if (!Array.isArray(selected) || selected.length === 0) return '';
-                const selectedOptions = filterDef.options!.filter(opt => selected.includes(opt.value));
+                if (!Array.isArray(selected) || selected.length === 0)
+                  return "";
+                const selectedOptions = filterDef.options!.filter((opt) =>
+                  selected.includes(opt.value),
+                );
                 return (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                     {selectedOptions.map((option) => (
                       <Chip
                         key={option.value}
                         label={option.label}
                         size="small"
                         sx={{
-                          height: '20px',
-                          fontSize: '0.7rem',
-                          bgcolor: 'primary.lighter',
-                          color: 'primary.main',
-                          '& .MuiChip-label': {
+                          height: "20px",
+                          fontSize: "0.7rem",
+                          bgcolor: "primary.lighter",
+                          color: "primary.main",
+                          "& .MuiChip-label": {
                             px: 0.75,
-                          }
+                          },
                         }}
                       />
                     ))}
@@ -780,33 +901,40 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 );
               }}
               sx={{
-                minHeight: '28px',
-                fontSize: '0.8125rem',
-                bgcolor: 'background.paper',
+                minHeight: "28px",
+                fontSize: "0.8125rem",
+                bgcolor: "background.paper",
                 borderRadius: 0,
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(0, 0, 0, 0.12)',
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "rgba(0, 0, 0, 0.12)",
                 },
-                '& .MuiSelect-select': {
+                "& .MuiSelect-select": {
                   py: 0.5,
-                }
+                },
               }}
               MenuProps={{
                 PaperProps: {
                   style: {
                     maxHeight: 400,
-                  }
-                }
+                  },
+                },
               }}
             >
               {/* Search box at the top */}
               <Box
-                sx={{ px: 2, py: 1, position: 'sticky', top: 0, bgcolor: 'background.paper', zIndex: 1 }}
+                sx={{
+                  px: 2,
+                  py: 1,
+                  position: "sticky",
+                  top: 0,
+                  bgcolor: "background.paper",
+                  zIndex: 1,
+                }}
                 onMouseDown={(e) => e.stopPropagation()}
               >
                 <TextField
                   size="small"
-                  placeholder={t('common.search')}
+                  placeholder={t("common.search")}
                   value={searchText}
                   onChange={(e) => {
                     e.stopPropagation();
@@ -816,25 +944,41 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                   onClick={(e) => e.stopPropagation()}
                   fullWidth
                   sx={{
-                    '& .MuiInputBase-root': {
-                      height: '32px',
-                      fontSize: '0.875rem',
-                    }
+                    "& .MuiInputBase-root": {
+                      height: "32px",
+                      fontSize: "0.875rem",
+                    },
                   }}
                 />
               </Box>
 
               {filterDef.options
-                .filter(option =>
-                  !searchText || option.label.toLowerCase().includes(searchText.toLowerCase())
+                .filter(
+                  (option) =>
+                    !searchText ||
+                    option.label
+                      .toLowerCase()
+                      .includes(searchText.toLowerCase()),
                 )
                 .map((option, idx) => (
-                  <MenuItem key={`${filter.key}-ms-${idx}-${option.value}`} value={option.value}>
+                  <MenuItem
+                    key={`${filter.key}-ms-${idx}-${option.value}`}
+                    value={option.value}
+                  >
                     <Checkbox
-                      checked={Array.isArray(filter.value) && filter.value.indexOf(option.value) > -1}
+                      checked={
+                        Array.isArray(filter.value) &&
+                        filter.value.indexOf(option.value) > -1
+                      }
                       size="small"
                     />
-                    {option.icon && <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>{option.icon}</Box>}
+                    {option.icon && (
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mr: 1 }}
+                      >
+                        {option.icon}
+                      </Box>
+                    )}
                     <ListItemText primary={option.label} />
                   </MenuItem>
                 ))}
@@ -842,7 +986,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
           </FormControl>
         )}
 
-        {filterDef.type === 'tags' && filterDef.options && (
+        {filterDef.type === "tags" && filterDef.options && (
           <FormControl
             size="small"
             sx={{
@@ -855,15 +999,20 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
               open={selectOpen && editingFilter === filter.key}
               onOpen={() => {
                 setSelectOpen(true);
-                setSearchText('');
+                setSearchText("");
               }}
               onClose={() => {
                 setSelectOpen(false);
-                setSearchText('');
+                setSearchText("");
 
                 // Immediately exit editing mode when Select closes
-                const currentFilter = activeFilters.find(f => f.key === filter.key);
-                const hasValue = currentFilter && Array.isArray(currentFilter.value) && currentFilter.value.length > 0;
+                const currentFilter = activeFilters.find(
+                  (f) => f.key === filter.key,
+                );
+                const hasValue =
+                  currentFilter &&
+                  Array.isArray(currentFilter.value) &&
+                  currentFilter.value.length > 0;
 
                 if (!hasValue) {
                   // Remove filter if no values selected
@@ -878,23 +1027,26 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
               }}
               autoFocus
               renderValue={(selected) => {
-                if (!Array.isArray(selected) || selected.length === 0) return '';
-                const selectedOptions = filterDef.options!.filter(opt => selected.includes(opt.value));
+                if (!Array.isArray(selected) || selected.length === 0)
+                  return "";
+                const selectedOptions = filterDef.options!.filter((opt) =>
+                  selected.includes(opt.value),
+                );
                 return (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                     {selectedOptions.map((option) => (
                       <Chip
                         key={option.value}
                         label={option.label}
                         size="small"
                         sx={{
-                          height: '20px',
-                          bgcolor: option.color || 'primary.main',
-                          color: '#fff',
-                          fontSize: '0.7rem',
-                          '& .MuiChip-label': {
+                          height: "20px",
+                          bgcolor: option.color || "primary.main",
+                          color: "#fff",
+                          fontSize: "0.7rem",
+                          "& .MuiChip-label": {
                             px: 1,
-                          }
+                          },
                         }}
                       />
                     ))}
@@ -902,33 +1054,40 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 );
               }}
               sx={{
-                minHeight: '28px',
-                fontSize: '0.8125rem',
-                bgcolor: 'background.paper',
+                minHeight: "28px",
+                fontSize: "0.8125rem",
+                bgcolor: "background.paper",
                 borderRadius: 0,
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(0, 0, 0, 0.12)',
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "rgba(0, 0, 0, 0.12)",
                 },
-                '& .MuiSelect-select': {
+                "& .MuiSelect-select": {
                   py: 0.5,
-                }
+                },
               }}
               MenuProps={{
                 PaperProps: {
                   style: {
                     maxHeight: 400,
-                  }
-                }
+                  },
+                },
               }}
             >
               {/* Search box at the top */}
               <Box
-                sx={{ px: 2, py: 1, position: 'sticky', top: 0, bgcolor: 'background.paper', zIndex: 1 }}
+                sx={{
+                  px: 2,
+                  py: 1,
+                  position: "sticky",
+                  top: 0,
+                  bgcolor: "background.paper",
+                  zIndex: 1,
+                }}
                 onMouseDown={(e) => e.stopPropagation()}
               >
                 <TextField
                   size="small"
-                  placeholder={t('common.search')}
+                  placeholder={t("common.search")}
                   value={searchText}
                   onChange={(e) => {
                     e.stopPropagation();
@@ -938,40 +1097,69 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                   onClick={(e) => e.stopPropagation()}
                   fullWidth
                   sx={{
-                    '& .MuiInputBase-root': {
-                      height: '32px',
-                      fontSize: '0.875rem',
-                    }
+                    "& .MuiInputBase-root": {
+                      height: "32px",
+                      fontSize: "0.875rem",
+                    },
                   }}
                 />
               </Box>
 
               {filterDef.options
-                .filter(option =>
-                  !searchText ||
-                  option.label.toLowerCase().includes(searchText.toLowerCase()) ||
-                  (option.description && option.description.toLowerCase().includes(searchText.toLowerCase()))
+                .filter(
+                  (option) =>
+                    !searchText ||
+                    option.label
+                      .toLowerCase()
+                      .includes(searchText.toLowerCase()) ||
+                    (option.description &&
+                      option.description
+                        .toLowerCase()
+                        .includes(searchText.toLowerCase())),
                 )
                 .map((option, idx) => (
-                  <MenuItem key={`${filter.key}-tag-${idx}-${option.value}`} value={option.value}>
+                  <MenuItem
+                    key={`${filter.key}-tag-${idx}-${option.value}`}
+                    value={option.value}
+                  >
                     <Checkbox
-                      checked={Array.isArray(filter.value) && filter.value.indexOf(option.value) > -1}
+                      checked={
+                        Array.isArray(filter.value) &&
+                        filter.value.indexOf(option.value) > -1
+                      }
                       size="small"
                     />
-                    <Tooltip title={option.description || ''} arrow placement="right">
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
+                    <Tooltip
+                      title={option.description || ""}
+                      arrow
+                      placement="right"
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          flex: 1,
+                        }}
+                      >
                         <Chip
                           label={option.label}
                           size="small"
                           sx={{
-                            height: '22px',
-                            bgcolor: option.color || 'primary.main',
-                            color: '#fff',
-                            fontSize: '0.75rem',
+                            height: "22px",
+                            bgcolor: option.color || "primary.main",
+                            color: "#fff",
+                            fontSize: "0.75rem",
                           }}
                         />
                         {option.description && (
-                          <Box component="span" sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+                          <Box
+                            component="span"
+                            sx={{
+                              fontSize: "0.75rem",
+                              color: "text.secondary",
+                            }}
+                          >
                             {option.description}
                           </Box>
                         )}
@@ -990,11 +1178,11 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
             width: 20,
             height: 20,
             p: 0,
-            color: 'primary.main',
-            '&:hover': {
-              color: 'error.main',
-              bgcolor: 'transparent',
-            }
+            color: "primary.main",
+            "&:hover": {
+              color: "error.main",
+              bgcolor: "transparent",
+            },
           }}
         >
           ✕
@@ -1005,7 +1193,11 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
 
   // Helper function to check if a filter has a meaningful value
   const hasFilterValue = (filter: ActiveFilter): boolean => {
-    if (filter.value === undefined || filter.value === null || filter.value === '') {
+    if (
+      filter.value === undefined ||
+      filter.value === null ||
+      filter.value === ""
+    ) {
       return false;
     }
     if (Array.isArray(filter.value) && filter.value.length === 0) {
@@ -1017,34 +1209,34 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
   // Get filters that are not yet active (only exclude filters with actual values)
   // This fixes the bug where cancelled/empty filters disappear from the menu
   const availableToAdd = availableFilters.filter(
-    f => !activeFilters.some(af => af.key === f.key && hasFilterValue(af))
+    (f) => !activeFilters.some((af) => af.key === f.key && hasFilterValue(af)),
   );
 
   return (
-    <Box sx={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 1,
-      width: noWrap ? '100%' : 'auto',
-      flexWrap: noWrap ? 'nowrap' : 'wrap',
-    }}>
-      {/* Left Actions - Before filters */}
-      {leftActions && (
-        <Box sx={{ flexShrink: 0 }}>
-          {leftActions}
-        </Box>
-      )}
-
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
         gap: 1,
-        flex: noWrap ? 1 : 'auto',
-        minWidth: noWrap ? 0 : 'auto',
-        overflow: noWrap ? 'auto' : 'visible',
-        flexWrap: noWrap ? 'nowrap' : 'wrap',
-      }}>
-        {activeFilters.map(filter => (
+        width: noWrap ? "100%" : "auto",
+        flexWrap: noWrap ? "nowrap" : "wrap",
+      }}
+    >
+      {/* Left Actions - Before filters */}
+      {leftActions && <Box sx={{ flexShrink: 0 }}>{leftActions}</Box>}
+
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          flex: noWrap ? 1 : "auto",
+          minWidth: noWrap ? 0 : "auto",
+          overflow: noWrap ? "auto" : "visible",
+          flexWrap: noWrap ? "nowrap" : "wrap",
+        }}
+      >
+        {activeFilters.map((filter) => (
           <React.Fragment key={`filter-wrapper-${filter.key}`}>
             {renderFilterValue(filter)}
           </React.Fragment>
@@ -1058,22 +1250,22 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
               variant="text"
               size="small"
               sx={{
-                height: '32px',
-                minWidth: 'auto',
+                height: "32px",
+                minWidth: "auto",
                 px: 1.5,
                 py: 0.5,
-                textTransform: 'none',
-                color: 'text.secondary',
-                fontSize: '0.875rem',
+                textTransform: "none",
+                color: "text.secondary",
+                fontSize: "0.875rem",
                 fontWeight: 500,
-                border: 'none',
-                '&:hover': {
-                  bgcolor: 'action.hover',
-                  color: 'primary.main',
-                }
+                border: "none",
+                "&:hover": {
+                  bgcolor: "action.hover",
+                  color: "primary.main",
+                },
               }}
             >
-              {t('common.filters.title')}
+              {t("common.filters.title")}
             </Button>
 
             <Menu
@@ -1084,20 +1276,20 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 sx: {
                   mt: 0.5,
                   minWidth: 180,
-                  boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-                }
+                  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+                },
               }}
             >
-              {availableToAdd.map(filterDef => (
+              {availableToAdd.map((filterDef) => (
                 <MenuItem
                   key={`add-filter-${filterDef.key}`}
                   onClick={() => handleAddFilter(filterDef)}
                   sx={{
-                    fontSize: '0.875rem',
+                    fontSize: "0.875rem",
                     py: 1,
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                    }
+                    "&:hover": {
+                      bgcolor: "action.hover",
+                    },
                   }}
                 >
                   {filterDef.label}
@@ -1109,16 +1301,14 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
 
         {/* Actions after filter add button */}
         {afterFilterAddActions && (
-          <Box sx={{ flexShrink: 0 }}>
-            {afterFilterAddActions}
-          </Box>
+          <Box sx={{ flexShrink: 0 }}>{afterFilterAddActions}</Box>
         )}
       </Box>
 
       {/* Refresh Button - Right aligned */}
       {onRefresh && (
         <Box sx={{ flexShrink: 0 }}>
-          <Tooltip title={refreshDisabled ? '' : t('common.refresh')}>
+          <Tooltip title={refreshDisabled ? "" : t("common.refresh")}>
             <span>
               <IconButton
                 size="small"
@@ -1136,4 +1326,3 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
 };
 
 export default DynamicFilterBar;
-

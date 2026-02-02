@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useDebounce } from '../../hooks/useDebounce';
-import { formatDateTimeDetailed } from '@/utils/dateFormat';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from 'dayjs';
-import { useTranslation } from 'react-i18next';
-import { usePageState } from '../../hooks/usePageState';
-import { useSearchParams } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useDebounce } from "../../hooks/useDebounce";
+import { formatDateTimeDetailed } from "@/utils/dateFormat";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
+import { usePageState } from "../../hooks/usePageState";
+import { useSearchParams } from "react-router-dom";
 
 import {
   Box,
@@ -38,7 +38,7 @@ import {
   Box as MuiBox,
   Checkbox,
   Drawer,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Search as SearchIcon,
   MoreVert as MoreVertIcon,
@@ -54,20 +54,22 @@ import {
   Save as SaveIcon,
   ContentCopy as ContentCopyIcon,
   Security as SecurityIcon,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 
-import { useSnackbar } from 'notistack';
-import { parseApiErrorMessage } from '../../utils/errorUtils';
-import { copyToClipboardWithNotification } from '../../utils/clipboard';
-import { WhitelistService, Whitelist, CreateWhitelistData } from '../../services/whitelistService';
-import SimplePagination from '../../components/common/SimplePagination';
-import IpWhitelistTab from '../../components/admin/IpWhitelistTab';
-import WhitelistOverview from '../../components/admin/WhitelistOverview';
-import EmptyState from '../../components/common/EmptyState';
-import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
-
-
+import { useSnackbar } from "notistack";
+import { parseApiErrorMessage } from "../../utils/errorUtils";
+import { copyToClipboardWithNotification } from "../../utils/clipboard";
+import {
+  WhitelistService,
+  Whitelist,
+  CreateWhitelistData,
+} from "../../services/whitelistService";
+import SimplePagination from "../../components/common/SimplePagination";
+import IpWhitelistTab from "../../components/admin/IpWhitelistTab";
+import WhitelistOverview from "../../components/admin/WhitelistOverview";
+import EmptyState from "../../components/common/EmptyState";
+import { useAuth } from "@/hooks/useAuth";
+import { PERMISSIONS } from "@/types/permissions";
 
 const WhitelistPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -82,28 +84,23 @@ const WhitelistPage: React.FC = () => {
   const accountIdFieldRef = useRef<HTMLInputElement>(null);
 
   // 페이지 상태 관리 (localStorage 연동)
-  const {
-    pageState,
-    updatePage,
-    updateLimit,
-    updateFilters,
-  } = usePageState({
+  const { pageState, updatePage, updateLimit, updateFilters } = usePageState({
     defaultState: {
       page: 1,
       limit: 10,
-      sortBy: 'createdAt',
-      sortOrder: 'DESC',
-      filters: { search: '' },
+      sortBy: "createdAt",
+      sortOrder: "DESC",
+      filters: { search: "" },
     },
-    storageKey: 'whitelistPage',
+    storageKey: "whitelistPage",
   });
 
   // Tab names for URL mapping (stable)
-  const tabNames = React.useMemo(() => ['account', 'ip', 'playground'], []);
+  const tabNames = React.useMemo(() => ["account", "ip", "playground"], []);
 
   // Get initial tab from URL, localStorage, or default to 0
   const getInitialTab = () => {
-    const tabParam = searchParams.get('tab');
+    const tabParam = searchParams.get("tab");
     if (tabParam) {
       const tabIndex = tabNames.indexOf(tabParam);
       if (tabIndex >= 0) {
@@ -112,7 +109,7 @@ const WhitelistPage: React.FC = () => {
     }
 
     // Check localStorage for saved tab
-    const savedTab = localStorage.getItem('whitelist.lastTab');
+    const savedTab = localStorage.getItem("whitelist.lastTab");
     if (savedTab) {
       const tabIndex = tabNames.indexOf(savedTab);
       if (tabIndex >= 0) {
@@ -128,18 +125,18 @@ const WhitelistPage: React.FC = () => {
   const [currentTab, setCurrentTab] = useState(getInitialTab);
 
   // 디바운싱된 검색어 (500ms 지연)
-  const debouncedSearch = useDebounce(pageState.filters?.search || '', 500);
-
+  const debouncedSearch = useDebounce(pageState.filters?.search || "", 500);
 
   // State
   const [whitelists, setWhitelists] = useState<Whitelist[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
-
   // Menu state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedWhitelist, setSelectedWhitelist] = useState<Whitelist | null>(null);
+  const [selectedWhitelist, setSelectedWhitelist] = useState<Whitelist | null>(
+    null,
+  );
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   // Dialog states
@@ -148,22 +145,22 @@ const WhitelistPage: React.FC = () => {
   const [bulkDialog, setBulkDialog] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
-    title: '',
-    message: '',
-    action: () => { },
+    title: "",
+    message: "",
+    action: () => {},
   });
 
   // Form data
   const [formData, setFormData] = useState<CreateWhitelistData>({
-    accountId: '',
-    ipAddress: '',
-    startDate: '',
-    endDate: '',
-    purpose: '',
+    accountId: "",
+    ipAddress: "",
+    startDate: "",
+    endDate: "",
+    purpose: "",
   });
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-  const [bulkData, setBulkData] = useState('');
+  const [bulkData, setBulkData] = useState("");
   const [fullEditingData, setFullEditingData] = useState<any>(null);
 
   const isDirty = useMemo(() => {
@@ -171,18 +168,22 @@ const WhitelistPage: React.FC = () => {
 
     const currentData = {
       accountId: formData.accountId?.trim(),
-      ipAddress: formData.ipAddress?.trim() || '',
-      startDate: formData.startDate || '',
-      endDate: formData.endDate || '',
-      purpose: formData.purpose?.trim() || '',
+      ipAddress: formData.ipAddress?.trim() || "",
+      startDate: formData.startDate || "",
+      endDate: formData.endDate || "",
+      purpose: formData.purpose?.trim() || "",
     };
 
     const originalData = {
       accountId: fullEditingData.accountId?.trim(),
-      ipAddress: fullEditingData.ipAddress?.trim() || '',
-      startDate: fullEditingData.startDate ? fullEditingData.startDate.split('T')[0] : '',
-      endDate: fullEditingData.endDate ? fullEditingData.endDate.split('T')[0] : '',
-      purpose: fullEditingData.purpose?.trim() || '',
+      ipAddress: fullEditingData.ipAddress?.trim() || "",
+      startDate: fullEditingData.startDate
+        ? fullEditingData.startDate.split("T")[0]
+        : "",
+      endDate: fullEditingData.endDate
+        ? fullEditingData.endDate.split("T")[0]
+        : "",
+      purpose: fullEditingData.purpose?.trim() || "",
     };
 
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
@@ -191,17 +192,17 @@ const WhitelistPage: React.FC = () => {
   // Selection handlers
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      setSelectedIds(whitelists.map(w => w.id));
+      setSelectedIds(whitelists.map((w) => w.id));
     } else {
       setSelectedIds([]);
     }
   };
 
   const handleSelectOne = (id: number) => {
-    setSelectedIds(prev =>
+    setSelectedIds((prev) =>
       prev.includes(id)
-        ? prev.filter(selectedId => selectedId !== id)
-        : [...prev, id]
+        ? prev.filter((selectedId) => selectedId !== id)
+        : [...prev, id],
     );
   };
 
@@ -211,23 +212,34 @@ const WhitelistPage: React.FC = () => {
       setLoading(true);
       const filters: any = {};
       if (debouncedSearch) filters.search = debouncedSearch;
-      const result = await WhitelistService.getWhitelists(pageState.page, pageState.limit, filters);
+      const result = await WhitelistService.getWhitelists(
+        pageState.page,
+        pageState.limit,
+        filters,
+      );
 
-      console.log('Whitelist load result:', result);
+      console.log("Whitelist load result:", result);
 
       // 안전한 데이터 접근
-      if (result && typeof result === 'object' && Array.isArray(result.whitelists)) {
+      if (
+        result &&
+        typeof result === "object" &&
+        Array.isArray(result.whitelists)
+      ) {
         setWhitelists(result.whitelists);
         setTotal(result.total || 0);
       } else {
-        console.error('Invalid response structure:', result);
+        console.error("Invalid response structure:", result);
         setWhitelists([]);
         setTotal(0);
         // 오류 메시지를 사용자에게 표시하지 않음 (서버 응답 구조 문제일 수 있음)
       }
     } catch (error: any) {
-      console.error('Error loading whitelists:', error);
-      enqueueSnackbar(parseApiErrorMessage(error, 'whitelist.errors.loadFailed'), { variant: 'error' });
+      console.error("Error loading whitelists:", error);
+      enqueueSnackbar(
+        parseApiErrorMessage(error, "whitelist.errors.loadFailed"),
+        { variant: "error" },
+      );
       setWhitelists([]);
       setTotal(0);
     } finally {
@@ -241,12 +253,12 @@ const WhitelistPage: React.FC = () => {
 
   // Update tab when URL changes (browser back/forward)
   useEffect(() => {
-    const tabParam = searchParams.get('tab');
+    const tabParam = searchParams.get("tab");
     if (tabParam) {
       const tabIndex = tabNames.indexOf(tabParam);
       if (tabIndex >= 0 && tabIndex !== currentTab) {
         setCurrentTab(tabIndex);
-        localStorage.setItem('whitelist.lastTab', tabParam);
+        localStorage.setItem("whitelist.lastTab", tabParam);
       }
     }
   }, [searchParams, currentTab, tabNames]);
@@ -257,11 +269,11 @@ const WhitelistPage: React.FC = () => {
 
     // Update URL with new tab (single source of truth)
     const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.set('tab', name);
+    newSearchParams.set("tab", name);
     setSearchParams(newSearchParams, { replace: true });
 
     // Persist selection
-    localStorage.setItem('whitelist.lastTab', name);
+    localStorage.setItem("whitelist.lastTab", name);
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -270,20 +282,25 @@ const WhitelistPage: React.FC = () => {
   };
 
   const handleChangePage = (_event: unknown, newPage: number) => {
-    if (typeof newPage === 'number' && !isNaN(newPage)) {
+    if (typeof newPage === "number" && !isNaN(newPage)) {
       updatePage(newPage + 1); // MUI는 0부터 시작, 우리는 1부터 시작
     } else {
-      console.error('Invalid page number received:', newPage);
+      console.error("Invalid page number received:", newPage);
       updatePage(1); // Reset to first page
     }
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const newLimit = parseInt(event.target.value, 10);
     updateLimit(newLimit);
   };
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, whitelist: Whitelist) => {
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    whitelist: Whitelist,
+  ) => {
     setAnchorEl(event.currentTarget);
     setSelectedWhitelist(whitelist);
   };
@@ -302,15 +319,18 @@ const WhitelistPage: React.FC = () => {
       await WhitelistService.toggleWhitelistStatus(selectedWhitelist.id);
       enqueueSnackbar(
         selectedWhitelist.isEnabled
-          ? t('whitelist.statusDisabledSuccess')
-          : t('whitelist.statusEnabledSuccess'),
-        { variant: 'success' }
+          ? t("whitelist.statusDisabledSuccess")
+          : t("whitelist.statusEnabledSuccess"),
+        { variant: "success" },
       );
       handleMenuClose();
       loadWhitelists();
     } catch (error) {
-      console.error('Failed to toggle whitelist status:', error);
-      enqueueSnackbar(parseApiErrorMessage(error, 'whitelist.toggleStatusFailed'), { variant: 'error' });
+      console.error("Failed to toggle whitelist status:", error);
+      enqueueSnackbar(
+        parseApiErrorMessage(error, "whitelist.toggleStatusFailed"),
+        { variant: "error" },
+      );
     } finally {
       setLoading(false);
     }
@@ -320,18 +340,19 @@ const WhitelistPage: React.FC = () => {
   const handleCopyToClipboard = (text: string, type: string) => {
     copyToClipboardWithNotification(
       text,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+      () =>
+        enqueueSnackbar(t("common.copiedToClipboard"), { variant: "success" }),
+      () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
     );
   };
 
   const handleAdd = () => {
     setFormData({
-      accountId: '',
-      ipAddress: '',
-      startDate: '',
-      endDate: '',
-      purpose: '',
+      accountId: "",
+      ipAddress: "",
+      startDate: "",
+      endDate: "",
+      purpose: "",
     });
     setFormErrors({});
     setAddDialog(true);
@@ -346,10 +367,14 @@ const WhitelistPage: React.FC = () => {
     if (selectedWhitelist) {
       setFormData({
         accountId: selectedWhitelist.accountId,
-        ipAddress: selectedWhitelist.ipAddress || '',
-        startDate: selectedWhitelist.startDate ? selectedWhitelist.startDate.split('T')[0] : '',
-        endDate: selectedWhitelist.endDate ? selectedWhitelist.endDate.split('T')[0] : '',
-        purpose: selectedWhitelist.purpose || '',
+        ipAddress: selectedWhitelist.ipAddress || "",
+        startDate: selectedWhitelist.startDate
+          ? selectedWhitelist.startDate.split("T")[0]
+          : "",
+        endDate: selectedWhitelist.endDate
+          ? selectedWhitelist.endDate.split("T")[0]
+          : "",
+        purpose: selectedWhitelist.purpose || "",
       });
       setFullEditingData(JSON.parse(JSON.stringify(selectedWhitelist)));
       setFormErrors({});
@@ -367,17 +392,24 @@ const WhitelistPage: React.FC = () => {
     if (selectedWhitelist) {
       setConfirmDialog({
         open: true,
-        title: t('whitelist.dialog.deleteTitle'),
-        message: t('whitelist.dialog.deleteMessage', { name: selectedWhitelist.accountId }),
+        title: t("whitelist.dialog.deleteTitle"),
+        message: t("whitelist.dialog.deleteMessage", {
+          name: selectedWhitelist.accountId,
+        }),
         action: async () => {
           try {
             await WhitelistService.deleteWhitelist(selectedWhitelist.id);
-            enqueueSnackbar(t('whitelist.toast.deleted'), { variant: 'success' });
+            enqueueSnackbar(t("whitelist.toast.deleted"), {
+              variant: "success",
+            });
             loadWhitelists();
           } catch (error: any) {
-            enqueueSnackbar(parseApiErrorMessage(error, 'whitelist.errors.deleteFailed'), { variant: 'error' });
+            enqueueSnackbar(
+              parseApiErrorMessage(error, "whitelist.errors.deleteFailed"),
+              { variant: "error" },
+            );
           }
-          setConfirmDialog(prev => ({ ...prev, open: false }));
+          setConfirmDialog((prev) => ({ ...prev, open: false }));
         },
       });
     }
@@ -388,13 +420,17 @@ const WhitelistPage: React.FC = () => {
     const errors: Record<string, string> = {};
 
     // 계정 ID 유효성 검사
-    if (!formData.accountId || formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36) {
-      errors.accountId = t('whitelist.form.accountIdValidation');
+    if (
+      !formData.accountId ||
+      formData.accountId.trim().length < 4 ||
+      formData.accountId.trim().length > 36
+    ) {
+      errors.accountId = t("whitelist.form.accountIdValidation");
     }
 
     // 사용목적 필수 검사
     if (!formData.purpose || formData.purpose.trim().length === 0) {
-      errors.purpose = t('whitelist.form.purposeRequired');
+      errors.purpose = t("whitelist.form.purposeRequired");
     }
 
     setFormErrors(errors);
@@ -407,25 +443,24 @@ const WhitelistPage: React.FC = () => {
     }
 
     try {
-
-      console.log('handleSave - Debug info:', {
+      console.log("handleSave - Debug info:", {
         editDialog,
         selectedWhitelist,
         selectedWhitelistId: selectedWhitelist?.id,
-        formData
+        formData,
       });
 
       if (editDialog && selectedWhitelist) {
-        console.log('Executing UPDATE with ID:', selectedWhitelist.id);
+        console.log("Executing UPDATE with ID:", selectedWhitelist.id);
         await WhitelistService.updateWhitelist(selectedWhitelist.id, formData);
-        enqueueSnackbar(t('whitelist.toast.updated'), { variant: 'success' });
+        enqueueSnackbar(t("whitelist.toast.updated"), { variant: "success" });
         setEditDialog(false);
         setSelectedWhitelist(null);
         setFullEditingData(null);
       } else {
-        console.log('Executing CREATE');
+        console.log("Executing CREATE");
         await WhitelistService.createWhitelist(formData);
-        enqueueSnackbar(t('whitelist.toast.created'), { variant: 'success' });
+        enqueueSnackbar(t("whitelist.toast.created"), { variant: "success" });
         setAddDialog(false);
       }
 
@@ -434,41 +469,57 @@ const WhitelistPage: React.FC = () => {
         loadWhitelists();
       }, 100);
     } catch (error: any) {
-      console.error('Error saving whitelist:', error);
-      enqueueSnackbar(parseApiErrorMessage(error, 'whitelist.errors.saveFailed'), { variant: 'error' });
+      console.error("Error saving whitelist:", error);
+      enqueueSnackbar(
+        parseApiErrorMessage(error, "whitelist.errors.saveFailed"),
+        { variant: "error" },
+      );
     }
   };
 
   const handleBulkCreate = async () => {
     try {
-      const lines = bulkData.trim().split('\n').filter(line => line.trim());
-      const entries = lines.map(line => {
-        const parts = line.split('\t'); // Tab-separated values
-        return {
-          accountId: parts[0]?.trim() || '',
-          ipAddress: parts[1]?.trim() || undefined,
-          purpose: parts[2]?.trim() || undefined,
-        };
-      }).filter(entry => entry.accountId);
+      const lines = bulkData
+        .trim()
+        .split("\n")
+        .filter((line) => line.trim());
+      const entries = lines
+        .map((line) => {
+          const parts = line.split("\t"); // Tab-separated values
+          return {
+            accountId: parts[0]?.trim() || "",
+            ipAddress: parts[1]?.trim() || undefined,
+            purpose: parts[2]?.trim() || undefined,
+          };
+        })
+        .filter((entry) => entry.accountId);
 
       if (entries.length === 0) {
-        enqueueSnackbar(t('whitelist.errors.noValidEntries'), { variant: 'warning' });
+        enqueueSnackbar(t("whitelist.errors.noValidEntries"), {
+          variant: "warning",
+        });
         return;
       }
 
       const result = await WhitelistService.bulkCreateWhitelists(entries);
-      enqueueSnackbar(t('whitelist.toast.bulkCreated', { count: result.createdCount }), { variant: 'success' });
+      enqueueSnackbar(
+        t("whitelist.toast.bulkCreated", { count: result.createdCount }),
+        { variant: "success" },
+      );
       setBulkDialog(false);
-      setBulkData('');
+      setBulkData("");
       loadWhitelists();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'whitelist.errors.bulkCreateFailed'), { variant: 'error' });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, "whitelist.errors.bulkCreateFailed"),
+        { variant: "error" },
+      );
     }
   };
 
   // Use shared date-time formatter
   const formatDate = (dateString?: string) => {
-    if (!dateString) return '-';
+    if (!dateString) return "-";
     return formatDateTimeDetailed(dateString);
   };
 
@@ -478,44 +529,58 @@ const WhitelistPage: React.FC = () => {
       <Card>
         <CardContent>
           {/* Header */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <SecurityIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 3,
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <SecurityIcon sx={{ fontSize: 32, color: "primary.main" }} />
               <Box>
                 <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                  {t('whitelist.title')}
+                  {t("whitelist.title")}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {t('whitelist.subtitle')}
+                  {t("whitelist.subtitle")}
                 </Typography>
               </Box>
             </Box>
           </Box>
 
           <Tabs value={currentTab} onChange={handleTabChange} sx={{ mb: 3 }}>
-            <Tab label={t('whitelist.tabs.account')} />
-            <Tab label={t('whitelist.tabs.ip')} />
-            <Tab label={t('whitelist.tabs.playground')} />
+            <Tab label={t("whitelist.tabs.account")} />
+            <Tab label={t("whitelist.tabs.ip")} />
+            <Tab label={t("whitelist.tabs.playground")} />
           </Tabs>
 
           {/* Tab Content */}
-          <Box sx={{ display: currentTab === 0 ? 'block' : 'none' }}>
+          <Box sx={{ display: currentTab === 0 ? "block" : "none" }}>
             {/* Nickname Whitelist Header */}
             {canManage && (
-              <Box sx={{ display: 'flex', gap: 2, mb: 3, justifyContent: 'flex-end' }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 2,
+                  mb: 3,
+                  justifyContent: "flex-end",
+                }}
+              >
                 <Button
                   variant="outlined"
                   startIcon={<UploadIcon />}
                   onClick={() => setBulkDialog(true)}
                 >
-                  {t('whitelist.bulkImport')}
+                  {t("whitelist.bulkImport")}
                 </Button>
                 <Button
                   variant="contained"
                   startIcon={<AddIcon />}
                   onClick={handleAdd}
                 >
-                  {t('whitelist.addEntry')}
+                  {t("whitelist.addEntry")}
                 </Button>
               </Box>
             )}
@@ -523,11 +588,26 @@ const WhitelistPage: React.FC = () => {
             {/* Search & Filters */}
             <Card variant="outlined" sx={{ mb: 3 }}>
               <CardContent>
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                    }}
+                  >
                     <TextField
-                      placeholder={t('whitelist.searchPlaceholder')}
-                      value={pageState.filters?.search || ''}
+                      placeholder={t("whitelist.searchPlaceholder")}
+                      value={pageState.filters?.search || ""}
                       onChange={handleSearchChange}
                       size="small"
                       slotProps={{
@@ -548,17 +628,21 @@ const WhitelistPage: React.FC = () => {
 
             {/* Nickname Whitelist Table */}
             <Card variant="outlined">
-              <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+              <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
                 {loading ? (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-                    <Typography color="text.secondary">{t('common.loadingWhitelist')}</Typography>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", py: 6 }}
+                  >
+                    <Typography color="text.secondary">
+                      {t("common.loadingWhitelist")}
+                    </Typography>
                   </Box>
                 ) : whitelists.length === 0 ? (
                   <EmptyState
-                    message={t('whitelist.noEntries')}
-                    subtitle={canManage ? t('common.addFirstItem') : undefined}
+                    message={t("whitelist.noEntries")}
+                    subtitle={canManage ? t("common.addFirstItem") : undefined}
                     onAddClick={canManage ? handleAdd : undefined}
-                    addButtonLabel={t('whitelist.addEntry')}
+                    addButtonLabel={t("whitelist.addEntry")}
                   />
                 ) : (
                   <>
@@ -568,19 +652,33 @@ const WhitelistPage: React.FC = () => {
                           <TableRow>
                             <TableCell>
                               <Checkbox
-                                checked={selectedIds.length > 0 && selectedIds.length === whitelists.length}
-                                indeterminate={selectedIds.length > 0 && selectedIds.length < whitelists.length}
+                                checked={
+                                  selectedIds.length > 0 &&
+                                  selectedIds.length === whitelists.length
+                                }
+                                indeterminate={
+                                  selectedIds.length > 0 &&
+                                  selectedIds.length < whitelists.length
+                                }
                                 onChange={handleSelectAll}
                               />
                             </TableCell>
-                            <TableCell>{t('whitelist.form.accountId')}</TableCell>
-                            <TableCell>{t('whitelist.form.ipAddress')}</TableCell>
-                            <TableCell>{t('whitelist.allowedPeriod')}</TableCell>
-                            <TableCell>{t('whitelist.form.purpose')}</TableCell>
-                            <TableCell>{t('common.status')}</TableCell>
-                            <TableCell>{t('common.createdBy')}</TableCell>
-                            <TableCell>{t('common.createdAt')}</TableCell>
-                            <TableCell align="center">{t('common.actions')}</TableCell>
+                            <TableCell>
+                              {t("whitelist.form.accountId")}
+                            </TableCell>
+                            <TableCell>
+                              {t("whitelist.form.ipAddress")}
+                            </TableCell>
+                            <TableCell>
+                              {t("whitelist.allowedPeriod")}
+                            </TableCell>
+                            <TableCell>{t("whitelist.form.purpose")}</TableCell>
+                            <TableCell>{t("common.status")}</TableCell>
+                            <TableCell>{t("common.createdBy")}</TableCell>
+                            <TableCell>{t("common.createdAt")}</TableCell>
+                            <TableCell align="center">
+                              {t("common.actions")}
+                            </TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
@@ -597,14 +695,28 @@ const WhitelistPage: React.FC = () => {
                                 />
                               </TableCell>
                               <TableCell>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Typography variant="body2" fontWeight="medium">
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                  }}
+                                >
+                                  <Typography
+                                    variant="body2"
+                                    fontWeight="medium"
+                                  >
                                     {whitelist.accountId}
                                   </Typography>
-                                  <Tooltip title={t('whitelist.copyAccountId')}>
+                                  <Tooltip title={t("whitelist.copyAccountId")}>
                                     <IconButton
                                       size="small"
-                                      onClick={() => handleCopyToClipboard(whitelist.accountId, t('whitelist.form.accountId'))}
+                                      onClick={() =>
+                                        handleCopyToClipboard(
+                                          whitelist.accountId,
+                                          t("whitelist.form.accountId"),
+                                        )
+                                      }
                                       sx={{ p: 0.5 }}
                                     >
                                       <ContentCopyIcon fontSize="small" />
@@ -614,12 +726,28 @@ const WhitelistPage: React.FC = () => {
                               </TableCell>
                               <TableCell>
                                 {whitelist.ipAddress ? (
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Chip label={whitelist.ipAddress} size="small" />
-                                    <Tooltip title={t('whitelist.copyIpAddress')}>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 1,
+                                    }}
+                                  >
+                                    <Chip
+                                      label={whitelist.ipAddress}
+                                      size="small"
+                                    />
+                                    <Tooltip
+                                      title={t("whitelist.copyIpAddress")}
+                                    >
                                       <IconButton
                                         size="small"
-                                        onClick={() => handleCopyToClipboard(whitelist.ipAddress!, t('whitelist.form.ipAddress'))}
+                                        onClick={() =>
+                                          handleCopyToClipboard(
+                                            whitelist.ipAddress!,
+                                            t("whitelist.form.ipAddress"),
+                                          )
+                                        }
                                         sx={{ p: 0.5 }}
                                       >
                                         <ContentCopyIcon fontSize="small" />
@@ -627,8 +755,11 @@ const WhitelistPage: React.FC = () => {
                                     </Tooltip>
                                   </Box>
                                 ) : (
-                                  <Typography variant="body2" color="text.secondary">
-                                    {t('whitelist.anyIp')}
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
+                                    {t("whitelist.anyIp")}
                                   </Typography>
                                 )}
                               </TableCell>
@@ -636,34 +767,59 @@ const WhitelistPage: React.FC = () => {
                                 {whitelist.startDate || whitelist.endDate ? (
                                   <Box>
                                     <Typography variant="body2">
-                                      {formatDate(whitelist.startDate)} - {formatDate(whitelist.endDate)}
+                                      {formatDate(whitelist.startDate)} -{" "}
+                                      {formatDate(whitelist.endDate)}
                                     </Typography>
                                   </Box>
                                 ) : (
-                                  <Typography variant="body2" color="text.secondary">
-                                    {t('whitelist.permanent')}
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
+                                    {t("whitelist.permanent")}
                                   </Typography>
                                 )}
                               </TableCell>
                               <TableCell>
-                                <Typography variant="body2" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                  {whitelist.purpose || '-'}
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    maxWidth: 200,
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                  }}
+                                >
+                                  {whitelist.purpose || "-"}
                                 </Typography>
                               </TableCell>
                               <TableCell>
                                 <Chip
-                                  label={whitelist.isEnabled ? t('status.active') : t('status.inactive')}
-                                  color={whitelist.isEnabled ? 'success' : 'default'}
+                                  label={
+                                    whitelist.isEnabled
+                                      ? t("status.active")
+                                      : t("status.inactive")
+                                  }
+                                  color={
+                                    whitelist.isEnabled ? "success" : "default"
+                                  }
                                   size="small"
                                 />
                               </TableCell>
                               <TableCell>
                                 <Box>
-                                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                    {whitelist.createdByName || t('dashboard.unknown')}
+                                  <Typography
+                                    variant="body2"
+                                    sx={{ fontWeight: 500 }}
+                                  >
+                                    {whitelist.createdByName ||
+                                      t("dashboard.unknown")}
                                   </Typography>
                                   {whitelist.createdByEmail && (
-                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                      sx={{ display: "block" }}
+                                    >
                                       {whitelist.createdByEmail}
                                     </Typography>
                                   )}
@@ -711,12 +867,12 @@ const WhitelistPage: React.FC = () => {
                   {selectedWhitelist?.isEnabled ? (
                     <>
                       <BlockIcon sx={{ mr: 1 }} />
-                      {t('whitelist.disable')}
+                      {t("whitelist.disable")}
                     </>
                   ) : (
                     <>
                       <CheckCircleIcon sx={{ mr: 1 }} />
-                      {t('whitelist.enable')}
+                      {t("whitelist.enable")}
                     </>
                   )}
                 </MenuItem>
@@ -724,13 +880,13 @@ const WhitelistPage: React.FC = () => {
               {canManage && (
                 <MenuItem onClick={handleEdit}>
                   <EditIcon sx={{ mr: 1 }} />
-                  {t('common.edit')}
+                  {t("common.edit")}
                 </MenuItem>
               )}
               {canManage && (
-                <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
+                <MenuItem onClick={handleDelete} sx={{ color: "error.main" }}>
                   <DeleteIcon sx={{ mr: 1 }} />
-                  {t('common.delete')}
+                  {t("common.delete")}
                 </MenuItem>
               )}
             </Menu>
@@ -747,33 +903,40 @@ const WhitelistPage: React.FC = () => {
               }}
               sx={{
                 zIndex: 1301,
-                '& .MuiDrawer-paper': {
-                  width: { xs: '100%', sm: 500 },
-                  maxWidth: '100vw',
-                  display: 'flex',
-                  flexDirection: 'column'
-                }
+                "& .MuiDrawer-paper": {
+                  width: { xs: "100%", sm: 500 },
+                  maxWidth: "100vw",
+                  display: "flex",
+                  flexDirection: "column",
+                },
               }}
             >
               {/* Header */}
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                p: 2,
-                borderBottom: '1px solid',
-                borderColor: 'divider',
-                bgcolor: 'background.paper'
-              }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  p: 2,
+                  borderBottom: "1px solid",
+                  borderColor: "divider",
+                  bgcolor: "background.paper",
+                }}
+              >
                 <Box>
-                  <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-                    {editDialog ? t('whitelist.dialog.editTitle') : t('whitelist.dialog.addTitle')}
+                  <Typography
+                    variant="h6"
+                    component="h2"
+                    sx={{ fontWeight: 600 }}
+                  >
+                    {editDialog
+                      ? t("whitelist.dialog.editTitle")
+                      : t("whitelist.dialog.addTitle")}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {editDialog
-                      ? t('whitelist.dialog.editDescription')
-                      : t('whitelist.dialog.addDescription')
-                    }
+                      ? t("whitelist.dialog.editDescription")
+                      : t("whitelist.dialog.addDescription")}
                   </Typography>
                 </Box>
                 <IconButton
@@ -784,9 +947,9 @@ const WhitelistPage: React.FC = () => {
                   }}
                   size="small"
                   sx={{
-                    '&:hover': {
-                      backgroundColor: 'action.hover'
-                    }
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
                   }}
                 >
                   <CloseIcon />
@@ -794,109 +957,148 @@ const WhitelistPage: React.FC = () => {
               </Box>
 
               {/* Content */}
-              <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Box sx={{ flex: 1, overflow: "auto", p: 3 }}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   <Box>
                     <TextField
                       fullWidth
-                      label={t('whitelist.form.accountId')}
+                      label={t("whitelist.form.accountId")}
                       value={formData.accountId}
-                      onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, accountId: e.target.value })
+                      }
                       required
-                      placeholder={t('whitelist.form.accountIdPlaceholder')}
+                      placeholder={t("whitelist.form.accountIdPlaceholder")}
                       error={!!formErrors.accountId}
-                      helperText={formErrors.accountId || t('whitelist.form.accountIdHelp')}
+                      helperText={
+                        formErrors.accountId ||
+                        t("whitelist.form.accountIdHelp")
+                      }
                       inputRef={accountIdFieldRef}
                     />
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                      {t('whitelist.form.accountIdHelp')}
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ mt: 0.5, display: "block" }}
+                    >
+                      {t("whitelist.form.accountIdHelp")}
                     </Typography>
                   </Box>
                   <Box>
                     <TextField
                       fullWidth
-                      label={t('whitelist.form.ipAddressOpt')}
+                      label={t("whitelist.form.ipAddressOpt")}
                       value={formData.ipAddress}
-                      onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
-                      placeholder={t('whitelist.form.ipPlaceholder')}
+                      onChange={(e) =>
+                        setFormData({ ...formData, ipAddress: e.target.value })
+                      }
+                      placeholder={t("whitelist.form.ipPlaceholder")}
                     />
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                      {t('whitelist.form.ipHelp')}
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ mt: 0.5, display: "block" }}
+                    >
+                      {t("whitelist.form.ipHelp")}
                     </Typography>
                   </Box>
                   <Box>
                     <DatePicker
                       key={`start-date-${i18n.language}`}
-                      label={t('whitelist.form.startDateOpt')}
-                      value={formData.startDate ? dayjs(formData.startDate) : null}
+                      label={t("whitelist.form.startDateOpt")}
+                      value={
+                        formData.startDate ? dayjs(formData.startDate) : null
+                      }
                       onChange={(date) => {
                         setFormData({
                           ...formData,
-                          startDate: date && dayjs.isDayjs(date) ? date.format('YYYY-MM-DD') : ''
+                          startDate:
+                            date && dayjs.isDayjs(date)
+                              ? date.format("YYYY-MM-DD")
+                              : "",
                         });
                       }}
                       slotProps={{
                         textField: {
                           fullWidth: true,
-                          error: false
+                          error: false,
                         },
                         popper: {
                           style: {
-                            zIndex: 9999
-                          }
-                        }
+                            zIndex: 9999,
+                          },
+                        },
                       }}
                     />
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                      {t('whitelist.form.startDateHelp')}
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ mt: 0.5, display: "block" }}
+                    >
+                      {t("whitelist.form.startDateHelp")}
                     </Typography>
                   </Box>
                   <Box>
                     <DatePicker
                       key={`end-date-${i18n.language}`}
-                      label={t('whitelist.form.endDateOpt')}
+                      label={t("whitelist.form.endDateOpt")}
                       value={formData.endDate ? dayjs(formData.endDate) : null}
-                      onChange={(date) => setFormData({ ...formData, endDate: date ? date.format('YYYY-MM-DD') : '' })}
+                      onChange={(date) =>
+                        setFormData({
+                          ...formData,
+                          endDate: date ? date.format("YYYY-MM-DD") : "",
+                        })
+                      }
                       slotProps={{
                         textField: { fullWidth: true },
                         popper: {
                           style: {
-                            zIndex: 9999
-                          }
-                        }
+                            zIndex: 9999,
+                          },
+                        },
                       }}
                     />
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                      {t('whitelist.form.endDateHelp')}
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ mt: 0.5, display: "block" }}
+                    >
+                      {t("whitelist.form.endDateHelp")}
                     </Typography>
                   </Box>
                   <Box>
                     <TextField
                       fullWidth
-                      label={t('whitelist.form.purpose')}
+                      label={t("whitelist.form.purpose")}
                       value={formData.purpose}
-                      onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, purpose: e.target.value })
+                      }
                       multiline
                       rows={3}
-                      placeholder={t('whitelist.form.purposePlaceholder')}
+                      placeholder={t("whitelist.form.purposePlaceholder")}
                       required
                       error={!!formErrors.purpose}
-                      helperText={formErrors.purpose || t('whitelist.form.purposeHelp')}
+                      helperText={
+                        formErrors.purpose || t("whitelist.form.purposeHelp")
+                      }
                     />
                   </Box>
                 </Box>
               </Box>
 
               {/* Footer */}
-              <Box sx={{
-                p: 2,
-                borderTop: '1px solid',
-                borderColor: 'divider',
-                bgcolor: 'background.paper',
-                display: 'flex',
-                gap: 2,
-                justifyContent: 'flex-end'
-              }}>
+              <Box
+                sx={{
+                  p: 2,
+                  borderTop: "1px solid",
+                  borderColor: "divider",
+                  bgcolor: "background.paper",
+                  display: "flex",
+                  gap: 2,
+                  justifyContent: "flex-end",
+                }}
+              >
                 <Button
                   onClick={() => {
                     setSelectedWhitelist(null);
@@ -906,15 +1108,19 @@ const WhitelistPage: React.FC = () => {
                   startIcon={<CancelIcon />}
                   variant="outlined"
                 >
-                  {t('common.cancel')}
+                  {t("common.cancel")}
                 </Button>
                 <Button
                   onClick={handleSave}
                   variant="contained"
                   startIcon={<SaveIcon />}
-                  disabled={loading || (editDialog && !!selectedWhitelist && !isDirty)}
+                  disabled={
+                    loading || (editDialog && !!selectedWhitelist && !isDirty)
+                  }
                 >
-                  {(editDialog && selectedWhitelist) ? t('whitelist.dialog.update') : t('whitelist.dialog.add')}
+                  {editDialog && selectedWhitelist
+                    ? t("whitelist.dialog.update")
+                    : t("whitelist.dialog.add")}
                 </Button>
               </Box>
             </Drawer>
@@ -926,34 +1132,40 @@ const WhitelistPage: React.FC = () => {
               onClose={() => setBulkDialog(false)}
               sx={{
                 zIndex: 1301,
-                '& .MuiDrawer-paper': {
-                  width: { xs: '100%', sm: 600 },
-                  maxWidth: '100vw',
-                  display: 'flex',
-                  flexDirection: 'column'
-                }
+                "& .MuiDrawer-paper": {
+                  width: { xs: "100%", sm: 600 },
+                  maxWidth: "100vw",
+                  display: "flex",
+                  flexDirection: "column",
+                },
               }}
             >
               {/* Header */}
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                p: 2,
-                borderBottom: '1px solid',
-                borderColor: 'divider',
-                bgcolor: 'background.paper'
-              }}>
-                <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-                  {t('whitelist.dialog.bulkTitle')}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  p: 2,
+                  borderBottom: "1px solid",
+                  borderColor: "divider",
+                  bgcolor: "background.paper",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  component="h2"
+                  sx={{ fontWeight: 600 }}
+                >
+                  {t("whitelist.dialog.bulkTitle")}
                 </Typography>
                 <IconButton
                   onClick={() => setBulkDialog(false)}
                   size="small"
                   sx={{
-                    '&:hover': {
-                      backgroundColor: 'action.hover'
-                    }
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
                   }}
                 >
                   <CloseIcon />
@@ -961,13 +1173,21 @@ const WhitelistPage: React.FC = () => {
               </Box>
 
               {/* Content */}
-              <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+              <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
                 <Box sx={{ mb: 2 }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    {t('whitelist.dialog.bulkHint1')}
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 1 }}
+                  >
+                    {t("whitelist.dialog.bulkHint1")}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {t('whitelist.dialog.bulkHint2')}
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 2 }}
+                  >
+                    {t("whitelist.dialog.bulkHint2")}
                   </Typography>
                 </Box>
                 <TextField
@@ -976,32 +1196,31 @@ const WhitelistPage: React.FC = () => {
                   rows={10}
                   value={bulkData}
                   onChange={(e) => setBulkData(e.target.value)}
-                  placeholder={t('whitelist.dialog.bulkPlaceholder')}
+                  placeholder={t("whitelist.dialog.bulkPlaceholder")}
                 />
               </Box>
 
               {/* Footer */}
-              <Box sx={{
-                p: 2,
-                borderTop: '1px solid',
-                borderColor: 'divider',
-                bgcolor: 'background.paper',
-                display: 'flex',
-                gap: 2,
-                justifyContent: 'flex-end'
-              }}>
-                <Button
-                  onClick={() => setBulkDialog(false)}
-                  variant="outlined"
-                >
-                  {t('common.cancel')}
+              <Box
+                sx={{
+                  p: 2,
+                  borderTop: "1px solid",
+                  borderColor: "divider",
+                  bgcolor: "background.paper",
+                  display: "flex",
+                  gap: 2,
+                  justifyContent: "flex-end",
+                }}
+              >
+                <Button onClick={() => setBulkDialog(false)} variant="outlined">
+                  {t("common.cancel")}
                 </Button>
                 <Button
                   onClick={handleBulkCreate}
                   variant="contained"
                   startIcon={<UploadIcon />}
                 >
-                  {t('whitelist.dialog.import')}
+                  {t("whitelist.dialog.import")}
                 </Button>
               </Box>
             </Drawer>
@@ -1010,37 +1229,47 @@ const WhitelistPage: React.FC = () => {
             <Drawer
               anchor="right"
               open={confirmDialog.open}
-              onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
+              onClose={() =>
+                setConfirmDialog((prev) => ({ ...prev, open: false }))
+              }
               sx={{
                 zIndex: 1301,
-                '& .MuiDrawer-paper': {
-                  width: { xs: '100%', sm: 400 },
-                  maxWidth: '100vw',
-                  display: 'flex',
-                  flexDirection: 'column'
-                }
+                "& .MuiDrawer-paper": {
+                  width: { xs: "100%", sm: 400 },
+                  maxWidth: "100vw",
+                  display: "flex",
+                  flexDirection: "column",
+                },
               }}
             >
               {/* Header */}
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                p: 2,
-                borderBottom: '1px solid',
-                borderColor: 'divider',
-                bgcolor: 'background.paper'
-              }}>
-                <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  p: 2,
+                  borderBottom: "1px solid",
+                  borderColor: "divider",
+                  bgcolor: "background.paper",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  component="h2"
+                  sx={{ fontWeight: 600 }}
+                >
                   {confirmDialog.title}
                 </Typography>
                 <IconButton
-                  onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
+                  onClick={() =>
+                    setConfirmDialog((prev) => ({ ...prev, open: false }))
+                  }
                   size="small"
                   sx={{
-                    '&:hover': {
-                      backgroundColor: 'action.hover'
-                    }
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
                   }}
                 >
                   <CloseIcon />
@@ -1053,20 +1282,24 @@ const WhitelistPage: React.FC = () => {
               </Box>
 
               {/* Footer */}
-              <Box sx={{
-                p: 2,
-                borderTop: '1px solid',
-                borderColor: 'divider',
-                bgcolor: 'background.paper',
-                display: 'flex',
-                gap: 2,
-                justifyContent: 'flex-end'
-              }}>
+              <Box
+                sx={{
+                  p: 2,
+                  borderTop: "1px solid",
+                  borderColor: "divider",
+                  bgcolor: "background.paper",
+                  display: "flex",
+                  gap: 2,
+                  justifyContent: "flex-end",
+                }}
+              >
                 <Button
-                  onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
+                  onClick={() =>
+                    setConfirmDialog((prev) => ({ ...prev, open: false }))
+                  }
                   variant="outlined"
                 >
-                  {t('common.cancel')}
+                  {t("common.cancel")}
                 </Button>
                 <Button
                   onClick={confirmDialog.action}
@@ -1074,17 +1307,17 @@ const WhitelistPage: React.FC = () => {
                   variant="contained"
                   startIcon={<DeleteIcon />}
                 >
-                  {t('common.confirm')}
+                  {t("common.confirm")}
                 </Button>
               </Box>
             </Drawer>
           </Box>
 
-          <Box sx={{ display: currentTab === 1 ? 'block' : 'none' }}>
+          <Box sx={{ display: currentTab === 1 ? "block" : "none" }}>
             <IpWhitelistTab canManage={canManage} />
           </Box>
 
-          <Box sx={{ display: currentTab === 2 ? 'block' : 'none' }}>
+          <Box sx={{ display: currentTab === 2 ? "block" : "none" }}>
             <WhitelistOverview />
           </Box>
         </CardContent>

@@ -1,8 +1,14 @@
-import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
-import { useDebounce } from '../../hooks/useDebounce';
-import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { PERMISSIONS } from "@/types/permissions";
+import { useDebounce } from "../../hooks/useDebounce";
+import { useGlobalPageSize } from "../../hooks/useGlobalPageSize";
 import {
   Box,
   Card,
@@ -43,8 +49,8 @@ import {
   ListItemButton,
   ListItemText,
   ClickAwayListener,
-} from '@mui/material';
-import ResizableDrawer from '../../components/common/ResizableDrawer';
+} from "@mui/material";
+import ResizableDrawer from "../../components/common/ResizableDrawer";
 import {
   DndContext,
   closestCenter,
@@ -53,16 +59,16 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -78,23 +84,33 @@ import {
   ViewColumn as ViewColumnIcon,
   DragIndicator as DragIndicatorIcon,
   Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon
-} from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
-import { useSnackbar } from 'notistack';
-import { parseApiErrorMessage } from '../../utils/errorUtils';
-import { copyToClipboardWithNotification } from '@/utils/clipboard';
-import { formatRelativeTime } from '@/utils/dateFormat';
-import { messageTemplateService, MessageTemplate, MessageTemplateLocale, MessageTemplateType } from '@/services/messageTemplateService';
-import { tagService, Tag } from '@/services/tagService';
-import translationService from '@/services/translationService';
-import { getLanguageDisplayName } from '@/contexts/I18nContext';
-import SimplePagination from '@/components/common/SimplePagination';
-import FormDialogHeader from '@/components/common/FormDialogHeader';
-import EmptyState from '@/components/common/EmptyState';
-import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/MultiLanguageMessageInput';
-import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
-import { api } from '@/services/api';
+  VisibilityOff as VisibilityOffIcon,
+} from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
+import { useSnackbar } from "notistack";
+import { parseApiErrorMessage } from "../../utils/errorUtils";
+import { copyToClipboardWithNotification } from "@/utils/clipboard";
+import { formatRelativeTime } from "@/utils/dateFormat";
+import {
+  messageTemplateService,
+  MessageTemplate,
+  MessageTemplateLocale,
+  MessageTemplateType,
+} from "@/services/messageTemplateService";
+import { tagService, Tag } from "@/services/tagService";
+import translationService from "@/services/translationService";
+import { getLanguageDisplayName } from "@/contexts/I18nContext";
+import SimplePagination from "@/components/common/SimplePagination";
+import FormDialogHeader from "@/components/common/FormDialogHeader";
+import EmptyState from "@/components/common/EmptyState";
+import MultiLanguageMessageInput, {
+  MessageLocale,
+} from "@/components/common/MultiLanguageMessageInput";
+import DynamicFilterBar, {
+  FilterDefinition,
+  ActiveFilter,
+} from "@/components/common/DynamicFilterBar";
+import { api } from "@/services/api";
 
 // Column definition interface
 interface ColumnConfig {
@@ -110,7 +126,10 @@ interface SortableColumnItemProps {
   onToggleVisibility: (id: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
+  column,
+  onToggleVisibility,
+}) => {
   const { t } = useTranslation();
   const {
     attributes,
@@ -133,8 +152,17 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
       style={style}
       disablePadding
       secondaryAction={
-        <Box {...attributes} {...listeners} sx={{ cursor: 'grab', display: 'flex', alignItems: 'center', '&:active': { cursor: 'grabbing' } }}>
-          <DragIndicatorIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
+        <Box
+          {...attributes}
+          {...listeners}
+          sx={{
+            cursor: "grab",
+            display: "flex",
+            alignItems: "center",
+            "&:active": { cursor: "grabbing" },
+          }}
+        >
+          <DragIndicatorIcon sx={{ color: "text.disabled", fontSize: 20 }} />
         </Box>
       }
     >
@@ -154,7 +182,7 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
         />
         <ListItemText
           primary={t(column.labelKey)}
-          slotProps={{ primary: { variant: 'body2' } }}
+          slotProps={{ primary: { variant: "body2" } }}
         />
       </ListItemButton>
     </ListItem>
@@ -173,12 +201,16 @@ const MessageTemplatesPage: React.FC = () => {
   const loadStartTimeRef = useRef<number>(0);
   // Copy helper with type/label for proper i18n interpolation
   // includeValue=false -> use short toast without the copied value
-  const copyWithToast = (value: string, _typeLabel?: string, _includeValue: boolean = true) => {
+  const copyWithToast = (
+    value: string,
+    _typeLabel?: string,
+    _includeValue: boolean = true,
+  ) => {
     const onSuccess = () => {
-      enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+      enqueueSnackbar(t("common.copiedToClipboard"), { variant: "success" });
     };
     const onError = () => {
-      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
+      enqueueSnackbar(t("common.copyFailed"), { variant: "error" });
     };
     copyToClipboardWithNotification(value, onSuccess, onError);
   };
@@ -190,7 +222,7 @@ const MessageTemplatesPage: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
 
   // 필터
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   // 디바운싱된 검색어 (500ms 지연)
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
@@ -198,7 +230,7 @@ const MessageTemplatesPage: React.FC = () => {
   // 동적 필터 상태 (localStorage에서 복원)
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(() => {
     try {
-      const saved = localStorage.getItem('messageTemplatesPage.activeFilters');
+      const saved = localStorage.getItem("messageTemplatesPage.activeFilters");
       return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
@@ -208,31 +240,37 @@ const MessageTemplatesPage: React.FC = () => {
 
   // 동적 필터에서 값 추출 (useMemo로 참조 안정화)
   const isEnabledFilter = useMemo(() => {
-    const filter = activeFilters.find(f => f.key === 'isEnabled');
+    const filter = activeFilters.find((f) => f.key === "isEnabled");
     return filter?.value as boolean | boolean[] | undefined;
   }, [activeFilters]);
 
   const isEnabledOperator = useMemo(() => {
-    const filter = activeFilters.find(f => f.key === 'isEnabled');
+    const filter = activeFilters.find((f) => f.key === "isEnabled");
     return filter?.operator;
   }, [activeFilters]);
 
-  const tagIds = useMemo(() =>
-    activeFilters.find(f => f.key === 'tags')?.value as number[] || [],
-    [activeFilters]
+  const tagIds = useMemo(
+    () =>
+      (activeFilters.find((f) => f.key === "tags")?.value as number[]) || [],
+    [activeFilters],
   );
 
   const tagOperator = useMemo(() => {
-    const filter = activeFilters.find(f => f.key === 'tags');
+    const filter = activeFilters.find((f) => f.key === "tags");
     return filter?.operator;
   }, [activeFilters]);
 
   // 필터를 문자열로 변환하여 의존성 배열에 사용
-  const isEnabledFilterString = useMemo(() =>
-    Array.isArray(isEnabledFilter) ? isEnabledFilter.join(',') : (isEnabledFilter !== undefined ? String(isEnabledFilter) : ''),
-    [isEnabledFilter]
+  const isEnabledFilterString = useMemo(
+    () =>
+      Array.isArray(isEnabledFilter)
+        ? isEnabledFilter.join(",")
+        : isEnabledFilter !== undefined
+          ? String(isEnabledFilter)
+          : "",
+    [isEnabledFilter],
   );
-  const tagIdsString = useMemo(() => tagIds.join(','), [tagIds]);
+  const tagIdsString = useMemo(() => tagIds.join(","), [tagIds]);
 
   // 선택 관련
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -241,17 +279,26 @@ const MessageTemplatesPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<MessageTemplate | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deletingTemplate, setDeletingTemplate] = useState<MessageTemplate | null>(null);
+  const [deletingTemplate, setDeletingTemplate] =
+    useState<MessageTemplate | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
   // 태그 관련 상태
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
-  const [selectedTemplateForTags, setSelectedTemplateForTags] = useState<MessageTemplate | null>(null);
+  const [selectedTemplateForTags, setSelectedTemplateForTags] =
+    useState<MessageTemplate | null>(null);
   const [templateTags, setTemplateTags] = useState<Tag[]>([]);
 
-  const [fullEditingData, setFullEditingData] = useState<MessageTemplate | null>(null);
-  const [form, setForm] = useState<MessageTemplate>({ name: '', type: 'maintenance', isEnabled: true, defaultMessage: '', locales: [] });
+  const [fullEditingData, setFullEditingData] =
+    useState<MessageTemplate | null>(null);
+  const [form, setForm] = useState<MessageTemplate>({
+    name: "",
+    type: "maintenance",
+    isEnabled: true,
+    defaultMessage: "",
+    locales: [],
+  });
 
   const isDirty = useMemo(() => {
     if (!editing) return true;
@@ -262,9 +309,11 @@ const MessageTemplatesPage: React.FC = () => {
       type: form.type,
       isEnabled: !!form.isEnabled,
       supportsMultiLanguage: !!form.supportsMultiLanguage,
-      defaultMessage: form.defaultMessage?.trim() || '',
-      locales: (form.locales || []).map(l => ({ lang: l.lang, message: (l.message || '').trim() })).sort((a, b) => a.lang.localeCompare(b.lang)),
-      tags: (form.tags || []).map(t => t.id).sort((a, b) => a - b),
+      defaultMessage: form.defaultMessage?.trim() || "",
+      locales: (form.locales || [])
+        .map((l) => ({ lang: l.lang, message: (l.message || "").trim() }))
+        .sort((a, b) => a.lang.localeCompare(b.lang)),
+      tags: (form.tags || []).map((t) => t.id).sort((a, b) => a - b),
     };
 
     const originalData = {
@@ -272,9 +321,11 @@ const MessageTemplatesPage: React.FC = () => {
       type: fullEditingData.type,
       isEnabled: !!fullEditingData.isEnabled,
       supportsMultiLanguage: !!fullEditingData.supportsMultiLanguage,
-      defaultMessage: (fullEditingData.defaultMessage || '').trim(),
-      locales: (fullEditingData.locales || []).map(l => ({ lang: l.lang, message: (l.message || '').trim() })).sort((a, b) => a.lang.localeCompare(b.lang)),
-      tags: (fullEditingData.tags || []).map(t => t.id).sort((a, b) => a - b),
+      defaultMessage: (fullEditingData.defaultMessage || "").trim(),
+      locales: (fullEditingData.locales || [])
+        .map((l) => ({ lang: l.lang, message: (l.message || "").trim() }))
+        .sort((a, b) => a.lang.localeCompare(b.lang)),
+      tags: (fullEditingData.tags || []).map((t) => t.id).sort((a, b) => a - b),
     };
 
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
@@ -282,25 +333,29 @@ const MessageTemplatesPage: React.FC = () => {
 
   // Column configuration
   const defaultColumns: ColumnConfig[] = [
-    { id: 'name', labelKey: 'messageTemplates.name', visible: true },
-    { id: 'type', labelKey: 'messageTemplates.type', visible: true },
-    { id: 'defaultMessage', labelKey: 'messageTemplates.defaultMessage', visible: true },
-    { id: 'isEnabled', labelKey: 'messageTemplates.isEnabled', visible: true },
-    { id: 'tags', labelKey: 'common.tags', visible: true },
-    { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
+    { id: "name", labelKey: "messageTemplates.name", visible: true },
+    { id: "type", labelKey: "messageTemplates.type", visible: true },
+    {
+      id: "defaultMessage",
+      labelKey: "messageTemplates.defaultMessage",
+      visible: true,
+    },
+    { id: "isEnabled", labelKey: "messageTemplates.isEnabled", visible: true },
+    { id: "tags", labelKey: "common.tags", visible: true },
+    { id: "createdAt", labelKey: "common.createdAt", visible: true },
   ];
 
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
-    const saved = localStorage.getItem('messageTemplatesColumns');
+    const saved = localStorage.getItem("messageTemplatesColumns");
     if (saved) {
       try {
         const savedColumns = JSON.parse(saved);
         const mergedColumns = savedColumns.map((savedCol: ColumnConfig) => {
-          const defaultCol = defaultColumns.find(c => c.id === savedCol.id);
+          const defaultCol = defaultColumns.find((c) => c.id === savedCol.id);
           return defaultCol ? { ...defaultCol, ...savedCol } : savedCol;
         });
         const savedIds = new Set(savedColumns.map((c: ColumnConfig) => c.id));
-        const newColumns = defaultColumns.filter(c => !savedIds.has(c.id));
+        const newColumns = defaultColumns.filter((c) => !savedIds.has(c.id));
         return [...mergedColumns, ...newColumns];
       } catch (e) {
         return defaultColumns;
@@ -309,11 +364,14 @@ const MessageTemplatesPage: React.FC = () => {
     return defaultColumns;
   });
 
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<HTMLButtonElement | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
 
   // 폼 필드 ref들
@@ -327,7 +385,7 @@ const MessageTemplatesPage: React.FC = () => {
       const params: any = {
         q: debouncedSearchQuery || undefined,
         limit: rowsPerPage,
-        offset
+        offset,
       };
 
       if (isEnabledFilter !== undefined) {
@@ -335,7 +393,7 @@ const MessageTemplatesPage: React.FC = () => {
         if (isEnabledOperator) params.isEnabled_operator = isEnabledOperator;
       }
       if (tagIds.length > 0) {
-        params.tags = tagIds.map(id => id.toString());
+        params.tags = tagIds.map((id) => id.toString());
         if (tagOperator) params.tags_operator = tagOperator;
       }
 
@@ -344,14 +402,27 @@ const MessageTemplatesPage: React.FC = () => {
       setItems(result.templates);
       setTotal(result.total);
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'messageTemplates.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, "messageTemplates.loadFailed"),
+        { variant: "error" },
+      );
       setItems([]);
       setTotal(0);
     } finally {
       setLoading(false);
       setIsInitialLoad(false);
     }
-  }, [page, rowsPerPage, isEnabledFilterString, isEnabledOperator, tagIdsString, tagOperator, debouncedSearchQuery, enqueueSnackbar, t]);
+  }, [
+    page,
+    rowsPerPage,
+    isEnabledFilterString,
+    isEnabledOperator,
+    tagIdsString,
+    tagOperator,
+    debouncedSearchQuery,
+    enqueueSnackbar,
+    t,
+  ]);
 
   // 태그 로딩
   const loadTags = useCallback(async () => {
@@ -369,32 +440,35 @@ const MessageTemplatesPage: React.FC = () => {
   }, [load, loadTags]);
 
   // 동적 필터 정의
-  const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
-    {
-      key: 'isEnabled',
-      label: t('common.status'),
-      type: 'multiselect',
-      operator: 'any_of', // Status can be any of the selected values
-      allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
-      options: [
-        { value: true, label: t('common.enabled') },
-        { value: false, label: t('common.disabled') },
-      ],
-    },
-    {
-      key: 'tags',
-      label: t('common.tags'),
-      type: 'tags',
-      operator: 'include_all', // Tags are filtered with AND logic in backend
-      allowOperatorToggle: true, // Tags support both 'any_of' and 'include_all'
-      options: allTags.map(tag => ({
-        value: tag.id,
-        label: tag.name,
-        color: tag.color,
-        description: tag.description,
-      })),
-    },
-  ], [t, allTags]);
+  const availableFilterDefinitions: FilterDefinition[] = useMemo(
+    () => [
+      {
+        key: "isEnabled",
+        label: t("common.status"),
+        type: "multiselect",
+        operator: "any_of", // Status can be any of the selected values
+        allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
+        options: [
+          { value: true, label: t("common.enabled") },
+          { value: false, label: t("common.disabled") },
+        ],
+      },
+      {
+        key: "tags",
+        label: t("common.tags"),
+        type: "tags",
+        operator: "include_all", // Tags are filtered with AND logic in backend
+        allowOperatorToggle: true, // Tags support both 'any_of' and 'include_all'
+        options: allTags.map((tag) => ({
+          value: tag.id,
+          label: tag.name,
+          color: tag.color,
+          description: tag.description,
+        })),
+      },
+    ],
+    [t, allTags],
+  );
 
   // 동적 필터 핸들러
   const handleFilterAdd = (filter: ActiveFilter) => {
@@ -403,21 +477,24 @@ const MessageTemplatesPage: React.FC = () => {
   };
 
   const handleFilterRemove = (filterKey: string) => {
-    setActiveFilters(activeFilters.filter(f => f.key !== filterKey));
+    setActiveFilters(activeFilters.filter((f) => f.key !== filterKey));
     setPage(0);
   };
 
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
-    setActiveFilters(activeFilters.map(f =>
-      f.key === filterKey ? { ...f, value } : f
-    ));
+    setActiveFilters(
+      activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f)),
+    );
     setPage(0);
   };
 
-  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
-    setActiveFilters(activeFilters.map(f =>
-      f.key === filterKey ? { ...f, operator } : f
-    ));
+  const handleOperatorChange = (
+    filterKey: string,
+    operator: "any_of" | "include_all",
+  ) => {
+    setActiveFilters(
+      activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f)),
+    );
   };
 
   // 페이지 변경 핸들러
@@ -426,35 +503,48 @@ const MessageTemplatesPage: React.FC = () => {
   }, []);
 
   // 페이지 크기 변경 핸들러
-  const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const newRowsPerPage = parseInt(event.target.value, 10);
-    setRowsPerPage(newRowsPerPage);
-    setPage(0);
-  }, []);
+  const handleRowsPerPageChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newRowsPerPage = parseInt(event.target.value, 10);
+      setRowsPerPage(newRowsPerPage);
+      setPage(0);
+    },
+    [],
+  );
 
   // 선택 관련 핸들러
-  const handleSelectAll = useCallback((checked: boolean) => {
-    setSelectAll(checked);
-    if (checked) {
-      setSelectedIds(items.filter(item => item.id).map(item => item.id!));
-    } else {
-      setSelectedIds([]);
-    }
-  }, [items]);
+  const handleSelectAll = useCallback(
+    (checked: boolean) => {
+      setSelectAll(checked);
+      if (checked) {
+        setSelectedIds(items.filter((item) => item.id).map((item) => item.id!));
+      } else {
+        setSelectedIds([]);
+      }
+    },
+    [items],
+  );
 
-  const handleSelectItem = useCallback((id: number, checked: boolean) => {
-    setSelectedIds(prev => {
-      const newIds = checked
-        ? [...prev, id]
-        : prev.filter(selectedId => selectedId !== id);
+  const handleSelectItem = useCallback(
+    (id: number, checked: boolean) => {
+      setSelectedIds((prev) => {
+        const newIds = checked
+          ? [...prev, id]
+          : prev.filter((selectedId) => selectedId !== id);
 
-      // 전체 선택 상태 업데이트
-      const availableIds = items.filter(item => item.id).map(item => item.id!);
-      setSelectAll(newIds.length === availableIds.length && availableIds.length > 0);
+        // 전체 선택 상태 업데이트
+        const availableIds = items
+          .filter((item) => item.id)
+          .map((item) => item.id!);
+        setSelectAll(
+          newIds.length === availableIds.length && availableIds.length > 0,
+        );
 
-      return newIds;
-    });
-  }, [items]);
+        return newIds;
+      });
+    },
+    [items],
+  );
 
   // 일괄 삭제
   const handleBulkDelete = useCallback(() => {
@@ -465,44 +555,61 @@ const MessageTemplatesPage: React.FC = () => {
   const confirmBulkDelete = useCallback(async () => {
     try {
       await messageTemplateService.bulkDelete(selectedIds);
-      enqueueSnackbar(t('messageTemplates.bulkDeleteSuccess', { count: selectedIds.length }), { variant: 'success' });
+      enqueueSnackbar(
+        t("messageTemplates.bulkDeleteSuccess", { count: selectedIds.length }),
+        { variant: "success" },
+      );
       setSelectedIds([]);
       setSelectAll(false);
       setBulkDeleteDialogOpen(false);
       load();
     } catch (error: any) {
-      console.error('Error bulk deleting templates:', error);
-      enqueueSnackbar(parseApiErrorMessage(error, 'messageTemplates.bulkDeleteFailed'), { variant: 'error' });
+      console.error("Error bulk deleting templates:", error);
+      enqueueSnackbar(
+        parseApiErrorMessage(error, "messageTemplates.bulkDeleteFailed"),
+        { variant: "error" },
+      );
     }
   }, [selectedIds, t, enqueueSnackbar, load]);
 
   // 일괄 사용 가능/불가 변경
-  const handleBulkToggleAvailability = useCallback(async (isEnabled: boolean) => {
-    if (selectedIds.length === 0) return;
+  const handleBulkToggleAvailability = useCallback(
+    async (isEnabled: boolean) => {
+      if (selectedIds.length === 0) return;
 
-    try {
-      await Promise.all(selectedIds.map(async (id) => {
-        const template = items.find(item => item.id === id);
-        if (template) {
-          await messageTemplateService.update(id, { ...template, isEnabled });
-        }
-      }));
+      try {
+        await Promise.all(
+          selectedIds.map(async (id) => {
+            const template = items.find((item) => item.id === id);
+            if (template) {
+              await messageTemplateService.update(id, {
+                ...template,
+                isEnabled,
+              });
+            }
+          }),
+        );
 
-      enqueueSnackbar(
-        t('messageTemplates.bulkUpdateSuccess', {
-          count: selectedIds.length,
-          status: isEnabled ? t('common.available') : t('common.unavailable')
-        }),
-        { variant: 'success' }
-      );
-      setSelectedIds([]);
-      setSelectAll(false);
-      load();
-    } catch (error: any) {
-      console.error('Error bulk updating templates:', error);
-      enqueueSnackbar(parseApiErrorMessage(error, 'messageTemplates.bulkUpdateFailed'), { variant: 'error' });
-    }
-  }, [selectedIds, items, t, enqueueSnackbar, load]);
+        enqueueSnackbar(
+          t("messageTemplates.bulkUpdateSuccess", {
+            count: selectedIds.length,
+            status: isEnabled ? t("common.available") : t("common.unavailable"),
+          }),
+          { variant: "success" },
+        );
+        setSelectedIds([]);
+        setSelectAll(false);
+        load();
+      } catch (error: any) {
+        console.error("Error bulk updating templates:", error);
+        enqueueSnackbar(
+          parseApiErrorMessage(error, "messageTemplates.bulkUpdateFailed"),
+          { variant: "error" },
+        );
+      }
+    },
+    [selectedIds, items, t, enqueueSnackbar, load],
+  );
 
   // 개별 삭제
   const openDeleteDialog = useCallback((template: MessageTemplate) => {
@@ -515,20 +622,30 @@ const MessageTemplatesPage: React.FC = () => {
 
     try {
       await messageTemplateService.delete(deletingTemplate.id);
-      enqueueSnackbar(t('common.deleteSuccess'), { variant: 'success' });
+      enqueueSnackbar(t("common.deleteSuccess"), { variant: "success" });
       setDeleteDialogOpen(false);
       setDeletingTemplate(null);
       load();
     } catch (error: any) {
-      console.error('Error deleting template:', error);
-      enqueueSnackbar(parseApiErrorMessage(error, 'common.deleteFailed'), { variant: 'error' });
+      console.error("Error deleting template:", error);
+      enqueueSnackbar(parseApiErrorMessage(error, "common.deleteFailed"), {
+        variant: "error",
+      });
     }
   }, [deletingTemplate, t, enqueueSnackbar, load]);
 
   const handleAdd = () => {
     setEditing(null);
     setFullEditingData(null);
-    setForm({ name: '', type: 'maintenance', isEnabled: true, supportsMultiLanguage: false, defaultMessage: '', locales: [], tags: [] });
+    setForm({
+      name: "",
+      type: "maintenance",
+      isEnabled: true,
+      supportsMultiLanguage: false,
+      defaultMessage: "",
+      locales: [],
+      tags: [],
+    });
     setDialogOpen(true);
   };
 
@@ -541,52 +658,59 @@ const MessageTemplatesPage: React.FC = () => {
       type: row.type,
       isEnabled: Boolean((row as any).isEnabled),
       supportsMultiLanguage: Boolean((row as any).supportsMultiLanguage),
-      defaultMessage: (row as any).defaultMessage || '',
+      defaultMessage: (row as any).defaultMessage || "",
       locales: row.locales || [],
-      tags: row.tags || []
+      tags: row.tags || [],
     });
     setDialogOpen(true);
   };
 
   // 태그 관련 핸들러
-  const handleOpenTagDialog = useCallback(async (template: MessageTemplate) => {
-    try {
-      setSelectedTemplateForTags(template);
-      const tags = await messageTemplateService.getTags(template.id!);
-      setTemplateTags(tags);
-      setTagDialogOpen(true);
-    } catch (error) {
-      console.error('Error loading template tags:', error);
-      enqueueSnackbar(t('common.error'), { variant: 'error' });
-    }
-  }, [t, enqueueSnackbar]);
+  const handleOpenTagDialog = useCallback(
+    async (template: MessageTemplate) => {
+      try {
+        setSelectedTemplateForTags(template);
+        const tags = await messageTemplateService.getTags(template.id!);
+        setTemplateTags(tags);
+        setTagDialogOpen(true);
+      } catch (error) {
+        console.error("Error loading template tags:", error);
+        enqueueSnackbar(t("common.error"), { variant: "error" });
+      }
+    },
+    [t, enqueueSnackbar],
+  );
 
-  const handleSaveTags = useCallback(async (tagIds: number[]) => {
-    if (!selectedTemplateForTags?.id) return;
+  const handleSaveTags = useCallback(
+    async (tagIds: number[]) => {
+      if (!selectedTemplateForTags?.id) return;
 
-    try {
-      await messageTemplateService.setTags(selectedTemplateForTags.id, tagIds);
-      setTagDialogOpen(false);
-      enqueueSnackbar(t('common.success'), { variant: 'success' });
-      // 필요시 목록 새로고침
-      load();
-    } catch (error) {
-      console.error('Error saving template tags:', error);
-      enqueueSnackbar(t('common.error'), { variant: 'error' });
-    }
-  }, [selectedTemplateForTags, t, enqueueSnackbar, load]);
-
-
+      try {
+        await messageTemplateService.setTags(
+          selectedTemplateForTags.id,
+          tagIds,
+        );
+        setTagDialogOpen(false);
+        enqueueSnackbar(t("common.success"), { variant: "success" });
+        // 필요시 목록 새로고침
+        load();
+      } catch (error) {
+        console.error("Error saving template tags:", error);
+        enqueueSnackbar(t("common.error"), { variant: "error" });
+      }
+    },
+    [selectedTemplateForTags, t, enqueueSnackbar, load],
+  );
 
   const handleSave = async () => {
     if (!form.name.trim()) {
-      enqueueSnackbar(t('common.nameRequired'), { variant: 'error' });
+      enqueueSnackbar(t("common.nameRequired"), { variant: "error" });
       nameFieldRef.current?.focus();
       return;
     }
 
     if (!form.defaultMessage?.trim()) {
-      enqueueSnackbar(t('common.defaultMessageRequired'), { variant: 'error' });
+      enqueueSnackbar(t("common.defaultMessageRequired"), { variant: "error" });
       defaultMessageFieldRef.current?.focus();
       return;
     }
@@ -607,20 +731,26 @@ const MessageTemplatesPage: React.FC = () => {
       if (editing?.id) {
         await messageTemplateService.update(editing.id, payload);
         templateId = editing.id;
-        enqueueSnackbar(t('common.updateSuccess'), { variant: 'success' });
+        enqueueSnackbar(t("common.updateSuccess"), { variant: "success" });
       } else {
         const created = await messageTemplateService.create(payload);
-        templateId = created?.id || (created as any)?.data?.id || (created as any)?.insertId;
+        templateId =
+          created?.id ||
+          (created as any)?.data?.id ||
+          (created as any)?.insertId;
 
         if (!templateId) {
-          throw new Error(t('common.cannotGetTemplateId'));
+          throw new Error(t("common.cannotGetTemplateId"));
         }
-        enqueueSnackbar(t('common.createSuccess'), { variant: 'success' });
+        enqueueSnackbar(t("common.createSuccess"), { variant: "success" });
       }
 
       // 태그 설정
       if (form.tags && form.tags.length > 0) {
-        await messageTemplateService.setTags(templateId, form.tags.map(tag => tag.id));
+        await messageTemplateService.setTags(
+          templateId,
+          form.tags.map((tag) => tag.id),
+        );
       } else {
         // 태그가 없으면 기존 태그 모두 제거
         await messageTemplateService.setTags(templateId, []);
@@ -635,11 +765,16 @@ const MessageTemplatesPage: React.FC = () => {
       const status = error?.response?.status || error?.status;
       const errorData = error?.response?.data?.error || error?.error;
 
-      if (status === 409 && errorData?.code === 'DUPLICATE_NAME') {
+      if (status === 409 && errorData?.code === "DUPLICATE_NAME") {
         const templateName = errorData?.value || form.name;
-        enqueueSnackbar(t('common.duplicateNameErrorWithValue', { name: templateName }), { variant: 'error' });
+        enqueueSnackbar(
+          t("common.duplicateNameErrorWithValue", { name: templateName }),
+          { variant: "error" },
+        );
       } else {
-        enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), { variant: 'error' });
+        enqueueSnackbar(parseApiErrorMessage(error, "common.saveFailed"), {
+          variant: "error",
+        });
       }
     } finally {
       setSaving(false);
@@ -648,16 +783,19 @@ const MessageTemplatesPage: React.FC = () => {
 
   // Column handlers
   const handleToggleColumnVisibility = (columnId: string) => {
-    const newColumns = columns.map(col =>
-      col.id === columnId ? { ...col, visible: !col.visible } : col
+    const newColumns = columns.map((col) =>
+      col.id === columnId ? { ...col, visible: !col.visible } : col,
     );
     setColumns(newColumns);
-    localStorage.setItem('messageTemplatesColumns', JSON.stringify(newColumns));
+    localStorage.setItem("messageTemplatesColumns", JSON.stringify(newColumns));
   };
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem('messageTemplatesColumns', JSON.stringify(defaultColumns));
+    localStorage.setItem(
+      "messageTemplatesColumns",
+      JSON.stringify(defaultColumns),
+    );
   };
 
   const handleColumnDragEnd = (event: DragEndEvent) => {
@@ -667,60 +805,106 @@ const MessageTemplatesPage: React.FC = () => {
       const newIndex = columns.findIndex((col) => col.id === over.id);
       const newColumns = arrayMove(columns, oldIndex, newIndex);
       setColumns(newColumns);
-      localStorage.setItem('messageTemplatesColumns', JSON.stringify(newColumns));
+      localStorage.setItem(
+        "messageTemplatesColumns",
+        JSON.stringify(newColumns),
+      );
     }
   };
 
   const renderCellContent = (template: MessageTemplate, columnId: string) => {
     switch (columnId) {
-      case 'name':
+      case "name":
         return (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Typography
               variant="body2"
               sx={{
                 fontWeight: 500,
-                cursor: 'pointer',
-                '&:hover': {
-                  color: 'primary.main',
-                  textDecoration: 'underline'
-                }
+                cursor: "pointer",
+                "&:hover": {
+                  color: "primary.main",
+                  textDecoration: "underline",
+                },
               }}
               onClick={() => handleEdit(template)}
             >
               {template.name}
             </Typography>
-            <Tooltip title={t('common.copy')}>
-              <IconButton size="small" onClick={() => copyWithToast(template.name, t('messageTemplates.name'), false)}>
+            <Tooltip title={t("common.copy")}>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  copyWithToast(
+                    template.name,
+                    t("messageTemplates.name"),
+                    false,
+                  )
+                }
+              >
                 <ContentCopyIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>
         );
-      case 'type':
-        return <Chip label={t(`messageTemplates.types.${template.type}`)} size="small" color="primary" variant="outlined" />;
-      case 'defaultMessage':
+      case "type":
         return (
-          <Typography variant="body2" sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {template.defaultMessage || '-'}
+          <Chip
+            label={t(`messageTemplates.types.${template.type}`)}
+            size="small"
+            color="primary"
+            variant="outlined"
+          />
+        );
+      case "defaultMessage":
+        return (
+          <Typography
+            variant="body2"
+            sx={{
+              maxWidth: 300,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {template.defaultMessage || "-"}
           </Typography>
         );
-      case 'isEnabled':
-        return <Chip label={template.isEnabled ? t('common.enabled') : t('common.disabled')} size="small" color={template.isEnabled ? 'success' : 'default'} />;
-      case 'tags':
+      case "isEnabled":
         return (
-          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+          <Chip
+            label={
+              template.isEnabled ? t("common.enabled") : t("common.disabled")
+            }
+            size="small"
+            color={template.isEnabled ? "success" : "default"}
+          />
+        );
+      case "tags":
+        return (
+          <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
             {template.tags && template.tags.length > 0 ? (
               template.tags.map((tag) => (
-                <Chip key={tag.id} label={tag.name} size="small" sx={{ bgcolor: tag.color, color: '#fff' }} />
+                <Chip
+                  key={tag.id}
+                  label={tag.name}
+                  size="small"
+                  sx={{ bgcolor: tag.color, color: "#fff" }}
+                />
               ))
             ) : (
-              <Typography variant="body2" color="text.secondary">-</Typography>
+              <Typography variant="body2" color="text.secondary">
+                -
+              </Typography>
             )}
           </Box>
         );
-      case 'createdAt':
-        return <Typography variant="body2">{formatRelativeTime(template.createdAt)}</Typography>;
+      case "createdAt":
+        return (
+          <Typography variant="body2">
+            {formatRelativeTime(template.createdAt)}
+          </Typography>
+        );
       default:
         return null;
     }
@@ -730,66 +914,91 @@ const MessageTemplatesPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <TextFieldsIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <TextFieldsIcon sx={{ fontSize: 32, color: "primary.main" }} />
             <Box>
               <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                {t('messageTemplates.title')}
+                {t("messageTemplates.title")}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {t('messageTemplates.subtitle')}
+                {t("messageTemplates.subtitle")}
               </Typography>
             </Box>
           </Box>
           {canManage && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-              {t('messageTemplates.addTemplate')}
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAdd}
+            >
+              {t("messageTemplates.addTemplate")}
             </Button>
           )}
         </Box>
-
       </Box>
 
       {/* 필터 */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              alignItems: "center",
+              flexWrap: "wrap",
+              justifyContent: "space-between",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                alignItems: "center",
+                flexWrap: "wrap",
+                flex: 1,
+              }}
+            >
               {/* 검색 컨트롤을 맨 앞으로 이동하고 개선 */}
               <TextField
-                placeholder={t('messageTemplates.searchPlaceholderDetailed')}
+                placeholder={t("messageTemplates.searchPlaceholderDetailed")}
                 size="small"
                 sx={{
                   minWidth: 200,
                   flexGrow: 1,
                   maxWidth: 320,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
-                    '& fieldset': {
-                      borderColor: 'divider',
+                  "& .MuiOutlinedInput-root": {
+                    height: "40px",
+                    borderRadius: "20px",
+                    bgcolor: "background.paper",
+                    transition: "all 0.2s ease-in-out",
+                    "& fieldset": {
+                      borderColor: "divider",
                     },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': {
-                        borderColor: 'primary.light',
-                      }
+                    "&:hover": {
+                      bgcolor: "action.hover",
+                      "& fieldset": {
+                        borderColor: "primary.light",
+                      },
                     },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      }
-                    }
+                    "&.Mui-focused": {
+                      bgcolor: "background.paper",
+                      boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.1)",
+                      "& fieldset": {
+                        borderColor: "primary.main",
+                        borderWidth: "1px",
+                      },
+                    },
                   },
-                  '& .MuiInputBase-input': {
-                    fontSize: '0.875rem',
-                  }
+                  "& .MuiInputBase-input": {
+                    fontSize: "0.875rem",
+                  },
                 }}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -797,7 +1006,9 @@ const MessageTemplatesPage: React.FC = () => {
                   input: {
                     startAdornment: (
                       <InputAdornment position="start">
-                        <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                        <SearchIcon
+                          sx={{ color: "text.secondary", fontSize: 20 }}
+                        />
                       </InputAdornment>
                     ),
                   },
@@ -805,7 +1016,14 @@ const MessageTemplatesPage: React.FC = () => {
               />
 
               {/* Dynamic Filter Bar */}
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 1,
+                  alignItems: "center",
+                }}
+              >
                 <DynamicFilterBar
                   availableFilters={availableFilterDefinitions}
                   activeFilters={activeFilters}
@@ -816,14 +1034,14 @@ const MessageTemplatesPage: React.FC = () => {
                 />
 
                 {/* Column Settings Button */}
-                <Tooltip title={t('users.columnSettings')}>
+                <Tooltip title={t("users.columnSettings")}>
                   <IconButton
                     onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                     sx={{
-                      bgcolor: 'background.paper',
+                      bgcolor: "background.paper",
                       border: 1,
-                      borderColor: 'divider',
-                      '&:hover': { bgcolor: 'action.hover' },
+                      borderColor: "divider",
+                      "&:hover": { bgcolor: "action.hover" },
                     }}
                   >
                     <ViewColumnIcon />
@@ -837,37 +1055,58 @@ const MessageTemplatesPage: React.FC = () => {
 
       {/* 일괄 작업 툴바 */}
       {selectedIds.length > 0 && (
-        <Card sx={{ mb: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(110, 168, 255, 0.08)' : 'rgba(25, 118, 210, 0.04)' }}>
+        <Card
+          sx={{
+            mb: 2,
+            bgcolor: (theme) =>
+              theme.palette.mode === "dark"
+                ? "rgba(110, 168, 255, 0.08)"
+                : "rgba(25, 118, 210, 0.04)",
+          }}
+        >
           <CardContent sx={{ py: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'space-between' }}>
-              <Typography variant="body2" color="primary" sx={{ fontWeight: 500 }}>
-                {t('messageTemplates.selectedCount', { count: selectedIds.length })}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography
+                variant="body2"
+                color="primary"
+                sx={{ fontWeight: 500 }}
+              >
+                {t("messageTemplates.selectedCount", {
+                  count: selectedIds.length,
+                })}
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1 }}>
+              <Box sx={{ display: "flex", gap: 1 }}>
                 <Button
                   size="small"
                   variant="outlined"
                   onClick={() => handleBulkToggleAvailability(true)}
-                  sx={{ minWidth: 'auto' }}
+                  sx={{ minWidth: "auto" }}
                 >
-                  {t('messageTemplates.makeAvailable')}
+                  {t("messageTemplates.makeAvailable")}
                 </Button>
                 <Button
                   size="small"
                   variant="outlined"
                   onClick={() => handleBulkToggleAvailability(false)}
-                  sx={{ minWidth: 'auto' }}
+                  sx={{ minWidth: "auto" }}
                 >
-                  {t('messageTemplates.makeUnavailable')}
+                  {t("messageTemplates.makeUnavailable")}
                 </Button>
                 <Button
                   size="small"
                   variant="outlined"
                   color="error"
                   onClick={handleBulkDelete}
-                  sx={{ minWidth: 'auto' }}
+                  sx={{ minWidth: "auto" }}
                 >
-                  {t('common.delete')}
+                  {t("common.delete")}
                 </Button>
               </Box>
             </Box>
@@ -875,69 +1114,99 @@ const MessageTemplatesPage: React.FC = () => {
         </Card>
       )}
 
-      <Card sx={{ position: 'relative' }}>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+      <Card sx={{ position: "relative" }}>
+        <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
           {isInitialLoad && loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+              <Typography color="text.secondary">
+                {t("common.loadingData")}
+              </Typography>
             </Box>
           ) : items.length === 0 ? (
             <EmptyState
-              message={t('messageTemplates.noTemplatesFound')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
+              message={t("messageTemplates.noTemplatesFound")}
+              subtitle={canManage ? t("common.addFirstItem") : undefined}
               onAddClick={canManage ? handleAdd : undefined}
-              addButtonLabel={t('messageTemplates.addTemplate')}
+              addButtonLabel={t("messageTemplates.addTemplate")}
             />
           ) : (
             <>
               <TableContainer
                 sx={{
                   opacity: !isInitialLoad && loading ? 0.5 : 1,
-                  transition: 'opacity 0.15s ease-in-out',
-                  pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
+                  transition: "opacity 0.15s ease-in-out",
+                  pointerEvents: !isInitialLoad && loading ? "none" : "auto",
                 }}
               >
-                <Table sx={{ tableLayout: 'auto' }}>
+                <Table sx={{ tableLayout: "auto" }}>
                   <TableHead>
                     <TableRow>
                       {canManage && (
                         <TableCell padding="checkbox">
                           <Checkbox
                             checked={selectAll}
-                            indeterminate={selectedIds.length > 0 && selectedIds.length < items.filter(item => item.id).length}
+                            indeterminate={
+                              selectedIds.length > 0 &&
+                              selectedIds.length <
+                                items.filter((item) => item.id).length
+                            }
                             onChange={(e) => handleSelectAll(e.target.checked)}
                           />
                         </TableCell>
                       )}
-                      {columns.filter(col => col.visible).map((column) => (
-                        <TableCell key={column.id} width={column.width}>
-                          {t(column.labelKey)}
+                      {columns
+                        .filter((col) => col.visible)
+                        .map((column) => (
+                          <TableCell key={column.id} width={column.width}>
+                            {t(column.labelKey)}
+                          </TableCell>
+                        ))}
+                      {canManage && (
+                        <TableCell
+                          align="right"
+                          sx={{ width: 100, minWidth: 100 }}
+                        >
+                          {t("common.actions")}
                         </TableCell>
-                      ))}
-                      {canManage && <TableCell align="right" sx={{ width: 100, minWidth: 100 }}>{t('common.actions')}</TableCell>}
+                      )}
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {items.map(row => (
+                    {items.map((row) => (
                       <TableRow key={row.id} hover>
                         {canManage && (
                           <TableCell padding="checkbox">
                             <Checkbox
                               checked={selectedIds.includes(row.id!)}
-                              onChange={(e) => handleSelectItem(row.id!, e.target.checked)}
+                              onChange={(e) =>
+                                handleSelectItem(row.id!, e.target.checked)
+                              }
                               disabled={!row.id}
                             />
                           </TableCell>
                         )}
-                        {columns.filter(col => col.visible).map((column) => (
-                          <TableCell key={column.id}>
-                            {renderCellContent(row, column.id)}
-                          </TableCell>
-                        ))}
+                        {columns
+                          .filter((col) => col.visible)
+                          .map((column) => (
+                            <TableCell key={column.id}>
+                              {renderCellContent(row, column.id)}
+                            </TableCell>
+                          ))}
                         {canManage && (
                           <TableCell align="right">
-                            <IconButton size="small" onClick={() => handleEdit(row)}><EditIcon fontSize="small" /></IconButton>
-                            <IconButton size="small" color="error" onClick={() => openDeleteDialog(row)}><DeleteIcon fontSize="small" /></IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleEdit(row)}
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => openDeleteDialog(row)}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
                           </TableCell>
                         )}
                       </TableRow>
@@ -960,8 +1229,16 @@ const MessageTemplatesPage: React.FC = () => {
       <ResizableDrawer
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        title={editing ? t('messageTemplates.editTitle') : t('messageTemplates.addTitle')}
-        subtitle={editing ? t('messageTemplates.editDescription') : t('messageTemplates.addDescription')}
+        title={
+          editing
+            ? t("messageTemplates.editTitle")
+            : t("messageTemplates.addTitle")
+        }
+        subtitle={
+          editing
+            ? t("messageTemplates.editDescription")
+            : t("messageTemplates.addDescription")
+        }
         storageKey="messageTemplateFormDrawerWidth"
         defaultWidth={600}
         minWidth={500}
@@ -974,80 +1251,119 @@ const MessageTemplatesPage: React.FC = () => {
         }}
       >
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+        <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
-              label={t('common.name')}
+              label={t("common.name")}
               value={form.name}
-              onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, name: e.target.value }))
+              }
               fullWidth
               required
               inputRef={nameFieldRef}
             />
             <FormControlLabel
-              control={<Switch checked={form.isEnabled} onChange={(e) => setForm(prev => ({ ...prev, isEnabled: e.target.checked }))} />}
-              label={t('messageTemplates.availability')}
+              control={
+                <Switch
+                  checked={form.isEnabled}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      isEnabled: e.target.checked,
+                    }))
+                  }
+                />
+              }
+              label={t("messageTemplates.availability")}
             />
             {/* 다국어 메시지 입력 컴포넌트 */}
             <MultiLanguageMessageInput
-              defaultMessage={form.defaultMessage || ''}
-              onDefaultMessageChange={(message) => setForm(prev => ({ ...prev, defaultMessage: message }))}
-              defaultMessageLabel={t('messageTemplates.defaultMessage')}
-              defaultMessageHelperText={t('messageTemplates.defaultMessageHelp')}
+              defaultMessage={form.defaultMessage || ""}
+              onDefaultMessageChange={(message) =>
+                setForm((prev) => ({ ...prev, defaultMessage: message }))
+              }
+              defaultMessageLabel={t("messageTemplates.defaultMessage")}
+              defaultMessageHelperText={t(
+                "messageTemplates.defaultMessageHelp",
+              )}
               defaultMessageRequired={true}
               defaultMessageError={false}
-
               supportsMultiLanguage={form.supportsMultiLanguage || false}
-              onSupportsMultiLanguageChange={(supports) => setForm(prev => ({ ...prev, supportsMultiLanguage: supports }))}
-              supportsMultiLanguageLabel={t('messageTemplates.supportsMultiLanguage')}
-              supportsMultiLanguageHelperText={t('messageTemplates.supportsMultiLanguageHelp')}
-
-              locales={(form.locales || []).map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
+              onSupportsMultiLanguageChange={(supports) =>
+                setForm((prev) => ({
+                  ...prev,
+                  supportsMultiLanguage: supports,
+                }))
+              }
+              supportsMultiLanguageLabel={t(
+                "messageTemplates.supportsMultiLanguage",
+              )}
+              supportsMultiLanguageHelperText={t(
+                "messageTemplates.supportsMultiLanguageHelp",
+              )}
+              locales={(form.locales || []).map((l) => ({
+                lang: l.lang as "ko" | "en" | "zh",
+                message: l.message,
+              }))}
               onLocalesChange={(locales) => {
-                setForm(prev => ({ ...prev, locales: locales.map(l => ({ lang: l.lang, message: l.message })) }));
+                setForm((prev) => ({
+                  ...prev,
+                  locales: locales.map((l) => ({
+                    lang: l.lang,
+                    message: l.message,
+                  })),
+                }));
                 // 번역 결과가 있으면 자동으로 다국어 지원 활성화
-                const hasNonEmptyLocales = locales.some(l => l.message && l.message.trim() !== '');
+                const hasNonEmptyLocales = locales.some(
+                  (l) => l.message && l.message.trim() !== "",
+                );
                 if (hasNonEmptyLocales && !form.supportsMultiLanguage) {
-                  setForm(prev => ({ ...prev, supportsMultiLanguage: true }));
+                  setForm((prev) => ({ ...prev, supportsMultiLanguage: true }));
                 }
               }}
-              languageSpecificMessagesLabel={t('messageTemplates.languageSpecificMessages')}
-
+              languageSpecificMessagesLabel={t(
+                "messageTemplates.languageSpecificMessages",
+              )}
               enableTranslation={true}
-              translateButtonLabel={t('common.autoTranslate')}
-              translateTooltip={t('maintenance.translateTooltip')}
+              translateButtonLabel={t("common.autoTranslate")}
+              translateTooltip={t("maintenance.translateTooltip")}
             />
 
             {/* 태그 선택 */}
             <TextField
               select
               multiple
-              label={t('common.tags')}
-              value={form.tags?.map(tag => tag.id) || []}
+              label={t("common.tags")}
+              value={form.tags?.map((tag) => tag.id) || []}
               onChange={(e) => {
-                const selectedIds = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
-                const selectedTags = allTags.filter(tag => selectedIds.includes(String(tag.id)));
-                setForm(prev => ({ ...prev, tags: selectedTags }));
+                const selectedIds = Array.isArray(e.target.value)
+                  ? e.target.value
+                  : [e.target.value];
+                const selectedTags = allTags.filter((tag) =>
+                  selectedIds.includes(String(tag.id)),
+                );
+                setForm((prev) => ({ ...prev, tags: selectedTags }));
               }}
               SelectProps={{
                 multiple: true,
                 MenuProps: {
                   PaperProps: {
                     style: {
-                      zIndex: 99999
-                    }
-                  }
+                      zIndex: 99999,
+                    },
+                  },
                 },
                 renderValue: (selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                     {(selected as number[]).map((id) => {
-                      const tag = allTags.find(t => t.id === id);
+                      const tag = allTags.find((t) => t.id === id);
                       return tag ? (
                         <Chip
                           key={id}
                           label={tag.name}
                           size="small"
-                          sx={{ bgcolor: tag.color, color: '#fff' }}
+                          sx={{ bgcolor: tag.color, color: "#fff" }}
                         />
                       ) : null;
                     })}
@@ -1061,9 +1377,9 @@ const MessageTemplatesPage: React.FC = () => {
                   <Chip
                     label={tag.name}
                     size="small"
-                    sx={{ bgcolor: tag.color, color: '#fff', mr: 1 }}
+                    sx={{ bgcolor: tag.color, color: "#fff", mr: 1 }}
                   />
-                  {tag.description || '설명 없음'}
+                  {tag.description || "설명 없음"}
                 </MenuItem>
               ))}
             </TextField>
@@ -1071,22 +1387,24 @@ const MessageTemplatesPage: React.FC = () => {
         </Box>
 
         {/* Footer */}
-        <Box sx={{
-          p: 2,
-          borderTop: '1px solid',
-          borderColor: 'divider',
-          bgcolor: 'background.paper',
-          display: 'flex',
-          gap: 2,
-          justifyContent: 'flex-end'
-        }}>
+        <Box
+          sx={{
+            p: 2,
+            borderTop: "1px solid",
+            borderColor: "divider",
+            bgcolor: "background.paper",
+            display: "flex",
+            gap: 2,
+            justifyContent: "flex-end",
+          }}
+        >
           <Button
             onClick={() => setDialogOpen(false)}
             disabled={saving}
             startIcon={<CancelIcon />}
             variant="outlined"
           >
-            {t('common.cancel')}
+            {t("common.cancel")}
           </Button>
           <Button
             variant="contained"
@@ -1094,7 +1412,7 @@ const MessageTemplatesPage: React.FC = () => {
             disabled={saving || (!!editing && !isDirty)}
             startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
           >
-            {saving ? t('common.saving') : t('common.save')}
+            {saving ? t("common.saving") : t("common.save")}
           </Button>
         </Box>
       </ResizableDrawer>
@@ -1103,7 +1421,7 @@ const MessageTemplatesPage: React.FC = () => {
       <ResizableDrawer
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
-        title={t('common.confirmDelete')}
+        title={t("common.confirmDelete")}
         subtitle=""
         storageKey="messageTemplateDeleteDrawerWidth"
         defaultWidth={400}
@@ -1113,25 +1431,26 @@ const MessageTemplatesPage: React.FC = () => {
         {/* Content */}
         <Box sx={{ flex: 1, p: 2 }}>
           <Typography>
-            {t('messageTemplates.confirmDelete', { name: deletingTemplate?.name })}
+            {t("messageTemplates.confirmDelete", {
+              name: deletingTemplate?.name,
+            })}
           </Typography>
         </Box>
 
         {/* Footer */}
-        <Box sx={{
-          p: 2,
-          borderTop: '1px solid',
-          borderColor: 'divider',
-          bgcolor: 'background.paper',
-          display: 'flex',
-          gap: 2,
-          justifyContent: 'flex-end'
-        }}>
-          <Button
-            onClick={() => setDeleteDialogOpen(false)}
-            variant="outlined"
-          >
-            {t('common.cancel')}
+        <Box
+          sx={{
+            p: 2,
+            borderTop: "1px solid",
+            borderColor: "divider",
+            bgcolor: "background.paper",
+            display: "flex",
+            gap: 2,
+            justifyContent: "flex-end",
+          }}
+        >
+          <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={confirmDelete}
@@ -1139,7 +1458,7 @@ const MessageTemplatesPage: React.FC = () => {
             variant="contained"
             startIcon={<DeleteIcon />}
           >
-            {t('common.delete')}
+            {t("common.delete")}
           </Button>
         </Box>
       </ResizableDrawer>
@@ -1148,7 +1467,7 @@ const MessageTemplatesPage: React.FC = () => {
       <ResizableDrawer
         open={bulkDeleteDialogOpen}
         onClose={() => setBulkDeleteDialogOpen(false)}
-        title={t('common.confirmDelete')}
+        title={t("common.confirmDelete")}
         subtitle=""
         storageKey="messageTemplateBulkDeleteDrawerWidth"
         defaultWidth={400}
@@ -1158,25 +1477,29 @@ const MessageTemplatesPage: React.FC = () => {
         {/* Content */}
         <Box sx={{ flex: 1, p: 2 }}>
           <Typography>
-            {t('messageTemplates.confirmBulkDelete', { count: selectedIds.length })}
+            {t("messageTemplates.confirmBulkDelete", {
+              count: selectedIds.length,
+            })}
           </Typography>
         </Box>
 
         {/* Footer */}
-        <Box sx={{
-          p: 2,
-          borderTop: '1px solid',
-          borderColor: 'divider',
-          bgcolor: 'background.paper',
-          display: 'flex',
-          gap: 2,
-          justifyContent: 'flex-end'
-        }}>
+        <Box
+          sx={{
+            p: 2,
+            borderTop: "1px solid",
+            borderColor: "divider",
+            bgcolor: "background.paper",
+            display: "flex",
+            gap: 2,
+            justifyContent: "flex-end",
+          }}
+        >
           <Button
             onClick={() => setBulkDeleteDialogOpen(false)}
             variant="outlined"
           >
-            {t('common.cancel')}
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={confirmBulkDelete}
@@ -1184,26 +1507,35 @@ const MessageTemplatesPage: React.FC = () => {
             variant="contained"
             startIcon={<DeleteIcon />}
           >
-            {t('common.delete')}
+            {t("common.delete")}
           </Button>
         </Box>
       </ResizableDrawer>
 
       {/* 태그 관리 다이얼로그 */}
-      <Dialog open={tagDialogOpen} onClose={() => setTagDialogOpen(false)} maxWidth="md" fullWidth>
+      <Dialog
+        open={tagDialogOpen}
+        onClose={() => setTagDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
-          {t('common.tags')} - {selectedTemplateForTags?.name}
+          {t("common.tags")} - {selectedTemplateForTags?.name}
         </DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 2 }}>
             <TextField
               select
               multiple
-              label={t('common.selectTags')}
-              value={templateTags.map(tag => tag.id)}
+              label={t("common.selectTags")}
+              value={templateTags.map((tag) => tag.id)}
               onChange={(e) => {
-                const selectedIds = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
-                const selectedTags = allTags.filter(tag => selectedIds.includes(String(tag.id)));
+                const selectedIds = Array.isArray(e.target.value)
+                  ? e.target.value
+                  : [e.target.value];
+                const selectedTags = allTags.filter((tag) =>
+                  selectedIds.includes(String(tag.id)),
+                );
                 setTemplateTags(selectedTags);
               }}
               SelectProps={{
@@ -1211,20 +1543,20 @@ const MessageTemplatesPage: React.FC = () => {
                 MenuProps: {
                   PaperProps: {
                     style: {
-                      zIndex: 99999
-                    }
-                  }
+                      zIndex: 99999,
+                    },
+                  },
                 },
                 renderValue: (selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                     {(selected as number[]).map((id) => {
-                      const tag = allTags.find(t => t.id === id);
+                      const tag = allTags.find((t) => t.id === id);
                       return tag ? (
                         <Chip
                           key={id}
                           label={tag.name}
                           size="small"
-                          sx={{ bgcolor: tag.color, color: '#fff' }}
+                          sx={{ bgcolor: tag.color, color: "#fff" }}
                         />
                       ) : null;
                     })}
@@ -1238,9 +1570,9 @@ const MessageTemplatesPage: React.FC = () => {
                   <Chip
                     label={tag.name}
                     size="small"
-                    sx={{ bgcolor: tag.color, color: '#fff', mr: 1 }}
+                    sx={{ bgcolor: tag.color, color: "#fff", mr: 1 }}
                   />
-                  {tag.description || t('tags.noDescription')}
+                  {tag.description || t("tags.noDescription")}
                 </MenuItem>
               ))}
             </TextField>
@@ -1248,13 +1580,13 @@ const MessageTemplatesPage: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setTagDialogOpen(false)}>
-            {t('common.cancel')}
+            {t("common.cancel")}
           </Button>
           <Button
-            onClick={() => handleSaveTags(templateTags.map(tag => tag.id))}
+            onClick={() => handleSaveTags(templateTags.map((tag) => tag.id))}
             variant="contained"
           >
-            {t('common.save')}
+            {t("common.save")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1264,19 +1596,26 @@ const MessageTemplatesPage: React.FC = () => {
         open={Boolean(columnSettingsAnchor)}
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
         hideBackdrop
         disableScrollLock
       >
         <ClickAwayListener onClickAway={() => setColumnSettingsAnchor(null)}>
           <Box sx={{ p: 2, minWidth: 280, maxWidth: 320 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 1,
+              }}
+            >
               <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                {t('users.columnSettings')}
+                {t("users.columnSettings")}
               </Typography>
               <Button size="small" onClick={handleResetColumns} color="warning">
-                {t('common.reset')}
+                {t("common.reset")}
               </Button>
             </Box>
             <DndContext
@@ -1286,7 +1625,7 @@ const MessageTemplatesPage: React.FC = () => {
               modifiers={[restrictToVerticalAxis]}
             >
               <SortableContext
-                items={columns.map(col => col.id)}
+                items={columns.map((col) => col.id)}
                 strategy={verticalListSortingStrategy}
               >
                 <List dense disablePadding>

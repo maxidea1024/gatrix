@@ -1,22 +1,22 @@
 /**
  * Chat Server Test
- * 
+ *
  * Simulates a chat server
  */
 
-import { BaseTestServer, BaseServerConfig } from './base-server';
+import { BaseTestServer, BaseServerConfig } from "./base-server";
 
 class ChatServer extends BaseTestServer {
   private channels: Map<string, any> = new Map();
   private messageCount = 0;
 
   protected async onStart(): Promise<void> {
-    this.log('Chat server specific initialization');
-    
+    this.log("Chat server specific initialization");
+
     // Create default channels
-    this.createChannel('global', 'Global Chat');
-    this.createChannel('trade', 'Trade Chat');
-    this.createChannel('guild', 'Guild Chat');
+    this.createChannel("global", "Global Chat");
+    this.createChannel("trade", "Trade Chat");
+    this.createChannel("guild", "Guild Chat");
 
     // Simulate chat activity
     setInterval(() => {
@@ -24,13 +24,15 @@ class ChatServer extends BaseTestServer {
     }, 10000);
 
     // Listen to custom events
-    this.sdk.on('chat.broadcast', (data) => {
+    this.sdk.on("chat.broadcast", (data) => {
       this.log(`[CUSTOM EVENT] Broadcast message: ${JSON.stringify(data)}`);
     });
   }
 
   protected async onStop(): Promise<void> {
-    this.log(`Shutting down with ${this.channels.size} channels and ${this.messageCount} total messages`);
+    this.log(
+      `Shutting down with ${this.channels.size} channels and ${this.messageCount} total messages`,
+    );
     this.channels.clear();
   }
 
@@ -58,34 +60,40 @@ class ChatServer extends BaseTestServer {
         timestamp: new Date(),
       });
 
-      this.log(`Message in ${channel.name}: Total ${this.messageCount} messages`);
+      this.log(
+        `Message in ${channel.name}: Total ${this.messageCount} messages`,
+      );
 
       // Update service stats (only if service discovery is enabled)
       if (this.config.enableServiceDiscovery) {
-        this.sdk.updateServiceStatus({
-          status: 'ready',
-          stats: {
-            totalMessages: this.messageCount,
-            activeChannels: this.channels.size,
-          },
-        }).catch(err => this.logError('Failed to update service status', err));
+        this.sdk
+          .updateServiceStatus({
+            status: "ready",
+            stats: {
+              totalMessages: this.messageCount,
+              activeChannels: this.channels.size,
+            },
+          })
+          .catch((err) =>
+            this.logError("Failed to update service status", err),
+          );
       }
     }
   }
 }
 
 // Parse command line arguments
-const instanceId = process.argv[2] || '1';
-const port = parseInt(process.argv[3] || '8003');
-const group = process.argv[4] || 'production';
-const enableDiscovery = process.argv[5] === 'true' || false;
+const instanceId = process.argv[2] || "1";
+const port = parseInt(process.argv[3] || "8003");
+const group = process.argv[4] || "production";
+const enableDiscovery = process.argv[5] === "true" || false;
 
 const config: BaseServerConfig = {
-  serviceType: 'chatd',
+  serviceType: "chatd",
   serviceGroup: group,
   customLabels: {
-    env: process.env.NODE_ENV || 'development',
-    region: 'ap-northeast-2',
+    env: process.env.NODE_ENV || "development",
+    region: "ap-northeast-2",
   },
   instanceName: `chatd-${instanceId}`,
   port: port,
@@ -96,11 +104,8 @@ const config: BaseServerConfig = {
 
 const server = new ChatServer(config);
 
-
-
 // Start server
 server.start().catch((error) => {
-  console.error('Failed to start chat server:', error);
+  console.error("Failed to start chat server:", error);
   process.exit(1);
 });
-

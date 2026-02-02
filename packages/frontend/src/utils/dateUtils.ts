@@ -41,18 +41,20 @@ export const formatDuration = (milliseconds: number): string => {
   if (milliseconds < 1000) {
     return `${milliseconds}ms`;
   }
-  
+
   const seconds = Math.floor(milliseconds / 1000);
   if (seconds < 60) {
     return `${seconds}s`;
   }
-  
+
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
   if (minutes < 60) {
-    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
+    return remainingSeconds > 0
+      ? `${minutes}m ${remainingSeconds}s`
+      : `${minutes}m`;
   }
-  
+
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
   return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
@@ -66,26 +68,29 @@ export const formatRelativeTime = (dateString: string): string => {
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
-    
-    if (diffMs < 60000) { // Less than 1 minute
-      return 'Just now';
+
+    if (diffMs < 60000) {
+      // Less than 1 minute
+      return "Just now";
     }
-    
-    if (diffMs < 3600000) { // Less than 1 hour
+
+    if (diffMs < 3600000) {
+      // Less than 1 hour
       const minutes = Math.floor(diffMs / 60000);
-      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
     }
-    
-    if (diffMs < 86400000) { // Less than 1 day
+
+    if (diffMs < 86400000) {
+      // Less than 1 day
       const hours = Math.floor(diffMs / 3600000);
-      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
     }
-    
+
     const days = Math.floor(diffMs / 86400000);
     if (days < 7) {
-      return `${days} day${days > 1 ? 's' : ''} ago`;
+      return `${days} day${days > 1 ? "s" : ""} ago`;
     }
-    
+
     return formatDate(dateString);
   } catch (error) {
     return dateString;

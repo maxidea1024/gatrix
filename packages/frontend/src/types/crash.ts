@@ -68,7 +68,7 @@ export enum CrashState {
   CLOSED = 1,
   DELETED = 2,
   RESOLVED = 3,
-  REPEATED = 4
+  REPEATED = 4,
 }
 
 export interface CrashFilters {
@@ -92,18 +92,18 @@ export interface GetCrashEventsRequest {
   dateFrom?: string;
   dateTo?: string;
   sortBy?: string;
-  sortOrder?: 'ASC' | 'DESC';
+  sortOrder?: "ASC" | "DESC";
   platform?: string;
-  platformOperator?: 'any_of' | 'include_all';
+  platformOperator?: "any_of" | "include_all";
   environment?: string;
-  environmentOperator?: 'any_of' | 'include_all';
+  environmentOperator?: "any_of" | "include_all";
   branch?: string;
-  branchOperator?: 'any_of' | 'include_all';
+  branchOperator?: "any_of" | "include_all";
   marketType?: string;
-  marketTypeOperator?: 'any_of' | 'include_all';
+  marketTypeOperator?: "any_of" | "include_all";
   isEditor?: boolean;
   appVersion?: string;
-  appVersionOperator?: 'any_of' | 'include_all';
+  appVersionOperator?: "any_of" | "include_all";
 }
 
 export interface GetCrashEventsResponse {
@@ -157,33 +157,39 @@ export interface UpdateCrashJiraTicketRequest {
 // Helper functions for display
 export const getPlatformName = (platform: string): string => {
   const platformMap: Record<string, string> = {
-    'windows': 'Windows',
-    'ios': 'iOS',
-    'android': 'Android',
-    'mac': 'Mac',
-    'linux': 'Linux',
-    'web': 'Web'
+    windows: "Windows",
+    ios: "iOS",
+    android: "Android",
+    mac: "Mac",
+    linux: "Linux",
+    web: "Web",
   };
   return platformMap[platform.toLowerCase()] || platform;
 };
 
 export const getStateName = (state: CrashState): string => {
   switch (state) {
-    case CrashState.OPEN: return 'Open';
-    case CrashState.CLOSED: return 'Closed';
-    case CrashState.DELETED: return 'Deleted';
-    case CrashState.RESOLVED: return 'Resolved';
-    case CrashState.REPEATED: return 'Repeated';
-    default: return 'Unknown';
+    case CrashState.OPEN:
+      return "Open";
+    case CrashState.CLOSED:
+      return "Closed";
+    case CrashState.DELETED:
+      return "Deleted";
+    case CrashState.RESOLVED:
+      return "Resolved";
+    case CrashState.REPEATED:
+      return "Repeated";
+    default:
+      return "Unknown";
   }
 };
 
 export const getEnvironmentName = (environment: string): string => {
   const envMap: Record<string, string> = {
-    'dev': 'Development',
-    'staging': 'Staging',
-    'production': 'Production',
-    'qa': 'QA'
+    dev: "Development",
+    staging: "Staging",
+    production: "Production",
+    qa: "QA",
   };
   return envMap[environment.toLowerCase()] || environment;
 };

@@ -1,12 +1,16 @@
-import { Response } from 'express';
-import { AuthenticatedRequest } from '../types/auth';
-import Joi from 'joi';
-import ClientVersionService, { ClientVersionFilters, ClientVersionPagination, BulkStatusUpdateRequest } from '../services/ClientVersionService';
-import { ClientStatus } from '../models/ClientVersion';
-import { ClientVersionModel } from '../models/ClientVersion';
-import { GatrixError } from '../middleware/errorHandler';
-import logger from '../config/logger';
-import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
+import { Response } from "express";
+import { AuthenticatedRequest } from "../types/auth";
+import Joi from "joi";
+import ClientVersionService, {
+  ClientVersionFilters,
+  ClientVersionPagination,
+  BulkStatusUpdateRequest,
+} from "../services/ClientVersionService";
+import { ClientStatus } from "../models/ClientVersion";
+import { ClientVersionModel } from "../models/ClientVersion";
+import { GatrixError } from "../middleware/errorHandler";
+import logger from "../config/logger";
+import { UnifiedChangeGateway } from "../services/UnifiedChangeGateway";
 
 /**
  * Convert ISO 8601 datetime string to MySQL DATETIME format
@@ -16,7 +20,9 @@ import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
  * @param isoDateString - ISO 8601 datetime string
  * @returns MySQL DATETIME format string or null if invalid
  */
-function convertISOToMySQLDateTime(isoDateString: string | null | undefined): string | null {
+function convertISOToMySQLDateTime(
+  isoDateString: string | null | undefined,
+): string | null {
   if (!isoDateString) return null;
 
   try {
@@ -25,15 +31,18 @@ function convertISOToMySQLDateTime(isoDateString: string | null | undefined): st
 
     // Convert to MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)
     const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    const hours = String(date.getUTCHours()).padStart(2, '0');
-    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-    const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, "0");
+    const hours = String(date.getUTCHours()).padStart(2, "0");
+    const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+    const seconds = String(date.getUTCSeconds()).padStart(2, "0");
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   } catch (error) {
-    logger.warn(`Failed to convert ISO date to MySQL format: ${isoDateString}`, error);
+    logger.warn(
+      `Failed to convert ISO date to MySQL format: ${isoDateString}`,
+      error,
+    );
     return null;
   }
 }
@@ -41,101 +50,186 @@ function convertISOToMySQLDateTime(isoDateString: string | null | undefined): st
 // Validation schemas
 const createClientVersionSchema = Joi.object({
   platform: Joi.string().min(1).max(50).required(),
-  clientVersion: Joi.string().pattern(/^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/).required(),
-  clientStatus: Joi.string().valid(...Object.values(ClientStatus)).required(),
+  clientVersion: Joi.string()
+    .pattern(/^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/)
+    .required(),
+  clientStatus: Joi.string()
+    .valid(...Object.values(ClientStatus))
+    .required(),
   gameServerAddress: Joi.string().min(1).max(500).required(),
-  gameServerAddressForWhiteList: Joi.string().max(500).optional().allow('').empty('').default(null),
+  gameServerAddressForWhiteList: Joi.string()
+    .max(500)
+    .optional()
+    .allow("")
+    .empty("")
+    .default(null),
   patchAddress: Joi.string().min(1).max(500).required(),
-  patchAddressForWhiteList: Joi.string().max(500).optional().allow('').empty('').default(null),
+  patchAddressForWhiteList: Joi.string()
+    .max(500)
+    .optional()
+    .allow("")
+    .empty("")
+    .default(null),
   guestModeAllowed: Joi.boolean().required(),
-  externalClickLink: Joi.string().max(500).optional().allow('').empty('').default(null),
-  memo: Joi.string().optional().allow('').empty('').default(null),
-  customPayload: Joi.string().optional().allow('').empty('').default(null),
+  externalClickLink: Joi.string()
+    .max(500)
+    .optional()
+    .allow("")
+    .empty("")
+    .default(null),
+  memo: Joi.string().optional().allow("").empty("").default(null),
+  customPayload: Joi.string().optional().allow("").empty("").default(null),
   // 점검 관련 필드
-  maintenanceStartDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
-  maintenanceEndDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
-  maintenanceMessage: Joi.when('clientStatus', {
-    is: 'MAINTENANCE',
+  maintenanceStartDate: Joi.string()
+    .isoDate()
+    .optional()
+    .allow("")
+    .empty("")
+    .default(null),
+  maintenanceEndDate: Joi.string()
+    .isoDate()
+    .optional()
+    .allow("")
+    .empty("")
+    .default(null),
+  maintenanceMessage: Joi.when("clientStatus", {
+    is: "MAINTENANCE",
     then: Joi.string().min(1).required(),
-    otherwise: Joi.string().optional().allow('').empty('').default(null)
+    otherwise: Joi.string().optional().allow("").empty("").default(null),
   }),
   supportsMultiLanguage: Joi.boolean().optional().default(false),
-  maintenanceLocales: Joi.array().items(
-    Joi.object({
-      lang: Joi.string().valid('ko', 'en', 'zh').required(),
-      message: Joi.string().required(),
-    })
-  ).optional().default([]),
-  tags: Joi.array().items(Joi.object({
-    id: Joi.number().integer().positive().required(),
-    name: Joi.string().optional(),
-    color: Joi.string().optional(),
-    description: Joi.string().optional().allow(null),
-    createdBy: Joi.number().integer().optional(),
-    updatedBy: Joi.number().integer().optional(),
-    createdAt: Joi.date().optional(),
-    updatedAt: Joi.date().optional()
-  }).unknown(true)).optional().default([]),
+  maintenanceLocales: Joi.array()
+    .items(
+      Joi.object({
+        lang: Joi.string().valid("ko", "en", "zh").required(),
+        message: Joi.string().required(),
+      }),
+    )
+    .optional()
+    .default([]),
+  tags: Joi.array()
+    .items(
+      Joi.object({
+        id: Joi.number().integer().positive().required(),
+        name: Joi.string().optional(),
+        color: Joi.string().optional(),
+        description: Joi.string().optional().allow(null),
+        createdBy: Joi.number().integer().optional(),
+        updatedBy: Joi.number().integer().optional(),
+        createdAt: Joi.date().optional(),
+        updatedAt: Joi.date().optional(),
+      }).unknown(true),
+    )
+    .optional()
+    .default([]),
 });
 
 const updateClientVersionSchema = Joi.object({
   platform: Joi.string().min(1).max(50).optional(),
-  clientVersion: Joi.string().pattern(/^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/).optional(),
-  clientStatus: Joi.string().valid(...Object.values(ClientStatus)).optional(),
+  clientVersion: Joi.string()
+    .pattern(/^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/)
+    .optional(),
+  clientStatus: Joi.string()
+    .valid(...Object.values(ClientStatus))
+    .optional(),
   gameServerAddress: Joi.string().min(1).max(500).optional(),
-  gameServerAddressForWhiteList: Joi.string().max(500).optional().allow('').empty('').default(null),
+  gameServerAddressForWhiteList: Joi.string()
+    .max(500)
+    .optional()
+    .allow("")
+    .empty("")
+    .default(null),
   patchAddress: Joi.string().min(1).max(500).optional(),
-  patchAddressForWhiteList: Joi.string().max(500).optional().allow('').empty('').default(null),
+  patchAddressForWhiteList: Joi.string()
+    .max(500)
+    .optional()
+    .allow("")
+    .empty("")
+    .default(null),
   guestModeAllowed: Joi.boolean().optional(),
-  externalClickLink: Joi.string().max(500).optional().allow('').empty('').default(null),
-  memo: Joi.string().optional().allow('').empty('').default(null),
-  customPayload: Joi.string().optional().allow('').empty('').default(null),
+  externalClickLink: Joi.string()
+    .max(500)
+    .optional()
+    .allow("")
+    .empty("")
+    .default(null),
+  memo: Joi.string().optional().allow("").empty("").default(null),
+  customPayload: Joi.string().optional().allow("").empty("").default(null),
   // 점검 관련 필드
-  maintenanceStartDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
-  maintenanceEndDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
-  maintenanceMessage: Joi.when('clientStatus', {
-    is: 'MAINTENANCE',
+  maintenanceStartDate: Joi.string()
+    .isoDate()
+    .optional()
+    .allow("")
+    .empty("")
+    .default(null),
+  maintenanceEndDate: Joi.string()
+    .isoDate()
+    .optional()
+    .allow("")
+    .empty("")
+    .default(null),
+  maintenanceMessage: Joi.when("clientStatus", {
+    is: "MAINTENANCE",
     then: Joi.string().min(1).required(),
-    otherwise: Joi.string().optional().allow('').empty('').default(null)
+    otherwise: Joi.string().optional().allow("").empty("").default(null),
   }),
   supportsMultiLanguage: Joi.boolean().optional().default(false),
-  maintenanceLocales: Joi.array().items(
-    Joi.object({
-      lang: Joi.string().valid('ko', 'en', 'zh').required(),
-      message: Joi.string().required(),
-    })
-  ).optional().default([]),
+  maintenanceLocales: Joi.array()
+    .items(
+      Joi.object({
+        lang: Joi.string().valid("ko", "en", "zh").required(),
+        message: Joi.string().required(),
+      }),
+    )
+    .optional()
+    .default([]),
 });
 
 const getClientVersionsQuerySchema = Joi.object({
   page: Joi.number().integer().min(1).default(1),
   limit: Joi.number().integer().min(1).max(100).default(10),
-  sortBy: Joi.string().valid('id', 'channel', 'subChannel', 'clientVersion', 'clientStatus', 'createdAt', 'updatedAt').default('createdAt'),
-  sortOrder: Joi.string().valid('ASC', 'DESC').default('DESC'),
-  version: Joi.alternatives().try(
-    Joi.string(),
-    Joi.array().items(Joi.string())
-  ).optional(),
-  platform: Joi.alternatives().try(
-    Joi.string(),
-    Joi.array().items(Joi.string())
-  ).optional(),
-  clientStatus: Joi.alternatives().try(
-    Joi.string().valid(...Object.values(ClientStatus)),
-    Joi.array().items(Joi.string().valid(...Object.values(ClientStatus)))
-  ).optional(),
+  sortBy: Joi.string()
+    .valid(
+      "id",
+      "channel",
+      "subChannel",
+      "clientVersion",
+      "clientStatus",
+      "createdAt",
+      "updatedAt",
+    )
+    .default("createdAt"),
+  sortOrder: Joi.string().valid("ASC", "DESC").default("DESC"),
+  version: Joi.alternatives()
+    .try(Joi.string(), Joi.array().items(Joi.string()))
+    .optional(),
+  platform: Joi.alternatives()
+    .try(Joi.string(), Joi.array().items(Joi.string()))
+    .optional(),
+  clientStatus: Joi.alternatives()
+    .try(
+      Joi.string().valid(...Object.values(ClientStatus)),
+      Joi.array().items(Joi.string().valid(...Object.values(ClientStatus))),
+    )
+    .optional(),
   gameServerAddress: Joi.string().optional(),
   patchAddress: Joi.string().optional(),
-  guestModeAllowed: Joi.alternatives().try(
-    Joi.string().valid('true', 'false').custom((value, helpers) => {
-      if (value === 'true') return true;
-      if (value === 'false') return false;
-      return helpers.error('any.invalid');
-    }),
-    Joi.array().items(Joi.string().valid('true', 'false')).custom((value, helpers) => {
-      return value.map((v: string) => v === 'true');
-    })
-  ).optional(),
+  guestModeAllowed: Joi.alternatives()
+    .try(
+      Joi.string()
+        .valid("true", "false")
+        .custom((value, helpers) => {
+          if (value === "true") return true;
+          if (value === "false") return false;
+          return helpers.error("any.invalid");
+        }),
+      Joi.array()
+        .items(Joi.string().valid("true", "false"))
+        .custom((value, helpers) => {
+          return value.map((v: string) => v === "true");
+        }),
+    )
+    .optional(),
   externalClickLink: Joi.string().optional(),
   memo: Joi.string().optional(),
   customPayload: Joi.string().optional(),
@@ -147,7 +241,10 @@ const getClientVersionsQuerySchema = Joi.object({
   updatedAtTo: Joi.date().iso().optional(),
   search: Joi.string().optional(),
   tags: Joi.array().items(Joi.string()).optional(),
-  tagsOperator: Joi.string().valid('any_of', 'include_all').optional().default('any_of'),
+  tagsOperator: Joi.string()
+    .valid("any_of", "include_all")
+    .optional()
+    .default("any_of"),
   _t: Joi.string().optional(), // 캐시 방지용 타임스탬프
 });
 
@@ -155,14 +252,19 @@ const getClientVersionsQuerySchema = Joi.object({
 const exportClientVersionsQuerySchema = Joi.object({
   version: Joi.string().optional(),
   platform: Joi.string().optional(),
-  clientStatus: Joi.string().valid(...Object.values(ClientStatus)).optional(),
+  clientStatus: Joi.string()
+    .valid(...Object.values(ClientStatus))
+    .optional(),
   gameServerAddress: Joi.string().optional(),
   patchAddress: Joi.string().optional(),
-  guestModeAllowed: Joi.string().valid('true', 'false').optional().custom((value, helpers) => {
-    if (value === 'true') return true;
-    if (value === 'false') return false;
-    return helpers.error('any.invalid');
-  }),
+  guestModeAllowed: Joi.string()
+    .valid("true", "false")
+    .optional()
+    .custom((value, helpers) => {
+      if (value === "true") return true;
+      if (value === "false") return false;
+      return helpers.error("any.invalid");
+    }),
   externalClickLink: Joi.string().optional(),
   memo: Joi.string().optional(),
   customPayload: Joi.string().optional(),
@@ -178,80 +280,128 @@ const exportClientVersionsQuerySchema = Joi.object({
 
 const bulkUpdateStatusSchema = Joi.object({
   ids: Joi.array().items(Joi.number().integer().positive()).min(1).required(),
-  clientStatus: Joi.string().valid(...Object.values(ClientStatus)).required(),
+  clientStatus: Joi.string()
+    .valid(...Object.values(ClientStatus))
+    .required(),
   // 점검 관련 필드들
   maintenanceStartDate: Joi.string().isoDate().optional(),
   maintenanceEndDate: Joi.string().isoDate().optional(),
   maintenanceMessage: Joi.string().max(1000).optional(),
   supportsMultiLanguage: Joi.boolean().optional(),
-  maintenanceLocales: Joi.array().items(
-    Joi.object({
-      lang: Joi.string().valid('ko', 'en', 'zh').required(),
-      message: Joi.string().max(1000).required(),
-    })
-  ).optional(),
+  maintenanceLocales: Joi.array()
+    .items(
+      Joi.object({
+        lang: Joi.string().valid("ko", "en", "zh").required(),
+        message: Joi.string().max(1000).required(),
+      }),
+    )
+    .optional(),
   messageTemplateId: Joi.number().integer().positive().optional(),
 });
 
 const bulkCreateClientVersionSchema = Joi.object({
-  clientVersion: Joi.string().pattern(/^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/).required(),
-  clientStatus: Joi.string().valid(...Object.values(ClientStatus)).required(),
+  clientVersion: Joi.string()
+    .pattern(/^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/)
+    .required(),
+  clientStatus: Joi.string()
+    .valid(...Object.values(ClientStatus))
+    .required(),
   guestModeAllowed: Joi.boolean().required(),
-  externalClickLink: Joi.string().max(500).optional().allow('').empty('').default(null),
-  memo: Joi.string().max(1000).optional().allow('').empty('').default(null),
-  customPayload: Joi.string().max(5000).optional().allow('').empty('').default(null),
+  externalClickLink: Joi.string()
+    .max(500)
+    .optional()
+    .allow("")
+    .empty("")
+    .default(null),
+  memo: Joi.string().max(1000).optional().allow("").empty("").default(null),
+  customPayload: Joi.string()
+    .max(5000)
+    .optional()
+    .allow("")
+    .empty("")
+    .default(null),
 
   // 점검 관련 필드
-  maintenanceStartDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
-  maintenanceEndDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
-  maintenanceMessage: Joi.when('clientStatus', {
-    is: 'MAINTENANCE',
+  maintenanceStartDate: Joi.string()
+    .isoDate()
+    .optional()
+    .allow("")
+    .empty("")
+    .default(null),
+  maintenanceEndDate: Joi.string()
+    .isoDate()
+    .optional()
+    .allow("")
+    .empty("")
+    .default(null),
+  maintenanceMessage: Joi.when("clientStatus", {
+    is: "MAINTENANCE",
     then: Joi.string().min(1).required(),
-    otherwise: Joi.string().optional().allow('').empty('').default(null)
+    otherwise: Joi.string().optional().allow("").empty("").default(null),
   }),
   supportsMultiLanguage: Joi.boolean().optional().default(false),
-  maintenanceLocales: Joi.array().items(
-    Joi.object({
-      lang: Joi.string().valid('ko', 'en', 'zh').required(),
-      message: Joi.string().required(),
-    })
-  ).optional().default([]),
+  maintenanceLocales: Joi.array()
+    .items(
+      Joi.object({
+        lang: Joi.string().valid("ko", "en", "zh").required(),
+        message: Joi.string().required(),
+      }),
+    )
+    .optional()
+    .default([]),
 
-  platforms: Joi.array().items(
-    Joi.object({
-      platform: Joi.string().min(1).max(50).required(),
-      gameServerAddress: Joi.string().min(1).max(500).required(),
-      gameServerAddressForWhiteList: Joi.string().max(500).optional().allow('').empty('').default(null),
-      patchAddress: Joi.string().min(1).max(500).required(),
-      patchAddressForWhiteList: Joi.string().max(500).optional().allow('').empty('').default(null),
-    })
-  ).min(1).required(),
+  platforms: Joi.array()
+    .items(
+      Joi.object({
+        platform: Joi.string().min(1).max(50).required(),
+        gameServerAddress: Joi.string().min(1).max(500).required(),
+        gameServerAddressForWhiteList: Joi.string()
+          .max(500)
+          .optional()
+          .allow("")
+          .empty("")
+          .default(null),
+        patchAddress: Joi.string().min(1).max(500).required(),
+        patchAddressForWhiteList: Joi.string()
+          .max(500)
+          .optional()
+          .allow("")
+          .empty("")
+          .default(null),
+      }),
+    )
+    .min(1)
+    .required(),
 
   // 태그 필드 추가 - 필요한 필드만 받음
-  tags: Joi.array().items(
-    Joi.object({
-      id: Joi.number().integer().positive().required(),
-      name: Joi.string().required(),
-      color: Joi.string().required(),
-    })
-  ).optional().default([]),
+  tags: Joi.array()
+    .items(
+      Joi.object({
+        id: Joi.number().integer().positive().required(),
+        name: Joi.string().required(),
+        color: Joi.string().required(),
+      }),
+    )
+    .optional()
+    .default([]),
 });
 
 export class ClientVersionController {
   // 사용 가능한 버전 목록 조회 (distinct)
   static async getAvailableVersions(req: AuthenticatedRequest, res: Response) {
     try {
-      const environment = req.environment || 'development';
-      const versions = await ClientVersionService.getAvailableVersions(environment);
+      const environment = req.environment || "development";
+      const versions =
+        await ClientVersionService.getAvailableVersions(environment);
       res.json({
         success: true,
         data: versions,
       });
     } catch (error: any) {
-      logger.error('Error getting available versions:', error);
+      logger.error("Error getting available versions:", error);
       res.status(500).json({
         success: false,
-        message: error.message || 'Failed to get available versions',
+        message: error.message || "Failed to get available versions",
       });
     }
   }
@@ -269,24 +419,35 @@ export class ClientVersionController {
     const { page, limit, sortBy, sortOrder, _t, ...filterParams } = value;
 
     const filters: ClientVersionFilters = {};
-    const pagination: ClientVersionPagination = { page, limit, sortBy, sortOrder };
+    const pagination: ClientVersionPagination = {
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+    };
 
     // 필터 조건 설정
-    Object.keys(filterParams).forEach(key => {
+    Object.keys(filterParams).forEach((key) => {
       const value = filterParams[key];
       // guestModeAllowed는 boolean이므로 false도 유효한 값
-      if (value !== undefined && (value !== '' || key === 'guestModeAllowed' || key === 'tags' || key === 'tagsOperator')) {
+      if (
+        value !== undefined &&
+        (value !== "" ||
+          key === "guestModeAllowed" ||
+          key === "tags" ||
+          key === "tagsOperator")
+      ) {
         const processedValue: any = value;
 
         // guestModeAllowed는 이미 Joi에서 boolean 또는 boolean[]로 변환됨
         // 다른 필드는 그대로 사용
 
         // 타입 안전하게 할당
-        if (key === 'guestModeAllowed') {
+        if (key === "guestModeAllowed") {
           (filters as any).guestModeAllowed = processedValue;
-        } else if (key === 'tags') {
+        } else if (key === "tags") {
           (filters as any).tags = processedValue;
-        } else if (key === 'tagsOperator') {
+        } else if (key === "tagsOperator") {
           (filters as any).tagsOperator = processedValue;
         } else {
           filters[key as keyof ClientVersionFilters] = processedValue;
@@ -294,8 +455,12 @@ export class ClientVersionController {
       }
     });
 
-    const environment = req.environment || 'development';
-    const result = await ClientVersionService.getAllClientVersions(environment, filters, pagination);
+    const environment = req.environment || "development";
+    const result = await ClientVersionService.getAllClientVersions(
+      environment,
+      filters,
+      pagination,
+    );
 
     res.json({
       success: true,
@@ -309,16 +474,19 @@ export class ClientVersionController {
     if (isNaN(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid client version ID',
+        message: "Invalid client version ID",
       });
     }
 
-    const environment = req.environment || 'development';
-    const clientVersion = await ClientVersionService.getClientVersionById(id, environment);
+    const environment = req.environment || "development";
+    const clientVersion = await ClientVersionService.getClientVersionById(
+      id,
+      environment,
+    );
     if (!clientVersion) {
       return res.status(404).json({
         success: false,
-        message: 'Client version not found',
+        message: "Client version not found",
       });
     }
 
@@ -342,37 +510,42 @@ export class ClientVersionController {
     if (!userId) {
       return res.status(401).json({
         success: false,
-        message: 'User not authenticated',
+        message: "User not authenticated",
       });
     }
 
     const clientVersionData = {
       ...value,
       // Convert ISO 8601 datetime to MySQL DATETIME format
-      maintenanceStartDate: convertISOToMySQLDateTime(value.maintenanceStartDate),
+      maintenanceStartDate: convertISOToMySQLDateTime(
+        value.maintenanceStartDate,
+      ),
       maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
       createdBy: userId,
       updatedBy: userId,
     };
 
-    const environment = req.environment || 'development';
+    const environment = req.environment || "development";
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.requestCreation(
       userId,
       environment,
-      'g_client_versions',
+      "g_client_versions",
       clientVersionData,
       async () => {
-        return await ClientVersionService.createClientVersion(clientVersionData, environment);
-      }
+        return await ClientVersionService.createClientVersion(
+          clientVersionData,
+          environment,
+        );
+      },
     );
 
-    if (gatewayResult.mode === 'DIRECT') {
+    if (gatewayResult.mode === "DIRECT") {
       res.status(201).json({
         success: true,
         data: gatewayResult.data,
-        message: 'Client version created successfully',
+        message: "Client version created successfully",
       });
     } else {
       res.status(202).json({
@@ -381,13 +554,17 @@ export class ClientVersionController {
           changeRequestId: gatewayResult.changeRequestId,
           status: gatewayResult.status,
         },
-        message: 'Change request created. The client version will be created after approval.',
+        message:
+          "Change request created. The client version will be created after approval.",
       });
     }
   }
 
   // 클라이언트 버전 간편 생성
-  static async bulkCreateClientVersions(req: AuthenticatedRequest, res: Response) {
+  static async bulkCreateClientVersions(
+    req: AuthenticatedRequest,
+    res: Response,
+  ) {
     const { error, value } = bulkCreateClientVersionSchema.validate(req.body);
     if (error) {
       return res.status(400).json({
@@ -400,15 +577,17 @@ export class ClientVersionController {
     if (!userId) {
       return res.status(401).json({
         success: false,
-        message: 'User not authenticated',
+        message: "User not authenticated",
       });
     }
 
-    const environment = req.environment || 'development';
+    const environment = req.environment || "development";
     const bulkCreateData = {
       ...value,
       // Convert ISO 8601 datetime to MySQL DATETIME format
-      maintenanceStartDate: convertISOToMySQLDateTime(value.maintenanceStartDate),
+      maintenanceStartDate: convertISOToMySQLDateTime(
+        value.maintenanceStartDate,
+      ),
       maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
       createdBy: userId,
       updatedBy: userId,
@@ -416,7 +595,8 @@ export class ClientVersionController {
     };
 
     // Check if CR is required
-    const requiresApproval = await UnifiedChangeGateway.requiresApproval(environment);
+    const requiresApproval =
+      await UnifiedChangeGateway.requiresApproval(environment);
 
     if (requiresApproval) {
       let lastResult;
@@ -427,7 +607,8 @@ export class ClientVersionController {
           clientVersion: value.clientVersion,
           clientStatus: value.clientStatus,
           gameServerAddress: platform.gameServerAddress,
-          gameServerAddressForWhiteList: platform.gameServerAddressForWhiteList || null,
+          gameServerAddressForWhiteList:
+            platform.gameServerAddressForWhiteList || null,
           patchAddress: platform.patchAddress,
           patchAddressForWhiteList: platform.patchAddressForWhiteList || null,
           guestModeAllowed: value.guestModeAllowed,
@@ -444,9 +625,11 @@ export class ClientVersionController {
         lastResult = await UnifiedChangeGateway.requestCreation(
           userId,
           environment,
-          'g_client_versions',
+          "g_client_versions",
           itemData,
-          async () => { /* won't be called if requiresApproval is true */ }
+          async () => {
+            /* won't be called if requiresApproval is true */
+          },
         );
       }
 
@@ -456,14 +639,21 @@ export class ClientVersionController {
           changeRequestId: lastResult?.changeRequestId,
           status: lastResult?.status,
         },
-        message: 'Change request created. The client versions will be created after approval.',
+        message:
+          "Change request created. The client versions will be created after approval.",
       });
     } else {
       let clientVersions;
       try {
-        clientVersions = await ClientVersionService.bulkCreateClientVersions(bulkCreateData, environment);
+        clientVersions = await ClientVersionService.bulkCreateClientVersions(
+          bulkCreateData,
+          environment,
+        );
       } catch (error: any) {
-        if (error.message && error.message.includes('Duplicate client versions found')) {
+        if (
+          error.message &&
+          error.message.includes("Duplicate client versions found")
+        ) {
           throw new GatrixError(error.message, 409);
         }
         throw error;
@@ -483,7 +673,7 @@ export class ClientVersionController {
     if (isNaN(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid client version ID',
+        message: "Invalid client version ID",
       });
     }
 
@@ -499,46 +689,56 @@ export class ClientVersionController {
     if (!userId) {
       return res.status(401).json({
         success: false,
-        message: 'User not authenticated',
+        message: "User not authenticated",
       });
     }
 
     const updateData = {
       ...value,
       // Convert ISO 8601 datetime to MySQL DATETIME format
-      maintenanceStartDate: convertISOToMySQLDateTime(value.maintenanceStartDate),
+      maintenanceStartDate: convertISOToMySQLDateTime(
+        value.maintenanceStartDate,
+      ),
       maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
       createdBy: userId, // maintenanceLocales 새로 생성 시 필요
       updatedBy: userId,
     };
 
-    const environment = req.environment || 'development';
+    const environment = req.environment || "development";
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.processChange(
       userId,
       environment,
-      'g_client_versions',
+      "g_client_versions",
       String(id),
       updateData,
       async (processedData: any) => {
-        return await ClientVersionService.updateClientVersion(id, processedData, environment);
-      }
+        return await ClientVersionService.updateClientVersion(
+          id,
+          processedData,
+          environment,
+        );
+      },
     );
 
-    if (gatewayResult.mode === 'DIRECT') {
-      const clientVersion = await ClientVersionService.updateClientVersion(id, updateData, environment);
+    if (gatewayResult.mode === "DIRECT") {
+      const clientVersion = await ClientVersionService.updateClientVersion(
+        id,
+        updateData,
+        environment,
+      );
       if (!clientVersion) {
         return res.status(404).json({
           success: false,
-          message: 'Client version not found',
+          message: "Client version not found",
         });
       }
 
       res.json({
         success: true,
         data: clientVersion,
-        message: 'Client version updated successfully',
+        message: "Client version updated successfully",
       });
     } else {
       res.status(202).json({
@@ -547,7 +747,8 @@ export class ClientVersionController {
           changeRequestId: gatewayResult.changeRequestId,
           status: gatewayResult.status,
         },
-        message: 'Change request created. The update will be applied after approval.',
+        message:
+          "Change request created. The update will be applied after approval.",
       });
     }
   }
@@ -558,16 +759,16 @@ export class ClientVersionController {
     if (isNaN(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid client version ID',
+        message: "Invalid client version ID",
       });
     }
 
-    const environment = req.environment || 'development';
+    const environment = req.environment || "development";
     const userId = (req as any).user?.userId;
     if (!userId) {
       return res.status(401).json({
         success: false,
-        message: 'User not authenticated',
+        message: "User not authenticated",
       });
     }
 
@@ -575,17 +776,17 @@ export class ClientVersionController {
     const gatewayResult = await UnifiedChangeGateway.requestDeletion(
       userId,
       environment,
-      'g_client_versions',
+      "g_client_versions",
       String(id),
       async () => {
         await ClientVersionService.deleteClientVersion(id, environment);
-      }
+      },
     );
 
-    if (gatewayResult.mode === 'DIRECT') {
+    if (gatewayResult.mode === "DIRECT") {
       res.json({
         success: true,
-        message: 'Client version deleted successfully',
+        message: "Client version deleted successfully",
       });
     } else {
       res.status(202).json({
@@ -594,7 +795,8 @@ export class ClientVersionController {
           changeRequestId: gatewayResult.changeRequestId,
           status: gatewayResult.status,
         },
-        message: 'Change request created. The deletion will be applied after approval.',
+        message:
+          "Change request created. The deletion will be applied after approval.",
       });
     }
   }
@@ -613,22 +815,25 @@ export class ClientVersionController {
     if (!userId) {
       return res.status(401).json({
         success: false,
-        message: 'User not authenticated',
+        message: "User not authenticated",
       });
     }
 
     const bulkUpdateData: BulkStatusUpdateRequest = {
       ...value,
       // Convert ISO 8601 datetime to MySQL DATETIME format
-      maintenanceStartDate: convertISOToMySQLDateTime(value.maintenanceStartDate),
+      maintenanceStartDate: convertISOToMySQLDateTime(
+        value.maintenanceStartDate,
+      ),
       maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
       updatedBy: userId,
     };
 
-    const environment = req.environment || 'development';
+    const environment = req.environment || "development";
 
     // Check if CR is required
-    const requiresApproval = await UnifiedChangeGateway.requiresApproval(environment);
+    const requiresApproval =
+      await UnifiedChangeGateway.requiresApproval(environment);
 
     if (requiresApproval) {
       let lastResult;
@@ -642,15 +847,15 @@ export class ClientVersionController {
           supportsMultiLanguage: value.supportsMultiLanguage || false,
           maintenanceLocales: value.maintenanceLocales || [],
           messageTemplateId: value.messageTemplateId || null,
-          updatedBy: userId
+          updatedBy: userId,
         };
 
         lastResult = await UnifiedChangeGateway.requestModification(
           userId,
           environment,
-          'g_client_versions',
+          "g_client_versions",
           String(id),
-          updateDataAttrs
+          updateDataAttrs,
         );
       }
 
@@ -660,10 +865,14 @@ export class ClientVersionController {
           changeRequestId: lastResult?.changeRequestId,
           status: lastResult?.status,
         },
-        message: 'Change request created. The bulk status update will be applied after approval.',
+        message:
+          "Change request created. The bulk status update will be applied after approval.",
       });
     } else {
-      const updatedCount = await ClientVersionService.bulkUpdateStatus(bulkUpdateData, environment);
+      const updatedCount = await ClientVersionService.bulkUpdateStatus(
+        bulkUpdateData,
+        environment,
+      );
       res.json({
         success: true,
         data: {
@@ -675,7 +884,7 @@ export class ClientVersionController {
 
   // 채널 목록 조회
   static async getPlatforms(req: AuthenticatedRequest, res: Response) {
-    const environment = req.environment || 'development';
+    const environment = req.environment || "development";
     const platforms = await ClientVersionService.getPlatforms(environment);
 
     res.json({
@@ -693,7 +902,7 @@ export class ClientVersionController {
       if (!Array.isArray(tagIds)) {
         return res.status(400).json({
           success: false,
-          message: 'tagIds must be an array',
+          message: "tagIds must be an array",
         });
       }
 
@@ -701,13 +910,13 @@ export class ClientVersionController {
 
       res.json({
         success: true,
-        message: 'Tags updated successfully',
+        message: "Tags updated successfully",
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        message: 'Failed to update tags',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        message: "Failed to update tags",
+        error: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }
@@ -725,15 +934,17 @@ export class ClientVersionController {
     } catch (error) {
       res.status(500).json({
         success: false,
-        message: 'Failed to get tags',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        message: "Failed to get tags",
+        error: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }
 
   // 클라이언트 버전 내보내기 (CSV)
   static async exportClientVersions(req: AuthenticatedRequest, res: Response) {
-    const { error, value } = exportClientVersionsQuerySchema.validate(req.query);
+    const { error, value } = exportClientVersionsQuerySchema.validate(
+      req.query,
+    );
     if (error) {
       return res.status(400).json({
         success: false,
@@ -742,24 +953,28 @@ export class ClientVersionController {
     }
 
     try {
-      const environment = req.environment || 'development';
+      const environment = req.environment || "development";
       // 모든 데이터를 가져오기 위해 매우 큰 limit 사용
-      const result = await ClientVersionService.getAllClientVersions(environment, value, {
-        page: 1,
-        limit: 50000, // 충분히 큰 값
-        sortBy: 'createdAt',
-        sortOrder: 'DESC'
-      });
+      const result = await ClientVersionService.getAllClientVersions(
+        environment,
+        value,
+        {
+          page: 1,
+          limit: 50000, // 충분히 큰 값
+          sortBy: "createdAt",
+          sortOrder: "DESC",
+        },
+      );
 
       res.json({
         success: true,
         data: result,
       });
     } catch (error: any) {
-      logger.error('Error exporting client versions:', error);
+      logger.error("Error exporting client versions:", error);
       res.status(500).json({
         success: false,
-        message: error.message || 'Failed to export client versions',
+        message: error.message || "Failed to export client versions",
       });
     }
   }
@@ -768,16 +983,21 @@ export class ClientVersionController {
    * Reset all client versions and clear cache (for testing)
    * DELETE /api/v1/admin/client-versions/reset/all
    */
-  static async resetAllClientVersions(req: AuthenticatedRequest, res: Response) {
+  static async resetAllClientVersions(
+    req: AuthenticatedRequest,
+    res: Response,
+  ) {
     try {
       // Delete all client versions
       const deletedCount = await ClientVersionModel.deleteAll();
 
       // Clear all client version related cache
-      const { pubSubService } = require('../services/PubSubService');
-      await pubSubService.invalidateByPattern('*client_version:*');
+      const { pubSubService } = require("../services/PubSubService");
+      await pubSubService.invalidateByPattern("*client_version:*");
 
-      logger.info(`Reset all client versions: ${deletedCount} records deleted, cache cleared`);
+      logger.info(
+        `Reset all client versions: ${deletedCount} records deleted, cache cleared`,
+      );
 
       res.json({
         success: true,
@@ -785,13 +1005,13 @@ export class ClientVersionController {
         data: {
           deletedCount,
           cacheCleared: true,
-        }
+        },
       });
     } catch (error: any) {
-      logger.error('Error resetting client versions:', error);
+      logger.error("Error resetting client versions:", error);
       res.status(500).json({
         success: false,
-        message: error.message || 'Failed to reset client versions',
+        message: error.message || "Failed to reset client versions",
       });
     }
   }

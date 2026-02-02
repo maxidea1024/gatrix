@@ -30,4 +30,3 @@ export interface PlatformConfigContextType {
   error: string | null;
   refresh: () => Promise<void>;
 }
-

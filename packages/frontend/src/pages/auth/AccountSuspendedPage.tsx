@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 import {
   Box,
   Card,
@@ -6,16 +6,16 @@ import {
   Typography,
   Button,
   Stack,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Block as BlockIcon,
   ArrowBack as ArrowBackIcon,
   ContactSupport as ContactSupportIcon,
-} from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { LanguageSelector } from '@/components/LanguageSelector';
-import { AuthService } from '@/services/auth';
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { AuthService } from "@/services/auth";
 
 const AccountSuspendedPage: React.FC = () => {
   const navigate = useNavigate();
@@ -28,25 +28,25 @@ const AccountSuspendedPage: React.FC = () => {
   }, []);
 
   const handleBackToLogin = () => {
-    navigate('/login', { replace: true });
+    navigate("/login", { replace: true });
   };
 
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'background.default',
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "background.default",
         p: 2,
-        position: 'relative',
+        position: "relative",
       }}
     >
       {/* Language Selector */}
       <Box
         sx={{
-          position: 'absolute',
+          position: "absolute",
           top: 16,
           right: 16,
           zIndex: 1000,
@@ -55,15 +55,15 @@ const AccountSuspendedPage: React.FC = () => {
         <LanguageSelector />
       </Box>
 
-      <Card sx={{ maxWidth: 500, width: '100%' }}>
-        <CardContent sx={{ p: 4, textAlign: 'center' }}>
+      <Card sx={{ maxWidth: 500, width: "100%" }}>
+        <CardContent sx={{ p: 4, textAlign: "center" }}>
           {/* Icon */}
-          <BlockIcon 
-            sx={{ 
-              fontSize: 64, 
-              color: 'error.main',
-              mb: 2 
-            }} 
+          <BlockIcon
+            sx={{
+              fontSize: 64,
+              color: "error.main",
+              mb: 2,
+            }}
           />
 
           {/* Header */}
@@ -71,17 +71,17 @@ const AccountSuspendedPage: React.FC = () => {
             Gatrix
           </Typography>
           <Typography variant="h6" gutterBottom color="error.main">
-            {t('accountSuspended.title')}
+            {t("accountSuspended.title")}
           </Typography>
 
           {/* Message */}
           <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-            {t('accountSuspended.message')}
+            {t("accountSuspended.message")}
           </Typography>
 
           {/* Additional Info */}
           <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-            {t('accountSuspended.additionalInfo')}
+            {t("accountSuspended.additionalInfo")}
           </Typography>
 
           {/* Action Buttons */}
@@ -93,9 +93,9 @@ const AccountSuspendedPage: React.FC = () => {
               color="primary"
               fullWidth
             >
-              {t('accountSuspended.contactSupport')}
+              {t("accountSuspended.contactSupport")}
             </Button>
-            
+
             <Button
               variant="text"
               size="large"
@@ -103,7 +103,7 @@ const AccountSuspendedPage: React.FC = () => {
               onClick={handleBackToLogin}
               fullWidth
             >
-              {t('accountSuspended.backToLogin')}
+              {t("accountSuspended.backToLogin")}
             </Button>
           </Stack>
         </CardContent>

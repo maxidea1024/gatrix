@@ -23,11 +23,11 @@ export interface InvitationResponse {
 export enum InvitationDuration {
   HOURS_48 = 48,
   WEEK = 168, // 7 * 24
-  MONTH = 720 // 30 * 24
+  MONTH = 720, // 30 * 24
 }
 
 export const InvitationDurationLabels = {
-  [InvitationDuration.HOURS_48]: '48시간',
-  [InvitationDuration.WEEK]: '1주일',
-  [InvitationDuration.MONTH]: '1개월'
+  [InvitationDuration.HOURS_48]: "48시간",
+  [InvitationDuration.WEEK]: "1주일",
+  [InvitationDuration.MONTH]: "1개월",
 };

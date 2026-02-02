@@ -4,9 +4,9 @@
  * Fetches environment list from backend and tracks changes
  */
 
-import { ApiClient } from '../client/ApiClient';
-import { Logger } from '../utils/logger';
-import { EnvironmentInfo, EnvironmentListResponse } from '../types/api';
+import { ApiClient } from "../client/ApiClient";
+import { Logger } from "../utils/logger";
+import { EnvironmentInfo, EnvironmentListResponse } from "../types/api";
 
 export class EnvironmentService {
   private apiClient: ApiClient;
@@ -14,7 +14,9 @@ export class EnvironmentService {
   // Cached environment list
   private cachedEnvironments: EnvironmentInfo[] = [];
   // Callback for environment changes
-  private onChangeCallbacks: Array<(added: string[], removed: string[]) => void> = [];
+  private onChangeCallbacks: Array<
+    (added: string[], removed: string[]) => void
+  > = [];
 
   constructor(apiClient: ApiClient, logger: Logger) {
     this.apiClient = apiClient;
@@ -26,29 +28,32 @@ export class EnvironmentService {
    * GET /api/v1/server/environments
    */
   async fetchEnvironments(): Promise<EnvironmentInfo[]> {
-    const endpoint = '/api/v1/server/environments';
+    const endpoint = "/api/v1/server/environments";
 
-    this.logger.debug('Fetching environment list');
+    this.logger.debug("Fetching environment list");
 
-    const response = await this.apiClient.get<EnvironmentListResponse>(endpoint);
+    const response =
+      await this.apiClient.get<EnvironmentListResponse>(endpoint);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch environments');
+      throw new Error(
+        response.error?.message || "Failed to fetch environments",
+      );
     }
 
     const environments = response.data.environments;
 
     // Detect changes
-    const oldNames = this.cachedEnvironments.map(e => e.environment);
-    const newNames = environments.map(e => e.environment);
+    const oldNames = this.cachedEnvironments.map((e) => e.environment);
+    const newNames = environments.map((e) => e.environment);
 
-    const added = newNames.filter(n => !oldNames.includes(n));
-    const removed = oldNames.filter(n => !newNames.includes(n));
+    const added = newNames.filter((n) => !oldNames.includes(n));
+    const removed = oldNames.filter((n) => !newNames.includes(n));
 
     // Update cache
     this.cachedEnvironments = environments;
 
-    this.logger.info('Environments fetched', {
+    this.logger.info("Environments fetched", {
       count: environments.length,
       added: added.length > 0 ? added : undefined,
       removed: removed.length > 0 ? removed : undefined,
@@ -73,14 +78,16 @@ export class EnvironmentService {
    * Get cached environment names
    */
   getEnvironmentNames(): string[] {
-    return this.cachedEnvironments.map(e => e.environment);
+    return this.cachedEnvironments.map((e) => e.environment);
   }
 
   /**
    * Check if an environment exists
    */
   hasEnvironment(environmentName: string): boolean {
-    return this.cachedEnvironments.some(e => e.environment === environmentName);
+    return this.cachedEnvironments.some(
+      (e) => e.environment === environmentName,
+    );
   }
 
   /**
@@ -90,7 +97,9 @@ export class EnvironmentService {
   onChange(callback: (added: string[], removed: string[]) => void): () => void {
     this.onChangeCallbacks.push(callback);
     return () => {
-      this.onChangeCallbacks = this.onChangeCallbacks.filter(cb => cb !== callback);
+      this.onChangeCallbacks = this.onChangeCallbacks.filter(
+        (cb) => cb !== callback,
+      );
     };
   }
 
@@ -102,7 +111,9 @@ export class EnvironmentService {
       try {
         callback(added, removed);
       } catch (error: any) {
-        this.logger.error('Error in environment change callback', { error: error.message });
+        this.logger.error("Error in environment change callback", {
+          error: error.message,
+        });
       }
     }
   }
@@ -112,7 +123,7 @@ export class EnvironmentService {
    */
   clearCache(): void {
     this.cachedEnvironments = [];
-    this.logger.debug('Environment cache cleared');
+    this.logger.debug("Environment cache cleared");
   }
 
   /**
@@ -122,4 +133,3 @@ export class EnvironmentService {
     return this.fetchEnvironments();
   }
 }
-

@@ -4,7 +4,7 @@
  * Client-side service for interacting with service discovery API
  */
 
-import api from './api';
+import api from "./api";
 
 /**
  * Service Ports - Named port mapping
@@ -16,22 +16,28 @@ export interface ServicePorts {
 }
 
 export interface ServiceLabels {
-  service: string;              // Required: Service type (e.g., 'world', 'auth')
-  group?: string;               // Optional: Service group (e.g., 'kr', 'us')
+  service: string; // Required: Service type (e.g., 'world', 'auth')
+  group?: string; // Optional: Service group (e.g., 'kr', 'us')
   [key: string]: string | undefined; // Additional custom labels
 }
 
 export interface ServiceInstance {
   instanceId: string;
-  labels: ServiceLabels;        // Replaces type + serviceGroup
+  labels: ServiceLabels; // Replaces type + serviceGroup
   hostname: string;
   externalAddress: string;
   internalAddress: string;
   ports: ServicePorts;
-  status: 'initializing' | 'ready' | 'shutting_down' | 'error' | 'terminated' | 'no-response';
-  createdAt: string;            // Creation time (immutable)
-  updatedAt: string;            // Last update time
-  stats?: Record<string, any>;  // Renamed from instanceStats
+  status:
+    | "initializing"
+    | "ready"
+    | "shutting_down"
+    | "error"
+    | "terminated"
+    | "no-response";
+  createdAt: string; // Creation time (immutable)
+  updatedAt: string; // Last update time
+  stats?: Record<string, any>; // Renamed from instanceStats
   meta?: Record<string, any>;
 }
 
@@ -47,7 +53,7 @@ class ServiceDiscoveryService {
    */
   async getServices(serviceType?: string): Promise<ServiceInstance[]> {
     const params = serviceType ? { serviceType } : {};
-    const response = await api.get('/admin/services', { params });
+    const response = await api.get("/admin/services", { params });
     return response.data;
   }
 
@@ -55,7 +61,7 @@ class ServiceDiscoveryService {
    * Get service statistics
    */
   async getServiceStats(): Promise<ServiceStats> {
-    const response = await api.get('/admin/services/stats');
+    const response = await api.get("/admin/services/stats");
     return response.data;
   }
 
@@ -63,7 +69,7 @@ class ServiceDiscoveryService {
    * Get service types
    */
   async getServiceTypes(): Promise<string[]> {
-    const response = await api.get('/admin/services/types');
+    const response = await api.get("/admin/services/types");
     return response.data;
   }
 
@@ -77,8 +83,11 @@ class ServiceDiscoveryService {
   /**
    * Clean up all terminated and error services
    */
-  async cleanupServices(): Promise<{ deletedCount: number; totalCount: number }> {
-    const response = await api.post('/admin/services/cleanup');
+  async cleanupServices(): Promise<{
+    deletedCount: number;
+    totalCount: number;
+  }> {
+    const response = await api.post("/admin/services/cleanup");
     return response.data;
   }
 
@@ -86,7 +95,10 @@ class ServiceDiscoveryService {
    * Get cache status summary from a service instance
    * Calls the service's /internal/cache/summary endpoint via backend proxy
    */
-  async getCacheSummary(serviceType: string, instanceId: string): Promise<{
+  async getCacheSummary(
+    serviceType: string,
+    instanceId: string,
+  ): Promise<{
     status: string;
     timestamp?: string;
     lastRefreshedAt?: string | null;
@@ -95,7 +107,9 @@ class ServiceDiscoveryService {
     latency?: number;
     error?: string;
   }> {
-    const response = await api.get(`/admin/services/${serviceType}/${instanceId}/cache/summary`);
+    const response = await api.get(
+      `/admin/services/${serviceType}/${instanceId}/cache/summary`,
+    );
     return response.data;
   }
 
@@ -103,7 +117,10 @@ class ServiceDiscoveryService {
    * Get cache status from a service instance (full data)
    * Calls the service's /internal/cache endpoint via backend proxy
    */
-  async getCacheStatus(serviceType: string, instanceId: string): Promise<{
+  async getCacheStatus(
+    serviceType: string,
+    instanceId: string,
+  ): Promise<{
     status: string;
     timestamp?: string;
     lastRefreshedAt?: string | null;
@@ -113,7 +130,9 @@ class ServiceDiscoveryService {
     latency?: number;
     error?: string;
   }> {
-    const response = await api.get(`/admin/services/${serviceType}/${instanceId}/cache`);
+    const response = await api.get(
+      `/admin/services/${serviceType}/${instanceId}/cache`,
+    );
     return response.data;
   }
 
@@ -121,7 +140,10 @@ class ServiceDiscoveryService {
    * Health check a service instance
    * Pings the service's API port (internalApi/externalApi) /health endpoint
    */
-  async healthCheck(serviceType: string, instanceId: string): Promise<{
+  async healthCheck(
+    serviceType: string,
+    instanceId: string,
+  ): Promise<{
     healthy: boolean;
     status: number;
     latency: number;
@@ -129,7 +151,9 @@ class ServiceDiscoveryService {
     error?: string;
     url: string;
   }> {
-    const response = await api.post(`/admin/services/${serviceType}/${instanceId}/health`);
+    const response = await api.post(
+      `/admin/services/${serviceType}/${instanceId}/health`,
+    );
     return response.data;
   }
 
@@ -137,7 +161,10 @@ class ServiceDiscoveryService {
    * Get request statistics from a service instance
    * Calls the service's /internal/stats/requests endpoint via backend proxy
    */
-  async getRequestStats(serviceType: string, instanceId: string): Promise<{
+  async getRequestStats(
+    serviceType: string,
+    instanceId: string,
+  ): Promise<{
     success: boolean;
     data: {
       startTime: string;
@@ -145,16 +172,19 @@ class ServiceDiscoveryService {
       uptimeSeconds: number;
       totalRequests: number;
       statusCodes: Record<string, number>;
-      endpoints: Record<string, {
-        count: number;
-        avgDurationMs: number;
-        minDurationMs: number;
-        maxDurationMs: number;
-        p95DurationMs: number;
-        p99DurationMs: number;
-        bytesSent: number;
-        bytesReceived: number;
-      }>;
+      endpoints: Record<
+        string,
+        {
+          count: number;
+          avgDurationMs: number;
+          minDurationMs: number;
+          maxDurationMs: number;
+          p95DurationMs: number;
+          p99DurationMs: number;
+          bytesSent: number;
+          bytesReceived: number;
+        }
+      >;
       totals: {
         bytesSent: number;
         bytesReceived: number;
@@ -167,31 +197,45 @@ class ServiceDiscoveryService {
     latency?: number;
     error?: string;
   }> {
-    const response = await api.get(`/admin/services/${serviceType}/${instanceId}/stats/requests`);
+    const response = await api.get(
+      `/admin/services/${serviceType}/${instanceId}/stats/requests`,
+    );
     return response as any;
   }
 
   /**
    * Reset request statistics on a service instance
    */
-  async resetRequestStats(serviceType: string, instanceId: string): Promise<{
+  async resetRequestStats(
+    serviceType: string,
+    instanceId: string,
+  ): Promise<{
     success: boolean;
     message: string;
     timestamp: string;
   }> {
-    const response = await api.post(`/admin/services/${serviceType}/${instanceId}/stats/requests/reset`);
+    const response = await api.post(
+      `/admin/services/${serviceType}/${instanceId}/stats/requests/reset`,
+    );
     return response.data;
   }
 
   /**
    * Set request log rate limit on a service instance
    */
-  async setRequestLogRateLimit(serviceType: string, instanceId: string, limit: number): Promise<{
+  async setRequestLogRateLimit(
+    serviceType: string,
+    instanceId: string,
+    limit: number,
+  ): Promise<{
     success: boolean;
     rateLimit: number;
     message: string;
   }> {
-    const response = await api.post(`/admin/services/${serviceType}/${instanceId}/stats/rate-limit`, { limit });
+    const response = await api.post(
+      `/admin/services/${serviceType}/${instanceId}/stats/rate-limit`,
+      { limit },
+    );
     return response.data;
   }
 
@@ -201,9 +245,9 @@ class ServiceDiscoveryService {
    */
   createSSEConnection(
     onMessage: (event: { type: string; data: any }) => void,
-    onError?: (error: Event) => void
+    onError?: (error: Event) => void,
   ): EventSource {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
     // Add timestamp to prevent Safari caching
     const timestamp = Date.now();
     // Use relative URL - Vite proxy will handle it
@@ -216,12 +260,12 @@ class ServiceDiscoveryService {
         const data = JSON.parse(event.data);
         onMessage(data);
       } catch (error) {
-        console.error('Failed to parse SSE message:', error);
+        console.error("Failed to parse SSE message:", error);
       }
     };
 
     eventSource.onerror = (error) => {
-      console.error('SSE connection error:', error);
+      console.error("SSE connection error:", error);
       if (onError) {
         onError(error);
       }
@@ -232,4 +276,3 @@ class ServiceDiscoveryService {
 }
 
 export default new ServiceDiscoveryService();
-

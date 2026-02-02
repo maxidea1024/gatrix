@@ -1,6 +1,6 @@
-export type MailType = 'user' | 'system' | 'notification';
-export type MailPriority = 'low' | 'normal' | 'high' | 'urgent';
-export type ContentType = 'text' | 'html';
+export type MailType = "user" | "system" | "notification";
+export type MailPriority = "low" | "normal" | "high" | "urgent";
+export type ContentType = "text" | "html";
 
 export interface MailData {
   [key: string]: any;
@@ -52,4 +52,3 @@ export interface SendMailRequest {
   category?: string;
   mailData?: MailData;
 }
-

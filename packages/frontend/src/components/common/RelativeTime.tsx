@@ -4,10 +4,17 @@
  * Displays relative time (e.g., "3 minutes ago", "just now") that auto-updates.
  * Uses smooth text updates to avoid flickering.
  */
-import React, { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
-import { Tooltip, Typography, TypographyProps } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+  memo,
+} from "react";
+import { Tooltip, Typography, TypographyProps } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { formatRelativeTime, formatDateTimeDetailed } from "@/utils/dateFormat";
 
 interface RelativeTimeProps {
   /** Date value (ISO string, Date object, or null/undefined) */
@@ -15,11 +22,11 @@ interface RelativeTimeProps {
   /** Show tooltip with full date/time on hover (default: true) */
   showTooltip?: boolean;
   /** Typography variant (default: 'body2') */
-  variant?: TypographyProps['variant'];
+  variant?: TypographyProps["variant"];
   /** Typography color (default: 'text.secondary') */
-  color?: TypographyProps['color'];
+  color?: TypographyProps["color"];
   /** Additional sx props */
-  sx?: TypographyProps['sx'];
+  sx?: TypographyProps["sx"];
   /** Update interval in milliseconds (default: auto based on time distance) */
   updateInterval?: number;
   /** Show seconds for recent times (default: false) */
@@ -42,9 +49,9 @@ const getOptimalInterval = (date: Date, showSeconds?: boolean): number => {
   if (diff < 60 * 1000) {
     return showSeconds ? 1000 : 10000; // < 1 minute: every 1 sec (showSeconds) or 10 sec
   }
-  if (diff < 60 * 60 * 1000) return 30000;  // < 1 hour: every 30 seconds
+  if (diff < 60 * 60 * 1000) return 30000; // < 1 hour: every 30 seconds
   if (diff < 24 * 60 * 60 * 1000) return 60000; // < 1 day: every 1 minute
-  return 5 * 60 * 1000;                      // > 1 day: every 5 minutes
+  return 5 * 60 * 1000; // > 1 day: every 5 minutes
 };
 
 /**
@@ -54,15 +61,17 @@ const getOptimalInterval = (date: Date, showSeconds?: boolean): number => {
 const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
   date,
   showTooltip = true,
-  variant = 'body2',
-  color = 'text.secondary',
+  variant = "body2",
+  color = "text.secondary",
   sx,
   updateInterval,
   showSeconds = false,
   baseTime,
 }) => {
   const { t, i18n } = useTranslation();
-  const [relativeText, setRelativeText] = useState(() => formatRelativeTime(date, { showSeconds, baseTime }, i18n.language));
+  const [relativeText, setRelativeText] = useState(() =>
+    formatRelativeTime(date, { showSeconds, baseTime }, i18n.language),
+  );
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Memoize the parsed date to avoid recalculating
@@ -73,8 +82,12 @@ const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
 
   // Update the relative time text only if it actually changed
   const updateRelativeTime = useCallback(() => {
-    const newText = formatRelativeTime(date, { showSeconds, baseTime }, i18n.language);
-    setRelativeText(prev => prev === newText ? prev : newText);
+    const newText = formatRelativeTime(
+      date,
+      { showSeconds, baseTime },
+      i18n.language,
+    );
+    setRelativeText((prev) => (prev === newText ? prev : newText));
   }, [date, showSeconds, baseTime, i18n.language]);
 
   useEffect(() => {
@@ -89,7 +102,8 @@ const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
     }
 
     // Calculate interval
-    const interval = updateInterval ?? getOptimalInterval(parsedDate, showSeconds);
+    const interval =
+      updateInterval ?? getOptimalInterval(parsedDate, showSeconds);
 
     // Set up interval for updates
     intervalRef.current = setInterval(updateRelativeTime, interval);
@@ -100,10 +114,16 @@ const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
         intervalRef.current = null;
       }
     };
-  }, [parsedDate, updateInterval, updateRelativeTime, showSeconds, i18n.language]);
+  }, [
+    parsedDate,
+    updateInterval,
+    updateRelativeTime,
+    showSeconds,
+    i18n.language,
+  ]);
 
   // Handle invalid or missing date
-  if (!date || relativeText === '-') {
+  if (!date || relativeText === "-") {
     return (
       <Typography variant={variant} color={color} sx={sx}>
         -
@@ -113,9 +133,9 @@ const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
 
   // Process the text - handle __SECONDS_AGO__ special format
   let displayText = relativeText;
-  if (relativeText.startsWith('__SECONDS_AGO__')) {
-    const seconds = parseInt(relativeText.replace('__SECONDS_AGO__', ''), 10);
-    displayText = t('common.relativeTime.secondsAgo', { seconds });
+  if (relativeText.startsWith("__SECONDS_AGO__")) {
+    const seconds = parseInt(relativeText.replace("__SECONDS_AGO__", ""), 10);
+    displayText = t("common.relativeTime.secondsAgo", { seconds });
   }
 
   const fullDateTime = formatDateTimeDetailed(date);
@@ -126,10 +146,10 @@ const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
       variant={variant}
       color={color}
       sx={{
-        display: 'inline-flex',
-        whiteSpace: 'nowrap',
-        verticalAlign: 'middle',
-        ...sx
+        display: "inline-flex",
+        whiteSpace: "nowrap",
+        verticalAlign: "middle",
+        ...sx,
       }}
     >
       {displayText}
@@ -151,4 +171,3 @@ const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
 export const RelativeTime = memo(RelativeTimeInner);
 
 export default RelativeTime;
-

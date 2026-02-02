@@ -1,11 +1,14 @@
-import db from '../config/knex';
-import logger from '../config/logger';
-import { convertDateFieldsForMySQL, convertDateFieldsFromMySQL } from '../utils/dateUtils';
+import db from "../config/knex";
+import logger from "../config/logger";
+import {
+  convertDateFieldsForMySQL,
+  convertDateFieldsFromMySQL,
+} from "../utils/dateUtils";
 
 export interface GameWorldMaintenanceLocale {
   id?: number;
   gameWorldId: number;
-  lang: 'ko' | 'en' | 'zh';
+  lang: "ko" | "en" | "zh";
   message: string;
   createdBy?: number;
   updatedBy?: number;
@@ -100,27 +103,30 @@ export interface GameWorldListParams {
 }
 
 export class GameWorldModel {
-  static async findById(id: number, environment: string): Promise<GameWorld | null> {
+  static async findById(
+    id: number,
+    environment: string,
+  ): Promise<GameWorld | null> {
     try {
       return await this.findByIdWith(db, id, environment);
     } catch (error) {
-      logger.error('Error finding game world by ID:', error);
+      logger.error("Error finding game world by ID:", error);
       throw error;
     }
   }
 
   // Use provided connection/transaction to ensure visibility inside transactions
-  static async findByIdWith(conn: any, id: number, environment: string): Promise<GameWorld | null> {
-    const gameWorld = await conn('g_game_worlds as gw')
-      .leftJoin('g_users as c', 'gw.createdBy', 'c.id')
-      .leftJoin('g_users as u', 'gw.updatedBy', 'u.id')
-      .select([
-        'gw.*',
-        'c.name as createdByName',
-        'u.name as updatedByName'
-      ])
-      .where('gw.id', id)
-      .where('gw.environment', environment)
+  static async findByIdWith(
+    conn: any,
+    id: number,
+    environment: string,
+  ): Promise<GameWorld | null> {
+    const gameWorld = await conn("g_game_worlds as gw")
+      .leftJoin("g_users as c", "gw.createdBy", "c.id")
+      .leftJoin("g_users as u", "gw.updatedBy", "u.id")
+      .select(["gw.*", "c.name as createdByName", "u.name as updatedByName"])
+      .where("gw.id", id)
+      .where("gw.environment", environment)
       .first();
 
     if (!gameWorld) {
@@ -128,27 +134,38 @@ export class GameWorldModel {
     }
 
     // 점검 메시지 로케일 정보 로드
-    const maintenanceLocales = await conn('g_game_world_maintenance_locales')
-      .where('gameWorldId', id)
-      .select('lang', 'message');
+    const maintenanceLocales = await conn("g_game_world_maintenance_locales")
+      .where("gameWorldId", id)
+      .select("lang", "message");
 
-    return convertDateFieldsFromMySQL({
-      ...gameWorld,
-      maintenanceLocales: maintenanceLocales || []
-    }, ['createdAt', 'updatedAt', 'maintenanceStartDate', 'maintenanceEndDate']) as GameWorld;
+    return convertDateFieldsFromMySQL(
+      {
+        ...gameWorld,
+        maintenanceLocales: maintenanceLocales || [],
+      },
+      ["createdAt", "updatedAt", "maintenanceStartDate", "maintenanceEndDate"],
+    ) as GameWorld;
   }
 
-  static async findByWorldId(worldId: string, environment: string): Promise<GameWorld | null> {
+  static async findByWorldId(
+    worldId: string,
+    environment: string,
+  ): Promise<GameWorld | null> {
     try {
-      const gameWorld = await db('g_game_worlds')
-        .where('worldId', worldId)
-        .where('environment', environment)
+      const gameWorld = await db("g_game_worlds")
+        .where("worldId", worldId)
+        .where("environment", environment)
         .first();
 
       if (!gameWorld) return null;
-      return convertDateFieldsFromMySQL(gameWorld, ['createdAt', 'updatedAt', 'maintenanceStartDate', 'maintenanceEndDate']) as GameWorld;
+      return convertDateFieldsFromMySQL(gameWorld, [
+        "createdAt",
+        "updatedAt",
+        "maintenanceStartDate",
+        "maintenanceEndDate",
+      ]) as GameWorld;
     } catch (error) {
-      logger.error('Error finding game world by world ID:', error);
+      logger.error("Error finding game world by world ID:", error);
       throw error;
     }
   }
@@ -157,99 +174,115 @@ export class GameWorldModel {
     try {
       const {
         environment,
-        search = '',
+        search = "",
         isVisible,
         isMaintenance,
         tags,
       } = params;
 
       // Convert raw SQL to knex query builder
-      let query = db('g_game_worlds as gw')
-        .leftJoin('g_users as c', 'gw.createdBy', 'c.id')
-        .leftJoin('g_users as u', 'gw.updatedBy', 'u.id')
+      let query = db("g_game_worlds as gw")
+        .leftJoin("g_users as c", "gw.createdBy", "c.id")
+        .leftJoin("g_users as u", "gw.updatedBy", "u.id")
         .select([
-          'gw.*',
-          'c.name as createdByName',
-          'c.email as createdByEmail',
-          'u.name as updatedByName',
-          'u.email as updatedByEmail'
+          "gw.*",
+          "c.name as createdByName",
+          "c.email as createdByEmail",
+          "u.name as updatedByName",
+          "u.email as updatedByEmail",
         ])
-        .where('gw.environment', environment); // Filter by environment
+        .where("gw.environment", environment); // Filter by environment
 
       // Apply search filter
       if (search) {
         query = query.where(function () {
-          this.where('gw.name', 'like', `%${search}%`)
-            .orWhere('gw.worldId', 'like', `%${search}%`)
-            .orWhere('gw.description', 'like', `%${search}%`)
-            .orWhere('gw.tags', 'like', `%${search}%`);
+          this.where("gw.name", "like", `%${search}%`)
+            .orWhere("gw.worldId", "like", `%${search}%`)
+            .orWhere("gw.description", "like", `%${search}%`)
+            .orWhere("gw.tags", "like", `%${search}%`);
         });
       }
 
       // Apply visibility filter
       if (isVisible !== undefined) {
-        query = query.where('gw.isVisible', isVisible);
+        query = query.where("gw.isVisible", isVisible);
       }
 
       // Apply maintenance filter
       if (isMaintenance !== undefined) {
-        query = query.where('gw.isMaintenance', isMaintenance);
+        query = query.where("gw.isMaintenance", isMaintenance);
       }
 
       // Apply tags filter
       if (tags) {
-        const tagArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+        const tagArray = tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0);
         if (tagArray.length > 0) {
           query = query.where(function () {
             tagArray.forEach((tag, index) => {
               if (index === 0) {
-                this.where('gw.tags', 'like', `%${tag}%`);
+                this.where("gw.tags", "like", `%${tag}%`);
               } else {
-                this.andWhere('gw.tags', 'like', `%${tag}%`);
+                this.andWhere("gw.tags", "like", `%${tag}%`);
               }
             });
           });
         }
       }
 
-      const worlds = await query.orderBy('gw.displayOrder', 'ASC');
+      const worlds = await query.orderBy("gw.displayOrder", "ASC");
 
       // 각 게임월드에 대해 maintenanceLocales 추가
       const worldsWithLocales = await Promise.all(
         worlds.map(async (world: any) => {
-          const maintenanceLocales = await db('g_game_world_maintenance_locales')
-            .where('gameWorldId', world.id)
-            .select('lang', 'message');
+          const maintenanceLocales = await db(
+            "g_game_world_maintenance_locales",
+          )
+            .where("gameWorldId", world.id)
+            .select("lang", "message");
 
-          return convertDateFieldsFromMySQL({
-            ...world,
-            maintenanceLocales: maintenanceLocales || []
-          }, ['createdAt', 'updatedAt', 'maintenanceStartDate', 'maintenanceEndDate']) as GameWorld;
-        })
+          return convertDateFieldsFromMySQL(
+            {
+              ...world,
+              maintenanceLocales: maintenanceLocales || [],
+            },
+            [
+              "createdAt",
+              "updatedAt",
+              "maintenanceStartDate",
+              "maintenanceEndDate",
+            ],
+          ) as GameWorld;
+        }),
       );
 
       return worldsWithLocales;
     } catch (error) {
-      logger.error('Error listing game worlds:', error);
+      logger.error("Error listing game worlds:", error);
       throw error;
     }
   }
 
-  static async create(worldData: CreateGameWorldData, environment: string): Promise<GameWorld> {
+  static async create(
+    worldData: CreateGameWorldData,
+    environment: string,
+  ): Promise<GameWorld> {
     try {
       // Get the next display order if not provided (within the same environment)
       let displayOrder = worldData.displayOrder;
       if (displayOrder === undefined) {
         // Get the maximum display order to place new world at the top (when sorted DESC)
-        const maxOrderResult = await db('g_game_worlds')
-          .where('environment', environment)
-          .max('displayOrder as maxOrder')
+        const maxOrderResult = await db("g_game_worlds")
+          .where("environment", environment)
+          .max("displayOrder as maxOrder")
           .first();
         displayOrder = (maxOrderResult?.maxOrder || 0) + 10;
       }
 
       // Validate createdBy
-      if (!worldData.createdBy || typeof worldData.createdBy !== 'number') {
+      if (!worldData.createdBy || typeof worldData.createdBy !== "number") {
         throw new Error(`Invalid createdBy value: ${worldData.createdBy}`);
       }
 
@@ -274,13 +307,18 @@ export class GameWorldModel {
           infraSettings: gameWorldData.infraSettings ?? null,
           infraSettingsRaw: gameWorldData.infraSettingsRaw ?? null,
           worldServerAddress: gameWorldData.worldServerAddress, // Required field
-          createdBy: gameWorldData.createdBy
+          createdBy: gameWorldData.createdBy,
         };
 
         // 날짜 필드들을 MySQL DATETIME 형식으로 변환
-        const convertedData = convertDateFieldsForMySQL(insertData, ['createdAt', 'updatedAt', 'maintenanceStartDate', 'maintenanceEndDate']);
+        const convertedData = convertDateFieldsForMySQL(insertData, [
+          "createdAt",
+          "updatedAt",
+          "maintenanceStartDate",
+          "maintenanceEndDate",
+        ]);
 
-        const [insertId] = await trx('g_game_worlds').insert(convertedData);
+        const [insertId] = await trx("g_game_worlds").insert(convertedData);
 
         // 점검 메시지 로케일 처리
         if (maintenanceLocales && maintenanceLocales.length > 0) {
@@ -291,27 +329,31 @@ export class GameWorldModel {
             createdBy: worldData.createdBy,
             updatedBy: worldData.createdBy,
             createdAt: new Date(),
-            updatedAt: new Date()
+            updatedAt: new Date(),
           }));
 
-          await trx('g_game_world_maintenance_locales').insert(localeInserts);
+          await trx("g_game_world_maintenance_locales").insert(localeInserts);
         }
 
         // Use the same transaction connection to ensure visibility before commit
         const world = await this.findByIdWith(trx, insertId, environment);
         if (!world) {
-          throw new Error('Failed to create game world');
+          throw new Error("Failed to create game world");
         }
 
         return world;
       });
     } catch (error) {
-      logger.error('Error creating game world:', error);
+      logger.error("Error creating game world:", error);
       throw error;
     }
   }
 
-  static async update(id: number, worldData: UpdateGameWorldData, environment: string): Promise<GameWorld | null> {
+  static async update(
+    id: number,
+    worldData: UpdateGameWorldData,
+    environment: string,
+  ): Promise<GameWorld | null> {
     try {
       return await db.transaction(async (trx) => {
         // maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
@@ -322,7 +364,7 @@ export class GameWorldModel {
         Object.entries(gameWorldUpdateData).forEach(([key, value]) => {
           if (value !== undefined) {
             // customPayload, infraSettings는 JSON 문자열로 변환
-            if (key === 'customPayload' || key === 'infraSettings') {
+            if (key === "customPayload" || key === "infraSettings") {
               updateData[key] = value === null ? null : JSON.stringify(value);
             } else {
               updateData[key] = value;
@@ -331,22 +373,27 @@ export class GameWorldModel {
         });
 
         // 날짜 필드들을 MySQL DATETIME 형식으로 변환
-        const convertedUpdateData = convertDateFieldsForMySQL(updateData, ['createdAt', 'updatedAt', 'maintenanceStartDate', 'maintenanceEndDate']);
+        const convertedUpdateData = convertDateFieldsForMySQL(updateData, [
+          "createdAt",
+          "updatedAt",
+          "maintenanceStartDate",
+          "maintenanceEndDate",
+        ]);
 
         if (Object.keys(convertedUpdateData).length > 0) {
           convertedUpdateData.updatedAt = db.fn.now();
 
-          await trx('g_game_worlds')
-            .where('id', id)
-            .where('environment', environment)
+          await trx("g_game_worlds")
+            .where("id", id)
+            .where("environment", environment)
             .update(convertedUpdateData);
         }
 
         // 점검 메시지 로케일 처리
         if (maintenanceLocales !== undefined) {
           // 기존 로케일 삭제
-          await trx('g_game_world_maintenance_locales')
-            .where('gameWorldId', id)
+          await trx("g_game_world_maintenance_locales")
+            .where("gameWorldId", id)
             .del();
 
           // 새 로케일 추가
@@ -358,10 +405,10 @@ export class GameWorldModel {
               createdBy: worldData.updatedBy,
               updatedBy: worldData.updatedBy,
               createdAt: new Date(),
-              updatedAt: new Date()
+              updatedAt: new Date(),
             }));
 
-            await trx('g_game_world_maintenance_locales').insert(localeInserts);
+            await trx("g_game_world_maintenance_locales").insert(localeInserts);
           }
         }
 
@@ -369,62 +416,71 @@ export class GameWorldModel {
         return this.findByIdWith(trx, id, environment);
       });
     } catch (error) {
-      logger.error('Error updating game world:', error);
+      logger.error("Error updating game world:", error);
       throw error;
     }
   }
 
   static async delete(id: number, environment: string): Promise<boolean> {
     try {
-      const result = await db('g_game_worlds')
-        .where('id', id)
-        .where('environment', environment)
+      const result = await db("g_game_worlds")
+        .where("id", id)
+        .where("environment", environment)
         .del();
 
       return result > 0;
     } catch (error) {
-      logger.error('Error deleting game world:', error);
+      logger.error("Error deleting game world:", error);
       throw error;
     }
   }
 
-  static async exists(worldId: string, id: number, environment: string): Promise<boolean> {
+  static async exists(
+    worldId: string,
+    id: number,
+    environment: string,
+  ): Promise<boolean> {
     try {
-      const result = await db('g_game_worlds')
-        .where('worldId', worldId)
-        .where('environment', environment)
-        .whereNot('id', id)
-        .count('* as count')
+      const result = await db("g_game_worlds")
+        .where("worldId", worldId)
+        .where("environment", environment)
+        .whereNot("id", id)
+        .count("* as count")
         .first();
 
       return Number(result?.count || 0) > 0;
     } catch (error) {
-      logger.error('Error checking game world existence:', error);
+      logger.error("Error checking game world existence:", error);
       throw error;
     }
   }
 
-  static async updateDisplayOrders(orderUpdates: { id: number; displayOrder: number }[], environment: string): Promise<void> {
+  static async updateDisplayOrders(
+    orderUpdates: { id: number; displayOrder: number }[],
+    environment: string,
+  ): Promise<void> {
     try {
       await db.transaction(async (trx) => {
         for (const update of orderUpdates) {
-          const result = await trx('g_game_worlds')
-            .where('id', update.id)
-            .where('environment', environment)
+          const result = await trx("g_game_worlds")
+            .where("id", update.id)
+            .where("environment", environment)
             .update({
               displayOrder: update.displayOrder,
-              updatedAt: db.fn.now()
+              updatedAt: db.fn.now(),
             });
 
           if (result === 0) {
-            throw new Error(`No game world found with id ${update.id} in environment ${environment}`);
+            throw new Error(
+              `No game world found with id ${update.id} in environment ${environment}`,
+            );
           }
         }
       });
 
-      logger.info('Successfully updated all display orders');
+      logger.info("Successfully updated all display orders");
     } catch (error) {
-      logger.error('Error updating display orders:', error);
+      logger.error("Error updating display orders:", error);
       throw error;
     }
   }
@@ -436,28 +492,28 @@ export class GameWorldModel {
       if (!currentWorld) return false;
 
       // Find the world with the next lower displayOrder
-      const prevWorld = await db('g_game_worlds')
-        .where('environment', environment)
-        .where('displayOrder', '<', currentWorld.displayOrder)
-        .orderBy('displayOrder', 'desc')
+      const prevWorld = await db("g_game_worlds")
+        .where("environment", environment)
+        .where("displayOrder", "<", currentWorld.displayOrder)
+        .orderBy("displayOrder", "desc")
         .first();
 
       if (!prevWorld) return false; // Already at top
 
       // Swap display orders
-      await db('g_game_worlds')
-        .where('id', currentWorld.id)
-        .where('environment', environment)
+      await db("g_game_worlds")
+        .where("id", currentWorld.id)
+        .where("environment", environment)
         .update({ displayOrder: prevWorld.displayOrder });
 
-      await db('g_game_worlds')
-        .where('id', prevWorld.id)
-        .where('environment', environment)
+      await db("g_game_worlds")
+        .where("id", prevWorld.id)
+        .where("environment", environment)
         .update({ displayOrder: currentWorld.displayOrder });
 
       return true;
     } catch (error) {
-      logger.error('Error moving world up:', error);
+      logger.error("Error moving world up:", error);
       throw error;
     }
   }
@@ -469,28 +525,28 @@ export class GameWorldModel {
       if (!currentWorld) return false;
 
       // Find the world with the next higher displayOrder
-      const nextWorld = await db('g_game_worlds')
-        .where('environment', environment)
-        .where('displayOrder', '>', currentWorld.displayOrder)
-        .orderBy('displayOrder', 'asc')
+      const nextWorld = await db("g_game_worlds")
+        .where("environment", environment)
+        .where("displayOrder", ">", currentWorld.displayOrder)
+        .orderBy("displayOrder", "asc")
         .first();
 
       if (!nextWorld) return false; // Already at bottom
 
       // Swap display orders
-      await db('g_game_worlds')
-        .where('id', currentWorld.id)
-        .where('environment', environment)
+      await db("g_game_worlds")
+        .where("id", currentWorld.id)
+        .where("environment", environment)
         .update({ displayOrder: nextWorld.displayOrder });
 
-      await db('g_game_worlds')
-        .where('id', nextWorld.id)
-        .where('environment', environment)
+      await db("g_game_worlds")
+        .where("id", nextWorld.id)
+        .where("environment", environment)
         .update({ displayOrder: currentWorld.displayOrder });
 
       return true;
     } catch (error) {
-      logger.error('Error moving world down:', error);
+      logger.error("Error moving world down:", error);
       throw error;
     }
   }

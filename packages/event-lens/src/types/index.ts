@@ -1,8 +1,8 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // Event Type
 export const eventSchema = z.object({
-  type: z.enum(['track', 'identify', 'increment', 'decrement']),
+  type: z.enum(["track", "identify", "increment", "decrement"]),
   payload: z.object({
     name: z.string().optional(),
     profileId: z.string().optional(),
@@ -25,14 +25,14 @@ export interface Event {
   sessionId: string;
   createdAt: string;
   timestamp: string;
-  
+
   // Geo
   country?: string | null;
   city?: string | null;
   region?: string | null;
   latitude?: number | null;
   longitude?: number | null;
-  
+
   // Device
   os?: string | null;
   osVersion?: string | null;
@@ -41,28 +41,28 @@ export interface Event {
   device?: string | null;
   brand?: string | null;
   model?: string | null;
-  
+
   // Page
   path?: string | null;
   origin?: string | null;
   referrer?: string | null;
   referrerName?: string | null;
   referrerType?: string | null;
-  
+
   // UTM
   utmSource?: string | null;
   utmMedium?: string | null;
   utmCampaign?: string | null;
   utmTerm?: string | null;
   utmContent?: string | null;
-  
+
   // Custom
   properties?: string;
-  
+
   // Session metrics
   duration?: number | null;
   screenViews?: number | null;
-  
+
   // Raw data
   ip?: string;
   userAgent?: string;
@@ -106,7 +106,7 @@ export interface Session {
 export interface AnalyticsClient {
   id: string;
   name: string;
-  type: 'write' | 'read' | 'root';
+  type: "write" | "read" | "root";
   projectId: string;
   secret: string;
   cors?: string[];
@@ -166,4 +166,3 @@ export interface RetentionData {
 export default {
   eventSchema,
 };
-

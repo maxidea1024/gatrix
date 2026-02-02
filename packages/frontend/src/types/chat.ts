@@ -14,7 +14,7 @@ export interface Channel {
   id: number;
   name: string;
   description?: string;
-  type: 'public' | 'private' | 'direct';
+  type: "public" | "private" | "direct";
   createdBy: number;
   createdAt: string;
   updatedAt: string;
@@ -38,7 +38,7 @@ export interface ChannelMember {
   id: number;
   channelId: number;
   userId: number;
-  role: 'owner' | 'admin' | 'member';
+  role: "owner" | "admin" | "member";
   joinedAt: string;
   lastReadAt?: string;
   user: User;
@@ -67,16 +67,16 @@ export interface Message {
   hashtags: string[];
 }
 
-export type MessageType = 
-  | 'text' 
-  | 'image' 
-  | 'video' 
-  | 'audio' 
-  | 'file' 
-  | 'location' 
-  | 'link' 
-  | 'system' 
-  | 'emoji';
+export type MessageType =
+  | "text"
+  | "image"
+  | "video"
+  | "audio"
+  | "file"
+  | "location"
+  | "link"
+  | "system"
+  | "emoji";
 
 export interface MessageMetadata {
   linkPreview?: LinkPreview;
@@ -94,7 +94,7 @@ export interface LinkPreview {
   author?: string;
   readingTime?: string;
   publishedTime?: string;
-  type?: 'website' | 'article' | 'video' | 'image';
+  type?: "website" | "article" | "video" | "image";
   favicon?: string;
 }
 
@@ -110,13 +110,13 @@ export interface EditHistory {
   editedAt: string;
 }
 
-export type SystemEventType = 
-  | 'user_joined' 
-  | 'user_left' 
-  | 'channel_created' 
-  | 'channel_updated' 
-  | 'member_added' 
-  | 'member_removed';
+export type SystemEventType =
+  | "user_joined"
+  | "user_left"
+  | "channel_created"
+  | "channel_updated"
+  | "member_added"
+  | "member_removed";
 
 export interface MessageReaction {
   id: number;
@@ -174,13 +174,13 @@ export interface ChatNotification {
   message?: Message;
 }
 
-export type NotificationType = 
-  | 'new_message' 
-  | 'mention' 
-  | 'reply' 
-  | 'channel_invite' 
-  | 'user_joined' 
-  | 'user_left';
+export type NotificationType =
+  | "new_message"
+  | "mention"
+  | "reply"
+  | "channel_invite"
+  | "user_joined"
+  | "user_left";
 
 // WebSocket event types
 export interface WebSocketEvent {
@@ -191,57 +191,57 @@ export interface WebSocketEvent {
 
 export type WebSocketEventType =
   // 서버 → 클라이언트 이벤트 (서버에서 실제로 emit하는 이벤트들)
-  | 'connected'                    // 연결 성공
-  | 'error'                       // 오류 발생
-  | 'message_sent'                // 메시지 전송 완료
-  | 'user_typing'                 // 타이핑 시작 알림
-  | 'user_stop_typing'            // 타이핑 중지 알림
-  | 'user_typing_thread'          // 스레드 타이핑 시작 알림
-  | 'user_stop_typing_thread'     // 스레드 타이핑 중지 알림
-  | 'user_status_changed'         // 사용자 상태 변경 알림
-  | 'user_left'                   // 사용자 채널 퇴장 알림
-  | 'message'                     // 일반 메시지 (MessageController)
-  | 'new_message'                 // 새 메시지 (BroadcastService)
+  | "connected" // 연결 성공
+  | "error" // 오류 발생
+  | "message_sent" // 메시지 전송 완료
+  | "user_typing" // 타이핑 시작 알림
+  | "user_stop_typing" // 타이핑 중지 알림
+  | "user_typing_thread" // 스레드 타이핑 시작 알림
+  | "user_stop_typing_thread" // 스레드 타이핑 중지 알림
+  | "user_status_changed" // 사용자 상태 변경 알림
+  | "user_left" // 사용자 채널 퇴장 알림
+  | "message" // 일반 메시지 (MessageController)
+  | "new_message" // 새 메시지 (BroadcastService)
 
   // 클라이언트 → 서버 이벤트 (클라이언트에서 서버로 보내는 이벤트들)
-  | 'join_channel'               // 채널 입장
-  | 'leave_channel'              // 채널 퇴장
-  | 'send_message'               // 메시지 전송
-  | 'start_typing'               // 타이핑 시작
-  | 'stop_typing'                // 타이핑 중지
-  | 'mark_read'                  // 메시지 읽음 처리
-  | 'update_status'              // 상태 업데이트
-  | 'activity'                   // 활동 업데이트
+  | "join_channel" // 채널 입장
+  | "leave_channel" // 채널 퇴장
+  | "send_message" // 메시지 전송
+  | "start_typing" // 타이핑 시작
+  | "stop_typing" // 타이핑 중지
+  | "mark_read" // 메시지 읽음 처리
+  | "update_status" // 상태 업데이트
+  | "activity" // 활동 업데이트
 
   // 클라이언트 내부 이벤트 (프론트엔드에서만 사용)
-  | 'message_created'            // 메시지 생성 (message 이벤트에서 파싱)
-  | 'message_updated'            // 메시지 수정 (message 이벤트에서 파싱)
-  | 'message_deleted'            // 메시지 삭제 (message 이벤트에서 파싱)
-  | 'thread_message_created'     // 스레드 메시지 생성 (message 이벤트에서 파싱)
-  | 'thread_updated'             // 스레드 업데이트 (message 이벤트에서 파싱)
-  | 'message_reaction_updated'   // 리액션 업데이트
-  | 'connection_established'     // 연결 설정됨
-  | 'connection_lost'            // 연결 끊어짐
-  | 'connection_error'           // 연결 오류
-  | 'connection_failed'          // 연결 실패
-  | 'authentication_failed'      // 인증 실패
-  | 'channel_invitation'         // 채널 초대
-  | 'invitation_response'        // 초대 응답
-  | 'invitation_cancelled'       // 초대 취소
-  | 'user_joined_channel'        // 사용자 채널 입장
-  | 'user_left_channel'          // 사용자 채널 퇴장
-  | 'channel_updated'            // 채널 업데이트
-  | 'reaction_added'             // 리액션 추가
-  | 'reaction_removed'           // 리액션 제거
-  | 'user_online'                // 사용자 온라인
-  | 'user_offline'               // 사용자 오프라인
-  | 'presence_update';           // 상태 업데이트
+  | "message_created" // 메시지 생성 (message 이벤트에서 파싱)
+  | "message_updated" // 메시지 수정 (message 이벤트에서 파싱)
+  | "message_deleted" // 메시지 삭제 (message 이벤트에서 파싱)
+  | "thread_message_created" // 스레드 메시지 생성 (message 이벤트에서 파싱)
+  | "thread_updated" // 스레드 업데이트 (message 이벤트에서 파싱)
+  | "message_reaction_updated" // 리액션 업데이트
+  | "connection_established" // 연결 설정됨
+  | "connection_lost" // 연결 끊어짐
+  | "connection_error" // 연결 오류
+  | "connection_failed" // 연결 실패
+  | "authentication_failed" // 인증 실패
+  | "channel_invitation" // 채널 초대
+  | "invitation_response" // 초대 응답
+  | "invitation_cancelled" // 초대 취소
+  | "user_joined_channel" // 사용자 채널 입장
+  | "user_left_channel" // 사용자 채널 퇴장
+  | "channel_updated" // 채널 업데이트
+  | "reaction_added" // 리액션 추가
+  | "reaction_removed" // 리액션 제거
+  | "user_online" // 사용자 온라인
+  | "user_offline" // 사용자 오프라인
+  | "presence_update"; // 상태 업데이트
 
 // API request/response types
 export interface CreateChannelRequest {
   name: string;
   description?: string;
-  type: 'public' | 'private';
+  type: "public" | "private";
   memberIds?: number[];
   settings?: Partial<ChannelSettings>;
 }
@@ -280,7 +280,7 @@ export interface GetMessagesRequest {
 }
 
 export interface GetChannelsRequest {
-  type?: 'public' | 'private' | 'direct';
+  type?: "public" | "private" | "direct";
   search?: string;
   page?: number;
   limit?: number;
@@ -298,7 +298,12 @@ export interface ChatState {
   notifications: ChatNotification[];
   isConnected: boolean;
   isLoading: boolean;
-  loadingStage: 'idle' | 'syncing' | 'connecting' | 'loading_channels' | 'complete';
+  loadingStage:
+    | "idle"
+    | "syncing"
+    | "connecting"
+    | "loading_channels"
+    | "complete";
   loadingStartTime: number | null; // 로딩 시작 시간
   pendingInvitationsCount: number; // 받은 초대 수
   error: string | null; // error message
@@ -308,11 +313,17 @@ export interface ChatContextType {
   state: ChatState;
   actions: {
     setCurrentChannel: (channelId: number | null) => void;
-    sendMessage: (channelId: number, message: SendMessageRequest) => Promise<Message>;
+    sendMessage: (
+      channelId: number,
+      message: SendMessageRequest,
+    ) => Promise<Message>;
     editMessage: (messageId: number, content: string) => Promise<Message>;
     deleteMessage: (messageId: number) => Promise<void>;
     createChannel: (channel: CreateChannelRequest) => Promise<Channel>;
-    updateChannel: (channelId: number, updates: UpdateChannelRequest) => Promise<Channel>;
+    updateChannel: (
+      channelId: number,
+      updates: UpdateChannelRequest,
+    ) => Promise<Channel>;
     joinChannel: (channelId: number) => Promise<void>;
     leaveChannel: (channelId: number) => Promise<void>;
     addReaction: (messageId: number, emoji: string) => Promise<void>;
@@ -324,7 +335,11 @@ export interface ChatContextType {
     loadMessages: (channelId: number, forceReload?: boolean) => Promise<void>;
     loadMoreMessages: (channelId: number) => Promise<void>;
     uploadFile: (file: File, channelId: number) => Promise<MessageAttachment>;
-    inviteUser: (channelId: number, userId: number, message?: string) => Promise<void>;
+    inviteUser: (
+      channelId: number,
+      userId: number,
+      message?: string,
+    ) => Promise<void>;
     loadPendingInvitationsCount: () => Promise<void>;
     getThreadMessages: (threadId: number) => Promise<Message[]>;
     clearError: () => void;
@@ -342,7 +357,7 @@ export interface EmojiData {
 }
 
 export interface RichTextElement {
-  type: 'text' | 'emoji' | 'mention' | 'hashtag' | 'link';
+  type: "text" | "emoji" | "mention" | "hashtag" | "link";
   content: string;
   data?: any; // additional data for specific types
 }

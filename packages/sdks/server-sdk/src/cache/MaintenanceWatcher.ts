@@ -10,8 +10,8 @@
  * - Future startDate or endDate set: schedule timers to check at those times
  */
 
-import { Logger } from '../utils/logger';
-import { MaintenanceStatus, GameWorld } from '../types/api';
+import { Logger } from "../utils/logger";
+import { MaintenanceStatus, GameWorld } from "../types/api";
 
 export interface MaintenanceStateSnapshot {
   // Service-level maintenance state
@@ -31,18 +31,21 @@ export interface MaintenanceStateSnapshot {
   // Actual start times for world maintenance (worldId -> actualStartTime)
   worldActualStartTimes: Map<string, string>;
   // World-level maintenance details for update detection (worldId -> details)
-  worldDetails: Map<string, {
-    startDate?: string;
-    endDate?: string;
-    message?: string;
-    forceDisconnect?: boolean;
-    gracePeriodMinutes?: number;
-  }>;
+  worldDetails: Map<
+    string,
+    {
+      startDate?: string;
+      endDate?: string;
+      message?: string;
+      forceDisconnect?: boolean;
+      gracePeriodMinutes?: number;
+    }
+  >;
 }
 
 export interface MaintenanceEventData {
   /** Source of maintenance: 'service' for global, 'world' for world-level */
-  source: 'service' | 'world';
+  source: "service" | "world";
   /** World ID (only present when source is 'world') */
   worldId?: string;
   /** Whether maintenance is starting (true) or ending (false) - not present for updated */
@@ -68,14 +71,14 @@ export interface MaintenanceEventData {
 // Local events are prefixed with 'local.' to distinguish from backend events
 // grace_period_expired: Emitted when grace period has passed and players should be kicked
 export type MaintenanceEventType =
-  | 'local.maintenance.started'
-  | 'local.maintenance.ended'
-  | 'local.maintenance.updated'
-  | 'local.maintenance.grace_period_expired';
+  | "local.maintenance.started"
+  | "local.maintenance.ended"
+  | "local.maintenance.updated"
+  | "local.maintenance.grace_period_expired";
 
 export type MaintenanceEventCallback = (
   eventType: MaintenanceEventType,
-  data: MaintenanceEventData
+  data: MaintenanceEventData,
 ) => void | Promise<void>;
 
 export class MaintenanceWatcher {
@@ -114,13 +117,15 @@ export class MaintenanceWatcher {
    */
   private emitEvent(
     eventType: MaintenanceEventType,
-    data: MaintenanceEventData
+    data: MaintenanceEventData,
   ): void {
     for (const callback of this.callbacks) {
       try {
         callback(eventType, data);
       } catch (error: any) {
-        this.logger.error('Error in maintenance event callback', { error: error.message });
+        this.logger.error("Error in maintenance event callback", {
+          error: error.message,
+        });
       }
     }
   }
@@ -153,7 +158,7 @@ export class MaintenanceWatcher {
     if (delay > 100) {
       this.logger.debug(`Scheduling maintenance check for ${key}`, {
         targetTime: targetTime.toISOString(),
-        delayMs: delay
+        delayMs: delay,
       });
 
       const timer = setTimeout(() => {
@@ -189,8 +194,11 @@ export class MaintenanceWatcher {
    * Schedule grace period expiry timer for service maintenance
    * When grace period expires, emit grace_period_expired event
    */
-  private scheduleServiceGracePeriodTimer(actualStartTime: string, gracePeriodMinutes: number): void {
-    const key = 'service-grace-period';
+  private scheduleServiceGracePeriodTimer(
+    actualStartTime: string,
+    gracePeriodMinutes: number,
+  ): void {
+    const key = "service-grace-period";
 
     // Clear existing timer if any
     const existingTimer = this.gracePeriodTimers.get(key);
@@ -201,10 +209,12 @@ export class MaintenanceWatcher {
 
     if (!gracePeriodMinutes || gracePeriodMinutes <= 0) {
       // Emit immediately if no grace period
-      this.logger.info('Service maintenance started with no grace period, emitting grace_period_expired immediately');
+      this.logger.info(
+        "Service maintenance started with no grace period, emitting grace_period_expired immediately",
+      );
       setImmediate(() => {
-        this.emitEvent('local.maintenance.grace_period_expired', {
-          source: 'service',
+        this.emitEvent("local.maintenance.grace_period_expired", {
+          source: "service",
           timestamp: new Date().toISOString(),
           actualStartTime,
           details: this.previousState?.serviceDetails,
@@ -214,15 +224,17 @@ export class MaintenanceWatcher {
     }
 
     const startTime = new Date(actualStartTime).getTime();
-    const expiryTime = startTime + (gracePeriodMinutes * 60 * 1000);
+    const expiryTime = startTime + gracePeriodMinutes * 60 * 1000;
     const delay = expiryTime - Date.now();
 
     if (delay <= 0) {
       // Grace period already expired, emit immediately
-      this.logger.info('Service maintenance grace period already expired, emitting immediately');
+      this.logger.info(
+        "Service maintenance grace period already expired, emitting immediately",
+      );
       setImmediate(() => {
-        this.emitEvent('local.maintenance.grace_period_expired', {
-          source: 'service',
+        this.emitEvent("local.maintenance.grace_period_expired", {
+          source: "service",
           timestamp: new Date().toISOString(),
           actualStartTime,
           details: this.previousState?.serviceDetails,
@@ -235,14 +247,14 @@ export class MaintenanceWatcher {
       actualStartTime,
       gracePeriodMinutes,
       expiryTime: new Date(expiryTime).toISOString(),
-      delayMs: delay
+      delayMs: delay,
     });
 
     const timer = setTimeout(() => {
       this.gracePeriodTimers.delete(key);
-      this.logger.info('Service maintenance grace period expired');
-      this.emitEvent('local.maintenance.grace_period_expired', {
-        source: 'service',
+      this.logger.info("Service maintenance grace period expired");
+      this.emitEvent("local.maintenance.grace_period_expired", {
+        source: "service",
         timestamp: new Date().toISOString(),
         actualStartTime,
         details: this.previousState?.serviceDetails,
@@ -255,7 +267,11 @@ export class MaintenanceWatcher {
   /**
    * Schedule grace period expiry timer for world maintenance
    */
-  private scheduleWorldGracePeriodTimer(worldId: string, actualStartTime: string, gracePeriodMinutes: number): void {
+  private scheduleWorldGracePeriodTimer(
+    worldId: string,
+    actualStartTime: string,
+    gracePeriodMinutes: number,
+  ): void {
     const key = `world-${worldId}-grace-period`;
 
     // Clear existing timer if any
@@ -269,10 +285,13 @@ export class MaintenanceWatcher {
 
     if (!gracePeriodMinutes || gracePeriodMinutes <= 0) {
       // Emit immediately if no grace period
-      this.logger.info('World maintenance started with no grace period, emitting grace_period_expired immediately', { worldId });
+      this.logger.info(
+        "World maintenance started with no grace period, emitting grace_period_expired immediately",
+        { worldId },
+      );
       setImmediate(() => {
-        this.emitEvent('local.maintenance.grace_period_expired', {
-          source: 'world',
+        this.emitEvent("local.maintenance.grace_period_expired", {
+          source: "world",
           worldId,
           timestamp: new Date().toISOString(),
           actualStartTime,
@@ -283,15 +302,18 @@ export class MaintenanceWatcher {
     }
 
     const startTime = new Date(actualStartTime).getTime();
-    const expiryTime = startTime + (gracePeriodMinutes * 60 * 1000);
+    const expiryTime = startTime + gracePeriodMinutes * 60 * 1000;
     const delay = expiryTime - Date.now();
 
     if (delay <= 0) {
       // Grace period already expired, emit immediately
-      this.logger.info('World maintenance grace period already expired, emitting immediately', { worldId });
+      this.logger.info(
+        "World maintenance grace period already expired, emitting immediately",
+        { worldId },
+      );
       setImmediate(() => {
-        this.emitEvent('local.maintenance.grace_period_expired', {
-          source: 'world',
+        this.emitEvent("local.maintenance.grace_period_expired", {
+          source: "world",
           worldId,
           timestamp: new Date().toISOString(),
           actualStartTime,
@@ -306,14 +328,14 @@ export class MaintenanceWatcher {
       actualStartTime,
       gracePeriodMinutes,
       expiryTime: new Date(expiryTime).toISOString(),
-      delayMs: delay
+      delayMs: delay,
     });
 
     const timer = setTimeout(() => {
       this.gracePeriodTimers.delete(key);
-      this.logger.info('World maintenance grace period expired', { worldId });
-      this.emitEvent('local.maintenance.grace_period_expired', {
-        source: 'world',
+      this.logger.info("World maintenance grace period expired", { worldId });
+      this.emitEvent("local.maintenance.grace_period_expired", {
+        source: "world",
         worldId,
         timestamp: new Date().toISOString(),
         actualStartTime,
@@ -328,12 +350,12 @@ export class MaintenanceWatcher {
    * Cancel grace period timer for service maintenance
    */
   private cancelServiceGracePeriodTimer(): void {
-    const key = 'service-grace-period';
+    const key = "service-grace-period";
     const timer = this.gracePeriodTimers.get(key);
     if (timer) {
       clearTimeout(timer);
       this.gracePeriodTimers.delete(key);
-      this.logger.debug('Cancelled service grace period timer');
+      this.logger.debug("Cancelled service grace period timer");
     }
   }
 
@@ -346,7 +368,7 @@ export class MaintenanceWatcher {
     if (timer) {
       clearTimeout(timer);
       this.gracePeriodTimers.delete(key);
-      this.logger.debug('Cancelled world grace period timer', { worldId });
+      this.logger.debug("Cancelled world grace period timer", { worldId });
     }
   }
 
@@ -361,14 +383,14 @@ export class MaintenanceWatcher {
     if (startsAt) {
       const startDate = new Date(startsAt);
       if (startDate.getTime() > Date.now()) {
-        this.scheduleCheck('service-start', startDate);
+        this.scheduleCheck("service-start", startDate);
       }
     }
 
     if (endsAt) {
       const endDate = new Date(endsAt);
       if (endDate.getTime() > Date.now()) {
-        this.scheduleCheck('service-end', endDate);
+        this.scheduleCheck("service-end", endDate);
       }
     }
   }
@@ -430,12 +452,12 @@ export class MaintenanceWatcher {
    */
   createStateSnapshot(
     serviceMaintenanceStatus: MaintenanceStatus | null,
-    gameWorlds: GameWorld[]
+    gameWorlds: GameWorld[],
   ): MaintenanceStateSnapshot {
     // Check service-level maintenance
     let serviceInMaintenance = false;
     let serviceActualStartTime: string | undefined;
-    let serviceDetails: MaintenanceStateSnapshot['serviceDetails'];
+    let serviceDetails: MaintenanceStateSnapshot["serviceDetails"];
 
     if (serviceMaintenanceStatus?.hasMaintenanceScheduled) {
       const now = new Date();
@@ -460,7 +482,8 @@ export class MaintenanceWatcher {
         } else if (!startDate) {
           // Immediate maintenance - use current time as start
           // Note: This will be recalculated each time, so we preserve from previous state if available
-          serviceActualStartTime = this.previousState?.serviceActualStartTime || now.toISOString();
+          serviceActualStartTime =
+            this.previousState?.serviceActualStartTime || now.toISOString();
         }
       }
 
@@ -468,7 +491,10 @@ export class MaintenanceWatcher {
       serviceDetails = {
         startsAt: detail?.startsAt ?? undefined,
         endsAt: detail?.endsAt ?? undefined,
-        message: detail?.message || detail?.localeMessages?.en || detail?.localeMessages?.ko,
+        message:
+          detail?.message ||
+          detail?.localeMessages?.en ||
+          detail?.localeMessages?.ko,
         kickExistingPlayers: detail?.kickExistingPlayers,
         kickDelayMinutes: detail?.kickDelayMinutes,
       };
@@ -477,7 +503,12 @@ export class MaintenanceWatcher {
     // Check world-level maintenance states and details
     const worldMaintenanceStates = new Map<string, boolean>();
     const worldActualStartTimes = new Map<string, string>();
-    const worldDetails = new Map<string, MaintenanceStateSnapshot['worldDetails'] extends Map<string, infer V> ? V : never>();
+    const worldDetails = new Map<
+      string,
+      MaintenanceStateSnapshot["worldDetails"] extends Map<string, infer V>
+        ? V
+        : never
+    >();
 
     for (const world of gameWorlds) {
       if (world.worldId) {
@@ -487,14 +518,20 @@ export class MaintenanceWatcher {
         // Calculate actual start time for world maintenance
         if (isMaintenanceActive) {
           const now = new Date();
-          const startDate = world.maintenanceStartDate ? new Date(world.maintenanceStartDate) : null;
+          const startDate = world.maintenanceStartDate
+            ? new Date(world.maintenanceStartDate)
+            : null;
 
           if (startDate && now >= startDate) {
             worldActualStartTimes.set(world.worldId, startDate.toISOString());
           } else if (!startDate) {
             // Immediate maintenance - preserve from previous state or use current time
-            const previousStartTime = this.previousState?.worldActualStartTimes.get(world.worldId);
-            worldActualStartTimes.set(world.worldId, previousStartTime || now.toISOString());
+            const previousStartTime =
+              this.previousState?.worldActualStartTimes.get(world.worldId);
+            worldActualStartTimes.set(
+              world.worldId,
+              previousStartTime || now.toISOString(),
+            );
           }
         }
 
@@ -524,30 +561,38 @@ export class MaintenanceWatcher {
    */
   checkAndEmitChanges(
     serviceMaintenanceStatus: MaintenanceStatus | null,
-    gameWorlds: GameWorld[]
+    gameWorlds: GameWorld[],
   ): void {
     // Store for scheduled timer checks
     this.lastServiceStatus = serviceMaintenanceStatus;
     this.lastGameWorlds = gameWorlds;
 
-    const currentState = this.createStateSnapshot(serviceMaintenanceStatus, gameWorlds);
+    const currentState = this.createStateSnapshot(
+      serviceMaintenanceStatus,
+      gameWorlds,
+    );
 
     // Debug log for state comparison
-    this.logger.debug('MaintenanceWatcher state check', {
-      previousServiceInMaintenance: this.previousState?.serviceInMaintenance ?? 'null',
+    this.logger.debug("MaintenanceWatcher state check", {
+      previousServiceInMaintenance:
+        this.previousState?.serviceInMaintenance ?? "null",
       currentServiceInMaintenance: currentState.serviceInMaintenance,
-      hasMaintenanceScheduled: serviceMaintenanceStatus?.hasMaintenanceScheduled ?? 'null',
-      isMaintenanceActive: serviceMaintenanceStatus?.isMaintenanceActive ?? 'null',
-      serviceMaintenanceStatusDetail: serviceMaintenanceStatus?.detail ? {
-        startsAt: serviceMaintenanceStatus.detail.startsAt,
-        endsAt: serviceMaintenanceStatus.detail.endsAt,
-      } : 'null',
+      hasMaintenanceScheduled:
+        serviceMaintenanceStatus?.hasMaintenanceScheduled ?? "null",
+      isMaintenanceActive:
+        serviceMaintenanceStatus?.isMaintenanceActive ?? "null",
+      serviceMaintenanceStatusDetail: serviceMaintenanceStatus?.detail
+        ? {
+            startsAt: serviceMaintenanceStatus.detail.startsAt,
+            endsAt: serviceMaintenanceStatus.detail.endsAt,
+          }
+        : "null",
     });
 
     // Skip if this is the first check (no previous state)
     if (this.previousState === null) {
       this.previousState = currentState;
-      this.logger.debug('MaintenanceWatcher initialized', {
+      this.logger.debug("MaintenanceWatcher initialized", {
         serviceInMaintenance: currentState.serviceInMaintenance,
         worldsTracked: currentState.worldMaintenanceStates.size,
       });
@@ -560,15 +605,20 @@ export class MaintenanceWatcher {
     const timestamp = new Date().toISOString();
 
     // Check service-level maintenance change
-    if (this.previousState.serviceInMaintenance !== currentState.serviceInMaintenance) {
+    if (
+      this.previousState.serviceInMaintenance !==
+      currentState.serviceInMaintenance
+    ) {
       const eventType: MaintenanceEventType = currentState.serviceInMaintenance
-        ? 'local.maintenance.started'
-        : 'local.maintenance.ended';
+        ? "local.maintenance.started"
+        : "local.maintenance.ended";
 
-      this.logger.info(`Service maintenance ${currentState.serviceInMaintenance ? 'started' : 'ended'}`);
+      this.logger.info(
+        `Service maintenance ${currentState.serviceInMaintenance ? "started" : "ended"}`,
+      );
 
       this.emitEvent(eventType, {
-        source: 'service',
+        source: "service",
         isStarting: currentState.serviceInMaintenance,
         timestamp,
         actualStartTime: currentState.serviceActualStartTime,
@@ -577,20 +627,31 @@ export class MaintenanceWatcher {
 
       // Schedule or cancel grace period timer based on maintenance state
       // Service-level uses kickExistingPlayers and kickDelayMinutes
-      if (currentState.serviceInMaintenance && currentState.serviceDetails?.kickExistingPlayers) {
+      if (
+        currentState.serviceInMaintenance &&
+        currentState.serviceDetails?.kickExistingPlayers
+      ) {
         // Maintenance started with kickExistingPlayers enabled - schedule grace period timer
-        const actualStartTime = currentState.serviceActualStartTime || timestamp;
-        const gracePeriodMinutes = currentState.serviceDetails.kickDelayMinutes ?? 0;
-        this.scheduleServiceGracePeriodTimer(actualStartTime, gracePeriodMinutes);
+        const actualStartTime =
+          currentState.serviceActualStartTime || timestamp;
+        const gracePeriodMinutes =
+          currentState.serviceDetails.kickDelayMinutes ?? 0;
+        this.scheduleServiceGracePeriodTimer(
+          actualStartTime,
+          gracePeriodMinutes,
+        );
       } else if (!currentState.serviceInMaintenance) {
         // Maintenance ended - cancel grace period timer
         this.cancelServiceGracePeriodTimer();
       }
-    } else if (currentState.serviceInMaintenance && this.hasServiceDetailsChanged(currentState)) {
+    } else if (
+      currentState.serviceInMaintenance &&
+      this.hasServiceDetailsChanged(currentState)
+    ) {
       // Service is in maintenance but details changed -> emit updated
-      this.logger.info('Service maintenance updated');
-      this.emitEvent('local.maintenance.updated', {
-        source: 'service',
+      this.logger.info("Service maintenance updated");
+      this.emitEvent("local.maintenance.updated", {
+        source: "service",
         timestamp,
         actualStartTime: currentState.serviceActualStartTime,
         details: currentState.serviceDetails,
@@ -598,9 +659,14 @@ export class MaintenanceWatcher {
 
       // Reschedule grace period timer if kick settings changed
       if (currentState.serviceDetails?.kickExistingPlayers) {
-        const actualStartTime = currentState.serviceActualStartTime || timestamp;
-        const gracePeriodMinutes = currentState.serviceDetails.kickDelayMinutes ?? 0;
-        this.scheduleServiceGracePeriodTimer(actualStartTime, gracePeriodMinutes);
+        const actualStartTime =
+          currentState.serviceActualStartTime || timestamp;
+        const gracePeriodMinutes =
+          currentState.serviceDetails.kickDelayMinutes ?? 0;
+        this.scheduleServiceGracePeriodTimer(
+          actualStartTime,
+          gracePeriodMinutes,
+        );
       } else {
         // kickExistingPlayers disabled - cancel timer
         this.cancelServiceGracePeriodTimer();
@@ -615,20 +681,26 @@ export class MaintenanceWatcher {
       : Array.from(currentState.worldMaintenanceStates.keys());
 
     for (const worldId of worldsToCheck) {
-      const previousWorldState = this.previousState.worldMaintenanceStates.get(worldId) ?? false;
-      const currentWorldState = currentState.worldMaintenanceStates.get(worldId) ?? false;
+      const previousWorldState =
+        this.previousState.worldMaintenanceStates.get(worldId) ?? false;
+      const currentWorldState =
+        currentState.worldMaintenanceStates.get(worldId) ?? false;
       const currentWorldDetails = currentState.worldDetails.get(worldId);
-      const currentWorldActualStartTime = currentState.worldActualStartTimes.get(worldId);
+      const currentWorldActualStartTime =
+        currentState.worldActualStartTimes.get(worldId);
 
       if (previousWorldState !== currentWorldState) {
         const eventType: MaintenanceEventType = currentWorldState
-          ? 'local.maintenance.started'
-          : 'local.maintenance.ended';
+          ? "local.maintenance.started"
+          : "local.maintenance.ended";
 
-        this.logger.info(`World maintenance ${currentWorldState ? 'started' : 'ended'}`, { worldId });
+        this.logger.info(
+          `World maintenance ${currentWorldState ? "started" : "ended"}`,
+          { worldId },
+        );
 
         this.emitEvent(eventType, {
-          source: 'world',
+          source: "world",
           worldId,
           isStarting: currentWorldState,
           timestamp,
@@ -640,17 +712,25 @@ export class MaintenanceWatcher {
         if (currentWorldState && currentWorldDetails?.forceDisconnect) {
           // Maintenance started with forceDisconnect enabled - schedule grace period timer
           const actualStartTime = currentWorldActualStartTime || timestamp;
-          const gracePeriodMinutes = currentWorldDetails.gracePeriodMinutes ?? 0;
-          this.scheduleWorldGracePeriodTimer(worldId, actualStartTime, gracePeriodMinutes);
+          const gracePeriodMinutes =
+            currentWorldDetails.gracePeriodMinutes ?? 0;
+          this.scheduleWorldGracePeriodTimer(
+            worldId,
+            actualStartTime,
+            gracePeriodMinutes,
+          );
         } else if (!currentWorldState) {
           // Maintenance ended - cancel grace period timer
           this.cancelWorldGracePeriodTimer(worldId);
         }
-      } else if (currentWorldState && this.hasWorldDetailsChanged(worldId, currentState)) {
+      } else if (
+        currentWorldState &&
+        this.hasWorldDetailsChanged(worldId, currentState)
+      ) {
         // World is in maintenance but details changed -> emit updated
-        this.logger.info('World maintenance updated', { worldId });
-        this.emitEvent('local.maintenance.updated', {
-          source: 'world',
+        this.logger.info("World maintenance updated", { worldId });
+        this.emitEvent("local.maintenance.updated", {
+          source: "world",
           worldId,
           timestamp,
           actualStartTime: currentWorldActualStartTime,
@@ -660,8 +740,13 @@ export class MaintenanceWatcher {
         // Reschedule grace period timer if kick settings changed
         if (currentWorldDetails?.forceDisconnect) {
           const actualStartTime = currentWorldActualStartTime || timestamp;
-          const gracePeriodMinutes = currentWorldDetails.gracePeriodMinutes ?? 0;
-          this.scheduleWorldGracePeriodTimer(worldId, actualStartTime, gracePeriodMinutes);
+          const gracePeriodMinutes =
+            currentWorldDetails.gracePeriodMinutes ?? 0;
+          this.scheduleWorldGracePeriodTimer(
+            worldId,
+            actualStartTime,
+            gracePeriodMinutes,
+          );
         } else {
           // forceDisconnect disabled - cancel timer
           this.cancelWorldGracePeriodTimer(worldId);
@@ -681,35 +766,44 @@ export class MaintenanceWatcher {
   /**
    * Check if service maintenance details have changed
    */
-  private hasServiceDetailsChanged(currentState: MaintenanceStateSnapshot): boolean {
+  private hasServiceDetailsChanged(
+    currentState: MaintenanceStateSnapshot,
+  ): boolean {
     const prev = this.previousState?.serviceDetails;
     const curr = currentState.serviceDetails;
 
     if (!prev && !curr) return false;
     if (!prev || !curr) return true;
 
-    return prev.startsAt !== curr.startsAt ||
-           prev.endsAt !== curr.endsAt ||
-           prev.message !== curr.message ||
-           prev.kickExistingPlayers !== curr.kickExistingPlayers ||
-           prev.kickDelayMinutes !== curr.kickDelayMinutes;
+    return (
+      prev.startsAt !== curr.startsAt ||
+      prev.endsAt !== curr.endsAt ||
+      prev.message !== curr.message ||
+      prev.kickExistingPlayers !== curr.kickExistingPlayers ||
+      prev.kickDelayMinutes !== curr.kickDelayMinutes
+    );
   }
 
   /**
    * Check if world maintenance details have changed
    */
-  private hasWorldDetailsChanged(worldId: string, currentState: MaintenanceStateSnapshot): boolean {
+  private hasWorldDetailsChanged(
+    worldId: string,
+    currentState: MaintenanceStateSnapshot,
+  ): boolean {
     const prev = this.previousState?.worldDetails.get(worldId);
     const curr = currentState.worldDetails.get(worldId);
 
     if (!prev && !curr) return false;
     if (!prev || !curr) return true;
 
-    return prev.startDate !== curr.startDate ||
-           prev.endDate !== curr.endDate ||
-           prev.message !== curr.message ||
-           prev.forceDisconnect !== curr.forceDisconnect ||
-           prev.gracePeriodMinutes !== curr.gracePeriodMinutes;
+    return (
+      prev.startDate !== curr.startDate ||
+      prev.endDate !== curr.endDate ||
+      prev.message !== curr.message ||
+      prev.forceDisconnect !== curr.forceDisconnect ||
+      prev.gracePeriodMinutes !== curr.gracePeriodMinutes
+    );
   }
 
   /**

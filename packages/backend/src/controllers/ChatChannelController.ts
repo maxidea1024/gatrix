@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
-import { ChatServerService } from '../services/ChatServerService';
-import { createLogger } from '../config/logger';
-import { JWTPayload } from '../types/auth';
+import { Request, Response } from "express";
+import { ChatServerService } from "../services/ChatServerService";
+import { createLogger } from "../config/logger";
+import { JWTPayload } from "../types/auth";
 
-const logger = createLogger('ChatChannelController');
+const logger = createLogger("ChatChannelController");
 
 /**
  * Chat Channel Controller
@@ -21,24 +21,26 @@ export class ChatChannelController {
       if (!user) {
         res.status(401).json({
           success: false,
-          error: { message: 'Authentication required' }
+          error: { message: "Authentication required" },
         });
         return;
       }
 
       // Chat Server에서 사용자 채널 목록 조회
-      const response = await ChatChannelController.chatServerService.getUserChannels(user.userId);
+      const response =
+        await ChatChannelController.chatServerService.getUserChannels(
+          user.userId,
+        );
 
       res.json({
         success: true,
-        data: response // Chat Server의 응답을 그대로 전달 (data: [], pagination: {...})
+        data: response, // Chat Server의 응답을 그대로 전달 (data: [], pagination: {...})
       });
-
     } catch (error) {
-      logger.error('Error getting user channels:', error);
+      logger.error("Error getting user channels:", error);
       res.status(500).json({
         success: false,
-        error: { message: 'Failed to get channels' }
+        error: { message: "Failed to get channels" },
       });
     }
   }
@@ -52,17 +54,17 @@ export class ChatChannelController {
       if (!user) {
         res.status(401).json({
           success: false,
-          error: { message: 'Authentication required' }
+          error: { message: "Authentication required" },
         });
         return;
       }
 
-      const { name, description, type = 'public' } = req.body;
+      const { name, description, type = "public" } = req.body;
 
       if (!name) {
         res.status(400).json({
           success: false,
-          error: { message: 'Channel name is required' }
+          error: { message: "Channel name is required" },
         });
         return;
       }
@@ -78,26 +80,28 @@ export class ChatChannelController {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         isArchived: false,
-        maxMembers: 1000
+        maxMembers: 1000,
       };
 
-      logger.info('✅ Channel created successfully (temporary implementation):', {
-        channelId: channel.id,
-        name: channel.name,
-        type: channel.type,
-        createdBy: user.userId
-      });
+      logger.info(
+        "✅ Channel created successfully (temporary implementation):",
+        {
+          channelId: channel.id,
+          name: channel.name,
+          type: channel.type,
+          createdBy: user.userId,
+        },
+      );
 
       res.status(201).json({
         success: true,
-        data: { channel }
+        data: { channel },
       });
-
     } catch (error) {
-      logger.error('Error creating channel:', error);
+      logger.error("Error creating channel:", error);
       res.status(500).json({
         success: false,
-        error: { message: 'Failed to create channel' }
+        error: { message: "Failed to create channel" },
       });
     }
   }
@@ -111,7 +115,7 @@ export class ChatChannelController {
       if (!user) {
         res.status(401).json({
           success: false,
-          error: { message: 'Authentication required' }
+          error: { message: "Authentication required" },
         });
         return;
       }
@@ -119,26 +123,27 @@ export class ChatChannelController {
       const { channelId } = req.params;
 
       // Chat Server에서 채널 정보 조회
-      const channel = await ChatChannelController.chatServerService.getChannel(parseInt(channelId));
+      const channel = await ChatChannelController.chatServerService.getChannel(
+        parseInt(channelId),
+      );
 
       if (!channel) {
         res.status(404).json({
           success: false,
-          error: { message: 'Channel not found' }
+          error: { message: "Channel not found" },
         });
         return;
       }
 
       res.json({
         success: true,
-        data: { channel }
+        data: { channel },
       });
-
     } catch (error) {
-      logger.error('Error getting channel:', error);
+      logger.error("Error getting channel:", error);
       res.status(500).json({
         success: false,
-        error: { message: 'Failed to get channel' }
+        error: { message: "Failed to get channel" },
       });
     }
   }
@@ -152,7 +157,7 @@ export class ChatChannelController {
       if (!user) {
         res.status(401).json({
           success: false,
-          error: { message: 'Authentication required' }
+          error: { message: "Authentication required" },
         });
         return;
       }
@@ -161,24 +166,24 @@ export class ChatChannelController {
       const { page = 1, limit = 50 } = req.query;
 
       // Chat Server에서 채널 메시지 조회
-      const messages = await ChatChannelController.chatServerService.getChannelMessages(
-        parseInt(channelId),
-        {
-          page: parseInt(page as string),
-          limit: parseInt(limit as string)
-        }
-      );
+      const messages =
+        await ChatChannelController.chatServerService.getChannelMessages(
+          parseInt(channelId),
+          {
+            page: parseInt(page as string),
+            limit: parseInt(limit as string),
+          },
+        );
 
       res.json({
         success: true,
-        data: { messages }
+        data: { messages },
       });
-
     } catch (error) {
-      logger.error('Error getting channel messages:', error);
+      logger.error("Error getting channel messages:", error);
       res.status(500).json({
         success: false,
-        error: { message: 'Failed to get messages' }
+        error: { message: "Failed to get messages" },
       });
     }
   }
@@ -192,7 +197,7 @@ export class ChatChannelController {
       if (!user) {
         res.status(401).json({
           success: false,
-          error: { message: 'Authentication required' }
+          error: { message: "Authentication required" },
         });
         return;
       }
@@ -200,18 +205,20 @@ export class ChatChannelController {
       const { search } = req.query;
 
       // Chat Server에서 사용자 목록 조회
-      const users = await ChatChannelController.chatServerService.getUsers(user.userId, search as string);
+      const users = await ChatChannelController.chatServerService.getUsers(
+        user.userId,
+        search as string,
+      );
 
       res.json({
         success: true,
-        data: users
+        data: users,
       });
-
     } catch (error) {
-      logger.error('Error getting users:', error);
+      logger.error("Error getting users:", error);
       res.status(500).json({
         success: false,
-        error: { message: 'Failed to get users' }
+        error: { message: "Failed to get users" },
       });
     }
   }

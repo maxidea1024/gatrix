@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Box, Toolbar, useMediaQuery, useTheme } from '@mui/material';
-import { Header } from './Header';
-import { Sidebar, DesktopSidebar } from './Sidebar';
+import React, { useState } from "react";
+import { Box, Toolbar, useMediaQuery, useTheme } from "@mui/material";
+import { Header } from "./Header";
+import { Sidebar, DesktopSidebar } from "./Sidebar";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,7 +12,7 @@ const DRAWER_WIDTH = 280;
 
 export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleDrawerToggle = () => {
@@ -24,7 +24,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       {/* Header */}
       <Header onMenuClick={handleDrawerToggle} title={title} />
 
@@ -45,14 +45,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
         sx={{
           flexGrow: 1,
           width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
-          minHeight: '100vh',
-          backgroundColor: 'background.default',
+          minHeight: "100vh",
+          backgroundColor: "background.default",
         }}
       >
         <Toolbar />
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
+        <Box sx={{ p: 3 }}>{children}</Box>
       </Box>
     </Box>
   );
@@ -61,7 +59,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
 // HOC for wrapping pages with layout
 export const withLayout = (
   Component: React.ComponentType<any>,
-  title?: string
+  title?: string,
 ) => {
   return (props: any) => (
     <Layout title={title}>

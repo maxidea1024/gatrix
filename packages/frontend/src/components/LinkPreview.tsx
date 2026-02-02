@@ -1,13 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { LinkPreviewData, linkPreviewService } from '../services/linkPreviewService';
-import './LinkPreview.css';
+import React, { useState, useEffect } from "react";
+import {
+  LinkPreviewData,
+  linkPreviewService,
+} from "../services/linkPreviewService";
+import "./LinkPreview.css";
 
 interface LinkPreviewProps {
   url: string;
   className?: string;
 }
 
-export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' }) => {
+export const LinkPreview: React.FC<LinkPreviewProps> = ({
+  url,
+  className = "",
+}) => {
   const [preview, setPreview] = useState<LinkPreviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -23,16 +29,16 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
       try {
         setLoading(true);
         setError(false);
-        
+
         const previewData = await linkPreviewService.getPreview(url);
-        
+
         if (previewData) {
           setPreview(previewData);
         } else {
           setError(true);
         }
       } catch (err) {
-        console.error('Failed to load link preview:', err);
+        console.error("Failed to load link preview:", err);
         setError(true);
       } finally {
         setLoading(false);
@@ -44,7 +50,10 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
 
   if (loading) {
     return (
-      <div className={`link-preview loading ${className}`} data-link-preview="loading">
+      <div
+        className={`link-preview loading ${className}`}
+        data-link-preview="loading"
+      >
         <div className="link-preview-skeleton">
           <div className="skeleton-image"></div>
           <div className="skeleton-content">
@@ -59,12 +68,17 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
 
   if (error || !preview) {
     return (
-      <div className={`link-preview error ${className}`} data-link-preview="error">
+      <div
+        className={`link-preview error ${className}`}
+        data-link-preview="error"
+      >
         <div className="link-preview-fallback">
           <div className="fallback-icon">🔗</div>
           <div className="fallback-content">
             <div className="fallback-url">{url}</div>
-            <div className="fallback-message">링크 미리보기를 불러올 수 없습니다</div>
+            <div className="fallback-message">
+              링크 미리보기를 불러올 수 없습니다
+            </div>
           </div>
         </div>
       </div>
@@ -72,22 +86,26 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
   }
 
   const handleClick = () => {
-    window.open(url, '_blank', 'noopener,noreferrer');
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const formatDescription = (description: string) => {
     if (description.length > 150) {
-      return description.substring(0, 150) + '...';
+      return description.substring(0, 150) + "...";
     }
     return description;
   };
 
   const isYouTubeUrl = (url: string): boolean => {
-    return /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/.test(url);
+    return /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/.test(
+      url,
+    );
   };
 
   const getYouTubeEmbedUrl = (url: string): string | null => {
-    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/);
+    const match = url.match(
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+    );
     return match ? `https://www.youtube.com/embed/${match[1]}` : null;
   };
 
@@ -96,19 +114,27 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
     if (!embedUrl) return null;
 
     return (
-      <div className="link-preview-youtube" style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
+      <div
+        className="link-preview-youtube"
+        style={{
+          position: "relative",
+          paddingBottom: "56.25%",
+          height: 0,
+          overflow: "hidden",
+        }}
+      >
         <iframe
           src={embedUrl}
-          title={preview?.title || 'YouTube video'}
+          title={preview?.title || "YouTube video"}
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           style={{
-            position: 'absolute',
+            position: "absolute",
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%'
+            width: "100%",
+            height: "100%",
           }}
         />
       </div>
@@ -116,7 +142,11 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
   };
 
   return (
-    <div className={`link-preview ${className}`} onClick={isYouTubeUrl(url) ? undefined : handleClick} data-link-preview="loaded">
+    <div
+      className={`link-preview ${className}`}
+      onClick={isYouTubeUrl(url) ? undefined : handleClick}
+      data-link-preview="loaded"
+    >
       <div className="link-preview-card">
         {isYouTubeUrl(url) ? (
           renderYouTubeEmbed()
@@ -124,10 +154,10 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
           <div className="link-preview-image">
             <img
               src={preview.image}
-              alt={preview.title || 'Link preview'}
+              alt={preview.title || "Link preview"}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
+                target.style.display = "none";
               }}
             />
           </div>
@@ -142,7 +172,7 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
                 className="link-preview-favicon"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
+                  target.style.display = "none";
                 }}
               />
             )}
@@ -183,7 +213,12 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
 
           <div className="link-preview-url">
             {isYouTubeUrl(url) ? (
-              <a href={url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
                 {url}
               </a>
             ) : (
@@ -201,8 +236,13 @@ interface LinkPreviewListProps {
   className?: string;
 }
 
-export const LinkPreviewList: React.FC<LinkPreviewListProps> = ({ urls, className = '' }) => {
-  const [previews, setPreviews] = useState<Map<string, LinkPreviewData | null>>(new Map());
+export const LinkPreviewList: React.FC<LinkPreviewListProps> = ({
+  urls,
+  className = "",
+}) => {
+  const [previews, setPreviews] = useState<Map<string, LinkPreviewData | null>>(
+    new Map(),
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -217,7 +257,7 @@ export const LinkPreviewList: React.FC<LinkPreviewListProps> = ({ urls, classNam
         const previewMap = await linkPreviewService.getMultiplePreviews(urls);
         setPreviews(previewMap);
       } catch (err) {
-        console.error('Failed to load link previews:', err);
+        console.error("Failed to load link previews:", err);
       } finally {
         setLoading(false);
       }
@@ -236,7 +276,9 @@ export const LinkPreviewList: React.FC<LinkPreviewListProps> = ({ urls, classNam
     );
   }
 
-  const validPreviews = Array.from(previews.entries()).filter(([_, preview]) => preview !== null);
+  const validPreviews = Array.from(previews.entries()).filter(
+    ([_, preview]) => preview !== null,
+  );
 
   if (validPreviews.length === 0) {
     return null;

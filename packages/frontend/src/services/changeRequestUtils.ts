@@ -4,9 +4,9 @@
 
 // Extended response type to indicate if change request was created
 export interface MutationResult<T> {
-    data?: T;
-    isChangeRequest: boolean;
-    changeRequestId?: string;
+  data?: T;
+  isChangeRequest: boolean;
+  changeRequestId?: string;
 }
 
 /**
@@ -14,22 +14,22 @@ export interface MutationResult<T> {
  * api methods return response.data, so we check for changeRequestId in the response
  */
 export function parseChangeRequestResponse<T>(
-    response: any,
-    dataExtractor: (responseData: any) => T | undefined
+  response: any,
+  dataExtractor: (responseData: any) => T | undefined,
 ): MutationResult<T> {
-    const responseData = response.data || response;
+  const responseData = response.data || response;
 
-    // Check if this is a change request response
-    if (responseData?.changeRequestId) {
-        return {
-            data: undefined,
-            isChangeRequest: true,
-            changeRequestId: responseData.changeRequestId,
-        };
-    }
-
+  // Check if this is a change request response
+  if (responseData?.changeRequestId) {
     return {
-        data: dataExtractor(responseData),
-        isChangeRequest: false,
+      data: undefined,
+      isChangeRequest: true,
+      changeRequestId: responseData.changeRequestId,
     };
+  }
+
+  return {
+    data: dataExtractor(responseData),
+    isChangeRequest: false,
+  };
 }

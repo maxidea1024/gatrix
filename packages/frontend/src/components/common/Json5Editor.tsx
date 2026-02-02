@@ -1,23 +1,32 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { Box, Typography, Alert, Menu, MenuItem, Divider, ListItemIcon, ListItemText } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { EditorView, basicSetup } from 'codemirror';
-import { EditorState } from '@codemirror/state';
-import { json5, json5ParseLinter } from 'codemirror-json5';
-import { linter, lintGutter } from '@codemirror/lint';
-import { openSearchPanel, gotoLine } from '@codemirror/search';
-import { undo, redo, selectAll } from '@codemirror/commands';
-import JSON5 from 'json5';
-import { copyToClipboard } from '../../utils/clipboard';
-import { useTranslation } from 'react-i18next';
-import ContentCutIcon from '@mui/icons-material/ContentCut';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import ContentPasteIcon from '@mui/icons-material/ContentPaste';
-import UndoIcon from '@mui/icons-material/Undo';
-import RedoIcon from '@mui/icons-material/Redo';
-import SelectAllIcon from '@mui/icons-material/SelectAll';
-import SearchIcon from '@mui/icons-material/Search';
-import ShortcutIcon from '@mui/icons-material/Shortcut';
+import React, { useRef, useEffect, useState, useCallback } from "react";
+import {
+  Box,
+  Typography,
+  Alert,
+  Menu,
+  MenuItem,
+  Divider,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import { EditorView, basicSetup } from "codemirror";
+import { EditorState } from "@codemirror/state";
+import { json5, json5ParseLinter } from "codemirror-json5";
+import { linter, lintGutter } from "@codemirror/lint";
+import { openSearchPanel, gotoLine } from "@codemirror/search";
+import { undo, redo, selectAll } from "@codemirror/commands";
+import JSON5 from "json5";
+import { copyToClipboard } from "../../utils/clipboard";
+import { useTranslation } from "react-i18next";
+import ContentCutIcon from "@mui/icons-material/ContentCut";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import ContentPasteIcon from "@mui/icons-material/ContentPaste";
+import UndoIcon from "@mui/icons-material/Undo";
+import RedoIcon from "@mui/icons-material/Redo";
+import SelectAllIcon from "@mui/icons-material/SelectAll";
+import SearchIcon from "@mui/icons-material/Search";
+import ShortcutIcon from "@mui/icons-material/Shortcut";
 
 interface Json5EditorProps {
   value: string;
@@ -39,7 +48,7 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
   error,
   label,
   helperText,
-  onValidationError
+  onValidationError,
 }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation();
@@ -54,14 +63,17 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
     mouseY: number;
   } | null>(null);
 
-  const handleContextMenu = useCallback((event: React.MouseEvent) => {
-    event.preventDefault();
-    setContextMenu(
-      contextMenu === null
-        ? { mouseX: event.clientX + 2, mouseY: event.clientY - 6 }
-        : null,
-    );
-  }, [contextMenu]);
+  const handleContextMenu = useCallback(
+    (event: React.MouseEvent) => {
+      event.preventDefault();
+      setContextMenu(
+        contextMenu === null
+          ? { mouseX: event.clientX + 2, mouseY: event.clientY - 6 }
+          : null,
+      );
+    },
+    [contextMenu],
+  );
 
   const handleCloseContextMenu = useCallback(() => {
     setContextMenu(null);
@@ -71,10 +83,17 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
   const handleCut = useCallback(() => {
     const view = editorViewRef.current;
     if (view) {
-      const selection = view.state.sliceDoc(view.state.selection.main.from, view.state.selection.main.to);
+      const selection = view.state.sliceDoc(
+        view.state.selection.main.from,
+        view.state.selection.main.to,
+      );
       copyToClipboard(selection);
       view.dispatch({
-        changes: { from: view.state.selection.main.from, to: view.state.selection.main.to, insert: '' }
+        changes: {
+          from: view.state.selection.main.from,
+          to: view.state.selection.main.to,
+          insert: "",
+        },
       });
     }
     handleCloseContextMenu();
@@ -83,7 +102,10 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
   const handleCopy = useCallback(() => {
     const view = editorViewRef.current;
     if (view) {
-      const selection = view.state.sliceDoc(view.state.selection.main.from, view.state.selection.main.to);
+      const selection = view.state.sliceDoc(
+        view.state.selection.main.from,
+        view.state.selection.main.to,
+      );
       copyToClipboard(selection);
     }
     handleCloseContextMenu();
@@ -94,7 +116,11 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
     if (view) {
       const text = await navigator.clipboard.readText();
       view.dispatch({
-        changes: { from: view.state.selection.main.from, to: view.state.selection.main.to, insert: text }
+        changes: {
+          from: view.state.selection.main.from,
+          to: view.state.selection.main.to,
+          insert: text,
+        },
       });
     }
     handleCloseContextMenu();
@@ -142,26 +168,26 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
 
   // CodeMirror search dialog phrases for localization
   const getSearchPhrases = () => ({
-    'Find': t('codemirror.find'),
-    'Replace': t('codemirror.replace'),
-    'next': t('codemirror.next'),
-    'previous': t('codemirror.previous'),
-    'all': t('codemirror.all'),
-    'match case': t('codemirror.matchCase'),
-    'by word': t('codemirror.byWord'),
-    'regexp': t('codemirror.regexp'),
-    'replace': t('codemirror.replaceAction'),
-    'replace all': t('codemirror.replaceAll'),
-    'close': t('codemirror.close'),
-    'Go to line': t('codemirror.goToLine'),
-    'go': t('codemirror.go'),
+    Find: t("codemirror.find"),
+    Replace: t("codemirror.replace"),
+    next: t("codemirror.next"),
+    previous: t("codemirror.previous"),
+    all: t("codemirror.all"),
+    "match case": t("codemirror.matchCase"),
+    "by word": t("codemirror.byWord"),
+    regexp: t("codemirror.regexp"),
+    replace: t("codemirror.replaceAction"),
+    "replace all": t("codemirror.replaceAll"),
+    close: t("codemirror.close"),
+    "Go to line": t("codemirror.goToLine"),
+    go: t("codemirror.go"),
   });
 
   // Create editor on mount
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const isDark = theme.palette.mode === 'dark';
+    const isDark = theme.palette.mode === "dark";
 
     const updateListener = EditorView.updateListener.of((update) => {
       if (update.docChanged && !isUpdatingRef.current) {
@@ -180,7 +206,7 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
             onValidationError?.(null);
           }
         } catch (e: any) {
-          const errorMsg = e.message || 'Invalid JSON5';
+          const errorMsg = e.message || "Invalid JSON5";
           setInternalError(errorMsg);
           onValidationError?.(errorMsg);
         }
@@ -196,106 +222,112 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
       EditorView.editable.of(!readOnly),
       EditorState.phrases.of(getSearchPhrases()),
       EditorView.theme({
-        '&': {
-          height: typeof height === 'number' ? `${height}px` : height,
-          border: '1px solid',
+        "&": {
+          height: typeof height === "number" ? `${height}px` : height,
+          border: "1px solid",
           borderColor: error ? theme.palette.error.main : theme.palette.divider,
           borderRadius: 0,
-          fontSize: '14px',
-          backgroundColor: isDark ? '#1e1e1e' : '#ffffff',
-          outline: 'none !important',
+          fontSize: "14px",
+          backgroundColor: isDark ? "#1e1e1e" : "#ffffff",
+          outline: "none !important",
         },
-        '&.cm-focused': {
-          outline: 'none !important',
+        "&.cm-focused": {
+          outline: "none !important",
         },
-        '.cm-scroller': {
-          overflow: 'auto',
-          fontFamily: 'D2Coding, "NanumGothicCoding", "Source Han Mono", "Noto Sans Mono CJK KR", Menlo, Monaco, "Courier New", monospace',
+        ".cm-scroller": {
+          overflow: "auto",
+          fontFamily:
+            'D2Coding, "NanumGothicCoding", "Source Han Mono", "Noto Sans Mono CJK KR", Menlo, Monaco, "Courier New", monospace',
         },
-        '.cm-content': {
-          padding: '8px',
-          color: isDark ? '#d4d4d4' : '#333333',
+        ".cm-content": {
+          padding: "8px",
+          color: isDark ? "#d4d4d4" : "#333333",
         },
-        '.cm-gutters': {
-          backgroundColor: isDark ? '#252526' : '#f5f5f5',
-          borderRight: '1px solid',
+        ".cm-gutters": {
+          backgroundColor: isDark ? "#252526" : "#f5f5f5",
+          borderRight: "1px solid",
           borderColor: theme.palette.divider,
-          color: isDark ? '#858585' : '#999999',
+          color: isDark ? "#858585" : "#999999",
         },
-        '.cm-activeLineGutter': {
-          backgroundColor: isDark ? '#2a2d2e' : '#e8e8e8',
+        ".cm-activeLineGutter": {
+          backgroundColor: isDark ? "#2a2d2e" : "#e8e8e8",
         },
-        '.cm-activeLine': {
-          backgroundColor: isDark ? '#2a2d2e40' : '#f0f0f040',
+        ".cm-activeLine": {
+          backgroundColor: isDark ? "#2a2d2e40" : "#f0f0f040",
         },
-        '.cm-cursor': {
-          borderLeftColor: isDark ? '#ffffff' : '#000000',
+        ".cm-cursor": {
+          borderLeftColor: isDark ? "#ffffff" : "#000000",
         },
         // Selection styling - use high contrast colors
-        '.cm-selectionBackground': {
-          backgroundColor: isDark ? '#264f78 !important' : '#add6ff !important',
+        ".cm-selectionBackground": {
+          backgroundColor: isDark ? "#264f78 !important" : "#add6ff !important",
         },
-        '&.cm-focused .cm-selectionBackground': {
-          backgroundColor: isDark ? '#264f78 !important' : '#add6ff !important',
+        "&.cm-focused .cm-selectionBackground": {
+          backgroundColor: isDark ? "#264f78 !important" : "#add6ff !important",
         },
         // Force selected text to be visible using ::selection pseudo-element
-        '.cm-content ::selection': {
-          backgroundColor: isDark ? '#264f78' : '#add6ff',
-          color: isDark ? '#ffffff' : '#000000',
+        ".cm-content ::selection": {
+          backgroundColor: isDark ? "#264f78" : "#add6ff",
+          color: isDark ? "#ffffff" : "#000000",
         },
-        '.cm-line ::selection': {
-          backgroundColor: isDark ? '#264f78' : '#add6ff',
-          color: isDark ? '#ffffff' : '#000000',
+        ".cm-line ::selection": {
+          backgroundColor: isDark ? "#264f78" : "#add6ff",
+          color: isDark ? "#ffffff" : "#000000",
         },
         // JSON5 syntax highlighting for dark theme
-        '.ͼb': { // boolean (true/false)
-          color: isDark ? '#569cd6' : '#0000ff',
+        ".ͼb": {
+          // boolean (true/false)
+          color: isDark ? "#569cd6" : "#0000ff",
         },
-        '.ͼc': { // number
-          color: isDark ? '#b5cea8' : '#098658',
+        ".ͼc": {
+          // number
+          color: isDark ? "#b5cea8" : "#098658",
         },
-        '.ͼd': { // string
-          color: isDark ? '#ce9178' : '#a31515',
+        ".ͼd": {
+          // string
+          color: isDark ? "#ce9178" : "#a31515",
         },
-        '.ͼe': { // property name
-          color: isDark ? '#9cdcfe' : '#001080',
+        ".ͼe": {
+          // property name
+          color: isDark ? "#9cdcfe" : "#001080",
         },
-        '.ͼm': { // comment
-          color: isDark ? '#6a9955' : '#008000',
+        ".ͼm": {
+          // comment
+          color: isDark ? "#6a9955" : "#008000",
         },
         // Lint tooltip styling for dark theme
-        '.cm-tooltip': {
-          backgroundColor: isDark ? '#252526' : '#f5f5f5',
-          color: isDark ? '#d4d4d4' : '#333333',
-          border: `1px solid ${isDark ? '#454545' : '#c8c8c8'}`,
+        ".cm-tooltip": {
+          backgroundColor: isDark ? "#252526" : "#f5f5f5",
+          color: isDark ? "#d4d4d4" : "#333333",
+          border: `1px solid ${isDark ? "#454545" : "#c8c8c8"}`,
           borderRadius: 0,
         },
-        '.cm-tooltip-lint': {
-          backgroundColor: isDark ? '#252526' : '#f5f5f5',
-          color: isDark ? '#d4d4d4' : '#333333',
+        ".cm-tooltip-lint": {
+          backgroundColor: isDark ? "#252526" : "#f5f5f5",
+          color: isDark ? "#d4d4d4" : "#333333",
         },
-        '.cm-diagnostic': {
-          padding: '4px 8px',
+        ".cm-diagnostic": {
+          padding: "4px 8px",
         },
-        '.cm-diagnostic-error': {
-          borderLeftColor: '#f44336',
-          color: isDark ? '#f48771' : '#d32f2f',
+        ".cm-diagnostic-error": {
+          borderLeftColor: "#f44336",
+          color: isDark ? "#f48771" : "#d32f2f",
         },
-        '.cm-diagnostic-warning': {
-          borderLeftColor: '#ff9800',
-          color: isDark ? '#ffb74d' : '#f57c00',
+        ".cm-diagnostic-warning": {
+          borderLeftColor: "#ff9800",
+          color: isDark ? "#ffb74d" : "#f57c00",
         },
-        '.cm-lintPoint-error:after': {
-          borderBottomColor: '#f44336',
+        ".cm-lintPoint-error:after": {
+          borderBottomColor: "#f44336",
         },
-        '.cm-lintPoint-warning:after': {
-          borderBottomColor: '#ff9800',
+        ".cm-lintPoint-warning:after": {
+          borderBottomColor: "#ff9800",
         },
       }),
     ];
 
     const state = EditorState.create({
-      doc: value || '',
+      doc: value || "",
       extensions,
     });
 
@@ -323,7 +355,7 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
           changes: {
             from: 0,
             to: currentValue.length,
-            insert: value || '',
+            insert: value || "",
           },
         });
         isUpdatingRef.current = false;
@@ -334,7 +366,13 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
   const displayError = error || internalError;
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: height === '100%' ? '100%' : 'auto' }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: height === "100%" ? "100%" : "auto",
+      }}
+    >
       {label && (
         <Typography variant="subtitle2" gutterBottom sx={{ flexShrink: 0 }}>
           {label}
@@ -345,11 +383,11 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
         ref={containerRef}
         onContextMenu={handleContextMenu}
         sx={{
-          flex: height === '100%' ? 1 : 'none',
+          flex: height === "100%" ? 1 : "none",
           minHeight: 0,
-          '& .cm-editor': {
-            height: height === '100%' ? '100%' : undefined,
-          }
+          "& .cm-editor": {
+            height: height === "100%" ? "100%" : undefined,
+          },
         }}
       />
 
@@ -365,47 +403,79 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
         }
       >
         <MenuItem onClick={handleUndo} disabled={readOnly}>
-          <ListItemIcon><UndoIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>{t('codemirror.undo')}</ListItemText>
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+Z</Typography>
+          <ListItemIcon>
+            <UndoIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("codemirror.undo")}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+            Ctrl+Z
+          </Typography>
         </MenuItem>
         <MenuItem onClick={handleRedo} disabled={readOnly}>
-          <ListItemIcon><RedoIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>{t('codemirror.redo')}</ListItemText>
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+Y</Typography>
+          <ListItemIcon>
+            <RedoIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("codemirror.redo")}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+            Ctrl+Y
+          </Typography>
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleCut} disabled={readOnly}>
-          <ListItemIcon><ContentCutIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>{t('codemirror.cut')}</ListItemText>
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+X</Typography>
+          <ListItemIcon>
+            <ContentCutIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("codemirror.cut")}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+            Ctrl+X
+          </Typography>
         </MenuItem>
         <MenuItem onClick={handleCopy}>
-          <ListItemIcon><ContentCopyIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>{t('codemirror.copy')}</ListItemText>
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+C</Typography>
+          <ListItemIcon>
+            <ContentCopyIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("codemirror.copy")}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+            Ctrl+C
+          </Typography>
         </MenuItem>
         <MenuItem onClick={handlePaste} disabled={readOnly}>
-          <ListItemIcon><ContentPasteIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>{t('codemirror.paste')}</ListItemText>
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+V</Typography>
+          <ListItemIcon>
+            <ContentPasteIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("codemirror.paste")}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+            Ctrl+V
+          </Typography>
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleSelectAll}>
-          <ListItemIcon><SelectAllIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>{t('codemirror.selectAll')}</ListItemText>
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+A</Typography>
+          <ListItemIcon>
+            <SelectAllIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("codemirror.selectAll")}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+            Ctrl+A
+          </Typography>
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleFind}>
-          <ListItemIcon><SearchIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>{t('codemirror.find')}</ListItemText>
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+F</Typography>
+          <ListItemIcon>
+            <SearchIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("codemirror.find")}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+            Ctrl+F
+          </Typography>
         </MenuItem>
         <MenuItem onClick={handleGoToLine}>
-          <ListItemIcon><ShortcutIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>{t('codemirror.goToLine')}</ListItemText>
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+G</Typography>
+          <ListItemIcon>
+            <ShortcutIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("codemirror.goToLine")}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+            Ctrl+G
+          </Typography>
         </MenuItem>
       </Menu>
 
@@ -416,7 +486,11 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
       )}
 
       {helperText && !displayError && (
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block', flexShrink: 0 }}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mt: 1, display: "block", flexShrink: 0 }}
+        >
           {helperText}
         </Typography>
       )}
@@ -425,4 +499,3 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
 };
 
 export default Json5Editor;
-

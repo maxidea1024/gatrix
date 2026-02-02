@@ -1,4 +1,4 @@
-import { apiService } from './api';
+import { apiService } from "./api";
 
 export interface ServerTimeResponse {
   success: boolean;
@@ -29,7 +29,9 @@ class TimeService {
     const clientLocalTime = new Date().getTime();
 
     try {
-      const response = await apiService.get<ServerTimeResponse>(`/public/time?clientLocalTime=${clientLocalTime}`);
+      const response = await apiService.get<ServerTimeResponse>(
+        `/public/time?clientLocalTime=${clientLocalTime}`,
+      );
       const currentLocalTime = new Date().getTime();
 
       const { serverLocalTime, uptime } = response.data || {};
@@ -46,7 +48,7 @@ class TimeService {
         ping,
         offset,
         uptime,
-        uptimeBaseTime: currentLocalTime
+        uptimeBaseTime: currentLocalTime,
       };
 
       this.currentServerTime = serverTimeData;
@@ -54,7 +56,7 @@ class TimeService {
 
       return serverTimeData;
     } catch (error) {
-      console.error('Failed to fetch server time:', error);
+      console.error("Failed to fetch server time:", error);
       throw error;
     }
   }
@@ -69,7 +71,9 @@ class TimeService {
 
     const now = Date.now();
     const timeSinceLastSync = now - this.currentServerTime.localTime.getTime();
-    return new Date(this.currentServerTime.serverTime.getTime() + timeSinceLastSync);
+    return new Date(
+      this.currentServerTime.serverTime.getTime() + timeSinceLastSync,
+    );
   }
 
   /**
@@ -81,7 +85,8 @@ class TimeService {
     }
 
     const now = Date.now();
-    const timeSinceLastSync = (now - this.currentServerTime.uptimeBaseTime) / 1000; // 초 단위
+    const timeSinceLastSync =
+      (now - this.currentServerTime.uptimeBaseTime) / 1000; // 초 단위
     return this.currentServerTime.uptime + timeSinceLastSync;
   }
 
@@ -91,7 +96,7 @@ class TimeService {
   startSync(): void {
     // 최초에 한번은 즉시 호출
     this.fetchServerTime().catch(console.error);
-    
+
     // 일정주기마다 동기화
     this.intervalId = setInterval(() => {
       this.fetchServerTime().catch(console.error);
@@ -129,11 +134,11 @@ class TimeService {
    * 모든 리스너에게 알림
    */
   private notifyListeners(data: ServerTimeData): void {
-    this.listeners.forEach(callback => {
+    this.listeners.forEach((callback) => {
       try {
         callback(data);
       } catch (error) {
-        console.error('Error in time service listener:', error);
+        console.error("Error in time service listener:", error);
       }
     });
   }

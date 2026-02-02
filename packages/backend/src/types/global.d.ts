@@ -7,7 +7,7 @@ declare global {
       toBeValidEmail(): R;
     }
   }
-  
+
   var testUtils: {
     createTestUser: (overrides?: any) => any;
     createTestAdmin: (overrides?: any) => any;

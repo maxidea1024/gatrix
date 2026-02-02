@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { useSnackbar } from 'notistack';
-import { useTranslation } from 'react-i18next';
-import apiService from '../services/api';
+import { useEffect, useRef, useState, useCallback } from "react";
+import { useSnackbar } from "notistack";
+import { useTranslation } from "react-i18next";
+import apiService from "../services/api";
 
 export interface SSEEvent {
   type: string;
@@ -35,7 +35,9 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
   } = options;
 
   const [isConnected, setIsConnected] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
+  const [connectionStatus, setConnectionStatus] = useState<
+    "disconnected" | "connecting" | "connected" | "error"
+  >("disconnected");
   const [lastEvent, setLastEvent] = useState<SSEEvent | null>(null);
 
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -43,13 +45,12 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const maxReconnectReachedRef = useRef(false); // 최대 재연결 시도 도달 여부 추적
 
-
   // Stable callback refs to avoid re-creating connect on every render
   const onConnectRef = useRef<typeof onConnect>();
   const onDisconnectRef = useRef<typeof onDisconnect>();
   const onErrorRef = useRef<typeof onError>();
   const onEventRef = useRef<typeof onEvent>();
-  const connectRef = useRef<() => void>(() => { });
+  const connectRef = useRef<() => void>(() => {});
   const isConnectingRef = useRef(false);
 
   useEffect(() => {
@@ -81,7 +82,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
     }
 
     isConnectingRef.current = true;
-    setConnectionStatus('connecting');
+    setConnectionStatus("connecting");
 
     try {
       // Get token from apiService (uses the latest token with auto-refresh)
@@ -93,16 +94,11 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         ? `/api/v1/admin/notifications/sse?token=${encodeURIComponent(token)}`
         : `/api/v1/admin/notifications/sse`;
 
-
-
       const eventSource = new EventSource(url);
-
-
-
 
       eventSource.onopen = () => {
         setIsConnected(true);
-        setConnectionStatus('connected');
+        setConnectionStatus("connected");
         reconnectAttemptsRef.current = 0;
         maxReconnectReachedRef.current = false; // 연결 성공 시 플래그 리셋
         isConnectingRef.current = false;
@@ -116,14 +112,14 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
           onEventRef.current?.(data);
           handleEvent(data);
         } catch (error) {
-          console.error('Error parsing SSE event:', error);
+          console.error("Error parsing SSE event:", error);
         }
       };
 
       eventSource.onerror = (error) => {
-        console.error('SSE connection error:', error);
+        console.error("SSE connection error:", error);
         setIsConnected(false);
-        setConnectionStatus('error');
+        setConnectionStatus("error");
         onErrorRef.current?.(error as any);
 
         // EventSource가 자동으로 재연결을 시도하므로 여기서는 연결을 닫고 수동으로 재연결 관리
@@ -134,7 +130,6 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
 
         // 이미 최대 재연결 시도에 도달했다면 더 이상 시도하지 않음
         if (maxReconnectReachedRef.current) {
-
           return;
         }
 
@@ -145,9 +140,11 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
           scheduleReconnect();
         } else {
           // 최대 재연결 시도에 도달했을 때 한 번만 에러 토스트 표시
-          console.error('Max reconnection attempts reached');
+          console.error("Max reconnection attempts reached");
           maxReconnectReachedRef.current = true;
-          enqueueSnackbar(t('common.connectionLostRefresh'), { variant: 'error' });
+          enqueueSnackbar(t("common.connectionLostRefresh"), {
+            variant: "error",
+          });
         }
       };
 
@@ -155,10 +152,9 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
       eventSource.onopen && eventSource.onopen.bind(eventSource);
 
       eventSourceRef.current = eventSource;
-
     } catch (error) {
-      console.error('Error creating SSE connection:', error);
-      setConnectionStatus('error');
+      console.error("Error creating SSE connection:", error);
+      setConnectionStatus("error");
       scheduleReconnect();
     }
   }, [maxReconnectAttempts, reconnectInterval]);
@@ -181,12 +177,11 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
     }
 
     setIsConnected(false);
-    setConnectionStatus('disconnected');
+    setConnectionStatus("disconnected");
   }, []);
 
   // 수동으로 연결 재시작 (최대 재연결 시도 플래그 리셋)
   const restart = useCallback(() => {
-
     disconnect();
     reconnectAttemptsRef.current = 0;
     maxReconnectReachedRef.current = false;
@@ -208,7 +203,6 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
 
     reconnectAttemptsRef.current++;
 
-
     reconnectTimeoutRef.current = setTimeout(() => {
       // 재연결 시도 전에 기존 연결 정리 (disconnect 함수 사용하지 않음 - 플래그 리셋 방지)
       if (eventSourceRef.current) {
@@ -220,179 +214,233 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
   }, [connect, reconnectInterval, maxReconnectAttempts]);
 
   // Handle different event types
-  const handleEvent = useCallback((event: SSEEvent) => {
-    switch (event.type) {
-      case 'connection':
-        break;
+  const handleEvent = useCallback(
+    (event: SSEEvent) => {
+      switch (event.type) {
+        case "connection":
+          break;
 
-      case 'ping':
-        // Keep-alive ping, no action needed
-        break;
+        case "ping":
+          // Keep-alive ping, no action needed
+          break;
 
-      case 'planning_data_updated':
-        // Dispatch custom event for PlanningDataContext to listen
-        window.dispatchEvent(new CustomEvent('planning-data-updated', { detail: event.data }));
-        break;
+        case "planning_data_updated":
+          // Dispatch custom event for PlanningDataContext to listen
+          window.dispatchEvent(
+            new CustomEvent("planning-data-updated", { detail: event.data }),
+          );
+          break;
 
-      case 'maintenance_status_change':
-        // Handled by MainLayout via onEvent. We still acknowledge to avoid noisy logs.
-        break;
+        case "maintenance_status_change":
+          // Handled by MainLayout via onEvent. We still acknowledge to avoid noisy logs.
+          break;
 
-      case 'invitation_created':
-        if (!skipInvitationNotifications) {
-          handleInvitationCreated(event.data);
-        }
-        break;
+        case "invitation_created":
+          if (!skipInvitationNotifications) {
+            handleInvitationCreated(event.data);
+          }
+          break;
 
-      case 'mail_received':
-        handleMailReceived(event.data);
-        break;
+        case "mail_received":
+          handleMailReceived(event.data);
+          break;
 
-      case 'invitation_deleted':
-        if (!skipInvitationNotifications) {
-          handleInvitationDeleted(event.data);
-        }
-        break;
+        case "invitation_deleted":
+          if (!skipInvitationNotifications) {
+            handleInvitationDeleted(event.data);
+          }
+          break;
 
-      case 'user_role_changed':
-        // Dispatch custom event for AuthContext or MainLayout to listen
-        window.dispatchEvent(new CustomEvent('user-role-changed', { detail: event.data }));
-        break;
+        case "user_role_changed":
+          // Dispatch custom event for AuthContext or MainLayout to listen
+          window.dispatchEvent(
+            new CustomEvent("user-role-changed", { detail: event.data }),
+          );
+          break;
 
-      case 'user_suspended':
-        // Dispatch custom event for immediate redirect to suspended page
-        window.dispatchEvent(new CustomEvent('user-suspended', { detail: event.data }));
-        break;
+        case "user_suspended":
+          // Dispatch custom event for immediate redirect to suspended page
+          window.dispatchEvent(
+            new CustomEvent("user-suspended", { detail: event.data }),
+          );
+          break;
 
-      case 'change_request_submitted':
-        // Dispatch custom event for CR notification
-        window.dispatchEvent(new CustomEvent('change-request-notification', { detail: { ...event.data, action: 'submitted' } }));
-        break;
+        case "change_request_submitted":
+          // Dispatch custom event for CR notification
+          window.dispatchEvent(
+            new CustomEvent("change-request-notification", {
+              detail: { ...event.data, action: "submitted" },
+            }),
+          );
+          break;
 
-      case 'change_request_approved':
-        // Dispatch custom event for CR notification
-        window.dispatchEvent(new CustomEvent('change-request-notification', { detail: { ...event.data, action: 'approved' } }));
-        break;
+        case "change_request_approved":
+          // Dispatch custom event for CR notification
+          window.dispatchEvent(
+            new CustomEvent("change-request-notification", {
+              detail: { ...event.data, action: "approved" },
+            }),
+          );
+          break;
 
-      case 'change_request_rejected':
-        // Dispatch custom event for CR notification
-        window.dispatchEvent(new CustomEvent('change-request-notification', { detail: { ...event.data, action: 'rejected' } }));
-        break;
+        case "change_request_rejected":
+          // Dispatch custom event for CR notification
+          window.dispatchEvent(
+            new CustomEvent("change-request-notification", {
+              detail: { ...event.data, action: "rejected" },
+            }),
+          );
+          break;
 
-      case 'change_request_executed':
-        // Dispatch custom event for CR notification
-        window.dispatchEvent(new CustomEvent('change-request-notification', { detail: { ...event.data, action: 'executed' } }));
-        break;
+        case "change_request_executed":
+          // Dispatch custom event for CR notification
+          window.dispatchEvent(
+            new CustomEvent("change-request-notification", {
+              detail: { ...event.data, action: "executed" },
+            }),
+          );
+          break;
 
-      case 'entity_lock.released':
-        // Dispatch custom event for entity lock release
-        window.dispatchEvent(new CustomEvent('entity-lock-released', { detail: event.data }));
-        break;
+        case "entity_lock.released":
+          // Dispatch custom event for entity lock release
+          window.dispatchEvent(
+            new CustomEvent("entity-lock-released", { detail: event.data }),
+          );
+          break;
 
-      case 'entity_lock.taken_over':
-        // Dispatch custom event for entity lock takeover
-        window.dispatchEvent(new CustomEvent('entity-lock-taken-over', { detail: event.data }));
-        break;
+        case "entity_lock.taken_over":
+          // Dispatch custom event for entity lock takeover
+          window.dispatchEvent(
+            new CustomEvent("entity-lock-taken-over", { detail: event.data }),
+          );
+          break;
 
-      default:
-        break;
-    }
-  }, [t]);
+        default:
+          break;
+      }
+    },
+    [t],
+  );
 
   // Handle invitation created notifications
-  const handleInvitationCreated = useCallback((data: any) => {
-    const { invitation } = data;
-    const message = invitation.email
-      ? t('users.invitationCreatedForEmail', { email: invitation.email })
-      : t('users.invitationCreated');
-    enqueueSnackbar(message, { variant: 'success' });
-  }, [enqueueSnackbar, t]);
+  const handleInvitationCreated = useCallback(
+    (data: any) => {
+      const { invitation } = data;
+      const message = invitation.email
+        ? t("users.invitationCreatedForEmail", { email: invitation.email })
+        : t("users.invitationCreated");
+      enqueueSnackbar(message, { variant: "success" });
+    },
+    [enqueueSnackbar, t],
+  );
 
   // Handle invitation deleted notifications
-  const handleInvitationDeleted = useCallback((data: any) => {
-    const { invitation } = data;
-    const message = invitation.email
-      ? t('users.invitationDeletedForEmail', { email: invitation.email })
-      : t('users.invitationDeleted');
-    enqueueSnackbar(message, { variant: 'success' });
-  }, [enqueueSnackbar, t]);
+  const handleInvitationDeleted = useCallback(
+    (data: any) => {
+      const { invitation } = data;
+      const message = invitation.email
+        ? t("users.invitationDeletedForEmail", { email: invitation.email })
+        : t("users.invitationDeleted");
+      enqueueSnackbar(message, { variant: "success" });
+    },
+    [enqueueSnackbar, t],
+  );
 
   // Handle mail received notifications
-  const handleMailReceived = useCallback((data: any) => {
-    const { senderName, subject, priority } = data;
-    const priorityIcon = priority === 'urgent' || priority === 'high' ? '🔴 ' : '';
-    enqueueSnackbar(`${priorityIcon}${t('mailbox.newMailFrom', { sender: senderName })}: ${subject}`, {
-      variant: priority === 'urgent' ? 'warning' : 'info',
-      autoHideDuration: 5000,
-    });
+  const handleMailReceived = useCallback(
+    (data: any) => {
+      const { senderName, subject, priority } = data;
+      const priorityIcon =
+        priority === "urgent" || priority === "high" ? "🔴 " : "";
+      enqueueSnackbar(
+        `${priorityIcon}${t("mailbox.newMailFrom", { sender: senderName })}: ${subject}`,
+        {
+          variant: priority === "urgent" ? "warning" : "info",
+          autoHideDuration: 5000,
+        },
+      );
 
-    // Trigger custom event for mailbox to refresh
-    window.dispatchEvent(new CustomEvent('mail-received'));
-  }, [enqueueSnackbar, t]);
+      // Trigger custom event for mailbox to refresh
+      window.dispatchEvent(new CustomEvent("mail-received"));
+    },
+    [enqueueSnackbar, t],
+  );
 
   // Subscribe to channels
-  const subscribe = useCallback(async (channels: string[]) => {
-    if (!isConnected) {
-      console.warn('Cannot subscribe: SSE not connected');
-      return false;
-    }
-
-    try {
-      const response = await fetch('/api/v1/admin/notifications/sse/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          clientId: 'current', // Server will identify client by session
-          channels,
-        }),
-      });
-
-      if (response.ok) {
-        return true;
-      } else {
-        console.error('Failed to subscribe to channels');
+  const subscribe = useCallback(
+    async (channels: string[]) => {
+      if (!isConnected) {
+        console.warn("Cannot subscribe: SSE not connected");
         return false;
       }
-    } catch (error) {
-      console.error('Error subscribing to channels:', error);
-      return false;
-    }
-  }, [isConnected]);
+
+      try {
+        const response = await fetch(
+          "/api/v1/admin/notifications/sse/subscribe",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              clientId: "current", // Server will identify client by session
+              channels,
+            }),
+          },
+        );
+
+        if (response.ok) {
+          return true;
+        } else {
+          console.error("Failed to subscribe to channels");
+          return false;
+        }
+      } catch (error) {
+        console.error("Error subscribing to channels:", error);
+        return false;
+      }
+    },
+    [isConnected],
+  );
 
   // Unsubscribe from channels
-  const unsubscribe = useCallback(async (channels: string[]) => {
-    if (!isConnected) {
-      console.warn('Cannot unsubscribe: SSE not connected');
-      return false;
-    }
-
-    try {
-      const response = await fetch('/api/v1/admin/notifications/sse/unsubscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          clientId: 'current',
-          channels,
-        }),
-      });
-
-      if (response.ok) {
-        return true;
-      } else {
-        console.error('Failed to unsubscribe from channels');
+  const unsubscribe = useCallback(
+    async (channels: string[]) => {
+      if (!isConnected) {
+        console.warn("Cannot unsubscribe: SSE not connected");
         return false;
       }
-    } catch (error) {
-      console.error('Error unsubscribing from channels:', error);
-      return false;
-    }
-  }, [isConnected]);
+
+      try {
+        const response = await fetch(
+          "/api/v1/admin/notifications/sse/unsubscribe",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              clientId: "current",
+              channels,
+            }),
+          },
+        );
+
+        if (response.ok) {
+          return true;
+        } else {
+          console.error("Failed to unsubscribe from channels");
+          return false;
+        }
+      } catch (error) {
+        console.error("Error unsubscribing from channels:", error);
+        return false;
+      }
+    },
+    [isConnected],
+  );
 
   // Auto-connect on mount
   useEffect(() => {
@@ -419,9 +467,9 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [isConnected, autoConnect]);
 
@@ -434,9 +482,9 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
       }
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, []);
 

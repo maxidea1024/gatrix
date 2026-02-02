@@ -1,6 +1,6 @@
-import mysql from 'mysql2/promise';
-import { config } from './index';
-import logger from './logger';
+import mysql from "mysql2/promise";
+import { config } from "./index";
+import logger from "./logger";
 
 export class Database {
   private static instance: Database;
@@ -39,18 +39,21 @@ export class Database {
       return rows;
     } catch (error: any) {
       // Don't log migrations table not found errors as they are handled gracefully
-      const isMigrationsTableError = error.code === 'ER_NO_SUCH_TABLE' &&
-                                     error.sqlMessage?.includes('migrations') &&
-                                     sql.includes('migrations');
+      const isMigrationsTableError =
+        error.code === "ER_NO_SUCH_TABLE" &&
+        error.sqlMessage?.includes("migrations") &&
+        sql.includes("migrations");
 
       if (!isMigrationsTableError) {
-        logger.error('Database query error:', error);
+        logger.error("Database query error:", error);
       }
       throw error;
     }
   }
 
-  public async transaction<T>(callback: (connection: mysql.PoolConnection) => Promise<T>): Promise<T> {
+  public async transaction<T>(
+    callback: (connection: mysql.PoolConnection) => Promise<T>,
+  ): Promise<T> {
     const connection = await this.pool.getConnection();
     await connection.beginTransaction();
 
@@ -60,7 +63,7 @@ export class Database {
       return result;
     } catch (error) {
       await connection.rollback();
-      logger.error('Transaction error:', error);
+      logger.error("Transaction error:", error);
       throw error;
     } finally {
       connection.release();
@@ -69,18 +72,18 @@ export class Database {
 
   public async testConnection(): Promise<boolean> {
     try {
-      await this.pool.execute('SELECT 1');
-      logger.info('Database connection successful');
+      await this.pool.execute("SELECT 1");
+      logger.info("Database connection successful");
       return true;
     } catch (error) {
-      logger.error('Database connection failed:', error);
+      logger.error("Database connection failed:", error);
       return false;
     }
   }
 
   public async close(): Promise<void> {
     await this.pool.end();
-    logger.info('Database connection pool closed');
+    logger.info("Database connection pool closed");
   }
 }
 

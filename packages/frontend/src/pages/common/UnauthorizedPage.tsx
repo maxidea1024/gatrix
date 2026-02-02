@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Box,
   Card,
@@ -7,16 +7,16 @@ import {
   Button,
   Chip,
   Divider,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Block,
   Home,
   ArrowBack,
   VpnKey as PermissionIcon,
-} from '@mui/icons-material';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { useTranslation } from 'react-i18next';
+} from "@mui/icons-material";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "react-i18next";
 
 interface LocationState {
   requiredPermissions?: string[];
@@ -35,7 +35,7 @@ const UnauthorizedPage: React.FC = () => {
   const requiredRole = state?.requiredRole;
 
   const handleGoHome = () => {
-    navigate('/dashboard');
+    navigate("/dashboard");
   };
 
   const handleGoBack = () => {
@@ -44,7 +44,7 @@ const UnauthorizedPage: React.FC = () => {
 
   // Translate permission key to display name
   const getPermissionDisplayName = (permission: string) => {
-    const key = `permissions.${permission.replace('.', '_')}`;
+    const key = `permissions.${permission.replace(".", "_")}`;
     const translated = t(key);
     // If translation key doesn't exist, return the original permission
     return translated === key ? permission : translated;
@@ -53,64 +53,78 @@ const UnauthorizedPage: React.FC = () => {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
         p: 2,
       }}
     >
-      <Card sx={{ maxWidth: 500, width: '100%' }}>
-        <CardContent sx={{ p: 4, textAlign: 'center' }}>
+      <Card sx={{ maxWidth: 500, width: "100%" }}>
+        <CardContent sx={{ p: 4, textAlign: "center" }}>
           {/* Icon */}
           <Block
             sx={{
               fontSize: 80,
-              color: 'error.main',
+              color: "error.main",
               mb: 3,
             }}
           />
 
           {/* Header */}
           <Typography variant="h4" component="h1" gutterBottom>
-            {t('errors.forbidden')}
+            {t("errors.forbidden")}
           </Typography>
 
           <Typography variant="h6" gutterBottom color="text.secondary">
-            403 - {t('errors.unauthorized')}
+            403 - {t("errors.unauthorized")}
           </Typography>
 
           {/* Message */}
           <Typography variant="body1" paragraph sx={{ mb: 3 }}>
-            {t('errors.noPermissionAdminOnly')}
+            {t("errors.noPermissionAdminOnly")}
           </Typography>
 
           {user && (
-            <Box sx={{ mb: 3, p: 2, bgcolor: 'grey.100', borderRadius: 0 }}>
+            <Box sx={{ mb: 3, p: 2, bgcolor: "grey.100", borderRadius: 0 }}>
               <Typography variant="body2" color="text.secondary">
-                {t('common.loggedInAs')}: <strong>{user.name}</strong>
+                {t("common.loggedInAs")}: <strong>{user.name}</strong>
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {t('dashboard.role')}: <strong>{user.role}</strong>
+                {t("dashboard.role")}: <strong>{user.role}</strong>
               </Typography>
             </Box>
           )}
 
           {/* Required Permissions Section */}
           {(requiredPermissions.length > 0 || requiredRole) && (
-            <Box sx={{ mb: 3, p: 2, bgcolor: 'warning.lighter', borderRadius: 0, textAlign: 'left' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                <PermissionIcon sx={{ fontSize: 20, color: 'warning.main' }} />
+            <Box
+              sx={{
+                mb: 3,
+                p: 2,
+                bgcolor: "warning.lighter",
+                borderRadius: 0,
+                textAlign: "left",
+              }}
+            >
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}
+              >
+                <PermissionIcon sx={{ fontSize: 20, color: "warning.main" }} />
                 <Typography variant="subtitle2" color="warning.dark">
-                  {t('errors.requiredPermissions')}
+                  {t("errors.requiredPermissions")}
                 </Typography>
               </Box>
               <Divider sx={{ mb: 1.5 }} />
               {requiredRole && (
                 <Box sx={{ mb: 1 }}>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                    {t('errors.requiredRole')}:
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block", mb: 0.5 }}
+                  >
+                    {t("errors.requiredRole")}:
                   </Typography>
                   <Chip
                     label={t(`users.roles.${requiredRole}`)}
@@ -122,10 +136,14 @@ const UnauthorizedPage: React.FC = () => {
               )}
               {requiredPermissions.length > 0 && (
                 <Box>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                    {t('errors.requiredPermissionsList')}:
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block", mb: 0.5 }}
+                  >
+                    {t("errors.requiredPermissionsList")}:
                   </Typography>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                     {requiredPermissions.map((permission) => (
                       <Chip
                         key={permission}
@@ -133,7 +151,7 @@ const UnauthorizedPage: React.FC = () => {
                         size="small"
                         color="warning"
                         variant="outlined"
-                        sx={{ fontSize: '0.75rem' }}
+                        sx={{ fontSize: "0.75rem" }}
                       />
                     ))}
                   </Box>
@@ -143,14 +161,14 @@ const UnauthorizedPage: React.FC = () => {
           )}
 
           {/* Actions */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Button
               variant="contained"
               startIcon={<Home />}
               onClick={handleGoHome}
               size="large"
             >
-              {t('common.goToDashboard')}
+              {t("common.goToDashboard")}
             </Button>
 
             <Button
@@ -158,13 +176,17 @@ const UnauthorizedPage: React.FC = () => {
               startIcon={<ArrowBack />}
               onClick={handleGoBack}
             >
-              {t('common.goBack')}
+              {t("common.goBack")}
             </Button>
           </Box>
 
           {/* Footer */}
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 3, display: 'block' }}>
-            {t('errors.contactSupport')}
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ mt: 3, display: "block" }}
+          >
+            {t("errors.contactSupport")}
           </Typography>
         </CardContent>
       </Card>

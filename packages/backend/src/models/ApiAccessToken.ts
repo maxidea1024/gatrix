@@ -1,11 +1,11 @@
-import { Model } from 'objection';
-import { User } from './User';
-import { Environment } from './Environment';
-import crypto from 'crypto';
-import bcrypt from 'bcrypt';
-import { ulid } from 'ulid';
+import { Model } from "objection";
+import { User } from "./User";
+import { Environment } from "./Environment";
+import crypto from "crypto";
+import bcrypt from "bcrypt";
+import { ulid } from "ulid";
 
-export type TokenType = 'client' | 'server' | 'edge' | 'all';
+export type TokenType = "client" | "server" | "edge" | "all";
 
 export interface ApiAccessTokenData {
   id?: string; // ULID (26 characters)
@@ -24,7 +24,7 @@ export interface ApiAccessTokenData {
 }
 
 export class ApiAccessToken extends Model implements ApiAccessTokenData {
-  static tableName = 'g_api_access_tokens';
+  static tableName = "g_api_access_tokens";
 
   id!: string; // ULID
   tokenName!: string;
@@ -46,21 +46,24 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
 
   static get jsonSchema() {
     return {
-      type: 'object',
-      required: ['tokenName', 'tokenValue', 'tokenType', 'createdBy'],
+      type: "object",
+      required: ["tokenName", "tokenValue", "tokenType", "createdBy"],
       properties: {
-        id: { type: 'string', minLength: 26, maxLength: 26 },
-        tokenName: { type: 'string', minLength: 1, maxLength: 200 },
-        tokenValue: { type: 'string', minLength: 1, maxLength: 255 },
-        tokenType: { type: 'string', enum: ['client', 'server', 'edge', 'all'] },
-        expiresAt: { type: ['string', 'object', 'null'], format: 'date-time' },
-        lastUsedAt: { type: ['string', 'object', 'null'], format: 'date-time' },
-        usageCount: { type: ['integer', 'null'], minimum: 0 },
-        allowAllEnvironments: { type: 'boolean', default: true },
-        createdBy: { type: 'integer' },
-        createdAt: { type: ['string', 'object'], format: 'date-time' },
-        updatedAt: { type: ['string', 'object'], format: 'date-time' }
-      }
+        id: { type: "string", minLength: 26, maxLength: 26 },
+        tokenName: { type: "string", minLength: 1, maxLength: 200 },
+        tokenValue: { type: "string", minLength: 1, maxLength: 255 },
+        tokenType: {
+          type: "string",
+          enum: ["client", "server", "edge", "all"],
+        },
+        expiresAt: { type: ["string", "object", "null"], format: "date-time" },
+        lastUsedAt: { type: ["string", "object", "null"], format: "date-time" },
+        usageCount: { type: ["integer", "null"], minimum: 0 },
+        allowAllEnvironments: { type: "boolean", default: true },
+        createdBy: { type: "integer" },
+        createdAt: { type: ["string", "object"], format: "date-time" },
+        updatedAt: { type: ["string", "object"], format: "date-time" },
+      },
     };
   }
 
@@ -70,30 +73,30 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
         relation: Model.ManyToManyRelation,
         modelClass: Environment,
         join: {
-          from: 'g_api_access_tokens.id',
+          from: "g_api_access_tokens.id",
           through: {
-            from: 'g_api_access_token_environments.tokenId',
-            to: 'g_api_access_token_environments.environment'
+            from: "g_api_access_token_environments.tokenId",
+            to: "g_api_access_token_environments.environment",
           },
-          to: 'g_environments.environment'
-        }
+          to: "g_environments.environment",
+        },
       },
       creator: {
         relation: Model.BelongsToOneRelation,
         modelClass: User,
         join: {
-          from: 'g_api_access_tokens.createdBy',
-          to: 'g_users.id'
-        }
+          from: "g_api_access_tokens.createdBy",
+          to: "g_users.id",
+        },
       },
       updater: {
         relation: Model.BelongsToOneRelation,
         modelClass: User,
         join: {
-          from: 'g_api_access_tokens.updatedBy',
-          to: 'g_users.id'
-        }
-      }
+          from: "g_api_access_tokens.updatedBy",
+          to: "g_users.id",
+        },
+      },
     };
   }
 
@@ -134,8 +137,8 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
    */
   static generateToken(): string {
     // Generate a secure random token
-    const prefix = 'gatrix_';
-    const randomBytes = crypto.randomBytes(32).toString('hex');
+    const prefix = "gatrix_";
+    const randomBytes = crypto.randomBytes(32).toString("hex");
     return `${prefix}${randomBytes}`;
   }
 
@@ -150,7 +153,10 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   /**
    * Verify a token against stored value (plain text comparison)
    */
-  static async verifyToken(token: string, storedTokenValue: string): Promise<boolean> {
+  static async verifyToken(
+    token: string,
+    storedTokenValue: string,
+  ): Promise<boolean> {
     return token === storedTokenValue;
   }
 
@@ -174,13 +180,11 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
       tokenType: data.tokenType,
       expiresAt: data.expiresAt,
       createdBy: data.createdBy,
-      allowAllEnvironments: data.allowAllEnvironments ?? true
+      allowAllEnvironments: data.allowAllEnvironments ?? true,
     } as any);
 
     return { token, plainToken };
   }
-
-
 
   /**
    * Find token by plain text comparison
@@ -188,11 +192,11 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   static async findByToken(token: string): Promise<ApiAccessToken | undefined> {
     // Direct database query for plain text token
     const tokenRecord = await this.query()
-      .where('tokenValue', token)
-      .where(builder => {
-        builder.whereNull('expiresAt').orWhere('expiresAt', '>', new Date());
+      .where("tokenValue", token)
+      .where((builder) => {
+        builder.whereNull("expiresAt").orWhere("expiresAt", ">", new Date());
       })
-      .withGraphFetched('environments')
+      .withGraphFetched("environments")
       .first();
 
     return tokenRecord;
@@ -211,11 +215,12 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     // 캐시 기반 ?�용??추적 (비동기로 처리?�여 API ?�답 ?�도???�향 ?�음)
     if (tokenRecord.id) {
       // ?�적 import�??�환 참조 방�?
-      const { default: apiTokenUsageService } = await import('../services/ApiTokenUsageService');
-      apiTokenUsageService.recordTokenUsage(tokenRecord.id).catch(error => {
+      const { default: apiTokenUsageService } =
+        await import("../services/ApiTokenUsageService");
+      apiTokenUsageService.recordTokenUsage(tokenRecord.id).catch((error) => {
         // ?�용??추적 ?�패가 API ?�청??방해?��? ?�도�?로그�??��?
-        const logger = require('../config/logger').default;
-        logger.error('Failed to record token usage:', error);
+        const logger = require("../config/logger").default;
+        logger.error("Failed to record token usage:", error);
       });
     }
 
@@ -225,21 +230,26 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   /**
    * Get tokens for environment
    */
-  static async getForEnvironment(environment: string): Promise<ApiAccessToken[]> {
-    const { default: knex } = await import('../config/knex');
+  static async getForEnvironment(
+    environment: string,
+  ): Promise<ApiAccessToken[]> {
+    const { default: knex } = await import("../config/knex");
 
     // Find tokens that have access to this environment
-    const tokenIds = await knex('g_api_access_token_environments')
-      .where('environment', environment)
-      .select('tokenId');
+    const tokenIds = await knex("g_api_access_token_environments")
+      .where("environment", environment)
+      .select("tokenId");
 
     return await this.query()
-      .whereIn('id', tokenIds.map(t => t.tokenId))
-      .withGraphFetched('[creator(basicInfo), environments]')
+      .whereIn(
+        "id",
+        tokenIds.map((t) => t.tokenId),
+      )
+      .withGraphFetched("[creator(basicInfo), environments]")
       .modifiers({
-        basicInfo: (builder) => builder.select('id', 'username', 'email')
+        basicInfo: (builder) => builder.select("id", "username", "email"),
       })
-      .orderBy('createdAt', 'desc');
+      .orderBy("createdAt", "desc");
   }
 
   /**
@@ -247,12 +257,12 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
    */
   static async getAdminTokens(): Promise<ApiAccessToken[]> {
     return await this.query()
-      .where('tokenType', 'admin')
-      .withGraphFetched('creator(basicInfo)')
+      .where("tokenType", "admin")
+      .withGraphFetched("creator(basicInfo)")
       .modifiers({
-        basicInfo: (builder) => builder.select('id', 'username', 'email')
+        basicInfo: (builder) => builder.select("id", "username", "email"),
       })
-      .orderBy('createdAt', 'desc');
+      .orderBy("createdAt", "desc");
   }
 
   /**
@@ -268,11 +278,9 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   async extend(expiresAt: Date): Promise<ApiAccessToken> {
     return await this.$query().patchAndFetch({
       expiresAt,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
   }
-
-
 
   /**
    * Check if token is expired
@@ -301,13 +309,17 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   }> {
     // This would typically come from metrics/logs
     // For now, return basic info
-    const daysActive = this.createdAt ?
-      Math.floor((new Date().getTime() - this.createdAt.getTime()) / (1000 * 60 * 60 * 24)) : 0;
+    const daysActive = this.createdAt
+      ? Math.floor(
+          (new Date().getTime() - this.createdAt.getTime()) /
+            (1000 * 60 * 60 * 24),
+        )
+      : 0;
 
     return {
       totalRequests: 0, // Would be calculated from metrics
       lastUsed: this.lastUsedAt,
-      daysActive
+      daysActive,
     };
   }
 
@@ -316,7 +328,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
    */
   static async cleanupExpired(): Promise<number> {
     const result = await this.query()
-      .where('expiresAt', '<', new Date())
+      .where("expiresAt", "<", new Date())
       .delete();
 
     return result;
@@ -350,14 +362,14 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
 
     // If environments relation is already loaded, check it
     if (this.environments) {
-      return this.environments.some(env => env.environment === environment);
+      return this.environments.some((env) => env.environment === environment);
     }
 
     // Otherwise, query the database
     const db = Model.knex();
-    const result = await db('g_api_access_token_environments')
-      .where('tokenId', this.id)
-      .where('environment', environment)
+    const result = await db("g_api_access_token_environments")
+      .where("tokenId", this.id)
+      .where("environment", environment)
       .first();
 
     return !!result;
@@ -370,15 +382,15 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     if (this.allowAllEnvironments) {
       // Return all environment names
       const db = Model.knex();
-      const environments = await db('g_environments').select('environment');
+      const environments = await db("g_environments").select("environment");
       return environments.map((e: any) => e.environment);
     }
 
     // Return only allowed environment names
     const db = Model.knex();
-    const environments = await db('g_api_access_token_environments')
-      .where('tokenId', this.id)
-      .select('environment');
+    const environments = await db("g_api_access_token_environments")
+      .where("tokenId", this.id)
+      .select("environment");
     return environments.map((e: any) => e.environment);
   }
 
@@ -391,23 +403,23 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     // Use transaction to ensure atomicity
     await db.transaction(async (trx) => {
       // Delete existing environment assignments
-      await trx('g_api_access_token_environments')
-        .where('tokenId', this.id)
+      await trx("g_api_access_token_environments")
+        .where("tokenId", this.id)
         .delete();
 
       // Insert new environment assignments
       if (environments.length > 0) {
-        const insertData = environments.map(env => ({
+        const insertData = environments.map((env) => ({
           id: ulid(), // Generate ULID for each record
           tokenId: this.id,
           environment: env,
         }));
-        await trx('g_api_access_token_environments').insert(insertData);
+        await trx("g_api_access_token_environments").insert(insertData);
       }
 
       // Update allowAllEnvironments flag
-      await trx('g_api_access_tokens')
-        .where('id', this.id)
+      await trx("g_api_access_tokens")
+        .where("id", this.id)
         .update({ allowAllEnvironments: environments.length === 0 });
     });
   }

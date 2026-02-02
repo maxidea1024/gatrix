@@ -1,9 +1,14 @@
-import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
-import { useSnackbar } from 'notistack';
-import { useTranslation } from 'react-i18next';
-import { useChat } from '../../contexts/ChatContext';
-import { Message, User } from '../../types/chat';
-import { getChatWebSocketService } from '../../services/chatWebSocketService';
+import React, {
+  useEffect,
+  useRef,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
+import { useSnackbar } from "notistack";
+import { useTranslation } from "react-i18next";
+import { useChat } from "../../contexts/ChatContext";
+import { Message, User } from "../../types/chat";
+import { getChatWebSocketService } from "../../services/chatWebSocketService";
 
 interface NotificationManagerProps {
   currentUserId: number;
@@ -16,11 +21,10 @@ export interface NotificationManagerRef {
   showUserLeaveNotification: (user: User, channelId: number) => void;
 }
 
-const NotificationManager = forwardRef<NotificationManagerRef, NotificationManagerProps>(({
-  currentUserId,
-  activeChannelId,
-  isWindowFocused,
-}, ref) => {
+const NotificationManager = forwardRef<
+  NotificationManagerRef,
+  NotificationManagerProps
+>(({ currentUserId, activeChannelId, isWindowFocused }, ref) => {
   const { t } = useTranslation();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { state } = useChat();
@@ -30,16 +34,16 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
   // Initialize notification sound
   useEffect(() => {
     try {
-      audioRef.current = new Audio('/sounds/notification.mp3');
+      audioRef.current = new Audio("/sounds/notification.mp3");
       audioRef.current.volume = 0.5;
     } catch (error) {
-      console.warn('Notification sound file not found:', error);
+      console.warn("Notification sound file not found:", error);
     }
   }, []);
 
   // Request notification permission
   useEffect(() => {
-    if ('Notification' in window && Notification.permission === 'default') {
+    if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission();
     }
   }, []);
@@ -50,8 +54,8 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
     if (allMessages.length > 0) {
       lastMessageIdRef.current = allMessages[allMessages.length - 1].id;
     }
-  // run once on mount
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle new messages (skip until users are loaded and baseline set)
@@ -81,7 +85,13 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
 
     // Show notification
     showMessageNotification(latestMessage);
-  }, [state.messages, state.users, currentUserId, activeChannelId, isWindowFocused]);
+  }, [
+    state.messages,
+    state.users,
+    currentUserId,
+    activeChannelId,
+    isWindowFocused,
+  ]);
 
   // Handle user join/leave events
   useEffect(() => {
@@ -97,25 +107,22 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
       return;
     }
 
-    const channel = state.channels.find(c => c.id === message.channelId);
-    const channelName = channel?.name || t('chat.unknownChannel');
+    const channel = state.channels.find((c) => c.id === message.channelId);
+    const channelName = channel?.name || t("chat.unknownChannel");
     const username = user.username || user.name || `User${message.userId}`;
 
     // Browser notification
     if (
-      'Notification' in window &&
-      Notification.permission === 'granted' &&
+      "Notification" in window &&
+      Notification.permission === "granted" &&
       !isWindowFocused
     ) {
-      const notification = new Notification(
-        `${username} in #${channelName}`,
-        {
-          body: getMessagePreview(message),
-          icon: user.avatarUrl || '/icons/chat-notification.png',
-          tag: `chat-${message.channelId}`,
-          requireInteraction: false,
-        }
-      );
+      const notification = new Notification(`${username} in #${channelName}`, {
+        body: getMessagePreview(message),
+        icon: user.avatarUrl || "/icons/chat-notification.png",
+        tag: `chat-${message.channelId}`,
+        requireInteraction: false,
+      });
 
       notification.onclick = () => {
         window.focus();
@@ -132,7 +139,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
       enqueueSnackbar(
         `${username} in #${channelName}: ${getMessagePreview(message)}`,
         {
-          variant: 'info',
+          variant: "info",
           autoHideDuration: 4000,
           action: (key) => (
             <button
@@ -141,17 +148,17 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
                 window.location.hash = `#/chat?channel=${message.channelId}`;
               }}
               style={{
-                background: 'none',
-                border: 'none',
-                color: 'inherit',
-                textDecoration: 'underline',
-                cursor: 'pointer',
+                background: "none",
+                border: "none",
+                color: "inherit",
+                textDecoration: "underline",
+                cursor: "pointer",
               }}
             >
-              {t('chat.viewMessage')}
+              {t("chat.viewMessage")}
             </button>
           ),
-        }
+        },
       );
     }
 
@@ -160,54 +167,54 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
   };
 
   const showUserJoinNotification = (user: User, channelId: number) => {
-    const channel = state.channels.find(c => c.id === channelId);
-    const channelName = channel?.name || t('chat.unknownChannel');
+    const channel = state.channels.find((c) => c.id === channelId);
+    const channelName = channel?.name || t("chat.unknownChannel");
 
     enqueueSnackbar(
-      t('chat.userJoined', {
+      t("chat.userJoined", {
         user: user.username,
         channel: channelName,
       }),
       {
-        variant: 'success',
+        variant: "success",
         autoHideDuration: 3000,
-      }
+      },
     );
   };
 
   const showUserLeaveNotification = (user: User, channelId: number) => {
-    const channel = state.channels.find(c => c.id === channelId);
-    const channelName = channel?.name || t('chat.unknownChannel');
+    const channel = state.channels.find((c) => c.id === channelId);
+    const channelName = channel?.name || t("chat.unknownChannel");
 
     enqueueSnackbar(
-      t('chat.userLeft', {
+      t("chat.userLeft", {
         user: user.username,
         channel: channelName,
       }),
       {
-        variant: 'warning',
+        variant: "warning",
         autoHideDuration: 3000,
-      }
+      },
     );
   };
 
   const getMessagePreview = (message: Message): string => {
     switch (message.type) {
-      case 'image':
-        return t('chat.sentImage');
-      case 'video':
-        return t('chat.sentVideo');
-      case 'audio':
-        return t('chat.sentAudio');
-      case 'file':
-        return t('chat.sentFile');
-      case 'location':
-        return t('chat.sentLocation');
-      case 'system':
+      case "image":
+        return t("chat.sentImage");
+      case "video":
+        return t("chat.sentVideo");
+      case "audio":
+        return t("chat.sentAudio");
+      case "file":
+        return t("chat.sentFile");
+      case "location":
+        return t("chat.sentLocation");
+      case "system":
         return message.content;
       default:
         return message.content.length > 50
-          ? message.content.substring(0, 50) + '...'
+          ? message.content.substring(0, 50) + "..."
           : message.content;
     }
   };
@@ -228,28 +235,25 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
 
     const handleInvitationResponse = (event: any) => {
       const { data } = event;
-      console.log('📬 Invitation response received:', data);
+      console.log("📬 Invitation response received:", data);
       // 토스트 제거 - ChatContext에서 처리하므로 중복 방지
     };
 
     const handleInvitationCancelled = (event: any) => {
       const { data } = event;
-      console.log('❌ Invitation cancelled:', data);
+      console.log("❌ Invitation cancelled:", data);
 
-      enqueueSnackbar(
-        'An invitation was cancelled',
-        { variant: 'warning' }
-      );
+      enqueueSnackbar("An invitation was cancelled", { variant: "warning" });
     };
 
     // 이벤트 리스너 등록 (channel_invitation은 ChatContext에서 처리)
-    webSocketService.on('invitation_response', handleInvitationResponse);
-    webSocketService.on('invitation_cancelled', handleInvitationCancelled);
+    webSocketService.on("invitation_response", handleInvitationResponse);
+    webSocketService.on("invitation_cancelled", handleInvitationCancelled);
 
     // 클린업
     return () => {
-      webSocketService.off('invitation_response', handleInvitationResponse);
-      webSocketService.off('invitation_cancelled', handleInvitationCancelled);
+      webSocketService.off("invitation_response", handleInvitationResponse);
+      webSocketService.off("invitation_cancelled", handleInvitationCancelled);
     };
   }, [enqueueSnackbar]);
 

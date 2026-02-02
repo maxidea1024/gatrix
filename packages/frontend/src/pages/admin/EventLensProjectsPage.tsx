@@ -1,16 +1,10 @@
-import React from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  keyframes,
-} from '@mui/material';
+import React from "react";
+import { Box, Card, CardContent, Typography, keyframes } from "@mui/material";
 import {
   Folder as FolderIcon,
   Construction as ConstructionIcon,
-} from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
+} from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 // Animation keyframes
 const iconBounce = keyframes`
@@ -38,14 +32,14 @@ const EventLensProjectsPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <FolderIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <FolderIcon sx={{ fontSize: 32, color: "primary.main" }} />
           <Box>
             <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t('eventLens.projects.title')}
+              {t("eventLens.projects.title")}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {t('eventLens.projects.subtitle')}
+              {t("eventLens.projects.subtitle")}
             </Typography>
           </Box>
         </Box>
@@ -53,32 +47,43 @@ const EventLensProjectsPage: React.FC = () => {
 
       {/* Coming Soon Card */}
       <Card>
-        <CardContent sx={{ textAlign: 'center', py: 8 }}>
+        <CardContent sx={{ textAlign: "center", py: 8 }}>
           {/* Animated Construction Icon */}
-          <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ mb: 3, display: "flex", justifyContent: "center" }}>
             <ConstructionIcon
               sx={{
                 fontSize: 64,
-                color: 'primary.main',
+                color: "primary.main",
                 animation: `${iconBounce} 2s ease-in-out infinite`,
               }}
             />
           </Box>
 
           {/* Coming Soon Text with Bouncing Dots */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 0.5 }}>
-            <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>
-              {t('common.comingSoon')}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: 0.5,
+            }}
+          >
+            <Typography
+              variant="h6"
+              color="text.secondary"
+              sx={{ fontWeight: 500 }}
+            >
+              {t("common.comingSoon")}
             </Typography>
-            <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <Box sx={{ display: "flex", gap: 0.5 }}>
               {[0, 1, 2].map((index) => (
                 <Box
                   key={index}
                   sx={{
                     width: 6,
                     height: 6,
-                    borderRadius: '50%',
-                    backgroundColor: 'text.secondary',
+                    borderRadius: "50%",
+                    backgroundColor: "text.secondary",
                     animation: `${dotBounce} 2s infinite`,
                     animationDelay: `${index * 0.25}s`,
                   }}
@@ -89,7 +94,7 @@ const EventLensProjectsPage: React.FC = () => {
 
           {/* Subtitle */}
           <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-            {t('eventLens.projects.comingSoonSubtitle')}
+            {t("eventLens.projects.comingSoonSubtitle")}
           </Typography>
         </CardContent>
       </Card>
@@ -98,4 +103,3 @@ const EventLensProjectsPage: React.FC = () => {
 };
 
 export default EventLensProjectsPage;
-

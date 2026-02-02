@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Box,
   Select,
@@ -9,11 +9,14 @@ import {
   CircularProgress,
   Paper,
   Divider,
-} from '@mui/material';
-import { CardGiftcard as GiftIcon } from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
-import { useSnackbar } from 'notistack';
-import planningDataService, { RewardTypeInfo, RewardItem } from '../../services/planningDataService';
+} from "@mui/material";
+import { CardGiftcard as GiftIcon } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
+import { useSnackbar } from "notistack";
+import planningDataService, {
+  RewardTypeInfo,
+  RewardItem,
+} from "../../services/planningDataService";
 
 export interface RewardSelection {
   rewardType: string;
@@ -47,7 +50,6 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
   const [loadingTypes, setLoadingTypes] = useState(false);
   const [loadingItems, setLoadingItems] = useState(false);
 
-
   // Function to load reward types
   const loadRewardTypes = useCallback(async () => {
     try {
@@ -55,40 +57,56 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
       const types = await planningDataService.getRewardTypeList();
       setRewardTypes(types);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('planningData.errors.loadRewardTypesFailed'), { variant: 'error' });
+      enqueueSnackbar(
+        error.message || t("planningData.errors.loadRewardTypesFailed"),
+        { variant: "error" },
+      );
     } finally {
       setLoadingTypes(false);
     }
   }, [enqueueSnackbar, t]);
 
   // Function to load items for a specific reward type
-  const loadItems = useCallback(async (rewardType: number) => {
-    try {
-      setLoadingItems(true);
-      const typeInfo = rewardTypes.find(t => t.value === rewardType);
+  const loadItems = useCallback(
+    async (rewardType: number) => {
+      try {
+        setLoadingItems(true);
+        const typeInfo = rewardTypes.find((t) => t.value === rewardType);
 
-      if (typeInfo && typeInfo.hasTable) {
-        // Map i18n language to backend language code
-        const languageMap: Record<string, 'kr' | 'en' | 'zh'> = {
-          'ko': 'kr',
-          'en': 'en',
-          'zh': 'zh',
-        };
-        const language = languageMap[i18n.language] || 'kr';
+        if (typeInfo && typeInfo.hasTable) {
+          // Map i18n language to backend language code
+          const languageMap: Record<string, "kr" | "en" | "zh"> = {
+            ko: "kr",
+            en: "en",
+            zh: "zh",
+          };
+          const language = languageMap[i18n.language] || "kr";
 
-        const itemList = await planningDataService.getRewardTypeItems(rewardType, language);
-        console.log('[RewardItemSelector] Loaded items with language:', language, itemList.slice(0, 3)); // Log first 3 items
-        setItems(itemList);
-      } else {
+          const itemList = await planningDataService.getRewardTypeItems(
+            rewardType,
+            language,
+          );
+          console.log(
+            "[RewardItemSelector] Loaded items with language:",
+            language,
+            itemList.slice(0, 3),
+          ); // Log first 3 items
+          setItems(itemList);
+        } else {
+          setItems([]);
+        }
+      } catch (error: any) {
+        enqueueSnackbar(
+          error.message || t("planningData.errors.loadItemsFailed"),
+          { variant: "error" },
+        );
         setItems([]);
+      } finally {
+        setLoadingItems(false);
       }
-    } catch (error: any) {
-      enqueueSnackbar(error.message || t('planningData.errors.loadItemsFailed'), { variant: 'error' });
-      setItems([]);
-    } finally {
-      setLoadingItems(false);
-    }
-  }, [rewardTypes, enqueueSnackbar, t, i18n.language]);
+    },
+    [rewardTypes, enqueueSnackbar, t, i18n.language],
+  );
 
   // Load reward types on mount and when language changes
   useEffect(() => {
@@ -106,8 +124,10 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
 
   const handleRewardTypeChange = (newRewardType: string) => {
     // For reward types without table, set itemId to "0"
-    const typeInfo = rewardTypes.find(t => t.value === parseInt(newRewardType));
-    const itemId = typeInfo?.hasTable ? '' : '0';
+    const typeInfo = rewardTypes.find(
+      (t) => t.value === parseInt(newRewardType),
+    );
+    const itemId = typeInfo?.hasTable ? "" : "0";
 
     onChange({
       rewardType: newRewardType,
@@ -124,10 +144,10 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
   };
 
   const handleQuantityChange = (newQuantity: number | string) => {
-    if (newQuantity === '') {
+    if (newQuantity === "") {
       onChange({
         ...value,
-        quantity: '' as any,
+        quantity: "" as any,
       });
       return;
     }
@@ -145,15 +165,13 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
   // Get selected reward type info
   const selectedTypeInfo = useMemo(() => {
     if (!value.rewardType) return null;
-    return rewardTypes.find(t => t.value === parseInt(value.rewardType));
+    return rewardTypes.find((t) => t.value === parseInt(value.rewardType));
   }, [value.rewardType, rewardTypes]);
-
-
 
   // Get selected item
   const selectedItem = useMemo(() => {
     if (!value.itemId) return null;
-    return items.find(item => item.id === parseInt(value.itemId)) || null;
+    return items.find((item) => item.id === parseInt(value.itemId)) || null;
   }, [value.itemId, items]);
 
   return (
@@ -161,22 +179,27 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
       variant="outlined"
       sx={{
         p: 1,
-        backgroundColor: disabled ? 'action.disabledBackground' : 'background.paper',
-        borderColor: error ? 'error.main' : 'divider',
+        backgroundColor: disabled
+          ? "action.disabledBackground"
+          : "background.paper",
+        borderColor: error ? "error.main" : "divider",
       }}
     >
-      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
         {/* Gift Icon */}
-        <GiftIcon sx={{ color: '#ff9800', fontSize: 24, ml: 0.5 }} />
+        <GiftIcon sx={{ color: "#ff9800", fontSize: 24, ml: 0.5 }} />
 
         {/* Reward Type Selector */}
         <Select
           value={
             loadingTypes || rewardTypes.length === 0
-              ? ''
-              : value.rewardType && rewardTypes.some(t => t.value === parseInt(value.rewardType))
+              ? ""
+              : value.rewardType &&
+                  rewardTypes.some(
+                    (t) => t.value === parseInt(value.rewardType),
+                  )
                 ? String(value.rewardType)
-                : ''
+                : ""
           }
           onChange={(e) => handleRewardTypeChange(e.target.value)}
           disabled={disabled || loadingTypes}
@@ -186,15 +209,15 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
           sx={{
             width: 200,
             flexShrink: 0,
-            '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-            '& .MuiSelect-select': {
+            "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+            "& .MuiSelect-select": {
               py: 0.75,
-              fontSize: '0.875rem',
-            }
+              fontSize: "0.875rem",
+            },
           }}
         >
           <MenuItem value="" disabled>
-            <em>{t('rewards.rewardType')}</em>
+            <em>{t("rewards.rewardType")}</em>
           </MenuItem>
           {loadingTypes ? (
             <MenuItem disabled>
@@ -217,40 +240,43 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
             <Autocomplete
               value={selectedItem ?? null}
               onChange={(_event, newValue) => {
-                handleItemIdChange(newValue ? newValue.id.toString() : '');
+                handleItemIdChange(newValue ? newValue.id.toString() : "");
               }}
               options={items}
               getOptionLabel={(option) => `[${option.id}] ${option.name}`}
               loading={loadingItems}
               disabled={disabled || loadingItems}
               disableClearable
-              sx={{ flex: '1 1 200px', minWidth: 0 }}
+              sx={{ flex: "1 1 200px", minWidth: 0 }}
               filterOptions={(options, state) => {
                 const inputValue = state.inputValue.toLowerCase();
                 if (!inputValue) return options;
-                return options.filter(option =>
-                  option.name.toLowerCase().includes(inputValue) ||
-                  option.id.toString().includes(inputValue)
+                return options.filter(
+                  (option) =>
+                    option.name.toLowerCase().includes(inputValue) ||
+                    option.id.toString().includes(inputValue),
                 );
               }}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  placeholder={t('rewards.item')}
+                  placeholder={t("rewards.item")}
                   error={error}
                   size="small"
                   sx={{
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': { border: 'none' },
-                      fontSize: '0.875rem',
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { border: "none" },
+                      fontSize: "0.875rem",
                       py: 0,
-                    }
+                    },
                   }}
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
                       <>
-                        {loadingItems ? <CircularProgress color="inherit" size={16} /> : null}
+                        {loadingItems ? (
+                          <CircularProgress color="inherit" size={16} />
+                        ) : null}
                         {params.InputProps.endAdornment}
                       </>
                     ),
@@ -264,7 +290,7 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
                   </Typography>
                 </li>
               )}
-              noOptionsText={t('rewards.noItemsFound')}
+              noOptionsText={t("rewards.noItemsFound")}
               size="small"
             />
             <Divider orientation="vertical" flexItem />
@@ -272,14 +298,20 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
         )}
 
         {/* Description for types without table */}
-        {selectedTypeInfo && !selectedTypeInfo.hasTable && selectedTypeInfo.descriptionKey && (
-          <>
-            <Typography variant="caption" color="text.secondary" sx={{ flex: '1 1 auto', px: 1 }}>
-              {t(selectedTypeInfo.descriptionKey)}
-            </Typography>
-            <Divider orientation="vertical" flexItem />
-          </>
-        )}
+        {selectedTypeInfo &&
+          !selectedTypeInfo.hasTable &&
+          selectedTypeInfo.descriptionKey && (
+            <>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ flex: "1 1 auto", px: 1 }}
+              >
+                {t(selectedTypeInfo.descriptionKey)}
+              </Typography>
+              <Divider orientation="vertical" flexItem />
+            </>
+          )}
 
         {/* Quantity Input - Only show if reward type is selected */}
         {value.rewardType && (
@@ -289,23 +321,24 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
             onChange={(e) => handleQuantityChange(e.target.value)}
             disabled={disabled}
             error={error}
-            placeholder={t('rewards.quantity')}
+            placeholder={t("rewards.quantity")}
             size="small"
             sx={{
               width: 90,
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': { border: 'none' },
-                fontSize: '0.875rem',
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { border: "none" },
+                fontSize: "0.875rem",
               },
-              '& input[type=number]': {
-                MozAppearance: 'textfield',
-                textAlign: 'right',
+              "& input[type=number]": {
+                MozAppearance: "textfield",
+                textAlign: "right",
                 py: 0.75,
               },
-              '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
-                WebkitAppearance: 'none',
-                margin: 0,
-              },
+              "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button":
+                {
+                  WebkitAppearance: "none",
+                  margin: 0,
+                },
             }}
             inputProps={{
               min: minQuantity,
@@ -316,7 +349,11 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
       </Box>
 
       {helperText && (
-        <Typography variant="caption" color={error ? 'error' : 'text.secondary'} sx={{ mt: 0.5, display: 'block', px: 1 }}>
+        <Typography
+          variant="caption"
+          color={error ? "error" : "text.secondary"}
+          sx={{ mt: 0.5, display: "block", px: 1 }}
+        >
           {helperText}
         </Typography>
       )}
@@ -325,4 +362,3 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
 };
 
 export default RewardItemSelector;
-

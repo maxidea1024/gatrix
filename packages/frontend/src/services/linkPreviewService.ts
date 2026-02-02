@@ -1,4 +1,4 @@
-import { apiClient } from './api';
+import { apiClient } from "./api";
 
 export interface LinkPreviewData {
   url: string;
@@ -43,12 +43,12 @@ class LinkPreviewService {
 
     try {
       const result = await request;
-      
+
       // 성공한 경우 캐시에 저장
       if (result) {
         this.cache.set(url, result);
       }
-      
+
       return result;
     } finally {
       // 요청 완료 후 pending 목록에서 제거
@@ -61,9 +61,12 @@ class LinkPreviewService {
    */
   private async fetchPreview(url: string): Promise<LinkPreviewData | null> {
     try {
-      const response = await apiClient.post<LinkPreviewResponse>('/link-preview', {
-        url
-      });
+      const response = await apiClient.post<LinkPreviewResponse>(
+        "/link-preview",
+        {
+          url,
+        },
+      );
 
       if (response.data.success && response.data.data) {
         return response.data.data;
@@ -71,7 +74,7 @@ class LinkPreviewService {
 
       return null;
     } catch (error) {
-      console.error('Failed to fetch link preview:', error);
+      console.error("Failed to fetch link preview:", error);
       return null;
     }
   }
@@ -103,28 +106,52 @@ class LinkPreviewService {
   isPreviewableUrl(url: string): boolean {
     try {
       const parsedUrl = new URL(url);
-      
+
       // HTTP/HTTPS만 지원
-      if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      if (!["http:", "https:"].includes(parsedUrl.protocol)) {
         return false;
       }
 
       // 이미지 파일은 제외
-      const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'];
+      const imageExtensions = [
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".webp",
+        ".svg",
+        ".bmp",
+      ];
       const pathname = parsedUrl.pathname.toLowerCase();
-      if (imageExtensions.some(ext => pathname.endsWith(ext))) {
+      if (imageExtensions.some((ext) => pathname.endsWith(ext))) {
         return false;
       }
 
       // 동영상 파일은 제외
-      const videoExtensions = ['.mp4', '.webm', '.ogg', '.avi', '.mov', '.wmv', '.flv'];
-      if (videoExtensions.some(ext => pathname.endsWith(ext))) {
+      const videoExtensions = [
+        ".mp4",
+        ".webm",
+        ".ogg",
+        ".avi",
+        ".mov",
+        ".wmv",
+        ".flv",
+      ];
+      if (videoExtensions.some((ext) => pathname.endsWith(ext))) {
         return false;
       }
 
       // 문서 파일은 제외
-      const docExtensions = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'];
-      if (docExtensions.some(ext => pathname.endsWith(ext))) {
+      const docExtensions = [
+        ".pdf",
+        ".doc",
+        ".docx",
+        ".xls",
+        ".xlsx",
+        ".ppt",
+        ".pptx",
+      ];
+      if (docExtensions.some((ext) => pathname.endsWith(ext))) {
         return false;
       }
 
@@ -140,18 +167,20 @@ class LinkPreviewService {
   extractUrls(text: string): string[] {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const matches = text.match(urlRegex);
-    return matches ? matches.filter(url => this.isPreviewableUrl(url)) : [];
+    return matches ? matches.filter((url) => this.isPreviewableUrl(url)) : [];
   }
 
   /**
    * 여러 URL의 미리보기를 동시에 가져옵니다
    */
-  async getMultiplePreviews(urls: string[]): Promise<Map<string, LinkPreviewData | null>> {
+  async getMultiplePreviews(
+    urls: string[],
+  ): Promise<Map<string, LinkPreviewData | null>> {
     const results = new Map<string, LinkPreviewData | null>();
-    
+
     // 미리보기 가능한 URL만 필터링
-    const previewableUrls = urls.filter(url => this.isPreviewableUrl(url));
-    
+    const previewableUrls = urls.filter((url) => this.isPreviewableUrl(url));
+
     // 동시에 모든 미리보기 요청
     const promises = previewableUrls.map(async (url) => {
       const preview = await this.getPreview(url);
@@ -170,14 +199,14 @@ class LinkPreviewService {
       const date = new Date(publishedTime);
       const now = new Date();
       const diffMs = now.getTime() - date.getTime();
-      
+
       const diffMinutes = Math.floor(diffMs / (1000 * 60));
       const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
       const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
       const diffMonths = Math.floor(diffDays / 30);
       const diffYears = Math.floor(diffDays / 365);
 
-      if (diffMinutes < 1) return '방금 전';
+      if (diffMinutes < 1) return "방금 전";
       if (diffMinutes < 60) return `${diffMinutes}분 전`;
       if (diffHours < 24) return `${diffHours}시간 전`;
       if (diffDays < 30) return `${diffDays}일 전`;

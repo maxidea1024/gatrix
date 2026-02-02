@@ -35,10 +35,10 @@ export declare function isValidULID(id: string): boolean;
  */
 export declare function getTimestampFromULID(id: string): number;
 declare const _default: {
-    generateULID: typeof generateULID;
-    generateULIDWithTimestamp: typeof generateULIDWithTimestamp;
-    isValidULID: typeof isValidULID;
-    getTimestampFromULID: typeof getTimestampFromULID;
+  generateULID: typeof generateULID;
+  generateULIDWithTimestamp: typeof generateULIDWithTimestamp;
+  isValidULID: typeof isValidULID;
+  getTimestampFromULID: typeof getTimestampFromULID;
 };
 export default _default;
 //# sourceMappingURL=ulid.d.ts.map

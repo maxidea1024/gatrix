@@ -1,14 +1,16 @@
-import { Response } from 'express';
-import StoreProductService, { StoreProduct } from '../services/StoreProductService';
-import { TagService } from '../services/TagService';
-import logger from '../config/logger';
-import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
-import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
-import { EnvironmentRequest } from '../middleware/environmentResolver';
+import { Response } from "express";
+import StoreProductService, {
+  StoreProduct,
+} from "../services/StoreProductService";
+import { TagService } from "../services/TagService";
+import logger from "../config/logger";
+import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from "../constants/cacheKeys";
+import { respondWithEtagCache } from "../utils/serverSdkEtagCache";
+import { EnvironmentRequest } from "../middleware/environmentResolver";
 
 // Supported language codes for SDK API
-type SdkLanguage = 'ko' | 'en' | 'zh';
-const DEFAULT_LANGUAGE: SdkLanguage = 'zh';
+type SdkLanguage = "ko" | "en" | "zh";
+const DEFAULT_LANGUAGE: SdkLanguage = "zh";
 
 /**
  * Get localized name for a product based on language
@@ -20,20 +22,35 @@ function getLocalizedName(product: StoreProduct, lang: SdkLanguage): string {
     en: product.nameEn,
     zh: product.nameZh,
   };
-  return langMap[lang] || product.nameZh || product.nameKo || product.productName || '';
+  return (
+    langMap[lang] ||
+    product.nameZh ||
+    product.nameKo ||
+    product.productName ||
+    ""
+  );
 }
 
 /**
  * Get localized description for a product based on language
  * Falls back to zh -> ko -> description if requested language is not available
  */
-function getLocalizedDescription(product: StoreProduct, lang: SdkLanguage): string | null {
+function getLocalizedDescription(
+  product: StoreProduct,
+  lang: SdkLanguage,
+): string | null {
   const langMap: Record<SdkLanguage, string | null> = {
     ko: product.descriptionKo,
     en: product.descriptionEn,
     zh: product.descriptionZh,
   };
-  return langMap[lang] || product.descriptionZh || product.descriptionKo || product.description || null;
+  return (
+    langMap[lang] ||
+    product.descriptionZh ||
+    product.descriptionKo ||
+    product.description ||
+    null
+  );
 }
 
 /**
@@ -41,7 +58,11 @@ function getLocalizedDescription(product: StoreProduct, lang: SdkLanguage): stri
  * Removes: id, isActive, metadata, createdBy, updatedBy, createdAt, updatedAt, environment
  * Also removes multi-language fields and replaces with localized name/description
  */
-function stripInternalFields(product: StoreProduct, tags: any[], lang: SdkLanguage) {
+function stripInternalFields(
+  product: StoreProduct,
+  tags: any[],
+  lang: SdkLanguage,
+) {
   const {
     // Keep id for SDK event matching
     isActive: _isActive,
@@ -95,9 +116,9 @@ function stripInternalFields(product: StoreProduct, tags: any[], lang: SdkLangua
  * Returns default language (zh) if not provided or invalid
  */
 function parseLanguage(langParam: unknown): SdkLanguage {
-  if (typeof langParam === 'string') {
+  if (typeof langParam === "string") {
     const lang = langParam.toLowerCase();
-    if (lang === 'ko' || lang === 'en' || lang === 'zh') {
+    if (lang === "ko" || lang === "en" || lang === "zh") {
       return lang;
     }
   }
@@ -124,8 +145,8 @@ export class ServerStoreProductController {
         return res.status(400).json({
           success: false,
           error: {
-            code: 'MISSING_ENVIRONMENT',
-            message: 'Environment is required',
+            code: "MISSING_ENVIRONMENT",
+            message: "Environment is required",
           },
         });
       }
@@ -133,7 +154,7 @@ export class ServerStoreProductController {
       await respondWithEtagCache(res, {
         cacheKey: `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`,
         ttlMs: DEFAULT_CONFIG.STORE_PRODUCT_TTL,
-        requestEtag: req.headers['if-none-match'],
+        requestEtag: req.headers["if-none-match"],
         buildPayload: async () => {
           const result = await StoreProductService.getStoreProducts({
             environment: environment,
@@ -145,12 +166,17 @@ export class ServerStoreProductController {
           // Fetch tags for each product and strip internal fields with localization
           const productsWithTags = await Promise.all(
             result.products.map(async (product) => {
-              const tags = await TagService.listTagsForEntity('store_product', product.id);
+              const tags = await TagService.listTagsForEntity(
+                "store_product",
+                product.id,
+              );
               return stripInternalFields(product, tags, lang);
             }),
           );
 
-          logger.info(`Server SDK: Retrieved ${productsWithTags.length} store products for environment ${environment} (lang: ${lang})`);
+          logger.info(
+            `Server SDK: Retrieved ${productsWithTags.length} store products for environment ${environment} (lang: ${lang})`,
+          );
 
           return {
             success: true,
@@ -162,12 +188,15 @@ export class ServerStoreProductController {
         },
       });
     } catch (error) {
-      logger.error('Error in ServerStoreProductController.getStoreProducts:', error);
+      logger.error(
+        "Error in ServerStoreProductController.getStoreProducts:",
+        error,
+      );
       res.status(500).json({
         success: false,
         error: {
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to retrieve store products',
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to retrieve store products",
         },
       });
     }
@@ -188,8 +217,8 @@ export class ServerStoreProductController {
         return res.status(400).json({
           success: false,
           error: {
-            code: 'MISSING_ENVIRONMENT',
-            message: 'Environment is required',
+            code: "MISSING_ENVIRONMENT",
+            message: "Environment is required",
           },
         });
       }
@@ -198,21 +227,22 @@ export class ServerStoreProductController {
         return res.status(400).json({
           success: false,
           error: {
-            code: 'INVALID_PARAMETERS',
-            message: 'Invalid product ID',
-            details: { reason: 'Product ID is required' },
+            code: "INVALID_PARAMETERS",
+            message: "Invalid product ID",
+            details: { reason: "Product ID is required" },
           },
         });
       }
 
-      const product = await StoreProductService.getStoreProductByIdAcrossEnvironments(id);
+      const product =
+        await StoreProductService.getStoreProductByIdAcrossEnvironments(id);
 
       if (!product) {
         return res.status(404).json({
           success: false,
           error: {
-            code: 'NOT_FOUND',
-            message: 'Store product not found',
+            code: "NOT_FOUND",
+            message: "Store product not found",
           },
         });
       }
@@ -222,17 +252,22 @@ export class ServerStoreProductController {
         return res.status(404).json({
           success: false,
           error: {
-            code: 'NOT_FOUND',
-            message: 'Store product not found',
+            code: "NOT_FOUND",
+            message: "Store product not found",
           },
         });
       }
 
       // Fetch tags for the product and strip internal fields with localization
-      const tags = await TagService.listTagsForEntity('store_product', product.id);
+      const tags = await TagService.listTagsForEntity(
+        "store_product",
+        product.id,
+      );
       const cleanProduct = stripInternalFields(product, tags, lang);
 
-      logger.info(`Server SDK: Retrieved store product ${id} (lang: ${lang}) for environment ${environment}`);
+      logger.info(
+        `Server SDK: Retrieved store product ${id} (lang: ${lang}) for environment ${environment}`,
+      );
 
       res.json({
         success: true,
@@ -241,18 +276,19 @@ export class ServerStoreProductController {
         },
       });
     } catch (error) {
-      logger.error('Error in ServerStoreProductController.getStoreProductById:', error);
+      logger.error(
+        "Error in ServerStoreProductController.getStoreProductById:",
+        error,
+      );
       res.status(500).json({
         success: false,
         error: {
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to retrieve store product',
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to retrieve store product",
         },
       });
     }
   }
 }
 
-
 export default ServerStoreProductController;
-

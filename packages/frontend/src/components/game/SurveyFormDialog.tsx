@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -21,26 +21,34 @@ import {
   OutlinedInput,
   Alert,
   AlertTitle,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
   Close as CloseIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
-} from '@mui/icons-material';
-import ResizableDrawer from '../common/ResizableDrawer';
-import { useTranslation } from 'react-i18next';
-import { useSnackbar } from 'notistack';
-import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
-import { useGameWorld } from '../../contexts/GameWorldContext';
-import surveyService, { Survey, TriggerCondition, ParticipationReward, ChannelSubchannelData } from '../../services/surveyService';
-import RewardSelector from './RewardSelector';
-import TargetSettingsGroup from './TargetSettingsGroup';
-import { useEnvironment } from '../../contexts/EnvironmentContext';
-import { useHandleApiError } from '../../hooks/useHandleApiError';
-import { showChangeRequestCreatedToast, getActionLabel } from '../../utils/changeRequestToast';
-import { useEntityLock } from '../../hooks/useEntityLock';
+} from "@mui/icons-material";
+import ResizableDrawer from "../common/ResizableDrawer";
+import { useTranslation } from "react-i18next";
+import { useSnackbar } from "notistack";
+import { usePlatformConfig } from "../../contexts/PlatformConfigContext";
+import { useGameWorld } from "../../contexts/GameWorldContext";
+import surveyService, {
+  Survey,
+  TriggerCondition,
+  ParticipationReward,
+  ChannelSubchannelData,
+} from "../../services/surveyService";
+import RewardSelector from "./RewardSelector";
+import TargetSettingsGroup from "./TargetSettingsGroup";
+import { useEnvironment } from "../../contexts/EnvironmentContext";
+import { useHandleApiError } from "../../hooks/useHandleApiError";
+import {
+  showChangeRequestCreatedToast,
+  getActionLabel,
+} from "../../utils/changeRequestToast";
+import { useEntityLock } from "../../hooks/useEntityLock";
 
 interface SurveyFormDialogProps {
   open: boolean;
@@ -66,39 +74,48 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
 
   // Entity Lock for edit mode
   const { hasLock, lockedBy, pendingCR, forceTakeover } = useEntityLock({
-    table: 'g_surveys',
+    table: "g_surveys",
     entityId: survey?.id || null,
     isEditing: open && !!survey,
     // onLockLost is called when lock is taken - toast is now handled by useEntityLock via SSE
   });
 
   // Form state
-  const [platformSurveyId, setPlatformSurveyId] = useState('');
-  const [surveyTitle, setSurveyTitle] = useState('');
-  const [surveyContent, setSurveyContent] = useState('');
-  const [triggerConditions, setTriggerConditions] = useState<TriggerCondition[]>([
-    { type: 'userLevel', value: 1 },
-  ]);
-  const [participationRewards, setParticipationRewards] = useState<ParticipationReward[]>([]);
+  const [platformSurveyId, setPlatformSurveyId] = useState("");
+  const [surveyTitle, setSurveyTitle] = useState("");
+  const [surveyContent, setSurveyContent] = useState("");
+  const [triggerConditions, setTriggerConditions] = useState<
+    TriggerCondition[]
+  >([{ type: "userLevel", value: 1 }]);
+  const [participationRewards, setParticipationRewards] = useState<
+    ParticipationReward[]
+  >([]);
   const [rewardTemplateId, setRewardTemplateId] = useState<string | null>(null);
-  const [rewardMode, setRewardMode] = useState<'direct' | 'template'>('direct');
-  const [rewardMailTitle, setRewardMailTitle] = useState('');
-  const [rewardMailContent, setRewardMailContent] = useState('');
+  const [rewardMode, setRewardMode] = useState<"direct" | "template">("direct");
+  const [rewardMailTitle, setRewardMailTitle] = useState("");
+  const [rewardMailContent, setRewardMailContent] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   // Targeting state
   const [targetPlatforms, setTargetPlatforms] = useState<string[]>([]);
   const [targetPlatformsInverted, setTargetPlatformsInverted] = useState(false);
-  const [targetChannelSubchannels, setTargetChannelSubchannels] = useState<ChannelSubchannelData[]>([]);
-  const [targetChannelSubchannelsInverted, setTargetChannelSubchannelsInverted] = useState(false);
+  const [targetChannelSubchannels, setTargetChannelSubchannels] = useState<
+    ChannelSubchannelData[]
+  >([]);
+  const [
+    targetChannelSubchannelsInverted,
+    setTargetChannelSubchannelsInverted,
+  ] = useState(false);
   const [targetWorlds, setTargetWorlds] = useState<string[]>([]);
   const [targetWorldsInverted, setTargetWorldsInverted] = useState(false);
 
   // Collapse states
   const [basicInfoExpanded, setBasicInfoExpanded] = useState(true);
-  const [triggerConditionsExpanded, setTriggerConditionsExpanded] = useState(true);
-  const [participationMailExpanded, setParticipationMailExpanded] = useState(true);
+  const [triggerConditionsExpanded, setTriggerConditionsExpanded] =
+    useState(true);
+  const [participationMailExpanded, setParticipationMailExpanded] =
+    useState(true);
   const [rewardsExpanded, setRewardsExpanded] = useState(true);
   const [targetingExpanded, setTargetingExpanded] = useState(true);
 
@@ -107,24 +124,26 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
     if (survey) {
       setPlatformSurveyId(survey.platformSurveyId);
       setSurveyTitle(survey.surveyTitle);
-      setSurveyContent(survey.surveyContent || '');
+      setSurveyContent(survey.surveyContent || "");
       setTriggerConditions(survey.triggerConditions);
 
       // Set reward mode and data based on rewardTemplateId
       if (survey.rewardTemplateId) {
-        setRewardMode('template');
+        setRewardMode("template");
         setRewardTemplateId(survey.rewardTemplateId);
         setParticipationRewards([]);
       } else {
-        setRewardMode('direct');
+        setRewardMode("direct");
         setRewardTemplateId(null);
         setParticipationRewards(survey.participationRewards || []);
       }
 
-      setRewardMailTitle(survey.rewardMailTitle || '');
-      setRewardMailContent(survey.rewardMailContent || '');
+      setRewardMailTitle(survey.rewardMailTitle || "");
+      setRewardMailContent(survey.rewardMailContent || "");
       setIsActive(Boolean(survey.isActive));
-      setTargetPlatforms(Array.isArray(survey.targetPlatforms) ? survey.targetPlatforms : []);
+      setTargetPlatforms(
+        Array.isArray(survey.targetPlatforms) ? survey.targetPlatforms : [],
+      );
       setTargetPlatformsInverted(survey.targetPlatformsInverted || false);
 
       // Convert targetChannels and targetSubchannels to targetChannelSubchannels format
@@ -136,7 +155,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       // Parse targetSubchannels from "channel:subchannel" format
       const subchannelsByChannel: { [key: string]: string[] } = {};
       targetSubchannels.forEach((subchannelKey: string) => {
-        const [channel, subchannel] = subchannelKey.split(':');
+        const [channel, subchannel] = subchannelKey.split(":");
         if (channel && subchannel) {
           if (!subchannelsByChannel[channel]) {
             subchannelsByChannel[channel] = [];
@@ -156,20 +175,24 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       }
 
       setTargetChannelSubchannels(targetChannelSubchannels);
-      setTargetChannelSubchannelsInverted(survey.targetChannelSubchannelsInverted || false);
-      setTargetWorlds(Array.isArray(survey.targetWorlds) ? survey.targetWorlds : []);
+      setTargetChannelSubchannelsInverted(
+        survey.targetChannelSubchannelsInverted || false,
+      );
+      setTargetWorlds(
+        Array.isArray(survey.targetWorlds) ? survey.targetWorlds : [],
+      );
       setTargetWorldsInverted(survey.targetWorldsInverted || false);
     } else {
       // Reset form
-      setPlatformSurveyId('');
-      setSurveyTitle('');
-      setSurveyContent('');
-      setTriggerConditions([{ type: 'userLevel', value: 1 }]);
+      setPlatformSurveyId("");
+      setSurveyTitle("");
+      setSurveyContent("");
+      setTriggerConditions([{ type: "userLevel", value: 1 }]);
       setParticipationRewards([]);
       setRewardTemplateId(null);
-      setRewardMode('direct');
-      setRewardMailTitle('');
-      setRewardMailContent('');
+      setRewardMode("direct");
+      setRewardMailTitle("");
+      setRewardMailContent("");
       setIsActive(true);
       setTargetPlatforms([]);
       setTargetPlatformsInverted(false);
@@ -204,18 +227,25 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
     const currentData = {
       platformSurveyId: platformSurveyId.trim(),
       surveyTitle: surveyTitle.trim(),
-      surveyContent: surveyContent.trim() || '',
-      triggerConditions: triggerConditions.map(c => ({ type: c.type, value: c.value })),
-      participationRewards: rewardMode === 'direct' ? participationRewards : null,
-      rewardTemplateId: rewardMode === 'template' ? rewardTemplateId : null,
-      rewardMailTitle: rewardMailTitle.trim() || '',
-      rewardMailContent: rewardMailContent.trim() || '',
+      surveyContent: surveyContent.trim() || "",
+      triggerConditions: triggerConditions.map((c) => ({
+        type: c.type,
+        value: c.value,
+      })),
+      participationRewards:
+        rewardMode === "direct" ? participationRewards : null,
+      rewardTemplateId: rewardMode === "template" ? rewardTemplateId : null,
+      rewardMailTitle: rewardMailTitle.trim() || "",
+      rewardMailContent: rewardMailContent.trim() || "",
       isActive: !!isActive,
-      targetPlatforms: targetPlatforms.length > 0 ? [...targetPlatforms].sort() : null,
+      targetPlatforms:
+        targetPlatforms.length > 0 ? [...targetPlatforms].sort() : null,
       targetPlatformsInverted,
-      targetChannels: currentChannels.length > 0 ? [...currentChannels].sort() : null,
+      targetChannels:
+        currentChannels.length > 0 ? [...currentChannels].sort() : null,
       targetChannelsInverted: targetChannelSubchannelsInverted,
-      targetSubchannels: currentSubchannels.length > 0 ? [...currentSubchannels].sort() : null,
+      targetSubchannels:
+        currentSubchannels.length > 0 ? [...currentSubchannels].sort() : null,
       targetSubchannelsInverted: targetChannelSubchannelsInverted,
       targetWorlds: targetWorlds.length > 0 ? [...targetWorlds].sort() : null,
       targetWorldsInverted: targetWorldsInverted,
@@ -224,75 +254,121 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
     const originalData = {
       platformSurveyId: survey.platformSurveyId.trim(),
       surveyTitle: survey.surveyTitle.trim(),
-      surveyContent: survey.surveyContent?.trim() || '',
-      triggerConditions: (survey.triggerConditions || []).map(c => ({ type: c.type, value: c.value })),
-      participationRewards: survey.rewardTemplateId ? null : (survey.participationRewards || []),
+      surveyContent: survey.surveyContent?.trim() || "",
+      triggerConditions: (survey.triggerConditions || []).map((c) => ({
+        type: c.type,
+        value: c.value,
+      })),
+      participationRewards: survey.rewardTemplateId
+        ? null
+        : survey.participationRewards || [],
       rewardTemplateId: survey.rewardTemplateId || null,
-      rewardMailTitle: survey.rewardMailTitle?.trim() || '',
-      rewardMailContent: survey.rewardMailContent?.trim() || '',
+      rewardMailTitle: survey.rewardMailTitle?.trim() || "",
+      rewardMailContent: survey.rewardMailContent?.trim() || "",
       isActive: !!survey.isActive,
-      targetPlatforms: (survey.targetPlatforms || []).length > 0 ? [...survey.targetPlatforms].sort() : null,
+      targetPlatforms:
+        (survey.targetPlatforms || []).length > 0
+          ? [...survey.targetPlatforms].sort()
+          : null,
       targetPlatformsInverted: survey.targetPlatformsInverted || false,
-      targetChannels: ((survey as any).targetChannels || []).length > 0 ? [...(survey as any).targetChannels].sort() : null,
+      targetChannels:
+        ((survey as any).targetChannels || []).length > 0
+          ? [...(survey as any).targetChannels].sort()
+          : null,
       targetChannelsInverted: survey.targetChannelSubchannelsInverted || false,
-      targetSubchannels: ((survey as any).targetSubchannels || []).length > 0 ? [...(survey as any).targetSubchannels].sort() : null,
-      targetSubchannelsInverted: survey.targetChannelSubchannelsInverted || false,
-      targetWorlds: (survey.targetWorlds || []).length > 0 ? [...survey.targetWorlds].sort() : null,
+      targetSubchannels:
+        ((survey as any).targetSubchannels || []).length > 0
+          ? [...(survey as any).targetSubchannels].sort()
+          : null,
+      targetSubchannelsInverted:
+        survey.targetChannelSubchannelsInverted || false,
+      targetWorlds:
+        (survey.targetWorlds || []).length > 0
+          ? [...survey.targetWorlds].sort()
+          : null,
       targetWorldsInverted: survey.targetWorldsInverted || false,
     };
 
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
   }, [
-    survey, platformSurveyId, surveyTitle, surveyContent, triggerConditions,
-    participationRewards, rewardTemplateId, rewardMode, rewardMailTitle, rewardMailContent,
-    isActive, targetPlatforms, targetPlatformsInverted, targetChannelSubchannels,
-    targetChannelSubchannelsInverted, targetWorlds, targetWorldsInverted
+    survey,
+    platformSurveyId,
+    surveyTitle,
+    surveyContent,
+    triggerConditions,
+    participationRewards,
+    rewardTemplateId,
+    rewardMode,
+    rewardMailTitle,
+    rewardMailContent,
+    isActive,
+    targetPlatforms,
+    targetPlatformsInverted,
+    targetChannelSubchannels,
+    targetChannelSubchannelsInverted,
+    targetWorlds,
+    targetWorldsInverted,
   ]);
 
   // Get available condition types (exclude already used types)
-  const getAvailableConditionTypes = (currentIndex: number): ('userLevel' | 'joinDays')[] => {
+  const getAvailableConditionTypes = (
+    currentIndex: number,
+  ): ("userLevel" | "joinDays")[] => {
     const usedTypes = triggerConditions
-      .map((c, idx) => idx !== currentIndex ? c.type : null)
-      .filter(Boolean) as ('userLevel' | 'joinDays')[];
+      .map((c, idx) => (idx !== currentIndex ? c.type : null))
+      .filter(Boolean) as ("userLevel" | "joinDays")[];
 
-    const allTypes: ('userLevel' | 'joinDays')[] = ['userLevel', 'joinDays'];
-    return allTypes.filter(type => !usedTypes.includes(type));
+    const allTypes: ("userLevel" | "joinDays")[] = ["userLevel", "joinDays"];
+    return allTypes.filter((type) => !usedTypes.includes(type));
   };
 
   // Check if we can add more conditions
   const canAddMoreConditions = () => {
-    const usedTypes = new Set(triggerConditions.map(c => c.type));
+    const usedTypes = new Set(triggerConditions.map((c) => c.type));
     return usedTypes.size < 2; // Only 2 types available: userLevel and joinDays
   };
 
   // Trigger condition handlers
   const handleAddTriggerCondition = () => {
     if (!canAddMoreConditions()) {
-      enqueueSnackbar(t('surveys.allConditionTypesUsed'), { variant: 'warning' });
+      enqueueSnackbar(t("surveys.allConditionTypesUsed"), {
+        variant: "warning",
+      });
       return;
     }
 
     // Find the first available type
-    const usedTypes = new Set(triggerConditions.map(c => c.type));
-    const availableType = usedTypes.has('userLevel') ? 'joinDays' : 'userLevel';
+    const usedTypes = new Set(triggerConditions.map((c) => c.type));
+    const availableType = usedTypes.has("userLevel") ? "joinDays" : "userLevel";
 
-    setTriggerConditions([...triggerConditions, { type: availableType, value: 1 }]);
+    setTriggerConditions([
+      ...triggerConditions,
+      { type: availableType, value: 1 },
+    ]);
   };
 
   const handleRemoveTriggerCondition = (index: number) => {
     if (triggerConditions.length === 1) {
-      enqueueSnackbar(t('surveys.atLeastOneCondition'), { variant: 'warning' });
+      enqueueSnackbar(t("surveys.atLeastOneCondition"), { variant: "warning" });
       return;
     }
     setTriggerConditions(triggerConditions.filter((_, i) => i !== index));
   };
 
-  const handleTriggerConditionChange = (index: number, field: keyof TriggerCondition, value: any) => {
+  const handleTriggerConditionChange = (
+    index: number,
+    field: keyof TriggerCondition,
+    value: any,
+  ) => {
     // If changing type, check if the new type is already used
-    if (field === 'type') {
-      const isTypeUsed = triggerConditions.some((c, idx) => idx !== index && c.type === value);
+    if (field === "type") {
+      const isTypeUsed = triggerConditions.some(
+        (c, idx) => idx !== index && c.type === value,
+      );
       if (isTypeUsed) {
-        enqueueSnackbar(t('surveys.conditionTypeAlreadyUsed'), { variant: 'warning' });
+        enqueueSnackbar(t("surveys.conditionTypeAlreadyUsed"), {
+          variant: "warning",
+        });
         return;
       }
     }
@@ -306,43 +382,52 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   const handleSubmit = async () => {
     // Validation
     if (!platformSurveyId.trim()) {
-      enqueueSnackbar(t('surveys.platformSurveyIdRequired'), { variant: 'error' });
+      enqueueSnackbar(t("surveys.platformSurveyIdRequired"), {
+        variant: "error",
+      });
       return;
     }
     if (!surveyTitle.trim()) {
-      enqueueSnackbar(t('surveys.surveyTitleRequired'), { variant: 'error' });
+      enqueueSnackbar(t("surveys.surveyTitleRequired"), { variant: "error" });
       return;
     }
     if (triggerConditions.length === 0) {
-      enqueueSnackbar(t('surveys.atLeastOneCondition'), { variant: 'error' });
+      enqueueSnackbar(t("surveys.atLeastOneCondition"), { variant: "error" });
       return;
     }
 
     // Validate that either participationRewards or rewardTemplateId is provided
-    if (rewardMode === 'direct' && participationRewards.length === 0) {
-      enqueueSnackbar(t('surveys.atLeastOneReward'), { variant: 'error' });
+    if (rewardMode === "direct" && participationRewards.length === 0) {
+      enqueueSnackbar(t("surveys.atLeastOneReward"), { variant: "error" });
       return;
     }
-    if (rewardMode === 'template' && !rewardTemplateId) {
-      enqueueSnackbar(t('rewardSelector.selectTemplate'), { variant: 'error' });
+    if (rewardMode === "template" && !rewardTemplateId) {
+      enqueueSnackbar(t("rewardSelector.selectTemplate"), { variant: "error" });
       return;
     }
 
     // Validate participation rewards if in direct mode
-    if (rewardMode === 'direct') {
+    if (rewardMode === "direct") {
       for (let i = 0; i < participationRewards.length; i++) {
         const reward = participationRewards[i];
         if (!reward.rewardType) {
-          enqueueSnackbar(t('surveys.rewardTypeRequired', { index: i + 1 }), { variant: 'error' });
+          enqueueSnackbar(t("surveys.rewardTypeRequired", { index: i + 1 }), {
+            variant: "error",
+          });
           return;
         }
         // Check if itemId is required (for reward types with table)
-        if (!reward.itemId || reward.itemId === '') {
-          enqueueSnackbar(t('surveys.rewardItemRequired', { index: i + 1 }), { variant: 'error' });
+        if (!reward.itemId || reward.itemId === "") {
+          enqueueSnackbar(t("surveys.rewardItemRequired", { index: i + 1 }), {
+            variant: "error",
+          });
           return;
         }
         if (!reward.quantity || reward.quantity <= 0) {
-          enqueueSnackbar(t('surveys.rewardQuantityRequired', { index: i + 1 }), { variant: 'error' });
+          enqueueSnackbar(
+            t("surveys.rewardQuantityRequired", { index: i + 1 }),
+            { variant: "error" },
+          );
           return;
         }
       }
@@ -374,8 +459,9 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         surveyTitle: surveyTitle.trim(),
         surveyContent: surveyContent.trim() || undefined,
         triggerConditions,
-        participationRewards: rewardMode === 'direct' ? participationRewards : null,
-        rewardTemplateId: rewardMode === 'template' ? rewardTemplateId : null,
+        participationRewards:
+          rewardMode === "direct" ? participationRewards : null,
+        rewardTemplateId: rewardMode === "template" ? rewardTemplateId : null,
         rewardMailTitle: rewardMailTitle.trim() || undefined,
         rewardMailContent: rewardMailContent.trim() || undefined,
         isActive,
@@ -383,7 +469,8 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         targetPlatformsInverted: targetPlatformsInverted,
         targetChannels: targetChannels.length > 0 ? targetChannels : null,
         targetChannelsInverted: targetChannelSubchannelsInverted,
-        targetSubchannels: targetSubchannels.length > 0 ? targetSubchannels : null,
+        targetSubchannels:
+          targetSubchannels.length > 0 ? targetSubchannels : null,
         targetSubchannelsInverted: targetChannelSubchannelsInverted,
         targetWorlds: targetWorlds.length > 0 ? targetWorlds : null,
         targetWorldsInverted: targetWorldsInverted,
@@ -392,23 +479,33 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       if (survey) {
         const result = await surveyService.updateSurvey(survey.id, data);
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate,
+          );
         } else {
-          enqueueSnackbar(t('surveys.updateSuccess'), { variant: 'success' });
+          enqueueSnackbar(t("surveys.updateSuccess"), { variant: "success" });
         }
       } else {
         const result = await surveyService.createSurvey(data);
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate,
+          );
         } else {
-          enqueueSnackbar(t('surveys.createSuccess'), { variant: 'success' });
+          enqueueSnackbar(t("surveys.createSuccess"), { variant: "success" });
         }
       }
       onSuccess();
       onClose();
     } catch (error: any) {
-      console.error('Failed to save survey:', error);
-      const fallbackKey = requiresApproval ? 'surveys.requestSaveFailed' : 'surveys.saveFailed';
+      console.error("Failed to save survey:", error);
+      const fallbackKey = requiresApproval
+        ? "surveys.requestSaveFailed"
+        : "surveys.saveFailed";
       handleApiError(error, fallbackKey);
     } finally {
       setSubmitting(false);
@@ -419,8 +516,8 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
     <ResizableDrawer
       open={open}
       onClose={onClose}
-      title={survey ? t('surveys.editSurvey') : t('surveys.createSurvey')}
-      subtitle={t('surveys.formSubtitle')}
+      title={survey ? t("surveys.editSurvey") : t("surveys.createSurvey")}
+      subtitle={t("surveys.formSubtitle")}
       storageKey="surveyFormDrawerWidth"
       defaultWidth={800}
       minWidth={600}
@@ -430,7 +527,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       <Box
         sx={{
           flex: 1,
-          overflow: 'auto',
+          overflow: "auto",
           p: 3,
         }}
       >
@@ -441,19 +538,27 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
               severity="warning"
               action={
                 <Button color="inherit" size="small" onClick={forceTakeover}>
-                  {t('entityLock.takeOver')}
+                  {t("entityLock.takeOver")}
                 </Button>
               }
             >
-              <AlertTitle>{t('entityLock.warning', { userName: lockedBy.userName, userEmail: lockedBy.userEmail })}</AlertTitle>
+              <AlertTitle>
+                {t("entityLock.warning", {
+                  userName: lockedBy.userName,
+                  userEmail: lockedBy.userEmail,
+                })}
+              </AlertTitle>
             </Alert>
           )}
 
           {/* Pending CR Warning */}
           {survey && pendingCR && (
             <Alert severity="info">
-              <AlertTitle>{t('entityLock.pendingCR')}</AlertTitle>
-              {t('entityLock.pendingCRDetail', { crTitle: pendingCR.crTitle, crId: pendingCR.crId })}
+              <AlertTitle>{t("entityLock.pendingCR")}</AlertTitle>
+              {t("entityLock.pendingCRDetail", {
+                crTitle: pendingCR.crTitle,
+                crId: pendingCR.crId,
+              })}
             </Alert>
           )}
 
@@ -466,10 +571,14 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                   onChange={(e) => setIsActive(e.target.checked)}
                 />
               }
-              label={t('surveys.isActive')}
+              label={t("surveys.isActive")}
             />
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', ml: 4, mt: 0.5 }}>
-              {t('surveys.isActiveHelp')}
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: "block", ml: 4, mt: 0.5 }}
+            >
+              {t("surveys.isActiveHelp")}
             </Typography>
           </Box>
 
@@ -477,30 +586,30 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
           <Paper variant="outlined" sx={{ p: 2 }}>
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
+                display: "flex",
+                alignItems: "center",
                 gap: 1,
                 mb: basicInfoExpanded ? 1 : 0,
-                cursor: 'pointer',
+                cursor: "pointer",
               }}
               onClick={() => setBasicInfoExpanded(!basicInfoExpanded)}
             >
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                {t('common.basicInformation')}
+                {t("common.basicInformation")}
               </Typography>
-              <IconButton size="small" sx={{ pointerEvents: 'none' }}>
+              <IconButton size="small" sx={{ pointerEvents: "none" }}>
                 {basicInfoExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               </IconButton>
             </Box>
             <Collapse in={basicInfoExpanded}>
               <Stack spacing={2} sx={{ mt: 1 }}>
                 <TextField
-                  label={t('surveys.platformSurveyId')}
+                  label={t("surveys.platformSurveyId")}
                   value={platformSurveyId}
                   onChange={(e) => setPlatformSurveyId(e.target.value)}
                   required
                   fullWidth
-                  helperText={t('surveys.platformSurveyIdHelp')}
+                  helperText={t("surveys.platformSurveyIdHelp")}
                 />
               </Stack>
             </Collapse>
@@ -536,20 +645,26 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
           <Paper variant="outlined" sx={{ p: 2 }}>
             <Box
               sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
                 mb: triggerConditionsExpanded ? 1 : 0,
-                cursor: 'pointer',
+                cursor: "pointer",
               }}
-              onClick={() => setTriggerConditionsExpanded(!triggerConditionsExpanded)}
+              onClick={() =>
+                setTriggerConditionsExpanded(!triggerConditionsExpanded)
+              }
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                  {t('surveys.triggerConditions')}
+                  {t("surveys.triggerConditions")}
                 </Typography>
-                <IconButton size="small" sx={{ pointerEvents: 'none' }}>
-                  {triggerConditionsExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                <IconButton size="small" sx={{ pointerEvents: "none" }}>
+                  {triggerConditionsExpanded ? (
+                    <ExpandLessIcon />
+                  ) : (
+                    <ExpandMoreIcon />
+                  )}
                 </IconButton>
               </Box>
               {triggerConditionsExpanded && (
@@ -562,25 +677,35 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                   }}
                   disabled={!canAddMoreConditions()}
                 >
-                  {t('surveys.addCondition')}
+                  {t("surveys.addCondition")}
                 </Button>
               )}
             </Box>
             <Collapse in={triggerConditionsExpanded}>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-                {t('surveys.triggerConditionsHelp')}
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", mb: 2 }}
+              >
+                {t("surveys.triggerConditionsHelp")}
               </Typography>
               {triggerConditions.map((condition, index) => {
                 const availableTypes = getAvailableConditionTypes(index);
                 return (
                   <Box key={index}>
-                    <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                    <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
                       <FormControl sx={{ minWidth: 150 }}>
-                        <InputLabel>{t('surveys.conditionType')}</InputLabel>
+                        <InputLabel>{t("surveys.conditionType")}</InputLabel>
                         <Select
                           value={condition.type}
-                          onChange={(e) => handleTriggerConditionChange(index, 'type', e.target.value)}
-                          label={t('surveys.conditionType')}
+                          onChange={(e) =>
+                            handleTriggerConditionChange(
+                              index,
+                              "type",
+                              e.target.value,
+                            )
+                          }
+                          label={t("surveys.conditionType")}
                         >
                           {/* Always show current type */}
                           {!availableTypes.includes(condition.type) && (
@@ -589,7 +714,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                             </MenuItem>
                           )}
                           {/* Show available types */}
-                          {availableTypes.map(type => (
+                          {availableTypes.map((type) => (
                             <MenuItem key={type} value={type}>
                               {t(`surveys.condition.${type}`)}
                             </MenuItem>
@@ -597,19 +722,28 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                         </Select>
                       </FormControl>
                       <TextField
-                        label={t('surveys.conditionValue')}
+                        label={t("surveys.conditionValue")}
                         type="number"
                         value={condition.value}
-                        onChange={(e) => handleTriggerConditionChange(index, 'value', e.target.value === '' ? '' : parseInt(e.target.value) || 0)}
+                        onChange={(e) =>
+                          handleTriggerConditionChange(
+                            index,
+                            "value",
+                            e.target.value === ""
+                              ? ""
+                              : parseInt(e.target.value) || 0,
+                          )
+                        }
                         sx={{
                           flex: 1,
-                          '& input[type=number]': {
-                            MozAppearance: 'textfield',
+                          "& input[type=number]": {
+                            MozAppearance: "textfield",
                           },
-                          '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
-                            WebkitAppearance: 'none',
-                            margin: 0,
-                          },
+                          "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button":
+                            {
+                              WebkitAppearance: "none",
+                              margin: 0,
+                            },
                         }}
                       />
                       <IconButton
@@ -621,7 +755,13 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                     </Box>
                     {/* AND separator between conditions */}
                     {index < triggerConditions.length - 1 && (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          my: 1,
+                        }}
+                      >
                         <Chip
                           label="AND"
                           size="small"
@@ -641,43 +781,53 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
           <Paper variant="outlined" sx={{ p: 2 }}>
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
+                display: "flex",
+                alignItems: "center",
                 gap: 1,
                 mb: participationMailExpanded ? 1 : 0,
-                cursor: 'pointer',
+                cursor: "pointer",
               }}
-              onClick={() => setParticipationMailExpanded(!participationMailExpanded)}
+              onClick={() =>
+                setParticipationMailExpanded(!participationMailExpanded)
+              }
             >
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                {t('surveys.participationMail')}
+                {t("surveys.participationMail")}
               </Typography>
-              <IconButton size="small" sx={{ pointerEvents: 'none' }}>
-                {participationMailExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              <IconButton size="small" sx={{ pointerEvents: "none" }}>
+                {participationMailExpanded ? (
+                  <ExpandLessIcon />
+                ) : (
+                  <ExpandMoreIcon />
+                )}
               </IconButton>
             </Box>
             <Collapse in={participationMailExpanded}>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-                {t('surveys.participationMailHelp')}
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", mb: 2 }}
+              >
+                {t("surveys.participationMailHelp")}
               </Typography>
               <Stack spacing={2}>
                 <TextField
-                  label={t('surveys.surveyTitle')}
+                  label={t("surveys.surveyTitle")}
                   value={surveyTitle}
                   onChange={(e) => setSurveyTitle(e.target.value)}
                   required
                   fullWidth
-                  helperText={t('surveys.surveyTitleHelp')}
+                  helperText={t("surveys.surveyTitleHelp")}
                 />
                 <TextField
-                  label={t('surveys.surveyContent')}
+                  label={t("surveys.surveyContent")}
                   value={surveyContent}
                   onChange={(e) => setSurveyContent(e.target.value)}
                   multiline
                   rows={3}
                   fullWidth
                   required
-                  helperText={t('surveys.surveyContentHelp')}
+                  helperText={t("surveys.surveyContentHelp")}
                 />
               </Stack>
             </Collapse>
@@ -687,39 +837,43 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
           <Paper variant="outlined" sx={{ p: 2 }}>
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
+                display: "flex",
+                alignItems: "center",
                 gap: 1,
                 mb: rewardsExpanded ? 1 : 0,
-                cursor: 'pointer',
+                cursor: "pointer",
               }}
               onClick={() => setRewardsExpanded(!rewardsExpanded)}
             >
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                {t('surveys.section.rewards')}
+                {t("surveys.section.rewards")}
               </Typography>
-              <IconButton size="small" sx={{ pointerEvents: 'none' }}>
+              <IconButton size="small" sx={{ pointerEvents: "none" }}>
                 {rewardsExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               </IconButton>
             </Box>
             <Collapse in={rewardsExpanded}>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-                {t('surveys.rewardsHelp')}
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", mb: 2 }}
+              >
+                {t("surveys.rewardsHelp")}
               </Typography>
               <Stack spacing={2}>
                 {/* Reward Mail */}
                 <TextField
-                  label={t('surveys.rewardMailTitle')}
+                  label={t("surveys.rewardMailTitle")}
                   value={rewardMailTitle}
                   onChange={(e) => setRewardMailTitle(e.target.value)}
                   fullWidth
                   size="small"
                   required
-                  helperText={t('surveys.rewardMailTitleHelp')}
+                  helperText={t("surveys.rewardMailTitleHelp")}
                 />
 
                 <TextField
-                  label={t('surveys.rewardMailContent')}
+                  label={t("surveys.rewardMailContent")}
                   value={rewardMailContent}
                   onChange={(e) => setRewardMailContent(e.target.value)}
                   multiline
@@ -727,23 +881,27 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                   fullWidth
                   size="small"
                   required
-                  helperText={t('surveys.rewardMailContentHelp')}
+                  helperText={t("surveys.rewardMailContentHelp")}
                 />
 
                 {/* Participation Rewards */}
                 <Box>
                   <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    {t('surveys.participationRewards')}
+                    {t("surveys.participationRewards")}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-                    {t('surveys.participationRewardsHelp')}
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block", mb: 2 }}
+                  >
+                    {t("surveys.participationRewardsHelp")}
                   </Typography>
                   <RewardSelector
                     value={participationRewards}
                     onChange={setParticipationRewards}
                     onModeChange={(mode, templateId) => {
                       setRewardMode(mode);
-                      if (mode === 'template') {
+                      if (mode === "template") {
                         setRewardTemplateId(templateId || null);
                       } else {
                         setRewardTemplateId(null);
@@ -751,7 +909,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                     }}
                     minQuantity={1}
                     initialMode={rewardMode}
-                    initialTemplateId={rewardTemplateId || ''}
+                    initialTemplateId={rewardTemplateId || ""}
                   />
                 </Box>
               </Stack>
@@ -765,22 +923,22 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         sx={{
           p: 2,
           borderTop: 1,
-          borderColor: 'divider',
-          bgcolor: 'background.paper',
-          display: 'flex',
+          borderColor: "divider",
+          bgcolor: "background.paper",
+          display: "flex",
           gap: 1,
-          justifyContent: 'flex-end',
+          justifyContent: "flex-end",
         }}
       >
         <Button onClick={onClose} disabled={submitting}>
-          {t('common.cancel')}
+          {t("common.cancel")}
         </Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
           disabled={submitting || (!!survey && !isDirty)}
         >
-          {getActionLabel(survey ? 'update' : 'create', requiresApproval, t)}
+          {getActionLabel(survey ? "update" : "create", requiresApproval, t)}
         </Button>
       </Box>
       <ErrorDialog />
@@ -789,4 +947,3 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
 };
 
 export default SurveyFormDialog;
-

@@ -1,6 +1,6 @@
-import axios from 'axios';
-import { config } from '../config/env';
-import logger from '../config/logger';
+import axios from "axios";
+import { config } from "../config/env";
+import logger from "../config/logger";
 
 interface TokenUsageStats {
   usageCount: number;
@@ -19,7 +19,9 @@ class TokenUsageTracker {
   private readonly edgeInstanceId: string;
 
   constructor() {
-    this.reportIntervalMs = parseInt(process.env.TOKEN_USAGE_REPORT_INTERVAL_MS || '60000');
+    this.reportIntervalMs = parseInt(
+      process.env.TOKEN_USAGE_REPORT_INTERVAL_MS || "60000",
+    );
     this.edgeInstanceId = `edge-${config.group}-${process.pid}`;
   }
 
@@ -29,24 +31,27 @@ class TokenUsageTracker {
    */
   async initialize(): Promise<void> {
     if (this.initialized) {
-      logger.warn('[TokenUsageTracker] Already initialized');
+      logger.warn("[TokenUsageTracker] Already initialized");
       return;
     }
 
-    logger.info('[TokenUsageTracker] Initializing token usage tracker...', {
+    logger.info("[TokenUsageTracker] Initializing token usage tracker...", {
       reportIntervalMs: this.reportIntervalMs,
       edgeInstanceId: this.edgeInstanceId,
     });
 
     // Start periodic reporting
     this.reportTimer = setInterval(() => {
-      this.reportUsageToBackend().catch(err => {
-        logger.error('[TokenUsageTracker] Failed to report usage:', err.message);
+      this.reportUsageToBackend().catch((err) => {
+        logger.error(
+          "[TokenUsageTracker] Failed to report usage:",
+          err.message,
+        );
       });
     }, this.reportIntervalMs);
 
     this.initialized = true;
-    logger.info('[TokenUsageTracker] Initialized');
+    logger.info("[TokenUsageTracker] Initialized");
   }
 
   /**
@@ -64,13 +69,16 @@ class TokenUsageTracker {
       try {
         await this.reportUsageToBackend();
       } catch (error) {
-        logger.error('[TokenUsageTracker] Failed to report usage during shutdown:', error);
+        logger.error(
+          "[TokenUsageTracker] Failed to report usage during shutdown:",
+          error,
+        );
       }
     }
 
     this.usageMap.clear();
     this.initialized = false;
-    logger.info('[TokenUsageTracker] Shutdown complete');
+    logger.info("[TokenUsageTracker] Shutdown complete");
   }
 
   /**
@@ -131,20 +139,20 @@ class TokenUsageTracker {
         },
         {
           headers: {
-            'x-api-token': config.apiToken,
-            'x-application-name': config.applicationName,
+            "x-api-token": config.apiToken,
+            "x-application-name": config.applicationName,
           },
           timeout: 10000,
-        }
+        },
       );
 
       if (response.data?.success) {
-        logger.info('[TokenUsageTracker] Usage reported successfully', {
+        logger.info("[TokenUsageTracker] Usage reported successfully", {
           tokenCount: usageData.length,
           totalUsage: usageData.reduce((sum, d) => sum + d.usageCount, 0),
         });
       } else {
-        throw new Error(response.data?.message || 'Unknown error');
+        throw new Error(response.data?.message || "Unknown error");
       }
     } catch (error: any) {
       // Restore usage data on failure
@@ -165,4 +173,3 @@ class TokenUsageTracker {
 }
 
 export const tokenUsageTracker = new TokenUsageTracker();
-

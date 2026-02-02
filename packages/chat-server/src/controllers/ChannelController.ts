@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
-import { ChannelModel } from '../models/Channel';
-import { MessageModel } from '../models/Message';
-import { CreateChannelData, UpdateChannelData } from '../types/chat';
-import { getMetrics } from '../services/MetricsService';
-import logger from '../config/logger';
+import { Request, Response } from "express";
+import { ChannelModel } from "../models/Channel";
+import { MessageModel } from "../models/Message";
+import { CreateChannelData, UpdateChannelData } from "../types/chat";
+import { getMetrics } from "../services/MetricsService";
+import logger from "../config/logger";
 
 export class ChannelController {
   // 채널 생성
@@ -16,7 +16,7 @@ export class ChannelController {
       if (!data.name || !data.type) {
         res.status(400).json({
           success: false,
-          error: 'Name and type are required',
+          error: "Name and type are required",
         });
         return;
       }
@@ -27,22 +27,28 @@ export class ChannelController {
 
       const metrics = getMetrics((req as any).app);
       if (metrics.messageLatency) {
-        metrics.messageLatency.observe({ server_id: process.env.SERVER_ID || 'unknown', operation: 'channel_create' }, latency);
+        metrics.messageLatency.observe(
+          {
+            server_id: process.env.SERVER_ID || "unknown",
+            operation: "channel_create",
+          },
+          latency,
+        );
       }
 
       res.status(201).json({
         success: true,
         data: channel,
-        message: 'Channel created successfully',
+        message: "Channel created successfully",
       });
 
       logger.info(`Channel created: ${channel.id} by user ${userId}`);
     } catch (error) {
-      logger.error('Error creating channel:', error);
+      logger.error("Error creating channel:", error);
       res.status(500).json({
         success: false,
-        error: 'Failed to create channel',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to create channel",
+        message: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }
@@ -56,7 +62,7 @@ export class ChannelController {
       if (isNaN(channelId)) {
         res.status(400).json({
           success: false,
-          error: 'Invalid channel ID',
+          error: "Invalid channel ID",
         });
         return;
       }
@@ -66,7 +72,7 @@ export class ChannelController {
       if (!isMember) {
         res.status(403).json({
           success: false,
-          error: 'Access denied',
+          error: "Access denied",
         });
         return;
       }
@@ -75,7 +81,7 @@ export class ChannelController {
       if (!channel) {
         res.status(404).json({
           success: false,
-          error: 'Channel not found',
+          error: "Channel not found",
         });
         return;
       }
@@ -85,10 +91,10 @@ export class ChannelController {
         data: channel,
       });
     } catch (error) {
-      logger.error('Error getting channel:', error);
+      logger.error("Error getting channel:", error);
       res.status(500).json({
         success: false,
-        error: 'Failed to get channel',
+        error: "Failed to get channel",
       });
     }
   }
@@ -97,11 +103,7 @@ export class ChannelController {
   static async getUserChannels(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
-      const {
-        type,
-        page = 1,
-        limit = 20,
-      } = req.query;
+      const { type, page = 1, limit = 20 } = req.query;
 
       const offset = (Number(page) - 1) * Number(limit);
       const options = {
@@ -125,10 +127,10 @@ export class ChannelController {
         },
       });
     } catch (error) {
-      logger.error('Error getting user channels:', error);
+      logger.error("Error getting user channels:", error);
       res.status(500).json({
         success: false,
-        error: 'Failed to get channels',
+        error: "Failed to get channels",
       });
     }
   }
@@ -143,17 +145,17 @@ export class ChannelController {
       if (isNaN(channelId)) {
         res.status(400).json({
           success: false,
-          error: 'Invalid channel ID',
+          error: "Invalid channel ID",
         });
         return;
       }
 
       // 권한 확인 (채널 소유자 또는 관리자)
       const userRole = await ChannelModel.getUserRole(channelId, userId);
-      if (!userRole || !['owner', 'admin'].includes(userRole)) {
+      if (!userRole || !["owner", "admin"].includes(userRole)) {
         res.status(403).json({
           success: false,
-          error: 'Insufficient permissions',
+          error: "Insufficient permissions",
         });
         return;
       }
@@ -162,7 +164,7 @@ export class ChannelController {
       if (!channel) {
         res.status(404).json({
           success: false,
-          error: 'Channel not found',
+          error: "Channel not found",
         });
         return;
       }
@@ -170,15 +172,15 @@ export class ChannelController {
       res.json({
         success: true,
         data: channel,
-        message: 'Channel updated successfully',
+        message: "Channel updated successfully",
       });
 
       logger.info(`Channel updated: ${channelId} by user ${userId}`);
     } catch (error) {
-      logger.error('Error updating channel:', error);
+      logger.error("Error updating channel:", error);
       res.status(500).json({
         success: false,
-        error: 'Failed to update channel',
+        error: "Failed to update channel",
       });
     }
   }
@@ -188,22 +190,22 @@ export class ChannelController {
     try {
       const channelId = parseInt(req.params.id);
       const userId = (req as any).user.id;
-      const { reason = 'Channel deleted by user' } = req.body;
+      const { reason = "Channel deleted by user" } = req.body;
 
       if (isNaN(channelId)) {
         res.status(400).json({
           success: false,
-          error: 'Invalid channel ID',
+          error: "Invalid channel ID",
         });
         return;
       }
 
       // 권한 확인 (채널 소유자만)
       const userRole = await ChannelModel.getUserRole(channelId, userId);
-      if (userRole !== 'owner') {
+      if (userRole !== "owner") {
         res.status(403).json({
           success: false,
-          error: 'Only channel owner can delete the channel',
+          error: "Only channel owner can delete the channel",
         });
         return;
       }
@@ -212,22 +214,22 @@ export class ChannelController {
       if (!success) {
         res.status(404).json({
           success: false,
-          error: 'Channel not found',
+          error: "Channel not found",
         });
         return;
       }
 
       res.json({
         success: true,
-        message: 'Channel deleted successfully',
+        message: "Channel deleted successfully",
       });
 
       logger.info(`Channel deleted: ${channelId} by user ${userId}`);
     } catch (error) {
-      logger.error('Error deleting channel:', error);
+      logger.error("Error deleting channel:", error);
       res.status(500).json({
         success: false,
-        error: 'Failed to delete channel',
+        error: "Failed to delete channel",
       });
     }
   }
@@ -236,16 +238,12 @@ export class ChannelController {
   static async search(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
-      const {
-        q: query,
-        page = 1,
-        limit = 20,
-      } = req.query;
+      const { q: query, page = 1, limit = 20 } = req.query;
 
-      if (!query || typeof query !== 'string') {
+      if (!query || typeof query !== "string") {
         res.status(400).json({
           success: false,
-          error: 'Search query is required',
+          error: "Search query is required",
         });
         return;
       }
@@ -271,10 +269,10 @@ export class ChannelController {
         },
       });
     } catch (error) {
-      logger.error('Error searching channels:', error);
+      logger.error("Error searching channels:", error);
       res.status(500).json({
         success: false,
-        error: 'Failed to search channels',
+        error: "Failed to search channels",
       });
     }
   }
@@ -291,10 +289,10 @@ export class ChannelController {
         data: channels,
       });
     } catch (error) {
-      logger.error('Error getting popular channels:', error);
+      logger.error("Error getting popular channels:", error);
       res.status(500).json({
         success: false,
-        error: 'Failed to get popular channels',
+        error: "Failed to get popular channels",
       });
     }
   }
@@ -308,7 +306,7 @@ export class ChannelController {
       if (isNaN(channelId)) {
         res.status(400).json({
           success: false,
-          error: 'Invalid channel ID',
+          error: "Invalid channel ID",
         });
         return;
       }
@@ -318,7 +316,7 @@ export class ChannelController {
       if (!isMember) {
         res.status(403).json({
           success: false,
-          error: 'Access denied',
+          error: "Access denied",
         });
         return;
       }
@@ -327,7 +325,7 @@ export class ChannelController {
       if (!stats) {
         res.status(404).json({
           success: false,
-          error: 'Channel not found',
+          error: "Channel not found",
         });
         return;
       }
@@ -337,10 +335,10 @@ export class ChannelController {
         data: stats,
       });
     } catch (error) {
-      logger.error('Error getting channel stats:', error);
+      logger.error("Error getting channel stats:", error);
       res.status(500).json({
         success: false,
-        error: 'Failed to get channel stats',
+        error: "Failed to get channel stats",
       });
     }
   }
@@ -353,7 +351,7 @@ export class ChannelController {
       if (isNaN(channelId)) {
         res.status(400).json({
           success: false,
-          error: 'Invalid channel ID',
+          error: "Invalid channel ID",
         });
         return;
       }
@@ -365,10 +363,10 @@ export class ChannelController {
         data: { exists },
       });
     } catch (error) {
-      logger.error('Error checking channel existence:', error);
+      logger.error("Error checking channel existence:", error);
       res.status(500).json({
         success: false,
-        error: 'Failed to check channel existence',
+        error: "Failed to check channel existence",
       });
     }
   }
@@ -380,12 +378,14 @@ export class ChannelController {
       const userId = (req as any).user.id;
       const limit = parseInt(req.query.limit as string) || 50;
       const offset = parseInt(req.query.offset as string) || 0;
-      const before = req.query.before ? parseInt(req.query.before as string) : undefined;
+      const before = req.query.before
+        ? parseInt(req.query.before as string)
+        : undefined;
 
       if (isNaN(channelId)) {
         res.status(400).json({
           success: false,
-          error: 'Invalid channel ID',
+          error: "Invalid channel ID",
         });
         return;
       }
@@ -395,7 +395,7 @@ export class ChannelController {
       if (!hasAccess) {
         res.status(403).json({
           success: false,
-          error: 'Access denied to this channel',
+          error: "Access denied to this channel",
         });
         return;
       }
@@ -417,10 +417,10 @@ export class ChannelController {
         },
       });
     } catch (error) {
-      logger.error('Error getting channel messages:', error);
+      logger.error("Error getting channel messages:", error);
       res.status(500).json({
         success: false,
-        error: 'Failed to get channel messages',
+        error: "Failed to get channel messages",
       });
     }
   }
@@ -438,49 +438,51 @@ export class ChannelController {
         logger.warn(`❌ Invalid channel ID: ${req.params.id}`);
         res.status(400).json({
           success: false,
-          error: 'Invalid channel ID',
+          error: "Invalid channel ID",
         });
         return;
       }
 
       // 채널 멤버십 확인 (타임아웃 설정)
-      const userRole = await Promise.race([
+      const userRole = (await Promise.race([
         ChannelModel.getUserRole(channelId, userId),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Membership check timeout')), 3000)
-        )
-      ]) as any;
+          setTimeout(() => reject(new Error("Membership check timeout")), 3000),
+        ),
+      ])) as any;
 
       if (!userRole) {
         res.status(403).json({
           success: false,
-          error: 'You are not a member of this channel',
+          error: "You are not a member of this channel",
         });
         return;
       }
 
       // 읽음 상태 업데이트 (타임아웃 설정)
-      const success = await Promise.race([
+      const success = (await Promise.race([
         ChannelModel.markAsRead(channelId, userId, messageId),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Mark as read timeout')), 4000)
-        )
-      ]) as boolean;
+          setTimeout(() => reject(new Error("Mark as read timeout")), 4000),
+        ),
+      ])) as boolean;
 
       if (!success) {
         res.status(500).json({
           success: false,
-          error: 'Failed to update read status',
+          error: "Failed to update read status",
         });
         return;
       }
 
       const duration = Date.now() - startTime;
-      logger.info(`User ${userId} marked channel ${channelId} as read${messageId ? ` up to message ${messageId}` : ''} (${duration}ms)`);
+      logger.info(
+        `User ${userId} marked channel ${channelId} as read${messageId ? ` up to message ${messageId}` : ""} (${duration}ms)`,
+      );
 
       res.json({
         success: true,
-        message: 'Channel marked as read',
+        message: "Channel marked as read",
         data: {
           channelId,
           userId,
@@ -493,16 +495,16 @@ export class ChannelController {
       logger.error(`Error marking channel as read (${duration}ms):`, error);
 
       // 타임아웃 에러인 경우 특별 처리
-      if (error instanceof Error && error.message.includes('timeout')) {
+      if (error instanceof Error && error.message.includes("timeout")) {
         res.status(408).json({
           success: false,
-          error: 'Request timeout',
-          code: 'TIMEOUT'
+          error: "Request timeout",
+          code: "TIMEOUT",
         });
       } else {
         res.status(500).json({
           success: false,
-          error: 'Failed to mark channel as read',
+          error: "Failed to mark channel as read",
         });
       }
     }
@@ -517,7 +519,7 @@ export class ChannelController {
       if (isNaN(channelId)) {
         res.status(400).json({
           success: false,
-          error: 'Invalid channel ID',
+          error: "Invalid channel ID",
         });
         return;
       }
@@ -527,7 +529,7 @@ export class ChannelController {
       if (!channel) {
         res.status(404).json({
           success: false,
-          error: 'Channel not found',
+          error: "Channel not found",
         });
         return;
       }
@@ -537,18 +539,18 @@ export class ChannelController {
       if (isMember) {
         res.status(200).json({
           success: true,
-          message: 'Already a member of this channel',
+          message: "Already a member of this channel",
         });
         return;
       }
 
       // 채널에 참여
-      await ChannelModel.addMember(channelId, userId, 'member');
+      await ChannelModel.addMember(channelId, userId, "member");
 
       // WebSocket을 통해 채널 참여 알림
       const io = (req as any).io;
       if (io) {
-        io.to(`channel:${channelId}`).emit('user_joined', {
+        io.to(`channel:${channelId}`).emit("user_joined", {
           channelId,
           userId,
           timestamp: Date.now(),
@@ -559,13 +561,13 @@ export class ChannelController {
 
       res.status(200).json({
         success: true,
-        message: 'Successfully joined channel',
+        message: "Successfully joined channel",
       });
     } catch (error) {
-      logger.error('Error joining channel:', error);
+      logger.error("Error joining channel:", error);
       res.status(500).json({
         success: false,
-        error: 'Failed to join channel',
+        error: "Failed to join channel",
       });
     }
   }
@@ -579,7 +581,7 @@ export class ChannelController {
       if (isNaN(channelId)) {
         res.status(400).json({
           success: false,
-          error: 'Invalid channel ID',
+          error: "Invalid channel ID",
         });
         return;
       }
@@ -589,7 +591,7 @@ export class ChannelController {
       if (!channel) {
         res.status(404).json({
           success: false,
-          error: 'Channel not found',
+          error: "Channel not found",
         });
         return;
       }
@@ -599,7 +601,7 @@ export class ChannelController {
       if (!isMember) {
         res.status(400).json({
           success: false,
-          error: 'Not a member of this channel',
+          error: "Not a member of this channel",
         });
         return;
       }
@@ -610,7 +612,7 @@ export class ChannelController {
       // WebSocket을 통해 채널 나가기 알림
       const io = (req as any).io;
       if (io) {
-        io.to(`channel:${channelId}`).emit('user_left', {
+        io.to(`channel:${channelId}`).emit("user_left", {
           channelId,
           userId,
           timestamp: Date.now(),
@@ -621,13 +623,13 @@ export class ChannelController {
 
       res.status(200).json({
         success: true,
-        message: 'Successfully left channel',
+        message: "Successfully left channel",
       });
     } catch (error) {
-      logger.error('Error leaving channel:', error);
+      logger.error("Error leaving channel:", error);
       res.status(500).json({
         success: false,
-        error: 'Failed to leave channel',
+        error: "Failed to leave channel",
       });
     }
   }

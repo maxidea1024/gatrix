@@ -1,6 +1,6 @@
-import { GatrixServerSDK, GatrixSDKConfig } from '@gatrix/server-sdk';
-import { config } from '../config/env';
-import logger from '../config/logger';
+import { GatrixServerSDK, GatrixSDKConfig } from "@gatrix/server-sdk";
+import { config } from "../config/env";
+import logger from "../config/logger";
 
 /**
  * SDK Manager - Singleton for managing GatrixServerSDK instance
@@ -22,7 +22,7 @@ class SDKManager {
   }
 
   private async doInitialize(): Promise<void> {
-    logger.info('Initializing GatrixServerSDK...');
+    logger.info("Initializing GatrixServerSDK...");
 
     const sdkConfig: GatrixSDKConfig = {
       gatrixUrl: config.gatrixUrl,
@@ -38,12 +38,14 @@ class SDKManager {
       environments: config.environments,
 
       // Redis for PubSub (optional)
-      redis: config.redis.host ? {
-        host: config.redis.host,
-        port: config.redis.port,
-        password: config.redis.password,
-        db: config.redis.db,
-      } : undefined,
+      redis: config.redis.host
+        ? {
+            host: config.redis.host,
+            port: config.redis.port,
+            password: config.redis.password,
+            db: config.redis.db,
+          }
+        : undefined,
 
       // Cache configuration
       cache: {
@@ -74,19 +76,21 @@ class SDKManager {
 
     try {
       // Use APP_VERSION env var (set via Docker build-arg) or fallback to package.json
-      let serverVersion = process.env.APP_VERSION || '0.0.0';
-      if (serverVersion === '0.0.0') {
+      let serverVersion = process.env.APP_VERSION || "0.0.0";
+      if (serverVersion === "0.0.0") {
         try {
-          const packageJson = require('../../package.json');
-          serverVersion = packageJson.version || '0.0.0';
+          const packageJson = require("../../package.json");
+          serverVersion = packageJson.version || "0.0.0";
         } catch (err) {
-          logger.warn('Failed to load package.json version, using default 0.0.0');
+          logger.warn(
+            "Failed to load package.json version, using default 0.0.0",
+          );
         }
       }
 
       this.sdk = new GatrixServerSDK(sdkConfig);
       await this.sdk.initialize();
-      logger.info('GatrixServerSDK initialized successfully', {
+      logger.info("GatrixServerSDK initialized successfully", {
         environments: config.environments,
         syncMethod: config.cache.syncMethod,
       });
@@ -94,7 +98,7 @@ class SDKManager {
       // Register Edge service to Service Discovery
       const result = await this.sdk.registerService({
         labels: {
-          service: 'edge',
+          service: "edge",
           group: config.group,
           appVersion: serverVersion,
         },
@@ -103,17 +107,17 @@ class SDKManager {
           internalApi: config.port + 10,
           metricsApi: config.metricsPort,
         },
-        status: 'ready',
+        status: "ready",
         meta: {
-          instanceName: 'edge-1',
+          instanceName: "edge-1",
         },
       });
-      logger.info('Edge service registered to Service Discovery via SDK', {
+      logger.info("Edge service registered to Service Discovery via SDK", {
         instanceId: result.instanceId,
         version: serverVersion,
       });
     } catch (error) {
-      logger.error('Failed to initialize GatrixServerSDK:', error);
+      logger.error("Failed to initialize GatrixServerSDK:", error);
       throw error;
     }
   }
@@ -132,18 +136,17 @@ class SDKManager {
     if (this.sdk) {
       try {
         await this.sdk.unregisterService();
-        logger.info('Edge service unregistered from Service Discovery');
+        logger.info("Edge service unregistered from Service Discovery");
       } catch (error) {
-        logger.warn('Error unregistering Edge service:', error);
+        logger.warn("Error unregistering Edge service:", error);
       }
       await this.sdk.close();
       this.sdk = null;
       this.initPromise = null;
-      logger.info('GatrixServerSDK shutdown complete');
+      logger.info("GatrixServerSDK shutdown complete");
     }
   }
 }
 
 // Export singleton instance
 export const sdkManager = new SDKManager();
-

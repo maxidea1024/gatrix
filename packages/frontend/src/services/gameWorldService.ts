@@ -1,12 +1,12 @@
-import { api } from './api';
-import axios from 'axios';
+import { api } from "./api";
+import axios from "axios";
 import {
   GameWorld,
   CreateGameWorldData,
   UpdateGameWorldData,
   GameWorldListParams,
-  GameWorldListResult
-} from '../types/gameWorld';
+  GameWorldListResult,
+} from "../types/gameWorld";
 
 // Extended response type to indicate if change request was created
 export interface GameWorldMutationResult {
@@ -17,9 +17,11 @@ export interface GameWorldMutationResult {
 
 export const gameWorldService = {
   // Get list of game worlds
-  async getGameWorlds(params?: GameWorldListParams): Promise<GameWorldListResult> {
+  async getGameWorlds(
+    params?: GameWorldListParams,
+  ): Promise<GameWorldListResult> {
     try {
-      const response = await api.get('/admin/game-worlds', { params });
+      const response = await api.get("/admin/game-worlds", { params });
 
       // 응답 구조 확인 - 두 가지 경우 모두 처리
       let data: any;
@@ -30,16 +32,16 @@ export const gameWorldService = {
         // 직접 응답 구조: { worlds: [], total: 0 }
         data = response.data;
       } else {
-        console.error('Invalid response structure:', response.data);
-        throw new Error('Invalid response structure');
+        console.error("Invalid response structure:", response.data);
+        throw new Error("Invalid response structure");
       }
 
       return {
-        worlds: (data.worlds || []),
-        total: data.total || 0
+        worlds: data.worlds || [],
+        total: data.total || 0,
       };
     } catch (error: any) {
-      console.error('API Error:', error.response?.data || error.message);
+      console.error("API Error:", error.response?.data || error.message);
       throw error;
     }
   },
@@ -57,15 +59,23 @@ export const gameWorldService = {
   },
 
   // Create new game world
-  async createGameWorld(data: CreateGameWorldData): Promise<GameWorldMutationResult> {
+  async createGameWorld(
+    data: CreateGameWorldData,
+  ): Promise<GameWorldMutationResult> {
     // Ensure boolean fields are actually boolean, not numbers
     const sanitizedData = {
       ...data,
-      ...(data.isVisible !== undefined && { isVisible: Boolean(data.isVisible) }),
-      ...(data.isMaintenance !== undefined && { isMaintenance: Boolean(data.isMaintenance) }),
-      ...(data.supportsMultiLanguage !== undefined && { supportsMultiLanguage: Boolean(data.supportsMultiLanguage) }),
+      ...(data.isVisible !== undefined && {
+        isVisible: Boolean(data.isVisible),
+      }),
+      ...(data.isMaintenance !== undefined && {
+        isMaintenance: Boolean(data.isMaintenance),
+      }),
+      ...(data.supportsMultiLanguage !== undefined && {
+        supportsMultiLanguage: Boolean(data.supportsMultiLanguage),
+      }),
     };
-    const response: any = await api.post('/admin/game-worlds', sanitizedData);
+    const response: any = await api.post("/admin/game-worlds", sanitizedData);
 
     // Check if this is a change request response
     // api.post returns response.data, so we check for changeRequestId in data property
@@ -85,15 +95,27 @@ export const gameWorldService = {
   },
 
   // Update game world
-  async updateGameWorld(id: number, data: UpdateGameWorldData): Promise<GameWorldMutationResult> {
+  async updateGameWorld(
+    id: number,
+    data: UpdateGameWorldData,
+  ): Promise<GameWorldMutationResult> {
     // Ensure boolean fields are actually boolean, not numbers
     const sanitizedData = {
       ...data,
-      ...(data.isVisible !== undefined && { isVisible: Boolean(data.isVisible) }),
-      ...(data.isMaintenance !== undefined && { isMaintenance: Boolean(data.isMaintenance) }),
-      ...(data.supportsMultiLanguage !== undefined && { supportsMultiLanguage: Boolean(data.supportsMultiLanguage) }),
+      ...(data.isVisible !== undefined && {
+        isVisible: Boolean(data.isVisible),
+      }),
+      ...(data.isMaintenance !== undefined && {
+        isMaintenance: Boolean(data.isMaintenance),
+      }),
+      ...(data.supportsMultiLanguage !== undefined && {
+        supportsMultiLanguage: Boolean(data.supportsMultiLanguage),
+      }),
     };
-    const response: any = await api.put(`/admin/game-worlds/${id}`, sanitizedData);
+    const response: any = await api.put(
+      `/admin/game-worlds/${id}`,
+      sanitizedData,
+    );
 
     // Check if this is a change request response
     // api.put returns response.data, so we check for changeRequestId in data property
@@ -134,7 +156,9 @@ export const gameWorldService = {
 
   // Toggle visibility
   async toggleVisibility(id: number): Promise<GameWorldMutationResult> {
-    const response: any = await api.patch(`/admin/game-worlds/${id}/toggle-visibility`);
+    const response: any = await api.patch(
+      `/admin/game-worlds/${id}/toggle-visibility`,
+    );
     const responseData = response.data || response;
 
     // Check if this is a change request response
@@ -154,7 +178,9 @@ export const gameWorldService = {
 
   // Toggle maintenance status
   async toggleMaintenance(id: number): Promise<GameWorldMutationResult> {
-    const response: any = await api.patch(`/admin/game-worlds/${id}/toggle-maintenance`);
+    const response: any = await api.patch(
+      `/admin/game-worlds/${id}/toggle-maintenance`,
+    );
     const responseData = response.data || response;
 
     // Check if this is a change request response
@@ -173,25 +199,35 @@ export const gameWorldService = {
   },
 
   // Update maintenance status with details
-  async updateMaintenance(id: number, data: {
-    isMaintenance: boolean;
-    maintenanceStartDate?: string;
-    maintenanceEndDate?: string;
-    maintenanceMessage?: string;
-    maintenanceMessageTemplateId?: number | null;
-    supportsMultiLanguage?: boolean;
-    maintenanceLocales?: Array<{ lang: 'ko' | 'en' | 'zh'; message: string }>;
-    forceDisconnect?: boolean;
-    gracePeriodMinutes?: number;
-  }): Promise<GameWorldMutationResult> {
+  async updateMaintenance(
+    id: number,
+    data: {
+      isMaintenance: boolean;
+      maintenanceStartDate?: string;
+      maintenanceEndDate?: string;
+      maintenanceMessage?: string;
+      maintenanceMessageTemplateId?: number | null;
+      supportsMultiLanguage?: boolean;
+      maintenanceLocales?: Array<{ lang: "ko" | "en" | "zh"; message: string }>;
+      forceDisconnect?: boolean;
+      gracePeriodMinutes?: number;
+    },
+  ): Promise<GameWorldMutationResult> {
     // Ensure boolean fields are actually boolean
     const sanitizedData = {
       ...data,
       isMaintenance: Boolean(data.isMaintenance),
-      ...(data.supportsMultiLanguage !== undefined && { supportsMultiLanguage: Boolean(data.supportsMultiLanguage) }),
-      ...(data.forceDisconnect !== undefined && { forceDisconnect: Boolean(data.forceDisconnect) }),
+      ...(data.supportsMultiLanguage !== undefined && {
+        supportsMultiLanguage: Boolean(data.supportsMultiLanguage),
+      }),
+      ...(data.forceDisconnect !== undefined && {
+        forceDisconnect: Boolean(data.forceDisconnect),
+      }),
     };
-    const response: any = await api.patch(`/admin/game-worlds/${id}/maintenance`, sanitizedData);
+    const response: any = await api.patch(
+      `/admin/game-worlds/${id}/maintenance`,
+      sanitizedData,
+    );
     const responseData = response.data || response;
 
     // Check if this is a change request response
@@ -210,10 +246,14 @@ export const gameWorldService = {
   },
 
   // Update display orders
-  async updateDisplayOrders(orderUpdates: { id: number; displayOrder: number }[]): Promise<void> {
-    console.log('Sending updateDisplayOrders request:', { orderUpdates });
-    const response = await api.patch('/admin/game-worlds/update-orders', { orderUpdates });
-    console.log('updateDisplayOrders response:', response.data);
+  async updateDisplayOrders(
+    orderUpdates: { id: number; displayOrder: number }[],
+  ): Promise<void> {
+    console.log("Sending updateDisplayOrders request:", { orderUpdates });
+    const response = await api.patch("/admin/game-worlds/update-orders", {
+      orderUpdates,
+    });
+    console.log("updateDisplayOrders response:", response.data);
   },
 
   // Move world up
@@ -226,5 +266,5 @@ export const gameWorldService = {
   async moveDown(id: number): Promise<boolean> {
     const response = await api.patch(`/admin/game-worlds/${id}/move-down`);
     return response.data?.data?.moved ?? response.data?.moved ?? false;
-  }
+  },
 };

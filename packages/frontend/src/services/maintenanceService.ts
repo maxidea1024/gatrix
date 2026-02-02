@@ -1,7 +1,10 @@
-import { apiService } from './api';
-import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
+import { apiService } from "./api";
+import {
+  MutationResult,
+  parseChangeRequestResponse,
+} from "./changeRequestUtils";
 
-export type MaintenanceType = 'regular' | 'emergency';
+export type MaintenanceType = "regular" | "emergency";
 
 export interface MaintenanceDetail {
   type: MaintenanceType;
@@ -21,24 +24,52 @@ export interface MaintenanceDetail {
 }
 
 export const maintenanceService = {
-  async getStatus(): Promise<{ isUnderMaintenance: boolean; detail: MaintenanceDetail | null }> {
+  async getStatus(): Promise<{
+    isUnderMaintenance: boolean;
+    detail: MaintenanceDetail | null;
+  }> {
     // Add cache-busting to avoid browser caching stale maintenance status
-    const res = await apiService.get<{ isUnderMaintenance: boolean; detail: MaintenanceDetail | null }>(
-      `/admin/maintenance/isUnderMaintenance`,
-      { headers: { 'Cache-Control': 'no-cache' } }
-    );
+    const res = await apiService.get<{
+      isUnderMaintenance: boolean;
+      detail: MaintenanceDetail | null;
+    }>(`/admin/maintenance/isUnderMaintenance`, {
+      headers: { "Cache-Control": "no-cache" },
+    });
     return res.data as any;
   },
-  async setStatus(payload: { isMaintenance: boolean; type?: MaintenanceType; startsAt?: string | null; endsAt?: string | null; kickExistingPlayers?: boolean; kickDelayMinutes?: number; message?: string; messages?: MaintenanceDetail['messages'] }): Promise<MutationResult<void>> {
+  async setStatus(payload: {
+    isMaintenance: boolean;
+    type?: MaintenanceType;
+    startsAt?: string | null;
+    endsAt?: string | null;
+    kickExistingPlayers?: boolean;
+    kickDelayMinutes?: number;
+    message?: string;
+    messages?: MaintenanceDetail["messages"];
+  }): Promise<MutationResult<void>> {
     const response = await apiService.post(`/admin/maintenance`, payload);
     return parseChangeRequestResponse<void>(response, () => undefined);
   },
-  async getTemplates(): Promise<{ templates: Array<{ message?: string; messages?: MaintenanceDetail['messages'] }> }> {
-    const res = await apiService.get<{ templates: Array<{ message?: string; messages?: MaintenanceDetail['messages'] }> }>(`/admin/maintenance/templates`);
+  async getTemplates(): Promise<{
+    templates: Array<{
+      message?: string;
+      messages?: MaintenanceDetail["messages"];
+    }>;
+  }> {
+    const res = await apiService.get<{
+      templates: Array<{
+        message?: string;
+        messages?: MaintenanceDetail["messages"];
+      }>;
+    }>(`/admin/maintenance/templates`);
     return res.data as any;
   },
-  async saveTemplates(templates: Array<{ message?: string; messages?: MaintenanceDetail['messages'] }>) {
+  async saveTemplates(
+    templates: Array<{
+      message?: string;
+      messages?: MaintenanceDetail["messages"];
+    }>,
+  ) {
     return apiService.post(`/admin/maintenance/templates`, { templates });
-  }
+  },
 };
-

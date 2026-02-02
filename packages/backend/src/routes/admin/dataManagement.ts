@@ -1,6 +1,6 @@
-import express from 'express';
-import multer from 'multer';
-import * as dataManagementController from '../../controllers/DataManagementController';
+import express from "express";
+import multer from "multer";
+import * as dataManagementController from "../../controllers/DataManagementController";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -20,7 +20,7 @@ const upload = multer({ storage: multer.memoryStorage() });
  *               type: string
  *               format: binary
  */
-router.get('/export', dataManagementController.exportData as any);
+router.get("/export", dataManagementController.exportData as any);
 
 /**
  * @swagger
@@ -42,6 +42,10 @@ router.get('/export', dataManagementController.exportData as any);
  *       200:
  *         description: Import successful
  */
-router.post('/import', upload.single('file') as any, dataManagementController.importData as any);
+router.post(
+  "/import",
+  upload.single("file") as any,
+  dataManagementController.importData as any,
+);
 
 export default router;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -10,21 +10,21 @@ import {
   Stack,
   Divider,
   useTheme,
-  ClickAwayListener
-} from '@mui/material';
+  ClickAwayListener,
+} from "@mui/material";
 import {
   Settings as SettingsIcon,
-  Public as PublicIcon
-} from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
-import moment from 'moment-timezone';
+  Public as PublicIcon,
+} from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
+import moment from "moment-timezone";
 import {
   getStoredTimezone,
   setStoredTimezone,
   formatDateTimeDetailed,
-  formatUptime
-} from '../../utils/dateFormat';
-import { timeService, ServerTimeData } from '../../services/timeService';
+  formatUptime,
+} from "../../utils/dateFormat";
+import { timeService, ServerTimeData } from "../../services/timeService";
 
 const TimezoneSelector: React.FC = () => {
   const { t } = useTranslation();
@@ -32,7 +32,9 @@ const TimezoneSelector: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [timezone, setTimezone] = useState<string>(getStoredTimezone());
   const [serverTime, setServerTime] = useState<Date>(new Date());
-  const [serverTimeData, setServerTimeData] = useState<ServerTimeData | null>(null);
+  const [serverTimeData, setServerTimeData] = useState<ServerTimeData | null>(
+    null,
+  );
   const [currentUptime, setCurrentUptime] = useState<number>(0);
 
   const timezoneOptions = moment.tz.names();
@@ -80,14 +82,14 @@ const TimezoneSelector: React.FC = () => {
   };
 
   const formatTimezone = (tz: string) => {
-    const offset = moment.tz(tz).format('Z');
+    const offset = moment.tz(tz).format("Z");
     return `${tz} (UTC${offset})`;
   };
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       {/* 서버 시간 표시 (클릭 가능) */}
-      <Tooltip title={t('common.timezone')}>
+      <Tooltip title={t("common.timezone")}>
         <Chip
           icon={<PublicIcon />}
           label={formatDateTimeDetailed(serverTime)}
@@ -95,35 +97,39 @@ const TimezoneSelector: React.FC = () => {
           variant="outlined"
           onClick={handleClick}
           sx={{
-            fontFamily: 'monospace',
-            fontSize: '0.75rem',
+            fontFamily: "monospace",
+            fontSize: "0.75rem",
             color: theme.palette.text.primary,
-            borderColor: theme.palette.mode === 'dark'
-              ? 'rgba(255, 255, 255, 0.3)'
-              : 'rgba(0, 0, 0, 0.23)',
-            backgroundColor: theme.palette.mode === 'dark'
-              ? 'rgba(255, 255, 255, 0.05)'
-              : 'rgba(0, 0, 0, 0.02)',
+            borderColor:
+              theme.palette.mode === "dark"
+                ? "rgba(255, 255, 255, 0.3)"
+                : "rgba(0, 0, 0, 0.23)",
+            backgroundColor:
+              theme.palette.mode === "dark"
+                ? "rgba(255, 255, 255, 0.05)"
+                : "rgba(0, 0, 0, 0.02)",
             borderRadius: 2,
-            cursor: 'pointer',
-            '& .MuiChip-icon': {
-              fontSize: '0.875rem',
-              color: theme.palette.text.secondary
+            cursor: "pointer",
+            "& .MuiChip-icon": {
+              fontSize: "0.875rem",
+              color: theme.palette.text.secondary,
             },
-            '&:hover': {
-              backgroundColor: theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.1)'
-                : 'rgba(0, 0, 0, 0.05)',
-              borderColor: theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.5)'
-                : 'rgba(0, 0, 0, 0.4)',
-              '& .MuiChip-label': {
-                color: theme.palette.text.primary
+            "&:hover": {
+              backgroundColor:
+                theme.palette.mode === "dark"
+                  ? "rgba(255, 255, 255, 0.1)"
+                  : "rgba(0, 0, 0, 0.05)",
+              borderColor:
+                theme.palette.mode === "dark"
+                  ? "rgba(255, 255, 255, 0.5)"
+                  : "rgba(0, 0, 0, 0.4)",
+              "& .MuiChip-label": {
+                color: theme.palette.text.primary,
               },
-              '& .MuiChip-icon': {
-                color: theme.palette.text.primary
-              }
-            }
+              "& .MuiChip-icon": {
+                color: theme.palette.text.primary,
+              },
+            },
           }}
         />
       </Tooltip>
@@ -134,120 +140,126 @@ const TimezoneSelector: React.FC = () => {
         anchorEl={anchorEl}
         onClose={handleClose}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
+          vertical: "bottom",
+          horizontal: "right",
         }}
         transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
+          vertical: "top",
+          horizontal: "right",
         }}
         hideBackdrop
         disableScrollLock
         PaperProps={{
           sx: {
-            bgcolor: 'background.paper',
-            border: '1px solid',
-            borderColor: 'divider',
-            boxShadow: 3
-          }
+            bgcolor: "background.paper",
+            border: "1px solid",
+            borderColor: "divider",
+            boxShadow: 3,
+          },
         }}
       >
         <ClickAwayListener onClickAway={handleClose}>
           <Box sx={{ p: 2, minWidth: 300 }}>
-          <Stack spacing={2}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <SettingsIcon fontSize="small" />
-              <Typography variant="subtitle2">
-                {t('settings.timezone')}
-              </Typography>
-            </Box>
-            
-            <Divider />
-            
-            {/* 현재 시간 정보 */}
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                {t('common.currentLocalTime')}
-              </Typography>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                {formatDateTimeDetailed(new Date())}
-              </Typography>
-            </Box>
-
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                {t('common.serverTime')}
-              </Typography>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                {formatDateTimeDetailed(serverTime)}
-                {serverTimeData && (
-                  <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                    ({t('common.ping')}: {serverTimeData.ping}ms)
-                  </Typography>
-                )}
-              </Typography>
-            </Box>
-
-            {/* 서버 업타임 */}
-            {serverTimeData && (
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  {t('common.serverUptime')}
-                </Typography>
-                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                  {formatUptime(currentUptime)}
+            <Stack spacing={2}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <SettingsIcon fontSize="small" />
+                <Typography variant="subtitle2">
+                  {t("settings.timezone")}
                 </Typography>
               </Box>
-            )}
 
-            <Divider />
+              <Divider />
 
-            {/* Timezone 선택 */}
-            <Autocomplete
-              value={timezone}
-              onChange={(_, newValue) => handleTimezoneChange(newValue)}
-              options={timezoneOptions}
-              getOptionLabel={formatTimezone}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={t('common.selectTimezone')}
-                  size="small"
-                  placeholder={t('common.searchTimezone')}
-                />
-              )}
-              renderOption={(props, option) => (
-                <li {...props}>
-                  <Box>
-                    <Typography variant="body2">{option}</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      UTC{moment.tz(option).format('Z')}
+              {/* 현재 시간 정보 */}
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  {t("common.currentLocalTime")}
+                </Typography>
+                <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
+                  {formatDateTimeDetailed(new Date())}
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  {t("common.serverTime")}
+                </Typography>
+                <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
+                  {formatDateTimeDetailed(serverTime)}
+                  {serverTimeData && (
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ ml: 1 }}
+                    >
+                      ({t("common.ping")}: {serverTimeData.ping}ms)
                     </Typography>
-                  </Box>
-                </li>
-              )}
-              size="small"
-            />
+                  )}
+                </Typography>
+              </Box>
 
-            {/* 현재 선택된 timezone 정보 */}
-            <Box sx={{
-              p: 1,
-              bgcolor: 'action.hover',
-              borderRadius: 1,
-              border: '1px solid',
-              borderColor: 'divider'
-            }}>
-              <Typography variant="caption" color="text.secondary">
-                {t('common.selectedTimezone')}
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                {formatTimezone(timezone)}
-              </Typography>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                {moment().tz(timezone).format('YYYY-MM-DD HH:mm:ss')}
-              </Typography>
-            </Box>
-          </Stack>
+              {/* 서버 업타임 */}
+              {serverTimeData && (
+                <Box>
+                  <Typography variant="caption" color="text.secondary">
+                    {t("common.serverUptime")}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
+                    {formatUptime(currentUptime)}
+                  </Typography>
+                </Box>
+              )}
+
+              <Divider />
+
+              {/* Timezone 선택 */}
+              <Autocomplete
+                value={timezone}
+                onChange={(_, newValue) => handleTimezoneChange(newValue)}
+                options={timezoneOptions}
+                getOptionLabel={formatTimezone}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("common.selectTimezone")}
+                    size="small"
+                    placeholder={t("common.searchTimezone")}
+                  />
+                )}
+                renderOption={(props, option) => (
+                  <li {...props}>
+                    <Box>
+                      <Typography variant="body2">{option}</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        UTC{moment.tz(option).format("Z")}
+                      </Typography>
+                    </Box>
+                  </li>
+                )}
+                size="small"
+              />
+
+              {/* 현재 선택된 timezone 정보 */}
+              <Box
+                sx={{
+                  p: 1,
+                  bgcolor: "action.hover",
+                  borderRadius: 1,
+                  border: "1px solid",
+                  borderColor: "divider",
+                }}
+              >
+                <Typography variant="caption" color="text.secondary">
+                  {t("common.selectedTimezone")}
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: "medium" }}>
+                  {formatTimezone(timezone)}
+                </Typography>
+                <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
+                  {moment().tz(timezone).format("YYYY-MM-DD HH:mm:ss")}
+                </Typography>
+              </Box>
+            </Stack>
           </Box>
         </ClickAwayListener>
       </Popover>

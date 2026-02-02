@@ -1,12 +1,12 @@
-import { Knex } from 'knex';
-import crypto from 'crypto';
-import { generateULID } from '../src/utils/ulid';
-import { config } from '../src/config';
-import fs from 'fs/promises';
-import path from 'path';
+import { Knex } from "knex";
+import crypto from "crypto";
+import { generateULID } from "../src/utils/ulid";
+import { config } from "../src/config";
+import fs from "fs/promises";
+import path from "path";
 
-const knex: Knex = require('knex')({
-  client: 'mysql2',
+const knex: Knex = require("knex")({
+  client: "mysql2",
   connection: {
     host: config.database.host,
     port: config.database.port,
@@ -18,45 +18,87 @@ const knex: Knex = require('knex')({
 });
 
 // Sample data arrays
-const platforms = ['android', 'ios', 'windows', 'mac', 'linux'];
-const environments = ['production', 'staging', 'development'];
-const branches = ['main', 'develop', 'feature/new-ui', 'hotfix/crash-fix'];
-const marketTypes = ['google', 'apple', 'steam', 'epic'];
-const appVersions = ['1.0.0', '1.0.1', '1.1.0', '1.2.0', '2.0.0', '2.1.0', '2.2.0', '3.0.0'];
-const resVersions = ['1.0.0', '1.0.1', '1.1.0', '1.2.0', '2.0.0', '2.1.0', '2.2.0', '3.0.0'];
+const platforms = ["android", "ios", "windows", "mac", "linux"];
+const environments = ["production", "staging", "development"];
+const branches = ["main", "develop", "feature/new-ui", "hotfix/crash-fix"];
+const marketTypes = ["google", "apple", "steam", "epic"];
+const appVersions = [
+  "1.0.0",
+  "1.0.1",
+  "1.1.0",
+  "1.2.0",
+  "2.0.0",
+  "2.1.0",
+  "2.2.0",
+  "3.0.0",
+];
+const resVersions = [
+  "1.0.0",
+  "1.0.1",
+  "1.1.0",
+  "1.2.0",
+  "2.0.0",
+  "2.1.0",
+  "2.2.0",
+  "3.0.0",
+];
 
 // 대항해시대 온라인 스타일 사용자 이름
 const userNames = [
-  'CaptainDrake', 'AdmiralNelson', 'NavigatorMagellan', 'TraderVasco', 'PirateBlackbeard',
-  'ExplorerColumbus', 'MerchantMarco', 'SailorSinbad', 'CommanderCortez', 'VoyagerCook',
-  'SeaWolfMorgan', 'TreasureHunter', 'OceanMaster', 'WindRider', 'StormChaser',
-  'GoldSeeker', 'SilkTrader', 'SpiceRunner', 'CannonMaster', 'ShipBuilder',
-  'MapMaker', 'CompassKeeper', 'AnchorDrop', 'SailMaster', 'DeckHand',
-  'FirstMate', 'Quartermaster', 'Boatswain', 'Navigator', 'Helmsman',
+  "CaptainDrake",
+  "AdmiralNelson",
+  "NavigatorMagellan",
+  "TraderVasco",
+  "PirateBlackbeard",
+  "ExplorerColumbus",
+  "MerchantMarco",
+  "SailorSinbad",
+  "CommanderCortez",
+  "VoyagerCook",
+  "SeaWolfMorgan",
+  "TreasureHunter",
+  "OceanMaster",
+  "WindRider",
+  "StormChaser",
+  "GoldSeeker",
+  "SilkTrader",
+  "SpiceRunner",
+  "CannonMaster",
+  "ShipBuilder",
+  "MapMaker",
+  "CompassKeeper",
+  "AnchorDrop",
+  "SailMaster",
+  "DeckHand",
+  "FirstMate",
+  "Quartermaster",
+  "Boatswain",
+  "Navigator",
+  "Helmsman",
 ];
 
 // 게임 시스템 오류 메시지
 const userMessages = [
-  'Failed to load ship inventory data',
-  'Trade route calculation error',
-  'Port connection timeout',
-  'Ship collision detection failed',
-  'Weather system synchronization error',
-  'Cargo weight calculation overflow',
-  'Navigation map rendering failed',
-  'Player position desync detected',
-  'Guild data corruption',
-  'Quest state machine error',
-  'Item duplication detected',
-  'Server packet loss exceeded threshold',
-  'Memory leak in ocean rendering',
-  'Texture streaming failure',
-  'Audio engine crash',
-  'Physics simulation divergence',
-  'Database connection pool exhausted',
-  'Cache invalidation error',
-  'Session token expired unexpectedly',
-  'Resource loading deadlock',
+  "Failed to load ship inventory data",
+  "Trade route calculation error",
+  "Port connection timeout",
+  "Ship collision detection failed",
+  "Weather system synchronization error",
+  "Cargo weight calculation overflow",
+  "Navigation map rendering failed",
+  "Player position desync detected",
+  "Guild data corruption",
+  "Quest state machine error",
+  "Item duplication detected",
+  "Server packet loss exceeded threshold",
+  "Memory leak in ocean rendering",
+  "Texture streaming failure",
+  "Audio engine crash",
+  "Physics simulation divergence",
+  "Database connection pool exhausted",
+  "Cache invalidation error",
+  "Session token expired unexpectedly",
+  "Resource loading deadlock",
   null,
   null,
   null,
@@ -169,82 +211,82 @@ const stackTraces = [
 
 // Generate realistic log content with variable length
 function generateLogContent(lineCount: number): string {
-  const logLevels = ['INFO', 'DEBUG', 'WARN', 'ERROR'];
+  const logLevels = ["INFO", "DEBUG", "WARN", "ERROR"];
   const logMessages = [
-    'Game client started',
-    'Loading configuration from config.xml',
-    'Initializing graphics engine',
-    'Creating DirectX device',
-    'Loading shader programs',
-    'Initializing audio system',
-    'Connecting to game server',
-    'Authenticating user credentials',
-    'Loading player data from server',
-    'Initializing world map',
-    'Loading port data',
-    'Loading ship models',
-    'Loading texture atlases',
-    'Compiling shader: ocean_water.hlsl',
-    'Compiling shader: ship_hull.hlsl',
-    'Creating render targets',
-    'Initializing physics engine',
-    'Loading collision meshes',
-    'Starting game loop',
-    'Player entered port: Lisbon',
-    'Player entered port: Seville',
-    'Player entered port: London',
-    'Trade window opened',
-    'Inventory updated',
-    'Ship cargo weight calculated',
-    'Navigation route calculated',
-    'Weather system updated',
-    'Ocean waves simulated',
-    'Ship position synchronized',
-    'Network packet received',
-    'Network packet sent',
-    'Guild data synchronized',
-    'Quest state updated',
-    'Achievement unlocked',
-    'Item equipped',
-    'Skill level increased',
-    'Experience points gained',
-    'High latency detected: 250ms',
-    'Connection timeout warning',
-    'Retrying connection...',
-    'Memory usage: 1.2GB / 4.0GB',
-    'Memory usage: 2.5GB / 4.0GB',
-    'Memory usage: 3.8GB / 4.0GB',
-    'Low memory warning',
-    'Garbage collection triggered',
-    'Texture cache cleared',
-    'Model cache cleared',
-    'Audio buffer underrun',
-    'Frame rate dropped below 30 FPS',
-    'GPU driver timeout detected',
-    'Null reference exception in Ship.Update()',
-    'Index out of range in Inventory.GetItem()',
-    'Invalid argument in Network.SendPacket()',
-    'Out of memory in TextureManager.LoadTexture()',
-    'Stack overflow in PathFinding.FindPath()',
-    'Access violation in CollisionDetector.CheckCollision()',
-    'Invalid operation in Guild.UpdateMembers()',
-    'Timeout in NetworkManager.PollServer()',
-    'Database connection lost',
-    'Failed to save player data',
-    'Failed to load resource file',
-    'Shader compilation failed',
-    'Render target creation failed',
-    'Audio device initialization failed',
-    'Network socket error',
-    'File not found: data/ships/galleon.mdl',
-    'File not found: textures/ocean/wave_normal.dds',
-    'Permission denied: save/player.dat',
-    'Disk full: unable to write log file',
-    'Application terminated abnormally',
+    "Game client started",
+    "Loading configuration from config.xml",
+    "Initializing graphics engine",
+    "Creating DirectX device",
+    "Loading shader programs",
+    "Initializing audio system",
+    "Connecting to game server",
+    "Authenticating user credentials",
+    "Loading player data from server",
+    "Initializing world map",
+    "Loading port data",
+    "Loading ship models",
+    "Loading texture atlases",
+    "Compiling shader: ocean_water.hlsl",
+    "Compiling shader: ship_hull.hlsl",
+    "Creating render targets",
+    "Initializing physics engine",
+    "Loading collision meshes",
+    "Starting game loop",
+    "Player entered port: Lisbon",
+    "Player entered port: Seville",
+    "Player entered port: London",
+    "Trade window opened",
+    "Inventory updated",
+    "Ship cargo weight calculated",
+    "Navigation route calculated",
+    "Weather system updated",
+    "Ocean waves simulated",
+    "Ship position synchronized",
+    "Network packet received",
+    "Network packet sent",
+    "Guild data synchronized",
+    "Quest state updated",
+    "Achievement unlocked",
+    "Item equipped",
+    "Skill level increased",
+    "Experience points gained",
+    "High latency detected: 250ms",
+    "Connection timeout warning",
+    "Retrying connection...",
+    "Memory usage: 1.2GB / 4.0GB",
+    "Memory usage: 2.5GB / 4.0GB",
+    "Memory usage: 3.8GB / 4.0GB",
+    "Low memory warning",
+    "Garbage collection triggered",
+    "Texture cache cleared",
+    "Model cache cleared",
+    "Audio buffer underrun",
+    "Frame rate dropped below 30 FPS",
+    "GPU driver timeout detected",
+    "Null reference exception in Ship.Update()",
+    "Index out of range in Inventory.GetItem()",
+    "Invalid argument in Network.SendPacket()",
+    "Out of memory in TextureManager.LoadTexture()",
+    "Stack overflow in PathFinding.FindPath()",
+    "Access violation in CollisionDetector.CheckCollision()",
+    "Invalid operation in Guild.UpdateMembers()",
+    "Timeout in NetworkManager.PollServer()",
+    "Database connection lost",
+    "Failed to save player data",
+    "Failed to load resource file",
+    "Shader compilation failed",
+    "Render target creation failed",
+    "Audio device initialization failed",
+    "Network socket error",
+    "File not found: data/ships/galleon.mdl",
+    "File not found: textures/ocean/wave_normal.dds",
+    "Permission denied: save/player.dat",
+    "Disk full: unable to write log file",
+    "Application terminated abnormally",
   ];
 
   const lines: string[] = [];
-  const startTime = Date.now() - (lineCount * 100); // Simulate logs over time
+  const startTime = Date.now() - lineCount * 100; // Simulate logs over time
 
   for (let i = 0; i < lineCount; i++) {
     const timestamp = new Date(startTime + i * 100).toISOString();
@@ -253,7 +295,7 @@ function generateLogContent(lineCount: number): string {
     lines.push(`[${timestamp}] [${level}] ${message}`);
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 // Generate random element from array
@@ -273,19 +315,19 @@ function randomDate(): Date {
   const hoursAgo = randomInt(0, 23);
   const minutesAgo = randomInt(0, 59);
   const secondsAgo = randomInt(0, 59);
-  
+
   const date = new Date(now);
   date.setDate(date.getDate() - daysAgo);
   date.setHours(date.getHours() - hoursAgo);
   date.setMinutes(date.getMinutes() - minutesAgo);
   date.setSeconds(date.getSeconds() - secondsAgo);
-  
+
   return date;
 }
 
 // Generate MD5 hash
 function generateMD5(content: string): string {
-  return crypto.createHash('md5').update(content).digest('hex');
+  return crypto.createHash("md5").update(content).digest("hex");
 }
 
 // Generate crash groups
@@ -303,7 +345,9 @@ async function generateCrashGroups(count: number = 500): Promise<string[]> {
     const firstVersion = randomElement(appVersions);
     const lastVersion = randomElement(appVersions);
     const firstCrash = randomDate();
-    const lastCrash = new Date(firstCrash.getTime() + randomInt(0, 7 * 24 * 60 * 60 * 1000)); // Up to 7 days later
+    const lastCrash = new Date(
+      firstCrash.getTime() + randomInt(0, 7 * 24 * 60 * 60 * 1000),
+    ); // Up to 7 days later
 
     // Store stack trace file
     const hash = md5Hash;
@@ -312,13 +356,19 @@ async function generateCrashGroups(count: number = 500): Promise<string[]> {
     const stackTraceUrl = `/crashes/${dir1}/${dir2}/${hash}`;
 
     // Create stack trace file
-    const stackTraceDir = path.join(process.cwd(), 'public', 'crashes', dir1, dir2);
+    const stackTraceDir = path.join(
+      process.cwd(),
+      "public",
+      "crashes",
+      dir1,
+      dir2,
+    );
     await fs.mkdir(stackTraceDir, { recursive: true });
-    await fs.writeFile(path.join(stackTraceDir, hash), stackTrace, 'utf8');
+    await fs.writeFile(path.join(stackTraceDir, hash), stackTrace, "utf8");
 
     const crashId = generateULID();
 
-    await knex('crashes').insert({
+    await knex("crashes").insert({
       id: crashId,
       chash: md5Hash,
       branch: branch,
@@ -331,7 +381,7 @@ async function generateCrashGroups(count: number = 500): Promise<string[]> {
       firstCrashAt: firstCrash,
       lastCrashAt: lastCrash,
       stackFilePath: stackTraceUrl,
-      firstLine: stackTrace.split('\n')[0].substring(0, 200),
+      firstLine: stackTrace.split("\n")[0].substring(0, 200),
       createdAt: firstCrash,
       updatedAt: lastCrash,
     });
@@ -348,33 +398,50 @@ async function generateCrashGroups(count: number = 500): Promise<string[]> {
 }
 
 // Generate crash events
-async function generateCrashEvents(crashIds: string[], eventsPerCrash: number = 20): Promise<void> {
+async function generateCrashEvents(
+  crashIds: string[],
+  eventsPerCrash: number = 20,
+): Promise<void> {
   const totalEvents = crashIds.length * eventsPerCrash;
-  console.log(`Generating ${totalEvents} crash events (${eventsPerCrash} per crash group)...`);
+  console.log(
+    `Generating ${totalEvents} crash events (${eventsPerCrash} per crash group)...`,
+  );
 
   let eventCount = 0;
   let gameUserIdCounter = 2000; // Starting game user ID
 
   for (const crashId of crashIds) {
     // Get crash info
-    const crash = await knex('crashes').where('id', crashId).first();
+    const crash = await knex("crashes").where("id", crashId).first();
 
     const events = [];
     for (let i = 0; i < eventsPerCrash; i++) {
       const createdAt = randomDate();
       const year = createdAt.getFullYear();
-      const month = String(createdAt.getMonth() + 1).padStart(2, '0');
-      const day = String(createdAt.getDate()).padStart(2, '0');
+      const month = String(createdAt.getMonth() + 1).padStart(2, "0");
+      const day = String(createdAt.getDate()).padStart(2, "0");
 
       const eventId = generateULID();
       const logFileUrl = `/crashes/logs/${year}/${month}/${day}/${eventId}.txt`;
 
       // Generate log file with random line count (30 to 30000 lines)
       const logLineCount = randomInt(30, 30000);
-      const logDir = path.join(process.cwd(), 'public', 'crashes', 'logs', String(year), month, day);
+      const logDir = path.join(
+        process.cwd(),
+        "public",
+        "crashes",
+        "logs",
+        String(year),
+        month,
+        day,
+      );
       await fs.mkdir(logDir, { recursive: true });
       const logContent = generateLogContent(logLineCount);
-      await fs.writeFile(path.join(logDir, `${eventId}.txt`), logContent, 'utf8');
+      await fs.writeFile(
+        path.join(logDir, `${eventId}.txt`),
+        logContent,
+        "utf8",
+      );
 
       // Generate account ID in format like "20332433333" (11 digits)
       const accountId = `20${String(randomInt(100000000, 999999999))}`;
@@ -400,7 +467,7 @@ async function generateCrashEvents(crashIds: string[], eventsPerCrash: number = 
     }
 
     // Insert in batches
-    await knex('crash_events').insert(events);
+    await knex("crash_events").insert(events);
 
     eventCount += eventsPerCrash;
     if (eventCount % 500 === 0) {
@@ -414,28 +481,27 @@ async function generateCrashEvents(crashIds: string[], eventsPerCrash: number = 
 // Main function
 async function main() {
   try {
-    console.log('Starting crash events seeding...\n');
+    console.log("Starting crash events seeding...\n");
 
     // Clear existing data
-    console.log('Clearing existing data...');
-    await knex('crash_events').del();
-    await knex('crashes').del();
-    console.log('✓ Cleared existing data\n');
+    console.log("Clearing existing data...");
+    await knex("crash_events").del();
+    await knex("crashes").del();
+    console.log("✓ Cleared existing data\n");
 
     // Generate crash groups (500 groups)
     const crashIds = await generateCrashGroups(500);
-    console.log('');
+    console.log("");
 
     // Generate crash events (20 events per group = 10000 total)
     await generateCrashEvents(crashIds, 20);
-    console.log('');
+    console.log("");
 
-    console.log('✅ Seeding completed successfully!');
+    console.log("✅ Seeding completed successfully!");
     console.log(`   Total crash groups: ${crashIds.length}`);
     console.log(`   Total crash events: ${crashIds.length * 20}`);
-
   } catch (error) {
-    console.error('❌ Error seeding crash events:', error);
+    console.error("❌ Error seeding crash events:", error);
     throw error;
   } finally {
     await knex.destroy();
@@ -444,4 +510,3 @@ async function main() {
 
 // Run the script
 main();
-

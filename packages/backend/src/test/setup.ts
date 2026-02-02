@@ -1,13 +1,12 @@
-
-import '../types/global';
+import "../types/global";
 
 // Set test environment
-process.env.NODE_ENV = 'test';
-process.env.DB_NAME = 'gate_test';
-process.env.REDIS_DB = '1'; // Use different Redis DB for tests
+process.env.NODE_ENV = "test";
+process.env.DB_NAME = "gate_test";
+process.env.REDIS_DB = "1"; // Use different Redis DB for tests
 
 // Mock logger to reduce noise in tests
-jest.mock('../config/logger', () => ({
+jest.mock("../config/logger", () => ({
   info: jest.fn(),
   error: jest.fn(),
   warn: jest.fn(),
@@ -15,7 +14,7 @@ jest.mock('../config/logger', () => ({
 }));
 
 // Mock Redis client
-jest.mock('../config/redis', () => ({
+jest.mock("../config/redis", () => ({
   get: jest.fn(),
   set: jest.fn(),
   setex: jest.fn(),
@@ -29,30 +28,28 @@ jest.mock('../config/redis', () => ({
 (global as any).testUtils = {
   createTestUser: (overrides = {}) => ({
     id: 1,
-    email: 'test@example.com',
-    name: 'Test User',
-    role: 'user',
-    status: 'active',
+    email: "test@example.com",
+    name: "Test User",
+    role: "user",
+    status: "active",
     emailVerified: true,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
   }),
-  
+
   createTestAdmin: (overrides = {}) => ({
     id: 2,
-    email: 'admin@example.com',
-    name: 'Test Admin',
-    role: 'admin',
-    status: 'active',
+    email: "admin@example.com",
+    name: "Test Admin",
+    role: "admin",
+    status: "active",
     emailVerified: true,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
   }),
 };
-
-
 
 expect.extend({
   toBeValidDate(received) {
@@ -69,10 +66,10 @@ expect.extend({
       };
     }
   },
-  
+
   toBeValidEmail(received) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const pass = typeof received === 'string' && emailRegex.test(received);
+    const pass = typeof received === "string" && emailRegex.test(received);
     if (pass) {
       return {
         message: () => `expected ${received} not to be a valid email`,

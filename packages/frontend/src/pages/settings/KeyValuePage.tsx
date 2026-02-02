@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { PERMISSIONS } from "@/types/permissions";
 import {
   Box,
   Button,
@@ -17,7 +17,7 @@ import {
   Tooltip,
   Typography,
   Chip,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -25,19 +25,19 @@ import {
   Lock as LockIcon,
   ContentCopy as CopyIcon,
   FileCopy as DuplicateIcon,
-} from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
-import { useSnackbar } from 'notistack';
-import { parseApiErrorMessage } from '../../utils/errorUtils';
-import { varsService, VarItem } from '@/services/varsService';
-import EmptyState from '@/components/common/EmptyState';
-import { formatDateTimeDetailed } from '@/utils/dateFormat';
-import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
-import KeyValueFormDrawer from '@/components/settings/KeyValueFormDrawer';
-import { copyToClipboardWithNotification } from '@/utils/clipboard';
-import { TableLoadingRow } from '@/components/common/TableLoadingRow';
+} from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
+import { useSnackbar } from "notistack";
+import { parseApiErrorMessage } from "../../utils/errorUtils";
+import { varsService, VarItem } from "@/services/varsService";
+import EmptyState from "@/components/common/EmptyState";
+import { formatDateTimeDetailed } from "@/utils/dateFormat";
+import ConfirmDeleteDialog from "@/components/common/ConfirmDeleteDialog";
+import KeyValueFormDrawer from "@/components/settings/KeyValueFormDrawer";
+import { copyToClipboardWithNotification } from "@/utils/clipboard";
+import { TableLoadingRow } from "@/components/common/TableLoadingRow";
 
-import { useEnvironment } from '@/contexts/EnvironmentContext';
+import { useEnvironment } from "@/contexts/EnvironmentContext";
 
 const KeyValuePage: React.FC = () => {
   const { t } = useTranslation();
@@ -51,7 +51,10 @@ const KeyValuePage: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<VarItem | null>(null);
   const [isDuplicateMode, setIsDuplicateMode] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; item: VarItem | null }>({
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    open: boolean;
+    item: VarItem | null;
+  }>({
     open: false,
     item: null,
   });
@@ -63,7 +66,9 @@ const KeyValuePage: React.FC = () => {
       const data = await varsService.getAllKV();
       setItems(data);
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'settings.kv.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, "settings.kv.loadFailed"), {
+        variant: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -91,12 +96,12 @@ const KeyValuePage: React.FC = () => {
   const handleDuplicate = (item: VarItem) => {
     // Check if item is copyable
     if (!item.isCopyable) {
-      enqueueSnackbar(t('common.cannotCopySystemItem'), { variant: 'warning' });
+      enqueueSnackbar(t("common.cannotCopySystemItem"), { variant: "warning" });
       return;
     }
 
     // Create a copy with _copy suffix
-    const baseKey = item.varKey.replace(/^(kv:|$)/, '');
+    const baseKey = item.varKey.replace(/^(kv:|$)/, "");
     const newKey = `${baseKey}_copy`;
 
     // Create a new item with copied data (without id to trigger create mode)
@@ -119,35 +124,46 @@ const KeyValuePage: React.FC = () => {
   const handleCopyKeyName = (keyName: string) => {
     copyToClipboardWithNotification(
       keyName,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+      () =>
+        enqueueSnackbar(t("common.copiedToClipboard"), { variant: "success" }),
+      () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
     );
   };
 
   // Get chip color based on type
-  const getTypeChipColor = (type: string): 'default' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning' => {
+  const getTypeChipColor = (
+    type: string,
+  ):
+    | "default"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "error"
+    | "info"
+    | "warning" => {
     switch (type) {
-      case 'string':
-        return 'primary';
-      case 'number':
-        return 'info';
-      case 'boolean':
-        return 'success';
-      case 'color':
-        return 'secondary';
-      case 'array':
-        return 'warning';
-      case 'object':
-        return 'error';
+      case "string":
+        return "primary";
+      case "number":
+        return "info";
+      case "boolean":
+        return "success";
+      case "color":
+        return "secondary";
+      case "array":
+        return "warning";
+      case "object":
+        return "error";
       default:
-        return 'default';
+        return "default";
     }
   };
 
   // Format type display
   const formatTypeDisplay = (item: VarItem): string => {
-    if (item.valueType === 'array') {
-      const elementType = item.description?.match(/\[elementType:(\w+)\]/)?.[1] || 'unknown';
+    if (item.valueType === "array") {
+      const elementType =
+        item.description?.match(/\[elementType:(\w+)\]/)?.[1] || "unknown";
       return `${elementType}[]`;
     }
     return item.valueType;
@@ -161,31 +177,35 @@ const KeyValuePage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deleteConfirm.item) return;
 
-    const keyName = deleteConfirm.item.varKey.replace('kv:', '');
+    const keyName = deleteConfirm.item.varKey.replace("kv:", "");
     try {
       await varsService.deleteKV(keyName);
-      enqueueSnackbar(t('settings.kv.deleteSuccess', { key: keyName }), { variant: 'success' });
+      enqueueSnackbar(t("settings.kv.deleteSuccess", { key: keyName }), {
+        variant: "success",
+      });
       setDeleteConfirm({ open: false, item: null });
       loadItems();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'settings.kv.deleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, "settings.kv.deleteFailed"), {
+        variant: "error",
+      });
     }
   };
 
   // Render value display in table
   const renderValueDisplay = (item: VarItem) => {
     switch (item.valueType) {
-      case 'boolean':
+      case "boolean":
         return (
           <Chip
             label={item.varValue}
             size="small"
-            color={item.varValue === 'true' ? 'success' : 'default'}
+            color={item.varValue === "true" ? "success" : "default"}
           />
         );
-      case 'color':
+      case "color":
         return (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Box
               sx={{
                 width: 24,
@@ -193,33 +213,33 @@ const KeyValuePage: React.FC = () => {
                 borderRadius: 0,
                 bgcolor: item.varValue,
                 border: 1,
-                borderColor: 'divider',
+                borderColor: "divider",
               }}
             />
-            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+            <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
               {item.varValue}
             </Typography>
           </Box>
         );
-      case 'object':
-      case 'array':
+      case "object":
+      case "array":
         return (
           <Typography
             variant="body2"
             sx={{
-              fontFamily: 'monospace',
+              fontFamily: "monospace",
               maxWidth: 300,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
             }}
           >
             {item.varValue}
           </Typography>
         );
-      case 'string':
+      case "string":
         return (
-          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+          <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
             "{item.varValue}"
           </Typography>
         );
@@ -231,9 +251,16 @@ const KeyValuePage: React.FC = () => {
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
         <Typography variant="body2" color="text.secondary">
-          {t('settings.kv.subtitle')}
+          {t("settings.kv.subtitle")}
         </Typography>
         {canManage && (
           <Button
@@ -241,68 +268,80 @@ const KeyValuePage: React.FC = () => {
             startIcon={<AddIcon />}
             onClick={handleCreate}
           >
-            {t('settings.kv.create')}
+            {t("settings.kv.create")}
           </Button>
         )}
       </Box>
 
       {/* Table */}
       <Card>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+        <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
           {loading && items.length === 0 ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+              <Typography color="text.secondary">
+                {t("common.loadingData")}
+              </Typography>
             </Box>
           ) : items.length === 0 ? (
             <EmptyState
-              message={t('settings.kv.noItems')}
+              message={t("settings.kv.noItems")}
               onAddClick={canManage ? handleCreate : undefined}
-              addButtonLabel={t('settings.kv.create')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
+              addButtonLabel={t("settings.kv.create")}
+              subtitle={canManage ? t("common.addFirstItem") : undefined}
             />
           ) : (
             <TableContainer>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>{t('settings.kv.key')}</TableCell>
-                    <TableCell>{t('settings.kv.type')}</TableCell>
-                    <TableCell>{t('settings.kv.value')}</TableCell>
-                    <TableCell>{t('settings.kv.description')}</TableCell>
-                    <TableCell>{t('common.updatedAt')}</TableCell>
-                    {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
+                    <TableCell>{t("settings.kv.key")}</TableCell>
+                    <TableCell>{t("settings.kv.type")}</TableCell>
+                    <TableCell>{t("settings.kv.value")}</TableCell>
+                    <TableCell>{t("settings.kv.description")}</TableCell>
+                    <TableCell>{t("common.updatedAt")}</TableCell>
+                    {canManage && (
+                      <TableCell align="center">
+                        {t("common.actions")}
+                      </TableCell>
+                    )}
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {items.map((item) => (
                     <TableRow key={item.varKey} hover>
                       <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
                           <Typography
                             variant="body2"
                             sx={{
-                              fontFamily: 'monospace',
-                              cursor: 'pointer',
-                              '&:hover': {
-                                textDecoration: 'underline',
-                                color: 'primary.main',
+                              fontFamily: "monospace",
+                              cursor: "pointer",
+                              "&:hover": {
+                                textDecoration: "underline",
+                                color: "primary.main",
                               },
                             }}
                             onClick={() => handleEdit(item)}
                           >
-                            {item.varKey.replace('kv:', '')}
+                            {item.varKey.replace("kv:", "")}
                           </Typography>
-                          <Tooltip title={t('common.copy')}>
+                          <Tooltip title={t("common.copy")}>
                             <IconButton
                               size="small"
-                              onClick={() => handleCopyKeyName(item.varKey.replace('kv:', ''))}
+                              onClick={() =>
+                                handleCopyKeyName(
+                                  item.varKey.replace("kv:", ""),
+                                )
+                              }
                               sx={{ p: 0.5 }}
                             >
                               <CopyIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                           {item.isSystemDefined && (
-                            <Tooltip title={t('settings.kv.systemDefined')}>
+                            <Tooltip title={t("settings.kv.systemDefined")}>
                               <LockIcon fontSize="small" color="action" />
                             </Tooltip>
                           )}
@@ -318,18 +357,28 @@ const KeyValuePage: React.FC = () => {
                       </TableCell>
                       <TableCell>{renderValueDisplay(item)}</TableCell>
                       <TableCell>
-                        <Tooltip title={item.description?.replace(/\[elementType:\w+\]\s*/, '') || '-'}>
+                        <Tooltip
+                          title={
+                            item.description?.replace(
+                              /\[elementType:\w+\]\s*/,
+                              "",
+                            ) || "-"
+                          }
+                        >
                           <Typography
                             variant="body2"
                             color="text.secondary"
                             sx={{
-                              maxWidth: '300px',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
+                              maxWidth: "300px",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
                             }}
                           >
-                            {item.description?.replace(/\[elementType:\w+\]\s*/, '') || '-'}
+                            {item.description?.replace(
+                              /\[elementType:\w+\]\s*/,
+                              "",
+                            ) || "-"}
                           </Typography>
                         </Tooltip>
                       </TableCell>
@@ -340,12 +389,21 @@ const KeyValuePage: React.FC = () => {
                       </TableCell>
                       {canManage && (
                         <TableCell align="center">
-                          <Tooltip title={t('common.edit')}>
-                            <IconButton size="small" onClick={() => handleEdit(item)}>
+                          <Tooltip title={t("common.edit")}>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleEdit(item)}
+                            >
                               <EditIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
-                          <Tooltip title={!item.isCopyable ? t('settings.kv.cannotCopy') : t('common.duplicate')}>
+                          <Tooltip
+                            title={
+                              !item.isCopyable
+                                ? t("settings.kv.cannotCopy")
+                                : t("common.duplicate")
+                            }
+                          >
                             <span>
                               <IconButton
                                 size="small"
@@ -356,7 +414,13 @@ const KeyValuePage: React.FC = () => {
                               </IconButton>
                             </span>
                           </Tooltip>
-                          <Tooltip title={item.isSystemDefined ? t('settings.kv.systemDefined') : t('common.delete')}>
+                          <Tooltip
+                            title={
+                              item.isSystemDefined
+                                ? t("settings.kv.systemDefined")
+                                : t("common.delete")
+                            }
+                          >
                             <span>
                               <IconButton
                                 size="small"
@@ -392,12 +456,13 @@ const KeyValuePage: React.FC = () => {
         open={deleteConfirm.open}
         onClose={() => setDeleteConfirm({ open: false, item: null })}
         onConfirm={handleDeleteConfirm}
-        title={t('settings.kv.deleteConfirmTitle')}
-        message={t('settings.kv.deleteConfirmMessage', { key: deleteConfirm.item?.varKey.replace('kv:', '') || '' })}
+        title={t("settings.kv.deleteConfirmTitle")}
+        message={t("settings.kv.deleteConfirmMessage", {
+          key: deleteConfirm.item?.varKey.replace("kv:", "") || "",
+        })}
       />
     </Box>
   );
 };
 
 export default KeyValuePage;
-

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 import {
   Box,
   TextField,
@@ -12,15 +12,12 @@ import {
   Grid,
   Chip,
   IconButton,
-  Button
-} from '@mui/material';
-import {
-  Add as AddIcon,
-  Delete as DeleteIcon
-} from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
-import { JobSchema, JobSchemaField } from '../../types/job';
-import JsonEditor from '../common/JsonEditor';
+  Button,
+} from "@mui/material";
+import { Add as AddIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
+import { JobSchema, JobSchemaField } from "../../types/job";
+import JsonEditor from "../common/JsonEditor";
 
 interface DynamicJobDataFormProps {
   jobSchema: JobSchema;
@@ -33,20 +30,20 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
   jobSchema,
   data,
   onChange,
-  errors
+  errors,
 }) => {
   const { t } = useTranslation();
 
-  console.log('DynamicJobDataForm received data:', data);
-  console.log('DynamicJobDataForm received jobSchema:', jobSchema);
+  console.log("DynamicJobDataForm received data:", data);
+  console.log("DynamicJobDataForm received jobSchema:", jobSchema);
 
   // 스키마가 변경될 때만 기본값 설정
   useEffect(() => {
     if (!jobSchema || Object.keys(jobSchema).length === 0) return;
 
-    console.log('DynamicJobDataForm useEffect - jobSchema changed');
-    console.log('Current data:', data);
-    console.log('JobSchema:', jobSchema);
+    console.log("DynamicJobDataForm useEffect - jobSchema changed");
+    console.log("Current data:", data);
+    console.log("JobSchema:", jobSchema);
 
     // 기본값이 필요한 필드만 처리
     const newData = { ...data };
@@ -55,11 +52,14 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
     Object.entries(jobSchema).forEach(([fieldName, field]) => {
       // 필드에 값이 없고 기본값이 있는 경우에만 기본값 설정
       const currentValue = data[fieldName];
-      const hasValue = currentValue !== undefined &&
-                      currentValue !== null &&
-                      currentValue !== '';
+      const hasValue =
+        currentValue !== undefined &&
+        currentValue !== null &&
+        currentValue !== "";
 
-      console.log(`Field ${fieldName}: currentValue=${currentValue}, hasValue=${hasValue}, default=${field.default}`);
+      console.log(
+        `Field ${fieldName}: currentValue=${currentValue}, hasValue=${hasValue}, default=${field.default}`,
+      );
 
       // 기본값이 있고 현재 값이 없는 경우에만 설정
       if (!hasValue && field.default !== undefined) {
@@ -69,8 +69,8 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
       }
     });
 
-    console.log('New data after defaults:', newData);
-    console.log('Has changes:', hasChanges);
+    console.log("New data after defaults:", newData);
+    console.log("Has changes:", hasChanges);
 
     if (hasChanges) {
       onChange(newData);
@@ -84,7 +84,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
 
   const handleArrayAdd = (fieldName: string) => {
     const currentArray = data[fieldName] || [];
-    const newArray = [...currentArray, ''];
+    const newArray = [...currentArray, ""];
     handleFieldChange(fieldName, newArray);
   };
 
@@ -94,7 +94,11 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
     handleFieldChange(fieldName, newArray);
   };
 
-  const handleArrayItemChange = (fieldName: string, index: number, value: any) => {
+  const handleArrayItemChange = (
+    fieldName: string,
+    index: number,
+    value: any,
+  ) => {
     const currentArray = data[fieldName] || [];
     const newArray = [...currentArray];
     newArray[index] = value;
@@ -102,12 +106,12 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
   };
 
   const renderField = (fieldName: string, field: JobSchemaField) => {
-    const value = data[fieldName] || field.default || '';
+    const value = data[fieldName] || field.default || "";
     const errorKey = `job_data_map.${fieldName}`;
     const hasError = !!errors[errorKey];
 
     switch (field.type) {
-      case 'string':
+      case "string":
         return (
           <TextField
             fullWidth
@@ -120,7 +124,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
           />
         );
 
-      case 'password':
+      case "password":
         return (
           <TextField
             fullWidth
@@ -134,7 +138,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
           />
         );
 
-      case 'text':
+      case "text":
         return (
           <TextField
             fullWidth
@@ -149,25 +153,27 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
           />
         );
 
-      case 'number':
+      case "number":
         return (
           <TextField
             fullWidth
             type="number"
             label={field.description}
             value={value}
-            onChange={(e) => handleFieldChange(fieldName, parseFloat(e.target.value) || 0)}
+            onChange={(e) =>
+              handleFieldChange(fieldName, parseFloat(e.target.value) || 0)
+            }
             required={field.required}
             error={hasError}
             helperText={hasError ? errors[errorKey] : undefined}
             inputProps={{
               min: field.validation?.min,
-              max: field.validation?.max
+              max: field.validation?.max,
             }}
           />
         );
 
-      case 'boolean':
+      case "boolean":
         return (
           <FormControlLabel
             control={
@@ -180,10 +186,12 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
           />
         );
 
-      case 'select':
+      case "select":
         return (
           <FormControl fullWidth error={hasError}>
-            <InputLabel required={field.required}>{field.description}</InputLabel>
+            <InputLabel required={field.required}>
+              {field.description}
+            </InputLabel>
             <Select
               value={value}
               onChange={(e) => handleFieldChange(fieldName, e.target.value)}
@@ -196,37 +204,43 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
               ))}
             </Select>
             {hasError && (
-              <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+              <Typography
+                variant="caption"
+                color="error"
+                sx={{ mt: 0.5, ml: 1.5 }}
+              >
                 {errors[errorKey]}
               </Typography>
             )}
           </FormControl>
         );
 
-      case 'array':
+      case "array":
         const arrayValue = data[fieldName] || [];
         return (
           <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
               <Typography variant="body2" fontWeight="medium">
                 {field.description}
-                {field.required && <span style={{ color: 'red' }}> *</span>}
+                {field.required && <span style={{ color: "red" }}> *</span>}
               </Typography>
               <Button
                 size="small"
                 startIcon={<AddIcon />}
                 onClick={() => handleArrayAdd(fieldName)}
               >
-                {t('common.add')}
+                {t("common.add")}
               </Button>
             </Box>
             {arrayValue.map((item: any, index: number) => (
-              <Box key={index} sx={{ display: 'flex', gap: 1, mb: 1 }}>
+              <Box key={index} sx={{ display: "flex", gap: 1, mb: 1 }}>
                 <TextField
                   fullWidth
                   size="small"
                   value={item}
-                  onChange={(e) => handleArrayItemChange(fieldName, index, e.target.value)}
+                  onChange={(e) =>
+                    handleArrayItemChange(fieldName, index, e.target.value)
+                  }
                   placeholder={`${field.description} ${index + 1}`}
                 />
                 <IconButton
@@ -246,12 +260,15 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
           </Box>
         );
 
-      case 'object':
-        const jsonValue = typeof value === 'object' ? JSON.stringify(value || {}, null, 2) : value || '{}';
+      case "object":
+        const jsonValue =
+          typeof value === "object"
+            ? JSON.stringify(value || {}, null, 2)
+            : value || "{}";
         return (
           <Box>
             <Typography variant="body2" sx={{ mb: 1 }}>
-              {field.label} {field.required && `(${t('common.required')})`}
+              {field.label} {field.required && `(${t("common.required")})`}
             </Typography>
             <JsonEditor
               value={jsonValue}
@@ -289,40 +306,46 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
   if (!jobSchema || Object.keys(jobSchema).length === 0) {
     return (
       <Typography variant="body2" color="text.secondary">
-        {t('jobs.noConfigurationRequired')}
+        {t("jobs.noConfigurationRequired")}
       </Typography>
     );
   }
 
   // HTTP 요청 타입인지 확인
-  const isHttpRequest = Object.keys(jobSchema).includes('url') && Object.keys(jobSchema).includes('method');
-  const httpMethod = data.method || 'GET';
-  const shouldHideBody = isHttpRequest && httpMethod === 'GET';
+  const isHttpRequest =
+    Object.keys(jobSchema).includes("url") &&
+    Object.keys(jobSchema).includes("method");
+  const httpMethod = data.method || "GET";
+  const shouldHideBody = isHttpRequest && httpMethod === "GET";
 
   // 필드 순서 정의 (HTTP 요청의 경우)
   const getFieldOrder = () => {
     if (isHttpRequest) {
-      const orderedFields = ['method', 'url', 'headers', 'body'];
-      const otherFields = Object.keys(jobSchema).filter(key => !orderedFields.includes(key));
+      const orderedFields = ["method", "url", "headers", "body"];
+      const otherFields = Object.keys(jobSchema).filter(
+        (key) => !orderedFields.includes(key),
+      );
       return [...orderedFields, ...otherFields];
     }
     return Object.keys(jobSchema);
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       {/* GET 요청일 때 body 필드가 숨겨졌다는 안내 메시지 */}
       {shouldHideBody && jobSchema.body && (
-        <Box sx={{
-          p: 2,
-          bgcolor: 'info.light',
-          borderRadius: 1,
-          border: 1,
-          borderColor: 'info.main',
-          color: 'info.contrastText'
-        }}>
+        <Box
+          sx={{
+            p: 2,
+            bgcolor: "info.light",
+            borderRadius: 1,
+            border: 1,
+            borderColor: "info.main",
+            color: "info.contrastText",
+          }}
+        >
           <Typography variant="body2">
-            💡 {t('jobs.getRequestNoBody')}
+            💡 {t("jobs.getRequestNoBody")}
           </Typography>
         </Box>
       )}
@@ -332,15 +355,17 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
         if (!field) return null;
 
         // GET 요청일 때 body 필드 숨기기
-        if (shouldHideBody && fieldName === 'body') {
+        if (shouldHideBody && fieldName === "body") {
           return null;
         }
 
         return (
           <Box key={fieldName}>
             <Box>
-              {field.type !== 'boolean' && field.type !== 'array' && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              {field.type !== "boolean" && field.type !== "array" && (
+                <Box
+                  sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
+                >
                   <Typography variant="caption" color="text.secondary">
                     {fieldName}
                   </Typography>
@@ -348,15 +373,15 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
                     label={field.type}
                     size="small"
                     variant="outlined"
-                    sx={{ fontSize: '0.7rem', height: '20px' }}
+                    sx={{ fontSize: "0.7rem", height: "20px" }}
                   />
                   {field.required && (
                     <Chip
-                      label={t('common.required')}
+                      label={t("common.required")}
                       size="small"
                       color="error"
                       variant="outlined"
-                      sx={{ fontSize: '0.7rem', height: '20px' }}
+                      sx={{ fontSize: "0.7rem", height: "20px" }}
                     />
                   )}
                 </Box>

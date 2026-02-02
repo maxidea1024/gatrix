@@ -6,13 +6,13 @@
  * NOTE: Game servers register directly to etcd/Redis, not via HTTP API
  */
 
-import { Request, Response } from 'express';
-import serviceDiscoveryService from '../services/serviceDiscoveryService';
+import { Request, Response } from "express";
+import serviceDiscoveryService from "../services/serviceDiscoveryService";
 import {
   sendInternalError,
   sendSuccessResponse,
   ErrorCodes,
-} from '../utils/apiResponse';
+} from "../utils/apiResponse";
 
 class ServiceDiscoveryController {
   /**
@@ -22,11 +22,19 @@ class ServiceDiscoveryController {
   async getServices(req: Request, res: Response) {
     try {
       const { type, group } = req.query;
-      const services = await serviceDiscoveryService.getServices(type as string, group as string);
+      const services = await serviceDiscoveryService.getServices(
+        type as string,
+        group as string,
+      );
 
       return sendSuccessResponse(res, services);
     } catch (error) {
-      return sendInternalError(res, 'Failed to get services', error, ErrorCodes.SERVICE_DISCOVERY_ERROR);
+      return sendInternalError(
+        res,
+        "Failed to get services",
+        error,
+        ErrorCodes.SERVICE_DISCOVERY_ERROR,
+      );
     }
   }
 
@@ -40,7 +48,12 @@ class ServiceDiscoveryController {
 
       return sendSuccessResponse(res, stats);
     } catch (error) {
-      return sendInternalError(res, 'Failed to get service stats', error, ErrorCodes.SERVICE_DISCOVERY_ERROR);
+      return sendInternalError(
+        res,
+        "Failed to get service stats",
+        error,
+        ErrorCodes.SERVICE_DISCOVERY_ERROR,
+      );
     }
   }
 
@@ -54,7 +67,12 @@ class ServiceDiscoveryController {
 
       return sendSuccessResponse(res, types);
     } catch (error) {
-      return sendInternalError(res, 'Failed to get service types', error, ErrorCodes.SERVICE_DISCOVERY_ERROR);
+      return sendInternalError(
+        res,
+        "Failed to get service types",
+        error,
+        ErrorCodes.SERVICE_DISCOVERY_ERROR,
+      );
     }
   }
 }

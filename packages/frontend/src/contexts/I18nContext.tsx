@@ -1,14 +1,14 @@
-import React, { createContext, useContext, ReactNode } from 'react';
-import i18n from 'i18next';
-import { initReactI18next, useTranslation } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
-import { Language } from '@/types';
-import { UserService } from '@/services/users';
+import React, { createContext, useContext, ReactNode } from "react";
+import i18n from "i18next";
+import { initReactI18next, useTranslation } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+import { Language } from "@/types";
+import { UserService } from "@/services/users";
 
 // Import translation files (INI format)
-import enTranslations from '@/locales/en.ini';
-import koTranslations from '@/locales/ko.ini';
-import zhTranslations from '@/locales/zh.ini';
+import enTranslations from "@/locales/en.ini";
+import koTranslations from "@/locales/ko.ini";
+import zhTranslations from "@/locales/zh.ini";
 
 // Language configuration
 const resources = {
@@ -23,8 +23,8 @@ const resources = {
   },
 };
 
-const supportedLanguages: Language[] = ['en', 'ko', 'zh'];
-const defaultLanguage: Language = 'en';
+const supportedLanguages: Language[] = ["en", "ko", "zh"];
+const defaultLanguage: Language = "en";
 
 // Initialize i18next
 i18n
@@ -35,13 +35,13 @@ i18n
     fallbackLng: false, // Disable fallback to show missing keys
     supportedLngs: supportedLanguages,
     nonExplicitSupportedLngs: true,
-    load: 'languageOnly',
+    load: "languageOnly",
     debug: false, // Set to true for i18n debugging
 
     detection: {
-      order: ['localStorage', 'navigator', 'htmlTag'],
-      caches: ['localStorage'],
-      lookupLocalStorage: 'i18nextLng',
+      order: ["localStorage", "navigator", "htmlTag"],
+      caches: ["localStorage"],
+      lookupLocalStorage: "i18nextLng",
     },
 
     interpolation: {
@@ -77,12 +77,12 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
   // Migrate legacy localStorage key if present (i8nextLng -> i18nextLng)
   try {
-    const legacy = localStorage.getItem('i8nextLng');
-    if (legacy && !localStorage.getItem('i18nextLng')) {
-      localStorage.setItem('i18nextLng', legacy);
+    const legacy = localStorage.getItem("i8nextLng");
+    if (legacy && !localStorage.getItem("i18nextLng")) {
+      localStorage.setItem("i18nextLng", legacy);
       i18nInstance.changeLanguage(legacy as Language);
     }
-  } catch { }
+  } catch {}
 
   const changeLanguage = async (lang: Language) => {
     // 프론트엔드 언어 변경
@@ -90,13 +90,13 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
     // 백엔드에 사용자 언어 설정 업데이트 (로그인된 사용자만)
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (token) {
         await UserService.updateLanguage(lang);
         console.log(`✅ User language preference updated to: ${lang}`);
       }
     } catch (error) {
-      console.warn('⚠️ Failed to update user language preference:', error);
+      console.warn("⚠️ Failed to update user language preference:", error);
       // 백엔드 업데이트 실패해도 프론트엔드 언어 변경은 유지
     }
   };
@@ -111,17 +111,13 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     supportedLanguages,
   };
 
-  return (
-    <I18nContext.Provider value={value}>
-      {children}
-    </I18nContext.Provider>
-  );
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 };
 
 export const useI18n = (): I18nContextType => {
   const context = useContext(I18nContext);
   if (context === undefined) {
-    throw new Error('useI18n must be used within an I18nProvider');
+    throw new Error("useI18n must be used within an I18nProvider");
   }
   return context;
 };
@@ -134,95 +130,95 @@ export const useTranslations = () => {
     t,
     // Common translations
     common: {
-      loading: t('common.loading'),
-      loadFailed: t('common.loadFailed'),
-      error: t('common.error'),
-      success: t('common.success'),
-      warning: t('common.warning'),
-      info: t('common.info'),
-      save: t('common.save'),
-      cancel: t('common.cancel'),
-      delete: t('common.delete'),
-      edit: t('common.edit'),
-      add: t('common.add'),
-      search: t('common.search'),
-      filter: t('common.filter'),
-      refresh: t('common.refresh'),
-      back: t('common.back'),
-      next: t('common.next'),
-      previous: t('common.previous'),
-      submit: t('common.submit'),
-      reset: t('common.reset'),
-      confirm: t('common.confirm'),
-      yes: t('common.yes'),
-      no: t('common.no'),
-      ok: t('common.ok'),
-      close: t('common.close'),
+      loading: t("common.loading"),
+      loadFailed: t("common.loadFailed"),
+      error: t("common.error"),
+      success: t("common.success"),
+      warning: t("common.warning"),
+      info: t("common.info"),
+      save: t("common.save"),
+      cancel: t("common.cancel"),
+      delete: t("common.delete"),
+      edit: t("common.edit"),
+      add: t("common.add"),
+      search: t("common.search"),
+      filter: t("common.filter"),
+      refresh: t("common.refresh"),
+      back: t("common.back"),
+      next: t("common.next"),
+      previous: t("common.previous"),
+      submit: t("common.submit"),
+      reset: t("common.reset"),
+      confirm: t("common.confirm"),
+      yes: t("common.yes"),
+      no: t("common.no"),
+      ok: t("common.ok"),
+      close: t("common.close"),
     },
     // Navigation translations
     nav: {
-      dashboard: t('navigation.dashboard'),
-      users: t('navigation.users'),
-      profile: t('navigation.profile'),
-      settings: t('navigation.settings'),
-      administration: t('navigation.administration'),
-      userManagement: t('navigation.userManagement'),
-      auditLogs: t('navigation.auditLogs'),
-      systemStats: t('navigation.systemStats'),
-      logout: t('navigation.logout'),
+      dashboard: t("navigation.dashboard"),
+      users: t("navigation.users"),
+      profile: t("navigation.profile"),
+      settings: t("navigation.settings"),
+      administration: t("navigation.administration"),
+      userManagement: t("navigation.userManagement"),
+      auditLogs: t("navigation.auditLogs"),
+      systemStats: t("navigation.systemStats"),
+      logout: t("navigation.logout"),
     },
     // Auth translations
     auth: {
-      login: t('auth.login'),
-      register: t('auth.register'),
-      logout: t('auth.logout'),
-      email: t('auth.email'),
-      password: t('auth.password'),
-      confirmPassword: t('auth.confirmPassword'),
-      name: t('auth.name'),
-      forgotPassword: t('auth.forgotPassword'),
-      rememberMe: t('auth.rememberMe'),
-      loginWithGoogle: t('auth.loginWithGoogle'),
-      loginWithGitHub: t('auth.loginWithGitHub'),
-      alreadyHaveAccount: t('auth.alreadyHaveAccount'),
-      dontHaveAccount: t('auth.dontHaveAccount'),
-      signUp: t('auth.signUp'),
-      signIn: t('auth.signIn'),
-      welcomeBack: t('auth.welcomeBack'),
-      createAccount: t('auth.createAccount'),
-      loginSuccess: t('auth.loginSuccess'),
-      loginFailed: t('auth.loginFailed'),
-      registerSuccess: t('auth.registerSuccess'),
-      registerFailed: t('auth.registerFailed'),
-      logoutSuccess: t('auth.logoutSuccess'),
-      invalidCredentials: t('auth.invalidCredentials'),
-      accountPending: t('auth.accountPending'),
-      accountSuspended: t('auth.accountSuspended'),
+      login: t("auth.login"),
+      register: t("auth.register"),
+      logout: t("auth.logout"),
+      email: t("auth.email"),
+      password: t("auth.password"),
+      confirmPassword: t("auth.confirmPassword"),
+      name: t("auth.name"),
+      forgotPassword: t("auth.forgotPassword"),
+      rememberMe: t("auth.rememberMe"),
+      loginWithGoogle: t("auth.loginWithGoogle"),
+      loginWithGitHub: t("auth.loginWithGitHub"),
+      alreadyHaveAccount: t("auth.alreadyHaveAccount"),
+      dontHaveAccount: t("auth.dontHaveAccount"),
+      signUp: t("auth.signUp"),
+      signIn: t("auth.signIn"),
+      welcomeBack: t("auth.welcomeBack"),
+      createAccount: t("auth.createAccount"),
+      loginSuccess: t("auth.loginSuccess"),
+      loginFailed: t("auth.loginFailed"),
+      registerSuccess: t("auth.registerSuccess"),
+      registerFailed: t("auth.registerFailed"),
+      logoutSuccess: t("auth.logoutSuccess"),
+      invalidCredentials: t("auth.invalidCredentials"),
+      accountPending: t("auth.accountPending"),
+      accountSuspended: t("auth.accountSuspended"),
     },
     // Status translations
     status: {
-      pending: t('status.pending'),
-      active: t('status.active'),
-      suspended: t('status.suspended'),
-      deleted: t('status.deleted'),
+      pending: t("status.pending"),
+      active: t("status.active"),
+      suspended: t("status.suspended"),
+      deleted: t("status.deleted"),
     },
     // Role translations
     roles: {
-      admin: t('roles.admin'),
-      user: t('roles.user'),
+      admin: t("roles.admin"),
+      user: t("roles.user"),
     },
     // Error translations
     errors: {
-      generic: t('errors.generic'),
-      networkError: t('errors.networkError'),
-      unauthorized: t('errors.unauthorized'),
-      forbidden: t('errors.forbidden'),
-      notFound: t('errors.notFound'),
-      serverError: t('errors.serverError'),
-      validationError: t('errors.validationError'),
-      sessionExpired: t('errors.sessionExpired'),
-      tryAgain: t('errors.tryAgain'),
-      contactSupport: t('errors.contactSupport'),
+      generic: t("errors.generic"),
+      networkError: t("errors.networkError"),
+      unauthorized: t("errors.unauthorized"),
+      forbidden: t("errors.forbidden"),
+      notFound: t("errors.notFound"),
+      serverError: t("errors.serverError"),
+      validationError: t("errors.validationError"),
+      sessionExpired: t("errors.sessionExpired"),
+      tryAgain: t("errors.tryAgain"),
+      contactSupport: t("errors.contactSupport"),
     },
   };
 };
@@ -230,9 +226,9 @@ export const useTranslations = () => {
 // Language display names
 export const getLanguageDisplayName = (lang: Language): string => {
   const displayNames: Record<Language, string> = {
-    en: 'English',
-    ko: '한국어',
-    zh: '中文',
+    en: "English",
+    ko: "한국어",
+    zh: "中文",
   };
   return displayNames[lang] || lang;
 };

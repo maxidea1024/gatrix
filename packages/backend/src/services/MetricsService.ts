@@ -1,7 +1,7 @@
-import type express from 'express';
-import config from '../config';
-import AppInstance from '../utils/AppInstance';
-import os from 'os';
+import type express from "express";
+import config from "../config";
+import AppInstance from "../utils/AppInstance";
+import os from "os";
 
 /**
  * MetricsService for Backend (Express)
@@ -11,17 +11,19 @@ import os from 'os';
  */
 export const initMetrics = (app: express.Application): void => {
   try {
-    if (!config || !config as any) {
+    if (!config || (!config as any)) {
       // Config not ready; do nothing
       return;
     }
 
-    const enabled = (config as any).monitoring?.enabled === true || String(process.env.MONITORING_ENABLED).toLowerCase() === 'true';
+    const enabled =
+      (config as any).monitoring?.enabled === true ||
+      String(process.env.MONITORING_ENABLED).toLowerCase() === "true";
     if (!enabled) return;
 
     // Lazy require to avoid import-time side effects
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const promClient = require('prom-client');
+    const promClient = require("prom-client");
 
     const register = new promClient.Registry();
 
@@ -32,46 +34,46 @@ export const initMetrics = (app: express.Application): void => {
 
     // Get primary IP address (first non-loopback IPv4)
     const interfaces = os.networkInterfaces();
-    let ip = 'unknown';
+    let ip = "unknown";
     for (const name of Object.keys(interfaces)) {
       const iface = interfaces[name];
       if (iface) {
         for (const addr of iface) {
-          if (addr.family === 'IPv4' && !addr.internal) {
+          if (addr.family === "IPv4" && !addr.internal) {
             ip = addr.address;
             break;
           }
         }
-        if (ip !== 'unknown') break;
+        if (ip !== "unknown") break;
       }
     }
 
     register.setDefaultLabels({
-      service: 'backend',
+      service: "backend",
       instanceId,
       hostname,
-      ip
+      ip,
     });
     promClient.collectDefaultMetrics({ register });
 
     const httpRequestDuration = new promClient.Histogram({
-      name: 'http_request_duration_seconds',
-      help: 'Duration of HTTP requests in seconds',
-      labelNames: ['method', 'status_code', 'route'],
+      name: "http_request_duration_seconds",
+      help: "Duration of HTTP requests in seconds",
+      labelNames: ["method", "status_code", "route"],
       buckets: [0.005, 0.01, 0.05, 0.1, 0.3, 1, 3, 5, 10],
     });
 
     register.registerMetric(httpRequestDuration);
     // Network I/O counters: total bytes in/out
     const requestBytesTotal = new promClient.Counter({
-      name: 'http_request_bytes_in_total',
-      help: 'Total incoming HTTP request bytes',
-      labelNames: ['method', 'status_code', 'route'],
+      name: "http_request_bytes_in_total",
+      help: "Total incoming HTTP request bytes",
+      labelNames: ["method", "status_code", "route"],
     });
     const responseBytesTotal = new promClient.Counter({
-      name: 'http_response_bytes_out_total',
-      help: 'Total outgoing HTTP response bytes',
-      labelNames: ['method', 'status_code', 'route'],
+      name: "http_response_bytes_out_total",
+      help: "Total outgoing HTTP response bytes",
+      labelNames: ["method", "status_code", "route"],
     });
     register.registerMetric(requestBytesTotal);
     register.registerMetric(responseBytesTotal);
@@ -82,8 +84,8 @@ export const initMetrics = (app: express.Application): void => {
       // Capture socket I/O counters at request start to compute deltas safely with keep-alive
       const sock: any = (req as any).socket;
       const ioStart = {
-        read: typeof sock?.bytesRead === 'number' ? sock.bytesRead : 0,
-        written: typeof sock?.bytesWritten === 'number' ? sock.bytesWritten : 0,
+        read: typeof sock?.bytesRead === "number" ? sock.bytesRead : 0,
+        written: typeof sock?.bytesWritten === "number" ? sock.bytesWritten : 0,
       };
       (res as any)._metrics_io_start = ioStart;
 
@@ -95,7 +97,8 @@ export const initMetrics = (app: express.Application): void => {
         try {
           if (!chunk) return 0;
           if (Buffer.isBuffer(chunk)) return chunk.length;
-          if (typeof chunk === 'string') return Buffer.byteLength(chunk, encoding || 'utf8');
+          if (typeof chunk === "string")
+            return Buffer.byteLength(chunk, encoding || "utf8");
         } catch (_) {
           // ignore
         }
@@ -112,21 +115,32 @@ export const initMetrics = (app: express.Application): void => {
 
       let _metrics_bytes_recorded = false; // guard to avoid double counting when using compression/keep-alive
 
-
-      res.on('finish', () => {
+      res.on("finish", () => {
         try {
           const end = process.hrtime.bigint();
           const duration = Number(end - start) / 1e9; // seconds
-          const route = (req as any).route?.path || (req as any).originalUrl?.split('?')[0] || 'unknown';
+          const route =
+            (req as any).route?.path ||
+            (req as any).originalUrl?.split("?")[0] ||
+            "unknown";
           const labels = [req.method, String(res.statusCode), route] as const;
           httpRequestDuration.labels(...labels).observe(duration);
           // Compute request/response byte deltas with header fallback
           const sockNow: any = (req as any).socket;
-          const ioPrev = (res as any)._metrics_io_start as { read: number; written: number } | undefined;
-          const endRead = typeof sockNow?.bytesRead === 'number' ? sockNow.bytesRead : 0;
-          const endWritten = typeof sockNow?.bytesWritten === 'number' ? sockNow.bytesWritten : 0;
+          const ioPrev = (res as any)._metrics_io_start as
+            | { read: number; written: number }
+            | undefined;
+          const endRead =
+            typeof sockNow?.bytesRead === "number" ? sockNow.bytesRead : 0;
+          const endWritten =
+            typeof sockNow?.bytesWritten === "number"
+              ? sockNow.bytesWritten
+              : 0;
           // Request bytes: prefer Content-Length header, otherwise socket delta
-          const reqCL = (req.headers['content-length'] as string | string[] | undefined);
+          const reqCL = req.headers["content-length"] as
+            | string
+            | string[]
+            | undefined;
           let reqBytes = 0;
           if (reqCL) {
             const raw = Array.isArray(reqCL) ? reqCL[0] : reqCL;
@@ -142,9 +156,9 @@ export const initMetrics = (app: express.Application): void => {
           if (_metrics_written_acc > 0) {
             resBytes = _metrics_written_acc;
           } else {
-            const resCL: any = res.getHeader('content-length');
-            if (typeof resCL === 'number') resBytes = resCL;
-            else if (typeof resCL === 'string') {
+            const resCL: any = res.getHeader("content-length");
+            if (typeof resCL === "number") resBytes = resCL;
+            else if (typeof resCL === "string") {
               const parsed = parseInt(resCL, 10);
               if (!Number.isNaN(parsed)) resBytes = parsed;
             }
@@ -155,29 +169,48 @@ export const initMetrics = (app: express.Application): void => {
           }
           // Always inc to ensure series is created even when bytes are 0; only set recorded flag if > 0
           requestBytesTotal.labels(...labels).inc(Math.max(0, reqBytes));
-          if (reqBytes > 0) { _metrics_bytes_recorded = true; }
+          if (reqBytes > 0) {
+            _metrics_bytes_recorded = true;
+          }
           responseBytesTotal.labels(...labels).inc(Math.max(0, resBytes));
-          if (resBytes > 0) { _metrics_bytes_recorded = true; }
+          if (resBytes > 0) {
+            _metrics_bytes_recorded = true;
+          }
         } catch (_) {
           // swallow metrics errors
         }
       });
 
       // Fallback: when using compression + keep-alive, socket.bytesWritten may update after 'finish'
-      res.on('close', () => {
+      res.on("close", () => {
         try {
           if (_metrics_bytes_recorded) return;
           const sockNow: any = (req as any).socket;
-          const ioPrev = (res as any)._metrics_io_start as { read: number; written: number } | undefined;
-          const route = (req as any).route?.path || (req as any).originalUrl?.split('?')[0] || 'unknown';
+          const ioPrev = (res as any)._metrics_io_start as
+            | { read: number; written: number }
+            | undefined;
+          const route =
+            (req as any).route?.path ||
+            (req as any).originalUrl?.split("?")[0] ||
+            "unknown";
           const labels = [req.method, String(res.statusCode), route] as const;
           if (ioPrev) {
-            const endRead = typeof sockNow?.bytesRead === 'number' ? sockNow.bytesRead : 0;
-            const endWritten = typeof sockNow?.bytesWritten === 'number' ? sockNow.bytesWritten : 0;
+            const endRead =
+              typeof sockNow?.bytesRead === "number" ? sockNow.bytesRead : 0;
+            const endWritten =
+              typeof sockNow?.bytesWritten === "number"
+                ? sockNow.bytesWritten
+                : 0;
             const dReq = endRead - ioPrev.read;
             const dRes = endWritten - ioPrev.written;
-            if (Number.isFinite(dReq) && dReq > 0) { requestBytesTotal.labels(...labels).inc(dReq); _metrics_bytes_recorded = true; }
-            if (Number.isFinite(dRes) && dRes > 0) { responseBytesTotal.labels(...labels).inc(dRes); _metrics_bytes_recorded = true; }
+            if (Number.isFinite(dReq) && dReq > 0) {
+              requestBytesTotal.labels(...labels).inc(dReq);
+              _metrics_bytes_recorded = true;
+            }
+            if (Number.isFinite(dRes) && dRes > 0) {
+              responseBytesTotal.labels(...labels).inc(dRes);
+              _metrics_bytes_recorded = true;
+            }
           }
         } catch (_) {
           // swallow metrics errors
@@ -187,10 +220,10 @@ export const initMetrics = (app: express.Application): void => {
       next();
     });
 
-    const metricsPath = (config as any).monitoring?.metricsPath || '/metrics';
+    const metricsPath = (config as any).monitoring?.metricsPath || "/metrics";
     app.get(metricsPath, async (_req, res) => {
       try {
-        res.set('Content-Type', register.contentType);
+        res.set("Content-Type", register.contentType);
         res.end(await register.metrics());
       } catch (error) {
         res.status(500).end(String(error));
@@ -199,9 +232,8 @@ export const initMetrics = (app: express.Application): void => {
   } catch (err) {
     // Do not crash app because of metrics init
     // eslint-disable-next-line no-console
-    console.warn('[Metrics] Initialization skipped due to error:', err);
+    console.warn("[Metrics] Initialization skipped due to error:", err);
   }
 };
 
 export default { initMetrics };
-

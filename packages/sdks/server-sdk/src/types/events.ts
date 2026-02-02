@@ -7,40 +7,40 @@
 // ============================================================================
 
 export type StandardEventType =
-  | 'gameworld.created'
-  | 'gameworld.updated'
-  | 'gameworld.deleted'
-  | 'gameworld.order_changed'
-  | 'popup.created'
-  | 'popup.updated'
-  | 'popup.deleted'
-  | 'survey.created'
-  | 'survey.updated'
-  | 'survey.deleted'
-  | 'survey.settings.updated'
-  | 'maintenance.settings.updated'
-  | 'maintenance.started'
-  | 'maintenance.ended'
-  | 'whitelist.updated'
-  | 'client_version.created'
-  | 'client_version.updated'
-  | 'client_version.deleted'
-  | 'banner.created'
-  | 'banner.updated'
-  | 'banner.deleted'
-  | 'service_notice.created'
-  | 'service_notice.updated'
-  | 'service_notice.deleted'
-  | 'store_product.created'
-  | 'store_product.updated'
-  | 'store_product.deleted'
-  | 'store_product.bulk_updated'
-  | 'environment.created'
-  | 'environment.deleted'
-  | 'feature_flag.changed'
-  | 'feature_flag.created'
-  | 'feature_flag.updated'
-  | 'feature_flag.deleted';
+  | "gameworld.created"
+  | "gameworld.updated"
+  | "gameworld.deleted"
+  | "gameworld.order_changed"
+  | "popup.created"
+  | "popup.updated"
+  | "popup.deleted"
+  | "survey.created"
+  | "survey.updated"
+  | "survey.deleted"
+  | "survey.settings.updated"
+  | "maintenance.settings.updated"
+  | "maintenance.started"
+  | "maintenance.ended"
+  | "whitelist.updated"
+  | "client_version.created"
+  | "client_version.updated"
+  | "client_version.deleted"
+  | "banner.created"
+  | "banner.updated"
+  | "banner.deleted"
+  | "service_notice.created"
+  | "service_notice.updated"
+  | "service_notice.deleted"
+  | "store_product.created"
+  | "store_product.updated"
+  | "store_product.deleted"
+  | "store_product.bulk_updated"
+  | "environment.created"
+  | "environment.deleted"
+  | "feature_flag.changed"
+  | "feature_flag.created"
+  | "feature_flag.updated"
+  | "feature_flag.deleted";
 
 export interface StandardEventData {
   id?: number | string; // Optional for bulk events that don't have a single id
@@ -51,7 +51,7 @@ export interface StandardEventData {
    */
   environment?: string;
   isVisible?: boolean | number; // For gameworld.updated, popup.updated events (MySQL returns 0/1)
-  isActive?: boolean | number;  // For survey.updated, store_product.updated events (MySQL returns 0/1)
+  isActive?: boolean | number; // For survey.updated, store_product.updated events (MySQL returns 0/1)
   status?: string; // For banner.created, banner.updated events (draft, published, archived)
   isMaintenance?: boolean; // For maintenance.settings.updated events
   maintenanceStartDate?: string; // For maintenance.settings.updated events

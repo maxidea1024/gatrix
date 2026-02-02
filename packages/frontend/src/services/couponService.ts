@@ -1,10 +1,16 @@
-import { api } from './api';
-import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
+import { api } from "./api";
+import {
+  MutationResult,
+  parseChangeRequestResponse,
+} from "./changeRequestUtils";
 
-export type CouponType = 'SPECIAL' | 'NORMAL';
-export type CouponStatus = 'ACTIVE' | 'DISABLED' | 'DELETED';
-export type CodePattern = 'ALPHANUMERIC_8' | 'ALPHANUMERIC_16' | 'ALPHANUMERIC_16_HYPHEN';
-export type UsageLimitType = 'USER' | 'CHARACTER';
+export type CouponType = "SPECIAL" | "NORMAL";
+export type CouponStatus = "ACTIVE" | "DISABLED" | "DELETED";
+export type CodePattern =
+  | "ALPHANUMERIC_8"
+  | "ALPHANUMERIC_16"
+  | "ALPHANUMERIC_16_HYPHEN";
+export type UsageLimitType = "USER" | "CHARACTER";
 
 export interface CouponSetting {
   id: string;
@@ -28,7 +34,7 @@ export interface CouponSetting {
   targetChannelsInverted?: boolean;
   targetWorldsInverted?: boolean;
   createdAt?: string;
-  generationStatus?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
+  generationStatus?: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
   generatedCount?: number;
   totalCount?: number;
   disabledReason?: string | null;
@@ -51,7 +57,10 @@ export interface ListSettingsResponse {
   limit: number;
 }
 
-export interface CreateCouponSettingInput extends Omit<CouponSetting, 'id' | 'status' | 'startsAt' | 'expiresAt'> {
+export interface CreateCouponSettingInput extends Omit<
+  CouponSetting,
+  "id" | "status" | "startsAt" | "expiresAt"
+> {
   startsAt: string; // ISO
   expiresAt: string; // ISO
   status?: CouponStatus;
@@ -67,7 +76,7 @@ export interface CreateCouponSettingInput extends Omit<CouponSetting, 'id' | 'st
   targetUserIdsInverted?: boolean;
 }
 
-export interface UpdateCouponSettingInput extends Partial<CreateCouponSettingInput> { }
+export interface UpdateCouponSettingInput extends Partial<CreateCouponSettingInput> {}
 
 export interface UsageRecord {
   id: string;
@@ -99,7 +108,7 @@ export interface IssuedCouponCode {
   id: string;
   settingId: string;
   code: string;
-  status: 'ISSUED' | 'USED' | 'REVOKED';
+  status: "ISSUED" | "USED" | "REVOKED";
   createdAt: string;
   usedAt: string | null;
 }
@@ -119,26 +128,33 @@ export interface IssuedCodesStats {
 
 // Generation status types
 export interface GenerationStatus {
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
   generatedCount: number;
   totalCount: number;
   progress: number;
 }
 
 export const couponService = {
-  async listSettings(params?: ListSettingsParams): Promise<ListSettingsResponse> {
-    const res = await api.get('/admin/coupon-settings', { params });
+  async listSettings(
+    params?: ListSettingsParams,
+  ): Promise<ListSettingsResponse> {
+    const res = await api.get("/admin/coupon-settings", { params });
     return res.data;
   },
   async getSetting(id: string): Promise<{ setting: any }> {
     const res = await api.get(`/admin/coupon-settings/${id}`);
     return res.data;
   },
-  async createSetting(data: CreateCouponSettingInput): Promise<MutationResult<any>> {
-    const res = await api.post('/admin/coupon-settings', data);
+  async createSetting(
+    data: CreateCouponSettingInput,
+  ): Promise<MutationResult<any>> {
+    const res = await api.post("/admin/coupon-settings", data);
     return parseChangeRequestResponse<any>(res, (r) => r?.setting);
   },
-  async updateSetting(id: string, data: UpdateCouponSettingInput): Promise<MutationResult<any>> {
+  async updateSetting(
+    id: string,
+    data: UpdateCouponSettingInput,
+  ): Promise<MutationResult<any>> {
     const res = await api.patch(`/admin/coupon-settings/${id}`, data);
     return parseChangeRequestResponse<any>(res, (r) => r?.setting);
   },
@@ -146,40 +162,100 @@ export const couponService = {
     const res = await api.delete(`/admin/coupon-settings/${id}`);
     return parseChangeRequestResponse<void>(res, () => undefined);
   },
-  async getUsage(settingId?: string, params?: { page?: number; limit?: number; search?: string; platform?: string; channel?: string; subChannel?: string; gameWorldId?: string; characterId?: string; from?: string; to?: string; }): Promise<UsageListResponse> {
-    const url = settingId ? `/admin/coupon-settings/${settingId}/usage` : '/admin/coupon-settings/usage';
+  async getUsage(
+    settingId?: string,
+    params?: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      platform?: string;
+      channel?: string;
+      subChannel?: string;
+      gameWorldId?: string;
+      characterId?: string;
+      from?: string;
+      to?: string;
+    },
+  ): Promise<UsageListResponse> {
+    const url = settingId
+      ? `/admin/coupon-settings/${settingId}/usage`
+      : "/admin/coupon-settings/usage";
     const res = await api.get(url, { params });
     return res.data;
   },
-  async getUsageForExport(params?: { offset?: number; limit?: number; settingId?: string; couponCode?: string; platform?: string; channel?: string; subChannel?: string; gameWorldId?: string; characterId?: string; }): Promise<{ records: any[]; total: number; offset: number; limit: number; hasMore: boolean }> {
-    const res = await api.get('/admin/coupon-settings/usage/export-chunked', { params });
+  async getUsageForExport(params?: {
+    offset?: number;
+    limit?: number;
+    settingId?: string;
+    couponCode?: string;
+    platform?: string;
+    channel?: string;
+    subChannel?: string;
+    gameWorldId?: string;
+    characterId?: string;
+  }): Promise<{
+    records: any[];
+    total: number;
+    offset: number;
+    limit: number;
+    hasMore: boolean;
+  }> {
+    const res = await api.get("/admin/coupon-settings/usage/export-chunked", {
+      params,
+    });
     return res.data;
   },
-  async exportUsage(params?: { settingId?: string; couponCode?: string; platform?: string; channel?: string; subChannel?: string; gameWorldId?: string; characterId?: string; timezone?: string; }): Promise<{ records: any[]; filename: string }> {
-    const res = await api.get('/admin/coupon-settings/usage/export', { params });
+  async exportUsage(params?: {
+    settingId?: string;
+    couponCode?: string;
+    platform?: string;
+    channel?: string;
+    subChannel?: string;
+    gameWorldId?: string;
+    characterId?: string;
+    timezone?: string;
+  }): Promise<{ records: any[]; filename: string }> {
+    const res = await api.get("/admin/coupon-settings/usage/export", {
+      params,
+    });
     return res.data;
   },
   async getIssuedCodesStats(settingId: string): Promise<IssuedCodesStats> {
-    const res = await api.get(`/admin/coupon-settings/${settingId}/issued-codes-stats`);
-    console.log('[couponService] getIssuedCodesStats response:', res);
+    const res = await api.get(
+      `/admin/coupon-settings/${settingId}/issued-codes-stats`,
+    );
+    console.log("[couponService] getIssuedCodesStats response:", res);
     // API service already unwraps response.data, so res = { success: true, data: { issued, used, unused } }
     return res.data;
   },
-  async getIssuedCodesForExport(settingId: string, params?: { offset?: number; limit?: number; search?: string }): Promise<IssuedCodesResponse> {
-    const res = await api.get(`/admin/coupon-settings/${settingId}/issued-codes-export`, { params });
-    console.log('[couponService] getIssuedCodesForExport response:', res);
+  async getIssuedCodesForExport(
+    settingId: string,
+    params?: { offset?: number; limit?: number; search?: string },
+  ): Promise<IssuedCodesResponse> {
+    const res = await api.get(
+      `/admin/coupon-settings/${settingId}/issued-codes-export`,
+      { params },
+    );
+    console.log("[couponService] getIssuedCodesForExport response:", res);
     // API service already unwraps response.data, so res = { success: true, data: { codes, total, offset, limit, hasMore } }
     return res.data;
   },
-  async getIssuedCodes(settingId: string, params?: { page?: number; limit?: number; search?: string }): Promise<IssuedCodesResponse> {
-    const res = await api.get(`/admin/coupon-settings/${settingId}/issued-codes`, { params });
-    console.log('[couponService] getIssuedCodes response:', res);
+  async getIssuedCodes(
+    settingId: string,
+    params?: { page?: number; limit?: number; search?: string },
+  ): Promise<IssuedCodesResponse> {
+    const res = await api.get(
+      `/admin/coupon-settings/${settingId}/issued-codes`,
+      { params },
+    );
+    console.log("[couponService] getIssuedCodes response:", res);
     // API service already unwraps response.data, so res = { success: true, data: { codes, total, page, limit } }
     return res.data;
   },
   async getGenerationStatus(settingId: string): Promise<GenerationStatus> {
-    const res = await api.get(`/admin/coupon-settings/${settingId}/generation-status`);
+    const res = await api.get(
+      `/admin/coupon-settings/${settingId}/generation-status`,
+    );
     return res.data.data;
-  }
+  },
 };
-

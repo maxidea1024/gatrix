@@ -1,6 +1,6 @@
-import mysql from 'mysql2/promise';
-import { config } from './index';
-import logger from '../utils/logger';
+import mysql from "mysql2/promise";
+import { config } from "./index";
+import logger from "../utils/logger";
 
 let pool: mysql.Pool | null = null;
 
@@ -23,13 +23,12 @@ export async function testMySQLConnection(): Promise<boolean> {
     const connection = await mysqlPool.getConnection();
     await connection.ping();
     connection.release();
-    logger.info('✅ MySQL connected successfully');
+    logger.info("✅ MySQL connected successfully");
     return true;
   } catch (error) {
-    logger.error('❌ MySQL connection failed', { error });
+    logger.error("❌ MySQL connection failed", { error });
     return false;
   }
 }
 
 export default mysqlPool;
-

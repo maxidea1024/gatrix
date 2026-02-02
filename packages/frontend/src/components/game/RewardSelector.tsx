@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Paper,
@@ -16,15 +16,15 @@ import {
   Select,
   MenuItem,
   Tooltip,
-} from '@mui/material';
-import {
-  Add as AddIcon,
-  Delete as DeleteIcon,
-} from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
-import { useSnackbar } from 'notistack';
-import RewardItemSelector, { RewardSelection } from './RewardItemSelector';
-import rewardTemplateService, { RewardTemplate, ParticipationReward } from '../../services/rewardTemplateService';
+} from "@mui/material";
+import { Add as AddIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
+import { useSnackbar } from "notistack";
+import RewardItemSelector, { RewardSelection } from "./RewardItemSelector";
+import rewardTemplateService, {
+  RewardTemplate,
+  ParticipationReward,
+} from "../../services/rewardTemplateService";
 
 interface RewardSelectorProps {
   value: ParticipationReward[];
@@ -36,7 +36,7 @@ interface RewardSelectorProps {
   initialTemplateId?: string;
 }
 
-type RewardMode = 'direct' | 'template';
+type RewardMode = "direct" | "template";
 
 const RewardSelector: React.FC<RewardSelectorProps> = ({
   value,
@@ -44,8 +44,8 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
   onModeChange,
   disabled = false,
   minQuantity = 1,
-  initialMode = 'direct',
-  initialTemplateId = '',
+  initialMode = "direct",
+  initialTemplateId = "",
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -56,7 +56,8 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
   const [loadingTemplates, setLoadingTemplates] = useState(false);
   const [showModeChangeWarning, setShowModeChangeWarning] = useState(false);
   const [pendingMode, setPendingMode] = useState<RewardMode | null>(null);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>(initialTemplateId);
+  const [selectedTemplateId, setSelectedTemplateId] =
+    useState<string>(initialTemplateId);
 
   // Load templates on mount
   useEffect(() => {
@@ -71,8 +72,13 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
 
   // Auto-load template rewards when initialTemplateId is set and templates are loaded
   useEffect(() => {
-    if (initialMode === 'template' && initialTemplateId && templates.length > 0 && value.length === 0) {
-      const template = templates.find(t => t.id === initialTemplateId);
+    if (
+      initialMode === "template" &&
+      initialTemplateId &&
+      templates.length > 0 &&
+      value.length === 0
+    ) {
+      const template = templates.find((t) => t.id === initialTemplateId);
       if (template && template.rewardItems && template.rewardItems.length > 0) {
         onChange([...template.rewardItems]);
       }
@@ -82,10 +88,14 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
   const loadTemplates = async () => {
     try {
       setLoadingTemplates(true);
-      const response = await rewardTemplateService.getRewardTemplates({ limit: 100 });
+      const response = await rewardTemplateService.getRewardTemplates({
+        limit: 100,
+      });
       setTemplates(response.templates);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('rewardTemplates.errors.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(error.message || t("rewardTemplates.errors.loadFailed"), {
+        variant: "error",
+      });
     } finally {
       setLoadingTemplates(false);
     }
@@ -97,8 +107,8 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
       setShowModeChangeWarning(true);
     } else {
       setMode(newMode);
-      setSelectedTemplateId('');
-      onModeChange?.(newMode, '');
+      setSelectedTemplateId("");
+      onModeChange?.(newMode, "");
     }
   };
 
@@ -107,16 +117,16 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
       setMode(pendingMode);
       onChange([]);
       setPendingMode(null);
-      setSelectedTemplateId('');
-      onModeChange?.(pendingMode, '');
+      setSelectedTemplateId("");
+      onModeChange?.(pendingMode, "");
     }
     setShowModeChangeWarning(false);
   };
 
   const handleAddReward = () => {
     const newReward: ParticipationReward = {
-      rewardType: '',
-      itemId: '',
+      rewardType: "",
+      itemId: "",
       quantity: minQuantity,
     };
     onChange([...value, newReward]);
@@ -138,12 +148,14 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
 
   const handleSelectTemplate = (templateId: string) => {
     setSelectedTemplateId(templateId);
-    const template = templates.find(t => t.id === templateId);
+    const template = templates.find((t) => t.id === templateId);
     if (template && template.rewardItems && template.rewardItems.length > 0) {
       onChange([...template.rewardItems]);
-      onModeChange?.('template', templateId);
+      onModeChange?.("template", templateId);
     } else if (template) {
-      enqueueSnackbar(t('rewardSelector.templateEmpty'), { variant: 'warning' });
+      enqueueSnackbar(t("rewardSelector.templateEmpty"), {
+        variant: "warning",
+      });
     }
   };
 
@@ -151,28 +163,39 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
     <Box>
       {/* Mode Selection Dropdown */}
       <FormControl fullWidth sx={{ mb: 2 }}>
-        <InputLabel>{t('rewardSelector.selectMode')}</InputLabel>
+        <InputLabel>{t("rewardSelector.selectMode")}</InputLabel>
         <Select
           value={mode}
-          label={t('rewardSelector.selectMode')}
+          label={t("rewardSelector.selectMode")}
           onChange={(e) => handleModeChange(e.target.value as RewardMode)}
           disabled={disabled}
         >
-          <MenuItem value="direct">{t('rewardSelector.directMode')}</MenuItem>
-          <MenuItem value="template">{t('rewardSelector.templateMode')}</MenuItem>
+          <MenuItem value="direct">{t("rewardSelector.directMode")}</MenuItem>
+          <MenuItem value="template">
+            {t("rewardSelector.templateMode")}
+          </MenuItem>
         </Select>
       </FormControl>
 
       {/* Direct Mode */}
-      {mode === 'direct' && (
+      {mode === "direct" && (
         <Box>
-          <Typography variant="subtitle2" sx={{ mb: 2 }}>{t('rewardSelector.rewards')}</Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-            {t('rewardSelector.directModeHelp')}
+          <Typography variant="subtitle2" sx={{ mb: 2 }}>
+            {t("rewardSelector.rewards")}
+          </Typography>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: "block", mb: 2 }}
+          >
+            {t("rewardSelector.directModeHelp")}
           </Typography>
           <Stack spacing={2}>
             {value.map((reward, index) => (
-              <Box key={index} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+              <Box
+                key={index}
+                sx={{ display: "flex", gap: 1, alignItems: "flex-start" }}
+              >
                 <Box sx={{ flex: 1 }}>
                   <RewardItemSelector
                     value={{
@@ -180,12 +203,14 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
                       itemId: reward.itemId,
                       quantity: reward.quantity,
                     }}
-                    onChange={(selection) => handleRewardChange(index, selection)}
+                    onChange={(selection) =>
+                      handleRewardChange(index, selection)
+                    }
                     disabled={disabled}
                     minQuantity={minQuantity}
                   />
                 </Box>
-                <Tooltip title={t('rewardSelector.deleteReward')}>
+                <Tooltip title={t("rewardSelector.deleteReward")}>
                   <IconButton
                     onClick={() => handleRemoveReward(index)}
                     disabled={disabled}
@@ -198,9 +223,22 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
               </Box>
             ))}
             {value.length === 0 && (
-              <Box sx={{ py: 3, px: 2, textAlign: 'center', bgcolor: 'warning.lighter', border: '2px dashed', borderColor: 'warning.main', borderRadius: 1 }}>
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'warning.dark', mb: 2 }}>
-                  ⚠️ {t('rewardSelector.noRewards')}
+              <Box
+                sx={{
+                  py: 3,
+                  px: 2,
+                  textAlign: "center",
+                  bgcolor: "warning.lighter",
+                  border: "2px dashed",
+                  borderColor: "warning.main",
+                  borderRadius: 1,
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 600, color: "warning.dark", mb: 2 }}
+                >
+                  ⚠️ {t("rewardSelector.noRewards")}
                 </Typography>
                 <Button
                   fullWidth
@@ -209,7 +247,7 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
                   onClick={handleAddReward}
                   disabled={disabled}
                 >
-                  {t('rewardSelector.addReward')}
+                  {t("rewardSelector.addReward")}
                 </Button>
               </Box>
             )}
@@ -221,7 +259,7 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
                 onClick={handleAddReward}
                 disabled={disabled}
               >
-                {t('rewardSelector.addReward')}
+                {t("rewardSelector.addReward")}
               </Button>
             )}
           </Stack>
@@ -229,40 +267,57 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
       )}
 
       {/* Template Mode */}
-      {mode === 'template' && (
+      {mode === "template" && (
         <Box>
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-            {t('rewardSelector.templateModeHelp')}
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: "block", mb: 2 }}
+          >
+            {t("rewardSelector.templateModeHelp")}
           </Typography>
 
           {loadingTemplates ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
               <CircularProgress />
             </Box>
           ) : templates.length === 0 ? (
-            <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
-              {t('rewardSelector.noTemplates')}
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ py: 2, textAlign: "center" }}
+            >
+              {t("rewardSelector.noTemplates")}
             </Typography>
           ) : (
             <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>{t('rewardSelector.selectTemplate')}</InputLabel>
+              <InputLabel>{t("rewardSelector.selectTemplate")}</InputLabel>
               <Select
                 value={selectedTemplateId}
-                label={t('rewardSelector.selectTemplate')}
+                label={t("rewardSelector.selectTemplate")}
                 onChange={(e) => handleSelectTemplate(e.target.value)}
                 disabled={disabled}
               >
                 <MenuItem value="">
-                  <em>{t('rewardSelector.selectTemplate')}</em>
+                  <em>{t("rewardSelector.selectTemplate")}</em>
                 </MenuItem>
                 {templates.map((template) => (
                   <MenuItem key={template.id} value={template.id}>
                     {template.name}
-                    {template.rewardItems && template.rewardItems.length > 0 && (
-                      <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                        ({t('rewardSelector.itemCount', { count: template.rewardItems.length })})
-                      </Typography>
-                    )}
+                    {template.rewardItems &&
+                      template.rewardItems.length > 0 && (
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ ml: 1 }}
+                        >
+                          (
+                          {t("rewardSelector.itemCount", {
+                            count: template.rewardItems.length,
+                          })}
+                          )
+                        </Typography>
+                      )}
                   </MenuItem>
                 ))}
               </Select>
@@ -272,14 +327,21 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
           {value.length > 0 && (
             <Box sx={{ mt: 2 }}>
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                {t('rewardSelector.appliedRewards')}
+                {t("rewardSelector.appliedRewards")}
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                {t('rewardSelector.templateReadOnlyHelp')}
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", mb: 1 }}
+              >
+                {t("rewardSelector.templateReadOnlyHelp")}
               </Typography>
               <Stack spacing={1}>
                 {value.map((reward, index) => (
-                  <Box key={index} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                  <Box
+                    key={index}
+                    sx={{ display: "flex", gap: 1, alignItems: "flex-start" }}
+                  >
                     <Box sx={{ flex: 1 }}>
                       <RewardItemSelector
                         value={{
@@ -301,19 +363,26 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
       )}
 
       {/* Mode Change Warning Dialog */}
-      <Dialog open={showModeChangeWarning} onClose={() => setShowModeChangeWarning(false)}>
-        <DialogTitle>{t('rewardSelector.modeChangeWarning')}</DialogTitle>
+      <Dialog
+        open={showModeChangeWarning}
+        onClose={() => setShowModeChangeWarning(false)}
+      >
+        <DialogTitle>{t("rewardSelector.modeChangeWarning")}</DialogTitle>
         <DialogContent>
           <Typography>
-            {t('rewardSelector.modeChangeWarningMessage')}
+            {t("rewardSelector.modeChangeWarningMessage")}
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowModeChangeWarning(false)}>
-            {t('common.cancel')}
+            {t("common.cancel")}
           </Button>
-          <Button onClick={handleConfirmModeChange} variant="contained" color="error">
-            {t('common.confirm')}
+          <Button
+            onClick={handleConfirmModeChange}
+            variant="contained"
+            color="error"
+          >
+            {t("common.confirm")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -322,4 +391,3 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
 };
 
 export default RewardSelector;
-

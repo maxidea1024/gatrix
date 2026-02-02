@@ -1,11 +1,11 @@
 /**
  * Frontend Logger Utility
- * 
+ *
  * 프론트엔드에서 사용할 수 있는 로깅 유틸리티
  * 개발 환경에서는 console에 출력하고, 프로덕션에서는 선택적으로 서버에 전송
  */
 
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+export type LogLevel = "debug" | "info" | "warn" | "error";
 
 interface LogEntry {
   level: LogLevel;
@@ -24,35 +24,36 @@ class Logger {
 
   constructor() {
     this.isDevelopment = import.meta.env.DEV;
-    this.enableServerLogging = import.meta.env.VITE_ENABLE_SERVER_LOGGING === 'true';
+    this.enableServerLogging =
+      import.meta.env.VITE_ENABLE_SERVER_LOGGING === "true";
   }
 
   /**
    * Debug 레벨 로그
    */
   debug(message: string, data?: any): void {
-    this.log('debug', message, data);
+    this.log("debug", message, data);
   }
 
   /**
    * Info 레벨 로그
    */
   info(message: string, data?: any): void {
-    this.log('info', message, data);
+    this.log("info", message, data);
   }
 
   /**
    * Warning 레벨 로그
    */
   warn(message: string, data?: any): void {
-    this.log('warn', message, data);
+    this.log("warn", message, data);
   }
 
   /**
    * Error 레벨 로그
    */
   error(message: string, data?: any): void {
-    this.log('error', message, data);
+    this.log("error", message, data);
   }
 
   /**
@@ -74,7 +75,7 @@ class Logger {
     }
 
     // 프로덕션에서는 error와 warn만 콘솔에 출력
-    if (!this.isDevelopment && (level === 'error' || level === 'warn')) {
+    if (!this.isDevelopment && (level === "error" || level === "warn")) {
       this.logToConsole(level, message, data);
     }
 
@@ -92,17 +93,17 @@ class Logger {
     const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
 
     switch (level) {
-      case 'debug':
-        console.debug(prefix, message, data || '');
+      case "debug":
+        console.debug(prefix, message, data || "");
         break;
-      case 'info':
-        console.info(prefix, message, data || '');
+      case "info":
+        console.info(prefix, message, data || "");
         break;
-      case 'warn':
-        console.warn(prefix, message, data || '');
+      case "warn":
+        console.warn(prefix, message, data || "");
         break;
-      case 'error':
-        console.error(prefix, message, data || '');
+      case "error":
+        console.error(prefix, message, data || "");
         break;
     }
   }
@@ -119,7 +120,7 @@ class Logger {
     }
 
     // Error 레벨은 즉시 서버에 전송
-    if (logEntry.level === 'error') {
+    if (logEntry.level === "error") {
       this.flushToServer();
     }
   }
@@ -137,16 +138,16 @@ class Logger {
       this.logBuffer = [];
 
       // 서버에 로그 전송 (실제 구현 시 API 엔드포인트 필요)
-      await fetch('/api/v1/client/logs', {
-        method: 'POST',
+      await fetch("/api/v1/client/logs", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ logs }),
       });
     } catch (error) {
       // 서버 로깅 실패 시 콘솔에만 출력
-      console.error('Failed to send logs to server:', error);
+      console.error("Failed to send logs to server:", error);
     }
   }
 
@@ -179,14 +180,17 @@ class Logger {
 const logger = new Logger();
 
 // 페이지 언로드 시 로그 플러시
-window.addEventListener('beforeunload', () => {
+window.addEventListener("beforeunload", () => {
   logger.flush();
 });
 
 // 주기적으로 로그 플러시 (5분마다)
-setInterval(() => {
-  logger.flush();
-}, 5 * 60 * 1000);
+setInterval(
+  () => {
+    logger.flush();
+  },
+  5 * 60 * 1000,
+);
 
 export default logger;
 

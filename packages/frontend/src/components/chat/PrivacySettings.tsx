@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -17,19 +17,19 @@ import {
   Divider,
   CircularProgress,
   IconButton,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Close as CloseIcon,
   Security as SecurityIcon,
   Visibility as VisibilityIcon,
   Message as MessageIcon,
-} from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
-import { useSnackbar } from 'notistack';
+} from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
+import { useSnackbar } from "notistack";
 
 interface PrivacySettingsData {
-  channelInvitePolicy: 'everyone' | 'contacts_only' | 'nobody';
-  directMessagePolicy: 'everyone' | 'contacts_only' | 'nobody';
+  channelInvitePolicy: "everyone" | "contacts_only" | "nobody";
+  directMessagePolicy: "everyone" | "contacts_only" | "nobody";
   discoverableByEmail: boolean;
   discoverableByName: boolean;
   requireFriendRequest: boolean;
@@ -42,13 +42,18 @@ interface PrivacySettingsProps {
   subtitle?: string;
 }
 
-const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title, subtitle }) => {
+const PrivacySettings: React.FC<PrivacySettingsProps> = ({
+  open,
+  onClose,
+  title,
+  subtitle,
+}) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
   const [settings, setSettings] = useState<PrivacySettingsData>({
-    channelInvitePolicy: 'everyone',
-    directMessagePolicy: 'everyone',
+    channelInvitePolicy: "everyone",
+    directMessagePolicy: "everyone",
     discoverableByEmail: true,
     discoverableByName: true,
     requireFriendRequest: false,
@@ -60,9 +65,9 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title,
   const loadSettings = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/v1/privacy/settings', {
+      const response = await fetch("/api/v1/privacy/settings", {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
@@ -73,8 +78,8 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title,
         }
       }
     } catch (error) {
-      console.error('Failed to load privacy settings:', error);
-      enqueueSnackbar(t('chat.privacyLoadFailed'), { variant: 'error' });
+      console.error("Failed to load privacy settings:", error);
+      enqueueSnackbar(t("chat.privacyLoadFailed"), { variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -84,11 +89,11 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title,
   const saveSettings = async () => {
     setSaving(true);
     try {
-      const response = await fetch('/api/v1/privacy/settings', {
-        method: 'PUT',
+      const response = await fetch("/api/v1/privacy/settings", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(settings),
       });
@@ -96,17 +101,19 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title,
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          enqueueSnackbar(t('chat.privacySaveSuccess'), { variant: 'success' });
+          enqueueSnackbar(t("chat.privacySaveSuccess"), { variant: "success" });
           onClose();
         } else {
-          enqueueSnackbar(data.error || t('chat.privacySaveFailed'), { variant: 'error' });
+          enqueueSnackbar(data.error || t("chat.privacySaveFailed"), {
+            variant: "error",
+          });
         }
       } else {
-        enqueueSnackbar(t('chat.privacySaveFailed'), { variant: 'error' });
+        enqueueSnackbar(t("chat.privacySaveFailed"), { variant: "error" });
       }
     } catch (error) {
-      console.error('Failed to save privacy settings:', error);
-      enqueueSnackbar(t('chat.privacySaveFailed'), { variant: 'error' });
+      console.error("Failed to save privacy settings:", error);
+      enqueueSnackbar(t("chat.privacySaveFailed"), { variant: "error" });
     } finally {
       setSaving(false);
     }
@@ -119,15 +126,21 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title,
     }
   }, [open]);
 
-  const handlePolicyChange = (field: keyof PrivacySettingsData, value: string) => {
-    setSettings(prev => ({
+  const handlePolicyChange = (
+    field: keyof PrivacySettingsData,
+    value: string,
+  ) => {
+    setSettings((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const handleSwitchChange = (field: keyof PrivacySettingsData, checked: boolean) => {
-    setSettings(prev => ({
+  const handleSwitchChange = (
+    field: keyof PrivacySettingsData,
+    checked: boolean,
+  ) => {
+    setSettings((prev) => ({
       ...prev,
       [field]: checked,
     }));
@@ -135,14 +148,14 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title,
 
   const getPolicyDescription = (policy: string) => {
     switch (policy) {
-      case 'everyone':
-        return t('chat.privacyPolicyEveryoneDesc');
-      case 'contacts_only':
-        return t('chat.privacyPolicyContactsDesc');
-      case 'nobody':
-        return t('chat.privacyPolicyNobodyDesc');
+      case "everyone":
+        return t("chat.privacyPolicyEveryoneDesc");
+      case "contacts_only":
+        return t("chat.privacyPolicyContactsDesc");
+      case "nobody":
+        return t("chat.privacyPolicyNobodyDesc");
       default:
-        return '';
+        return "";
     }
   };
 
@@ -153,10 +166,16 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title,
           <Box>
             <Box display="flex" alignItems="center" gap={1}>
               <SecurityIcon />
-              <Typography variant="h6">{title || t('chat.privacySettings')}</Typography>
+              <Typography variant="h6">
+                {title || t("chat.privacySettings")}
+              </Typography>
             </Box>
             {subtitle && (
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 0.5 }}
+              >
                 {subtitle}
               </Typography>
             )}
@@ -178,32 +197,42 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title,
             <Box mb={3}>
               <Box display="flex" alignItems="center" gap={1} mb={2}>
                 <MessageIcon color="primary" />
-                <Typography variant="h6">{t('chat.channelInvitations')}</Typography>
+                <Typography variant="h6">
+                  {t("chat.channelInvitations")}
+                </Typography>
               </Box>
               <FormControl component="fieldset">
-                <FormLabel component="legend">{t('chat.whoCanInviteChannels')}</FormLabel>
+                <FormLabel component="legend">
+                  {t("chat.whoCanInviteChannels")}
+                </FormLabel>
                 <RadioGroup
                   value={settings.channelInvitePolicy}
-                  onChange={(e) => handlePolicyChange('channelInvitePolicy', e.target.value)}
+                  onChange={(e) =>
+                    handlePolicyChange("channelInvitePolicy", e.target.value)
+                  }
                 >
                   <FormControlLabel
                     value="everyone"
                     control={<Radio />}
-                    label={t('chat.privacyPolicyEveryone')}
+                    label={t("chat.privacyPolicyEveryone")}
                   />
                   <FormControlLabel
                     value="contacts_only"
                     control={<Radio />}
-                    label={t('chat.privacyPolicyContacts')}
+                    label={t("chat.privacyPolicyContacts")}
                     disabled // TODO: Enable when contact system is implemented
                   />
                   <FormControlLabel
                     value="nobody"
                     control={<Radio />}
-                    label={t('chat.privacyPolicyNobody')}
+                    label={t("chat.privacyPolicyNobody")}
                   />
                 </RadioGroup>
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mt: 1 }}
+                >
                   {getPolicyDescription(settings.channelInvitePolicy)}
                 </Typography>
               </FormControl>
@@ -215,32 +244,40 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title,
             <Box my={3}>
               <Box display="flex" alignItems="center" gap={1} mb={2}>
                 <MessageIcon color="primary" />
-                <Typography variant="h6">{t('chat.directMessages')}</Typography>
+                <Typography variant="h6">{t("chat.directMessages")}</Typography>
               </Box>
               <FormControl component="fieldset">
-                <FormLabel component="legend">{t('chat.whoCanStartDirectMessages')}</FormLabel>
+                <FormLabel component="legend">
+                  {t("chat.whoCanStartDirectMessages")}
+                </FormLabel>
                 <RadioGroup
                   value={settings.directMessagePolicy}
-                  onChange={(e) => handlePolicyChange('directMessagePolicy', e.target.value)}
+                  onChange={(e) =>
+                    handlePolicyChange("directMessagePolicy", e.target.value)
+                  }
                 >
                   <FormControlLabel
                     value="everyone"
                     control={<Radio />}
-                    label={t('chat.privacyPolicyEveryone')}
+                    label={t("chat.privacyPolicyEveryone")}
                   />
                   <FormControlLabel
                     value="contacts_only"
                     control={<Radio />}
-                    label={t('chat.privacyPolicyContacts')}
+                    label={t("chat.privacyPolicyContacts")}
                     disabled // TODO: Enable when contact system is implemented
                   />
                   <FormControlLabel
                     value="nobody"
                     control={<Radio />}
-                    label={t('chat.privacyPolicyNobody')}
+                    label={t("chat.privacyPolicyNobody")}
                   />
                 </RadioGroup>
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mt: 1 }}
+                >
                   {getPolicyDescription(settings.directMessagePolicy)}
                 </Typography>
               </FormControl>
@@ -252,33 +289,53 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title,
             <Box mt={3}>
               <Box display="flex" alignItems="center" gap={1} mb={2}>
                 <VisibilityIcon color="primary" />
-                <Typography variant="h6">{t('chat.discoverySettings')}</Typography>
+                <Typography variant="h6">
+                  {t("chat.discoverySettings")}
+                </Typography>
               </Box>
               <FormGroup>
                 <FormControlLabel
                   control={
                     <Switch
                       checked={settings.discoverableByEmail}
-                      onChange={(e) => handleSwitchChange('discoverableByEmail', e.target.checked)}
+                      onChange={(e) =>
+                        handleSwitchChange(
+                          "discoverableByEmail",
+                          e.target.checked,
+                        )
+                      }
                     />
                   }
-                  label={t('chat.allowFindByEmail')}
+                  label={t("chat.allowFindByEmail")}
                 />
-                <Typography variant="caption" color="text.secondary" sx={{ ml: 4, mb: 2 }}>
-                  {t('chat.allowFindByEmailDesc')}
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ ml: 4, mb: 2 }}
+                >
+                  {t("chat.allowFindByEmailDesc")}
                 </Typography>
 
                 <FormControlLabel
                   control={
                     <Switch
                       checked={settings.discoverableByName}
-                      onChange={(e) => handleSwitchChange('discoverableByName', e.target.checked)}
+                      onChange={(e) =>
+                        handleSwitchChange(
+                          "discoverableByName",
+                          e.target.checked,
+                        )
+                      }
                     />
                   }
-                  label={t('chat.allowFindByName')}
+                  label={t("chat.allowFindByName")}
                 />
-                <Typography variant="caption" color="text.secondary" sx={{ ml: 4 }}>
-                  {t('chat.allowFindByNameDesc')}
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ ml: 4 }}
+                >
+                  {t("chat.allowFindByNameDesc")}
                 </Typography>
               </FormGroup>
             </Box>
@@ -288,7 +345,7 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title,
 
       <DialogActions>
         <Button onClick={onClose} disabled={saving}>
-          {t('common.cancel')}
+          {t("common.cancel")}
         </Button>
         <Button
           variant="contained"
@@ -296,7 +353,7 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title,
           disabled={loading || saving}
           startIcon={saving ? <CircularProgress size={16} /> : null}
         >
-          {saving ? t('chat.privacySaving') : t('chat.privacySaveSettings')}
+          {saving ? t("chat.privacySaving") : t("chat.privacySaveSettings")}
         </Button>
       </DialogActions>
     </Dialog>

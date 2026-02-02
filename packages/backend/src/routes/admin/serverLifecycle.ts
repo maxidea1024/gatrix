@@ -1,7 +1,7 @@
-import { Router } from 'express';
-import serverLifecycleController from '../../controllers/ServerLifecycleController';
-import { authenticate, requirePermission } from '../../middleware/auth';
-import { PERMISSIONS } from '../../types/permissions';
+import { Router } from "express";
+import serverLifecycleController from "../../controllers/ServerLifecycleController";
+import { authenticate, requirePermission } from "../../middleware/auth";
+import { PERMISSIONS } from "../../types/permissions";
 
 const router = Router();
 
@@ -18,9 +18,9 @@ router.use(authenticate as any);
  *       - bearerAuth: []
  */
 router.get(
-    '/events',
-    requirePermission(PERMISSIONS.SERVERS_VIEW) as any,
-    serverLifecycleController.getEvents
+  "/events",
+  requirePermission(PERMISSIONS.SERVERS_VIEW) as any,
+  serverLifecycleController.getEvents,
 );
 
 /**
@@ -33,9 +33,9 @@ router.get(
  *       - bearerAuth: []
  */
 router.get(
-    '/summary',
-    requirePermission(PERMISSIONS.SERVERS_VIEW) as any,
-    serverLifecycleController.getRecentSummary
+  "/summary",
+  requirePermission(PERMISSIONS.SERVERS_VIEW) as any,
+  serverLifecycleController.getRecentSummary,
 );
 
 export default router;

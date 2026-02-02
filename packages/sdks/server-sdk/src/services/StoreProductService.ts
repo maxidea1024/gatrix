@@ -5,14 +5,22 @@
  * Extends BaseEnvironmentService for common fetch/caching logic
  */
 
-import { ApiClient } from '../client/ApiClient';
-import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/EnvironmentResolver';
-import { StoreProduct, StoreProductListResponse } from '../types/api';
-import { BaseEnvironmentService } from './BaseEnvironmentService';
+import { ApiClient } from "../client/ApiClient";
+import { Logger } from "../utils/logger";
+import { EnvironmentResolver } from "../utils/EnvironmentResolver";
+import { StoreProduct, StoreProductListResponse } from "../types/api";
+import { BaseEnvironmentService } from "./BaseEnvironmentService";
 
-export class StoreProductService extends BaseEnvironmentService<StoreProduct, StoreProductListResponse, string> {
-  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
+export class StoreProductService extends BaseEnvironmentService<
+  StoreProduct,
+  StoreProductListResponse,
+  string
+> {
+  constructor(
+    apiClient: ApiClient,
+    logger: Logger,
+    envResolver: EnvironmentResolver,
+  ) {
     super(apiClient, logger, envResolver);
   }
 
@@ -27,7 +35,7 @@ export class StoreProductService extends BaseEnvironmentService<StoreProduct, St
   }
 
   protected getServiceName(): string {
-    return 'store products';
+    return "store products";
   }
 
   protected getItemId(item: StoreProduct): string {
@@ -39,11 +47,17 @@ export class StoreProductService extends BaseEnvironmentService<StoreProduct, St
   /**
    * Refresh cached store products for a specific environment
    */
-  async refreshByEnvironment(environment: string, suppressWarnings?: boolean): Promise<StoreProduct[]> {
+  async refreshByEnvironment(
+    environment: string,
+    suppressWarnings?: boolean,
+  ): Promise<StoreProduct[]> {
     if (!this.featureEnabled && !suppressWarnings) {
-      this.logger.warn('StoreProductService.refreshByEnvironment() called but feature is disabled', { environment });
+      this.logger.warn(
+        "StoreProductService.refreshByEnvironment() called but feature is disabled",
+        { environment },
+      );
     }
-    this.logger.info('Refreshing store products cache', { environment });
+    this.logger.info("Refreshing store products cache", { environment });
     // Invalidate ETag cache to force fresh data fetch
     this.apiClient.invalidateEtagCache(this.getEndpoint(environment));
     return await this.listByEnvironment(environment);
@@ -58,9 +72,13 @@ export class StoreProductService extends BaseEnvironmentService<StoreProduct, St
    * @param environment Environment name (required)
    */
   async getById(id: string, environment: string): Promise<StoreProduct> {
-    const response = await this.apiClient.get<{ product: StoreProduct }>(`/api/v1/server/${encodeURIComponent(environment)}/store-products/${id}`);
+    const response = await this.apiClient.get<{ product: StoreProduct }>(
+      `/api/v1/server/${encodeURIComponent(environment)}/store-products/${id}`,
+    );
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch store product');
+      throw new Error(
+        response.error?.message || "Failed to fetch store product",
+      );
     }
     return response.data.product;
   }
@@ -83,20 +101,31 @@ export class StoreProductService extends BaseEnvironmentService<StoreProduct, St
    * @param environment Environment name (required)
    * @param isActive Optional active status
    */
-  async updateSingleProduct(id: string, environment: string, isActive?: boolean | number): Promise<void> {
+  async updateSingleProduct(
+    id: string,
+    environment: string,
+    isActive?: boolean | number,
+  ): Promise<void> {
     try {
-      this.logger.debug('Updating single store product in cache', { id, environment, isActive });
+      this.logger.debug("Updating single store product in cache", {
+        id,
+        environment,
+        isActive,
+      });
 
       // If isActive is explicitly false (0 or false), just remove from cache by ULID
       if (isActive === false || isActive === 0) {
-        this.logger.info('Store product isActive=false, removing from cache', { id, environment });
+        this.logger.info("Store product isActive=false, removing from cache", {
+          id,
+          environment,
+        });
         this.removeByUlidFromCache(id, environment);
         return;
       }
 
       // Otherwise, fetch from API and add/update
       // Add small delay to ensure backend transaction is committed
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Invalidate ETag cache before fetching to ensure fresh data
       this.apiClient.invalidateEtagCache(`/store-products/${id}`);
@@ -105,7 +134,7 @@ export class StoreProductService extends BaseEnvironmentService<StoreProduct, St
       const updatedProduct = await this.getById(id, environment);
       this.updateItemByUlidInCache(updatedProduct, environment);
     } catch (error: any) {
-      this.logger.error('Failed to update single store product in cache', {
+      this.logger.error("Failed to update single store product in cache", {
         id,
         environment,
         error: error.message,
@@ -120,26 +149,38 @@ export class StoreProductService extends BaseEnvironmentService<StoreProduct, St
    */
   private removeByUlidFromCache(ulid: string, environment: string): void {
     const currentItems = this.cachedByEnv.get(environment) || [];
-    const newItems = currentItems.filter(item => item.id !== ulid);
+    const newItems = currentItems.filter((item) => item.id !== ulid);
     this.cachedByEnv.set(environment, newItems);
-    this.logger.debug('Store product removed from cache by ULID', { ulid, environment });
+    this.logger.debug("Store product removed from cache by ULID", {
+      ulid,
+      environment,
+    });
   }
 
   /**
    * Update or add an item in cache by ULID (event uses ULID, not cmsProductId)
    */
-  private updateItemByUlidInCache(item: StoreProduct, environment: string): void {
+  private updateItemByUlidInCache(
+    item: StoreProduct,
+    environment: string,
+  ): void {
     const currentItems = this.cachedByEnv.get(environment) || [];
-    const existsInCache = currentItems.some(i => i.id === item.id);
+    const existsInCache = currentItems.some((i) => i.id === item.id);
 
     if (existsInCache) {
-      const newItems = currentItems.map(i => i.id === item.id ? item : i);
+      const newItems = currentItems.map((i) => (i.id === item.id ? item : i));
       this.cachedByEnv.set(environment, newItems);
-      this.logger.debug('Store product updated in cache by ULID', { id: item.id, environment });
+      this.logger.debug("Store product updated in cache by ULID", {
+        id: item.id,
+        environment,
+      });
     } else {
       const newItems = [...currentItems, item];
       this.cachedByEnv.set(environment, newItems);
-      this.logger.debug('Store product added to cache by ULID', { id: item.id, environment });
+      this.logger.debug("Store product added to cache by ULID", {
+        id: item.id,
+        environment,
+      });
     }
   }
 

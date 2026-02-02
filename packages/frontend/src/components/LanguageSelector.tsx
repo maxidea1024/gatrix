@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   IconButton,
   Menu,
@@ -8,29 +8,26 @@ import {
   Tooltip,
   Box,
   Typography,
-} from '@mui/material';
-import {
-  Language as LanguageIcon,
-  Check,
-} from '@mui/icons-material';
-import { useI18n, getLanguageDisplayName } from '@/contexts/I18nContext';
-import { Language } from '@/types';
+} from "@mui/material";
+import { Language as LanguageIcon, Check } from "@mui/icons-material";
+import { useI18n, getLanguageDisplayName } from "@/contexts/I18nContext";
+import { Language } from "@/types";
 
 interface LanguageSelectorProps {
-  variant?: 'icon' | 'text' | 'full';
-  size?: 'small' | 'medium' | 'large';
+  variant?: "icon" | "text" | "full";
+  size?: "small" | "medium" | "large";
 }
 
 // Language flag emojis
 const languageFlags: Record<Language, string> = {
-  en: '🇺🇸',
-  ko: '🇰🇷',
-  zh: '🇨🇳',
+  en: "🇺🇸",
+  ko: "🇰🇷",
+  zh: "🇨🇳",
 };
 
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
-  variant = 'icon',
-  size = 'medium',
+  variant = "icon",
+  size = "medium",
 }) => {
   const { language, changeLanguage, supportedLanguages, t } = useI18n();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -50,20 +47,20 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 
   const renderTrigger = () => {
     switch (variant) {
-      case 'text':
+      case "text":
         return (
           <Box
             onClick={handleClick}
             sx={{
-              display: 'flex',
-              alignItems: 'center',
+              display: "flex",
+              alignItems: "center",
               gap: 1,
-              cursor: 'pointer',
+              cursor: "pointer",
               px: 1,
               py: 0.5,
               borderRadius: 1,
-              '&:hover': {
-                backgroundColor: 'action.hover',
+              "&:hover": {
+                backgroundColor: "action.hover",
               },
             }}
           >
@@ -72,22 +69,22 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
             </Typography>
           </Box>
         );
-      case 'full':
+      case "full":
         return (
           <Box
             onClick={handleClick}
             sx={{
-              display: 'flex',
-              alignItems: 'center',
+              display: "flex",
+              alignItems: "center",
               gap: 1,
-              cursor: 'pointer',
+              cursor: "pointer",
               px: 2,
               py: 1,
               borderRadius: 1,
               border: 1,
-              borderColor: 'divider',
-              '&:hover': {
-                backgroundColor: 'action.hover',
+              borderColor: "divider",
+              "&:hover": {
+                backgroundColor: "action.hover",
               },
             }}
           >
@@ -99,17 +96,17 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         );
       default:
         return (
-          <Tooltip title={t('language.changeLanguage')}>
+          <Tooltip title={t("language.changeLanguage")}>
             <IconButton
               onClick={handleClick}
               size={size}
               aria-label="change language"
               sx={{
-                color: 'rgba(255, 255, 255, 0.9)',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                  color: 'white',
+                color: "rgba(255, 255, 255, 0.9)",
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
+                  color: "white",
                 },
               }}
             >
@@ -123,13 +120,13 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   return (
     <>
       {renderTrigger()}
-      
+
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleClose}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         PaperProps={{
           sx: { minWidth: 180 },
         }}
@@ -141,14 +138,12 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
             selected={language === lang}
           >
             <ListItemIcon>
-              <Box sx={{ fontSize: '1.2rem', minWidth: 'auto', mr: 1 }}>
+              <Box sx={{ fontSize: "1.2rem", minWidth: "auto", mr: 1 }}>
                 {languageFlags[lang]}
               </Box>
               {language === lang && <Check fontSize="small" />}
             </ListItemIcon>
-            <ListItemText>
-              {getLanguageDisplayName(lang)}
-            </ListItemText>
+            <ListItemText>{getLanguageDisplayName(lang)}</ListItemText>
           </MenuItem>
         ))}
       </Menu>
@@ -180,37 +175,33 @@ export const CompactLanguageSelector: React.FC = () => {
         onClick={handleClick}
         size="small"
         sx={{
-          fontSize: '1.2rem',
-          minWidth: 'auto',
+          fontSize: "1.2rem",
+          minWidth: "auto",
         }}
       >
         {languageFlags[language]}
       </IconButton>
-      
+
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleClose}
-        transformOrigin={{ horizontal: 'center', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
+        transformOrigin={{ horizontal: "center", vertical: "top" }}
+        anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
       >
         {supportedLanguages.map((lang) => (
           <MenuItem
             key={lang}
             onClick={() => handleLanguageChange(lang)}
             selected={language === lang}
-            sx={{ minHeight: 'auto', py: 1 }}
+            sx={{ minHeight: "auto", py: 1 }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box sx={{ fontSize: '1.2rem' }}>
-                {languageFlags[lang]}
-              </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box sx={{ fontSize: "1.2rem" }}>{languageFlags[lang]}</Box>
               <Typography variant="body2">
                 {getLanguageDisplayName(lang)}
               </Typography>
-              {language === lang && (
-                <Check fontSize="small" color="primary" />
-              )}
+              {language === lang && <Check fontSize="small" color="primary" />}
             </Box>
           </MenuItem>
         ))}

@@ -9,10 +9,10 @@
  * - In multi-environment mode (edge), environment MUST always be provided
  */
 
-import { ApiClient } from '../client/ApiClient';
-import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/EnvironmentResolver';
-import { MaintenanceStatus } from '../types/api';
+import { ApiClient } from "../client/ApiClient";
+import { Logger } from "../utils/logger";
+import { EnvironmentResolver } from "../utils/EnvironmentResolver";
+import { MaintenanceStatus } from "../types/api";
 
 export class ServiceMaintenanceService {
   private apiClient: ApiClient;
@@ -23,7 +23,11 @@ export class ServiceMaintenanceService {
   // Whether this feature is enabled
   private featureEnabled: boolean = true;
 
-  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
+  constructor(
+    apiClient: ApiClient,
+    logger: Logger,
+    envResolver: EnvironmentResolver,
+  ) {
     this.apiClient = apiClient;
     this.logger = logger;
     this.envResolver = envResolver;
@@ -48,15 +52,19 @@ export class ServiceMaintenanceService {
    * Fetch service maintenance status for a specific environment
    * GET /api/v1/server/:env/maintenance
    */
-  async getStatusByEnvironment(environment: string): Promise<MaintenanceStatus> {
+  async getStatusByEnvironment(
+    environment: string,
+  ): Promise<MaintenanceStatus> {
     const endpoint = `/api/v1/server/${encodeURIComponent(environment)}/maintenance`;
 
-    this.logger.debug('Fetching service maintenance status', { environment });
+    this.logger.debug("Fetching service maintenance status", { environment });
 
     const response = await this.apiClient.get<MaintenanceStatus>(endpoint);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch service maintenance status');
+      throw new Error(
+        response.error?.message || "Failed to fetch service maintenance status",
+      );
     }
 
     // Ensure isMaintenanceActive has a boolean value (for backward compatibility with older backend)
@@ -67,7 +75,7 @@ export class ServiceMaintenanceService {
 
     this.cachedStatusByEnv.set(environment, status);
 
-    this.logger.info('Service maintenance status fetched', {
+    this.logger.info("Service maintenance status fetched", {
       environment,
       hasMaintenanceScheduled: status.hasMaintenanceScheduled,
       isMaintenanceActive: status.isMaintenanceActive,
@@ -79,8 +87,13 @@ export class ServiceMaintenanceService {
   /**
    * Fetch service maintenance status for multiple environments
    */
-  async getStatusByEnvironments(environments: string[]): Promise<MaintenanceStatus[]> {
-    this.logger.debug('Fetching service maintenance status for multiple environments', { environments });
+  async getStatusByEnvironments(
+    environments: string[],
+  ): Promise<MaintenanceStatus[]> {
+    this.logger.debug(
+      "Fetching service maintenance status for multiple environments",
+      { environments },
+    );
 
     const results: MaintenanceStatus[] = [];
 
@@ -89,7 +102,10 @@ export class ServiceMaintenanceService {
         const status = await this.getStatusByEnvironment(env);
         results.push(status);
       } catch (error) {
-        this.logger.error(`Failed to fetch maintenance status for environment ${env}`, { error });
+        this.logger.error(
+          `Failed to fetch maintenance status for environment ${env}`,
+          { error },
+        );
       }
     }
 
@@ -101,13 +117,18 @@ export class ServiceMaintenanceService {
    * @param environment Environment name
    * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
-  async refreshByEnvironment(environment: string, suppressWarnings?: boolean): Promise<MaintenanceStatus> {
+  async refreshByEnvironment(
+    environment: string,
+    suppressWarnings?: boolean,
+  ): Promise<MaintenanceStatus> {
     if (!this.featureEnabled && !suppressWarnings) {
-      this.logger.warn('ServiceMaintenanceService.refreshByEnvironment() called but feature is disabled', { environment });
+      this.logger.warn(
+        "ServiceMaintenanceService.refreshByEnvironment() called but feature is disabled",
+        { environment },
+      );
     }
     return await this.getStatusByEnvironment(environment);
   }
-
 
   /**
    * Get cached service maintenance status
@@ -129,7 +150,7 @@ export class ServiceMaintenanceService {
    */
   clearCache(): void {
     this.cachedStatusByEnv.clear();
-    this.logger.debug('Service maintenance cache cleared');
+    this.logger.debug("Service maintenance cache cleared");
   }
 
   /**
@@ -137,7 +158,9 @@ export class ServiceMaintenanceService {
    */
   clearCacheForEnvironment(environment: string): void {
     this.cachedStatusByEnv.delete(environment);
-    this.logger.debug('Service maintenance cache cleared for environment', { environment });
+    this.logger.debug("Service maintenance cache cleared for environment", {
+      environment,
+    });
   }
 
   /**
@@ -197,7 +220,10 @@ export class ServiceMaintenanceService {
    * @param lang Language code
    * @param environment Environment name (required)
    */
-  getMessage(lang: 'ko' | 'en' | 'zh' = 'en', environment: string): string | null {
+  getMessage(
+    lang: "ko" | "en" | "zh" = "en",
+    environment: string,
+  ): string | null {
     const cachedStatus = this.cachedStatusByEnv.get(environment);
     if (!this.isMaintenanceActive(environment) || !cachedStatus?.detail) {
       return null;
@@ -219,8 +245,9 @@ export class ServiceMaintenanceService {
    * Fetch service maintenance status for multiple environments
    * (Alias for getStatusByEnvironments for consistency with BaseEnvironmentService)
    */
-  async listByEnvironments(environments: string[]): Promise<MaintenanceStatus[]> {
+  async listByEnvironments(
+    environments: string[],
+  ): Promise<MaintenanceStatus[]> {
     return this.getStatusByEnvironments(environments);
   }
 }
-

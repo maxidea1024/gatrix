@@ -1,6 +1,9 @@
-import api from './api';
-import { Tag } from './tagService';
-import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
+import api from "./api";
+import { Tag } from "./tagService";
+import {
+  MutationResult,
+  parseChangeRequestResponse,
+} from "./changeRequestUtils";
 
 export interface ParticipationReward {
   rewardType: string;
@@ -39,7 +42,7 @@ export interface GetRewardTemplatesParams {
   limit?: number;
   search?: string;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface GetRewardTemplatesResponse {
@@ -53,8 +56,10 @@ class RewardTemplateService {
   /**
    * Get all reward templates with pagination
    */
-  async getRewardTemplates(params?: GetRewardTemplatesParams): Promise<GetRewardTemplatesResponse> {
-    const response = await api.get('/admin/reward-templates', { params });
+  async getRewardTemplates(
+    params?: GetRewardTemplatesParams,
+  ): Promise<GetRewardTemplatesResponse> {
+    const response = await api.get("/admin/reward-templates", { params });
     // API service already unwraps response.data, so response = { success: true, data: { templates, total, page, limit }, message: "..." }
     return response.data;
   }
@@ -71,17 +76,28 @@ class RewardTemplateService {
   /**
    * Create a new reward template
    */
-  async createRewardTemplate(input: CreateRewardTemplateInput): Promise<MutationResult<RewardTemplate>> {
-    const response = await api.post('/admin/reward-templates', input);
-    return parseChangeRequestResponse<RewardTemplate>(response, (r) => r?.template);
+  async createRewardTemplate(
+    input: CreateRewardTemplateInput,
+  ): Promise<MutationResult<RewardTemplate>> {
+    const response = await api.post("/admin/reward-templates", input);
+    return parseChangeRequestResponse<RewardTemplate>(
+      response,
+      (r) => r?.template,
+    );
   }
 
   /**
    * Update a reward template
    */
-  async updateRewardTemplate(id: string, input: UpdateRewardTemplateInput): Promise<MutationResult<RewardTemplate>> {
+  async updateRewardTemplate(
+    id: string,
+    input: UpdateRewardTemplateInput,
+  ): Promise<MutationResult<RewardTemplate>> {
     const response = await api.put(`/admin/reward-templates/${id}`, input);
-    return parseChangeRequestResponse<RewardTemplate>(response, (r) => r?.template);
+    return parseChangeRequestResponse<RewardTemplate>(
+      response,
+      (r) => r?.template,
+    );
   }
 
   /**
@@ -95,11 +111,12 @@ class RewardTemplateService {
   /**
    * Check references for a reward template
    */
-  async checkReferences(id: string): Promise<{ surveys: any[], coupons: any[] }> {
+  async checkReferences(
+    id: string,
+  ): Promise<{ surveys: any[]; coupons: any[] }> {
     const response = await api.get(`/admin/reward-templates/${id}/references`);
     return response.data.data;
   }
 }
 
 export default new RewardTemplateService();
-

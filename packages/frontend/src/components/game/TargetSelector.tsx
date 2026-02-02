@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef } from "react";
 import {
   Box,
   Typography,
@@ -12,7 +12,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
-} from '@mui/material';
+} from "@mui/material";
 
 export interface TargetSelectorOption {
   label: string;
@@ -48,7 +48,7 @@ export interface TargetSelectorConfig {
   userIdsInverted?: boolean;
 
   // Type
-  type?: 'simple' | 'channel' | 'userIds';
+  type?: "simple" | "channel" | "userIds";
 }
 
 interface ChannelSubchannelData {
@@ -70,7 +70,7 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
   onUserIdsChange,
   onUserIdsInvertedChange,
   userIdsInverted = false,
-  type = 'simple',
+  type = "simple",
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showDropdown, setShowDropdown] = React.useState(false);
@@ -98,10 +98,12 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
 
   const renderSelectedChips = () => {
     if (selectedValues.length === 0) {
-      return !isInverted && (
-        <Typography variant="body2" color="text.secondary">
-          선택된 항목이 없습니다.
-        </Typography>
+      return (
+        !isInverted && (
+          <Typography variant="body2" color="text.secondary">
+            선택된 항목이 없습니다.
+          </Typography>
+        )
       );
     }
 
@@ -134,12 +136,14 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
               control={
                 <Checkbox
                   checked={isSelected}
-                  onChange={(e) => handleOptionChange(option.value, e.target.checked)}
+                  onChange={(e) =>
+                    handleOptionChange(option.value, e.target.checked)
+                  }
                   size="small"
                 />
               }
               label={option.label}
-              sx={{ display: 'block', mb: 1 }}
+              sx={{ display: "block", mb: 1 }}
             />
           );
         })}
@@ -150,7 +154,12 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
   const renderUserIdInput = () => {
     if (!enableUserIdInput || userIds === undefined) return null;
 
-    const userIdList = userIds ? userIds.split(',').map((id) => id.trim()).filter((id) => id) : [];
+    const userIdList = userIds
+      ? userIds
+          .split(",")
+          .map((id) => id.trim())
+          .filter((id) => id)
+      : [];
 
     return (
       <Box>
@@ -160,25 +169,25 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
 
         <Box
           sx={{
-            border: '1px solid',
-            borderColor: 'action.disabled',
+            border: "1px solid",
+            borderColor: "action.disabled",
             borderRadius: 1,
             p: 1.5,
             minHeight: 56,
-            display: 'flex',
-            alignItems: 'flex-start',
-            flexWrap: 'wrap',
+            display: "flex",
+            alignItems: "flex-start",
+            flexWrap: "wrap",
             gap: 1,
-            bgcolor: 'background.paper',
-            transition: 'all 0.2s',
-            '&:hover': {
-              borderColor: 'action.active',
-              bgcolor: 'action.hover',
+            bgcolor: "background.paper",
+            transition: "all 0.2s",
+            "&:hover": {
+              borderColor: "action.active",
+              bgcolor: "action.hover",
             },
-            '&:focus-within': {
-              borderColor: 'primary.main',
-              boxShadow: '0 0 0 2px rgba(25, 103, 210, 0.1)',
-            }
+            "&:focus-within": {
+              borderColor: "primary.main",
+              boxShadow: "0 0 0 2px rgba(25, 103, 210, 0.1)",
+            },
           }}
         >
           {userIds && userIds.trim() && (
@@ -190,26 +199,28 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
                 onUserIdsInvertedChange?.(!userIdsInverted);
               }}
               sx={{
-                minWidth: 'auto',
+                minWidth: "auto",
                 px: 1,
                 py: 0.5,
                 fontWeight: 600,
-                textTransform: 'none',
-                fontSize: '0.85rem',
-                ...(userIdsInverted ? {
-                  bgcolor: 'error.main',
-                  color: 'white',
-                  '&:hover': {
-                    bgcolor: 'error.dark',
-                  }
-                } : {
-                  bgcolor: 'action.disabled',
-                  color: 'text.secondary',
-                  '&:hover': {
-                    bgcolor: 'action.disabled',
-                    opacity: 0.8,
-                  }
-                })
+                textTransform: "none",
+                fontSize: "0.85rem",
+                ...(userIdsInverted
+                  ? {
+                      bgcolor: "error.main",
+                      color: "white",
+                      "&:hover": {
+                        bgcolor: "error.dark",
+                      },
+                    }
+                  : {
+                      bgcolor: "action.disabled",
+                      color: "text.secondary",
+                      "&:hover": {
+                        bgcolor: "action.disabled",
+                        opacity: 0.8,
+                      },
+                    }),
               }}
             >
               NOT
@@ -222,7 +233,9 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
               label={id}
               onDelete={() => {
                 const filtered = userIdList.filter((_, i) => i !== index);
-                onUserIdsChange?.(filtered.length > 0 ? filtered.join(', ') : '');
+                onUserIdsChange?.(
+                  filtered.length > 0 ? filtered.join(", ") : "",
+                );
               }}
               size="small"
             />
@@ -230,27 +243,34 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
 
           <input
             type="text"
-            placeholder={userIds && userIds.trim() ? '' : 'user1, user2, user3...'}
+            placeholder={
+              userIds && userIds.trim() ? "" : "user1, user2, user3..."
+            }
             onKeyDown={(e) => {
               const input = (e.currentTarget as HTMLInputElement).value.trim();
-              if ((e.key === 'Enter' || e.key === ',') && input) {
+              if ((e.key === "Enter" || e.key === ",") && input) {
                 e.preventDefault();
-                const newIds = input.split(',').map((id) => id.trim()).filter((id) => id);
-                const uniqueIds = Array.from(new Set([...userIdList, ...newIds]));
-                onUserIdsChange?.(uniqueIds.join(', '));
-                (e.currentTarget as HTMLInputElement).value = '';
+                const newIds = input
+                  .split(",")
+                  .map((id) => id.trim())
+                  .filter((id) => id);
+                const uniqueIds = Array.from(
+                  new Set([...userIdList, ...newIds]),
+                );
+                onUserIdsChange?.(uniqueIds.join(", "));
+                (e.currentTarget as HTMLInputElement).value = "";
               }
             }}
             style={{
               flex: 1,
               minWidth: 150,
-              border: 'none',
-              outline: 'none',
-              fontSize: '0.875rem',
-              fontFamily: 'inherit',
-              backgroundColor: 'transparent',
-              color: 'inherit',
-              caretColor: 'inherit',
+              border: "none",
+              outline: "none",
+              fontSize: "0.875rem",
+              fontFamily: "inherit",
+              backgroundColor: "transparent",
+              color: "inherit",
+              caretColor: "inherit",
             }}
           />
         </Box>
@@ -272,22 +292,22 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
         {/* Selected Items Display */}
         <Box
           sx={{
-            border: '1px solid',
-            borderColor: 'action.disabled',
+            border: "1px solid",
+            borderColor: "action.disabled",
             borderRadius: 1,
             p: 1.5,
             minHeight: 56,
-            display: 'flex',
-            alignItems: 'center',
-            flexWrap: 'wrap',
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
             gap: 1,
-            bgcolor: 'background.paper',
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-            '&:hover': {
-              borderColor: 'action.active',
-              bgcolor: 'action.hover',
-            }
+            bgcolor: "background.paper",
+            cursor: "pointer",
+            transition: "all 0.2s",
+            "&:hover": {
+              borderColor: "action.active",
+              bgcolor: "action.hover",
+            },
           }}
           onClick={handleToggleDropdown}
         >
@@ -297,26 +317,28 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
               size="small"
               onClick={handleNotClick}
               sx={{
-                minWidth: 'auto',
+                minWidth: "auto",
                 px: 1,
                 py: 0.5,
                 fontWeight: 600,
-                textTransform: 'none',
-                fontSize: '0.85rem',
-                ...(isInverted ? {
-                  bgcolor: 'error.main',
-                  color: 'white',
-                  '&:hover': {
-                    bgcolor: 'error.dark',
-                  }
-                } : {
-                  bgcolor: 'action.disabled',
-                  color: 'text.secondary',
-                  '&:hover': {
-                    bgcolor: 'action.disabled',
-                    opacity: 0.8,
-                  }
-                })
+                textTransform: "none",
+                fontSize: "0.85rem",
+                ...(isInverted
+                  ? {
+                      bgcolor: "error.main",
+                      color: "white",
+                      "&:hover": {
+                        bgcolor: "error.dark",
+                      },
+                    }
+                  : {
+                      bgcolor: "action.disabled",
+                      color: "text.secondary",
+                      "&:hover": {
+                        bgcolor: "action.disabled",
+                        opacity: 0.8,
+                      },
+                    }),
               }}
             >
               NOT
@@ -328,18 +350,18 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
         {/* Dropdown */}
         <Box
           sx={{
-            border: '1px solid',
-            borderColor: 'action.disabled',
+            border: "1px solid",
+            borderColor: "action.disabled",
             borderRadius: 1,
-            overflow: showDropdown ? 'auto' : 'hidden',
+            overflow: showDropdown ? "auto" : "hidden",
             mt: 0,
-            bgcolor: 'background.paper',
-            position: 'relative',
+            bgcolor: "background.paper",
+            position: "relative",
             top: -1,
             maxHeight: showDropdown ? 300 : 0,
             opacity: showDropdown ? 1 : 0,
-            transition: 'all 0.3s ease-in-out',
-            visibility: showDropdown ? 'visible' : 'hidden',
+            transition: "all 0.3s ease-in-out",
+            visibility: showDropdown ? "visible" : "hidden",
           }}
         >
           {renderDropdownContent()}
@@ -356,4 +378,3 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
 };
 
 export default TargetSelector;
-

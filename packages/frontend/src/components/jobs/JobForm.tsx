@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -16,20 +16,26 @@ import {
   Chip,
   FormControlLabel,
   Switch,
-  Autocomplete
-} from '@mui/material';
+  Autocomplete,
+} from "@mui/material";
 import {
   ExpandMore as ExpandMoreIcon,
   Cancel as CancelIcon,
   Save as SaveIcon,
-  Add as AddIcon
-} from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
-import { Job, JobType, CreateJobData, UpdateJobData, JobSchemaField } from '../../types/job';
-import { Tag, tagService } from '../../services/tagService';
-import { jobService } from '../../services/jobService';
-import DynamicJobDataForm from './DynamicJobDataForm';
-import { getContrastColor } from '@/utils/colorUtils';
+  Add as AddIcon,
+} from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
+import {
+  Job,
+  JobType,
+  CreateJobData,
+  UpdateJobData,
+  JobSchemaField,
+} from "../../types/job";
+import { Tag, tagService } from "../../services/tagService";
+import { jobService } from "../../services/jobService";
+import DynamicJobDataForm from "./DynamicJobDataForm";
+import { getContrastColor } from "@/utils/colorUtils";
 
 interface JobFormProps {
   job?: Job | null;
@@ -39,21 +45,27 @@ interface JobFormProps {
   isDrawer?: boolean;
 }
 
-const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, isDrawer = false }) => {
+const JobForm: React.FC<JobFormProps> = ({
+  job,
+  jobTypes,
+  onSubmit,
+  onCancel,
+  isDrawer = false,
+}) => {
   const { t } = useTranslation();
 
-  console.log('JobForm - Component rendered with jobTypes:', jobTypes);
-  console.log('JobForm - jobTypes length:', jobTypes?.length);
-  console.log('JobForm - jobTypes type:', typeof jobTypes);
+  console.log("JobForm - Component rendered with jobTypes:", jobTypes);
+  console.log("JobForm - jobTypes length:", jobTypes?.length);
+  console.log("JobForm - jobTypes type:", typeof jobTypes);
 
   // Form state
   const [formData, setFormData] = useState({
-    name: '',
-    jobTypeId: '',
-    memo: '',
+    name: "",
+    jobTypeId: "",
+    memo: "",
     isEnabled: true,
     tagIds: [] as number[],
-    jobDataMap: {}
+    jobDataMap: {},
   });
 
   const [selectedJobType, setSelectedJobType] = useState<JobType | null>(null);
@@ -62,19 +74,25 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
 
   // Initialize form data
   useEffect(() => {
-    console.log('JobForm useEffect triggered - job:', job, 'jobTypes:', jobTypes);
+    console.log(
+      "JobForm useEffect triggered - job:",
+      job,
+      "jobTypes:",
+      jobTypes,
+    );
     if (job) {
-      console.log('Initializing form with job:', job);
-      console.log('Job jobDataMap:', job.jobDataMap);
-      console.log('Job jobDataMap type:', typeof job.jobDataMap);
-      console.log('Job jobDataMap keys:', Object.keys(job.jobDataMap || {}));
+      console.log("Initializing form with job:", job);
+      console.log("Job jobDataMap:", job.jobDataMap);
+      console.log("Job jobDataMap type:", typeof job.jobDataMap);
+      console.log("Job jobDataMap keys:", Object.keys(job.jobDataMap || {}));
 
       // Job 편집 모드에서 jobDataMap이 비어있으면 상세 정보를 다시 조회
-      const hasJobDataMap = job.jobDataMap && Object.keys(job.jobDataMap).length > 0;
-      console.log('Has jobDataMap:', hasJobDataMap);
+      const hasJobDataMap =
+        job.jobDataMap && Object.keys(job.jobDataMap).length > 0;
+      console.log("Has jobDataMap:", hasJobDataMap);
 
       if (!hasJobDataMap && job.id) {
-        console.log('JobDataMap is empty, fetching detailed job info...');
+        console.log("JobDataMap is empty, fetching detailed job info...");
         // 상세 정보 조회
         fetchJobDetails(job.id);
         return;
@@ -83,20 +101,20 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
       const newFormData = {
         name: job.name,
         jobTypeId: job.jobTypeId.toString(),
-        memo: job.memo || '',
+        memo: job.memo || "",
         isEnabled: job.isEnabled ?? true,
-        tagIds: job.tags?.map(tag => tag.id) || [],
-        jobDataMap: job.jobDataMap || {}
+        tagIds: job.tags?.map((tag) => tag.id) || [],
+        jobDataMap: job.jobDataMap || {},
       };
 
-      console.log('Setting formData to:', newFormData);
+      console.log("Setting formData to:", newFormData);
       setFormData(newFormData);
 
-      const jobType = jobTypes.find(jt => jt.id === job.jobTypeId);
-      console.log('Found job type:', jobType);
+      const jobType = jobTypes.find((jt) => jt.id === job.jobTypeId);
+      console.log("Found job type:", jobType);
       setSelectedJobType(jobType || null);
     } else {
-      console.log('No job provided, skipping initialization');
+      console.log("No job provided, skipping initialization");
     }
   }, [job, jobTypes]);
 
@@ -107,7 +125,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
         const tags = await tagService.list();
         setAvailableTags(tags);
       } catch (error) {
-        console.error('Failed to load tags:', error);
+        console.error("Failed to load tags:", error);
       }
     };
     loadTags();
@@ -115,28 +133,28 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
 
   // Handle job type change
   const handleJobTypeChange = (jobTypeId: string) => {
-    const jobType = jobTypes.find(jt => jt.id === parseInt(jobTypeId));
-    console.log('Selected job type:', jobType);
-    console.log('Job schema:', jobType?.jobSchema);
+    const jobType = jobTypes.find((jt) => jt.id === parseInt(jobTypeId));
+    console.log("Selected job type:", jobType);
+    console.log("Job schema:", jobType?.jobSchema);
     setSelectedJobType(jobType || null);
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       jobTypeId: jobTypeId,
       // Job 편집 모드에서는 기존 jobDataMap 유지, 새 생성 시에만 초기화
-      jobDataMap: job ? prev.jobDataMap : {}
+      jobDataMap: job ? prev.jobDataMap : {},
     }));
   };
 
   // Handle form field changes
   const handleFieldChange = (field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
 
     // Clear error for this field
     if (errors[field]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[field];
         return newErrors;
@@ -146,14 +164,14 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
 
   // Handle job data map changes
   const handleJobDataChange = (jobDataMap: any) => {
-    console.log('JobForm handleJobDataChange called with:', jobDataMap);
-    setFormData(prev => {
-      console.log('JobForm previous formData.jobDataMap:', prev.jobDataMap);
+    console.log("JobForm handleJobDataChange called with:", jobDataMap);
+    setFormData((prev) => {
+      console.log("JobForm previous formData.jobDataMap:", prev.jobDataMap);
       const updated = {
         ...prev,
-        jobDataMap: jobDataMap
+        jobDataMap: jobDataMap,
       };
-      console.log('JobForm updated formData.jobDataMap:', updated.jobDataMap);
+      console.log("JobForm updated formData.jobDataMap:", updated.jobDataMap);
       return updated;
     });
   };
@@ -163,21 +181,26 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = t('jobs.validation.nameRequired');
+      newErrors.name = t("jobs.validation.nameRequired");
     }
 
     if (!formData.jobTypeId) {
-      newErrors.jobTypeId = t('jobs.validation.jobTypeRequired');
+      newErrors.jobTypeId = t("jobs.validation.jobTypeRequired");
     }
 
     // Validate job data map based on schema
     if (selectedJobType?.jobSchema) {
       const schema = selectedJobType.jobSchema;
-      Object.entries(schema).forEach(([key, field]: [string, JobSchemaField]) => {
-        if (field.required && !formData.jobDataMap[key]) {
-          newErrors[`jobDataMap.${key}`] = t('jobs.validation.fieldRequired', { field: field.description });
-        }
-      });
+      Object.entries(schema).forEach(
+        ([key, field]: [string, JobSchemaField]) => {
+          if (field.required && !formData.jobDataMap[key]) {
+            newErrors[`jobDataMap.${key}`] = t(
+              "jobs.validation.fieldRequired",
+              { field: field.description },
+            );
+          }
+        },
+      );
     }
 
     setErrors(newErrors);
@@ -198,7 +221,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
       memo: formData.memo || undefined,
       isEnabled: formData.isEnabled,
       tagIds: formData.tagIds,
-      jobDataMap: formData.jobDataMap
+      jobDataMap: formData.jobDataMap,
     };
 
     onSubmit(submitData);
@@ -206,162 +229,199 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
 
   if (isDrawer) {
     return (
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: "flex", flexDirection: "column", height: "100%" }}
+      >
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: 'auto' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box sx={{ flex: 1, overflow: "auto" }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             {/* Basic Information */}
             <Typography variant="h6" gutterBottom>
-              {t('jobs.basicInformation')}
+              {t("jobs.basicInformation")}
             </Typography>
 
-        <Box>
-          <TextField
-            fullWidth
-            label={t('common.name')}
-            value={formData.name}
-            onChange={(e) => handleFieldChange('name', e.target.value)}
-            error={!!errors.name}
-            helperText={errors.name}
-            required
-          />
-        </Box>
-
-        <Box>
-          <FormControl fullWidth error={!!errors.jobTypeId}>
-            <InputLabel required>{t('jobs.jobType')}</InputLabel>
-            <Select
-              value={formData.jobTypeId}
-              onChange={(e) => handleJobTypeChange(e.target.value)}
-              label={t('jobs.jobType')}
-              disabled={!!job} // Disable job type change when editing
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    zIndex: 99999
-                  }
-                }
-              }}
-            >
-              {console.log('JobForm - Rendering job types:', jobTypes) || jobTypes.filter(jt => jt.isEnabled).map((jobType) => (
-                <MenuItem key={jobType.id} value={jobType.id.toString()}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    {jobType.displayName}
-                    <Chip label={jobType.name} size="small" variant="outlined" />
-                  </Box>
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.jobTypeId && (
-              <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
-                {errors.jobTypeId}
-              </Typography>
-            )}
-          </FormControl>
-        </Box>
-
-        <Box>
-          <TextField
-            fullWidth
-            label={t('common.memo')}
-            value={formData.memo}
-            onChange={(e) => handleFieldChange('memo', e.target.value)}
-            multiline
-            rows={2}
-          />
-        </Box>
-
-        <Box>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={formData.isEnabled}
-                onChange={(e) => handleFieldChange('isEnabled', e.target.checked)}
-                color="primary"
-              />
-            }
-            label={t('common.usable')}
-          />
-        </Box>
-
-        <Box>
-          <Autocomplete
-            multiple
-            options={availableTags}
-            getOptionLabel={(option) => option.name}
-            value={availableTags.filter(tag => formData.tagIds.includes(tag.id))}
-            onChange={(_, newValue) => {
-              handleFieldChange('tagIds', newValue.map(tag => tag.id));
-            }}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
-                <Chip
-                  variant="outlined"
-                  label={option.name}
-                  style={{ backgroundColor: option.color, color: '#fff' }}
-                  {...getTagProps({ index })}
-                />
-              ))
-            }
-            renderInput={(params) => (
+            <Box>
               <TextField
-                {...params}
-                label={t('common.tags')}
-                placeholder={t('common.selectTags')}
+                fullWidth
+                label={t("common.name")}
+                value={formData.name}
+                onChange={(e) => handleFieldChange("name", e.target.value)}
+                error={!!errors.name}
+                helperText={errors.name}
+                required
               />
-            )}
-          />
-        </Box>
+            </Box>
 
-
-
-
-
-        {/* Job Data Configuration */}
-        {selectedJobType && selectedJobType.jobSchema && (
-          <Box>
-            <Divider sx={{ my: 2 }} />
-            <Accordion defaultExpanded>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6">
-                  {t('jobs.jobDataConfiguration')} - {selectedJobType.displayName}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                {selectedJobType.description && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {selectedJobType.description}
+            <Box>
+              <FormControl fullWidth error={!!errors.jobTypeId}>
+                <InputLabel required>{t("jobs.jobType")}</InputLabel>
+                <Select
+                  value={formData.jobTypeId}
+                  onChange={(e) => handleJobTypeChange(e.target.value)}
+                  label={t("jobs.jobType")}
+                  disabled={!!job} // Disable job type change when editing
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        zIndex: 99999,
+                      },
+                    },
+                  }}
+                >
+                  {console.log("JobForm - Rendering job types:", jobTypes) ||
+                    jobTypes
+                      .filter((jt) => jt.isEnabled)
+                      .map((jobType) => (
+                        <MenuItem
+                          key={jobType.id}
+                          value={jobType.id.toString()}
+                        >
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            {jobType.displayName}
+                            <Chip
+                              label={jobType.name}
+                              size="small"
+                              variant="outlined"
+                            />
+                          </Box>
+                        </MenuItem>
+                      ))}
+                </Select>
+                {errors.jobTypeId && (
+                  <Typography
+                    variant="caption"
+                    color="error"
+                    sx={{ mt: 0.5, ml: 1.5 }}
+                  >
+                    {errors.jobTypeId}
                   </Typography>
                 )}
-                <DynamicJobDataForm
-                  jobSchema={selectedJobType.jobSchema}
-                  data={formData.jobDataMap}
-                  onChange={handleJobDataChange}
-                  errors={errors}
-                />
-              </AccordionDetails>
-            </Accordion>
-          </Box>
-        )}
+              </FormControl>
+            </Box>
 
+            <Box>
+              <TextField
+                fullWidth
+                label={t("common.memo")}
+                value={formData.memo}
+                onChange={(e) => handleFieldChange("memo", e.target.value)}
+                multiline
+                rows={2}
+              />
+            </Box>
+
+            <Box>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.isEnabled}
+                    onChange={(e) =>
+                      handleFieldChange("isEnabled", e.target.checked)
+                    }
+                    color="primary"
+                  />
+                }
+                label={t("common.usable")}
+              />
+            </Box>
+
+            <Box>
+              <Autocomplete
+                multiple
+                options={availableTags}
+                getOptionLabel={(option) => option.name}
+                value={availableTags.filter((tag) =>
+                  formData.tagIds.includes(tag.id),
+                )}
+                onChange={(_, newValue) => {
+                  handleFieldChange(
+                    "tagIds",
+                    newValue.map((tag) => tag.id),
+                  );
+                }}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      variant="outlined"
+                      label={option.name}
+                      style={{ backgroundColor: option.color, color: "#fff" }}
+                      {...getTagProps({ index })}
+                    />
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("common.tags")}
+                    placeholder={t("common.selectTags")}
+                  />
+                )}
+              />
+            </Box>
+
+            {/* Job Data Configuration */}
+            {selectedJobType && selectedJobType.jobSchema && (
+              <Box>
+                <Divider sx={{ my: 2 }} />
+                <Accordion defaultExpanded>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography variant="h6">
+                      {t("jobs.jobDataConfiguration")} -{" "}
+                      {selectedJobType.displayName}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {selectedJobType.description && (
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 2 }}
+                      >
+                        {selectedJobType.description}
+                      </Typography>
+                    )}
+                    <DynamicJobDataForm
+                      jobSchema={selectedJobType.jobSchema}
+                      data={formData.jobDataMap}
+                      onChange={handleJobDataChange}
+                      errors={errors}
+                    />
+                  </AccordionDetails>
+                </Accordion>
+              </Box>
+            )}
           </Box>
         </Box>
 
         {/* Footer */}
-        <Box sx={{
-          p: 2,
-          borderTop: '1px solid',
-          borderColor: 'divider',
-          bgcolor: 'background.paper',
-          display: 'flex',
-          gap: 1,
-          justifyContent: 'flex-end'
-        }}>
+        <Box
+          sx={{
+            p: 2,
+            borderTop: "1px solid",
+            borderColor: "divider",
+            bgcolor: "background.paper",
+            display: "flex",
+            gap: 1,
+            justifyContent: "flex-end",
+          }}
+        >
           <Button onClick={onCancel} startIcon={<CancelIcon />}>
-            {t('common.cancel')}
+            {t("common.cancel")}
           </Button>
-          <Button type="submit" variant="contained" startIcon={job ? <SaveIcon /> : <AddIcon />}>
-            {job ? '작업 수정' : '작업 추가'}
+          <Button
+            type="submit"
+            variant="contained"
+            startIcon={job ? <SaveIcon /> : <AddIcon />}
+          >
+            {job ? "작업 수정" : "작업 추가"}
           </Button>
         </Box>
       </Box>
@@ -370,18 +430,18 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
         {/* Basic Information */}
         <Typography variant="h6" gutterBottom>
-          {t('jobs.basicInformation')}
+          {t("jobs.basicInformation")}
         </Typography>
 
         <Box>
           <TextField
             fullWidth
-            label={t('common.name')}
+            label={t("common.name")}
             value={formData.name}
-            onChange={(e) => handleFieldChange('name', e.target.value)}
+            onChange={(e) => handleFieldChange("name", e.target.value)}
             error={!!errors.name}
             helperText={errors.name}
             required
@@ -390,10 +450,10 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
 
         <Box>
           <FormControl fullWidth error={!!errors.jobTypeId}>
-            <InputLabel>{t('jobs.jobType')}</InputLabel>
+            <InputLabel>{t("jobs.jobType")}</InputLabel>
             <Select
               value={formData.jobTypeId}
-              label={t('jobs.jobType')}
+              label={t("jobs.jobType")}
               onChange={(e) => handleJobTypeChange(e.target.value)}
             >
               {jobTypes.map((jobType) => (
@@ -403,7 +463,11 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
               ))}
             </Select>
             {errors.jobTypeId && (
-              <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+              <Typography
+                variant="caption"
+                color="error"
+                sx={{ mt: 0.5, ml: 1.5 }}
+              >
                 {errors.jobTypeId}
               </Typography>
             )}
@@ -413,9 +477,9 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
         <Box>
           <TextField
             fullWidth
-            label={t('common.memo')}
+            label={t("common.memo")}
             value={formData.memo}
-            onChange={(e) => handleFieldChange('memo', e.target.value)}
+            onChange={(e) => handleFieldChange("memo", e.target.value)}
             multiline
             rows={2}
           />
@@ -426,26 +490,33 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
             control={
               <Switch
                 checked={formData.isEnabled}
-                onChange={(e) => handleFieldChange('isEnabled', e.target.checked)}
+                onChange={(e) =>
+                  handleFieldChange("isEnabled", e.target.checked)
+                }
                 color="primary"
               />
             }
-            label={t('common.usable')}
+            label={t("common.usable")}
           />
         </Box>
 
         {/* Tags */}
         <Box>
           <Typography variant="subtitle2" gutterBottom>
-            {t('common.tags')}
+            {t("common.tags")}
           </Typography>
           <Autocomplete
             multiple
             options={availableTags}
             getOptionLabel={(option) => option.name}
-            value={availableTags.filter(tag => formData.tagIds.includes(tag.id))}
+            value={availableTags.filter((tag) =>
+              formData.tagIds.includes(tag.id),
+            )}
             onChange={(_, newValue) => {
-              handleFieldChange('tagIds', newValue.map(tag => tag.id));
+              handleFieldChange(
+                "tagIds",
+                newValue.map((tag) => tag.id),
+              );
             }}
             renderTags={(value, getTagProps) =>
               value.map((option, index) => {
@@ -456,7 +527,10 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
                     variant="outlined"
                     label={option.name}
                     size="small"
-                    sx={{ bgcolor: option.color, color: getContrastColor(option.color) }}
+                    sx={{
+                      bgcolor: option.color,
+                      color: getContrastColor(option.color),
+                    }}
                     {...chipProps}
                   />
                 );
@@ -465,7 +539,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
             renderInput={(params) => (
               <TextField
                 {...params}
-                placeholder={t('common.selectTags')}
+                placeholder={t("common.selectTags")}
                 variant="outlined"
               />
             )}
@@ -477,24 +551,30 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, is
           <Box>
             <Divider sx={{ my: 2 }} />
             <Typography variant="h6" gutterBottom>
-              {t('jobs.jobData')}
+              {t("jobs.jobData")}
             </Typography>
             <DynamicJobDataForm
               jobSchema={selectedJobType.schema}
               data={formData.jobDataMap}
-              onChange={(data) => handleFieldChange('jobDataMap', data)}
+              onChange={(data) => handleFieldChange("jobDataMap", data)}
               errors={errors}
             />
           </Box>
         )}
 
         {/* Actions */}
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 3 }}>
+        <Box
+          sx={{ display: "flex", gap: 2, justifyContent: "flex-end", mt: 3 }}
+        >
           <Button onClick={onCancel} startIcon={<CancelIcon />}>
-            {t('common.cancel')}
+            {t("common.cancel")}
           </Button>
-          <Button type="submit" variant="contained" startIcon={job ? <SaveIcon /> : <AddIcon />}>
-            {job ? '작업 수정' : '작업 추가'}
+          <Button
+            type="submit"
+            variant="contained"
+            startIcon={job ? <SaveIcon /> : <AddIcon />}
+          >
+            {job ? "작업 수정" : "작업 추가"}
           </Button>
         </Box>
       </Box>

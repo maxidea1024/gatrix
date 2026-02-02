@@ -6,17 +6,17 @@
  * NOTE: Game servers register directly to etcd/Redis, not via this service
  */
 
-import logger from '../config/logger';
-import { ServiceDiscoveryFactory } from './serviceDiscovery/ServiceDiscoveryFactory';
+import logger from "../config/logger";
+import { ServiceDiscoveryFactory } from "./serviceDiscovery/ServiceDiscoveryFactory";
 import {
   IServiceDiscoveryProvider,
   ServiceInstance,
   WatchCallback,
   UpdateServiceStatusInput,
   WatchEvent,
-} from '../types/serviceDiscovery';
-import config from '../config';
-import ServerLifecycleEvent from '../models/ServerLifecycleEvent';
+} from "../types/serviceDiscovery";
+import config from "../config";
+import ServerLifecycleEvent from "../models/ServerLifecycleEvent";
 
 class ServiceDiscoveryService {
   private provider: IServiceDiscoveryProvider;
@@ -24,11 +24,11 @@ class ServiceDiscoveryService {
 
   constructor() {
     this.provider = ServiceDiscoveryFactory.getInstance();
-    logger.info('ServiceDiscoveryService initialized (monitoring mode)');
+    logger.info("ServiceDiscoveryService initialized (monitoring mode)");
 
     // Start background event recording
-    this.startEventRecording().catch(err => {
-      logger.error('Failed to start background event recording:', err);
+    this.startEventRecording().catch((err) => {
+      logger.error("Failed to start background event recording:", err);
     });
   }
 
@@ -41,11 +41,11 @@ class ServiceDiscoveryService {
       try {
         await this.recordLifecycleEvent(event);
       } catch (err) {
-        logger.error('Error recording lifecycle event:', err);
+        logger.error("Error recording lifecycle event:", err);
       }
     });
 
-    logger.info('Background event recording started');
+    logger.info("Background event recording started");
   }
 
   /**
@@ -54,16 +54,16 @@ class ServiceDiscoveryService {
   private async recordLifecycleEvent(event: WatchEvent): Promise<void> {
     const { type, instance } = event;
     const instanceId = instance.instanceId;
-    const currentStatus = (instance.status || '').toLowerCase();
+    const currentStatus = (instance.status || "").toLowerCase();
 
     // Handle delete events - clean up tracking and return
-    if (type === 'delete') {
+    if (type === "delete") {
       this.lastSeenStatus.delete(instanceId);
       return;
     }
 
     // Skip recording heartbeats (not a real status change, just keep-alive)
-    if (currentStatus === 'heartbeat') {
+    if (currentStatus === "heartbeat") {
       return;
     }
 
@@ -74,13 +74,13 @@ class ServiceDiscoveryService {
     }
 
     const labels = instance.labels;
-    const envName = labels.environment || labels.env || 'development';
+    const envName = labels.environment || labels.env || "development";
 
     // Update last seen status if we're going to record
     this.lastSeenStatus.set(instanceId, currentStatus);
 
     // Determine event type - use actual status as event type
-    const eventType = currentStatus.toUpperCase().replace('-', '_'); // e.g., 'ready' -> 'READY', 'no-response' -> 'NO_RESPONSE'
+    const eventType = currentStatus.toUpperCase().replace("-", "_"); // e.g., 'ready' -> 'READY', 'no-response' -> 'NO_RESPONSE'
 
     // Calculate uptime if available
     let uptimeSeconds = 0;
@@ -93,10 +93,11 @@ class ServiceDiscoveryService {
     }
 
     // Extract error info
-    let errorMessage = instance.stats?.lastError || instance.meta?.terminationError;
+    let errorMessage =
+      instance.stats?.lastError || instance.meta?.terminationError;
     let errorStack: string | undefined;
 
-    if (errorMessage && typeof errorMessage === 'object') {
+    if (errorMessage && typeof errorMessage === "object") {
       errorStack = errorMessage.stack;
       errorMessage = errorMessage.message || errorMessage.toString();
     } else if (instance.stats?.lastErrorStack) {
@@ -128,30 +129,41 @@ class ServiceDiscoveryService {
       metadata: {
         stats: instance.stats,
         meta: instance.meta,
-      }
+      },
     });
 
-    logger.info(`Server lifecycle event recorded: ${labels.service}:${instanceId} -> ${eventType}`);
+    logger.info(
+      `Server lifecycle event recorded: ${labels.service}:${instanceId} -> ${eventType}`,
+    );
   }
 
   /**
    * Get all active services or services of a specific type and/or group (Admin monitoring)
    */
-  async getServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]> {
+  async getServices(
+    serviceType?: string,
+    serviceGroup?: string,
+  ): Promise<ServiceInstance[]> {
     return await this.provider.getServices(serviceType, serviceGroup);
   }
 
   /**
    * Get all inactive services (terminated, error, no-response) (Admin monitoring)
    */
-  async getInactiveServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]> {
+  async getInactiveServices(
+    serviceType?: string,
+    serviceGroup?: string,
+  ): Promise<ServiceInstance[]> {
     return await this.provider.getInactiveServices(serviceType, serviceGroup);
   }
 
   /**
    * Get a specific service instance (Admin monitoring)
    */
-  async getService(instanceId: string, serviceType: string): Promise<ServiceInstance | null> {
+  async getService(
+    instanceId: string,
+    serviceType: string,
+  ): Promise<ServiceInstance | null> {
     return await this.provider.getService(instanceId, serviceType);
   }
 
@@ -171,14 +183,20 @@ class ServiceDiscoveryService {
     const ttl = config.serviceDiscovery?.heartbeatTTL || 30;
     await this.provider.register(instance, ttl);
     const serviceType = instance.labels.service;
-    logger.info(`Service registered: ${serviceType}:${instance.instanceId}`, { labels: instance.labels });
+    logger.info(`Service registered: ${serviceType}:${instance.instanceId}`, {
+      labels: instance.labels,
+    });
   }
 
   /**
    * Unregister a service instance (Server SDK or Admin cleanup)
    * @param forceDelete - If true, permanently delete the service. If false, mark as terminated with TTL.
    */
-  async unregister(instanceId: string, serviceType: string, forceDelete: boolean = false): Promise<void> {
+  async unregister(
+    instanceId: string,
+    serviceType: string,
+    forceDelete: boolean = false,
+  ): Promise<void> {
     await this.provider.unregister(instanceId, serviceType, forceDelete);
   }
 
@@ -186,12 +204,15 @@ class ServiceDiscoveryService {
    * Update service status (Server SDK)
    * Partial merge update
    */
-  async updateStatus(input: UpdateServiceStatusInput, autoRegisterIfMissing = false): Promise<void> {
+  async updateStatus(
+    input: UpdateServiceStatusInput,
+    autoRegisterIfMissing = false,
+  ): Promise<void> {
     await this.provider.updateStatus(input, autoRegisterIfMissing);
     const serviceType = input.labels.service;
     logger.debug(`Service status updated: ${serviceType}:${input.instanceId}`, {
       status: input.status,
-      autoRegisterIfMissing
+      autoRegisterIfMissing,
     });
   }
 
@@ -209,7 +230,10 @@ class ServiceDiscoveryService {
    * Clean up all inactive services (terminated, error, no-response)
    * Delegates to provider implementation (Redis or etcd)
    */
-  async cleanupInactiveServices(): Promise<{ deletedCount: number; serviceTypes: string[] }> {
+  async cleanupInactiveServices(): Promise<{
+    deletedCount: number;
+    serviceTypes: string[];
+  }> {
     // Get inactive services (not active services)
     const inactiveServices = await this.getInactiveServices();
 
@@ -218,7 +242,9 @@ class ServiceDiscoveryService {
     }
 
     // Get unique service types
-    const serviceTypes = Array.from(new Set(inactiveServices.map((s) => s.labels.service)));
+    const serviceTypes = Array.from(
+      new Set(inactiveServices.map((s) => s.labels.service)),
+    );
 
     // Call provider's cleanup method
     return await this.provider.cleanupInactiveServices(serviceTypes);
@@ -229,7 +255,7 @@ class ServiceDiscoveryService {
    */
   async getServiceTypes(): Promise<string[]> {
     const services = await this.getServices();
-    const types = new Set(services.map(s => s.labels.service));
+    const types = new Set(services.map((s) => s.labels.service));
     return Array.from(types).sort();
   }
 
@@ -246,7 +272,7 @@ class ServiceDiscoveryService {
     const byType: Record<string, number> = {};
     const byStatus: Record<string, number> = {};
 
-    services.forEach(service => {
+    services.forEach((service) => {
       const serviceType = service.labels.service;
       byType[serviceType] = (byType[serviceType] || 0) + 1;
       byStatus[service.status] = (byStatus[service.status] || 0) + 1;
@@ -273,10 +299,9 @@ class ServiceDiscoveryService {
    */
   async close(): Promise<void> {
     await ServiceDiscoveryFactory.close();
-    logger.info('ServiceDiscoveryService closed');
+    logger.info("ServiceDiscoveryService closed");
   }
 }
 
 // Export singleton instance
 export default new ServiceDiscoveryService();
-

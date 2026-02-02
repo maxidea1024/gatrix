@@ -1,16 +1,18 @@
-import { Response, NextFunction } from 'express';
-import { AuditLogModel } from '../models/AuditLog';
-import { AuthenticatedRequest } from '../middleware/auth';
-import { createLogger } from '../config/logger';
-import db from '../config/knex';
+import { Response, NextFunction } from "express";
+import { AuditLogModel } from "../models/AuditLog";
+import { AuthenticatedRequest } from "../middleware/auth";
+import { createLogger } from "../config/logger";
+import db from "../config/knex";
 
-const logger = createLogger('EnhancedAuditLog');
+const logger = createLogger("EnhancedAuditLog");
 
 export interface EnhancedAuditLogOptions {
   action: string;
   resourceType?: string;
   getResourceId?: (req: any) => string | number | undefined;
-  getResourceIdFromResponse?: (responseBody: any) => string | number | undefined;
+  getResourceIdFromResponse?: (
+    responseBody: any,
+  ) => string | number | undefined;
   // Enhanced: Fetch old values from database before the operation
   fetchOldValues?: (req: any) => Promise<any>;
   // Enhanced: Get new values with more context
@@ -25,7 +27,11 @@ export interface EnhancedAuditLogOptions {
  * Follows 육하원칙 (5W1H): Who, What, When, Where, Why, How
  */
 export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
-  return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  return async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     // Capture old values BEFORE the operation
     let oldValues: any = undefined;
     let captureError: any = undefined;
@@ -35,7 +41,7 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
         oldValues = await options.fetchOldValues(req);
       }
     } catch (error) {
-      logger.error('Failed to fetch old values for audit log:', error);
+      logger.error("Failed to fetch old values for audit log:", error);
       captureError = error;
       // Continue with the request even if old values fetch fails
     }
@@ -45,8 +51,8 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
     let responseBody: any;
 
     // Override res.end to capture response data
-    res.end = function(chunk?: any, encoding?: any): Response {
-      if (chunk && typeof chunk === 'string') {
+    res.end = function (chunk?: any, encoding?: any): Response {
+      if (chunk && typeof chunk === "string") {
         try {
           responseBody = JSON.parse(chunk);
         } catch (e) {
@@ -57,7 +63,7 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
     };
 
     // Continue with the request
-    res.on('finish', async () => {
+    res.on("finish", async () => {
       try {
         // Skip logging if condition is met
         if (options.skipIf && options.skipIf(req, res)) {
@@ -70,7 +76,9 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
         }
 
         // Resource ID 결정 (요청에서 또는 응답에서)
-        let resourceId = options.getResourceId ? options.getResourceId(req) : undefined;
+        let resourceId = options.getResourceId
+          ? options.getResourceId(req)
+          : undefined;
         if (!resourceId && options.getResourceIdFromResponse && responseBody) {
           const id = options.getResourceIdFromResponse(responseBody);
           resourceId = id ? id.toString() : undefined;
@@ -99,19 +107,19 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
           oldValues: oldValues,
           newValues: finalNewValues,
           ipAddress: req.ip,
-          userAgent: req.get('User-Agent'),
+          userAgent: req.get("User-Agent"),
         });
 
         if (captureError) {
-          logger.warn('Audit log created but old values capture failed:', {
+          logger.warn("Audit log created but old values capture failed:", {
             action: options.action,
             resourceId,
-            error: captureError.message
+            error: captureError.message,
           });
         }
       } catch (error) {
         // Don't fail the request if audit logging fails
-        logger.error('Failed to create enhanced audit log:', error);
+        logger.error("Failed to create enhanced audit log:", error);
       }
     });
 
@@ -123,10 +131,8 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
  * Helper function to fetch game world details by ID
  */
 export async function fetchGameWorldById(id: number | string): Promise<any> {
-  const world = await db('g_game_worlds')
-    .where('id', id)
-    .first();
-  
+  const world = await db("g_game_worlds").where("id", id).first();
+
   if (!world) {
     return null;
   }
@@ -149,11 +155,11 @@ export async function fetchGameWorldById(id: number | string): Promise<any> {
  * Helper function to fetch user details by ID
  */
 export async function fetchUserById(id: number | string): Promise<any> {
-  const user = await db('g_users')
-    .select('id', 'name', 'email', 'role', 'status', 'emailVerified')
-    .where('id', id)
+  const user = await db("g_users")
+    .select("id", "name", "email", "role", "status", "emailVerified")
+    .where("id", id)
     .first();
-  
+
   return user || null;
 }
 
@@ -161,10 +167,8 @@ export async function fetchUserById(id: number | string): Promise<any> {
  * Helper function to fetch invitation details by ID
  */
 export async function fetchInvitationById(id: string): Promise<any> {
-  const invitation = await db('g_invitations')
-    .where('id', id)
-    .first();
-  
+  const invitation = await db("g_invitations").where("id", id).first();
+
   if (!invitation) {
     return null;
   }
@@ -186,10 +190,8 @@ export async function fetchInvitationById(id: string): Promise<any> {
  * Helper function to fetch API token details by ID
  */
 export async function fetchApiTokenById(id: number | string): Promise<any> {
-  const token = await db('g_api_access_tokens')
-    .where('id', id)
-    .first();
-  
+  const token = await db("g_api_access_tokens").where("id", id).first();
+
   if (!token) {
     return null;
   }
@@ -212,21 +214,24 @@ export async function fetchApiTokenById(id: number | string): Promise<any> {
 export async function fetchRecordsByIds(
   table: string,
   ids: (number | string)[],
-  selectFields?: string[]
+  selectFields?: string[],
 ): Promise<any[]> {
-  const query = db(table).whereIn('id', ids);
-  
+  const query = db(table).whereIn("id", ids);
+
   if (selectFields && selectFields.length > 0) {
     query.select(selectFields);
   }
-  
+
   return await query;
 }
 
 /**
  * Create context object with request metadata
  */
-export function createAuditContext(req: AuthenticatedRequest, additionalInfo?: any): any {
+export function createAuditContext(
+  req: AuthenticatedRequest,
+  additionalInfo?: any,
+): any {
   return {
     timestamp: new Date().toISOString(),
     userId: req.user?.userId,
@@ -234,10 +239,9 @@ export function createAuditContext(req: AuthenticatedRequest, additionalInfo?: a
     userEmail: req.user?.email,
     userRole: req.user?.role,
     ipAddress: req.ip,
-    userAgent: req.get('User-Agent'),
+    userAgent: req.get("User-Agent"),
     method: req.method,
     path: req.path,
     ...additionalInfo,
   };
 }
-

@@ -1,15 +1,15 @@
-import React from 'react';
-import { Box, Typography, Link, Chip, Avatar } from '@mui/material';
+import React from "react";
+import { Box, Typography, Link, Chip, Avatar } from "@mui/material";
 import {
   Image as ImageIcon,
   VideoFile as VideoIcon,
   AudioFile as AudioIcon,
   AttachFile as FileIcon,
   LocationOn as LocationIcon,
-} from '@mui/icons-material';
-import { Message, MessageType } from '../../types/chat';
-import { LinkPreviewList } from '../LinkPreview';
-import { linkPreviewService } from '../../services/linkPreviewService';
+} from "@mui/icons-material";
+import { Message, MessageType } from "../../types/chat";
+import { LinkPreviewList } from "../LinkPreview";
+import { linkPreviewService } from "../../services/linkPreviewService";
 
 interface MessageContentProps {
   message: Message;
@@ -26,7 +26,7 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
       .replace(/#(\w+)/g, '<span class="cs-hashtag">#$1</span>')
       .replace(
         /(https?:\/\/[^\s]+)/g,
-        '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+        '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>',
       );
 
     return (
@@ -36,27 +36,27 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
           component="div"
           dangerouslySetInnerHTML={{ __html: processedContent }}
           sx={{
-            wordBreak: 'break-word',
-            '& .cs-mention': {
-              backgroundColor: 'primary.light',
-              color: 'primary.main',
-              padding: '1px 4px',
-              borderRadius: '4px',
+            wordBreak: "break-word",
+            "& .cs-mention": {
+              backgroundColor: "primary.light",
+              color: "primary.main",
+              padding: "1px 4px",
+              borderRadius: "4px",
               fontWeight: 500,
             },
-            '& .cs-hashtag': {
-              color: 'info.main',
+            "& .cs-hashtag": {
+              color: "info.main",
               fontWeight: 500,
-              cursor: 'pointer',
-              '&:hover': {
-                textDecoration: 'underline',
+              cursor: "pointer",
+              "&:hover": {
+                textDecoration: "underline",
               },
             },
-            '& a': {
-              color: 'primary.main',
-              textDecoration: 'none',
-              '&:hover': {
-                textDecoration: 'underline',
+            "& a": {
+              color: "primary.main",
+              textDecoration: "none",
+              "&:hover": {
+                textDecoration: "underline",
               },
             },
           }}
@@ -71,52 +71,44 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
   };
 
   const renderImageContent = () => (
-    <Box sx={{ maxWidth: 300, borderRadius: 1, overflow: 'hidden' }}>
+    <Box sx={{ maxWidth: 300, borderRadius: 1, overflow: "hidden" }}>
       <img
         src={message.attachments?.[0]?.url}
         alt="Shared image"
         style={{
-          width: '100%',
-          height: 'auto',
-          display: 'block',
+          width: "100%",
+          height: "auto",
+          display: "block",
         }}
         loading="lazy"
       />
       {message.content && (
-        <Box sx={{ p: 1 }}>
-          {renderTextContent(message.content)}
-        </Box>
+        <Box sx={{ p: 1 }}>{renderTextContent(message.content)}</Box>
       )}
     </Box>
   );
 
   const renderVideoContent = () => (
-    <Box sx={{ maxWidth: 400, borderRadius: 1, overflow: 'hidden' }}>
+    <Box sx={{ maxWidth: 400, borderRadius: 1, overflow: "hidden" }}>
       <video
         src={message.attachments?.[0]?.url}
         controls
         style={{
-          width: '100%',
-          height: 'auto',
-          display: 'block',
+          width: "100%",
+          height: "auto",
+          display: "block",
         }}
       />
       {message.content && (
-        <Box sx={{ p: 1 }}>
-          {renderTextContent(message.content)}
-        </Box>
+        <Box sx={{ p: 1 }}>{renderTextContent(message.content)}</Box>
       )}
     </Box>
   );
 
   const renderAudioContent = () => (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1 }}>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1, p: 1 }}>
       <AudioIcon color="primary" />
-      <audio
-        src={message.attachments?.[0]?.url}
-        controls
-        style={{ flex: 1 }}
-      />
+      <audio src={message.attachments?.[0]?.url} controls style={{ flex: 1 }} />
     </Box>
   );
 
@@ -127,20 +119,20 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
     return (
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
+          display: "flex",
+          alignItems: "center",
           gap: 1,
           p: 1.5,
           border: 1,
-          borderColor: 'divider',
+          borderColor: "divider",
           borderRadius: 1,
-          backgroundColor: 'background.paper',
-          cursor: 'pointer',
-          '&:hover': {
-            backgroundColor: 'action.hover',
+          backgroundColor: "background.paper",
+          cursor: "pointer",
+          "&:hover": {
+            backgroundColor: "action.hover",
           },
         }}
-        onClick={() => window.open(attachment.url, '_blank')}
+        onClick={() => window.open(attachment.url, "_blank")}
       >
         <FileIcon color="primary" />
         <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -148,7 +140,7 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
             {attachment.name}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {attachment.size ? formatFileSize(attachment.size) : 'Unknown size'}
+            {attachment.size ? formatFileSize(attachment.size) : "Unknown size"}
           </Typography>
         </Box>
       </Box>
@@ -160,9 +152,25 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
     if (!location) return null;
 
     return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.0 }}>
-        <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, overflow: 'hidden', maxWidth: 360, width: '100%' }}>
-          <Box sx={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', backgroundColor: 'background.default' }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1.0 }}>
+        <Box
+          sx={{
+            border: 1,
+            borderColor: "divider",
+            borderRadius: 1,
+            overflow: "hidden",
+            maxWidth: 360,
+            width: "100%",
+          }}
+        >
+          <Box
+            sx={{
+              position: "relative",
+              width: "100%",
+              aspectRatio: "4 / 3",
+              backgroundColor: "background.default",
+            }}
+          >
             <iframe
               title="google-maps-location"
               src={`https://www.google.com/maps?q=${location.latitude},${location.longitude}&z=15&output=embed`}
@@ -173,22 +181,34 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
               referrerPolicy="no-referrer-when-downgrade"
             />
           </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 1, py: 0.75, backgroundColor: 'action.hover' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              px: 1,
+              py: 0.75,
+              backgroundColor: "action.hover",
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <LocationIcon color="primary" />
               <Box>
-                <Typography variant="body2">{location.name || 'Shared Location'}</Typography>
+                <Typography variant="body2">
+                  {location.name || "Shared Location"}
+                </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {location.address || `${location.latitude}, ${location.longitude}`}
+                  {location.address ||
+                    `${location.latitude}, ${location.longitude}`}
                 </Typography>
               </Box>
             </Box>
             <Typography
               variant="caption"
-              sx={{ color: 'primary.main', cursor: 'pointer' }}
+              sx={{ color: "primary.main", cursor: "pointer" }}
               onClick={() => {
                 const url = `https://maps.google.com/?q=${location.latitude},${location.longitude}`;
-                window.open(url, '_blank');
+                window.open(url, "_blank");
               }}
             >
               Google 지도에서 열기
@@ -200,39 +220,39 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
   };
 
   const renderSystemMessage = () => (
-    <Box sx={{ textAlign: 'center', py: 1 }}>
+    <Box sx={{ textAlign: "center", py: 1 }}>
       <Chip
         label={message.content}
         size="small"
         variant="outlined"
-        sx={{ fontSize: '0.75rem' }}
+        sx={{ fontSize: "0.75rem" }}
       />
     </Box>
   );
 
   const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   // Handle different message types
   switch (message.type) {
-    case 'image':
+    case "image":
       return renderImageContent();
-    case 'video':
+    case "video":
       return renderVideoContent();
-    case 'audio':
+    case "audio":
       return renderAudioContent();
-    case 'file':
+    case "file":
       return renderFileContent();
-    case 'location':
+    case "location":
       return renderLocationContent();
-    case 'system':
+    case "system":
       return renderSystemMessage();
-    case 'text':
+    case "text":
     default:
       return renderTextContent(message.content);
   }

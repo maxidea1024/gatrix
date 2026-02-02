@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Popover,
   Box,
@@ -9,8 +9,8 @@ import {
   ListItemButton,
   Checkbox,
   ClickAwayListener,
-} from '@mui/material';
-import { useTranslation } from 'react-i18next';
+} from "@mui/material";
+import { useTranslation } from "react-i18next";
 import {
   DndContext,
   closestCenter,
@@ -19,19 +19,19 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 // Column configuration interface
 export interface ColumnConfig {
@@ -47,15 +47,13 @@ interface SortableColumnItemProps {
   onToggleVisibility: (columnId: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
+  column,
+  onToggleVisibility,
+}) => {
   const { t } = useTranslation();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: column.id });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: column.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -68,8 +66,17 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
       style={style}
       disablePadding
       secondaryAction={
-        <Box {...attributes} {...listeners} sx={{ cursor: 'grab', display: 'flex', alignItems: 'center', '&:active': { cursor: 'grabbing' } }}>
-          <DragIndicatorIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
+        <Box
+          {...attributes}
+          {...listeners}
+          sx={{
+            cursor: "grab",
+            display: "flex",
+            alignItems: "center",
+            "&:active": { cursor: "grabbing" },
+          }}
+        >
+          <DragIndicatorIcon sx={{ color: "text.disabled", fontSize: 20 }} />
         </Box>
       }
     >
@@ -122,7 +129,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -137,8 +144,8 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
   };
 
   const handleToggleVisibility = (columnId: string) => {
-    const newColumns = columns.map(col =>
-      col.id === columnId ? { ...col, visible: !col.visible } : col
+    const newColumns = columns.map((col) =>
+      col.id === columnId ? { ...col, visible: !col.visible } : col,
     );
     onColumnsChange(newColumns);
   };
@@ -149,12 +156,12 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
       anchorEl={anchorEl}
       onClose={onClose}
       anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'right',
+        vertical: "bottom",
+        horizontal: "right",
       }}
       transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
+        vertical: "top",
+        horizontal: "right",
       }}
       slotProps={{
         paper: {
@@ -169,10 +176,19 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
     >
       <ClickAwayListener onClickAway={onClose}>
         <Box sx={{ p: 2, minWidth: 250 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="subtitle2">{t('common.columnSettings')}</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 1,
+            }}
+          >
+            <Typography variant="subtitle2">
+              {t("common.columnSettings")}
+            </Typography>
             <Button size="small" onClick={onReset}>
-              {t('common.reset')}
+              {t("common.reset")}
             </Button>
           </Box>
           <DndContext
@@ -182,7 +198,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
             modifiers={[restrictToVerticalAxis]}
           >
             <SortableContext
-              items={columns.map(c => c.id)}
+              items={columns.map((c) => c.id)}
               strategy={verticalListSortingStrategy}
             >
               <List dense>
@@ -203,4 +219,3 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
 };
 
 export default ColumnSettingsDialog;
-

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo } from "react";
 import {
   Box,
   Typography,
@@ -6,14 +6,12 @@ import {
   Tooltip,
   Paper,
   CircularProgress,
-} from '@mui/material';
-import {
-  ContentCopy as CopyIcon,
-} from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
-import { useSnackbar } from 'notistack';
-import { Virtuoso } from 'react-virtuoso';
-import { copyToClipboardWithNotification } from '../utils/clipboard';
+} from "@mui/material";
+import { ContentCopy as CopyIcon } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
+import { useSnackbar } from "notistack";
+import { Virtuoso } from "react-virtuoso";
+import { copyToClipboardWithNotification } from "../utils/clipboard";
 
 interface StackTraceViewerProps {
   stackTrace: string;
@@ -27,9 +25,11 @@ interface StackTraceViewerProps {
  */
 const highlightLuaLine = (line: string) => {
   // Lua keywords
-  const keywords = /\b(and|break|do|else|elseif|end|false|for|function|if|in|local|nil|not|or|repeat|return|then|true|until|while)\b/g;
+  const keywords =
+    /\b(and|break|do|else|elseif|end|false|for|function|if|in|local|nil|not|or|repeat|return|then|true|until|while)\b/g;
   // Lua built-in functions
-  const builtins = /\b(print|pairs|ipairs|type|tonumber|tostring|require|assert|error|pcall|xpcall|setmetatable|getmetatable|rawget|rawset|next|select|unpack|table|string|math|io|os|debug|coroutine)\b/g;
+  const builtins =
+    /\b(print|pairs|ipairs|type|tonumber|tostring|require|assert|error|pcall|xpcall|setmetatable|getmetatable|rawget|rawset|next|select|unpack|table|string|math|io|os|debug|coroutine)\b/g;
   // Strings
   const strings = /(["'])(?:(?=(\\?))\2.)*?\1/g;
   // Comments
@@ -49,22 +49,46 @@ const highlightLuaLine = (line: string) => {
   // Find all matches
   let match;
   while ((match = keywords.exec(line)) !== null) {
-    tokens.push({ start: match.index, end: match.index + match[0].length, color: '#569cd6' }); // Blue for keywords
+    tokens.push({
+      start: match.index,
+      end: match.index + match[0].length,
+      color: "#569cd6",
+    }); // Blue for keywords
   }
   while ((match = builtins.exec(line)) !== null) {
-    tokens.push({ start: match.index, end: match.index + match[0].length, color: '#4ec9b0' }); // Cyan for builtins
+    tokens.push({
+      start: match.index,
+      end: match.index + match[0].length,
+      color: "#4ec9b0",
+    }); // Cyan for builtins
   }
   while ((match = strings.exec(line)) !== null) {
-    tokens.push({ start: match.index, end: match.index + match[0].length, color: '#ce9178' }); // Orange for strings
+    tokens.push({
+      start: match.index,
+      end: match.index + match[0].length,
+      color: "#ce9178",
+    }); // Orange for strings
   }
   while ((match = comments.exec(line)) !== null) {
-    tokens.push({ start: match.index, end: match.index + match[0].length, color: '#6a9955' }); // Green for comments
+    tokens.push({
+      start: match.index,
+      end: match.index + match[0].length,
+      color: "#6a9955",
+    }); // Green for comments
   }
   while ((match = numbers.exec(line)) !== null) {
-    tokens.push({ start: match.index, end: match.index + match[0].length, color: '#b5cea8' }); // Light green for numbers
+    tokens.push({
+      start: match.index,
+      end: match.index + match[0].length,
+      color: "#b5cea8",
+    }); // Light green for numbers
   }
   while ((match = functionCalls.exec(line)) !== null) {
-    tokens.push({ start: match.index, end: match.index + match[1].length, color: '#dcdcaa' }); // Yellow for function calls
+    tokens.push({
+      start: match.index,
+      end: match.index + match[1].length,
+      color: "#dcdcaa",
+    }); // Yellow for function calls
   }
 
   // Sort tokens by start position
@@ -82,7 +106,7 @@ const highlightLuaLine = (line: string) => {
 
   // Build result with colored spans
   if (filteredTokens.length === 0) {
-    return <span style={{ color: '#d4d4d4' }}>{line || ' '}</span>;
+    return <span style={{ color: "#d4d4d4" }}>{line || " "}</span>;
   }
 
   const elements: React.ReactNode[] = [];
@@ -92,16 +116,16 @@ const highlightLuaLine = (line: string) => {
     // Add text before token
     if (token.start > lastIndex) {
       elements.push(
-        <span key={`text-${idx}`} style={{ color: '#d4d4d4' }}>
+        <span key={`text-${idx}`} style={{ color: "#d4d4d4" }}>
           {line.substring(lastIndex, token.start)}
-        </span>
+        </span>,
       );
     }
     // Add colored token
     elements.push(
       <span key={`token-${idx}`} style={{ color: token.color }}>
         {line.substring(token.start, token.end)}
-      </span>
+      </span>,
     );
     lastIndex = token.end;
   });
@@ -109,9 +133,9 @@ const highlightLuaLine = (line: string) => {
   // Add remaining text
   if (lastIndex < line.length) {
     elements.push(
-      <span key="text-end" style={{ color: '#d4d4d4' }}>
+      <span key="text-end" style={{ color: "#d4d4d4" }}>
         {line.substring(lastIndex)}
-      </span>
+      </span>,
     );
   }
 
@@ -131,38 +155,45 @@ export const StackTraceViewer: React.FC<StackTraceViewerProps> = ({
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
-  const lines = useMemo(() => stackTrace.split('\n'), [stackTrace]);
+  const lines = useMemo(() => stackTrace.split("\n"), [stackTrace]);
 
   const handleCopyAll = () => {
     copyToClipboardWithNotification(
       stackTrace,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+      () =>
+        enqueueSnackbar(t("common.copiedToClipboard"), { variant: "success" }),
+      () => enqueueSnackbar(t("common.copyFailed"), { variant: "error" }),
     );
   };
 
   // Memoize style objects
-  const lineNumberBaseStyle = useMemo(() => ({
-    minWidth: '50px',
-    px: 1,
-    py: 0.25,
-    textAlign: 'right' as const,
-    borderRight: '1px solid',
-    borderColor: 'grey.700',
-    userSelect: 'none' as const,
-    fontFamily: 'D2Coding, monospace',
-    color: 'grey.500',
-    bgcolor: 'grey.800',
-  }), []);
+  const lineNumberBaseStyle = useMemo(
+    () => ({
+      minWidth: "50px",
+      px: 1,
+      py: 0.25,
+      textAlign: "right" as const,
+      borderRight: "1px solid",
+      borderColor: "grey.700",
+      userSelect: "none" as const,
+      fontFamily: "D2Coding, monospace",
+      color: "grey.500",
+      bgcolor: "grey.800",
+    }),
+    [],
+  );
 
-  const lineContentStyle = useMemo(() => ({
-    flex: 1,
-    px: 2,
-    py: 0.25,
-    whiteSpace: 'pre-wrap' as const,
-    wordBreak: 'break-all' as const,
-    fontFamily: 'D2Coding, monospace',
-  }), []);
+  const lineContentStyle = useMemo(
+    () => ({
+      flex: 1,
+      px: 2,
+      py: 0.25,
+      whiteSpace: "pre-wrap" as const,
+      wordBreak: "break-all" as const,
+      fontFamily: "D2Coding, monospace",
+    }),
+    [],
+  );
 
   // Memoized row component
   const Row = React.memo(({ index }: { index: number }) => {
@@ -173,11 +204,11 @@ export const StackTraceViewer: React.FC<StackTraceViewerProps> = ({
       <Box
         display="flex"
         sx={{
-          outline: '1px dashed transparent',
-          outlineOffset: '-1px',
-          '&:hover': {
-            bgcolor: 'rgba(255, 255, 255, 0.05)',
-            outlineColor: 'grey.600',
+          outline: "1px dashed transparent",
+          outlineOffset: "-1px",
+          "&:hover": {
+            bgcolor: "rgba(255, 255, 255, 0.05)",
+            outlineColor: "grey.600",
           },
         }}
       >
@@ -187,14 +218,12 @@ export const StackTraceViewer: React.FC<StackTraceViewerProps> = ({
         </Box>
 
         {/* Line Content with Lua syntax highlighting */}
-        <Box sx={lineContentStyle}>
-          {highlightLuaLine(line)}
-        </Box>
+        <Box sx={lineContentStyle}>{highlightLuaLine(line)}</Box>
       </Box>
     );
   });
 
-  Row.displayName = 'StackTraceViewerRow';
+  Row.displayName = "StackTraceViewerRow";
 
   if (loading) {
     return (
@@ -205,14 +234,22 @@ export const StackTraceViewer: React.FC<StackTraceViewerProps> = ({
   }
 
   return (
-    <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <Box
+      sx={{
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+      }}
+    >
       {/* Toolbar */}
       <Box sx={{ flexShrink: 0, mb: 1 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="caption" color="text.secondary">
-            {stackFilePath || t('crashes.stackTrace')} ({lines.length} {t('crashes.lines')})
+            {stackFilePath || t("crashes.stackTrace")} ({lines.length}{" "}
+            {t("crashes.lines")})
           </Typography>
-          <Tooltip title={t('crashes.copyAll')}>
+          <Tooltip title={t("crashes.copyAll")}>
             <IconButton size="small" onClick={handleCopyAll}>
               <CopyIcon fontSize="small" />
             </IconButton>
@@ -225,20 +262,20 @@ export const StackTraceViewer: React.FC<StackTraceViewerProps> = ({
         variant="outlined"
         sx={{
           flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          bgcolor: 'grey.900',
-          color: 'grey.100',
-          fontFamily: 'D2Coding, monospace',
-          fontSize: '0.75rem',
-          position: 'relative',
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+          bgcolor: "grey.900",
+          color: "grey.100",
+          fontFamily: "D2Coding, monospace",
+          fontSize: "0.75rem",
+          position: "relative",
         }}
       >
         <Virtuoso
           totalCount={lines.length}
           itemContent={(index) => <Row index={index} />}
-          style={{ height: '100%' }}
+          style={{ height: "100%" }}
           overscan={{
             main: 200,
             reverse: 100,
@@ -250,4 +287,3 @@ export const StackTraceViewer: React.FC<StackTraceViewerProps> = ({
 };
 
 export default StackTraceViewer;
-

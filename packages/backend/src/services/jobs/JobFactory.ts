@@ -1,5 +1,4 @@
-import logger from '../../config/logger';
-
+import logger from "../../config/logger";
 
 // Job 실행 결과 인터페이스
 export interface JobExecutionResult {
@@ -33,52 +32,63 @@ export abstract class BaseJob {
 
   public async executeWithTimeout(): Promise<JobExecutionResult> {
     const startTime = Date.now();
-    
+
     try {
       const timeoutPromise = new Promise<JobExecutionResult>((_, reject) => {
         setTimeout(() => {
-          reject(new Error(`Job execution timeout after ${this.context.timeoutSeconds} seconds`));
+          reject(
+            new Error(
+              `Job execution timeout after ${this.context.timeoutSeconds} seconds`,
+            ),
+          );
         }, this.context.timeoutSeconds * 1000);
       });
 
       const executionPromise = this.execute();
       const result = await Promise.race([executionPromise, timeoutPromise]);
-      
+
       const executionTime = Date.now() - startTime;
       return {
         ...result,
-        executionTimeMs: executionTime
+        executionTimeMs: executionTime,
       };
     } catch (error) {
       const executionTime = Date.now() - startTime;
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       logger.error(`Job execution failed: ${errorMessage}`, {
         jobId: this.context.jobId,
         jobType: this.context.jobType,
-        error: errorMessage
+        error: errorMessage,
       });
 
       return {
         success: false,
         error: errorMessage,
-        executionTimeMs: executionTime
+        executionTimeMs: executionTime,
       };
     }
   }
 
   protected validateRequiredFields(fields: string[]): void {
-    const missing = fields.filter(field => !this.context.jobDataMap[field]);
+    const missing = fields.filter((field) => !this.context.jobDataMap[field]);
     if (missing.length > 0) {
-      throw new Error(`Missing required fields: ${missing.join(', ')}`);
+      throw new Error(`Missing required fields: ${missing.join(", ")}`);
     }
   }
 }
 
 // Job Factory
 export class JobFactory {
-  private static jobTypes: Map<string, new (context: JobExecutionContext) => BaseJob> = new Map();
+  private static jobTypes: Map<
+    string,
+    new (context: JobExecutionContext) => BaseJob
+  > = new Map();
 
-  static registerJobType(typeName: string, jobClass: new (context: JobExecutionContext) => BaseJob): void {
+  static registerJobType(
+    typeName: string,
+    jobClass: new (context: JobExecutionContext) => BaseJob,
+  ): void {
     this.jobTypes.set(typeName, jobClass);
     logger.info(`Registered job type: ${typeName}`);
   }
@@ -88,7 +98,7 @@ export class JobFactory {
     if (!JobClass) {
       throw new Error(`Unknown job type: ${context.jobType}`);
     }
-    
+
     return new JobClass(context);
   }
 
@@ -103,14 +113,16 @@ export class JobFactory {
 
 // Job 실행기
 export class JobExecutor {
-  static async executeJob(context: JobExecutionContext): Promise<JobExecutionResult> {
+  static async executeJob(
+    context: JobExecutionContext,
+  ): Promise<JobExecutionResult> {
     try {
       logger.info(`Starting job execution`, {
         jobId: context.jobId,
         jobName: context.jobName,
         jobType: context.jobType,
         executionId: context.executionId,
-        retryAttempt: context.retryAttempt
+        retryAttempt: context.retryAttempt,
       });
 
       const job = JobFactory.createJob(context);
@@ -119,21 +131,22 @@ export class JobExecutor {
       logger.info(`Job execution completed`, {
         jobId: context.jobId,
         success: result.success,
-        executionTimeMs: result.executionTimeMs
+        executionTimeMs: result.executionTimeMs,
       });
 
       return result;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       logger.error(`Job execution failed`, {
         jobId: context.jobId,
-        error: errorMessage
+        error: errorMessage,
       });
 
       return {
         success: false,
         error: errorMessage,
-        executionTimeMs: 0
+        executionTimeMs: 0,
       };
     }
   }

@@ -1,7 +1,7 @@
-import { apiService } from './api';
+import { apiService } from "./api";
 
 export interface ServiceDiscoveryConfig {
-  mode: 'redis' | 'etcd';
+  mode: "redis" | "etcd";
   etcdHosts: string;
   defaultTtl: number;
   heartbeatInterval: number;
@@ -15,7 +15,7 @@ class ServiceDiscoveryConfigService {
    * Get service discovery configuration
    */
   async getConfig(): Promise<ServiceDiscoveryConfig> {
-    const response = await apiService.get('/admin/services/config');
+    const response = await apiService.get("/admin/services/config");
     return response.data;
   }
 
@@ -23,9 +23,9 @@ class ServiceDiscoveryConfigService {
    * Update service discovery configuration
    */
   async updateConfig(config: Partial<ServiceDiscoveryConfig>): Promise<void> {
-    await apiService.put('/admin/services/config', config);
+    await apiService.put("/admin/services/config", config);
   }
 }
 
-export const serviceDiscoveryConfigService = new ServiceDiscoveryConfigService();
-
+export const serviceDiscoveryConfigService =
+  new ServiceDiscoveryConfigService();

@@ -3,11 +3,17 @@
  * Provides service discovery operations via Backend API
  */
 
-import * as os from 'os';
-import { Logger } from '../utils/logger';
-import { ApiClient } from '../client/ApiClient';
-import { ServiceInstance, GetServicesParams, RegisterServiceInput, UpdateServiceStatusInput, ServiceLabels } from '../types/api';
-import { getFirstNicAddress } from '../utils/network';
+import * as os from "os";
+import { Logger } from "../utils/logger";
+import { ApiClient } from "../client/ApiClient";
+import {
+  ServiceInstance,
+  GetServicesParams,
+  RegisterServiceInput,
+  UpdateServiceStatusInput,
+  ServiceLabels,
+} from "../types/api";
+import { getFirstNicAddress } from "../utils/network";
 
 export class ServiceDiscoveryService {
   private apiClient: ApiClient;
@@ -70,7 +76,14 @@ export class ServiceDiscoveryService {
    * - hostname is auto-detected from os.hostname() if omitted
    * - internalAddress is auto-detected from first NIC if omitted
    */
-  async register(input: RegisterServiceInput): Promise<{ instanceId: string; hostname: string; internalAddress: string; externalAddress: string }> {
+  async register(
+    input: RegisterServiceInput,
+  ): Promise<{
+    instanceId: string;
+    hostname: string;
+    internalAddress: string;
+    externalAddress: string;
+  }> {
     // Auto-detect hostname and internalAddress if not provided
     const internalAddress = input.internalAddress || getFirstNicAddress();
     const hostname = input.hostname || os.hostname();
@@ -78,18 +91,20 @@ export class ServiceDiscoveryService {
     const registrationInput = {
       ...input,
       hostname,
-      internalAddress
+      internalAddress,
     };
 
-    this.logger.debug('Registering service via API', registrationInput);
+    this.logger.debug("Registering service via API", registrationInput);
 
-    const response = await this.apiClient.post<{ instanceId: string; hostname: string; internalAddress: string; externalAddress: string }>(
-      '/api/v1/server/services/register',
-      registrationInput
-    );
+    const response = await this.apiClient.post<{
+      instanceId: string;
+      hostname: string;
+      internalAddress: string;
+      externalAddress: string;
+    }>("/api/v1/server/services/register", registrationInput);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to register service');
+      throw new Error(response.error?.message || "Failed to register service");
     }
 
     const { instanceId, externalAddress } = response.data;
@@ -106,12 +121,12 @@ export class ServiceDiscoveryService {
       status: input.status,
     };
 
-    this.logger.info('Service registered via API', {
+    this.logger.info("Service registered via API", {
       instanceId,
       labels: input.labels,
       hostname,
       internalAddress,
-      externalAddress
+      externalAddress,
     });
 
     // Start heartbeat to keep service alive in Redis
@@ -129,35 +144,40 @@ export class ServiceDiscoveryService {
    */
   async unregister(): Promise<void> {
     if (!this.instanceId || !this.labels) {
-      this.logger.warn('No service instance to unregister');
+      this.logger.warn("No service instance to unregister");
       return;
     }
 
     // Stop heartbeat first
     this.stopHeartbeat();
 
-    this.logger.debug('Unregistering service via API', {
+    this.logger.debug("Unregistering service via API", {
       instanceId: this.instanceId,
       labels: this.labels,
     });
 
     try {
-      const response = await this.apiClient.postNoRetry('/api/v1/server/services/unregister', {
-        instanceId: this.instanceId,
-        labels: this.labels,
-      });
+      const response = await this.apiClient.postNoRetry(
+        "/api/v1/server/services/unregister",
+        {
+          instanceId: this.instanceId,
+          labels: this.labels,
+        },
+      );
 
       if (!response.success) {
-        throw new Error(response.error?.message || 'Failed to unregister service');
+        throw new Error(
+          response.error?.message || "Failed to unregister service",
+        );
       }
 
-      this.logger.info('Service unregistered via API', {
+      this.logger.info("Service unregistered via API", {
         instanceId: this.instanceId,
         labels: this.labels,
       });
     } catch (error) {
       // Log error but don't throw - unregister is best-effort during shutdown
-      this.logger.warn('Failed to unregister service', {
+      this.logger.warn("Failed to unregister service", {
         instanceId: this.instanceId,
         error: error instanceof Error ? error.message : String(error),
       });
@@ -182,11 +202,11 @@ export class ServiceDiscoveryService {
   async updateStatus(input: UpdateServiceStatusInput): Promise<void> {
     // Silently skip if not registered - register() must be called first
     if (!this.instanceId || !this.labels) {
-      this.logger.debug('Skipping updateStatus - service not registered yet');
+      this.logger.debug("Skipping updateStatus - service not registered yet");
       return;
     }
 
-    this.logger.debug('Updating service status via API', {
+    this.logger.debug("Updating service status via API", {
       instanceId: this.instanceId,
       labels: this.labels,
       status: input.status,
@@ -212,12 +232,15 @@ export class ServiceDiscoveryService {
 
     let response;
     try {
-      response = await this.apiClient.post('/api/v1/server/services/status', payload);
+      response = await this.apiClient.post(
+        "/api/v1/server/services/status",
+        payload,
+      );
     } catch (error: any) {
       // Handle thrown errors from ApiClient (e.g. 404, 500)
       const errorMessage = error.message || String(error);
 
-      if (errorMessage.includes('not found')) {
+      if (errorMessage.includes("not found")) {
         return await this.handleServiceNotFound(input);
       }
 
@@ -225,17 +248,18 @@ export class ServiceDiscoveryService {
     }
 
     if (!response.success) {
-      const errorMessage = response.error?.message || 'Failed to update service status';
+      const errorMessage =
+        response.error?.message || "Failed to update service status";
 
       // Check if error is "Service not found" and we have backup data
-      if (errorMessage.includes('not found')) {
+      if (errorMessage.includes("not found")) {
         return await this.handleServiceNotFound(input);
       }
 
       throw new Error(errorMessage);
     }
 
-    this.logger.debug('Service status updated via API', {
+    this.logger.debug("Service status updated via API", {
       instanceId: this.instanceId,
       labels: this.labels,
       status: input.status,
@@ -245,12 +269,17 @@ export class ServiceDiscoveryService {
   /**
    * Handle 'Service not found' error by attempting auto-registration
    */
-  private async handleServiceNotFound(input: UpdateServiceStatusInput): Promise<void> {
+  private async handleServiceNotFound(
+    input: UpdateServiceStatusInput,
+  ): Promise<void> {
     if (this.registrationBackup) {
-      this.logger.warn('Service not found in registry, attempting auto-registration', {
-        instanceId: this.instanceId,
-        service: this.labels?.service,
-      });
+      this.logger.warn(
+        "Service not found in registry, attempting auto-registration",
+        {
+          instanceId: this.instanceId,
+          service: this.labels?.service,
+        },
+      );
 
       try {
         // Re-register using backup data
@@ -261,11 +290,13 @@ export class ServiceDiscoveryService {
           internalAddress: this.registrationBackup.internalAddress,
           ports: this.registrationBackup.ports,
           meta: this.registrationBackup.meta,
-          status: (input.status || this.registrationBackup.status || 'ready') as any,
+          status: (input.status ||
+            this.registrationBackup.status ||
+            "ready") as any,
           stats: input.stats,
         });
 
-        this.logger.info('Service auto-registered successfully', {
+        this.logger.info("Service auto-registered successfully", {
           instanceId: this.instanceId,
           service: this.labels?.service,
         });
@@ -273,7 +304,7 @@ export class ServiceDiscoveryService {
         // Successfully re-registered
         return;
       } catch (reregisterError: any) {
-        this.logger.error('Failed to auto-register service', {
+        this.logger.error("Failed to auto-register service", {
           instanceId: this.instanceId,
           error: reregisterError.message || String(reregisterError),
         });
@@ -282,14 +313,19 @@ export class ServiceDiscoveryService {
     } else {
       // No backup data - this happens when server was restarted but register() was not called first
       // Clear the stale instanceId and labels to force a fresh register()
-      this.logger.error('Service not found and no backup data available. Did you call register() first?', {
-        instanceId: this.instanceId,
-        service: this.labels?.service,
-      });
+      this.logger.error(
+        "Service not found and no backup data available. Did you call register() first?",
+        {
+          instanceId: this.instanceId,
+          service: this.labels?.service,
+        },
+      );
       this.stopHeartbeat();
       this.instanceId = undefined;
       this.labels = undefined;
-      throw new Error('Service not found. Please call register() to re-register the service.');
+      throw new Error(
+        "Service not found. Please call register() to re-register the service.",
+      );
     }
   }
 
@@ -305,7 +341,7 @@ export class ServiceDiscoveryService {
    * - Any custom label key-value pairs
    */
   async fetchServices(params?: GetServicesParams): Promise<ServiceInstance[]> {
-    this.logger.debug('Fetching services via API', params);
+    this.logger.debug("Fetching services via API", params);
 
     const queryParams: any = {};
 
@@ -340,21 +376,24 @@ export class ServiceDiscoveryService {
 
     const headers: any = {};
     if (this.instanceId) {
-      headers['X-Instance-Id'] = this.instanceId;
+      headers["X-Instance-Id"] = this.instanceId;
     }
 
-    const response = await this.apiClient.get<ServiceInstance[]>('/api/v1/server/services', {
-      params: queryParams,
-      headers,
-    });
+    const response = await this.apiClient.get<ServiceInstance[]>(
+      "/api/v1/server/services",
+      {
+        params: queryParams,
+        headers,
+      },
+    );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch services');
+      throw new Error(response.error?.message || "Failed to fetch services");
     }
 
     const services = response.data;
 
-    this.logger.info('Services fetched via API', { count: services.length });
+    this.logger.info("Services fetched via API", { count: services.length });
 
     return services;
   }
@@ -363,18 +402,21 @@ export class ServiceDiscoveryService {
    * Fetch a specific service instance
    * GET /api/v1/server/services/:serviceType/:instanceId
    */
-  async fetchService(serviceType: string, instanceId: string): Promise<ServiceInstance | null> {
-    this.logger.debug('Fetching service via API', { serviceType, instanceId });
+  async fetchService(
+    serviceType: string,
+    instanceId: string,
+  ): Promise<ServiceInstance | null> {
+    this.logger.debug("Fetching service via API", { serviceType, instanceId });
 
     const response = await this.apiClient.get<ServiceInstance>(
-      `/api/v1/server/services/${serviceType}/${instanceId}`
+      `/api/v1/server/services/${serviceType}/${instanceId}`,
     );
 
     if (!response.success || !response.data) {
       return null;
     }
 
-    this.logger.info('Service fetched via API', { serviceType, instanceId });
+    this.logger.info("Service fetched via API", { serviceType, instanceId });
 
     return response.data;
   }
@@ -385,16 +427,19 @@ export class ServiceDiscoveryService {
    */
   private startHeartbeat(): void {
     if (this.heartbeatInterval) {
-      this.logger.warn('Heartbeat already running');
+      this.logger.warn("Heartbeat already running");
       return;
     }
 
     this.heartbeatInterval = setInterval(async () => {
       // Skip if previous update is still in progress (e.g., retrying after backend restart)
       if (this.isUpdating) {
-        this.logger.debug('Skipping heartbeat - previous update still in progress', {
-          instanceId: this.instanceId,
-        });
+        this.logger.debug(
+          "Skipping heartbeat - previous update still in progress",
+          {
+            instanceId: this.instanceId,
+          },
+        );
         return;
       }
 
@@ -409,7 +454,7 @@ export class ServiceDiscoveryService {
         // Include registration backup data for auto-register if service is missing from etcd
         // Use 'heartbeat' status to distinguish from actual status changes
         await this.updateStatus({
-          status: 'heartbeat',
+          status: "heartbeat",
           autoRegisterIfMissing: true,
           hostname: this.registrationBackup?.hostname,
           internalAddress: this.registrationBackup?.internalAddress,
@@ -417,12 +462,12 @@ export class ServiceDiscoveryService {
           meta: this.registrationBackup?.meta,
         });
 
-        this.logger.debug('Heartbeat sent', {
+        this.logger.debug("Heartbeat sent", {
           instanceId: this.instanceId,
           service: this.labels.service,
         });
       } catch (error) {
-        this.logger.warn('Heartbeat failed', {
+        this.logger.warn("Heartbeat failed", {
           instanceId: this.instanceId,
           error: error instanceof Error ? error.message : String(error),
         });
@@ -431,7 +476,7 @@ export class ServiceDiscoveryService {
       }
     }, this.heartbeatIntervalMs);
 
-    this.logger.info('Heartbeat started', {
+    this.logger.info("Heartbeat started", {
       instanceId: this.instanceId,
       intervalMs: this.heartbeatIntervalMs,
     });
@@ -444,7 +489,7 @@ export class ServiceDiscoveryService {
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = undefined;
-      this.logger.info('Heartbeat stopped', {
+      this.logger.info("Heartbeat stopped", {
         instanceId: this.instanceId,
       });
     }

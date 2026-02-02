@@ -1,19 +1,19 @@
-import { Server as SocketIOServer } from 'socket.io';
-import { pack, unpack } from 'msgpackr';
-import { gzip, gunzip } from 'zlib';
-import { promisify } from 'util';
-import LRUCache from 'lru-cache';
-import { config } from '../config';
-import { redisManager } from '../config/redis';
-import { createLogger } from '../config/logger';
+import { Server as SocketIOServer } from "socket.io";
+import { pack, unpack } from "msgpackr";
+import { gzip, gunzip } from "zlib";
+import { promisify } from "util";
+import LRUCache from "lru-cache";
+import { config } from "../config";
+import { redisManager } from "../config/redis";
+import { createLogger } from "../config/logger";
 
-const logger = createLogger('BroadcastService');
+const logger = createLogger("BroadcastService");
 
 const gzipAsync = promisify(gzip);
 const gunzipAsync = promisify(gunzip);
 
 export interface BroadcastMessage {
-  type: 'message' | 'typing' | 'user_status' | 'channel_update';
+  type: "message" | "typing" | "user_status" | "channel_update";
   channelId?: number;
   userId?: number;
   data: any;
@@ -54,24 +54,24 @@ export class BroadcastService {
 
     // Subscribe to broadcast channels
     subClient.subscribe(
-      'chat:broadcast',
-      'chat:channel_broadcast',
-      'chat:user_broadcast'
+      "chat:broadcast",
+      "chat:channel_broadcast",
+      "chat:user_broadcast",
     );
 
-    subClient.on('message', async (channel: string, message: string) => {
+    subClient.on("message", async (channel: string, message: string) => {
       try {
         let broadcastMessage: BroadcastMessage;
 
         if (config.broadcasting.useMessagePack) {
-          const buffer = Buffer.from(message, 'base64');
+          const buffer = Buffer.from(message, "base64");
           const decompressed = config.broadcasting.compression
             ? await gunzipAsync(buffer)
             : buffer;
           broadcastMessage = unpack(decompressed);
         } else {
           // JWT 토큰이나 다른 문자열이 아닌 유효한 JSON인지 확인
-          if (!message.startsWith('{') && !message.startsWith('[')) {
+          if (!message.startsWith("{") && !message.startsWith("[")) {
             // JSON이 아닌 메시지는 무시
             return;
           }
@@ -85,31 +85,38 @@ export class BroadcastService {
 
         await this.handleIncomingBroadcast(channel, broadcastMessage);
       } catch (error) {
-        logger.error('Error processing broadcast message:', error);
+        logger.error("Error processing broadcast message:", error);
       }
     });
   }
 
-  private async handleIncomingBroadcast(channel: string, message: BroadcastMessage): Promise<void> {
+  private async handleIncomingBroadcast(
+    channel: string,
+    message: BroadcastMessage,
+  ): Promise<void> {
     switch (channel) {
-      case 'chat:broadcast':
+      case "chat:broadcast":
         await this.handleGlobalBroadcast(message);
         break;
-      case 'chat:channel_broadcast':
+      case "chat:channel_broadcast":
         await this.handleChannelBroadcast(message);
         break;
-      case 'chat:user_broadcast':
+      case "chat:user_broadcast":
         await this.handleUserBroadcast(message);
         break;
     }
   }
 
-  private async handleGlobalBroadcast(message: BroadcastMessage): Promise<void> {
+  private async handleGlobalBroadcast(
+    message: BroadcastMessage,
+  ): Promise<void> {
     // Broadcast to all connected clients on this server
-    this.io.emit('global_message', message.data);
+    this.io.emit("global_message", message.data);
   }
 
-  private async handleChannelBroadcast(message: BroadcastMessage): Promise<void> {
+  private async handleChannelBroadcast(
+    message: BroadcastMessage,
+  ): Promise<void> {
     if (!message.channelId) return;
 
     // Get local users in this channel
@@ -117,7 +124,9 @@ export class BroadcastService {
 
     if (localUsers.length > 0) {
       // Use room-based broadcasting for efficiency
-      this.io.to(`channel:${message.channelId}`).emit(message.type, message.data);
+      this.io
+        .to(`channel:${message.channelId}`)
+        .emit(message.type, message.data);
     }
   }
 
@@ -132,7 +141,11 @@ export class BroadcastService {
   }
 
   // Optimized broadcasting methods
-  public async broadcastToChannel(channelId: number, type: string, data: any): Promise<void> {
+  public async broadcastToChannel(
+    channelId: number,
+    type: string,
+    data: any,
+  ): Promise<void> {
     const message: BroadcastMessage = {
       type: type as any,
       channelId,
@@ -150,7 +163,11 @@ export class BroadcastService {
     }
   }
 
-  public async broadcastToUser(userId: number, type: string, data: any): Promise<void> {
+  public async broadcastToUser(
+    userId: number,
+    type: string,
+    data: any,
+  ): Promise<void> {
     const message: BroadcastMessage = {
       type: type as any,
       userId,
@@ -181,7 +198,9 @@ export class BroadcastService {
     this.messageQueue.get(channelId)!.push(message);
 
     // Check if batch is full
-    if (this.messageQueue.get(channelId)!.length >= config.broadcasting.batchSize) {
+    if (
+      this.messageQueue.get(channelId)!.length >= config.broadcasting.batchSize
+    ) {
       this.processBatch(channelId);
     }
   }
@@ -214,7 +233,7 @@ export class BroadcastService {
   private async sendChannelBroadcast(message: BroadcastMessage): Promise<void> {
     const serialized = await this.serializeMessage(message);
     const pubClient = redisManager.getPubClient();
-    await pubClient.publish('chat:channel_broadcast', serialized);
+    await pubClient.publish("chat:channel_broadcast", serialized);
 
     // Also broadcast locally
     await this.handleChannelBroadcast(message);
@@ -223,7 +242,7 @@ export class BroadcastService {
   private async sendUserBroadcast(message: BroadcastMessage): Promise<void> {
     const serialized = await this.serializeMessage(message);
     const pubClient = redisManager.getPubClient();
-    await pubClient.publish('chat:user_broadcast', serialized);
+    await pubClient.publish("chat:user_broadcast", serialized);
 
     // Also handle locally
     await this.handleUserBroadcast(message);
@@ -232,7 +251,7 @@ export class BroadcastService {
   private async sendGlobalBroadcast(message: BroadcastMessage): Promise<void> {
     const serialized = await this.serializeMessage(message);
     const pubClient = redisManager.getPubClient();
-    await pubClient.publish('chat:broadcast', serialized);
+    await pubClient.publish("chat:broadcast", serialized);
 
     // Also handle locally
     await this.handleGlobalBroadcast(message);
@@ -242,7 +261,7 @@ export class BroadcastService {
     const cacheKey = `${message.type}:${message.timestamp}`;
 
     if (this.compressionCache.has(cacheKey)) {
-      return this.compressionCache.get(cacheKey)!.toString('base64');
+      return this.compressionCache.get(cacheKey)!.toString("base64");
     }
 
     let serialized: Buffer;
@@ -260,18 +279,18 @@ export class BroadcastService {
     }
 
     this.compressionCache.set(cacheKey, serialized);
-    return serialized.toString('base64');
+    return serialized.toString("base64");
   }
 
   private async getLocalChannelUsers(channelId: number): Promise<number[]> {
     // Get all sockets in the channel room
     const sockets = await this.io.in(`channel:${channelId}`).fetchSockets();
-    return sockets.map(socket => (socket as any).userId).filter(Boolean);
+    return sockets.map((socket) => (socket as any).userId).filter(Boolean);
   }
 
   private async getUserSocket(userId: number): Promise<any> {
     const sockets = await this.io.fetchSockets();
-    return sockets.find(socket => (socket as any).userId === userId);
+    return sockets.find((socket) => (socket as any).userId === userId);
   }
 
   public async cleanup(): Promise<void> {
@@ -290,8 +309,13 @@ export class BroadcastService {
   // Performance monitoring
   public getStats(): any {
     return {
-      queuedMessages: Array.from(this.messageQueue.values()).reduce((sum, arr) => sum + arr.length, 0),
-      cacheHitRate: this.messageCache.calculatedSize / (this.messageCache.calculatedSize + this.messageCache.size),
+      queuedMessages: Array.from(this.messageQueue.values()).reduce(
+        (sum, arr) => sum + arr.length,
+        0,
+      ),
+      cacheHitRate:
+        this.messageCache.calculatedSize /
+        (this.messageCache.calculatedSize + this.messageCache.size),
       compressionCacheSize: this.compressionCache.size,
     };
   }
@@ -301,14 +325,19 @@ export class BroadcastService {
     return BroadcastService.instance;
   }
 
-  public static createInstance(io: SocketIOServer, serverId: string): BroadcastService {
+  public static createInstance(
+    io: SocketIOServer,
+    serverId: string,
+  ): BroadcastService {
     if (BroadcastService.instance) {
-      logger.warn('BroadcastService instance already exists, returning existing instance');
+      logger.warn(
+        "BroadcastService instance already exists, returning existing instance",
+      );
       return BroadcastService.instance;
     }
 
     BroadcastService.instance = new BroadcastService(io, serverId);
-    logger.info('BroadcastService singleton instance created', { serverId });
+    logger.info("BroadcastService singleton instance created", { serverId });
     return BroadcastService.instance;
   }
 
@@ -316,7 +345,7 @@ export class BroadcastService {
     if (BroadcastService.instance) {
       BroadcastService.instance.cleanup();
       BroadcastService.instance = null;
-      logger.info('BroadcastService singleton instance cleared');
+      logger.info("BroadcastService singleton instance cleared");
     }
   }
 }

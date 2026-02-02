@@ -10,9 +10,9 @@
  * - Services use EnvironmentResolver for consistent environment handling
  */
 
-import { ApiClient } from '../client/ApiClient';
-import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/EnvironmentResolver';
+import { ApiClient } from "../client/ApiClient";
+import { Logger } from "../utils/logger";
+import { EnvironmentResolver } from "../utils/EnvironmentResolver";
 
 /**
  * Configuration for extracting items from API response
@@ -28,7 +28,11 @@ export interface ItemExtractor<T, TResponse> {
  * @template TResponse - The API response type
  * @template TId - The ID type for items (string or number)
  */
-export abstract class BaseEnvironmentService<T, TResponse, TId = string | number> {
+export abstract class BaseEnvironmentService<
+  T,
+  TResponse,
+  TId = string | number,
+> {
   protected apiClient: ApiClient;
   protected logger: Logger;
   protected envResolver: EnvironmentResolver;
@@ -39,7 +43,11 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
    */
   protected featureEnabled: boolean = true;
 
-  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
+  constructor(
+    apiClient: ApiClient,
+    logger: Logger,
+    envResolver: EnvironmentResolver,
+  ) {
     this.apiClient = apiClient;
     this.logger = logger;
     this.envResolver = envResolver;
@@ -65,8 +73,13 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
    * @param environment Optional environment parameter
    * @param methodName Method name for error messages
    */
-  protected resolveEnvironment(environment?: string, methodName?: string): string {
-    const context = methodName ? `${this.getServiceName()}.${methodName}` : this.getServiceName();
+  protected resolveEnvironment(
+    environment?: string,
+    methodName?: string,
+  ): string {
+    const context = methodName
+      ? `${this.getServiceName()}.${methodName}`
+      : this.getServiceName();
     return this.envResolver.resolve(environment, context);
   }
 
@@ -97,13 +110,18 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     const response = await this.apiClient.get<TResponse>(endpoint);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || `Failed to fetch ${this.getServiceName()}`);
+      throw new Error(
+        response.error?.message || `Failed to fetch ${this.getServiceName()}`,
+      );
     }
 
     const items = this.extractItems(response.data);
     this.cachedByEnv.set(environment, items);
 
-    this.logger.info(`${this.getServiceName()} fetched`, { count: items.length, environment });
+    this.logger.info(`${this.getServiceName()} fetched`, {
+      count: items.length,
+      environment,
+    });
 
     return items;
   }
@@ -112,7 +130,10 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
    * Fetch items for multiple environments
    */
   async listByEnvironments(environments: string[]): Promise<T[]> {
-    this.logger.debug(`Fetching ${this.getServiceName()} for multiple environments`, { environments });
+    this.logger.debug(
+      `Fetching ${this.getServiceName()} for multiple environments`,
+      { environments },
+    );
 
     const results: T[] = [];
 
@@ -121,7 +142,10 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
         const items = await this.listByEnvironment(env);
         results.push(...items);
       } catch (error) {
-        this.logger.error(`Failed to fetch ${this.getServiceName()} for environment ${env}`, { error });
+        this.logger.error(
+          `Failed to fetch ${this.getServiceName()} for environment ${env}`,
+          { error },
+        );
       }
     }
 
@@ -176,7 +200,10 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
    */
   clearCacheForEnvironment(environment: string): void {
     this.cachedByEnv.delete(environment);
-    this.logger.debug(`${this.getServiceName()} cache cleared for environment`, { environment });
+    this.logger.debug(
+      `${this.getServiceName()} cache cleared for environment`,
+      { environment },
+    );
   }
 
   /**
@@ -184,11 +211,19 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
    * @param environment Environment name
    * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
-  async refreshByEnvironment(environment: string, suppressWarnings?: boolean): Promise<T[]> {
+  async refreshByEnvironment(
+    environment: string,
+    suppressWarnings?: boolean,
+  ): Promise<T[]> {
     if (!this.featureEnabled && !suppressWarnings) {
-      this.logger.warn(`${this.getServiceName()}.refreshByEnvironment() called but feature is disabled`, { environment });
+      this.logger.warn(
+        `${this.getServiceName()}.refreshByEnvironment() called but feature is disabled`,
+        { environment },
+      );
     }
-    this.logger.info(`Refreshing ${this.getServiceName()} cache`, { environment });
+    this.logger.info(`Refreshing ${this.getServiceName()} cache`, {
+      environment,
+    });
     return await this.listByEnvironment(environment);
   }
 
@@ -198,7 +233,9 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
    */
   async refreshAllEnvironments(suppressWarnings?: boolean): Promise<void> {
     if (!this.featureEnabled && !suppressWarnings) {
-      this.logger.warn(`${this.getServiceName()}.refreshAllEnvironments() called but feature is disabled`);
+      this.logger.warn(
+        `${this.getServiceName()}.refreshAllEnvironments() called but feature is disabled`,
+      );
     }
     const environments = this.getCachedEnvironments();
     if (environments.length === 0) {
@@ -216,7 +253,10 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
    */
   updateCache(items: T[], environment: string): void {
     this.cachedByEnv.set(environment, items);
-    this.logger.debug(`${this.getServiceName()} cache updated`, { environment, count: items.length });
+    this.logger.debug(`${this.getServiceName()} cache updated`, {
+      environment,
+      count: items.length,
+    });
   }
 
   /**
@@ -228,16 +268,26 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     const currentItems = this.cachedByEnv.get(environment) || [];
     const itemId = this.getItemId(item);
 
-    const existsInCache = currentItems.some(i => this.getItemId(i) === itemId);
+    const existsInCache = currentItems.some(
+      (i) => this.getItemId(i) === itemId,
+    );
 
     if (existsInCache) {
-      const newItems = currentItems.map(i => this.getItemId(i) === itemId ? item : i);
+      const newItems = currentItems.map((i) =>
+        this.getItemId(i) === itemId ? item : i,
+      );
       this.cachedByEnv.set(environment, newItems);
-      this.logger.debug(`Single ${this.getServiceName()} updated in cache`, { id: itemId, environment });
+      this.logger.debug(`Single ${this.getServiceName()} updated in cache`, {
+        id: itemId,
+        environment,
+      });
     } else {
       const newItems = [...currentItems, item];
       this.cachedByEnv.set(environment, newItems);
-      this.logger.debug(`Single ${this.getServiceName()} added to cache`, { id: itemId, environment });
+      this.logger.debug(`Single ${this.getServiceName()} added to cache`, {
+        id: itemId,
+        environment,
+      });
     }
   }
 
@@ -248,9 +298,12 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
    */
   removeFromCache(id: TId, environment: string): void {
     const currentItems = this.cachedByEnv.get(environment) || [];
-    const newItems = currentItems.filter(item => this.getItemId(item) !== id);
+    const newItems = currentItems.filter((item) => this.getItemId(item) !== id);
     this.cachedByEnv.set(environment, newItems);
-    this.logger.debug(`${this.getServiceName()} removed from cache`, { id, environment });
+    this.logger.debug(`${this.getServiceName()} removed from cache`, {
+      id,
+      environment,
+    });
   }
 
   /**

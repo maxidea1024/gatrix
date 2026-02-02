@@ -1,6 +1,12 @@
-import db from '../config/knex';
+import db from "../config/knex";
 
-export type VarValueType = 'string' | 'number' | 'boolean' | 'color' | 'object' | 'array';
+export type VarValueType =
+  | "string"
+  | "number"
+  | "boolean"
+  | "color"
+  | "object"
+  | "array";
 
 export interface VarItem {
   id: number;
@@ -34,19 +40,29 @@ export interface UpdateVarData {
 
 export default class VarsModel {
   static async get(key: string, environment: string): Promise<string | null> {
-    const result = await db('g_vars')
-      .select('varValue')
-      .where('varKey', key)
-      .where('environment', environment)
+    const result = await db("g_vars")
+      .select("varValue")
+      .where("varKey", key)
+      .where("environment", environment)
       .first();
 
     return result?.varValue ?? null;
   }
 
-  static async set(key: string, value: string | null, userId: number, environment: string): Promise<void> {
-    await db('g_vars')
-      .insert({ varKey: key, varValue: value, createdBy: userId, environment: environment })
-      .onConflict(['varKey', 'environment'])
+  static async set(
+    key: string,
+    value: string | null,
+    userId: number,
+    environment: string,
+  ): Promise<void> {
+    await db("g_vars")
+      .insert({
+        varKey: key,
+        varValue: value,
+        createdBy: userId,
+        environment: environment,
+      })
+      .onConflict(["varKey", "environment"])
       .merge({ varValue: value, updatedBy: userId });
   }
 
@@ -54,22 +70,24 @@ export default class VarsModel {
    * Get all KV items (keys starting with 'kv:' or '$')
    */
   static async getAllKV(environment: string): Promise<VarItem[]> {
-    const results = await db('g_vars as v')
-      .leftJoin('g_users as creator', 'v.createdBy', 'creator.id')
-      .leftJoin('g_users as updater', 'v.updatedBy', 'updater.id')
+    const results = await db("g_vars as v")
+      .leftJoin("g_users as creator", "v.createdBy", "creator.id")
+      .leftJoin("g_users as updater", "v.updatedBy", "updater.id")
       .select(
-        'v.*',
-        'creator.name as createdByName',
-        'updater.name as updatedByName'
+        "v.*",
+        "creator.name as createdByName",
+        "updater.name as updatedByName",
       )
-      .where('v.environment', environment)
+      .where("v.environment", environment)
       .where((builder) => {
-        builder.where('v.varKey', 'like', 'kv:%').orWhere('v.varKey', 'like', '$%');
+        builder
+          .where("v.varKey", "like", "kv:%")
+          .orWhere("v.varKey", "like", "$%");
       })
-      .orderBy('v.varKey', 'asc');
+      .orderBy("v.varKey", "asc");
 
     // Convert MySQL boolean (0/1) to JavaScript boolean
-    return results.map(item => ({
+    return results.map((item) => ({
       ...item,
       isSystemDefined: Boolean(item.isSystemDefined),
       isCopyable: Boolean(item.isCopyable),
@@ -79,17 +97,20 @@ export default class VarsModel {
   /**
    * Get a single KV item by key
    */
-  static async getKV(key: string, environment: string): Promise<VarItem | null> {
-    const result = await db('g_vars as v')
-      .leftJoin('g_users as creator', 'v.createdBy', 'creator.id')
-      .leftJoin('g_users as updater', 'v.updatedBy', 'updater.id')
+  static async getKV(
+    key: string,
+    environment: string,
+  ): Promise<VarItem | null> {
+    const result = await db("g_vars as v")
+      .leftJoin("g_users as creator", "v.createdBy", "creator.id")
+      .leftJoin("g_users as updater", "v.updatedBy", "updater.id")
       .select(
-        'v.*',
-        'creator.name as createdByName',
-        'updater.name as updatedByName'
+        "v.*",
+        "creator.name as createdByName",
+        "updater.name as updatedByName",
       )
-      .where('v.varKey', key)
-      .where('v.environment', environment)
+      .where("v.varKey", key)
+      .where("v.environment", environment)
       .first();
 
     if (!result) {
@@ -107,11 +128,17 @@ export default class VarsModel {
   /**
    * Create a new KV item
    */
-  static async createKV(data: CreateVarData, userId: number, environment: string): Promise<VarItem> {
+  static async createKV(
+    data: CreateVarData,
+    userId: number,
+    environment: string,
+  ): Promise<VarItem> {
     // Ensure key starts with 'kv:'
-    const key = data.varKey.startsWith('kv:') ? data.varKey : `kv:${data.varKey}`;
+    const key = data.varKey.startsWith("kv:")
+      ? data.varKey
+      : `kv:${data.varKey}`;
 
-    await db('g_vars').insert({
+    await db("g_vars").insert({
       varKey: key,
       varValue: data.varValue,
       valueType: data.valueType,
@@ -123,7 +150,7 @@ export default class VarsModel {
 
     const created = await this.getKV(key, environment);
     if (!created) {
-      throw new Error('Failed to create KV item');
+      throw new Error("Failed to create KV item");
     }
     return created;
   }
@@ -131,15 +158,24 @@ export default class VarsModel {
   /**
    * Update an existing KV item
    */
-  static async updateKV(key: string, data: UpdateVarData, userId: number, environment: string): Promise<VarItem> {
+  static async updateKV(
+    key: string,
+    data: UpdateVarData,
+    userId: number,
+    environment: string,
+  ): Promise<VarItem> {
     // Check if item exists and is not system-defined for type changes
     const existing = await this.getKV(key, environment);
     if (!existing) {
-      throw new Error('KV item not found');
+      throw new Error("KV item not found");
     }
 
-    if (existing.isSystemDefined && data.valueType && data.valueType !== existing.valueType) {
-      throw new Error('Cannot change type of system-defined KV item');
+    if (
+      existing.isSystemDefined &&
+      data.valueType &&
+      data.valueType !== existing.valueType
+    ) {
+      throw new Error("Cannot change type of system-defined KV item");
     }
 
     const updateData: any = {
@@ -156,14 +192,14 @@ export default class VarsModel {
       updateData.description = data.description;
     }
 
-    await db('g_vars')
-      .where('varKey', key)
-      .where('environment', environment)
+    await db("g_vars")
+      .where("varKey", key)
+      .where("environment", environment)
       .update(updateData);
 
     const updated = await this.getKV(key, environment);
     if (!updated) {
-      throw new Error('Failed to update KV item');
+      throw new Error("Failed to update KV item");
     }
     return updated;
   }
@@ -174,16 +210,16 @@ export default class VarsModel {
   static async deleteKV(key: string, environment: string): Promise<void> {
     const existing = await this.getKV(key, environment);
     if (!existing) {
-      throw new Error('KV item not found');
+      throw new Error("KV item not found");
     }
 
     if (existing.isSystemDefined) {
-      throw new Error('Cannot delete system-defined KV item');
+      throw new Error("Cannot delete system-defined KV item");
     }
 
-    await db('g_vars')
-      .where('varKey', key)
-      .where('environment', environment)
+    await db("g_vars")
+      .where("varKey", key)
+      .where("environment", environment)
       .delete();
   }
 
@@ -198,18 +234,19 @@ export default class VarsModel {
     valueType: VarValueType,
     environment: string,
     description?: string,
-    isCopyable: boolean = true
+    isCopyable: boolean = true,
   ): Promise<void> {
-    const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
+    const fullKey =
+      key.startsWith("kv:") || key.startsWith("$") ? key : `kv:${key}`;
 
     // Check if item already exists
     const existing = await this.getKV(fullKey, environment);
 
     if (existing) {
       // Item exists: only update description and ensure isSystemDefined is true
-      await db('g_vars')
-        .where('varKey', fullKey)
-        .where('environment', environment)
+      await db("g_vars")
+        .where("varKey", fullKey)
+        .where("environment", environment)
         .update({
           description: description || existing.description || null,
           isSystemDefined: true,
@@ -217,7 +254,7 @@ export default class VarsModel {
         });
     } else {
       // Item doesn't exist: create it with initial value
-      await db('g_vars').insert({
+      await db("g_vars").insert({
         varKey: fullKey,
         varValue: value,
         valueType,

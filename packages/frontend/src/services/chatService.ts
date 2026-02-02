@@ -1,5 +1,5 @@
-import { apiService } from './api';
-import { AuthService } from './auth';
+import { apiService } from "./api";
+import { AuthService } from "./auth";
 import {
   Channel,
   Message,
@@ -12,33 +12,47 @@ import {
   ChannelMember,
   MessageAttachment,
   ChatNotification,
-  User
-} from '../types/chat';
+  User,
+} from "../types/chat";
 
 export class ChatService {
-  private static readonly BASE_URL = '/chat';
+  private static readonly BASE_URL = "/chat";
 
   // Channel management
   static async getChannels(params?: GetChannelsRequest): Promise<Channel[]> {
-    const response = await apiService.get<{ data: Channel[]; pagination: any }>(`${this.BASE_URL}/channels/my`, { params });
-    console.log('🔍 ChatService.getChannels response:', response);
+    const response = await apiService.get<{ data: Channel[]; pagination: any }>(
+      `${this.BASE_URL}/channels/my`,
+      { params },
+    );
+    console.log("🔍 ChatService.getChannels response:", response);
     // API 응답 구조: { success: true, data: [...] }
     // apiService는 이미 response.data를 반환하므로 response.data가 실제 데이터
     return response.data || [];
   }
 
   static async getChannel(channelId: number): Promise<Channel> {
-    const response = await apiService.get<Channel>(`${this.BASE_URL}/channels/${channelId}`);
+    const response = await apiService.get<Channel>(
+      `${this.BASE_URL}/channels/${channelId}`,
+    );
     return response.data;
   }
 
   static async createChannel(data: CreateChannelRequest): Promise<Channel> {
-    const response = await apiService.post<Channel>(`${this.BASE_URL}/channels`, data);
+    const response = await apiService.post<Channel>(
+      `${this.BASE_URL}/channels`,
+      data,
+    );
     return response.data;
   }
 
-  static async updateChannel(channelId: number, data: UpdateChannelRequest): Promise<Channel> {
-    const response = await apiService.put<Channel>(`${this.BASE_URL}/channels/${channelId}`, data);
+  static async updateChannel(
+    channelId: number,
+    data: UpdateChannelRequest,
+  ): Promise<Channel> {
+    const response = await apiService.put<Channel>(
+      `${this.BASE_URL}/channels/${channelId}`,
+      data,
+    );
     return response.data;
   }
 
@@ -56,20 +70,39 @@ export class ChatService {
 
   // Channel members
   static async getChannelMembers(channelId: number): Promise<ChannelMember[]> {
-    const response = await apiService.get<ChannelMember[]>(`${this.BASE_URL}/channels/${channelId}/members`);
+    const response = await apiService.get<ChannelMember[]>(
+      `${this.BASE_URL}/channels/${channelId}/members`,
+    );
     return response.data || [];
   }
 
-  static async addChannelMember(channelId: number, userId: number): Promise<void> {
-    await apiService.post(`${this.BASE_URL}/channels/${channelId}/members`, { userId });
+  static async addChannelMember(
+    channelId: number,
+    userId: number,
+  ): Promise<void> {
+    await apiService.post(`${this.BASE_URL}/channels/${channelId}/members`, {
+      userId,
+    });
   }
 
-  static async removeChannelMember(channelId: number, userId: number): Promise<void> {
-    await apiService.delete(`${this.BASE_URL}/channels/${channelId}/members/${userId}`);
+  static async removeChannelMember(
+    channelId: number,
+    userId: number,
+  ): Promise<void> {
+    await apiService.delete(
+      `${this.BASE_URL}/channels/${channelId}/members/${userId}`,
+    );
   }
 
-  static async updateMemberRole(channelId: number, userId: number, role: 'admin' | 'member'): Promise<void> {
-    await apiService.put(`${this.BASE_URL}/channels/${channelId}/members/${userId}`, { role });
+  static async updateMemberRole(
+    channelId: number,
+    userId: number,
+    role: "admin" | "member",
+  ): Promise<void> {
+    await apiService.put(
+      `${this.BASE_URL}/channels/${channelId}/members/${userId}`,
+      { role },
+    );
   }
 
   // Message management
@@ -83,33 +116,42 @@ export class ChatService {
     // Backend shape: { success: true, data: Message[], pagination: { total, hasMore, ... } }
     const response = await apiService.get<any>(
       `${this.BASE_URL}/channels/${channelId}/messages`,
-      { params: queryParams }
+      { params: queryParams },
     );
 
     const data = response;
     const messages: Message[] = Array.isArray(data.data)
       ? data.data
-      : (data.data?.messages || []);
-    const total: number = typeof data.pagination?.total === 'number'
-      ? data.pagination.total
-      : (Array.isArray(data.data) ? data.data.length : (data.data?.total || 0));
-    const hasMore: boolean = typeof data.pagination?.hasMore === 'boolean'
-      ? data.pagination.hasMore
-      : !!data.pagination?.hasNext;
+      : data.data?.messages || [];
+    const total: number =
+      typeof data.pagination?.total === "number"
+        ? data.pagination.total
+        : Array.isArray(data.data)
+          ? data.data.length
+          : data.data?.total || 0;
+    const hasMore: boolean =
+      typeof data.pagination?.hasMore === "boolean"
+        ? data.pagination.hasMore
+        : !!data.pagination?.hasNext;
 
     return { messages, hasMore, total };
   }
 
   static async getMessage(messageId: number): Promise<Message> {
-    const response = await apiService.get<Message>(`${this.BASE_URL}/messages/${messageId}`);
+    const response = await apiService.get<Message>(
+      `${this.BASE_URL}/messages/${messageId}`,
+    );
     return response.data;
   }
 
-  static async sendMessage(channelId: number, data: SendMessageRequest): Promise<Message> {
-    console.log('🔍 ChatService.sendMessage called with:', {
+  static async sendMessage(
+    channelId: number,
+    data: SendMessageRequest,
+  ): Promise<Message> {
+    console.log("🔍 ChatService.sendMessage called with:", {
       channelId,
       data,
-      url: `${this.BASE_URL}/channels/${channelId}/messages`
+      url: `${this.BASE_URL}/channels/${channelId}/messages`,
     });
 
     // 첨부파일이 있으면 FormData 사용, 없으면 JSON 사용
@@ -117,13 +159,17 @@ export class ChatService {
       const formData = new FormData();
 
       // Add text content and metadata
-      formData.append('content', data.content);
-      if (data.type) formData.append('type', data.type);
-      if (data.replyToId) formData.append('replyToId', data.replyToId.toString());
-      if (data.threadId) formData.append('threadId', data.threadId.toString());
-      if (data.mentions) formData.append('mentions', JSON.stringify(data.mentions));
-      if (data.hashtags) formData.append('hashtags', JSON.stringify(data.hashtags));
-      if (data.metadata) formData.append('metadata', JSON.stringify(data.metadata));
+      formData.append("content", data.content);
+      if (data.type) formData.append("type", data.type);
+      if (data.replyToId)
+        formData.append("replyToId", data.replyToId.toString());
+      if (data.threadId) formData.append("threadId", data.threadId.toString());
+      if (data.mentions)
+        formData.append("mentions", JSON.stringify(data.mentions));
+      if (data.hashtags)
+        formData.append("hashtags", JSON.stringify(data.hashtags));
+      if (data.metadata)
+        formData.append("metadata", JSON.stringify(data.metadata));
 
       // Add file attachments
       data.attachments.forEach((file, index) => {
@@ -135,35 +181,41 @@ export class ChatService {
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
       return response.data;
     } else {
       // 첨부파일이 없으면 JSON으로 전송
       const requestData = {
         content: data.content,
-        contentType: data.type || 'text',
+        contentType: data.type || "text",
         replyToMessageId: data.replyToId,
         threadId: data.threadId,
         mentions: data.mentions,
         hashtags: data.hashtags,
-        metadata: data.metadata
+        metadata: data.metadata,
       };
 
-      console.log('🔍 Sending JSON message data:', requestData);
+      console.log("🔍 Sending JSON message data:", requestData);
 
       const response = await apiService.post<Message>(
         `${this.BASE_URL}/channels/${channelId}/messages`,
-        requestData
+        requestData,
       );
       return response.data;
     }
   }
 
-  static async updateMessage(messageId: number, data: UpdateMessageRequest): Promise<Message> {
-    const response = await apiService.put<Message>(`${this.BASE_URL}/messages/${messageId}`, data);
+  static async updateMessage(
+    messageId: number,
+    data: UpdateMessageRequest,
+  ): Promise<Message> {
+    const response = await apiService.put<Message>(
+      `${this.BASE_URL}/messages/${messageId}`,
+      data,
+    );
     return response.data;
   }
 
@@ -173,42 +225,58 @@ export class ChatService {
 
   // Message reactions
   static async addReaction(messageId: number, emoji: string): Promise<void> {
-    await apiService.post(`${this.BASE_URL}/messages/${messageId}/reactions`, { emoji });
+    await apiService.post(`${this.BASE_URL}/messages/${messageId}/reactions`, {
+      emoji,
+    });
   }
 
   static async removeReaction(messageId: number, emoji: string): Promise<void> {
-    await apiService.delete(`${this.BASE_URL}/messages/${messageId}/reactions/${emoji}`);
+    await apiService.delete(
+      `${this.BASE_URL}/messages/${messageId}/reactions/${emoji}`,
+    );
   }
 
   // File upload
-  static async uploadFile(file: File, channelId: number): Promise<MessageAttachment> {
+  static async uploadFile(
+    file: File,
+    channelId: number,
+  ): Promise<MessageAttachment> {
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('channelId', channelId.toString());
+    formData.append("file", file);
+    formData.append("channelId", channelId.toString());
 
     const response = await apiService.post<MessageAttachment>(
       `${this.BASE_URL}/upload`,
       formData,
       {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
-      }
+      },
     );
     return response.data;
   }
 
   // Search
-  static async searchMessages(query: string, channelId?: number): Promise<Message[]> {
+  static async searchMessages(
+    query: string,
+    channelId?: number,
+  ): Promise<Message[]> {
     const params: any = { query };
     if (channelId) params.channelId = channelId;
 
-    const response = await apiService.get<Message[]>(`${this.BASE_URL}/search`, { params });
+    const response = await apiService.get<Message[]>(
+      `${this.BASE_URL}/search`,
+      { params },
+    );
     return response.data || [];
   }
 
   // Read status
-  static async markAsRead(channelId: number, messageId?: number): Promise<void> {
+  static async markAsRead(
+    channelId: number,
+    messageId?: number,
+  ): Promise<void> {
     const data: any = {};
     if (messageId) data.messageId = messageId;
 
@@ -216,7 +284,7 @@ export class ChatService {
       channelId,
       messageId,
       url: `${this.BASE_URL}/channels/${channelId}/read`,
-      data
+      data,
     });
 
     try {
@@ -224,9 +292,13 @@ export class ChatService {
       await this.ensureValidToken();
 
       // 백엔드를 통해 요청 (직접 라우트 사용)
-      const response = await apiService.post(`${this.BASE_URL}/channels/${channelId}/read`, data, {
-        timeout: 10000
-      });
+      const response = await apiService.post(
+        `${this.BASE_URL}/channels/${channelId}/read`,
+        data,
+        {
+          timeout: 10000,
+        },
+      );
 
       console.log(`✅ ChatService.markAsRead success:`, response);
     } catch (error: any) {
@@ -235,12 +307,18 @@ export class ChatService {
       // 401 오류인 경우 토큰 갱신 후 재시도
       if (error.response?.status === 401) {
         try {
-          console.log(`🔄 Token expired, refreshing and retrying markAsRead...`);
+          console.log(
+            `🔄 Token expired, refreshing and retrying markAsRead...`,
+          );
           await this.refreshTokenAndRetry();
 
-          const response = await apiService.post(`${this.BASE_URL}/channels/${channelId}/read`, data, {
-            timeout: 5000
-          });
+          const response = await apiService.post(
+            `${this.BASE_URL}/channels/${channelId}/read`,
+            data,
+            {
+              timeout: 5000,
+            },
+          );
 
           console.log(`✅ ChatService.markAsRead retry success:`, response);
           return;
@@ -255,14 +333,14 @@ export class ChatService {
 
   // 토큰 유효성 확인 및 갱신
   private static async ensureValidToken(): Promise<void> {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
     if (!token) {
-      throw new Error('No access token available');
+      throw new Error("No access token available");
     }
 
     try {
       // JWT 페이로드 디코딩하여 만료 시간 확인
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(token.split(".")[1]));
       const currentTime = Date.now() / 1000;
 
       // 토큰이 5분 이내에 만료되면 미리 갱신
@@ -271,7 +349,7 @@ export class ChatService {
         await this.refreshTokenAndRetry();
       }
     } catch (error) {
-      console.warn('Failed to check token expiry:', error);
+      console.warn("Failed to check token expiry:", error);
       // 토큰 파싱 실패 시에도 갱신 시도
       await this.refreshTokenAndRetry();
     }
@@ -284,12 +362,16 @@ export class ChatService {
 
   // Notifications
   static async getNotifications(): Promise<ChatNotification[]> {
-    const response = await apiService.get<ChatNotification[]>(`${this.BASE_URL}/notifications`);
+    const response = await apiService.get<ChatNotification[]>(
+      `${this.BASE_URL}/notifications`,
+    );
     return response.data || [];
   }
 
   static async markNotificationAsRead(notificationId: number): Promise<void> {
-    await apiService.put(`${this.BASE_URL}/notifications/${notificationId}/read`);
+    await apiService.put(
+      `${this.BASE_URL}/notifications/${notificationId}/read`,
+    );
   }
 
   static async markAllNotificationsAsRead(): Promise<void> {
@@ -299,7 +381,9 @@ export class ChatService {
   // User management
   static async getUsers(search?: string): Promise<User[]> {
     const params = search ? { search } : {};
-    const response = await apiService.get<any>(`${this.BASE_URL}/users`, { params });
+    const response = await apiService.get<any>(`${this.BASE_URL}/users`, {
+      params,
+    });
 
     // Handle different response structures
     if (response.data) {
@@ -308,11 +392,17 @@ export class ChatService {
         return response.data as User[];
       }
       // If response.data has a users property, return that
-      if ((response.data as any).users && Array.isArray((response.data as any).users)) {
+      if (
+        (response.data as any).users &&
+        Array.isArray((response.data as any).users)
+      ) {
         return (response.data as any).users as User[];
       }
       // If response.data has a data property, return that
-      if ((response.data as any).data && Array.isArray((response.data as any).data)) {
+      if (
+        (response.data as any).data &&
+        Array.isArray((response.data as any).data)
+      ) {
         return (response.data as any).data as User[];
       }
     }
@@ -328,11 +418,11 @@ export class ChatService {
 
     try {
       const response = await apiService.get<{ success: boolean; data: User[] }>(
-        `/users/search?q=${encodeURIComponent(query)}`
+        `/users/search?q=${encodeURIComponent(query)}`,
       );
       return response.data || [];
     } catch (error) {
-      console.error('Failed to search users:', error);
+      console.error("Failed to search users:", error);
       return [];
     }
   }
@@ -342,16 +432,18 @@ export class ChatService {
     await apiService.post(`${this.BASE_URL}/sync-user`);
   }
 
-
-
   static async getUsersInChannel(channelId: number): Promise<User[]> {
-    const response = await apiService.get<User[]>(`${this.BASE_URL}/channels/${channelId}/users`);
+    const response = await apiService.get<User[]>(
+      `${this.BASE_URL}/channels/${channelId}/users`,
+    );
     return response.data || [];
   }
 
   // Typing indicators
   static async startTyping(channelId: number): Promise<void> {
-    await apiService.post(`${this.BASE_URL}/channels/${channelId}/typing/start`);
+    await apiService.post(
+      `${this.BASE_URL}/channels/${channelId}/typing/start`,
+    );
   }
 
   static async stopTyping(channelId: number): Promise<void> {
@@ -360,13 +452,20 @@ export class ChatService {
 
   // Direct messages
   static async createDirectMessage(userId: number): Promise<Channel> {
-    const response = await apiService.post<Channel>(`${this.BASE_URL}/direct-messages`, { userId });
+    const response = await apiService.post<Channel>(
+      `${this.BASE_URL}/direct-messages`,
+      { userId },
+    );
     return response.data;
   }
 
-  static async getDirectMessageChannel(userId: number): Promise<Channel | null> {
+  static async getDirectMessageChannel(
+    userId: number,
+  ): Promise<Channel | null> {
     try {
-      const response = await apiService.get<Channel>(`${this.BASE_URL}/direct-messages/${userId}`);
+      const response = await apiService.get<Channel>(
+        `${this.BASE_URL}/direct-messages/${userId}`,
+      );
       return response.data;
     } catch (error: any) {
       if (error.response?.status === 404) {
@@ -377,15 +476,21 @@ export class ChatService {
   }
 
   // Channel settings
-  static async updateChannelSettings(channelId: number, settings: any): Promise<void> {
-    await apiService.put(`${this.BASE_URL}/channels/${channelId}/settings`, settings);
+  static async updateChannelSettings(
+    channelId: number,
+    settings: any,
+  ): Promise<void> {
+    await apiService.put(
+      `${this.BASE_URL}/channels/${channelId}/settings`,
+      settings,
+    );
   }
 
   // Message history and pagination
   static async getMessageHistory(
     channelId: number,
     beforeMessageId?: number,
-    limit: number = 50
+    limit: number = 50,
   ): Promise<{
     messages: Message[];
     hasMore: boolean;
@@ -402,12 +507,16 @@ export class ChatService {
   }
 
   // 사용자 초대
-  static async inviteUser(channelId: number, userId: number, message?: string): Promise<void> {
+  static async inviteUser(
+    channelId: number,
+    userId: number,
+    message?: string,
+  ): Promise<void> {
     console.log(`🔄 ChatService.inviteUser called:`, {
       channelId,
       userId,
       message,
-      url: `${this.BASE_URL}/channels/${channelId}/invite`
+      url: `${this.BASE_URL}/channels/${channelId}/invite`,
     });
 
     try {
@@ -418,8 +527,8 @@ export class ChatService {
         `${this.BASE_URL}/channels/${channelId}/invite`,
         {
           inviteeId: userId,
-          message
-        }
+          message,
+        },
       );
       console.log(`✅ ChatService.inviteUser success:`, response);
     } catch (error: any) {
@@ -428,15 +537,17 @@ export class ChatService {
       // 401 오류인 경우 토큰 갱신 후 재시도
       if (error.status === 401) {
         try {
-          console.log(`🔄 Token expired, refreshing and retrying inviteUser...`);
+          console.log(
+            `🔄 Token expired, refreshing and retrying inviteUser...`,
+          );
           await this.refreshTokenAndRetry();
 
           const response = await apiService.post(
             `${this.BASE_URL}/channels/${channelId}/invite`,
             {
               inviteeId: userId,
-              message
-            }
+              message,
+            },
           );
           console.log(`✅ ChatService.inviteUser retry success:`, response);
           return;
@@ -450,15 +561,22 @@ export class ChatService {
   }
 
   // Thread messages
-  static async getThreadMessages(threadId: number): Promise<{ messages: Message[]; total: number }> {
-    const response = await apiService.get<any>(`${this.BASE_URL}/messages/thread/${threadId}`);
+  static async getThreadMessages(
+    threadId: number,
+  ): Promise<{ messages: Message[]; total: number }> {
+    const response = await apiService.get<any>(
+      `${this.BASE_URL}/messages/thread/${threadId}`,
+    );
     // Backend shape: { success: true, data: Message[], pagination: { total, ... } }
     const messages: Message[] = Array.isArray(response.data)
       ? response.data
-      : (response.data?.messages || []);
-    const total: number = (response.pagination && typeof response.pagination.total === 'number')
-      ? response.pagination.total
-      : (Array.isArray(response.data) ? response.data.length : (response.data?.total || 0));
+      : response.data?.messages || [];
+    const total: number =
+      response.pagination && typeof response.pagination.total === "number"
+        ? response.pagination.total
+        : Array.isArray(response.data)
+          ? response.data.length
+          : response.data?.total || 0;
     return { messages, total };
   }
 }

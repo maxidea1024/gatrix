@@ -1,50 +1,50 @@
-import { Worker, Job } from 'bullmq';
-import { clickhouse } from '../config/clickhouse';
-import { redis } from '../config/redis';
-import logger from '../utils/logger';
+import { Worker, Job } from "bullmq";
+import { clickhouse } from "../config/clickhouse";
+import { redis } from "../config/redis";
+import logger from "../utils/logger";
 
 export class ProfileWorker {
   private worker: Worker;
 
   constructor() {
     this.worker = new Worker(
-      'event-lens-profiles',
+      "event-lens-profiles",
       this.processJob.bind(this),
       {
         connection: redis,
         concurrency: 5,
-      }
+      },
     );
 
-    this.worker.on('completed', (job) => {
-      logger.debug('Profile job completed', { jobId: job.id });
+    this.worker.on("completed", (job) => {
+      logger.debug("Profile job completed", { jobId: job.id });
     });
 
-    this.worker.on('failed', (job, error) => {
-      logger.error('Profile job failed', { 
-        jobId: job?.id, 
-        error: error.message 
+    this.worker.on("failed", (job, error) => {
+      logger.error("Profile job failed", {
+        jobId: job?.id,
+        error: error.message,
       });
     });
 
-    logger.info('✅ Profile Worker started');
+    logger.info("✅ Profile Worker started");
   }
 
   private async processJob(job: Job): Promise<void> {
     const { name } = job;
 
     switch (name) {
-      case 'identify-profile':
+      case "identify-profile":
         await this.identifyProfile(job.data);
         break;
-      case 'increment-property':
+      case "increment-property":
         await this.incrementProperty(job.data);
         break;
-      case 'decrement-property':
+      case "decrement-property":
         await this.decrementProperty(job.data);
         break;
       default:
-        logger.warn('Unknown profile job type', { name });
+        logger.warn("Unknown profile job type", { name });
     }
   }
 
@@ -58,31 +58,35 @@ export class ProfileWorker {
       if (existingProfile) {
         // 프로필 업데이트
         await clickhouse.insert({
-          table: 'profiles',
-          values: [{
-            id: existingProfile.id,
-            projectId,
-            profileId,
-            ...traits,
-            lastSeenAt: new Date().toISOString(),
-            createdAt: new Date().toISOString(),
-          }],
-          format: 'JSONEachRow',
+          table: "profiles",
+          values: [
+            {
+              id: existingProfile.id,
+              projectId,
+              profileId,
+              ...traits,
+              lastSeenAt: new Date().toISOString(),
+              createdAt: new Date().toISOString(),
+            },
+          ],
+          format: "JSONEachRow",
         });
       } else {
         // 새 프로필 생성
         await clickhouse.insert({
-          table: 'profiles',
-          values: [{
-            id: `${Date.now()}-${Math.random().toString(36).substring(2)}`,
-            projectId,
-            profileId,
-            ...traits,
-            firstSeenAt: new Date().toISOString(),
-            lastSeenAt: new Date().toISOString(),
-            createdAt: new Date().toISOString(),
-          }],
-          format: 'JSONEachRow',
+          table: "profiles",
+          values: [
+            {
+              id: `${Date.now()}-${Math.random().toString(36).substring(2)}`,
+              projectId,
+              profileId,
+              ...traits,
+              firstSeenAt: new Date().toISOString(),
+              lastSeenAt: new Date().toISOString(),
+              createdAt: new Date().toISOString(),
+            },
+          ],
+          format: "JSONEachRow",
         });
       }
 
@@ -90,13 +94,16 @@ export class ProfileWorker {
       await redis.set(
         `device:${projectId}:${deviceId}:profile`,
         profileId,
-        'EX',
-        86400 * 365 // 1년
+        "EX",
+        86400 * 365, // 1년
       );
 
-      logger.debug('Profile identified', { projectId, profileId });
+      logger.debug("Profile identified", { projectId, profileId });
     } catch (error: any) {
-      logger.error('Failed to identify profile', { error: error.message, data });
+      logger.error("Failed to identify profile", {
+        error: error.message,
+        data,
+      });
       throw error;
     }
   }
@@ -106,24 +113,38 @@ export class ProfileWorker {
 
     try {
       // 현재 값 조회
-      const currentValue = await this.getPropertyValue(projectId, profileId, property);
+      const currentValue = await this.getPropertyValue(
+        projectId,
+        profileId,
+        property,
+      );
       const newValue = (currentValue || 0) + value;
 
       // 프로필 업데이트
       await clickhouse.insert({
-        table: 'profiles',
-        values: [{
-          projectId,
-          profileId,
-          properties: JSON.stringify({ [property]: newValue }),
-          createdAt: new Date().toISOString(),
-        }],
-        format: 'JSONEachRow',
+        table: "profiles",
+        values: [
+          {
+            projectId,
+            profileId,
+            properties: JSON.stringify({ [property]: newValue }),
+            createdAt: new Date().toISOString(),
+          },
+        ],
+        format: "JSONEachRow",
       });
 
-      logger.debug('Property incremented', { projectId, profileId, property, value: newValue });
+      logger.debug("Property incremented", {
+        projectId,
+        profileId,
+        property,
+        value: newValue,
+      });
     } catch (error: any) {
-      logger.error('Failed to increment property', { error: error.message, data });
+      logger.error("Failed to increment property", {
+        error: error.message,
+        data,
+      });
       throw error;
     }
   }
@@ -155,7 +176,7 @@ export class ProfileWorker {
   private async getPropertyValue(
     projectId: string,
     profileId: string,
-    property: string
+    property: string,
   ): Promise<number | null> {
     const query = `
       SELECT JSONExtractInt(properties, {property:String}) as value
@@ -176,11 +197,10 @@ export class ProfileWorker {
   }
 
   async close(): Promise<void> {
-    logger.info('Closing Profile Worker...');
+    logger.info("Closing Profile Worker...");
     await this.worker.close();
-    logger.info('✅ Profile Worker closed');
+    logger.info("✅ Profile Worker closed");
   }
 }
 
 export default ProfileWorker;
-

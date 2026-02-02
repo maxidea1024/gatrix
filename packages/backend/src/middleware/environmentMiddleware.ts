@@ -8,10 +8,10 @@
  * - Sets the environment context for the request
  */
 
-import { Response, NextFunction } from 'express';
-import logger from '../config/logger';
-import { AuthenticatedRequest } from '../types/auth';
-import { Environment } from '../models/Environment';
+import { Response, NextFunction } from "express";
+import logger from "../config/logger";
+import { AuthenticatedRequest } from "../types/auth";
+import { Environment } from "../models/Environment";
 
 /**
  * Middleware to extract and set environment context
@@ -20,11 +20,11 @@ import { Environment } from '../models/Environment';
 export const environmentContextMiddleware = async (
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     // Extract environment from header ONLY
-    const environmentName = req.headers['x-environment'] as string;
+    const environmentName = req.headers["x-environment"] as string;
 
     if (!environmentName) {
       // If no environment is specified, we don't set req.environment
@@ -43,7 +43,7 @@ export const environmentContextMiddleware = async (
 
     next();
   } catch (error) {
-    logger.error('Error in environment middleware:', error);
+    logger.error("Error in environment middleware:", error);
     next();
   }
 };
@@ -53,14 +53,18 @@ export const environmentContextMiddleware = async (
  * Use this to restrict certain routes to specific environment types
  */
 export const requireEnvironmentType = (allowedTypes: string[]) => {
-  return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  return async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const environmentName = req.environment;
 
       if (!environmentName) {
         res.status(400).json({
           success: false,
-          message: 'Environment context is required for this operation'
+          message: "Environment context is required for this operation",
         });
         return;
       }
@@ -70,17 +74,17 @@ export const requireEnvironmentType = (allowedTypes: string[]) => {
       if (!environment || !allowedTypes.includes(environment.environmentType)) {
         res.status(403).json({
           success: false,
-          message: `This operation is not allowed in ${environment?.environmentType || 'unknown'} environment`
+          message: `This operation is not allowed in ${environment?.environmentType || "unknown"} environment`,
         });
         return;
       }
 
       next();
     } catch (error) {
-      logger.error('Error in requireEnvironmentType middleware:', error);
+      logger.error("Error in requireEnvironmentType middleware:", error);
       res.status(500).json({
         success: false,
-        message: 'Failed to validate environment type'
+        message: "Failed to validate environment type",
       });
     }
   };
@@ -93,7 +97,7 @@ export const requireEnvironmentType = (allowedTypes: string[]) => {
 export const preventProductionModification = async (
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const environmentName = req.environment;
@@ -104,18 +108,20 @@ export const preventProductionModification = async (
 
     const environment = await Environment.getByName(environmentName);
 
-    if (environment?.environmentType === 'production') {
+    if (environment?.environmentType === "production") {
       // For production, check if approval is required
       if (environment.requiresApproval) {
         // TODO: Implement approval workflow
         // For now, just log a warning
-        logger.warn(`Production modification attempted without approval workflow`);
+        logger.warn(
+          `Production modification attempted without approval workflow`,
+        );
       }
     }
 
     next();
   } catch (error) {
-    logger.error('Error in preventProductionModification middleware:', error);
+    logger.error("Error in preventProductionModification middleware:", error);
     next();
   }
 };

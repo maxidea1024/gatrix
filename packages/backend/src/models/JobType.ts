@@ -1,6 +1,6 @@
-import db from '../config/knex';
-import logger from '../config/logger';
-import { getCurrentEnvironment } from '../utils/environmentContext';
+import db from "../config/knex";
+import logger from "../config/logger";
+import { getCurrentEnvironment } from "../utils/environmentContext";
 
 export interface JobTypeAttributes {
   id: number;
@@ -40,16 +40,16 @@ export class JobTypeModel {
     if (!value) return null;
 
     // 이미 객체인 경우 그대로 반환
-    if (typeof value === 'object') {
+    if (typeof value === "object") {
       return value;
     }
 
     // 문자열인 경우 JSON 파싱 시도
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       try {
         return JSON.parse(value);
       } catch (error) {
-        logger.error('Failed to parse jobSchema JSON:', { value, error });
+        logger.error("Failed to parse jobSchema JSON:", { value, error });
         return null;
       }
     }
@@ -60,16 +60,16 @@ export class JobTypeModel {
   static async findAll(environment?: string): Promise<JobTypeAttributes[]> {
     try {
       const envName = environment ?? getCurrentEnvironment();
-      const results = await db('g_job_types as jt')
-        .leftJoin('g_users as cu', 'jt.createdBy', 'cu.id')
-        .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
+      const results = await db("g_job_types as jt")
+        .leftJoin("g_users as cu", "jt.createdBy", "cu.id")
+        .leftJoin("g_users as uu", "jt.updatedBy", "uu.id")
         .select([
-          'jt.*',
-          'cu.name as createdByName',
-          'uu.name as updatedByName'
+          "jt.*",
+          "cu.name as createdByName",
+          "uu.name as updatedByName",
         ])
-        .where('jt.environment', envName)
-        .orderBy('jt.name', 'asc');
+        .where("jt.environment", envName)
+        .orderBy("jt.name", "asc");
 
       return results.map((row: any) => ({
         id: row.id,
@@ -83,53 +83,59 @@ export class JobTypeModel {
         createdBy: row.createdBy,
         updatedBy: row.updatedBy,
         createdByName: row.createdByName,
-        updatedByName: row.updatedByName
+        updatedByName: row.updatedByName,
       }));
     } catch (error) {
-      logger.error('Error finding all job types:', error);
+      logger.error("Error finding all job types:", error);
       throw error;
     }
   }
 
-  static async findById(id: number, environment?: string): Promise<JobTypeAttributes | null> {
+  static async findById(
+    id: number,
+    environment?: string,
+  ): Promise<JobTypeAttributes | null> {
     try {
       const envName = environment ?? getCurrentEnvironment();
-      const row = await db('g_job_types as jt')
-        .leftJoin('g_users as cu', 'jt.createdBy', 'cu.id')
-        .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
+      const row = await db("g_job_types as jt")
+        .leftJoin("g_users as cu", "jt.createdBy", "cu.id")
+        .leftJoin("g_users as uu", "jt.updatedBy", "uu.id")
         .select([
-          'jt.*',
-          'cu.name as createdByName',
-          'uu.name as updatedByName'
+          "jt.*",
+          "cu.name as createdByName",
+          "uu.name as updatedByName",
         ])
-        .where('jt.id', id)
-        .where('jt.environment', envName)
+        .where("jt.id", id)
+        .where("jt.environment", envName)
         .first();
 
       if (!row) return null;
 
       return {
         ...row,
-        jobSchema: row.jobSchema ? this.parseJobSchema(row.jobSchema) : null
+        jobSchema: row.jobSchema ? this.parseJobSchema(row.jobSchema) : null,
       };
     } catch (error) {
-      logger.error('Error finding job type by id:', error);
+      logger.error("Error finding job type by id:", error);
       throw error;
     }
   }
 
-  static async findByName(name: string, environment?: string): Promise<JobTypeAttributes | null> {
+  static async findByName(
+    name: string,
+    environment?: string,
+  ): Promise<JobTypeAttributes | null> {
     try {
       const envName = environment ?? getCurrentEnvironment();
-      const row = await db('g_job_types as jt')
-        .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
+      const row = await db("g_job_types as jt")
+        .leftJoin("g_users as uu", "jt.updatedBy", "uu.id")
         .select([
-          'jt.*',
-          'cu.name as createdByName',
-          'uu.name as updatedByName'
+          "jt.*",
+          "cu.name as createdByName",
+          "uu.name as updatedByName",
         ])
-        .where('jt.name', name)
-        .where('jt.environment', envName)
+        .where("jt.name", name)
+        .where("jt.environment", envName)
         .first();
 
       if (!row) return null;
@@ -137,10 +143,10 @@ export class JobTypeModel {
       return {
         ...row,
         isEnabled: Boolean(row.isActive),
-        jobSchema: row.jobSchema ? this.parseJobSchema(row.jobSchema) : null
+        jobSchema: row.jobSchema ? this.parseJobSchema(row.jobSchema) : null,
       };
     } catch (error) {
-      logger.error('Error finding job type by name:', error);
+      logger.error("Error finding job type by name:", error);
       throw error;
     }
   }
@@ -150,29 +156,33 @@ export class JobTypeModel {
       const envName = getCurrentEnvironment();
       const schemaJson = data.jobSchema ? JSON.stringify(data.jobSchema) : null;
 
-      const [insertId] = await db('g_job_types').insert({
+      const [insertId] = await db("g_job_types").insert({
         environment: envName,
         name: data.name,
         displayName: data.displayName,
         description: data.description || null,
         jobSchema: schemaJson,
         isActive: data.isEnabled ?? true,
-        createdBy: data.createdBy || null
+        createdBy: data.createdBy || null,
       });
 
       const created = await this.findById(insertId, envName);
       if (!created) {
-        throw new Error('Failed to retrieve created job type');
+        throw new Error("Failed to retrieve created job type");
       }
 
       return created;
     } catch (error) {
-      logger.error('Error creating job type:', error);
+      logger.error("Error creating job type:", error);
       throw error;
     }
   }
 
-  static async update(id: number, data: UpdateJobTypeData, environment?: string): Promise<JobTypeAttributes> {
+  static async update(
+    id: number,
+    data: UpdateJobTypeData,
+    environment?: string,
+  ): Promise<JobTypeAttributes> {
     try {
       const envName = environment ?? getCurrentEnvironment();
       const updateData: any = {};
@@ -184,7 +194,9 @@ export class JobTypeModel {
         updateData.description = data.description;
       }
       if (data.jobSchema !== undefined) {
-        updateData.jobSchema = data.jobSchema ? JSON.stringify(data.jobSchema) : null;
+        updateData.jobSchema = data.jobSchema
+          ? JSON.stringify(data.jobSchema)
+          : null;
       }
       if (data.isEnabled !== undefined) {
         updateData.isEnabled = data.isEnabled;
@@ -195,19 +207,19 @@ export class JobTypeModel {
 
       updateData.updatedAt = db.fn.now();
 
-      await db('g_job_types')
-        .where('id', id)
-        .where('environment', envName)
+      await db("g_job_types")
+        .where("id", id)
+        .where("environment", envName)
         .update(updateData);
 
       const updated = await this.findById(id, envName);
       if (!updated) {
-        throw new Error('Job type not found after update');
+        throw new Error("Job type not found after update");
       }
 
       return updated;
     } catch (error) {
-      logger.error('Error updating job type:', error);
+      logger.error("Error updating job type:", error);
       throw error;
     }
   }
@@ -215,14 +227,14 @@ export class JobTypeModel {
   static async delete(id: number, environment?: string): Promise<boolean> {
     try {
       const envName = environment ?? getCurrentEnvironment();
-      const result = await db('g_job_types')
-        .where('id', id)
-        .where('environment', envName)
+      const result = await db("g_job_types")
+        .where("id", id)
+        .where("environment", envName)
         .del();
 
       return result > 0;
     } catch (error) {
-      logger.error('Error deleting job type:', error);
+      logger.error("Error deleting job type:", error);
       throw error;
     }
   }
@@ -230,16 +242,16 @@ export class JobTypeModel {
   static async findEnabled(environment?: string): Promise<JobTypeAttributes[]> {
     try {
       const envName = environment ?? getCurrentEnvironment();
-      const results = await db('g_job_types as jt')
-        .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
+      const results = await db("g_job_types as jt")
+        .leftJoin("g_users as uu", "jt.updatedBy", "uu.id")
         .select([
-          'jt.*',
-          'cu.name as createdByName',
-          'uu.name as updatedByName'
+          "jt.*",
+          "cu.name as createdByName",
+          "uu.name as updatedByName",
         ])
-        .where('jt.environment', envName)
-        .where('jt.isEnabled', true)
-        .orderBy('jt.name', 'asc');
+        .where("jt.environment", envName)
+        .where("jt.isEnabled", true)
+        .orderBy("jt.name", "asc");
 
       return results.map((row: any) => ({
         id: row.id,
@@ -253,10 +265,10 @@ export class JobTypeModel {
         createdBy: row.createdBy,
         updatedBy: row.updatedBy,
         createdByName: row.createdByName,
-        updatedByName: row.updatedByName
+        updatedByName: row.updatedByName,
       }));
     } catch (error) {
-      logger.error('Error finding enabled job types:', error);
+      logger.error("Error finding enabled job types:", error);
       throw error;
     }
   }

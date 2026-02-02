@@ -1,102 +1,99 @@
-import { Router } from 'express';
-import channelsRouter from './channels';
-import messagesRouter from './messages';
-import messageReactionsRouter from './messageReactions';
-import privacyRouter from './privacy';
-import invitationsRouter from './invitations';
-import directMessagesRouter from './direct-messages';
-import usersRouter from './users';
-import apiTokenRouter from './apiTokens';
+import { Router } from "express";
+import channelsRouter from "./channels";
+import messagesRouter from "./messages";
+import messageReactionsRouter from "./messageReactions";
+import privacyRouter from "./privacy";
+import invitationsRouter from "./invitations";
+import directMessagesRouter from "./direct-messages";
+import usersRouter from "./users";
+import apiTokenRouter from "./apiTokens";
 
-import { errorHandler } from '../middleware/auth';
+import { errorHandler } from "../middleware/auth";
 
 const router = Router();
 
-
-
 // API 정보 엔드포인트
-router.get('/', (req, res) => {
+router.get("/", (req, res) => {
   res.json({
     success: true,
     data: {
-      name: 'Gatrix Chat Server API',
-      version: '1.0.0',
-      description: 'High-performance scalable chat server for Gatrix platform',
+      name: "Gatrix Chat Server API",
+      version: "1.0.0",
+      description: "High-performance scalable chat server for Gatrix platform",
       endpoints: {
-        channels: '/api/v1/channels',
-        messages: '/api/v1/messages',
-        privacy: '/api/v1/privacy',
-        invitations: '/api/v1/invitations',
-        directMessages: '/api/v1/direct-messages',
-        auth: '/api/v1/auth',
-        users: '/api/v1/users',
-        linkPreview: '/api/v1/link-preview',
-        websocket: '/socket.io',
-        health: '/health',
-        metrics: '/metrics',
+        channels: "/api/v1/channels",
+        messages: "/api/v1/messages",
+        privacy: "/api/v1/privacy",
+        invitations: "/api/v1/invitations",
+        directMessages: "/api/v1/direct-messages",
+        auth: "/api/v1/auth",
+        users: "/api/v1/users",
+        linkPreview: "/api/v1/link-preview",
+        websocket: "/socket.io",
+        health: "/health",
+        metrics: "/metrics",
       },
       features: [
-        'Real-time messaging',
-        'Channel management',
-        'File uploads',
-        'Message reactions',
-        'User presence',
-        'Typing indicators',
-        'Message search',
-        'Thread support',
-        'Message formatting',
-        'Scalable architecture',
+        "Real-time messaging",
+        "Channel management",
+        "File uploads",
+        "Message reactions",
+        "User presence",
+        "Typing indicators",
+        "Message search",
+        "Thread support",
+        "Message formatting",
+        "Scalable architecture",
       ],
       limits: {
         maxMessageLength: 10000,
-        maxFileSize: '10MB',
+        maxFileSize: "10MB",
         maxChannelMembers: 10000,
-        rateLimit: 'Varies by endpoint',
+        rateLimit: "Varies by endpoint",
       },
     },
     timestamp: new Date().toISOString(),
-    serverId: process.env.SERVER_ID || 'unknown',
+    serverId: process.env.SERVER_ID || "unknown",
   });
 });
 
 // 라우트 등록
-router.use('/admin/tokens', apiTokenRouter);
-router.use('/users', usersRouter);
-router.use('/channels', channelsRouter);
-router.use('/messages', messagesRouter);
-router.use('/', messageReactionsRouter); // 메시지 리액션 라우트 (messages/:id/reactions)
-router.use('/privacy', privacyRouter);
-router.use('/invitations', invitationsRouter);
-router.use('/direct-messages', directMessagesRouter);
-
+router.use("/admin/tokens", apiTokenRouter);
+router.use("/users", usersRouter);
+router.use("/channels", channelsRouter);
+router.use("/messages", messagesRouter);
+router.use("/", messageReactionsRouter); // 메시지 리액션 라우트 (messages/:id/reactions)
+router.use("/privacy", privacyRouter);
+router.use("/invitations", invitationsRouter);
+router.use("/direct-messages", directMessagesRouter);
 
 // 404 핸들러
-router.use('*', (req, res) => {
+router.use("*", (req, res) => {
   res.status(404).json({
     success: false,
-    error: 'Endpoint not found',
+    error: "Endpoint not found",
     message: `${req.method} ${req.originalUrl} is not a valid API endpoint`,
     availableEndpoints: [
-      'GET /api/v1/',
-      'GET /api/v1/channels',
-      'POST /api/v1/channels',
-      'GET /api/v1/channels/:id',
-      'PUT /api/v1/channels/:id',
-      'DELETE /api/v1/channels/:id',
-      'GET /api/v1/channels/my',
-      'GET /api/v1/channels/popular',
-      'GET /api/v1/channels/search',
-      'GET /api/v1/channels/:id/messages',
-      'POST /api/v1/channels/:id/messages',
-      'POST /api/v1/channels/:id/read',
-      'GET /api/v1/messages',
-      'POST /api/v1/messages',
-      'GET /api/v1/messages/:id',
-      'PUT /api/v1/messages/:id',
-      'DELETE /api/v1/messages/:id',
-      'GET /api/v1/messages/channel/:channelId',
-      'GET /api/v1/messages/search',
-      'GET /api/v1/messages/thread/:threadId',
+      "GET /api/v1/",
+      "GET /api/v1/channels",
+      "POST /api/v1/channels",
+      "GET /api/v1/channels/:id",
+      "PUT /api/v1/channels/:id",
+      "DELETE /api/v1/channels/:id",
+      "GET /api/v1/channels/my",
+      "GET /api/v1/channels/popular",
+      "GET /api/v1/channels/search",
+      "GET /api/v1/channels/:id/messages",
+      "POST /api/v1/channels/:id/messages",
+      "POST /api/v1/channels/:id/read",
+      "GET /api/v1/messages",
+      "POST /api/v1/messages",
+      "GET /api/v1/messages/:id",
+      "PUT /api/v1/messages/:id",
+      "DELETE /api/v1/messages/:id",
+      "GET /api/v1/messages/channel/:channelId",
+      "GET /api/v1/messages/search",
+      "GET /api/v1/messages/thread/:threadId",
     ],
     timestamp: new Date().toISOString(),
   });

@@ -1,14 +1,23 @@
-import api from './api';
-import { Job, JobType, JobExecution, CreateJobData, UpdateJobData, JobFilters, JobExecutionFilters, JobListResponse } from '../types/job';
+import api from "./api";
+import {
+  Job,
+  JobType,
+  JobExecution,
+  CreateJobData,
+  UpdateJobData,
+  JobFilters,
+  JobExecutionFilters,
+  JobListResponse,
+} from "../types/job";
 
 export const jobService = {
   // Job Types
   async getJobTypes(): Promise<JobType[]> {
-    const response = await api.get('/admin/jobs/job-types');
-    console.log('jobService.getJobTypes - Raw response:', response);
-    console.log('jobService.getJobTypes - Response data:', response.data);
+    const response = await api.get("/admin/jobs/job-types");
+    console.log("jobService.getJobTypes - Raw response:", response);
+    console.log("jobService.getJobTypes - Response data:", response.data);
     const result = response.data?.data || response.data || [];
-    console.log('jobService.getJobTypes - Final result:', result);
+    console.log("jobService.getJobTypes - Final result:", result);
     return result;
   },
 
@@ -18,41 +27,46 @@ export const jobService = {
   },
 
   async getEnabledJobTypes(): Promise<JobType[]> {
-    const response = await api.get('/admin/jobs/job-types?enabled=true');
+    const response = await api.get("/admin/jobs/job-types?enabled=true");
     return response.data?.data || response.data || [];
   },
 
   // Jobs
   async getJobs(filters?: JobFilters): Promise<Job[]> {
     const params = new URLSearchParams();
-    if (filters?.jobTypeId) params.append('jobTypeId', filters.jobTypeId.toString());
-    if (filters?.isEnabled !== undefined) params.append('isEnabled', filters.isEnabled.toString());
-    if (filters?.search) params.append('search', filters.search);
+    if (filters?.jobTypeId)
+      params.append("jobTypeId", filters.jobTypeId.toString());
+    if (filters?.isEnabled !== undefined)
+      params.append("isEnabled", filters.isEnabled.toString());
+    if (filters?.search) params.append("search", filters.search);
 
     const queryString = params.toString();
-    const url = queryString ? `/admin/jobs?${queryString}` : '/admin/jobs';
+    const url = queryString ? `/admin/jobs?${queryString}` : "/admin/jobs";
     const response = await api.get(url);
     return response.data?.data || response.data || [];
   },
 
   async getJobsWithPagination(filters?: JobFilters): Promise<JobListResponse> {
     const params = new URLSearchParams();
-    if (filters?.jobTypeId) params.append('jobTypeId', filters.jobTypeId.toString());
-    if (filters?.isEnabled !== undefined) params.append('isEnabled', filters.isEnabled.toString());
-    if (filters?.search) params.append('search', filters.search);
-    if (filters?.limit) params.append('limit', filters.limit.toString());
-    if (filters?.offset !== undefined) params.append('offset', filters.offset.toString());
-    if (filters?.page) params.append('page', filters.page.toString());
+    if (filters?.jobTypeId)
+      params.append("jobTypeId", filters.jobTypeId.toString());
+    if (filters?.isEnabled !== undefined)
+      params.append("isEnabled", filters.isEnabled.toString());
+    if (filters?.search) params.append("search", filters.search);
+    if (filters?.limit) params.append("limit", filters.limit.toString());
+    if (filters?.offset !== undefined)
+      params.append("offset", filters.offset.toString());
+    if (filters?.page) params.append("page", filters.page.toString());
 
     const queryString = params.toString();
-    const url = queryString ? `/admin/jobs?${queryString}` : '/admin/jobs';
+    const url = queryString ? `/admin/jobs?${queryString}` : "/admin/jobs";
     const response = await api.get(url);
 
     // 백엔드 응답 구조에 맞게 처리
     if (response.data?.pagination) {
       return {
         jobs: response.data.data || [],
-        pagination: response.data.pagination
+        pagination: response.data.pagination,
       };
     } else {
       // 페이지네이션이 없는 경우 기본값 반환
@@ -64,8 +78,8 @@ export const jobService = {
           limit: filters?.limit || 20,
           offset: filters?.offset || 0,
           page: filters?.page || 1,
-          totalPages: 1
-        }
+          totalPages: 1,
+        },
       };
     }
   },
@@ -76,7 +90,7 @@ export const jobService = {
   },
 
   async createJob(data: CreateJobData): Promise<Job> {
-    const response = await api.post('/admin/jobs', data);
+    const response = await api.post("/admin/jobs", data);
     return response.data?.data || response.data;
   },
 
@@ -96,29 +110,39 @@ export const jobService = {
   },
 
   // Job Executions
-  async getJobExecutions(jobId: number, filters?: JobExecutionFilters): Promise<JobExecution[]> {
+  async getJobExecutions(
+    jobId: number,
+    filters?: JobExecutionFilters,
+  ): Promise<JobExecution[]> {
     const params = new URLSearchParams();
-    if (filters?.limit) params.append('limit', filters.limit.toString());
-    if (filters?.offset) params.append('offset', filters.offset.toString());
+    if (filters?.limit) params.append("limit", filters.limit.toString());
+    if (filters?.offset) params.append("offset", filters.offset.toString());
 
     const queryString = params.toString();
-    const url = queryString ? `/admin/jobs/${jobId}/executions?${queryString}` : `/admin/jobs/${jobId}/executions`;
+    const url = queryString
+      ? `/admin/jobs/${jobId}/executions?${queryString}`
+      : `/admin/jobs/${jobId}/executions`;
     const response = await api.get(url);
     return response.data?.data || response.data || [];
   },
 
-  async getAllJobExecutions(filters?: JobExecutionFilters): Promise<JobExecution[]> {
+  async getAllJobExecutions(
+    filters?: JobExecutionFilters,
+  ): Promise<JobExecution[]> {
     const params = new URLSearchParams();
-    if (filters?.jobId) params.append('jobId', filters.jobId.toString());
-    if (filters?.scheduleId) params.append('scheduleId', filters.scheduleId.toString());
-    if (filters?.status) params.append('status', filters.status);
-    if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom);
-    if (filters?.dateTo) params.append('dateTo', filters.dateTo);
-    if (filters?.limit) params.append('limit', filters.limit.toString());
-    if (filters?.offset) params.append('offset', filters.offset.toString());
+    if (filters?.jobId) params.append("jobId", filters.jobId.toString());
+    if (filters?.scheduleId)
+      params.append("scheduleId", filters.scheduleId.toString());
+    if (filters?.status) params.append("status", filters.status);
+    if (filters?.dateFrom) params.append("dateFrom", filters.dateFrom);
+    if (filters?.dateTo) params.append("dateTo", filters.dateTo);
+    if (filters?.limit) params.append("limit", filters.limit.toString());
+    if (filters?.offset) params.append("offset", filters.offset.toString());
 
     const queryString = params.toString();
-    const url = queryString ? `/admin/jobs/job-executions?${queryString}` : '/admin/jobs/job-executions';
+    const url = queryString
+      ? `/admin/jobs/job-executions?${queryString}`
+      : "/admin/jobs/job-executions";
     const response = await api.get(url);
     return response.data?.data || response.data || [];
   },
@@ -128,14 +152,19 @@ export const jobService = {
     return response.data?.data || response.data;
   },
 
-  async getJobExecutionStatistics(dateFrom?: string, dateTo?: string): Promise<any> {
+  async getJobExecutionStatistics(
+    dateFrom?: string,
+    dateTo?: string,
+  ): Promise<any> {
     const params = new URLSearchParams();
-    if (dateFrom) params.append('date_from', dateFrom);
-    if (dateTo) params.append('date_to', dateTo);
+    if (dateFrom) params.append("date_from", dateFrom);
+    if (dateTo) params.append("date_to", dateTo);
 
     const queryString = params.toString();
-    const url = queryString ? `/admin/jobs/job-executions/statistics?${queryString}` : '/admin/jobs/job-executions/statistics';
+    const url = queryString
+      ? `/admin/jobs/job-executions/statistics?${queryString}`
+      : "/admin/jobs/job-executions/statistics";
     const response = await api.get(url);
     return response.data?.data || response.data;
-  }
+  },
 };

@@ -1,6 +1,6 @@
-import { Router } from 'express';
-import { UserController } from '../../controllers/UserController';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { Router } from "express";
+import { UserController } from "../../controllers/UserController";
+import { authenticate, requireAdmin } from "../../middleware/auth";
 
 const router = Router();
 
@@ -134,9 +134,9 @@ const router = Router();
 router.use(authenticate as any);
 
 // Self-service routes (available to all authenticated users)
-router.get('/me', UserController.getCurrentUser);
-router.put('/me', UserController.updateCurrentUser);
-router.put('/me/language', UserController.updateLanguage);
-router.get('/me/environments', UserController.getMyEnvironmentAccess);
+router.get("/me", UserController.getCurrentUser);
+router.put("/me", UserController.updateCurrentUser);
+router.put("/me/language", UserController.updateLanguage);
+router.get("/me/environments", UserController.getMyEnvironmentAccess);
 
 export default router;

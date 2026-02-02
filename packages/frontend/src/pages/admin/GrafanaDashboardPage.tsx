@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Tabs, Tab } from '@mui/material';
-import { useSearchParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useTheme } from '@/contexts/ThemeContext';
+import React, { useEffect, useMemo, useState } from "react";
+import { Box, Tabs, Tab } from "@mui/material";
+import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "@/contexts/ThemeContext";
 
-type DashboardKey = 'overview' | 'sdkMetrics';
+type DashboardKey = "overview" | "sdkMetrics";
 
 interface DashboardDefinition {
   key: DashboardKey;
@@ -12,8 +12,8 @@ interface DashboardDefinition {
 }
 
 const dashboards: DashboardDefinition[] = [
-  { key: 'overview', uid: 'gatrix-overview' },
-  { key: 'sdkMetrics', uid: 'gatrix-sdk-metrics' },
+  { key: "overview", uid: "gatrix-overview" },
+  { key: "sdkMetrics", uid: "gatrix-sdk-metrics" },
 ];
 
 export const GrafanaDashboardPage: React.FC = () => {
@@ -21,69 +21,84 @@ export const GrafanaDashboardPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [selectedDashboard, setSelectedDashboard] = useState<DashboardKey>(() => {
-    const param = searchParams.get('dashboard');
-    if (param === 'sdkMetrics') {
-      return 'sdkMetrics';
-    }
-    return 'overview';
-  });
+  const [selectedDashboard, setSelectedDashboard] = useState<DashboardKey>(
+    () => {
+      const param = searchParams.get("dashboard");
+      if (param === "sdkMetrics") {
+        return "sdkMetrics";
+      }
+      return "overview";
+    },
+  );
 
   useEffect(() => {
-    const param = searchParams.get('dashboard');
-    if (param === 'overview' || param === 'sdkMetrics') {
+    const param = searchParams.get("dashboard");
+    if (param === "overview" || param === "sdkMetrics") {
       setSelectedDashboard(param);
     }
   }, [searchParams]);
 
   const grafanaUrl = useMemo(() => {
     // Priority 1: Check runtime config (from docker-entrypoint.sh / config.js)
-    const runtimeEnv = (window as any)?.ENV?.VITE_GRAFANA_URL as string | undefined;
+    const runtimeEnv = (window as any)?.ENV?.VITE_GRAFANA_URL as
+      | string
+      | undefined;
     if (runtimeEnv && runtimeEnv.trim()) {
       return runtimeEnv.trim();
     }
     // Priority 2: Standard subpath proxy (works for both Dev/Vite and Prod/Nginx)
-    return '/grafana';
+    return "/grafana";
   }, []);
 
   const currentDashboard = useMemo(
-    () => dashboards.find((item) => item.key === selectedDashboard) ?? dashboards[0],
+    () =>
+      dashboards.find((item) => item.key === selectedDashboard) ??
+      dashboards[0],
     [selectedDashboard],
   );
 
   const iframeUrl = useMemo(() => {
-    const theme = isDark ? 'dark' : 'light';
+    const theme = isDark ? "dark" : "light";
     return `${grafanaUrl}/d/${currentDashboard.uid}?kiosk=tv&theme=${theme}`;
   }, [grafanaUrl, isDark, currentDashboard.uid]);
 
-  const handleChangeTab = (_event: React.SyntheticEvent, value: DashboardKey) => {
+  const handleChangeTab = (
+    _event: React.SyntheticEvent,
+    value: DashboardKey,
+  ) => {
     setSelectedDashboard(value);
     const next = new URLSearchParams(searchParams);
-    next.set('dashboard', value);
+    next.set("dashboard", value);
     setSearchParams(next, { replace: true });
   };
 
   return (
     <Box
       sx={{
-        width: '100%',
-        height: 'calc(100vh - 64px)',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
+        width: "100%",
+        height: "calc(100vh - 64px)",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={selectedDashboard}
           onChange={handleChangeTab}
           aria-label="Grafana dashboards"
           variant="scrollable"
           scrollButtons="auto"
-          sx={{ minHeight: 48, '& .MuiTab-root': { textTransform: 'none', fontWeight: 500 } }}
+          sx={{
+            minHeight: 48,
+            "& .MuiTab-root": { textTransform: "none", fontWeight: 500 },
+          }}
         >
-          <Tab value="overview" label={t('grafanaDashboard.tabs.overview')} />
-          <Tab value="sdkMetrics" label={t('grafanaDashboard.tabs.sdkMetrics')} />
+          <Tab value="overview" label={t("grafanaDashboard.tabs.overview")} />
+          <Tab
+            value="sdkMetrics"
+            label={t("grafanaDashboard.tabs.sdkMetrics")}
+          />
         </Tabs>
       </Box>
       <Box sx={{ flex: 1 }}>
@@ -91,12 +106,12 @@ export const GrafanaDashboardPage: React.FC = () => {
           key={iframeUrl}
           src={iframeUrl}
           style={{
-            width: '100%',
-            height: '100%',
-            border: 'none',
-            display: 'block',
+            width: "100%",
+            height: "100%",
+            border: "none",
+            display: "block",
           }}
-          title={t('sidebar.grafana')}
+          title={t("sidebar.grafana")}
           allowFullScreen
         />
       </Box>

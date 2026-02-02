@@ -1,5 +1,5 @@
-import VarsModel from '../models/Vars';
-import logger from '../config/logger';
+import VarsModel from "../models/Vars";
+import logger from "../config/logger";
 
 export interface PlatformDefaults {
   gameServerAddress?: string;
@@ -10,13 +10,15 @@ export interface PlatformDefaultsMap {
   [platform: string]: PlatformDefaults;
 }
 
-const PLATFORM_DEFAULTS_KEY = 'platform_defaults';
+const PLATFORM_DEFAULTS_KEY = "platform_defaults";
 
 export class PlatformDefaultsService {
   /**
    * 모든 플랫폼의 기본값 조회
    */
-  static async getAllDefaults(environment: string): Promise<PlatformDefaultsMap> {
+  static async getAllDefaults(
+    environment: string,
+  ): Promise<PlatformDefaultsMap> {
     try {
       const data = await VarsModel.get(PLATFORM_DEFAULTS_KEY, environment);
       if (!data) {
@@ -24,7 +26,7 @@ export class PlatformDefaultsService {
       }
       return JSON.parse(data);
     } catch (error) {
-      logger.error('Error getting platform defaults:', error);
+      logger.error("Error getting platform defaults:", error);
       return {};
     }
   }
@@ -32,7 +34,10 @@ export class PlatformDefaultsService {
   /**
    * 특정 플랫폼의 기본값 조회
    */
-  static async getPlatformDefaults(platform: string, environment: string): Promise<PlatformDefaults> {
+  static async getPlatformDefaults(
+    platform: string,
+    environment: string,
+  ): Promise<PlatformDefaults> {
     try {
       const allDefaults = await this.getAllDefaults(environment);
       return allDefaults[platform] || {};
@@ -45,11 +50,21 @@ export class PlatformDefaultsService {
   /**
    * 플랫폼별 기본값 설정
    */
-  static async setPlatformDefaults(platform: string, defaults: PlatformDefaults, userId: number, environment: string): Promise<void> {
+  static async setPlatformDefaults(
+    platform: string,
+    defaults: PlatformDefaults,
+    userId: number,
+    environment: string,
+  ): Promise<void> {
     try {
       const allDefaults = await this.getAllDefaults(environment);
       allDefaults[platform] = defaults;
-      await VarsModel.set(PLATFORM_DEFAULTS_KEY, JSON.stringify(allDefaults), userId, environment);
+      await VarsModel.set(
+        PLATFORM_DEFAULTS_KEY,
+        JSON.stringify(allDefaults),
+        userId,
+        environment,
+      );
       logger.info(`Platform defaults updated for ${platform}:`, defaults);
     } catch (error) {
       logger.error(`Error setting defaults for platform ${platform}:`, error);
@@ -60,12 +75,21 @@ export class PlatformDefaultsService {
   /**
    * 모든 플랫폼의 기본값 일괄 설정
    */
-  static async setAllDefaults(defaultsMap: PlatformDefaultsMap, userId: number, environment: string): Promise<void> {
+  static async setAllDefaults(
+    defaultsMap: PlatformDefaultsMap,
+    userId: number,
+    environment: string,
+  ): Promise<void> {
     try {
-      await VarsModel.set(PLATFORM_DEFAULTS_KEY, JSON.stringify(defaultsMap), userId, environment);
-      logger.info('All platform defaults updated:', defaultsMap);
+      await VarsModel.set(
+        PLATFORM_DEFAULTS_KEY,
+        JSON.stringify(defaultsMap),
+        userId,
+        environment,
+      );
+      logger.info("All platform defaults updated:", defaultsMap);
     } catch (error) {
-      logger.error('Error setting all platform defaults:', error);
+      logger.error("Error setting all platform defaults:", error);
       throw error;
     }
   }
@@ -73,11 +97,20 @@ export class PlatformDefaultsService {
   /**
    * 특정 플랫폼의 기본값 삭제
    */
-  static async deletePlatformDefaults(platform: string, userId: number, environment: string): Promise<void> {
+  static async deletePlatformDefaults(
+    platform: string,
+    userId: number,
+    environment: string,
+  ): Promise<void> {
     try {
       const allDefaults = await this.getAllDefaults(environment);
       delete allDefaults[platform];
-      await VarsModel.set(PLATFORM_DEFAULTS_KEY, JSON.stringify(allDefaults), userId, environment);
+      await VarsModel.set(
+        PLATFORM_DEFAULTS_KEY,
+        JSON.stringify(allDefaults),
+        userId,
+        environment,
+      );
       logger.info(`Platform defaults deleted for ${platform}`);
     } catch (error) {
       logger.error(`Error deleting defaults for platform ${platform}:`, error);
@@ -88,17 +121,28 @@ export class PlatformDefaultsService {
   /**
    * 클라이언트 버전 데이터에 기본값 적용
    */
-  static async applyDefaultsToClientVersion(platform: string, clientVersionData: any, environment: string): Promise<any> {
+  static async applyDefaultsToClientVersion(
+    platform: string,
+    clientVersionData: any,
+    environment: string,
+  ): Promise<any> {
     try {
       const defaults = await this.getPlatformDefaults(platform, environment);
 
       return {
         ...clientVersionData,
-        gameServerAddress: clientVersionData.gameServerAddress || defaults.gameServerAddress || '',
-        patchAddress: clientVersionData.patchAddress || defaults.patchAddress || '',
+        gameServerAddress:
+          clientVersionData.gameServerAddress ||
+          defaults.gameServerAddress ||
+          "",
+        patchAddress:
+          clientVersionData.patchAddress || defaults.patchAddress || "",
       };
     } catch (error) {
-      logger.error(`Error applying defaults to client version for platform ${platform}:`, error);
+      logger.error(
+        `Error applying defaults to client version for platform ${platform}:`,
+        error,
+      );
       return clientVersionData;
     }
   }

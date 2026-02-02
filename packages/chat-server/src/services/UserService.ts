@@ -1,8 +1,8 @@
-import { databaseManager } from '../config/database';
-import { CacheService } from './CacheService';
-import { createLogger } from '../config/logger';
+import { databaseManager } from "../config/database";
+import { CacheService } from "./CacheService";
+import { createLogger } from "../config/logger";
 
-const logger = createLogger('UserService');
+const logger = createLogger("UserService");
 
 export interface UserData {
   id: number;
@@ -12,7 +12,7 @@ export interface UserData {
   avatarUrl?: string;
   role?: string;
   status?: string;
-  chatStatus?: 'online' | 'away' | 'busy' | 'offline';
+  chatStatus?: "online" | "away" | "busy" | "offline";
   customStatus?: string;
   lastLoginAt?: string;
   lastActivityAt?: string;
@@ -23,8 +23,8 @@ export interface UserData {
 export class UserService {
   private static cacheService = CacheService.getInstance();
   private static readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-  private static readonly CACHE_PREFIX = 'user:';
-  private static readonly USERS_LIST_KEY = 'users:all';
+  private static readonly CACHE_PREFIX = "user:";
+  private static readonly USERS_LIST_KEY = "users:all";
 
   /**
    * Upsert user (create or update)
@@ -32,27 +32,32 @@ export class UserService {
   static async upsertUser(userData: UserData): Promise<UserData> {
     try {
       // 공용 날짜 변환 함수 사용
-      const convertToMySQLDateTime = (dateValue: string | undefined): string | null => {
+      const convertToMySQLDateTime = (
+        dateValue: string | undefined,
+      ): string | null => {
         if (!dateValue) return null;
         try {
-          return new Date(dateValue).toISOString().slice(0, 19).replace('T', ' ');
+          return new Date(dateValue)
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
         } catch {
           return null;
         }
       };
 
       // 현재 시간을 MySQL DATETIME 형식으로 생성
-      const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      const now = new Date().toISOString().slice(0, 19).replace("T", " ");
 
       // 필드 매핑 및 정리
       const userToSave: any = {
         ...userData,
         gatrixUserId: userData.id, // Gatrix 사용자 ID 저장
-        status: userData.status || 'active',
-        chatStatus: userData.chatStatus || 'offline',
+        status: userData.status || "active",
+        chatStatus: userData.chatStatus || "offline",
         lastActivityAt: convertToMySQLDateTime(userData.lastActivityAt),
         createdAt: convertToMySQLDateTime(userData.createdAt),
-        updatedAt: now
+        updatedAt: now,
       };
 
       // 존재하지 않는 필드들 제거
@@ -60,10 +65,23 @@ export class UserService {
 
       // Database upsert
       const db = databaseManager.getKnex();
-      await db('chat_users')
+      await db("chat_users")
         .insert(userToSave)
-        .onConflict('gatrixUserId')
-        .merge(['gatrixUserId', 'username', 'email', 'name', 'avatarUrl', 'role', 'status', 'chatStatus', 'customStatus', 'lastLoginAt', 'lastActivityAt', 'updatedAt']);
+        .onConflict("gatrixUserId")
+        .merge([
+          "gatrixUserId",
+          "username",
+          "email",
+          "name",
+          "avatarUrl",
+          "role",
+          "status",
+          "chatStatus",
+          "customStatus",
+          "lastLoginAt",
+          "lastActivityAt",
+          "updatedAt",
+        ]);
 
       // Cache the user
       const cacheKey = `${this.CACHE_PREFIX}${userData.id}`;
@@ -72,10 +90,12 @@ export class UserService {
       // Update users list cache
       await this.invalidateUsersListCache();
 
-      logger.info(`User ${userData.id} (${userData.username}) upserted successfully`);
+      logger.info(
+        `User ${userData.id} (${userData.username}) upserted successfully`,
+      );
       return userToSave;
     } catch (error) {
-      logger.error('Error upserting user:', error);
+      logger.error("Error upserting user:", error);
       throw error;
     }
   }
@@ -98,27 +118,41 @@ export class UserService {
         // Use transaction for each batch
         await db.transaction(async (trx) => {
           for (const userData of batch) {
-            const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            const now = new Date().toISOString().slice(0, 19).replace("T", " ");
             const userToSave: UserData = {
               id: userData.id,
               username: userData.username,
               name: userData.name || userData.username,
               email: userData.email || userData.username,
               avatarUrl: userData.avatarUrl || undefined,
-              status: userData.status || 'active',
-              chatStatus: userData.chatStatus || 'offline',
+              status: userData.status || "active",
+              chatStatus: userData.chatStatus || "offline",
               customStatus: userData.customStatus || undefined,
-              lastActivityAt: userData.lastActivityAt ? new Date(userData.lastActivityAt).toISOString().slice(0, 19).replace('T', ' ') : now,
-              createdAt: userData.createdAt ? new Date(userData.createdAt).toISOString().slice(0, 19).replace('T', ' ') : now,
-              updatedAt: now
+              lastActivityAt: userData.lastActivityAt
+                ? new Date(userData.lastActivityAt)
+                    .toISOString()
+                    .slice(0, 19)
+                    .replace("T", " ")
+                : now,
+              createdAt: userData.createdAt
+                ? new Date(userData.createdAt)
+                    .toISOString()
+                    .slice(0, 19)
+                    .replace("T", " ")
+                : now,
+              updatedAt: now,
             };
 
-            const existingUser = await trx('chat_users').where('id', userData.id).first();
+            const existingUser = await trx("chat_users")
+              .where("id", userData.id)
+              .first();
 
             if (existingUser) {
-              await trx('chat_users').where('id', userData.id).update(userToSave);
+              await trx("chat_users")
+                .where("id", userData.id)
+                .update(userToSave);
             } else {
-              await trx('chat_users').insert(userToSave);
+              await trx("chat_users").insert(userToSave);
             }
 
             results.push(userToSave);
@@ -138,7 +172,7 @@ export class UserService {
       logger.info(`Bulk upserted ${results.length} users successfully`);
       return results;
     } catch (error) {
-      logger.error('Error bulk upserting users:', error);
+      logger.error("Error bulk upserting users:", error);
       throw error;
     }
   }
@@ -149,7 +183,7 @@ export class UserService {
   static async getUserById(userId: number): Promise<UserData | null> {
     try {
       const cacheKey = `${this.CACHE_PREFIX}${userId}`;
-      
+
       // Try cache first
       let user = await this.cacheService.get<UserData>(cacheKey);
       if (user) {
@@ -158,7 +192,7 @@ export class UserService {
 
       // Fallback to database
       const db = databaseManager.getKnex();
-      user = await db('chat_users').where('id', userId).first();
+      user = await db("chat_users").where("id", userId).first();
       if (user) {
         // Cache the result
         await this.cacheService.set(cacheKey, user, this.CACHE_TTL);
@@ -184,14 +218,14 @@ export class UserService {
 
       // Fallback to database
       const db = databaseManager.getKnex();
-      users = await db('chat_users').select('*').orderBy('username');
-      
+      users = await db("chat_users").select("*").orderBy("username");
+
       // Cache the result
       await this.cacheService.set(this.USERS_LIST_KEY, users, this.CACHE_TTL);
 
       return users || [];
     } catch (error) {
-      logger.error('Error getting all users:', error);
+      logger.error("Error getting all users:", error);
       return [];
     }
   }
@@ -200,13 +234,13 @@ export class UserService {
    * Update user status
    */
   static async updateUserStatus(
-    userId: number, 
-    status?: 'online' | 'away' | 'busy' | 'offline',
-    customStatus?: string
+    userId: number,
+    status?: "online" | "away" | "busy" | "offline",
+    customStatus?: string,
   ): Promise<boolean> {
     try {
       const updates: Partial<UserData> = {
-        updatedAt: new Date().toISOString().slice(0, 19).replace('T', ' ')
+        updatedAt: new Date().toISOString().slice(0, 19).replace("T", " "),
       };
 
       if (status !== undefined) {
@@ -219,9 +253,7 @@ export class UserService {
 
       // Update database
       const db = databaseManager.getKnex();
-      const result = await db('chat_users')
-        .where('id', userId)
-        .update(updates);
+      const result = await db("chat_users").where("id", userId).update(updates);
 
       if (result > 0) {
         // Invalidate cache
@@ -247,7 +279,7 @@ export class UserService {
     try {
       // Delete from database
       const db = databaseManager.getKnex();
-      const result = await db('chat_users').where('id', userId).del();
+      const result = await db("chat_users").where("id", userId).del();
 
       if (result > 0) {
         // Remove from cache
@@ -273,7 +305,7 @@ export class UserService {
     try {
       await this.cacheService.delete(this.USERS_LIST_KEY);
     } catch (error) {
-      logger.error('Error invalidating users list cache:', error);
+      logger.error("Error invalidating users list cache:", error);
     }
   }
 
@@ -282,16 +314,14 @@ export class UserService {
    */
   static async updateLastSeen(userId: number): Promise<void> {
     try {
-      const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
-      
+      const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+
       // Update database
       const db = databaseManager.getKnex();
-      await db('chat_users')
-        .where('id', userId)
-        .update({
-          lastActivityAt: now,
-          updatedAt: now
-        });
+      await db("chat_users").where("id", userId).update({
+        lastActivityAt: now,
+        updatedAt: now,
+      });
 
       // Invalidate cache
       const cacheKey = `${this.CACHE_PREFIX}${userId}`;

@@ -1,8 +1,7 @@
-import { Response } from 'express';
-import { EventEmitter } from 'events';
-import logger from '../config/logger';
-import { pubSubService } from './PubSubService';
-
+import { Response } from "express";
+import { EventEmitter } from "events";
+import logger from "../config/logger";
+import { pubSubService } from "./PubSubService";
 
 export interface SSEClient {
   id: string;
@@ -43,20 +42,24 @@ export class SSENotificationService extends EventEmitter {
   /**
    * Add a new SSE client
    */
-  public addClient(clientId: string, response: Response, userId?: number): void {
+  public addClient(
+    clientId: string,
+    response: Response,
+    userId?: number,
+  ): void {
     // Set SSE headers
     response.writeHead(200, {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Cache-Control',
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "Cache-Control",
     });
     // Immediately flush headers and send a comment to start the stream
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (response as any).flushHeaders?.();
     try {
-      response.write(': connected\n\n');
+      response.write(": connected\n\n");
     } catch (_) {
       // ignore
     }
@@ -78,18 +81,20 @@ export class SSENotificationService extends EventEmitter {
     // Send initial connection event
     logger.info(`Sending initial connection event to client ${clientId}`);
     this.sendToClient(clientId, {
-      type: 'connection',
+      type: "connection",
       data: { clientId, connected: true },
       timestamp: new Date(),
     });
     logger.info(`Initial connection event sent to client ${clientId}`);
 
     // Handle client disconnect
-    response.on('close', () => {
+    response.on("close", () => {
       this.removeClient(clientId);
     });
 
-    logger.info(`SSE client connected: ${clientId}${userId ? ` (user: ${userId})` : ''}`);
+    logger.info(
+      `SSE client connected: ${clientId}${userId ? ` (user: ${userId})` : ""}`,
+    );
   }
 
   /**
@@ -114,8 +119,10 @@ export class SSENotificationService extends EventEmitter {
   public subscribe(clientId: string, channels: string[]): void {
     const client = this.clients.get(clientId);
     if (client) {
-      channels.forEach(channel => client.subscriptions.add(channel));
-      logger.debug(`Client ${clientId} subscribed to channels: ${channels.join(', ')}`);
+      channels.forEach((channel) => client.subscriptions.add(channel));
+      logger.debug(
+        `Client ${clientId} subscribed to channels: ${channels.join(", ")}`,
+      );
     }
   }
 
@@ -125,8 +132,10 @@ export class SSENotificationService extends EventEmitter {
   public unsubscribe(clientId: string, channels: string[]): void {
     const client = this.clients.get(clientId);
     if (client) {
-      channels.forEach(channel => client.subscriptions.delete(channel));
-      logger.debug(`Client ${clientId} unsubscribed from channels: ${channels.join(', ')}`);
+      channels.forEach((channel) => client.subscriptions.delete(channel));
+      logger.debug(
+        `Client ${clientId} unsubscribed from channels: ${channels.join(", ")}`,
+      );
     }
   }
 
@@ -150,7 +159,7 @@ export class SSENotificationService extends EventEmitter {
       logger.debug(`Sending SSE event to client ${clientId}:`, {
         type: event.type,
         data: event.data,
-        eventData: eventData.replace(/\n/g, '\\n')
+        eventData: eventData.replace(/\n/g, "\\n"),
       });
 
       client.response.write(eventData);
@@ -193,7 +202,9 @@ export class SSENotificationService extends EventEmitter {
         return;
       }
 
-      const hasSubscription = channels.some(channel => client.subscriptions.has(channel));
+      const hasSubscription = channels.some((channel) =>
+        client.subscriptions.has(channel),
+      );
       if (hasSubscription) {
         if (this.sendToClient(client.id, event)) {
           sentCount++;
@@ -231,7 +242,7 @@ export class SSENotificationService extends EventEmitter {
 
     // Send to specific users
     if (event.targetUsers && event.targetUsers.length > 0) {
-      event.targetUsers.forEach(userId => {
+      event.targetUsers.forEach((userId) => {
         totalSent += this.sendToUser(userId, event);
       });
     }
@@ -254,7 +265,7 @@ export class SSENotificationService extends EventEmitter {
    */
   private sendPing(): void {
     const pingEvent: NotificationEvent = {
-      type: 'ping',
+      type: "ping",
       data: { timestamp: new Date().toISOString() },
       timestamp: new Date(),
     };
@@ -308,8 +319,9 @@ export class SSENotificationService extends EventEmitter {
         clientsByUser[client.userId] = (clientsByUser[client.userId] || 0) + 1;
       }
 
-      client.subscriptions.forEach(subscription => {
-        subscriptionCounts[subscription] = (subscriptionCounts[subscription] || 0) + 1;
+      client.subscriptions.forEach((subscription) => {
+        subscriptionCounts[subscription] =
+          (subscriptionCounts[subscription] || 0) + 1;
       });
     });
 
@@ -339,7 +351,7 @@ export class SSENotificationService extends EventEmitter {
       this.removeClient(clientId);
     });
 
-    logger.info('SSE Notification Service shutdown complete');
+    logger.info("SSE Notification Service shutdown complete");
   }
 }
 
@@ -352,20 +364,29 @@ export class RemoteConfigNotifications {
   /**
    * Notify about config changes
    */
-  static async notifyConfigChange(configId: number, action: 'created' | 'updated' | 'deleted' | 'campaign_started' | 'campaign_ended', config: any): Promise<void> {
+  static async notifyConfigChange(
+    configId: number,
+    action:
+      | "created"
+      | "updated"
+      | "deleted"
+      | "campaign_started"
+      | "campaign_ended",
+    config: any,
+  ): Promise<void> {
     const event: NotificationEvent = {
-      type: 'remote_config_change',
+      type: "remote_config_change",
       data: {
         configId,
         action,
         config,
       },
       timestamp: new Date(),
-      targetChannels: ['remote_config', 'admin'],
+      targetChannels: ["remote_config", "admin"],
     };
 
     await pubSubService.publishNotification(event);
-    logger.info('Remote config change notification published via PubSub');
+    logger.info("Remote config change notification published via PubSub");
   }
 
   /**
@@ -373,37 +394,45 @@ export class RemoteConfigNotifications {
    */
   static notifyDeployment(deploymentId: number, configs: any[]): void {
     const event: NotificationEvent = {
-      type: 'remote_config_deployment',
+      type: "remote_config_deployment",
       data: {
         deploymentId,
         configCount: configs.length,
         configs,
       },
       timestamp: new Date(),
-      targetChannels: ['remote_config', 'admin'],
+      targetChannels: ["remote_config", "admin"],
     };
 
     const sentCount = this.sseService.sendNotification(event);
-    logger.info(`Remote config deployment notification sent to ${sentCount} clients`);
+    logger.info(
+      `Remote config deployment notification sent to ${sentCount} clients`,
+    );
   }
 
   /**
    * Notify about campaign status change
    */
-  static notifyCampaignStatusChange(campaignId: number, isActive: boolean, reason: string): void {
+  static notifyCampaignStatusChange(
+    campaignId: number,
+    isActive: boolean,
+    reason: string,
+  ): void {
     const event: NotificationEvent = {
-      type: 'campaign_status_change',
+      type: "campaign_status_change",
       data: {
         campaignId,
         isActive,
         reason,
       },
       timestamp: new Date(),
-      targetChannels: ['remote_config', 'campaigns', 'admin'],
+      targetChannels: ["remote_config", "campaigns", "admin"],
     };
 
     const sentCount = this.sseService.sendNotification(event);
-    logger.info(`Campaign status change notification sent to ${sentCount} clients`);
+    logger.info(
+      `Campaign status change notification sent to ${sentCount} clients`,
+    );
   }
 }
 
@@ -424,7 +453,7 @@ export class ChangeRequestNotifications {
     requesterName?: string;
   }): Promise<void> {
     const event: NotificationEvent = {
-      type: 'change_request_submitted',
+      type: "change_request_submitted",
       data: {
         id: changeRequest.id,
         title: changeRequest.title,
@@ -443,14 +472,18 @@ export class ChangeRequestNotifications {
   /**
    * Notify about change request approval
    */
-  static async notifyApproved(changeRequest: {
-    id: string;
-    title: string;
-    environment: string;
-    requesterId: number;
-  }, approverName?: string, actorId?: number): Promise<void> {
+  static async notifyApproved(
+    changeRequest: {
+      id: string;
+      title: string;
+      environment: string;
+      requesterId: number;
+    },
+    approverName?: string,
+    actorId?: number,
+  ): Promise<void> {
     const event: NotificationEvent = {
-      type: 'change_request_approved',
+      type: "change_request_approved",
       data: {
         id: changeRequest.id,
         title: changeRequest.title,
@@ -469,14 +502,18 @@ export class ChangeRequestNotifications {
   /**
    * Notify about change request execution
    */
-  static async notifyExecuted(changeRequest: {
-    id: string;
-    title: string;
-    environment: string;
-    requesterId: number;
-  }, executorName?: string, actorId?: number): Promise<void> {
+  static async notifyExecuted(
+    changeRequest: {
+      id: string;
+      title: string;
+      environment: string;
+      requesterId: number;
+    },
+    executorName?: string,
+    actorId?: number,
+  ): Promise<void> {
     const event: NotificationEvent = {
-      type: 'change_request_executed',
+      type: "change_request_executed",
       data: {
         id: changeRequest.id,
         title: changeRequest.title,
@@ -494,14 +531,19 @@ export class ChangeRequestNotifications {
   /**
    * Notify about change request rejection
    */
-  static async notifyRejected(changeRequest: {
-    id: string;
-    title: string;
-    environment: string;
-    requesterId: number;
-  }, rejectorName?: string, comment?: string, actorId?: number): Promise<void> {
+  static async notifyRejected(
+    changeRequest: {
+      id: string;
+      title: string;
+      environment: string;
+      requesterId: number;
+    },
+    rejectorName?: string,
+    comment?: string,
+    actorId?: number,
+  ): Promise<void> {
     const event: NotificationEvent = {
-      type: 'change_request_rejected',
+      type: "change_request_rejected",
       data: {
         id: changeRequest.id,
         title: changeRequest.title,

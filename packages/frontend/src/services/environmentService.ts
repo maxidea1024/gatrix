@@ -1,10 +1,10 @@
-import api from './api';
+import api from "./api";
 
 export interface Environment {
   environment: string; // Primary identifier (environment name)
   environmentName: string; // Alias for backward compatibility
   displayName: string;
-  environmentType: 'development' | 'staging' | 'production';
+  environmentType: "development" | "staging" | "production";
   description?: string;
   isSystemDefined: boolean;
   isHidden: boolean;
@@ -23,7 +23,7 @@ export interface CreateEnvironmentData {
   environment: string; // Environment name (primary key)
   displayName: string;
   description?: string;
-  environmentType: 'development' | 'staging' | 'production';
+  environmentType: "development" | "staging" | "production";
   color?: string;
   displayOrder?: number;
   baseEnvironment?: string; // If provided, copy data from this environment
@@ -34,7 +34,7 @@ export interface CreateEnvironmentData {
 export interface UpdateEnvironmentData {
   displayName?: string;
   description?: string;
-  environmentType?: 'development' | 'staging' | 'production';
+  environmentType?: "development" | "staging" | "production";
   color?: string;
   displayOrder?: number;
   isHidden?: boolean;
@@ -188,14 +188,16 @@ class EnvironmentService {
   /**
    * Get all environments
    */
-  async getEnvironments(includeHidden: boolean = false): Promise<Environment[]> {
+  async getEnvironments(
+    includeHidden: boolean = false,
+  ): Promise<Environment[]> {
     try {
-      const response = await api.get('/admin/environments', {
-        params: includeHidden ? { includeHidden: 'true' } : undefined
+      const response = await api.get("/admin/environments", {
+        params: includeHidden ? { includeHidden: "true" } : undefined,
       });
       return response.data || [];
     } catch (error) {
-      console.error('Error fetching environments:', error);
+      console.error("Error fetching environments:", error);
       throw error;
     }
   }
@@ -209,7 +211,7 @@ class EnvironmentService {
       const response = await api.get(`/admin/environments/${environment}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching environment:', error);
+      console.error("Error fetching environment:", error);
       throw error;
     }
   }
@@ -219,10 +221,10 @@ class EnvironmentService {
    */
   async createEnvironment(data: CreateEnvironmentData): Promise<Environment> {
     try {
-      const response = await api.post('/admin/environments', data);
+      const response = await api.post("/admin/environments", data);
       return response.data;
     } catch (error) {
-      console.error('Error creating environment:', error);
+      console.error("Error creating environment:", error);
       throw error;
     }
   }
@@ -231,12 +233,18 @@ class EnvironmentService {
    * Update an existing environment
    * @param environment Environment name (primary key)
    */
-  async updateEnvironment(environment: string, data: UpdateEnvironmentData): Promise<Environment> {
+  async updateEnvironment(
+    environment: string,
+    data: UpdateEnvironmentData,
+  ): Promise<Environment> {
     try {
-      const response = await api.put(`/admin/environments/${environment}`, data);
+      const response = await api.put(
+        `/admin/environments/${environment}`,
+        data,
+      );
       return response.data;
     } catch (error) {
-      console.error('Error updating environment:', error);
+      console.error("Error updating environment:", error);
       throw error;
     }
   }
@@ -246,12 +254,17 @@ class EnvironmentService {
    * @param sourceEnvironment Source environment name
    * @param targetEnvironment Target environment name
    */
-  async getCopyPreview(sourceEnvironment: string, targetEnvironment: string): Promise<CopyPreview> {
+  async getCopyPreview(
+    sourceEnvironment: string,
+    targetEnvironment: string,
+  ): Promise<CopyPreview> {
     try {
-      const response = await api.get(`/admin/environments/${sourceEnvironment}/copy/${targetEnvironment}/preview`);
+      const response = await api.get(
+        `/admin/environments/${sourceEnvironment}/copy/${targetEnvironment}/preview`,
+      );
       return response.data;
     } catch (error) {
-      console.error('Error fetching copy preview:', error);
+      console.error("Error fetching copy preview:", error);
       throw error;
     }
   }
@@ -261,12 +274,19 @@ class EnvironmentService {
    * @param sourceEnvironment Source environment name
    * @param targetEnvironment Target environment name
    */
-  async copyEnvironmentData(sourceEnvironment: string, targetEnvironment: string, options: CopyOptions): Promise<CopyResult> {
+  async copyEnvironmentData(
+    sourceEnvironment: string,
+    targetEnvironment: string,
+    options: CopyOptions,
+  ): Promise<CopyResult> {
     try {
-      const response = await api.post(`/admin/environments/${sourceEnvironment}/copy/${targetEnvironment}`, options);
+      const response = await api.post(
+        `/admin/environments/${sourceEnvironment}/copy/${targetEnvironment}`,
+        options,
+      );
       return response.data;
     } catch (error) {
-      console.error('Error copying environment data:', error);
+      console.error("Error copying environment data:", error);
       throw error;
     }
   }
@@ -277,10 +297,12 @@ class EnvironmentService {
    */
   async getRelatedData(environment: string): Promise<EnvironmentRelatedData> {
     try {
-      const response = await api.get(`/admin/environments/${environment}/related-data`);
+      const response = await api.get(
+        `/admin/environments/${environment}/related-data`,
+      );
       return response.data;
     } catch (error) {
-      console.error('Error fetching related data:', error);
+      console.error("Error fetching related data:", error);
       throw error;
     }
   }
@@ -290,11 +312,16 @@ class EnvironmentService {
    * @param environment Environment name (primary key)
    * @param force If true, delete all related data as well
    */
-  async deleteEnvironment(environment: string, force: boolean = false): Promise<void> {
+  async deleteEnvironment(
+    environment: string,
+    force: boolean = false,
+  ): Promise<void> {
     try {
-      await api.delete(`/admin/environments/${environment}`, { data: { force } });
+      await api.delete(`/admin/environments/${environment}`, {
+        data: { force },
+      });
     } catch (error) {
-      console.error('Error deleting environment:', error);
+      console.error("Error deleting environment:", error);
       throw error;
     }
   }

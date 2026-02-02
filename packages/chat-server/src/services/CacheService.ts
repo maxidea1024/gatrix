@@ -1,10 +1,10 @@
-import { EventEmitter } from 'events';
-import Keyv from 'keyv';
-import KeyvRedis from '@keyv/redis';
-import { config } from '../config';
-import { createLogger } from '../config/logger';
+import { EventEmitter } from "events";
+import Keyv from "keyv";
+import KeyvRedis from "@keyv/redis";
+import { config } from "../config";
+import { createLogger } from "../config/logger";
 
-const logger = createLogger('CacheService');
+const logger = createLogger("CacheService");
 
 export class CacheService extends EventEmitter {
   private static instance: CacheService;
@@ -26,8 +26,6 @@ export class CacheService extends EventEmitter {
     return CacheService.instance;
   }
 
-
-
   /**
    * Initialize multi-layer cache with Keyv (Memory + Redis)
    */
@@ -42,12 +40,15 @@ export class CacheService extends EventEmitter {
       if (config.redis.host) {
         try {
           // Use @keyv/redis for proper Redis support
-          const redisUrl = `redis://${config.redis.password ? `:${config.redis.password}@` : ''}${config.redis.host}:${config.redis.port}/${config.redis.db}`;
+          const redisUrl = `redis://${config.redis.password ? `:${config.redis.password}@` : ""}${config.redis.host}:${config.redis.port}/${config.redis.db}`;
           const redisStore = new KeyvRedis(redisUrl);
           this.l2Cache = new Keyv({ store: redisStore });
-          logger.info('Redis cache layer initialized');
+          logger.info("Redis cache layer initialized");
         } catch (redisError) {
-          logger.warn('Redis cache initialization failed, using memory only:', redisError);
+          logger.warn(
+            "Redis cache initialization failed, using memory only:",
+            redisError,
+          );
           this.l2Cache = null;
         }
       }
@@ -57,12 +58,12 @@ export class CacheService extends EventEmitter {
       this.initialized = true;
 
       if (this.l2Cache) {
-        logger.info('Cache initialized with Keyv multi-layer (Memory + Redis)');
+        logger.info("Cache initialized with Keyv multi-layer (Memory + Redis)");
       } else {
-        logger.info('Cache initialized with Keyv memory-only');
+        logger.info("Cache initialized with Keyv memory-only");
       }
     } catch (error) {
-      logger.error('Failed to initialize Keyv cache:', error);
+      logger.error("Failed to initialize Keyv cache:", error);
       throw error;
     }
   }
@@ -134,11 +135,9 @@ export class CacheService extends EventEmitter {
         if (this.l2Cache) {
           await this.l2Cache.clear();
         }
-      }
+      },
     };
   }
-
-
 
   /**
    * Static get method
@@ -151,7 +150,11 @@ export class CacheService extends EventEmitter {
   /**
    * Static set method
    */
-  public static async set<T>(key: string, data: T, ttlSeconds?: number): Promise<void> {
+  public static async set<T>(
+    key: string,
+    data: T,
+    ttlSeconds?: number,
+  ): Promise<void> {
     const instance = CacheService.getInstance();
     const ttlMs = ttlSeconds ? ttlSeconds * 1000 : undefined;
     instance.set<T>(key, data, ttlMs);
@@ -241,9 +244,9 @@ export class CacheService extends EventEmitter {
   async clear(): Promise<void> {
     try {
       await this.cache.clear();
-      logger.info('Cache cleared');
+      logger.info("Cache cleared");
     } catch (error) {
-      logger.error('Cache clear error:', error);
+      logger.error("Cache clear error:", error);
     }
   }
 

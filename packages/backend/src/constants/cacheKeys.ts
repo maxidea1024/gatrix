@@ -10,7 +10,7 @@
  * Used for data that varies by environment (game worlds, client versions, etc.)
  * Format: env:{environment}:{originalKey}
  */
-export const ENV_PREFIX = 'env';
+export const ENV_PREFIX = "env";
 
 /**
  * Create an environment-scoped cache key
@@ -49,14 +49,14 @@ export const GAME_WORLDS = {
    * - 표시 가능하고 점검 중이 아닌 월드들
    * - TTL: 10분
    */
-  PUBLIC: 'game_worlds:public',
+  PUBLIC: "game_worlds:public",
 
   /**
    * 관리자용 게임월드 목록
    * - 모든 월드 (숨김/점검 포함)
    * - TTL: 5분
    */
-  ADMIN: 'game_worlds:admin',
+  ADMIN: "game_worlds:admin",
 
   /**
    * 특정 게임월드 상세 정보
@@ -80,17 +80,18 @@ export const CLIENT_VERSION = {
    * @param channel 채널명
    * @param subChannel 서브채널명
    */
-  BY_CHANNEL: (channel: string, subChannel: string) => `client_version:${channel}:${subChannel}`,
+  BY_CHANNEL: (channel: string, subChannel: string) =>
+    `client_version:${channel}:${subChannel}`,
 
   /**
    * 모든 클라이언트 버전 목록
    */
-  ALL: 'client_versions:all',
+  ALL: "client_versions:all",
 
   /**
    * 활성화된 클라이언트 버전만
    */
-  ACTIVE: 'client_versions:active',
+  ACTIVE: "client_versions:active",
 } as const;
 
 /**
@@ -123,14 +124,15 @@ export const TAG = {
   /**
    * 모든 태그 목록
    */
-  ALL: 'tags:all',
+  ALL: "tags:all",
 
   /**
    * 엔티티별 태그 목록
    * @param entityType 엔티티 타입 (game_world, user 등)
    * @param entityId 엔티티 ID
    */
-  BY_ENTITY: (entityType: string, entityId: number) => `tags:${entityType}:${entityId}`,
+  BY_ENTITY: (entityType: string, entityId: number) =>
+    `tags:${entityType}:${entityId}`,
 } as const;
 
 /**
@@ -140,12 +142,12 @@ export const WHITELIST = {
   /**
    * 모든 화이트리스트 항목
    */
-  ALL: 'whitelist:all',
+  ALL: "whitelist:all",
 
   /**
    * 활성화된 화이트리스트 항목만
    */
-  ACTIVE: 'whitelist:active',
+  ACTIVE: "whitelist:active",
 
   /**
    * 특정 IP의 화이트리스트 상태
@@ -161,12 +163,12 @@ export const MAINTENANCE = {
   /**
    * 현재 점검 상태
    */
-  STATUS: 'maintenance:status',
+  STATUS: "maintenance:status",
 
   /**
    * 점검 템플릿 목록
    */
-  TEMPLATES: 'maintenance:templates',
+  TEMPLATES: "maintenance:templates",
 } as const;
 
 /**
@@ -176,7 +178,7 @@ export const MESSAGE_TEMPLATE = {
   /**
    * 모든 메시지 템플릿
    */
-  ALL: 'message_templates:all',
+  ALL: "message_templates:all",
 
   /**
    * 타입별 메시지 템플릿
@@ -194,7 +196,8 @@ export const TRANSLATION = {
    * @param hash 원문 텍스트 sha256 해시
    * @param lang 대상 언어 코드
    */
-  BY_TEXT_LANG: (hash: string, lang: 'ko' | 'en' | 'zh') => `translate:${hash}:${lang}`,
+  BY_TEXT_LANG: (hash: string, lang: "ko" | "en" | "zh") =>
+    `translate:${hash}:${lang}`,
 
   /**
    * 언어 감지 결과 (원문 텍스트 해시 기반)
@@ -203,7 +206,6 @@ export const TRANSLATION = {
   DETECT: (hash: string) => `translate:detect:${hash}`,
 } as const;
 
-
 /**
  * 작업(Job) 관련 캐시 키
  */
@@ -211,12 +213,12 @@ export const JOB = {
   /**
    * 모든 작업 목록
    */
-  ALL: 'jobs:all',
+  ALL: "jobs:all",
 
   /**
    * 작업 타입 목록
    */
-  TYPES: 'job_types:all',
+  TYPES: "job_types:all",
 
   /**
    * 특정 작업 상세 정보
@@ -241,7 +243,8 @@ export const AUDIT_LOG = {
    * @param userId 사용자 ID
    * @param page 페이지 번호
    */
-  BY_USER: (userId: number, page: number) => `audit_logs:user:${userId}:${page}`,
+  BY_USER: (userId: number, page: number) =>
+    `audit_logs:user:${userId}:${page}`,
 } as const;
 /**
  * Server SDK endpoint ETag cache keys
@@ -250,57 +253,57 @@ export const SERVER_SDK_ETAG = {
   /**
    * Game worlds list for server SDK
    */
-  GAME_WORLDS: 'server_sdk:etag:game_worlds',
+  GAME_WORLDS: "server_sdk:etag:game_worlds",
 
   /**
    * In-game popup notices for server SDK
    */
-  POPUP_NOTICES: 'server_sdk:etag:popup_notices',
+  POPUP_NOTICES: "server_sdk:etag:popup_notices",
 
   /**
    * Whitelists for server SDK
    */
-  WHITELISTS: 'server_sdk:etag:whitelists',
+  WHITELISTS: "server_sdk:etag:whitelists",
 
   /**
    * Maintenance status for server SDK
    */
-  MAINTENANCE: 'server_sdk:etag:maintenance',
+  MAINTENANCE: "server_sdk:etag:maintenance",
 
   /**
    * Surveys list for server SDK
    */
-  SURVEYS: 'server_sdk:etag:surveys',
+  SURVEYS: "server_sdk:etag:surveys",
 
   /**
    * Survey settings for server SDK
    */
-  SURVEY_SETTINGS: 'server_sdk:etag:survey_settings',
+  SURVEY_SETTINGS: "server_sdk:etag:survey_settings",
 
   /**
    * Client versions for server SDK (Edge)
    */
-  CLIENT_VERSIONS: 'server_sdk:etag:client_versions',
+  CLIENT_VERSIONS: "server_sdk:etag:client_versions",
 
   /**
    * Service notices for server SDK (Edge)
    */
-  SERVICE_NOTICES: 'server_sdk:etag:service_notices',
+  SERVICE_NOTICES: "server_sdk:etag:service_notices",
 
   /**
    * Banners for server SDK (Edge)
    */
-  BANNERS: 'server_sdk:etag:banners',
+  BANNERS: "server_sdk:etag:banners",
 
   /**
    * Store products for server SDK
    */
-  STORE_PRODUCTS: 'server_sdk:etag:store_products',
+  STORE_PRODUCTS: "server_sdk:etag:store_products",
 
   /**
    * Feature flags for server SDK
    */
-  FEATURE_FLAGS: 'server_sdk:etag:feature_flags',
+  FEATURE_FLAGS: "server_sdk:etag:feature_flags",
 } as const;
 
 /**
@@ -313,8 +316,8 @@ export const ENV_SCOPED = {
    * Game worlds related (environment-specific)
    */
   GAME_WORLDS: {
-    PUBLIC: 'game_worlds:public',
-    ADMIN: 'game_worlds:admin',
+    PUBLIC: "game_worlds:public",
+    ADMIN: "game_worlds:admin",
     DETAIL: (id: number) => `game_world:${id}`,
     BY_WORLD_ID: (worldId: string) => `game_world:world_id:${worldId}`,
   },
@@ -323,17 +326,18 @@ export const ENV_SCOPED = {
    * Client versions (environment-specific)
    */
   CLIENT_VERSION: {
-    BY_CHANNEL: (channel: string, subChannel: string) => `client_version:${channel}:${subChannel}`,
-    ALL: 'client_versions:all',
-    ACTIVE: 'client_versions:active',
+    BY_CHANNEL: (channel: string, subChannel: string) =>
+      `client_version:${channel}:${subChannel}`,
+    ALL: "client_versions:all",
+    ACTIVE: "client_versions:active",
   },
 
   /**
    * Whitelists (environment-specific)
    */
   WHITELIST: {
-    ALL: 'whitelist:all',
-    ACTIVE: 'whitelist:active',
+    ALL: "whitelist:all",
+    ACTIVE: "whitelist:active",
     BY_IP: (ip: string) => `whitelist:ip:${ip}`,
   },
 
@@ -341,29 +345,29 @@ export const ENV_SCOPED = {
    * Maintenance (environment-specific)
    */
   MAINTENANCE: {
-    STATUS: 'maintenance:status',
-    TEMPLATES: 'maintenance:templates',
+    STATUS: "maintenance:status",
+    TEMPLATES: "maintenance:templates",
   },
 
   /**
    * Server SDK ETags (environment-specific)
    */
   SDK_ETAG: {
-    GAME_WORLDS: 'server_sdk:etag:game_worlds',
-    POPUP_NOTICES: 'server_sdk:etag:popup_notices',
-    WHITELISTS: 'server_sdk:etag:whitelists',
-    MAINTENANCE: 'server_sdk:etag:maintenance',
-    SURVEYS: 'server_sdk:etag:surveys',
-    SURVEY_SETTINGS: 'server_sdk:etag:survey_settings',
-    FEATURE_FLAGS: 'server_sdk:etag:feature_flags',
+    GAME_WORLDS: "server_sdk:etag:game_worlds",
+    POPUP_NOTICES: "server_sdk:etag:popup_notices",
+    WHITELISTS: "server_sdk:etag:whitelists",
+    MAINTENANCE: "server_sdk:etag:maintenance",
+    SURVEYS: "server_sdk:etag:surveys",
+    SURVEY_SETTINGS: "server_sdk:etag:survey_settings",
+    FEATURE_FLAGS: "server_sdk:etag:feature_flags",
   },
 
   /**
    * Banners (environment-specific)
    */
   BANNERS: {
-    ALL: 'banners:all',
-    ACTIVE: 'banners:active',
+    ALL: "banners:all",
+    ACTIVE: "banners:active",
     BY_ID: (id: string) => `banner:${id}`,
   },
 
@@ -371,39 +375,37 @@ export const ENV_SCOPED = {
    * Service notices (environment-specific)
    */
   SERVICE_NOTICES: {
-    ALL: 'service_notices:all',
-    ACTIVE: 'service_notices:active',
+    ALL: "service_notices:all",
+    ACTIVE: "service_notices:active",
   },
 
   /**
    * Surveys (environment-specific)
    */
   SURVEYS: {
-    ALL: 'surveys:all',
-    ACTIVE: 'surveys:active',
-    SETTINGS: 'surveys:settings',
+    ALL: "surveys:all",
+    ACTIVE: "surveys:active",
+    SETTINGS: "surveys:settings",
   },
 
   /**
    * Ingame popup notices (environment-specific)
    */
   POPUP_NOTICES: {
-    ALL: 'popup_notices:all',
-    ACTIVE: 'popup_notices:active',
+    ALL: "popup_notices:all",
+    ACTIVE: "popup_notices:active",
   },
 
   /**
    * Feature flags (environment-specific)
    */
   FEATURE_FLAGS: {
-    ALL: 'feature_flags:all',
+    ALL: "feature_flags:all",
     BY_NAME: (flagName: string) => `feature_flag:${flagName}`,
-    SEGMENTS: 'feature_segments:all',
-    CONTEXT_FIELDS: 'feature_context_fields:all',
+    SEGMENTS: "feature_segments:all",
+    CONTEXT_FIELDS: "feature_context_fields:all",
   },
 } as const;
-
-
 
 /**
  * 캐시 패턴 (패턴 기반 삭제용)
@@ -412,12 +414,12 @@ export const PATTERNS = {
   /**
    * 모든 게임월드 관련 캐시
    */
-  GAME_WORLDS: 'game_world*',
+  GAME_WORLDS: "game_world*",
 
   /**
    * 모든 클라이언트 버전 관련 캐시
    */
-  CLIENT_VERSIONS: 'client_version*',
+  CLIENT_VERSIONS: "client_version*",
 
   /**
    * 특정 사용자 관련 모든 캐시
@@ -428,37 +430,37 @@ export const PATTERNS = {
   /**
    * 모든 태그 관련 캐시
    */
-  TAGS: 'tags*',
+  TAGS: "tags*",
 
   /**
    * 모든 화이트리스트 관련 캐시
    */
-  WHITELIST: 'whitelist*',
+  WHITELIST: "whitelist*",
 
   /**
    * 모든 점검 관련 캐시
    */
-  MAINTENANCE: 'maintenance*',
+  MAINTENANCE: "maintenance*",
 
   /**
    * 모든 메시지 템플릿 관련 캐시
    */
-  MESSAGE_TEMPLATES: 'message_template*',
+  MESSAGE_TEMPLATES: "message_template*",
 
   /**
    * 모든 작업 관련 캐시
    */
-  JOBS: 'job*',
+  JOBS: "job*",
 
   /**
    * 모든 감사 로그 관련 캐시
    */
-  AUDIT_LOGS: 'audit_log*',
+  AUDIT_LOGS: "audit_log*",
 
   /**
    * 모든 번역 관련 캐시
    */
-  TRANSLATION: 'translate*',
+  TRANSLATION: "translate*",
 
   /**
    * 특정 환경의 모든 캐시

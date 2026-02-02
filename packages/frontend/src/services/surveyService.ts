@@ -1,8 +1,11 @@
-import api from './api';
-import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
+import api from "./api";
+import {
+  MutationResult,
+  parseChangeRequestResponse,
+} from "./changeRequestUtils";
 
 export interface TriggerCondition {
-  type: 'userLevel' | 'joinDays';
+  type: "userLevel" | "joinDays";
   value: number;
 }
 
@@ -111,7 +114,7 @@ class SurveyService {
    * Get all surveys with pagination
    */
   async getSurveys(params?: GetSurveysParams): Promise<GetSurveysResponse> {
-    const response = await api.get('/admin/surveys', { params });
+    const response = await api.get("/admin/surveys", { params });
     return response.data;
   }
 
@@ -127,22 +130,29 @@ class SurveyService {
    * Get survey by platform survey ID
    */
   async getSurveyByPlatformId(platformSurveyId: string): Promise<Survey> {
-    const response = await api.get(`/admin/surveys/platform/${platformSurveyId}`);
+    const response = await api.get(
+      `/admin/surveys/platform/${platformSurveyId}`,
+    );
     return response.data.survey;
   }
 
   /**
    * Create a new survey
    */
-  async createSurvey(input: CreateSurveyInput): Promise<MutationResult<Survey>> {
-    const response = await api.post('/admin/surveys', input);
+  async createSurvey(
+    input: CreateSurveyInput,
+  ): Promise<MutationResult<Survey>> {
+    const response = await api.post("/admin/surveys", input);
     return parseChangeRequestResponse<Survey>(response, (r) => r?.survey);
   }
 
   /**
    * Update a survey
    */
-  async updateSurvey(id: string, input: UpdateSurveyInput): Promise<MutationResult<Survey>> {
+  async updateSurvey(
+    id: string,
+    input: UpdateSurveyInput,
+  ): Promise<MutationResult<Survey>> {
     const response = await api.put(`/admin/surveys/${id}`, input);
     return parseChangeRequestResponse<Survey>(response, (r) => r?.survey);
   }
@@ -167,15 +177,17 @@ class SurveyService {
    * Get survey configuration
    */
   async getSurveyConfig(): Promise<SurveyConfig> {
-    const response = await api.get('/admin/surveys/config');
+    const response = await api.get("/admin/surveys/config");
     return response.data.config;
   }
 
   /**
    * Update survey configuration
    */
-  async updateSurveyConfig(input: Partial<SurveyConfig>): Promise<SurveyConfig> {
-    const response = await api.put('/admin/surveys/config', input);
+  async updateSurveyConfig(
+    input: Partial<SurveyConfig>,
+  ): Promise<SurveyConfig> {
+    const response = await api.put("/admin/surveys/config", input);
     return response.data.config;
   }
 }

@@ -5,17 +5,25 @@
  * Extends BaseEnvironmentService for common fetch/caching logic
  */
 
-import { ApiClient } from '../client/ApiClient';
-import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/EnvironmentResolver';
-import { PopupNotice } from '../types/api';
-import { BaseEnvironmentService } from './BaseEnvironmentService';
+import { ApiClient } from "../client/ApiClient";
+import { Logger } from "../utils/logger";
+import { EnvironmentResolver } from "../utils/EnvironmentResolver";
+import { PopupNotice } from "../types/api";
+import { BaseEnvironmentService } from "./BaseEnvironmentService";
 
 // Response type is directly PopupNotice[] (not wrapped in object)
 type PopupNoticeListResponse = PopupNotice[];
 
-export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, PopupNoticeListResponse, number> {
-  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
+export class PopupNoticeService extends BaseEnvironmentService<
+  PopupNotice,
+  PopupNoticeListResponse,
+  number
+> {
+  constructor(
+    apiClient: ApiClient,
+    logger: Logger,
+    envResolver: EnvironmentResolver,
+  ) {
     super(apiClient, logger, envResolver);
   }
 
@@ -30,7 +38,7 @@ export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, Popu
   }
 
   protected getServiceName(): string {
-    return 'popup notices';
+    return "popup notices";
   }
 
   protected getItemId(item: PopupNotice): number {
@@ -46,15 +54,19 @@ export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, Popu
    * @param environment Environment name (required)
    */
   async getById(id: number, environment: string): Promise<PopupNotice> {
-    this.logger.debug('Fetching popup notice by ID', { id, environment });
+    this.logger.debug("Fetching popup notice by ID", { id, environment });
 
-    const response = await this.apiClient.get<{ notice: PopupNotice }>(`/api/v1/server/${encodeURIComponent(environment)}/ingame-popup-notices/${id}`);
+    const response = await this.apiClient.get<{ notice: PopupNotice }>(
+      `/api/v1/server/${encodeURIComponent(environment)}/ingame-popup-notices/${id}`,
+    );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch popup notice');
+      throw new Error(
+        response.error?.message || "Failed to fetch popup notice",
+      );
     }
 
-    this.logger.info('Popup notice fetched', { id });
+    this.logger.info("Popup notice fetched", { id });
 
     return response.data.notice;
   }
@@ -68,20 +80,31 @@ export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, Popu
    * @param environment Environment name (required)
    * @param isVisible Optional visibility status
    */
-  async updateSingleNotice(id: number, environment: string, isVisible?: boolean | number): Promise<void> {
+  async updateSingleNotice(
+    id: number,
+    environment: string,
+    isVisible?: boolean | number,
+  ): Promise<void> {
     try {
-      this.logger.debug('Updating single popup notice in cache', { id, environment, isVisible });
+      this.logger.debug("Updating single popup notice in cache", {
+        id,
+        environment,
+        isVisible,
+      });
 
       // If isVisible is explicitly false (0 or false), just remove from cache
       if (isVisible === false || isVisible === 0) {
-        this.logger.info('Popup notice isVisible=false, removing from cache', { id, environment });
+        this.logger.info("Popup notice isVisible=false, removing from cache", {
+          id,
+          environment,
+        });
         this.removeFromCache(id, environment);
         return;
       }
 
       // Otherwise, fetch from API and add/update
       // Add small delay to ensure backend transaction is committed
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Fetch the single notice from backend using getById
       let updatedNotice: PopupNotice;
@@ -89,14 +112,17 @@ export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, Popu
         updatedNotice = await this.getById(id, environment);
       } catch (_error: any) {
         // If notice not found (404), it's no longer active or visible
-        this.logger.debug('Popup notice not found or not active, removing from cache', { id, environment });
+        this.logger.debug(
+          "Popup notice not found or not active, removing from cache",
+          { id, environment },
+        );
         this.removeFromCache(id, environment);
         return;
       }
 
       this.updateItemInCache(updatedNotice, environment);
     } catch (error: any) {
-      this.logger.error('Failed to update single popup notice in cache', {
+      this.logger.error("Failed to update single popup notice in cache", {
         id,
         environment,
         error: error.message,
@@ -137,7 +163,8 @@ export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, Popu
     environment: string;
   }): PopupNotice[] {
     const now = new Date();
-    const { platform, channel, subChannel, worldId, userId, environment } = options;
+    const { platform, channel, subChannel, worldId, userId, environment } =
+      options;
     const notices = this.getCached(environment);
     const filtered = notices.filter((notice) => {
       // Check startDate: if set, current time must be after startDate
@@ -157,7 +184,11 @@ export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, Popu
       }
 
       // Platform targeting
-      if (platform && notice.targetPlatforms && notice.targetPlatforms.length > 0) {
+      if (
+        platform &&
+        notice.targetPlatforms &&
+        notice.targetPlatforms.length > 0
+      ) {
         const isInPlatformList = notice.targetPlatforms.includes(platform);
         const inverted = Boolean(notice.targetPlatformsInverted);
         if (inverted ? isInPlatformList : !isInPlatformList) {
@@ -166,7 +197,11 @@ export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, Popu
       }
 
       // Channel targeting
-      if (channel && notice.targetChannels && notice.targetChannels.length > 0) {
+      if (
+        channel &&
+        notice.targetChannels &&
+        notice.targetChannels.length > 0
+      ) {
         const isInChannelList = notice.targetChannels.includes(channel);
         const inverted = Boolean(notice.targetChannelsInverted);
         if (inverted ? isInChannelList : !isInChannelList) {
@@ -182,7 +217,8 @@ export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, Popu
         notice.targetSubchannels.length > 0
       ) {
         const subchannelKey = `${channel}:${subChannel}`;
-        const isInSubchannelList = notice.targetSubchannels.includes(subchannelKey);
+        const isInSubchannelList =
+          notice.targetSubchannels.includes(subchannelKey);
         const inverted = Boolean(notice.targetSubchannelsInverted);
         if (inverted ? isInSubchannelList : !isInSubchannelList) {
           return false;
@@ -203,7 +239,7 @@ export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, Popu
         const userIdList = Array.isArray(notice.targetUserIds)
           ? notice.targetUserIds
           : String(notice.targetUserIds)
-              .split(',')
+              .split(",")
               .map((id) => id.trim())
               .filter((id) => id);
 

@@ -1,5 +1,5 @@
-import db from '../config/knex';
-import logger from '../config/logger';
+import db from "../config/knex";
+import logger from "../config/logger";
 
 export interface ContextFieldOption {
   value: string | number;
@@ -19,7 +19,7 @@ export interface ContextField {
   key: string;
   name: string;
   description?: string;
-  type: 'string' | 'number' | 'boolean' | 'array';
+  type: "string" | "number" | "boolean" | "array";
   options?: ContextFieldOption[];
   defaultValue?: string;
   validation?: ContextFieldValidation;
@@ -35,7 +35,7 @@ export interface CreateContextFieldData {
   key: string;
   name: string;
   description?: string;
-  type: 'string' | 'number' | 'boolean' | 'array';
+  type: "string" | "number" | "boolean" | "array";
   options?: ContextFieldOption[];
   defaultValue?: string;
   validation?: ContextFieldValidation;
@@ -63,16 +63,16 @@ export class ContextFieldModel {
     if (!value) return null;
 
     // 이미 객체인 경우 그대로 반환
-    if (typeof value === 'object') {
+    if (typeof value === "object") {
       return value;
     }
 
     // 문자열인 경우 JSON 파싱 시도
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       try {
         return JSON.parse(value);
       } catch (error) {
-        logger.error('Failed to parse validationRules JSON:', { value, error });
+        logger.error("Failed to parse validationRules JSON:", { value, error });
         return null;
       }
     }
@@ -88,52 +88,86 @@ export class ContextFieldModel {
     limit?: number;
   }): Promise<{ fields: ContextField[]; total: number }> {
     try {
-      let query = db('g_remote_config_context_fields')
-        .leftJoin('g_users as creator', 'g_remote_config_context_fields.createdBy', 'creator.id')
-        .leftJoin('g_users as updater', 'g_remote_config_context_fields.updatedBy', 'updater.id')
+      let query = db("g_remote_config_context_fields")
+        .leftJoin(
+          "g_users as creator",
+          "g_remote_config_context_fields.createdBy",
+          "creator.id",
+        )
+        .leftJoin(
+          "g_users as updater",
+          "g_remote_config_context_fields.updatedBy",
+          "updater.id",
+        )
         .select([
-          'g_remote_config_context_fields.*',
-          'creator.name as creatorName',
-          'updater.name as updaterName'
+          "g_remote_config_context_fields.*",
+          "creator.name as creatorName",
+          "updater.name as updaterName",
         ])
-        .orderBy('g_remote_config_context_fields.createdAt', 'desc');
+        .orderBy("g_remote_config_context_fields.createdAt", "desc");
 
       // Apply filters
       if (filters?.search) {
-        query = query.where(function() {
-          this.where('g_remote_config_context_fields.fieldName', 'like', `%${filters.search}%`)
-            .orWhere('g_remote_config_context_fields.description', 'like', `%${filters.search}%`);
+        query = query.where(function () {
+          this.where(
+            "g_remote_config_context_fields.fieldName",
+            "like",
+            `%${filters.search}%`,
+          ).orWhere(
+            "g_remote_config_context_fields.description",
+            "like",
+            `%${filters.search}%`,
+          );
         });
       }
 
       if (filters?.type) {
-        query = query.where('g_remote_config_context_fields.fieldType', filters.type);
+        query = query.where(
+          "g_remote_config_context_fields.fieldType",
+          filters.type,
+        );
       }
 
       if (filters?.isActive !== undefined) {
-        query = query.where('g_remote_config_context_fields.isRequired', filters.isActive);
+        query = query.where(
+          "g_remote_config_context_fields.isRequired",
+          filters.isActive,
+        );
       }
 
       // Get total count with a separate simple query
-      let countQuery = db('g_remote_config_context_fields');
+      let countQuery = db("g_remote_config_context_fields");
 
       // Apply the same filters for count
       if (filters?.search) {
-        countQuery = countQuery.where(function() {
-          this.where('g_remote_config_context_fields.fieldName', 'like', `%${filters.search}%`)
-            .orWhere('g_remote_config_context_fields.description', 'like', `%${filters.search}%`);
+        countQuery = countQuery.where(function () {
+          this.where(
+            "g_remote_config_context_fields.fieldName",
+            "like",
+            `%${filters.search}%`,
+          ).orWhere(
+            "g_remote_config_context_fields.description",
+            "like",
+            `%${filters.search}%`,
+          );
         });
       }
 
       if (filters?.type) {
-        countQuery = countQuery.where('g_remote_config_context_fields.fieldType', filters.type);
+        countQuery = countQuery.where(
+          "g_remote_config_context_fields.fieldType",
+          filters.type,
+        );
       }
 
       if (filters?.isActive !== undefined) {
-        countQuery = countQuery.where('g_remote_config_context_fields.isRequired', filters.isActive);
+        countQuery = countQuery.where(
+          "g_remote_config_context_fields.isRequired",
+          filters.isActive,
+        );
       }
 
-      const totalResult = await countQuery.count('* as count').first();
+      const totalResult = await countQuery.count("* as count").first();
       const total = totalResult ? Number(totalResult.count) : 0;
 
       // Apply pagination
@@ -145,7 +179,7 @@ export class ContextFieldModel {
       const fields = await query;
 
       return {
-        fields: fields.map(field => {
+        fields: fields.map((field) => {
           const validation = this.parseValidationRules(field.validationRules);
           return {
             ...field,
@@ -157,29 +191,41 @@ export class ContextFieldModel {
             isRequired: field.isRequired || false,
             isActive: true, // Default to true since table doesn't have isActive
             isSystem: false, // Default to false since table doesn't have isSystem
-            creator: field.creatorName ? { name: field.creatorName } : undefined,
-            updater: field.updaterName ? { name: field.updaterName } : undefined
+            creator: field.creatorName
+              ? { name: field.creatorName }
+              : undefined,
+            updater: field.updaterName
+              ? { name: field.updaterName }
+              : undefined,
           };
         }),
-        total
+        total,
       };
     } catch (error) {
-      logger.error('Error finding context fields:', error);
+      logger.error("Error finding context fields:", error);
       throw error;
     }
   }
 
   static async findById(id: number): Promise<ContextField | null> {
     try {
-      const field = await db('g_remote_config_context_fields')
-        .leftJoin('g_users as creator', 'g_remote_config_context_fields.createdBy', 'creator.id')
-        .leftJoin('g_users as updater', 'g_remote_config_context_fields.updatedBy', 'updater.id')
+      const field = await db("g_remote_config_context_fields")
+        .leftJoin(
+          "g_users as creator",
+          "g_remote_config_context_fields.createdBy",
+          "creator.id",
+        )
+        .leftJoin(
+          "g_users as updater",
+          "g_remote_config_context_fields.updatedBy",
+          "updater.id",
+        )
         .select([
-          'g_remote_config_context_fields.*',
-          'creator.name as creatorName',
-          'updater.name as updaterName'
+          "g_remote_config_context_fields.*",
+          "creator.name as creatorName",
+          "updater.name as updaterName",
         ])
-        .where('g_remote_config_context_fields.id', id)
+        .where("g_remote_config_context_fields.id", id)
         .first();
 
       if (!field) return null;
@@ -196,25 +242,33 @@ export class ContextFieldModel {
         isActive: true, // Default to true since table doesn't have isActive
         isSystem: false, // Default to false since table doesn't have isSystem
         creator: field.creatorName ? { name: field.creatorName } : undefined,
-        updater: field.updaterName ? { name: field.updaterName } : undefined
+        updater: field.updaterName ? { name: field.updaterName } : undefined,
       };
     } catch (error) {
-      logger.error('Error finding context field by id:', error);
+      logger.error("Error finding context field by id:", error);
       throw error;
     }
   }
 
   static async findByKey(key: string): Promise<ContextField | null> {
     try {
-      const field = await db('g_remote_config_context_fields')
-        .leftJoin('g_users as creator', 'g_remote_config_context_fields.createdBy', 'creator.id')
-        .leftJoin('g_users as updater', 'g_remote_config_context_fields.updatedBy', 'updater.id')
+      const field = await db("g_remote_config_context_fields")
+        .leftJoin(
+          "g_users as creator",
+          "g_remote_config_context_fields.createdBy",
+          "creator.id",
+        )
+        .leftJoin(
+          "g_users as updater",
+          "g_remote_config_context_fields.updatedBy",
+          "updater.id",
+        )
         .select([
-          'g_remote_config_context_fields.*',
-          'creator.name as creatorName',
-          'updater.name as updaterName'
+          "g_remote_config_context_fields.*",
+          "creator.name as creatorName",
+          "updater.name as updaterName",
         ])
-        .where('g_remote_config_context_fields.fieldName', key)
+        .where("g_remote_config_context_fields.fieldName", key)
         .first();
 
       if (!field) {
@@ -233,10 +287,10 @@ export class ContextFieldModel {
         isActive: true, // Default to true since table doesn't have isActive
         isSystem: false, // Default to false since table doesn't have isSystem
         creator: field.creatorName ? { name: field.creatorName } : undefined,
-        updater: field.updaterName ? { name: field.updaterName } : undefined
+        updater: field.updaterName ? { name: field.updaterName } : undefined,
       };
     } catch (error) {
-      logger.error('Error finding context field by key:', error);
+      logger.error("Error finding context field by key:", error);
       throw error;
     }
   }
@@ -249,31 +303,38 @@ export class ContextFieldModel {
         description: data.description,
         isRequired: data.isRequired || false,
         defaultValue: data.defaultValue || null,
-        validationRules: data.validation ? JSON.stringify(data.validation) : null,
+        validationRules: data.validation
+          ? JSON.stringify(data.validation)
+          : null,
         createdBy: data.createdBy,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
-      const [id] = await db('g_remote_config_context_fields').insert(insertData);
+      const [id] = await db("g_remote_config_context_fields").insert(
+        insertData,
+      );
       const created = await this.findById(id);
 
       if (!created) {
-        throw new Error('Failed to retrieve created context field');
+        throw new Error("Failed to retrieve created context field");
       }
 
       return created;
     } catch (error) {
-      logger.error('Error creating context field:', error);
+      logger.error("Error creating context field:", error);
       throw error;
     }
   }
 
-  static async update(id: number, data: UpdateContextFieldData): Promise<ContextField | null> {
+  static async update(
+    id: number,
+    data: UpdateContextFieldData,
+  ): Promise<ContextField | null> {
     try {
       const updateData: any = {
         updatedAt: new Date(),
-        updatedBy: data.updatedBy
+        updatedBy: data.updatedBy,
       };
 
       // Map fields to correct column names
@@ -290,29 +351,31 @@ export class ContextFieldModel {
         updateData.isRequired = data.isRequired;
       }
       if (data.validation !== undefined) {
-        updateData.validationRules = data.validation ? JSON.stringify(data.validation) : null;
+        updateData.validationRules = data.validation
+          ? JSON.stringify(data.validation)
+          : null;
       }
 
-      await db('g_remote_config_context_fields')
-        .where('id', id)
+      await db("g_remote_config_context_fields")
+        .where("id", id)
         .update(updateData);
 
       return this.findById(id);
     } catch (error) {
-      logger.error('Error updating context field:', error);
+      logger.error("Error updating context field:", error);
       throw error;
     }
   }
 
   static async delete(id: number): Promise<boolean> {
     try {
-      const deleted = await db('g_remote_config_context_fields')
-        .where('id', id)
+      const deleted = await db("g_remote_config_context_fields")
+        .where("id", id)
         .del();
 
       return deleted > 0;
     } catch (error) {
-      logger.error('Error deleting context field:', error);
+      logger.error("Error deleting context field:", error);
       throw error;
     }
   }
@@ -323,12 +386,19 @@ export class ContextFieldModel {
     return keyRegex.test(key);
   }
 
-  static validateOptions(type: string, options?: ContextFieldOption[]): boolean {
-    if (type === 'array' && options) {
-      return Array.isArray(options) && options.every(option =>
-        typeof option === 'object' &&
-        option.hasOwnProperty('value') &&
-        option.hasOwnProperty('label')
+  static validateOptions(
+    type: string,
+    options?: ContextFieldOption[],
+  ): boolean {
+    if (type === "array" && options) {
+      return (
+        Array.isArray(options) &&
+        options.every(
+          (option) =>
+            typeof option === "object" &&
+            option.hasOwnProperty("value") &&
+            option.hasOwnProperty("label"),
+        )
       );
     }
     return true;
@@ -338,13 +408,13 @@ export class ContextFieldModel {
     if (!defaultValue) return true;
 
     switch (type) {
-      case 'string':
-        return typeof defaultValue === 'string';
-      case 'number':
+      case "string":
+        return typeof defaultValue === "string";
+      case "number":
         return !isNaN(Number(defaultValue));
-      case 'boolean':
-        return defaultValue === 'true' || defaultValue === 'false';
-      case 'array':
+      case "boolean":
+        return defaultValue === "true" || defaultValue === "false";
+      case "array":
         try {
           const parsed = JSON.parse(defaultValue);
           return Array.isArray(parsed);
@@ -361,11 +431,11 @@ export class ContextFieldModel {
     if (!field.defaultValue) return null;
 
     switch (field.type) {
-      case 'number':
+      case "number":
         return Number(field.defaultValue);
-      case 'boolean':
-        return field.defaultValue === 'true';
-      case 'array':
+      case "boolean":
+        return field.defaultValue === "true";
+      case "array":
         try {
           return JSON.parse(field.defaultValue);
         } catch {
@@ -378,9 +448,9 @@ export class ContextFieldModel {
 
   // Get available operators for this field type
   static getAvailableOperators(fieldType: string) {
-    const { CONTEXT_OPERATORS } = require('../types/contextFields');
+    const { CONTEXT_OPERATORS } = require("../types/contextFields");
     return CONTEXT_OPERATORS.filter((op: any) =>
-      op.supportedFieldTypes.includes(fieldType)
+      op.supportedFieldTypes.includes(fieldType),
     );
   }
 }

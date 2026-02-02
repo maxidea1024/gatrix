@@ -2,14 +2,19 @@
  * HTTP API Client using Axios
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
-import { ulid } from 'ulid';
-import { Logger } from '../utils/logger';
-import { ErrorCode, createError, isGatrixSDKError } from '../utils/errors';
-import { ApiResponse } from '../types/api';
-import { RetryConfig } from '../types/config';
-import { SdkMetrics } from '../utils/sdkMetrics';
-import { sleep } from '../utils/time';
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosError,
+} from "axios";
+import { ulid } from "ulid";
+import { Logger } from "../utils/logger";
+import { ErrorCode, createError, isGatrixSDKError } from "../utils/errors";
+import { ApiResponse } from "../types/api";
+import { RetryConfig } from "../types/config";
+import { SdkMetrics } from "../utils/sdkMetrics";
+import { sleep } from "../utils/time";
 
 export interface ApiClientConfig {
   baseURL: string;
@@ -53,14 +58,14 @@ export class ApiClient {
 
     // Build headers with optional environment
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'X-API-Token': config.apiToken,
-      'X-Application-Name': config.applicationName,
+      "Content-Type": "application/json",
+      "X-API-Token": config.apiToken,
+      "X-Application-Name": config.applicationName,
     };
 
     // Add environment header for single-environment mode
     if (config.environment) {
-      headers['X-Environment'] = config.environment;
+      headers["X-Environment"] = config.environment;
     }
 
     // Create axios instance
@@ -69,7 +74,8 @@ export class ApiClient {
       timeout: config.timeout || 30000,
       headers,
       // Treat 304 Not Modified as a successful response so we can handle ETag logic
-      validateStatus: (status) => (status >= 200 && status < 300) || status === 304,
+      validateStatus: (status) =>
+        (status >= 200 && status < 300) || status === 304,
     });
 
     // Request interceptor
@@ -78,7 +84,7 @@ export class ApiClient {
         // Record start time for latency metrics
         (requestConfig as any).__sdkStartTime = process.hrtime.bigint();
 
-        this.logger.debug('API Request', {
+        this.logger.debug("API Request", {
           method: requestConfig.method?.toUpperCase(),
           url: requestConfig.url,
           params: requestConfig.params,
@@ -86,28 +92,35 @@ export class ApiClient {
         return requestConfig;
       },
       (error) => {
-        this.logger.error('API Request Error', { error: error.message });
+        this.logger.error("API Request Error", { error: error.message });
         return Promise.reject(error);
-      }
+      },
     );
 
     // Response interceptor
     this.client.interceptors.response.use(
       (response) => {
-        this.logger.debug('API Response', {
+        this.logger.debug("API Response", {
           status: response.status,
           url: response.config.url,
         });
 
         // Observe HTTP duration and increment counters
         try {
-          const started = (response.config as any).__sdkStartTime as bigint | undefined;
+          const started = (response.config as any).__sdkStartTime as
+            | bigint
+            | undefined;
           if (started && this.metrics) {
             const elapsed = Number(process.hrtime.bigint() - started) / 1e9;
-            const method = response.config.method?.toUpperCase() || 'GET';
-            const route = response.config.url || 'unknown';
+            const method = response.config.method?.toUpperCase() || "GET";
+            const route = response.config.url || "unknown";
             // Use SDK metrics generic error counter and custom HTTP helpers if present
-            this.metrics.observeHttpDuration?.(method, route, response.status, elapsed);
+            this.metrics.observeHttpDuration?.(
+              method,
+              route,
+              response.status,
+              elapsed,
+            );
             this.metrics.incHttpRequestsTotal?.(method, route, response.status);
           }
         } catch {
@@ -122,12 +135,12 @@ export class ApiClient {
           const started = cfg?.__sdkStartTime as bigint | undefined;
           if (started && this.metrics) {
             const elapsed = Number(process.hrtime.bigint() - started) / 1e9;
-            const method = (cfg?.method?.toUpperCase?.() as string) || 'GET';
-            const route = (cfg?.url as string) || 'unknown';
+            const method = (cfg?.method?.toUpperCase?.() as string) || "GET";
+            const route = (cfg?.url as string) || "unknown";
             const status = error.response?.status || 0;
             this.metrics.observeHttpDuration?.(method, route, status, elapsed);
             this.metrics.incHttpRequestsTotal?.(method, route, status);
-            this.metrics.incError('http', 'request');
+            this.metrics.incError("http", "request");
           }
         } catch {
           // ignore metrics failures
@@ -136,7 +149,7 @@ export class ApiClient {
         // Don't call handleError here - it will be called in executeWithRetry on final failure
         // This prevents duplicate error logs during retry cycles
         return Promise.reject(error);
-      }
+      },
     );
   }
 
@@ -149,7 +162,7 @@ export class ApiClient {
       const status = error.response.status;
       const data = error.response.data as any;
 
-      this.logger.error('API Error Response', {
+      this.logger.error("API Error Response", {
         status,
         url: error.config?.url,
         error: data?.error || data?.message,
@@ -158,47 +171,47 @@ export class ApiClient {
       if (status === 401) {
         throw createError(
           ErrorCode.AUTH_FAILED,
-          'Authentication failed. Please check your API token.',
+          "Authentication failed. Please check your API token.",
           status,
-          data
+          data,
         );
       } else if (status >= 400 && status < 500) {
         throw createError(
           ErrorCode.INVALID_PARAMETERS,
-          data?.error?.message || data?.message || 'Invalid request parameters',
+          data?.error?.message || data?.message || "Invalid request parameters",
           status,
-          data
+          data,
         );
       } else if (status >= 500) {
         throw createError(
           ErrorCode.API_ERROR,
-          data?.error?.message || data?.message || 'Server error occurred',
+          data?.error?.message || data?.message || "Server error occurred",
           status,
-          data
+          data,
         );
       }
     } else if (error.request) {
       // Request was made but no response received
-      this.logger.error('Network Error', {
+      this.logger.error("Network Error", {
         url: error.config?.url,
         message: error.message,
       });
 
       throw createError(
         ErrorCode.NETWORK_ERROR,
-        'Network error. Please check your connection.',
+        "Network error. Please check your connection.",
         undefined,
-        { message: error.message }
+        { message: error.message },
       );
     } else {
       // Something else happened
-      this.logger.error('Request Setup Error', { message: error.message });
+      this.logger.error("Request Setup Error", { message: error.message });
 
       throw createError(
         ErrorCode.API_ERROR,
-        error.message || 'An unexpected error occurred',
+        error.message || "An unexpected error occurred",
         undefined,
-        { message: error.message }
+        { message: error.message },
       );
     }
   }
@@ -237,7 +250,9 @@ export class ApiClient {
    * Calculate retry delay with exponential backoff
    */
   private calculateRetryDelay(attemptNumber: number): number {
-    const delay = this.retryConfig.retryDelay * Math.pow(this.retryConfig.retryDelayMultiplier, attemptNumber);
+    const delay =
+      this.retryConfig.retryDelay *
+      Math.pow(this.retryConfig.retryDelayMultiplier, attemptNumber);
     return Math.min(delay, this.retryConfig.maxRetryDelay);
   }
 
@@ -275,11 +290,13 @@ export class ApiClient {
    */
   private async executeWithRetry<T>(
     fn: () => Promise<AxiosResponse<ApiResponse<T>>>,
-    context: { method: string; url: string }
+    context: { method: string; url: string },
   ): Promise<ApiResponse<T>> {
     let lastError: any;
     const isInfiniteRetry = this.retryConfig.maxRetries === -1;
-    const maxAttempts = isInfiniteRetry ? Number.MAX_SAFE_INTEGER : this.retryConfig.maxRetries;
+    const maxAttempts = isInfiniteRetry
+      ? Number.MAX_SAFE_INTEGER
+      : this.retryConfig.maxRetries;
 
     for (let attempt = 0; attempt <= maxAttempts; attempt++) {
       try {
@@ -287,7 +304,7 @@ export class ApiClient {
 
         // Log recovery if this was a retry attempt (attempt > 0 means we had at least one failure)
         if (attempt > 0) {
-          this.logger.info('*** API connection restored ***', {
+          this.logger.info("*** API connection restored ***", {
             method: context.method,
             url: context.url,
             retriesNeeded: attempt,
@@ -302,15 +319,18 @@ export class ApiClient {
         lastError = error;
 
         // Check if this is the final failure (not retryable or last attempt)
-        const isFinalFailure = !this.isRetryableError(lastError) || attempt === maxAttempts;
+        const isFinalFailure =
+          !this.isRetryableError(lastError) || attempt === maxAttempts;
 
         if (isFinalFailure) {
           // Log detailed error only on final failure
-          this.logger.error('Request failed permanently', {
+          this.logger.error("Request failed permanently", {
             method: context.method,
             url: context.url,
             attempt: attempt + 1,
-            maxRetries: isInfiniteRetry ? 'infinite' : this.retryConfig.maxRetries,
+            maxRetries: isInfiniteRetry
+              ? "infinite"
+              : this.retryConfig.maxRetries,
             error: this.extractDetailedErrorMessage(lastError),
           });
 
@@ -321,11 +341,13 @@ export class ApiClient {
 
         // Calculate delay and retry
         const delay = this.calculateRetryDelay(attempt);
-        this.logger.warn('Request failed, retrying...', {
+        this.logger.warn("Request failed, retrying...", {
           method: context.method,
           url: context.url,
           attempt: attempt + 1,
-          maxRetries: isInfiniteRetry ? 'infinite' : this.retryConfig.maxRetries,
+          maxRetries: isInfiniteRetry
+            ? "infinite"
+            : this.retryConfig.maxRetries,
           retryDelay: delay,
           error: this.extractDetailedErrorMessage(lastError),
         });
@@ -356,35 +378,43 @@ export class ApiClient {
     // Handle network errors with more context
     if (error.code) {
       // Axios error codes like ECONNREFUSED, ENOTFOUND, ETIMEDOUT, etc.
-      return `${error.code}: ${error.message || 'Unknown error'}`;
+      return `${error.code}: ${error.message || "Unknown error"}`;
     }
 
     // Default to error message
-    return error.message || 'Unknown error';
+    return error.message || "Unknown error";
   }
 
   /**
    * GET request (with retry)
    */
-  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+  async get<T = any>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<ApiResponse<T>> {
     const requestConfig: AxiosRequestConfig = { ...(config || {}) };
     const headers: Record<string, any> = { ...(requestConfig.headers || {}) };
 
     const cacheKey = this.buildCacheKey(url, requestConfig);
     const cachedEtag = this.etagStore.get(cacheKey);
     if (cachedEtag) {
-      headers['If-None-Match'] = cachedEtag;
+      headers["If-None-Match"] = cachedEtag;
     }
 
     requestConfig.headers = headers;
 
     return this.executeWithRetry(
       async () => {
-        const response = await this.client.get<ApiResponse<T>>(url, requestConfig);
+        const response = await this.client.get<ApiResponse<T>>(
+          url,
+          requestConfig,
+        );
 
         // Handle 304 Not Modified using cached response body
         if (response.status === 304) {
-          const cachedBody = this.bodyCache.get(cacheKey) as ApiResponse<T> | undefined;
+          const cachedBody = this.bodyCache.get(cacheKey) as
+            | ApiResponse<T>
+            | undefined;
           if (cachedBody) {
             return {
               ...response,
@@ -394,13 +424,21 @@ export class ApiClient {
           }
 
           // No cached body but got 304: fall back to a fresh request without conditional header
-          const retryConfig: AxiosRequestConfig = { ...requestConfig, headers: { ...headers } };
-          delete (retryConfig.headers as any)['If-None-Match'];
-          delete (retryConfig.headers as any)['if-none-match'];
+          const retryConfig: AxiosRequestConfig = {
+            ...requestConfig,
+            headers: { ...headers },
+          };
+          delete (retryConfig.headers as any)["If-None-Match"];
+          delete (retryConfig.headers as any)["if-none-match"];
 
-          const freshResponse = await this.client.get<ApiResponse<T>>(url, retryConfig);
+          const freshResponse = await this.client.get<ApiResponse<T>>(
+            url,
+            retryConfig,
+          );
 
-          const freshEtag = (freshResponse.headers as any)?.etag as string | undefined;
+          const freshEtag = (freshResponse.headers as any)?.etag as
+            | string
+            | undefined;
           if (freshEtag) {
             this.etagStore.set(cacheKey, freshEtag);
             this.bodyCache.set(cacheKey, freshResponse.data);
@@ -418,7 +456,7 @@ export class ApiClient {
 
         return response;
       },
-      { method: 'GET', url }
+      { method: "GET", url },
     );
   }
 
@@ -428,22 +466,25 @@ export class ApiClient {
   async post<T = any>(
     url: string,
     data?: any,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<ApiResponse<T>> {
     // Auto-generate requestId if not provided in headers
     const requestConfig = config || {};
     const headers = requestConfig.headers || {};
 
-    if (!headers['x-request-id']) {
-      headers['x-request-id'] = ulid();
-      this.logger.debug('Auto-generated requestId', { requestId: headers['x-request-id'], url });
+    if (!headers["x-request-id"]) {
+      headers["x-request-id"] = ulid();
+      this.logger.debug("Auto-generated requestId", {
+        requestId: headers["x-request-id"],
+        url,
+      });
     }
 
     requestConfig.headers = headers;
 
     return this.executeWithRetry(
       () => this.client.post<ApiResponse<T>>(url, data, requestConfig),
-      { method: 'POST', url }
+      { method: "POST", url },
     );
   }
 
@@ -453,21 +494,28 @@ export class ApiClient {
   async postNoRetry<T = any>(
     url: string,
     data?: any,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<ApiResponse<T>> {
     // Auto-generate requestId if not provided in headers
     const requestConfig = config || {};
     const headers = requestConfig.headers || {};
 
-    if (!headers['x-request-id']) {
-      headers['x-request-id'] = ulid();
-      this.logger.debug('Auto-generated requestId', { requestId: headers['x-request-id'], url });
+    if (!headers["x-request-id"]) {
+      headers["x-request-id"] = ulid();
+      this.logger.debug("Auto-generated requestId", {
+        requestId: headers["x-request-id"],
+        url,
+      });
     }
 
     requestConfig.headers = headers;
 
     try {
-      const response = await this.client.post<ApiResponse<T>>(url, data, requestConfig);
+      const response = await this.client.post<ApiResponse<T>>(
+        url,
+        data,
+        requestConfig,
+      );
       return response.data;
     } catch (error) {
       this.handleError(error as AxiosError);
@@ -481,22 +529,25 @@ export class ApiClient {
   async put<T = any>(
     url: string,
     data?: any,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<ApiResponse<T>> {
     // Auto-generate requestId if not provided in headers
     const requestConfig = config || {};
     const headers = requestConfig.headers || {};
 
-    if (!headers['x-request-id']) {
-      headers['x-request-id'] = ulid();
-      this.logger.debug('Auto-generated requestId', { requestId: headers['x-request-id'], url });
+    if (!headers["x-request-id"]) {
+      headers["x-request-id"] = ulid();
+      this.logger.debug("Auto-generated requestId", {
+        requestId: headers["x-request-id"],
+        url,
+      });
     }
 
     requestConfig.headers = headers;
 
     return this.executeWithRetry(
       () => this.client.put<ApiResponse<T>>(url, data, requestConfig),
-      { method: 'PUT', url }
+      { method: "PUT", url },
     );
   }
 
@@ -506,32 +557,38 @@ export class ApiClient {
   async patch<T = any>(
     url: string,
     data?: any,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<ApiResponse<T>> {
     // Auto-generate requestId if not provided in headers
     const requestConfig = config || {};
     const headers = requestConfig.headers || {};
 
-    if (!headers['x-request-id']) {
-      headers['x-request-id'] = ulid();
-      this.logger.debug('Auto-generated requestId', { requestId: headers['x-request-id'], url });
+    if (!headers["x-request-id"]) {
+      headers["x-request-id"] = ulid();
+      this.logger.debug("Auto-generated requestId", {
+        requestId: headers["x-request-id"],
+        url,
+      });
     }
 
     requestConfig.headers = headers;
 
     return this.executeWithRetry(
       () => this.client.patch<ApiResponse<T>>(url, data, requestConfig),
-      { method: 'PATCH', url }
+      { method: "PATCH", url },
     );
   }
 
   /**
    * DELETE request (with retry)
    */
-  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+  async delete<T = any>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<ApiResponse<T>> {
     return this.executeWithRetry(
       () => this.client.delete<ApiResponse<T>>(url, config),
-      { method: 'DELETE', url }
+      { method: "DELETE", url },
     );
   }
 
@@ -559,7 +616,10 @@ export class ApiClient {
       this.bodyCache.delete(key);
     }
     if (keysToDelete.length > 0) {
-      this.logger.debug('Invalidated ETag cache', { urlPattern, count: keysToDelete.length });
+      this.logger.debug("Invalidated ETag cache", {
+        urlPattern,
+        count: keysToDelete.length,
+      });
     }
   }
 
@@ -570,7 +630,7 @@ export class ApiClient {
     const count = this.etagStore.size;
     this.etagStore.clear();
     this.bodyCache.clear();
-    this.logger.debug('Cleared all ETag cache', { count });
+    this.logger.debug("Cleared all ETag cache", { count });
   }
 
   /**
@@ -598,7 +658,7 @@ export class ApiClient {
 
     // Throttle: only trigger if enough time has passed since last trigger
     if (now - this.lastRecoveryTriggerTime < this.recoveryThrottleMs) {
-      this.logger.debug('Connection recovery callback throttled', {
+      this.logger.debug("Connection recovery callback throttled", {
         timeSinceLastTrigger: now - this.lastRecoveryTriggerTime,
         throttleMs: this.recoveryThrottleMs,
       });
@@ -609,7 +669,7 @@ export class ApiClient {
 
     // Call all registered callbacks asynchronously (don't block the request)
     if (this.connectionRecoveryCallbacks.length > 0) {
-      this.logger.debug('Triggering connection recovery callbacks', {
+      this.logger.debug("Triggering connection recovery callbacks", {
         count: this.connectionRecoveryCallbacks.length,
       });
 
@@ -619,7 +679,7 @@ export class ApiClient {
           try {
             callback();
           } catch (error: any) {
-            this.logger.error('Error in connection recovery callback', {
+            this.logger.error("Error in connection recovery callback", {
               error: error.message,
             });
           }

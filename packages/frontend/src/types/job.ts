@@ -1,4 +1,4 @@
-import { Tag } from '../services/tagService';
+import { Tag } from "../services/tagService";
 
 export interface JobType {
   id: number;
@@ -22,7 +22,15 @@ export interface JobSchema {
 }
 
 export interface JobSchemaField {
-  type: 'string' | 'number' | 'boolean' | 'text' | 'password' | 'select' | 'array' | 'object';
+  type:
+    | "string"
+    | "number"
+    | "boolean"
+    | "text"
+    | "password"
+    | "select"
+    | "array"
+    | "object";
   required: boolean;
   description: string;
   default?: any;
@@ -73,12 +81,12 @@ export interface UpdateJobData {
 }
 
 export enum JobExecutionStatus {
-  PENDING = 'pending',
-  RUNNING = 'running',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-  TIMEOUT = 'timeout',
-  CANCELLED = 'cancelled'
+  PENDING = "pending",
+  RUNNING = "running",
+  COMPLETED = "completed",
+  FAILED = "failed",
+  TIMEOUT = "timeout",
+  CANCELLED = "cancelled",
 }
 
 export interface JobExecution {

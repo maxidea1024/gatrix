@@ -1,14 +1,14 @@
-import { Request, Response } from 'express';
-import { UserService } from '../services/userService';
-import { UserModel } from '../models/User';
-import logger from '../config/logger';
+import { Request, Response } from "express";
+import { UserService } from "../services/userService";
+import { UserModel } from "../models/User";
+import logger from "../config/logger";
 import {
   sendBadRequest,
   sendNotFound,
   sendInternalError,
   sendSuccessResponse,
   ErrorCodes,
-} from '../utils/apiResponse';
+} from "../utils/apiResponse";
 
 export interface ServerUserRequest extends Request {
   apiToken?: any;
@@ -21,13 +21,13 @@ class ServerUserController {
       const userId = parseInt(req.params.id);
 
       if (isNaN(userId)) {
-        return sendBadRequest(res, 'Invalid user ID', { field: 'id' });
+        return sendBadRequest(res, "Invalid user ID", { field: "id" });
       }
 
       const user = await UserService.getUserById(userId);
 
       if (!user) {
-        return sendNotFound(res, 'User not found', ErrorCodes.USER_NOT_FOUND);
+        return sendNotFound(res, "User not found", ErrorCodes.USER_NOT_FOUND);
       }
 
       return sendSuccessResponse(res, {
@@ -39,11 +39,15 @@ class ServerUserController {
         status: user.status,
         lastLoginAt: user.lastLoginAt,
         createdAt: user.createdAt,
-        updatedAt: user.updatedAt
+        updatedAt: user.updatedAt,
       });
-
     } catch (error) {
-      return sendInternalError(res, 'Failed to get user by ID', error, ErrorCodes.RESOURCE_FETCH_FAILED);
+      return sendInternalError(
+        res,
+        "Failed to get user by ID",
+        error,
+        ErrorCodes.RESOURCE_FETCH_FAILED,
+      );
     }
   }
 
@@ -53,7 +57,9 @@ class ServerUserController {
       const { userIds } = req.body;
 
       if (!Array.isArray(userIds)) {
-        return sendBadRequest(res, 'userIds must be an array', { field: 'userIds' });
+        return sendBadRequest(res, "userIds must be an array", {
+          field: "userIds",
+        });
       }
 
       if (userIds.length === 0) {
@@ -62,11 +68,16 @@ class ServerUserController {
 
       // 최대 100개까지만 허용
       if (userIds.length > 100) {
-        return sendBadRequest(res, 'Maximum 100 user IDs allowed', { maxAllowed: 100, received: userIds.length });
+        return sendBadRequest(res, "Maximum 100 user IDs allowed", {
+          maxAllowed: 100,
+          received: userIds.length,
+        });
       }
 
       // 모든 ID가 숫자인지 확인
-      const validUserIds = userIds.filter(id => Number.isInteger(id) && id > 0);
+      const validUserIds = userIds.filter(
+        (id) => Number.isInteger(id) && id > 0,
+      );
 
       if (validUserIds.length === 0) {
         return sendSuccessResponse(res, []);
@@ -87,7 +98,7 @@ class ServerUserController {
               status: user.status,
               lastLoginAt: user.lastLoginAt,
               createdAt: user.createdAt,
-              updatedAt: user.updatedAt
+              updatedAt: user.updatedAt,
             });
           }
         } catch (error) {
@@ -97,9 +108,13 @@ class ServerUserController {
       }
 
       return sendSuccessResponse(res, users);
-
     } catch (error) {
-      return sendInternalError(res, 'Failed to get users by IDs', error, ErrorCodes.RESOURCE_FETCH_FAILED);
+      return sendInternalError(
+        res,
+        "Failed to get users by IDs",
+        error,
+        ErrorCodes.RESOURCE_FETCH_FAILED,
+      );
     }
   }
 
@@ -113,13 +128,13 @@ class ServerUserController {
         ? new Date(lastSyncAt as string)
         : new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-      logger.info('User sync request:', { lastSyncAt, since });
+      logger.info("User sync request:", { lastSyncAt, since });
 
       // 실제 데이터베이스에서 사용자 조회
       const users = await UserModel.getUsersForSync(since);
 
       // 채팅 서버에서 기대하는 형식으로 변환
-      const syncUsers = users.map(user => ({
+      const syncUsers = users.map((user) => ({
         id: user.id,
         email: user.email,
         name: user.name,
@@ -128,17 +143,22 @@ class ServerUserController {
         status: user.status,
         lastLoginAt: user.lastLoginAt,
         createdAt: user.createdAt,
-        updatedAt: user.updatedAt
+        updatedAt: user.updatedAt,
       }));
 
       return sendSuccessResponse(res, {
         users: syncUsers,
         syncAt: new Date().toISOString(),
         lastSyncAt: since.toISOString(),
-        total: syncUsers.length
+        total: syncUsers.length,
       });
     } catch (error) {
-      return sendInternalError(res, 'Failed to sync users', error, ErrorCodes.RESOURCE_FETCH_FAILED);
+      return sendInternalError(
+        res,
+        "Failed to sync users",
+        error,
+        ErrorCodes.RESOURCE_FETCH_FAILED,
+      );
     }
   }
 }

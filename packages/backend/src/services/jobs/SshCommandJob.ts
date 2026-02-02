@@ -1,27 +1,27 @@
-import { Client } from 'ssh2';
-import { BaseJob, JobExecutionResult } from './JobFactory';
-import logger from '../../config/logger';
+import { Client } from "ssh2";
+import { BaseJob, JobExecutionResult } from "./JobFactory";
+import logger from "../../config/logger";
 
 export class SshCommandJob extends BaseJob {
   async execute(): Promise<JobExecutionResult> {
     return new Promise((resolve, reject) => {
       try {
         // 필수 필드 검증
-        this.validateRequiredFields(['host', 'username', 'command']);
+        this.validateRequiredFields(["host", "username", "command"]);
 
-        const { 
-          host, 
-          port = 22, 
-          username, 
-          password, 
-          privateKey, 
+        const {
+          host,
+          port = 22,
+          username,
+          password,
+          privateKey,
           command,
-          timeout = 60000
+          timeout = 60000,
         } = this.context.jobDataMap;
 
         const conn = new Client();
-        let output = '';
-        let errorOutput = '';
+        let output = "";
+        let errorOutput = "";
         let isResolved = false;
 
         // 연결 설정
@@ -29,7 +29,7 @@ export class SshCommandJob extends BaseJob {
           host,
           port,
           username,
-          readyTimeout: timeout
+          readyTimeout: timeout,
         };
 
         // 인증 방법 설정
@@ -38,7 +38,7 @@ export class SshCommandJob extends BaseJob {
         } else if (password) {
           connectConfig.password = password;
         } else {
-          throw new Error('Either password or privateKey must be provided');
+          throw new Error("Either password or privateKey must be provided");
         }
 
         // 타임아웃 설정
@@ -50,11 +50,11 @@ export class SshCommandJob extends BaseJob {
           }
         }, timeout);
 
-        conn.on('ready', () => {
+        conn.on("ready", () => {
           logger.info(`SSH connection established`, {
             jobId: this.context.jobId,
             host,
-            username
+            username,
           });
 
           conn.exec(command, (err, stream) => {
@@ -67,7 +67,7 @@ export class SshCommandJob extends BaseJob {
               return;
             }
 
-            stream.on('close', (code: number, signal: string) => {
+            stream.on("close", (code: number, signal: string) => {
               conn.end();
               clearTimeout(timeoutId);
 
@@ -77,7 +77,7 @@ export class SshCommandJob extends BaseJob {
                 logger.info(`SSH command completed`, {
                   jobId: this.context.jobId,
                   exitCode: code,
-                  signal
+                  signal,
                 });
 
                 const success = code === 0;
@@ -90,32 +90,34 @@ export class SshCommandJob extends BaseJob {
                     stderr: errorOutput,
                     command,
                     host,
-                    username
+                    username,
                   },
-                  error: success ? undefined : `Command failed with exit code ${code}`,
-                  executionTimeMs: 0 // Will be set by executeWithTimeout
+                  error: success
+                    ? undefined
+                    : `Command failed with exit code ${code}`,
+                  executionTimeMs: 0, // Will be set by executeWithTimeout
                 });
               }
             });
 
-            stream.on('data', (data: Buffer) => {
+            stream.on("data", (data: Buffer) => {
               output += data.toString();
             });
 
-            stream.stderr.on('data', (data: Buffer) => {
+            stream.stderr.on("data", (data: Buffer) => {
               errorOutput += data.toString();
             });
           });
         });
 
-        conn.on('error', (err) => {
+        conn.on("error", (err) => {
           clearTimeout(timeoutId);
           if (!isResolved) {
             isResolved = true;
             logger.error(`SSH connection failed`, {
               jobId: this.context.jobId,
               host,
-              error: err.message
+              error: err.message,
             });
             reject(err);
           }
@@ -123,11 +125,10 @@ export class SshCommandJob extends BaseJob {
 
         // SSH 연결 시작
         conn.connect(connectConfig);
-
       } catch (error) {
         logger.error(`SSH command job failed`, {
           jobId: this.context.jobId,
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : "Unknown error",
         });
         reject(error);
       }

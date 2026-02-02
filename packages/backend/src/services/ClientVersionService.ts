@@ -1,12 +1,18 @@
-import { ClientVersionModel, ClientVersionAttributes, ClientVersionCreationAttributes, ClientStatus } from '../models/ClientVersion';
-import { pubSubService } from './PubSubService';
-import logger from '../config/logger';
-import { applyMaintenanceStatusCalculationToArray, applyMaintenanceStatusCalculation } from '../utils/maintenanceUtils';
-import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
-import VarsModel from '../models/Vars';
-import { resolvePassiveData } from '../utils/passiveDataUtils';
-
-
+import {
+  ClientVersionModel,
+  ClientVersionAttributes,
+  ClientVersionCreationAttributes,
+  ClientStatus,
+} from "../models/ClientVersion";
+import { pubSubService } from "./PubSubService";
+import logger from "../config/logger";
+import {
+  applyMaintenanceStatusCalculationToArray,
+  applyMaintenanceStatusCalculation,
+} from "../utils/maintenanceUtils";
+import { SERVER_SDK_ETAG } from "../constants/cacheKeys";
+import VarsModel from "../models/Vars";
+import { resolvePassiveData } from "../utils/passiveDataUtils";
 
 export interface ClientVersionFilters {
   version?: string | string[];
@@ -26,14 +32,14 @@ export interface ClientVersionFilters {
   updatedAtTo?: Date;
   search?: string;
   tags?: string[];
-  tagsOperator?: 'any_of' | 'include_all';
+  tagsOperator?: "any_of" | "include_all";
 }
 
 export interface ClientVersionPagination {
   page: number;
   limit: number;
   sortBy?: string;
-  sortOrder?: 'ASC' | 'DESC';
+  sortOrder?: "ASC" | "DESC";
 }
 
 export interface ClientVersionListResponse {
@@ -53,7 +59,7 @@ export interface BulkStatusUpdateRequest {
   maintenanceEndDate?: string;
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
-  maintenanceLocales?: Array<{ lang: 'ko' | 'en' | 'zh', message: string }>;
+  maintenanceLocales?: Array<{ lang: "ko" | "en" | "zh"; message: string }>;
   messageTemplateId?: number;
 }
 
@@ -63,27 +69,34 @@ export interface BulkStatusUpdateRequest {
  */
 async function prepareClientVersionForSDK(
   version: ClientVersionAttributes,
-  environment: string
+  environment: string,
 ): Promise<any> {
   // Get clientVersionPassiveData from KV settings and resolve by version
   let passiveData: Record<string, any> = {};
   try {
-    const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', environment);
+    const passiveDataStr = await VarsModel.get(
+      "$clientVersionPassiveData",
+      environment,
+    );
     passiveData = resolvePassiveData(passiveDataStr, version.clientVersion);
   } catch (error) {
-    logger.warn('Failed to resolve clientVersionPassiveData for SDK event:', error);
+    logger.warn(
+      "Failed to resolve clientVersionPassiveData for SDK event:",
+      error,
+    );
   }
 
   // Parse customPayload
   let customPayload: Record<string, any> = {};
   try {
     if (version.customPayload) {
-      let parsed = typeof version.customPayload === 'string'
-        ? JSON.parse(version.customPayload)
-        : version.customPayload;
+      let parsed =
+        typeof version.customPayload === "string"
+          ? JSON.parse(version.customPayload)
+          : version.customPayload;
 
       // Handle double-encoded JSON string
-      if (typeof parsed === 'string') {
+      if (typeof parsed === "string") {
         try {
           parsed = JSON.parse(parsed);
         } catch (e) {
@@ -91,12 +104,15 @@ async function prepareClientVersionForSDK(
         }
       }
 
-      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
         customPayload = parsed;
       }
     }
   } catch (error) {
-    logger.warn(`Failed to parse customPayload for SDK event (version ${version.id}):`, error);
+    logger.warn(
+      `Failed to parse customPayload for SDK event (version ${version.id}):`,
+      error,
+    );
   }
 
   // Merge: passiveData first, then customPayload (customPayload overwrites)
@@ -112,20 +128,28 @@ export class ClientVersionService {
   // 사용 가능한 버전 목록 조회 (distinct)
   static async getAvailableVersions(environment: string): Promise<string[]> {
     try {
-      const versions = await ClientVersionModel.getDistinctVersions(environment);
-      return versions.sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+      const versions =
+        await ClientVersionModel.getDistinctVersions(environment);
+      return versions.sort((a, b) =>
+        b.localeCompare(a, undefined, { numeric: true }),
+      );
     } catch (error) {
-      logger.error('Error getting available versions:', error);
+      logger.error("Error getting available versions:", error);
       throw error;
     }
   }
 
   static async getClientVersions(
     environment: string,
-    filters: Omit<ClientVersionFilters, 'environment'> = {},
-    pagination: ClientVersionPagination
-  ): Promise<{ data: ClientVersionAttributes[], total: number }> {
-    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC' } = pagination;
+    filters: Omit<ClientVersionFilters, "environment"> = {},
+    pagination: ClientVersionPagination,
+  ): Promise<{ data: ClientVersionAttributes[]; total: number }> {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = "createdAt",
+      sortOrder = "DESC",
+    } = pagination;
     const offset = (page - 1) * limit;
 
     const whereConditions: any = { environment };
@@ -163,10 +187,15 @@ export class ClientVersionService {
 
   static async getAllClientVersions(
     environment: string,
-    filters: Omit<ClientVersionFilters, 'environment'> = {},
-    pagination: ClientVersionPagination
+    filters: Omit<ClientVersionFilters, "environment"> = {},
+    pagination: ClientVersionPagination,
   ): Promise<ClientVersionListResponse> {
-    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC' } = pagination;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = "createdAt",
+      sortOrder = "DESC",
+    } = pagination;
     const offset = (page - 1) * limit;
 
     // 검색 조건 구성
@@ -238,7 +267,8 @@ export class ClientVersionService {
       const totalPages = Math.ceil(total / limit);
 
       // Apply maintenance status calculation based on time constraints
-      const processedVersions = applyMaintenanceStatusCalculationToArray(clientVersions);
+      const processedVersions =
+        applyMaintenanceStatusCalculationToArray(clientVersions);
 
       return {
         clientVersions: processedVersions,
@@ -267,7 +297,8 @@ export class ClientVersionService {
       const totalPages = Math.ceil(total / limit);
 
       // Apply maintenance status calculation based on time constraints
-      const processedVersions = applyMaintenanceStatusCalculationToArray(clientVersions);
+      const processedVersions =
+        applyMaintenanceStatusCalculationToArray(clientVersions);
 
       return {
         clientVersions: processedVersions,
@@ -290,13 +321,15 @@ export class ClientVersionService {
       limit,
       offset,
       sortBy,
-      sortOrder
+      sortOrder,
     });
 
     const totalPages = Math.ceil(result.total / limit);
 
     // Apply maintenance status calculation based on time constraints
-    const processedVersions = applyMaintenanceStatusCalculationToArray(result.clientVersions);
+    const processedVersions = applyMaintenanceStatusCalculationToArray(
+      result.clientVersions,
+    );
 
     return {
       clientVersions: processedVersions,
@@ -307,7 +340,10 @@ export class ClientVersionService {
     };
   }
 
-  static async getClientVersionById(id: number, environment: string): Promise<ClientVersionAttributes | null> {
+  static async getClientVersionById(
+    id: number,
+    environment: string,
+  ): Promise<ClientVersionAttributes | null> {
     const version = await ClientVersionModel.findById(id, environment);
     if (!version) return null;
     // Apply maintenance status calculation based on time constraints
@@ -316,14 +352,16 @@ export class ClientVersionService {
 
   static async createClientVersion(
     data: ClientVersionCreationAttributes,
-    environment: string
+    environment: string,
   ): Promise<ClientVersionAttributes> {
     const result = await ClientVersionModel.create(data, environment);
 
     // Invalidate client version cache (including ETag cache for SDK)
-    await pubSubService.invalidateByPattern('*client_version:*');
+    await pubSubService.invalidateByPattern("*client_version:*");
     if (environment) {
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environment}`);
+      await pubSubService.invalidateKey(
+        `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environment}`,
+      );
     }
 
     // Publish event with full data for SDK cache update
@@ -331,7 +369,10 @@ export class ClientVersionService {
       const environment = result.environment;
 
       // Get full client version with tags for SDK cache
-      const fullClientVersion = await this.getClientVersionById(result.id!, environment);
+      const fullClientVersion = await this.getClientVersionById(
+        result.id!,
+        environment,
+      );
 
       // Prepare data for SDK (parse customPayload and merge with passiveData)
       const sdkReadyClientVersion = fullClientVersion
@@ -339,16 +380,16 @@ export class ClientVersionService {
         : null;
 
       await pubSubService.publishSDKEvent({
-        type: 'client_version.created',
+        type: "client_version.created",
         data: {
           id: result.id,
           environment,
           timestamp: Date.now(),
-          clientVersion: sdkReadyClientVersion
-        }
+          clientVersion: sdkReadyClientVersion,
+        },
       });
     } catch (err) {
-      logger.error('Failed to publish client version event', err);
+      logger.error("Failed to publish client version event", err);
     }
 
     return result;
@@ -356,19 +397,24 @@ export class ClientVersionService {
 
   static async bulkCreateClientVersions(
     data: any,
-    environment: string
+    environment: string,
   ): Promise<ClientVersionAttributes[]> {
     // 중복 체크
     const duplicates = [];
     for (const platform of data.platforms) {
-      const isDuplicate = await ClientVersionModel.checkDuplicate(platform.platform, data.clientVersion, undefined, environment);
+      const isDuplicate = await ClientVersionModel.checkDuplicate(
+        platform.platform,
+        data.clientVersion,
+        undefined,
+        environment,
+      );
       if (isDuplicate) {
         duplicates.push(`${platform.platform}-${data.clientVersion}`);
       }
     }
 
     if (duplicates.length > 0) {
-      throw new Error(`DUPLICATE_CLIENT_VERSIONS:${duplicates.join(', ')}`);
+      throw new Error(`DUPLICATE_CLIENT_VERSIONS:${duplicates.join(", ")}`);
     }
 
     // 받은 데이터를 각 플랫폼별로 클라이언트 버전 배열로 변환
@@ -378,7 +424,8 @@ export class ClientVersionService {
       clientVersion: data.clientVersion,
       clientStatus: data.clientStatus,
       gameServerAddress: platform.gameServerAddress,
-      gameServerAddressForWhiteList: platform.gameServerAddressForWhiteList || null,
+      gameServerAddressForWhiteList:
+        platform.gameServerAddressForWhiteList || null,
       patchAddress: platform.patchAddress,
       patchAddressForWhiteList: platform.patchAddressForWhiteList || null,
       guestModeAllowed: data.guestModeAllowed,
@@ -389,37 +436,54 @@ export class ClientVersionService {
       updatedBy: data.updatedBy,
     }));
 
-    const result = await ClientVersionModel.bulkCreate(clientVersions, environment);
+    const result = await ClientVersionModel.bulkCreate(
+      clientVersions,
+      environment,
+    );
 
     // 태그가 있는 경우 각 생성된 클라이언트 버전에 태그 설정
     if (data.tags && Array.isArray(data.tags) && data.tags.length > 0) {
-      const tagIds = data.tags.map((tag: any) => tag.id).filter((id: any) => id); // null/undefined 제거
+      const tagIds = data.tags
+        .map((tag: any) => tag.id)
+        .filter((id: any) => id); // null/undefined 제거
 
       if (tagIds.length > 0) {
         // 각 생성된 클라이언트 버전에 태그 설정
         for (const clientVersion of result) {
           if (clientVersion && clientVersion.id) {
             try {
-              await ClientVersionModel.setTags(clientVersion.id, tagIds, data.createdBy);
+              await ClientVersionModel.setTags(
+                clientVersion.id,
+                tagIds,
+                data.createdBy,
+              );
             } catch (error) {
-              logger.error(`Failed to set tags for client version ${clientVersion.id}:`, error);
+              logger.error(
+                `Failed to set tags for client version ${clientVersion.id}:`,
+                error,
+              );
               // 태그 설정 실패는 전체 작업을 중단하지 않음
             }
           } else {
-            logger.warn('Skipping tag setting for invalid client version:', clientVersion);
+            logger.warn(
+              "Skipping tag setting for invalid client version:",
+              clientVersion,
+            );
           }
         }
       }
     }
 
     // Invalidate client version cache (including ETag cache for SDK - all environments for bulk op)
-    await pubSubService.invalidateByPattern('*client_version:*');
-    await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
+    await pubSubService.invalidateByPattern("*client_version:*");
+    await pubSubService.invalidateByPattern(
+      `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`,
+    );
 
     // Publish generic update event (bulk op)
     await pubSubService.publishSDKEvent({
-      type: 'client_version.updated',
-      data: { timestamp: Date.now(), environment }
+      type: "client_version.updated",
+      data: { timestamp: Date.now(), environment },
     });
 
     return result;
@@ -428,22 +492,31 @@ export class ClientVersionService {
   static async updateClientVersion(
     id: number,
     data: Partial<ClientVersionCreationAttributes>,
-    environment: string
+    environment: string,
   ): Promise<ClientVersionAttributes | null> {
-    const updatedRowsCount = await ClientVersionModel.update(id, data, environment);
+    const updatedRowsCount = await ClientVersionModel.update(
+      id,
+      data,
+      environment,
+    );
 
     if (updatedRowsCount === 0) {
       return null;
     }
 
     // Invalidate client version cache
-    await pubSubService.invalidateByPattern('*client_version:*');
+    await pubSubService.invalidateByPattern("*client_version:*");
 
-    const updatedClientVersion = await this.getClientVersionById(id, environment);
+    const updatedClientVersion = await this.getClientVersionById(
+      id,
+      environment,
+    );
 
     // Invalidate ETag cache for SDK
     if (environment) {
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environment}`);
+      await pubSubService.invalidateKey(
+        `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environment}`,
+      );
     }
 
     // Publish event with full data for SDK cache update
@@ -454,63 +527,72 @@ export class ClientVersionService {
         // Prepare data for SDK (parse customPayload and merge with passiveData)
         const sdkReadyClientVersion = await prepareClientVersionForSDK(
           updatedClientVersion,
-          environment
+          environment,
         );
 
         await pubSubService.publishSDKEvent({
-          type: 'client_version.updated',
+          type: "client_version.updated",
           data: {
             id: updatedClientVersion.id,
             environment,
             timestamp: Date.now(),
-            clientVersion: sdkReadyClientVersion
-          }
+            clientVersion: sdkReadyClientVersion,
+          },
         });
       } catch (err) {
-        logger.error('Failed to publish client version event', err);
+        logger.error("Failed to publish client version event", err);
       }
     }
 
     return updatedClientVersion;
   }
 
-  static async deleteClientVersion(id: number, environment: string): Promise<boolean> {
+  static async deleteClientVersion(
+    id: number,
+    environment: string,
+  ): Promise<boolean> {
     const clientVersion = await ClientVersionModel.findById(id, environment);
     await ClientVersionModel.delete(id, environment);
     const deletedRowsCount = 1;
 
     if (deletedRowsCount > 0) {
-
       // Publish generic update event (deletion)
       await pubSubService.publishSDKEvent({
-        type: 'client_version.deleted',
-        data: { id, environment, timestamp: Date.now() }
+        type: "client_version.deleted",
+        data: { id, environment, timestamp: Date.now() },
       });
 
       // Invalidate client version cache (including ETag cache - all environments for deletion)
-      await pubSubService.invalidateByPattern('*client_version:*');
+      await pubSubService.invalidateByPattern("*client_version:*");
       if (environment) {
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environment}`);
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environment}`,
+        );
       }
     }
 
     return deletedRowsCount > 0;
   }
 
-  static async bulkUpdateStatus(data: BulkStatusUpdateRequest, environment: string): Promise<number> {
+  static async bulkUpdateStatus(
+    data: BulkStatusUpdateRequest,
+    environment: string,
+  ): Promise<number> {
     const result = await ClientVersionModel.bulkUpdateStatus(data, environment);
 
     if (result > 0) {
       // Publish generic update event (bulk status)
       await pubSubService.publishSDKEvent({
-        type: 'client_version.updated',
-        data: { timestamp: Date.now() }
+        type: "client_version.updated",
+        data: { timestamp: Date.now() },
       });
 
       // Invalidate client version cache (including ETag cache - all environments for bulk op)
-      await pubSubService.invalidateByPattern('*client_version:*');
+      await pubSubService.invalidateByPattern("*client_version:*");
       if (environment) {
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environment}`);
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environment}`,
+        );
       }
     }
 
@@ -525,9 +607,14 @@ export class ClientVersionService {
     platform: string,
     clientVersion: string,
     excludeId?: number,
-    environment?: string
+    environment?: string,
   ): Promise<boolean> {
-    return await ClientVersionModel.checkDuplicate(platform, clientVersion, excludeId, environment);
+    return await ClientVersionModel.checkDuplicate(
+      platform,
+      clientVersion,
+      excludeId,
+      environment,
+    );
   }
 
   /**
@@ -538,7 +625,7 @@ export class ClientVersionService {
   static async findByExact(
     platform: string,
     clientVersion: string,
-    environment: string
+    environment: string,
   ): Promise<ClientVersionAttributes | null> {
     const result = await ClientVersionModel.findAll({
       platform,
@@ -546,8 +633,8 @@ export class ClientVersionService {
       environment,
       limit: 1,
       offset: 0,
-      sortBy: 'id',
-      sortOrder: 'DESC',
+      sortBy: "id",
+      sortOrder: "DESC",
     });
     const { clientVersions: rows } = result;
 
@@ -563,7 +650,7 @@ export class ClientVersionService {
   static async findOnlineByExact(
     platform: string,
     clientVersion: string,
-    environment: string
+    environment: string,
   ): Promise<ClientVersionAttributes | null> {
     return this.findByExact(platform, clientVersion, environment);
   }
@@ -581,15 +668,15 @@ export class ClientVersionService {
   static async findLatestByPlatform(
     platform: string,
     status?: ClientStatus | ClientStatus[],
-    environment?: string
+    environment?: string,
   ): Promise<ClientVersionAttributes | null> {
     const queryOptions: any = {
       platform,
       environment,
       limit: 1,
       offset: 0,
-      sortBy: 'id',
-      sortOrder: 'DESC',
+      sortBy: "id",
+      sortOrder: "DESC",
     };
 
     // Only filter by status if explicitly provided

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, ReactNode } from 'react';
-import { Drawer, Box, IconButton, Typography } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import React, { useState, useEffect, ReactNode } from "react";
+import { Drawer, Box, IconButton, Typography } from "@mui/material";
+import { Close as CloseIcon } from "@mui/icons-material";
 
 interface ResizableDrawerProps {
   open: boolean;
@@ -65,17 +65,17 @@ const ResizableDrawer: React.FC<ResizableDrawerProps> = ({
     };
 
     if (isResizing) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = 'ew-resize';
-      document.body.style.userSelect = 'none';
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "ew-resize";
+      document.body.style.userSelect = "none";
     }
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
     };
   }, [isResizing, minWidth, maxWidth, storageKey]);
 
@@ -86,49 +86,51 @@ const ResizableDrawer: React.FC<ResizableDrawerProps> = ({
       onClose={onClose}
       sx={{
         zIndex,
-        '& .MuiDrawer-paper': {
+        "& .MuiDrawer-paper": {
           width: `${drawerWidth}px`,
-          maxWidth: '100vw',
-          display: 'flex',
-          flexDirection: 'column'
-        }
+          maxWidth: "100vw",
+          display: "flex",
+          flexDirection: "column",
+        },
       }}
       slotProps={{
-        backdrop: { sx: { zIndex: zIndex - 1 } }
+        backdrop: { sx: { zIndex: zIndex - 1 } },
       }}
       SlideProps={{
-        onEntered
+        onEntered,
       }}
     >
       {/* Resize Grip */}
       <Box
         onMouseDown={handleMouseDown}
         sx={{
-          position: 'absolute',
+          position: "absolute",
           left: 0,
           top: 0,
           bottom: 0,
-          width: '4px',
-          cursor: 'ew-resize',
-          bgcolor: isResizing ? 'primary.main' : 'transparent',
-          transition: 'background-color 0.2s',
+          width: "4px",
+          cursor: "ew-resize",
+          bgcolor: isResizing ? "primary.main" : "transparent",
+          transition: "background-color 0.2s",
           zIndex: 1000,
-          '&:hover': {
-            bgcolor: 'primary.light',
-          }
+          "&:hover": {
+            bgcolor: "primary.light",
+          },
         }}
       />
 
       {/* Header */}
-      <Box sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        p: 2,
-        borderBottom: 1,
-        borderColor: 'divider',
-        bgcolor: 'background.paper'
-      }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          p: 2,
+          borderBottom: 1,
+          borderColor: "divider",
+          bgcolor: "background.paper",
+        }}
+      >
         <Box>
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
             {title}
@@ -143,9 +145,9 @@ const ResizableDrawer: React.FC<ResizableDrawerProps> = ({
           onClick={onClose}
           size="small"
           sx={{
-            '&:hover': {
-              bgcolor: 'action.hover',
-            }
+            "&:hover": {
+              bgcolor: "action.hover",
+            },
           }}
         >
           <CloseIcon />
@@ -153,7 +155,14 @@ const ResizableDrawer: React.FC<ResizableDrawerProps> = ({
       </Box>
 
       {/* Content */}
-      <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <Box
+        sx={{
+          flex: 1,
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         {children}
       </Box>
     </Drawer>
@@ -161,4 +170,3 @@ const ResizableDrawer: React.FC<ResizableDrawerProps> = ({
 };
 
 export default ResizableDrawer;
-

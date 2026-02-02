@@ -1,16 +1,20 @@
-import winston from 'winston';
-import DailyRotateFile from 'winston-daily-rotate-file';
-import { config } from '../config';
-import os from 'os';
+import winston from "winston";
+import DailyRotateFile from "winston-daily-rotate-file";
+import { config } from "../config";
+import os from "os";
 
 const logLevel = config.logLevel;
 const nodeEnv = config.nodeEnv;
-const logFormatEnv = process.env.LOG_FORMAT || '';
-const serviceName = process.env.LOG_SERVICE_NAME || 'gatrix-event-lens';
-const monitoringEnabled = process.env.MONITORING_ENABLED === 'true' || process.env.MONITORING_ENABLED === '1';
+const logFormatEnv = process.env.LOG_FORMAT || "";
+const serviceName = process.env.LOG_SERVICE_NAME || "gatrix-event-lens";
+const monitoringEnabled =
+  process.env.MONITORING_ENABLED === "true" ||
+  process.env.MONITORING_ENABLED === "1";
 const hostname = os.hostname();
 
-const useJsonFormat = logFormatEnv ? logFormatEnv === 'json' : monitoringEnabled || nodeEnv !== 'development';
+const useJsonFormat = logFormatEnv
+  ? logFormatEnv === "json"
+  : monitoringEnabled || nodeEnv !== "development";
 
 /**
  * Get the first non-internal IPv4 address from network interfaces
@@ -26,7 +30,7 @@ function getInternalIp(): string {
 
     for (const addr of iface) {
       // Skip non-IPv4 and internal addresses
-      if (addr.family === 'IPv4' && !addr.internal) {
+      if (addr.family === "IPv4" && !addr.internal) {
         return addr.address;
       }
     }
@@ -38,14 +42,14 @@ function getInternalIp(): string {
     if (!iface) continue;
 
     for (const addr of iface) {
-      if (addr.family === 'IPv4') {
+      if (addr.family === "IPv4") {
         return addr.address;
       }
     }
   }
 
   // Ultimate fallback
-  return '127.0.0.1';
+  return "127.0.0.1";
 }
 
 const internalIp = getInternalIp();
@@ -67,27 +71,27 @@ const serviceFormat = winston.format((info) => {
 // JSON format for Loki / file logs
 const jsonFormat = winston.format.combine(
   serviceFormat(),
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+  winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
   winston.format.errors({ stack: true }),
   winston.format.splat(),
-  winston.format.json()
+  winston.format.json(),
 );
 
 // Pretty console format (for human readable logs)
 const consolePrettyFormat = winston.format.combine(
   serviceFormat(),
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+  winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
   winston.format.printf(({ timestamp, level, message, ...meta }) => {
     let msg = `${timestamp} [${level}]: ${message}`;
     if (Object.keys(meta).length > 0) {
       try {
         msg += ` ${JSON.stringify(meta)}`;
       } catch (error) {
-        msg += ' [Object could not be serialized]';
+        msg += " [Object could not be serialized]";
       }
     }
     return msg;
-  })
+  }),
 );
 
 const transports: winston.transport[] = [
@@ -98,23 +102,23 @@ const transports: winston.transport[] = [
 ];
 
 // File transports (only in production)
-if (config.nodeEnv === 'production') {
+if (config.nodeEnv === "production") {
   transports.push(
     new DailyRotateFile({
-      filename: 'logs/event-lens-%DATE%.log',
-      datePattern: 'YYYY-MM-DD',
-      maxSize: '20m',
-      maxFiles: '14d',
+      filename: "logs/event-lens-%DATE%.log",
+      datePattern: "YYYY-MM-DD",
+      maxSize: "20m",
+      maxFiles: "14d",
       format: jsonFormat,
     }),
     new DailyRotateFile({
-      filename: 'logs/event-lens-error-%DATE%.log',
-      datePattern: 'YYYY-MM-DD',
-      level: 'error',
-      maxSize: '20m',
-      maxFiles: '30d',
+      filename: "logs/event-lens-error-%DATE%.log",
+      datePattern: "YYYY-MM-DD",
+      level: "error",
+      maxSize: "20m",
+      maxFiles: "30d",
       format: jsonFormat,
-    })
+    }),
   );
 }
 
@@ -128,4 +132,3 @@ const logger = winston.createLogger({
 });
 
 export default logger;
-

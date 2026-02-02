@@ -1,33 +1,33 @@
-import { Worker, Job } from 'bullmq';
-import { clickhouse } from '../config/clickhouse';
-import { redis } from '../config/redis';
-import logger from '../utils/logger';
+import { Worker, Job } from "bullmq";
+import { clickhouse } from "../config/clickhouse";
+import { redis } from "../config/redis";
+import logger from "../utils/logger";
 
 export class SessionWorker {
   private worker: Worker;
 
   constructor() {
     this.worker = new Worker(
-      'event-lens-sessions',
+      "event-lens-sessions",
       this.processJob.bind(this),
       {
         connection: redis,
         concurrency: 5,
-      }
+      },
     );
 
-    this.worker.on('completed', (job) => {
-      logger.debug('Session job completed', { jobId: job.id });
+    this.worker.on("completed", (job) => {
+      logger.debug("Session job completed", { jobId: job.id });
     });
 
-    this.worker.on('failed', (job, error) => {
-      logger.error('Session job failed', { 
-        jobId: job?.id, 
-        error: error.message 
+    this.worker.on("failed", (job, error) => {
+      logger.error("Session job failed", {
+        jobId: job?.id,
+        error: error.message,
       });
     });
 
-    logger.info('✅ Session Worker started');
+    logger.info("✅ Session Worker started");
   }
 
   private async processJob(job: Job): Promise<void> {
@@ -35,7 +35,10 @@ export class SessionWorker {
     await this.aggregateSession(sessionId, projectId);
   }
 
-  private async aggregateSession(sessionId: string, projectId: string): Promise<void> {
+  private async aggregateSession(
+    sessionId: string,
+    projectId: string,
+  ): Promise<void> {
     try {
       const query = `
         SELECT
@@ -66,7 +69,7 @@ export class SessionWorker {
       const session = data.data?.[0];
 
       if (!session) {
-        logger.warn('Session not found', { sessionId, projectId });
+        logger.warn("Session not found", { sessionId, projectId });
         return;
       }
 
@@ -75,44 +78,45 @@ export class SessionWorker {
 
       // 세션 테이블에 저장
       await clickhouse.insert({
-        table: 'sessions',
-        values: [{
-          sessionId,
-          projectId,
-          deviceId: session.deviceId,
-          profileId: session.profileId,
-          startTime: session.startTime,
-          endTime: session.endTime,
-          duration: session.duration,
-          screenViews: session.screenViews,
-          isBounce,
-          country: session.country,
-          city: session.city,
-          browser: session.browser,
-          os: session.os,
-          referrer: session.referrer,
-          createdAt: new Date().toISOString(),
-        }],
-        format: 'JSONEachRow',
+        table: "sessions",
+        values: [
+          {
+            sessionId,
+            projectId,
+            deviceId: session.deviceId,
+            profileId: session.profileId,
+            startTime: session.startTime,
+            endTime: session.endTime,
+            duration: session.duration,
+            screenViews: session.screenViews,
+            isBounce,
+            country: session.country,
+            city: session.city,
+            browser: session.browser,
+            os: session.os,
+            referrer: session.referrer,
+            createdAt: new Date().toISOString(),
+          },
+        ],
+        format: "JSONEachRow",
       });
 
-      logger.debug('Session aggregated', { sessionId, projectId });
+      logger.debug("Session aggregated", { sessionId, projectId });
     } catch (error: any) {
-      logger.error('Failed to aggregate session', { 
-        error: error.message, 
-        sessionId, 
-        projectId 
+      logger.error("Failed to aggregate session", {
+        error: error.message,
+        sessionId,
+        projectId,
       });
       throw error;
     }
   }
 
   async close(): Promise<void> {
-    logger.info('Closing Session Worker...');
+    logger.info("Closing Session Worker...");
     await this.worker.close();
-    logger.info('✅ Session Worker closed');
+    logger.info("✅ Session Worker closed");
   }
 }
 
 export default SessionWorker;
-

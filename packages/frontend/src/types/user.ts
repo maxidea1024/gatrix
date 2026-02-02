@@ -9,10 +9,10 @@ export interface Tag {
 }
 
 // 사용자 역할
-export type UserRole = 'admin' | 'user';
+export type UserRole = "admin" | "user";
 
 // 사용자 상태
-export type UserStatus = 'pending' | 'active' | 'suspended' | 'deleted';
+export type UserStatus = "pending" | "active" | "suspended" | "deleted";
 
 // 기본 사용자 인터페이스
 export interface User {
@@ -92,8 +92,8 @@ export interface ApiResponse<T> {
 // 사용자 기본값
 export const USER_DEFAULTS = {
   PAGE_SIZE: 10,
-  SORT_BY: 'createdAt',
-  SORT_ORDER: 'DESC' as const,
-  ROLE: 'user' as UserRole,
-  STATUS: 'active' as UserStatus,
+  SORT_BY: "createdAt",
+  SORT_ORDER: "DESC" as const,
+  ROLE: "user" as UserRole,
+  STATUS: "active" as UserStatus,
 };

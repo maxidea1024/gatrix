@@ -1,7 +1,7 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { Box, CircularProgress } from '@mui/material';
+import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { Box, CircularProgress } from "@mui/material";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -16,7 +16,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredPermissions,
   requireActive = true,
 }) => {
-  const { isAuthenticated, isLoading, user, canAccess, hasPermission } = useAuth();
+  const { isAuthenticated, isLoading, user, canAccess, hasPermission } =
+    useAuth();
   const location = useLocation();
 
   // Show loading spinner while checking authentication
@@ -39,12 +40,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // Check if user is suspended
-  if (user?.status === 'suspended') {
+  if (user?.status === "suspended") {
     return <Navigate to="/account-suspended" replace />;
   }
 
   // Check if user account is active (if required)
-  if (requireActive && user?.status !== 'active') {
+  if (requireActive && user?.status !== "active") {
     return <Navigate to="/pending" replace />;
   }
 
@@ -55,7 +56,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         to="/unauthorized"
         state={{
           requiredRole: requiredRoles?.[0],
-          requiredPermissions: requiredPermissions
+          requiredPermissions: requiredPermissions,
         }}
         replace
       />
@@ -69,7 +70,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         <Navigate
           to="/unauthorized"
           state={{
-            requiredPermissions
+            requiredPermissions,
           }}
           replace
         />
@@ -87,7 +88,7 @@ export const withProtectedRoute = (
     requiredRoles?: string[];
     requiredPermissions?: string[];
     requireActive?: boolean;
-  }
+  },
 ) => {
   return (props: any) => (
     <ProtectedRoute {...options}>
@@ -97,16 +98,16 @@ export const withProtectedRoute = (
 };
 
 // Admin-only route wrapper
-export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return (
-    <ProtectedRoute requiredRoles={['admin']}>
-      {children}
-    </ProtectedRoute>
-  );
+export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  return <ProtectedRoute requiredRoles={["admin"]}>{children}</ProtectedRoute>;
 };
 
 // Public route (redirect to dashboard if already authenticated)
-export const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const PublicRoute: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {

@@ -1,8 +1,8 @@
-import { EventEmitter } from 'events';
-import Keyv from 'keyv';
-import KeyvRedis from '@keyv/redis';
-import logger from '../config/logger';
-import { config } from '../config/index';
+import { EventEmitter } from "events";
+import Keyv from "keyv";
+import KeyvRedis from "@keyv/redis";
+import logger from "../config/logger";
+import { config } from "../config/index";
 
 export class CacheService extends EventEmitter {
   private static instance: CacheService;
@@ -32,18 +32,21 @@ export class CacheService extends EventEmitter {
         this.l2Cache = new Keyv({
           store: new KeyvRedis(redisUrl),
         });
-        logger.info('Redis cache initialized', { url: redisUrl });
+        logger.info("Redis cache initialized", { url: redisUrl });
       } catch (error) {
-        logger.warn('Failed to initialize Redis cache, using memory cache only', { error });
+        logger.warn(
+          "Failed to initialize Redis cache, using memory cache only",
+          { error },
+        );
         this.l2Cache = undefined;
       }
 
       // Create unified cache interface
       this.cache = this.createUnifiedCache();
 
-      logger.info('Cache initialized with Keyv memory + Redis cache');
+      logger.info("Cache initialized with Keyv memory + Redis cache");
     } catch (error) {
-      logger.error('Failed to initialize cache:', error);
+      logger.error("Failed to initialize cache:", error);
       throw error;
     }
   }
@@ -116,7 +119,7 @@ export class CacheService extends EventEmitter {
         if (this.l2Cache) {
           await this.l2Cache.clear();
         }
-      }
+      },
     };
   }
 
@@ -138,7 +141,11 @@ export class CacheService extends EventEmitter {
   /**
    * Static set method
    */
-  public static async set<T>(key: string, data: T, ttlSeconds?: number): Promise<void> {
+  public static async set<T>(
+    key: string,
+    data: T,
+    ttlSeconds?: number,
+  ): Promise<void> {
     const instance = CacheService.getInstance();
     const ttlMs = ttlSeconds ? ttlSeconds * 1000 : undefined;
     await instance.set<T>(key, data, ttlMs);
@@ -272,9 +279,9 @@ export class CacheService extends EventEmitter {
   async clear(): Promise<void> {
     try {
       await this.cache.clear();
-      logger.debug('Cache cleared');
+      logger.debug("Cache cleared");
     } catch (error) {
-      logger.error('Cache clear error:', error);
+      logger.error("Cache clear error:", error);
     }
   }
 
@@ -288,7 +295,7 @@ export class CacheService extends EventEmitter {
 
       // Convert wildcard pattern to regex
       // e.g., 'client_version:*' -> /^client_version:.*/
-      const regexPattern = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+      const regexPattern = new RegExp("^" + pattern.replace(/\*/g, ".*") + "$");
 
       // Get all keys from registry that match the pattern
       const keysToDelete: string[] = [];
@@ -304,7 +311,9 @@ export class CacheService extends EventEmitter {
         deletedCount++;
       }
 
-      logger.info(`Cache pattern deletion: ${pattern} - ${deletedCount} keys deleted`);
+      logger.info(
+        `Cache pattern deletion: ${pattern} - ${deletedCount} keys deleted`,
+      );
       return deletedCount;
     } catch (error) {
       logger.error(`Cache pattern delete error for ${pattern}:`, error);
@@ -318,18 +327,18 @@ export class CacheService extends EventEmitter {
   async getStats() {
     try {
       return {
-        totalItems: 'unknown', // cache-manager doesn't expose size
-        validItems: 'unknown',
-        expiredItems: 'unknown',
-        memoryUsage: process.memoryUsage()
+        totalItems: "unknown", // cache-manager doesn't expose size
+        validItems: "unknown",
+        expiredItems: "unknown",
+        memoryUsage: process.memoryUsage(),
       };
     } catch (error) {
-      logger.error('Cache stats error:', error);
+      logger.error("Cache stats error:", error);
       return {
         totalItems: 0,
         validItems: 0,
         expiredItems: 0,
-        memoryUsage: process.memoryUsage()
+        memoryUsage: process.memoryUsage(),
       };
     }
   }
@@ -347,8 +356,6 @@ export class CacheService extends EventEmitter {
       return [];
     }
   }
-
-
 }
 
 // Singleton instance

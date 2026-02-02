@@ -1,44 +1,43 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import compression from 'compression';
-import cookieParser from 'cookie-parser';
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import compression from "compression";
+import cookieParser from "cookie-parser";
 // import session from 'express-session';
 // import ConnectRedis from 'connect-redis';
-import swaggerUi from 'swagger-ui-express';
-import { config } from './config';
+import swaggerUi from "swagger-ui-express";
+import { config } from "./config";
 // import redisClient from './config/redis';
-import passport from './config/passport';
-import swaggerSpec from './config/swagger';
+import passport from "./config/passport";
+import swaggerSpec from "./config/swagger";
 // import logger from './config/logger';
-import { requestLogger } from './middleware/requestLogger';
-import { errorHandler, notFoundHandler } from './middleware/errorHandler';
-import { generalLimiter, apiLimiter } from './middleware/rateLimiter';
-import { appInstance } from './utils/AppInstance';
-import { ALLOWED_HEADERS } from './constants/headers';
+import { requestLogger } from "./middleware/requestLogger";
+import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
+import { generalLimiter, apiLimiter } from "./middleware/rateLimiter";
+import { appInstance } from "./utils/AppInstance";
+import { ALLOWED_HEADERS } from "./constants/headers";
 // import { initializeJobTypes } from './services/jobs';
 // import { CampaignScheduler } from './services/campaignScheduler';
 
 // Import main routes module
-import routes from './routes';
+import routes from "./routes";
 
 // import advancedSettingsRoutes from './routes/advancedSettings';
-import { authenticate, requireAdmin } from './middleware/auth';
-import { BullBoardConfig } from './config/bullboard';
-
+import { authenticate, requireAdmin } from "./middleware/auth";
+import { BullBoardConfig } from "./config/bullboard";
 
 const app = express();
 
 // Disable "Powered by Express" header
-app.disable('x-powered-by');
+app.disable("x-powered-by");
 
 // Trust proxy for accurate IP addresses
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 // Security middleware
 // Skip helmet for Bull Board routes to allow iframe embedding and static resources
 app.use((req, res, next) => {
-  if (req.path.startsWith('/bull-board')) {
+  if (req.path.startsWith("/bull-board")) {
     return next();
   }
   helmet({
@@ -57,37 +56,42 @@ app.use((req, res, next) => {
 });
 
 // CORS configuration
-app.use(cors({
-  origin: config.corsOrigin,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ALLOWED_HEADERS,
-}));
+app.use(
+  cors({
+    origin: config.corsOrigin,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ALLOWED_HEADERS,
+  }),
+);
 
 // Compression middleware (disable for SSE streams)
-app.use(compression({
-  filter: (req, res) => {
-    const accept = req.headers['accept'];
-    const url = req.url || '';
-    if (typeof accept === 'string' && accept.includes('text/event-stream')) return false;
-    if (url.includes('/api/v1/admin/notifications/sse')) return false;
-    if (url.includes('/api/v1/admin/services/sse')) return false;
-    return compression.filter(req, res);
-  }
-}) as any);
+app.use(
+  compression({
+    filter: (req, res) => {
+      const accept = req.headers["accept"];
+      const url = req.url || "";
+      if (typeof accept === "string" && accept.includes("text/event-stream"))
+        return false;
+      if (url.includes("/api/v1/admin/notifications/sse")) return false;
+      if (url.includes("/api/v1/admin/services/sse")) return false;
+      return compression.filter(req, res);
+    },
+  }) as any,
+);
 
 // Chat proxy routes - MUST be before body parsing to avoid consuming request stream
-import chatRoutes from './routes/chat';
-app.use('/api/v1/chat', chatRoutes);
+import chatRoutes from "./routes/chat";
+app.use("/api/v1/chat", chatRoutes);
 
 // Analytics proxy routes - MUST be before body parsing
-import analyticsRoutes from './routes/analytics';
-app.use('/api/v1/analytics', analyticsRoutes);
+import analyticsRoutes from "./routes/analytics";
+app.use("/api/v1/analytics", analyticsRoutes);
 
 // Body parsing middleware
 // 100MB limit for planning data uploads
-app.use(express.json({ limit: '100mb' }));
-app.use(express.urlencoded({ extended: true, limit: '100mb' }));
+app.use(express.json({ limit: "100mb" }));
+app.use(express.urlencoded({ extended: true, limit: "100mb" }));
 
 // Cookie parsing middleware
 app.use(cookieParser() as any);
@@ -98,9 +102,11 @@ app.use(requestLogger);
 // Use SDK HTTP metrics middleware (private scope)
 let httpMetricsMiddleware: any = null;
 app.use((req, res, next) => {
-  const { gatrixSdk } = require('./index');
+  const { gatrixSdk } = require("./index");
   if (gatrixSdk && !httpMetricsMiddleware) {
-    httpMetricsMiddleware = gatrixSdk.createHttpMetricsMiddleware({ scope: 'private' });
+    httpMetricsMiddleware = gatrixSdk.createHttpMetricsMiddleware({
+      scope: "private",
+    });
   }
 
   if (httpMetricsMiddleware) {
@@ -109,10 +115,9 @@ app.use((req, res, next) => {
   next();
 });
 
-
 // Rate limiting
 app.use(generalLimiter as any);
-app.use('/api', apiLimiter as any);
+app.use("/api", apiLimiter as any);
 
 // Session configuration with Redis store
 // const RedisStore = (ConnectRedis as any)(session);
@@ -140,60 +145,69 @@ app.use(passport.initialize() as any);
 // app.use(passport.session() as any);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get("/health", (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Server is healthy',
+    message: "Server is healthy",
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    ...appInstance.getHealthInfo()
+    ...appInstance.getHealthInfo(),
   });
 });
 
 // Swagger API documentation
-if (config.nodeEnv !== 'production') {
+if (config.nodeEnv !== "production") {
   const swaggerOptions = {
     explorer: true,
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'Gatrix API Documentation',
+    customCss: ".swagger-ui .topbar { display: none }",
+    customSiteTitle: "Gatrix API Documentation",
   };
 
-  app.use('/api-docs', swaggerUi.serve as any, swaggerUi.setup(swaggerSpec, swaggerOptions) as any);
+  app.use(
+    "/api-docs",
+    swaggerUi.serve as any,
+    swaggerUi.setup(swaggerSpec, swaggerOptions) as any,
+  );
 
   // Swagger JSON endpoint
-  app.get('/api-docs.json', (req, res) => {
-    res.setHeader('Content-Type', 'application/json');
+  app.get("/api-docs.json", (req, res) => {
+    res.setHeader("Content-Type", "application/json");
     res.send(swaggerSpec);
   });
 }
 
 // API routes with rate limiting and caching
-app.use('/api/v1', apiLimiter as any, (req, res, next) => {
-  res.header('X-API-Version', '1.0.0');
+app.use("/api/v1", apiLimiter as any, (req, res, next) => {
+  res.header("X-API-Version", "1.0.0");
   next();
 });
 
 // Static file serving for uploads
-app.use('/uploads', express.static('uploads'));
+app.use("/uploads", express.static("uploads"));
 
 // Static file serving for public assets (favicon, etc.)
-app.use(express.static('public'));
+app.use(express.static("public"));
 
 // Routes - New organized structure
-app.use('/api/v1', routes);
+app.use("/api/v1", routes);
 
 // Bull Board (Admin only)
 const bullBoardAdapter = BullBoardConfig.initialize();
-app.use('/bull-board', bullBoardAdapter.getRouter());
-app.use('/api/v1/bull-board', (authenticate as any), (requireAdmin as any), bullBoardAdapter.getRouter());
+app.use("/bull-board", bullBoardAdapter.getRouter());
+app.use(
+  "/api/v1/bull-board",
+  authenticate as any,
+  requireAdmin as any,
+  bullBoardAdapter.getRouter(),
+);
 
 // app.use('/api/v1/advanced-settings', advancedSettingsRoutes);
 
 // Temporary route for testing
-app.get('/api/v1/test', (req: express.Request, res: express.Response) => {
+app.get("/api/v1/test", (req: express.Request, res: express.Response) => {
   res.json({
     success: true,
-    message: 'API is working',
+    message: "API is working",
     timestamp: new Date().toISOString(),
   });
 });

@@ -1,6 +1,6 @@
-import { Router, Request, Response } from 'express';
-import { sdkManager } from '../services/sdkManager';
-import { tokenMirrorService } from '../services/tokenMirrorService';
+import { Router, Request, Response } from "express";
+import { sdkManager } from "../services/sdkManager";
+import { tokenMirrorService } from "../services/tokenMirrorService";
 
 const router = Router();
 
@@ -8,18 +8,18 @@ const router = Router();
  * Health check endpoint
  * GET /health
  */
-router.get('/', (req: Request, res: Response) => {
+router.get("/", (req: Request, res: Response) => {
   const sdk = sdkManager.getSDK();
   const isSdkReady = sdk !== null;
   const isTokenMirrorReady = tokenMirrorService.isInitialized();
   const isReady = isSdkReady && isTokenMirrorReady;
 
   res.status(isReady ? 200 : 503).json({
-    status: isReady ? 'healthy' : 'initializing',
+    status: isReady ? "healthy" : "initializing",
     timestamp: new Date().toISOString(),
-    version: '1.0.0',
-    sdk: isSdkReady ? 'ready' : 'initializing',
-    tokenMirror: isTokenMirrorReady ? 'ready' : 'initializing',
+    version: "1.0.0",
+    sdk: isSdkReady ? "ready" : "initializing",
+    tokenMirror: isTokenMirrorReady ? "ready" : "initializing",
     tokenCount: tokenMirrorService.getTokenCount(),
   });
 });
@@ -28,19 +28,19 @@ router.get('/', (req: Request, res: Response) => {
  * Readiness check endpoint
  * GET /health/ready
  */
-router.get('/ready', (req: Request, res: Response) => {
+router.get("/ready", (req: Request, res: Response) => {
   const sdk = sdkManager.getSDK();
   const isReady = sdk !== null;
 
   if (isReady) {
     res.status(200).json({
-      status: 'ready',
+      status: "ready",
       timestamp: new Date().toISOString(),
     });
   } else {
     res.status(503).json({
-      status: 'not_ready',
-      message: 'SDK not initialized',
+      status: "not_ready",
+      message: "SDK not initialized",
       timestamp: new Date().toISOString(),
     });
   }
@@ -50,9 +50,9 @@ router.get('/ready', (req: Request, res: Response) => {
  * Liveness check endpoint
  * GET /health/live
  */
-router.get('/live', (req: Request, res: Response) => {
+router.get("/live", (req: Request, res: Response) => {
   res.status(200).json({
-    status: 'alive',
+    status: "alive",
     timestamp: new Date().toISOString(),
   });
 });

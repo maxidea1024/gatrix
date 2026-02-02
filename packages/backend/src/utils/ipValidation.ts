@@ -1,4 +1,4 @@
-import { GatrixError } from '../middleware/errorHandler';
+import { GatrixError } from "../middleware/errorHandler";
 
 /**
  * IP address and CIDR validation utilities
@@ -8,7 +8,8 @@ import { GatrixError } from '../middleware/errorHandler';
  * Validates if a string is a valid IPv4 address
  */
 export function isValidIPv4(ip: string): boolean {
-  const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  const ipv4Regex =
+    /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
   return ipv4Regex.test(ip);
 }
 
@@ -18,17 +19,17 @@ export function isValidIPv4(ip: string): boolean {
 export function isValidIPv6(ip: string): boolean {
   // More comprehensive IPv6 validation
   try {
-    const parts = ip.split(':');
+    const parts = ip.split(":");
     if (parts.length > 8) return false;
 
     // Handle compressed notation
-    if (ip.includes('::')) {
-      const doubleParts = ip.split('::');
+    if (ip.includes("::")) {
+      const doubleParts = ip.split("::");
       if (doubleParts.length > 2) return false;
     }
 
     for (const part of parts) {
-      if (part === '') continue; // Allow empty parts for compressed notation
+      if (part === "") continue; // Allow empty parts for compressed notation
       if (!/^[0-9a-fA-F]{1,4}$/.test(part)) return false;
     }
 
@@ -49,7 +50,7 @@ export function isValidIP(ip: string): boolean {
  * Validates if a string is a valid CIDR notation
  */
 export function isValidCIDR(cidr: string): boolean {
-  const parts = cidr.split('/');
+  const parts = cidr.split("/");
   if (parts.length !== 2) return false;
 
   const [ip, prefixStr] = parts;
@@ -76,13 +77,13 @@ export function isValidCIDR(cidr: string): boolean {
  * Validates if a string is a valid IP address or CIDR notation
  */
 export function isValidIPOrCIDR(input: string): boolean {
-  if (!input || typeof input !== 'string') return false;
+  if (!input || typeof input !== "string") return false;
 
   // Trim whitespace
   input = input.trim();
 
   // Check if it's a CIDR notation
-  if (input.includes('/')) {
+  if (input.includes("/")) {
     return isValidCIDR(input);
   }
 
@@ -97,14 +98,14 @@ export function isValidIPOrCIDR(input: string): boolean {
  * - Validates format
  */
 export function normalizeIPOrCIDR(input: string): string {
-  if (!input || typeof input !== 'string') {
-    throw new GatrixError('Invalid IP address or CIDR notation', 400);
+  if (!input || typeof input !== "string") {
+    throw new GatrixError("Invalid IP address or CIDR notation", 400);
   }
 
   const normalized = input.trim().toLowerCase();
 
   if (!isValidIPOrCIDR(normalized)) {
-    throw new GatrixError('Invalid IP address or CIDR notation format', 400);
+    throw new GatrixError("Invalid IP address or CIDR notation format", 400);
   }
 
   return normalized;
@@ -118,12 +119,12 @@ export function ipMatchesCIDR(ip: string, cidr: string): boolean {
     // For simplicity, we'll use a basic implementation
     // In production, you might want to use a library like 'ip-range-check'
 
-    if (!cidr.includes('/')) {
+    if (!cidr.includes("/")) {
       // If it's not CIDR, just compare directly
       return ip === cidr;
     }
 
-    const [network, prefixStr] = cidr.split('/');
+    const [network, prefixStr] = cidr.split("/");
     const prefix = parseInt(prefixStr, 10);
 
     if (isValidIPv4(ip) && isValidIPv4(network)) {
@@ -157,7 +158,11 @@ function ipv4MatchesCIDR(ip: string, network: string, prefix: number): boolean {
  * Converts IPv4 address to number
  */
 function ipv4ToNumber(ip: string): number {
-  return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
+  return (
+    ip
+      .split(".")
+      .reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0
+  );
 }
 
 /**
@@ -186,18 +191,21 @@ function ipv6MatchesCIDR(ip: string, network: string, prefix: number): boolean {
 function expandIPv6(ip: string): string | null {
   try {
     // Handle :: compression
-    if (ip.includes('::')) {
-      const parts = ip.split('::');
-      const left = parts[0] ? parts[0].split(':') : [];
-      const right = parts[1] ? parts[1].split(':') : [];
+    if (ip.includes("::")) {
+      const parts = ip.split("::");
+      const left = parts[0] ? parts[0].split(":") : [];
+      const right = parts[1] ? parts[1].split(":") : [];
       const missing = 8 - left.length - right.length;
-      const middle = Array(missing).fill('0000');
+      const middle = Array(missing).fill("0000");
       const expanded = [...left, ...middle, ...right];
-      ip = expanded.join(':');
+      ip = expanded.join(":");
     }
 
     // Pad each part to 4 digits
-    return ip.split(':').map(part => part.padStart(4, '0')).join(':');
+    return ip
+      .split(":")
+      .map((part) => part.padStart(4, "0"))
+      .join(":");
   } catch {
     return null;
   }
@@ -207,19 +215,20 @@ function expandIPv6(ip: string): string | null {
  * Converts IPv6 address to binary string
  */
 function ipv6ToBinary(ip: string): string {
-  return ip.split(':').map(part =>
-    parseInt(part, 16).toString(2).padStart(16, '0')
-  ).join('');
+  return ip
+    .split(":")
+    .map((part) => parseInt(part, 16).toString(2).padStart(16, "0"))
+    .join("");
 }
 
 /**
  * Gets a human-readable description of the IP/CIDR
  */
 export function getIPDescription(input: string): string {
-  if (!input) return 'Invalid';
+  if (!input) return "Invalid";
 
-  if (input.includes('/')) {
-    const [ip, prefix] = input.split('/');
+  if (input.includes("/")) {
+    const [ip, prefix] = input.split("/");
     if (isValidIPv4(ip)) {
       return `IPv4 network ${input} (${Math.pow(2, 32 - parseInt(prefix))} addresses)`;
     } else if (isValidIPv6(ip)) {

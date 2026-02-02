@@ -1,16 +1,15 @@
-import { Request } from 'express';
+import { Request } from "express";
 
 export interface AppUser {
   id: number;
   userId: number; // backward compatibility
   email: string;
   name: string;
-  role: 'admin' | 'user';
+  role: "admin" | "user";
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
-
 
 export interface AuthenticatedRequest extends Request {
   user?: AppUser;
@@ -38,5 +37,5 @@ export interface RegisterData {
 
 export interface TokenResponse {
   token: string;
-  user: Omit<AppUser, 'password'>;
+  user: Omit<AppUser, "password">;
 }

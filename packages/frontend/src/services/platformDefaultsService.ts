@@ -1,4 +1,4 @@
-import { apiService } from './api';
+import { apiService } from "./api";
 
 export interface PlatformDefaults {
   gameServerAddress?: string;
@@ -16,7 +16,7 @@ export interface ApiResponse<T> {
 }
 
 export class PlatformDefaultsService {
-  private static readonly BASE_URL = '/admin/platform-defaults';
+  private static readonly BASE_URL = "/admin/platform-defaults";
 
   /**
    * 모든 플랫폼의 기본값 조회
@@ -29,18 +29,27 @@ export class PlatformDefaultsService {
   /**
    * 특정 플랫폼의 기본값 조회
    */
-  static async getPlatformDefaults(platform: string): Promise<PlatformDefaults> {
-    const response = await apiService.get<{ platform: string; defaults: PlatformDefaults }>(
-      `${this.BASE_URL}/${encodeURIComponent(platform)}`
-    );
+  static async getPlatformDefaults(
+    platform: string,
+  ): Promise<PlatformDefaults> {
+    const response = await apiService.get<{
+      platform: string;
+      defaults: PlatformDefaults;
+    }>(`${this.BASE_URL}/${encodeURIComponent(platform)}`);
     return response.data?.defaults || {};
   }
 
   /**
    * 특정 플랫폼의 기본값 설정
    */
-  static async setPlatformDefaults(platform: string, defaults: PlatformDefaults): Promise<void> {
-    await apiService.put(`${this.BASE_URL}/${encodeURIComponent(platform)}`, defaults);
+  static async setPlatformDefaults(
+    platform: string,
+    defaults: PlatformDefaults,
+  ): Promise<void> {
+    await apiService.put(
+      `${this.BASE_URL}/${encodeURIComponent(platform)}`,
+      defaults,
+    );
   }
 
   /**
@@ -60,22 +69,33 @@ export class PlatformDefaultsService {
   /**
    * 클라이언트 버전 데이터에 기본값 적용
    */
-  static applyDefaultsToClientVersion(platform: string, defaults: PlatformDefaults, clientVersionData: any): any {
+  static applyDefaultsToClientVersion(
+    platform: string,
+    defaults: PlatformDefaults,
+    clientVersionData: any,
+  ): any {
     return {
       ...clientVersionData,
-      gameServerAddress: clientVersionData.gameServerAddress || defaults.gameServerAddress || '',
-      patchAddress: clientVersionData.patchAddress || defaults.patchAddress || '',
+      gameServerAddress:
+        clientVersionData.gameServerAddress || defaults.gameServerAddress || "",
+      patchAddress:
+        clientVersionData.patchAddress || defaults.patchAddress || "",
     };
   }
 
   /**
    * 간편 추가용 플랫폼 데이터에 기본값 적용
    */
-  static applyDefaultsToPlatformData(platform: string, defaults: PlatformDefaults, platformData: any): any {
+  static applyDefaultsToPlatformData(
+    platform: string,
+    defaults: PlatformDefaults,
+    platformData: any,
+  ): any {
     return {
       ...platformData,
-      gameServerAddress: platformData.gameServerAddress || defaults.gameServerAddress || '',
-      patchAddress: platformData.patchAddress || defaults.patchAddress || '',
+      gameServerAddress:
+        platformData.gameServerAddress || defaults.gameServerAddress || "",
+      patchAddress: platformData.patchAddress || defaults.patchAddress || "",
     };
   }
 }

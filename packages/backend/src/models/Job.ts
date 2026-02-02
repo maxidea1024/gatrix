@@ -1,5 +1,5 @@
-import db from '../config/knex';
-import logger from '../config/logger';
+import db from "../config/knex";
+import logger from "../config/logger";
 
 export interface JobFilters {
   environment: string;
@@ -40,7 +40,7 @@ export interface UpdateJobData {
 // JSON 파싱 유틸리티 함수
 const safeJsonParse = (input: any): any => {
   // 이미 객체인 경우 그대로 반환
-  if (typeof input === 'object' && input !== null) {
+  if (typeof input === "object" && input !== null) {
     return input;
   }
 
@@ -50,15 +50,15 @@ const safeJsonParse = (input: any): any => {
   }
 
   // 문자열인 경우 JSON 파싱 시도
-  if (typeof input === 'string') {
-    if (input === '{}') {
+  if (typeof input === "string") {
+    if (input === "{}") {
       return {};
     }
 
     try {
       return JSON.parse(input);
     } catch (error) {
-      logger.warn('Failed to parse JSON string:', { input, error });
+      logger.warn("Failed to parse JSON string:", { input, error });
       return {};
     }
   }
@@ -69,7 +69,7 @@ const safeJsonParse = (input: any): any => {
 
 // JSON 문자열화 유틸리티 함수
 const safeJsonStringify = (data: any): string => {
-  if (typeof data === 'string') {
+  if (typeof data === "string") {
     // 이미 문자열인 경우, JSON인지 확인
     try {
       JSON.parse(data);
@@ -83,35 +83,42 @@ const safeJsonStringify = (data: any): string => {
 };
 
 export class JobModel {
-  static async findAllWithPagination(filters: JobFilters): Promise<JobListResult> {
+  static async findAllWithPagination(
+    filters: JobFilters,
+  ): Promise<JobListResult> {
     try {
       // 기본값 설정
-      const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 20;
-      const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
+      const limit = filters?.limit
+        ? parseInt(filters.limit.toString(), 10)
+        : 20;
+      const offset = filters?.offset
+        ? parseInt(filters.offset.toString(), 10)
+        : 0;
       const environment = filters.environment;
 
       // 기본 쿼리 빌더 with environment filter
-      const baseQuery = () => db('g_jobs as j')
-        .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
-        .leftJoin('g_users as cu', 'j.createdBy', 'cu.id')
-        .leftJoin('g_users as uu', 'j.updatedBy', 'uu.id')
-        .where('j.environment', environment);
+      const baseQuery = () =>
+        db("g_jobs as j")
+          .leftJoin("g_job_types as jt", "j.jobTypeId", "jt.id")
+          .leftJoin("g_users as cu", "j.createdBy", "cu.id")
+          .leftJoin("g_users as uu", "j.updatedBy", "uu.id")
+          .where("j.environment", environment);
 
       // 필터 적용 함수
       const applyFilters = (query: any) => {
         if (filters?.jobTypeId) {
-          query.where('j.jobTypeId', filters.jobTypeId);
+          query.where("j.jobTypeId", filters.jobTypeId);
         }
 
         if (filters?.isEnabled !== undefined) {
-          query.where('j.isEnabled', filters.isEnabled);
+          query.where("j.isEnabled", filters.isEnabled);
         }
 
         if (filters?.search) {
           query.where(function (this: any) {
-            this.where('j.name', 'like', `%${filters.search}%`)
-              .orWhere('j.description', 'like', `%${filters.search}%`)
-              .orWhere('j.memo', 'like', `%${filters.search}%`);
+            this.where("j.name", "like", `%${filters.search}%`)
+              .orWhere("j.description", "like", `%${filters.search}%`)
+              .orWhere("j.memo", "like", `%${filters.search}%`);
           });
         }
 
@@ -120,28 +127,28 @@ export class JobModel {
 
       // Count 쿼리
       const countQuery = applyFilters(baseQuery())
-        .count('j.id as total')
+        .count("j.id as total")
         .first();
 
       // Data 쿼리 - 태그 정보 포함
       const dataQuery = applyFilters(baseQuery())
         .select([
-          'j.*',
-          'jt.name as jobTypeName',
-          'jt.displayName as jobTypeDisplayName',
-          'cu.name as createdByName',
-          'cu.email as createdByEmail',
-          'uu.name as updatedByName',
-          'uu.email as updatedByEmail'
+          "j.*",
+          "jt.name as jobTypeName",
+          "jt.displayName as jobTypeDisplayName",
+          "cu.name as createdByName",
+          "cu.email as createdByEmail",
+          "uu.name as updatedByName",
+          "uu.email as updatedByEmail",
         ])
-        .orderBy('j.createdAt', 'desc')
+        .orderBy("j.createdAt", "desc")
         .limit(limit)
         .offset(offset);
 
       // 병렬 실행
       const [countResult, dataResults] = await Promise.all([
         countQuery,
-        dataQuery
+        dataQuery,
       ]);
 
       const total = countResult?.total || 0;
@@ -163,23 +170,23 @@ export class JobModel {
         createdByName: row.createdByName,
         createdByEmail: row.createdByEmail,
         updatedByName: row.updatedByName,
-        updatedByEmail: row.updatedByEmail
+        updatedByEmail: row.updatedByEmail,
       }));
 
       // 각 Job에 대한 태그 정보 조회
       const jobIds = jobs.map((job: any) => job.id);
       if (jobIds.length > 0) {
-        const jobTags = await db('g_tag_assignments as ta')
-          .join('g_tags as t', 'ta.tagId', 't.id')
+        const jobTags = await db("g_tag_assignments as ta")
+          .join("g_tags as t", "ta.tagId", "t.id")
           .select([
-            'ta.entityId as jobId',
-            't.id as tagId',
-            't.name as tagName',
-            't.description as tagDescription',
-            't.color as tagColor'
+            "ta.entityId as jobId",
+            "t.id as tagId",
+            "t.name as tagName",
+            "t.description as tagDescription",
+            "t.color as tagColor",
           ])
-          .where('ta.entityType', 'job')
-          .whereIn('ta.entityId', jobIds);
+          .where("ta.entityType", "job")
+          .whereIn("ta.entityId", jobIds);
 
         // Job별로 태그 그룹화
         const tagsByJobId = jobTags.reduce((acc: any, tag: any) => {
@@ -190,7 +197,7 @@ export class JobModel {
             id: tag.tagId,
             name: tag.tagName,
             description: tag.tagDescription,
-            color: tag.tagColor
+            color: tag.tagColor,
           });
           return acc;
         }, {});
@@ -203,58 +210,58 @@ export class JobModel {
 
       return { jobs, total };
     } catch (error) {
-      logger.error('Error finding jobs with pagination:', error);
+      logger.error("Error finding jobs with pagination:", error);
       throw error;
     }
   }
 
   static async findById(id: number, environment: string): Promise<any | null> {
     try {
-      const job = await db('g_jobs as j')
-        .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
-        .leftJoin('g_users as cu', 'j.createdBy', 'cu.id')
-        .leftJoin('g_users as uu', 'j.updatedBy', 'uu.id')
+      const job = await db("g_jobs as j")
+        .leftJoin("g_job_types as jt", "j.jobTypeId", "jt.id")
+        .leftJoin("g_users as cu", "j.createdBy", "cu.id")
+        .leftJoin("g_users as uu", "j.updatedBy", "uu.id")
         .select([
-          'j.*',
-          'jt.name as jobTypeName',
-          'jt.displayName as jobTypeDisplayName',
-          'cu.name as createdByName',
-          'cu.email as createdByEmail',
-          'uu.name as updatedByName',
-          'uu.email as updatedByEmail'
+          "j.*",
+          "jt.name as jobTypeName",
+          "jt.displayName as jobTypeDisplayName",
+          "cu.name as createdByName",
+          "cu.email as createdByEmail",
+          "uu.name as updatedByName",
+          "uu.email as updatedByEmail",
         ])
-        .where('j.id', id)
-        .where('j.environment', environment)
+        .where("j.id", id)
+        .where("j.environment", environment)
         .first();
 
       if (!job) return null;
 
       // 태그 정보 조회
-      const jobTags = await db('g_tag_assignments as ta')
-        .join('g_tags as t', 'ta.tagId', 't.id')
+      const jobTags = await db("g_tag_assignments as ta")
+        .join("g_tags as t", "ta.tagId", "t.id")
         .select([
-          't.id as tagId',
-          't.name as tagName',
-          't.description as tagDescription',
-          't.color as tagColor'
+          "t.id as tagId",
+          "t.name as tagName",
+          "t.description as tagDescription",
+          "t.color as tagColor",
         ])
-        .where('ta.entityType', 'job')
-        .where('ta.entityId', id);
+        .where("ta.entityType", "job")
+        .where("ta.entityId", id);
 
       const tags = jobTags.map((tag: any) => ({
         id: tag.tagId,
         name: tag.tagName,
         description: tag.tagDescription,
-        color: tag.tagColor
+        color: tag.tagColor,
       }));
 
       return {
         ...job,
         jobDataMap: safeJsonParse(job.jobDataMap),
-        tags: tags
+        tags: tags,
       };
     } catch (error) {
-      logger.error('Error finding job by ID:', error);
+      logger.error("Error finding job by ID:", error);
       throw error;
     }
   }
@@ -263,7 +270,7 @@ export class JobModel {
     const trx = await db.transaction();
     try {
       const environment = jobData.environment;
-      const [insertId] = await trx('g_jobs').insert({
+      const [insertId] = await trx("g_jobs").insert({
         name: jobData.name,
         memo: jobData.memo,
         jobTypeId: jobData.jobTypeId,
@@ -273,66 +280,74 @@ export class JobModel {
         createdBy: jobData.createdBy,
         updatedBy: jobData.updatedBy,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
 
       // 태그 연결
       if (jobData.tagIds && jobData.tagIds.length > 0) {
-        const tagAssignments = jobData.tagIds.map(tagId => ({
-          entityType: 'job',
+        const tagAssignments = jobData.tagIds.map((tagId) => ({
+          entityType: "job",
           entityId: insertId,
           tagId: tagId,
           createdBy: jobData.createdBy || 1,
-          createdAt: new Date()
+          createdAt: new Date(),
         }));
-        await trx('g_tag_assignments').insert(tagAssignments);
+        await trx("g_tag_assignments").insert(tagAssignments);
       }
 
       await trx.commit();
       return await this.findById(insertId, environment);
     } catch (error) {
       await trx.rollback();
-      logger.error('Error creating job:', error);
+      logger.error("Error creating job:", error);
       throw error;
     }
   }
 
-  static async update(id: number, jobData: UpdateJobData, environment: string): Promise<any> {
+  static async update(
+    id: number,
+    jobData: UpdateJobData,
+    environment: string,
+  ): Promise<any> {
     const trx = await db.transaction();
     try {
       const updateData: any = {};
 
       if (jobData.name !== undefined) updateData.name = jobData.name;
       if (jobData.memo !== undefined) updateData.memo = jobData.memo;
-      if (jobData.jobTypeId !== undefined) updateData.jobTypeId = jobData.jobTypeId;
-      if (jobData.isEnabled !== undefined) updateData.isEnabled = jobData.isEnabled;
-      if (jobData.jobDataMap !== undefined) updateData.jobDataMap = safeJsonStringify(jobData.jobDataMap);
-      if (jobData.updatedBy !== undefined) updateData.updatedBy = jobData.updatedBy;
+      if (jobData.jobTypeId !== undefined)
+        updateData.jobTypeId = jobData.jobTypeId;
+      if (jobData.isEnabled !== undefined)
+        updateData.isEnabled = jobData.isEnabled;
+      if (jobData.jobDataMap !== undefined)
+        updateData.jobDataMap = safeJsonStringify(jobData.jobDataMap);
+      if (jobData.updatedBy !== undefined)
+        updateData.updatedBy = jobData.updatedBy;
 
       updateData.updatedAt = new Date();
 
-      await trx('g_jobs')
-        .where('id', id)
-        .where('environment', environment)
+      await trx("g_jobs")
+        .where("id", id)
+        .where("environment", environment)
         .update(updateData);
 
       // 태그 업데이트
       if (jobData.tagIds !== undefined) {
         // 기존 태그 연결 삭제
-        await trx('g_tag_assignments')
-          .where('entityType', 'job')
-          .where('entityId', id)
+        await trx("g_tag_assignments")
+          .where("entityType", "job")
+          .where("entityId", id)
           .del();
 
         // 새 태그 연결 추가
         if (jobData.tagIds.length > 0) {
-          const tagAssignments = jobData.tagIds.map(tagId => ({
-            entityType: 'job',
+          const tagAssignments = jobData.tagIds.map((tagId) => ({
+            entityType: "job",
             entityId: id,
             tagId: tagId,
-            createdAt: new Date()
+            createdAt: new Date(),
           }));
-          await trx('g_tag_assignments').insert(tagAssignments);
+          await trx("g_tag_assignments").insert(tagAssignments);
         }
       }
 
@@ -340,7 +355,7 @@ export class JobModel {
       return await this.findById(id, environment);
     } catch (error) {
       await trx.rollback();
-      logger.error('Error updating job:', error);
+      logger.error("Error updating job:", error);
       throw error;
     }
   }
@@ -349,74 +364,84 @@ export class JobModel {
     const trx = await db.transaction();
     try {
       // 태그 할당 삭제
-      await trx('g_tag_assignments')
-        .where('entityType', 'job')
-        .where('entityId', id)
+      await trx("g_tag_assignments")
+        .where("entityType", "job")
+        .where("entityId", id)
         .del();
 
       // Job 삭제
-      await trx('g_jobs').where('id', id).where('environment', environment).del();
+      await trx("g_jobs")
+        .where("id", id)
+        .where("environment", environment)
+        .del();
 
       await trx.commit();
     } catch (error) {
       await trx.rollback();
-      logger.error('Error deleting job:', error);
+      logger.error("Error deleting job:", error);
       throw error;
     }
   }
 
   // 태그 관련 메서드들
-  static async setTags(jobId: number, tagIds: number[], createdBy?: number): Promise<void> {
+  static async setTags(
+    jobId: number,
+    tagIds: number[],
+    createdBy?: number,
+  ): Promise<void> {
     try {
       await db.transaction(async (trx) => {
         // 기존 태그 할당 삭제
-        await trx('g_tag_assignments')
-          .where('entityType', 'job')
-          .where('entityId', jobId)
+        await trx("g_tag_assignments")
+          .where("entityType", "job")
+          .where("entityId", jobId)
           .del();
 
         // 새 태그 할당 추가
         if (tagIds.length > 0) {
-          const assignments = tagIds.map(tagId => ({
-            entityType: 'job',
+          const assignments = tagIds.map((tagId) => ({
+            entityType: "job",
             entityId: jobId,
             tagId: tagId,
             createdBy: createdBy || 1,
-            createdAt: new Date()
+            createdAt: new Date(),
           }));
-          await trx('g_tag_assignments').insert(assignments);
+          await trx("g_tag_assignments").insert(assignments);
         }
       });
     } catch (error) {
-      logger.error('Error setting job tags:', error);
+      logger.error("Error setting job tags:", error);
       throw error;
     }
   }
 
   static async getTags(jobId: number): Promise<any[]> {
     try {
-      return await db('g_tag_assignments as ta')
-        .join('g_tags as t', 'ta.tagId', 't.id')
-        .select(['t.id', 't.name', 't.color', 't.description'])
-        .where('ta.entityType', 'job')
-        .where('ta.entityId', jobId)
-        .orderBy('t.name');
+      return await db("g_tag_assignments as ta")
+        .join("g_tags as t", "ta.tagId", "t.id")
+        .select(["t.id", "t.name", "t.color", "t.description"])
+        .where("ta.entityType", "job")
+        .where("ta.entityId", jobId)
+        .orderBy("t.name");
     } catch (error) {
-      logger.error('Error getting job tags:', error);
+      logger.error("Error getting job tags:", error);
       throw error;
     }
   }
 
-  static async findByName(name: string, environment: string): Promise<any | null> {
+  static async findByName(
+    name: string,
+    environment: string,
+  ): Promise<any | null> {
     try {
-      const job = await db('g_jobs')
-        .where('name', name)
-        .where('environment', environment)
+      const job = await db("g_jobs")
+        .where("name", name)
+        .where("environment", environment)
         .first();
 
       return job || null;
     } catch (error) {
-      logger.error('Error finding job by name:', error);
+      logger.error("Error finding job by name:", error);
       throw error;
     }
   }

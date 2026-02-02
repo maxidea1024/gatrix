@@ -2,23 +2,23 @@
  * Logger Utility
  */
 
-import { LoggerConfig } from '../types/config';
-import * as os from 'os';
+import { LoggerConfig } from "../types/config";
+import * as os from "os";
 
-import { LokiTransport } from './LokiTransport';
+import { LokiTransport } from "./LokiTransport";
 
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
-export type LogFormat = 'pretty' | 'json';
+export type LogLevel = "debug" | "info" | "warn" | "error";
+export type LogFormat = "pretty" | "json";
 
 // ANSI color codes for terminal output
 const COLORS = {
-  reset: '\x1b[0m',
-  debug: '\x1b[36m', // Cyan
-  info: '\x1b[32m', // Green
-  warn: '\x1b[33m', // Yellow
-  error: '\x1b[31m', // Red
-  timestamp: '\x1b[90m', // Gray
-  bracket: '\x1b[90m', // Gray
+  reset: "\x1b[0m",
+  debug: "\x1b[36m", // Cyan
+  info: "\x1b[32m", // Green
+  warn: "\x1b[33m", // Yellow
+  error: "\x1b[31m", // Red
+  timestamp: "\x1b[90m", // Gray
+  bracket: "\x1b[90m", // Gray
 };
 
 /**
@@ -33,7 +33,7 @@ function getInternalIp(): string {
     if (!iface) continue;
 
     for (const addr of iface) {
-      if (addr.family === 'IPv4' && !addr.internal) {
+      if (addr.family === "IPv4" && !addr.internal) {
         return addr.address;
       }
     }
@@ -45,13 +45,13 @@ function getInternalIp(): string {
     if (!iface) continue;
 
     for (const addr of iface) {
-      if (addr.family === 'IPv4') {
+      if (addr.family === "IPv4") {
         return addr.address;
       }
     }
   }
 
-  return '127.0.0.1';
+  return "127.0.0.1";
 }
 
 export class Logger {
@@ -59,7 +59,7 @@ export class Logger {
   private customLogger?: (level: string, message: string, meta?: any) => void;
   private colorEnabled: boolean;
   private timeOffset: number; // Time offset in hours
-  private timestampFormat: 'iso8601' | 'local'; // Timestamp format
+  private timestampFormat: "iso8601" | "local"; // Timestamp format
   private sourceCategory?: string; // Source Category for logging
   private format: LogFormat; // Output format
   private context?: Record<string, any>; // Additional context fields
@@ -75,22 +75,22 @@ export class Logger {
   };
 
   constructor(config?: LoggerConfig, sourceCategory?: string) {
-    this.level = config?.level || 'info';
+    this.level = config?.level || "info";
     this.customLogger = config?.customLogger;
     this.timeOffset = config?.timeOffset ?? 0; // Default: UTC (0 offset)
-    this.timestampFormat = config?.timestampFormat ?? 'iso8601'; // Default: ISO8601
+    this.timestampFormat = config?.timestampFormat ?? "iso8601"; // Default: ISO8601
     this.sourceCategory = sourceCategory || config?.sourceCategory;
 
     // Fallback: Infer sourceCategory from Loki labels if not explicitly set
     if (!this.sourceCategory && config?.loki?.labels) {
-      if (config.loki.labels['sourceCategory']) {
-        this.sourceCategory = config.loki.labels['sourceCategory'];
-      } else if (config.loki.labels['source_category']) {
-        this.sourceCategory = config.loki.labels['source_category'];
+      if (config.loki.labels["sourceCategory"]) {
+        this.sourceCategory = config.loki.labels["sourceCategory"];
+      } else if (config.loki.labels["source_category"]) {
+        this.sourceCategory = config.loki.labels["source_category"];
       }
     }
 
-    this.format = config?.format ?? 'pretty'; // Default: pretty
+    this.format = config?.format ?? "pretty"; // Default: pretty
     this.context = config?.context;
     // Enable colors by default, disable if running in non-TTY environment
     this.colorEnabled = process.stdout?.isTTY !== false;
@@ -116,15 +116,15 @@ export class Logger {
     const offsetDate = new Date(now.getTime() + offsetMs);
 
     // Format based on timestampFormat setting
-    if (this.timestampFormat === 'local') {
+    if (this.timestampFormat === "local") {
       // Format: YYYY-MM-DD HH:mm:ss.sss
       const year = offsetDate.getUTCFullYear();
-      const month = String(offsetDate.getUTCMonth() + 1).padStart(2, '0');
-      const day = String(offsetDate.getUTCDate()).padStart(2, '0');
-      const hours = String(offsetDate.getUTCHours()).padStart(2, '0');
-      const minutes = String(offsetDate.getUTCMinutes()).padStart(2, '0');
-      const seconds = String(offsetDate.getUTCSeconds()).padStart(2, '0');
-      const ms = String(offsetDate.getUTCMilliseconds()).padStart(3, '0');
+      const month = String(offsetDate.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(offsetDate.getUTCDate()).padStart(2, "0");
+      const hours = String(offsetDate.getUTCHours()).padStart(2, "0");
+      const minutes = String(offsetDate.getUTCMinutes()).padStart(2, "0");
+      const seconds = String(offsetDate.getUTCSeconds()).padStart(2, "0");
+      const ms = String(offsetDate.getUTCMilliseconds()).padStart(3, "0");
 
       return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${ms}`;
     }
@@ -135,7 +135,7 @@ export class Logger {
 
   private formatPrettyMessage(level: LogLevel, message: string): string {
     const timestamp = this.getFormattedTimestamp();
-    const sourceCategory = this.sourceCategory || 'GatrixServerSDK';
+    const sourceCategory = this.sourceCategory || "GatrixServerSDK";
 
     if (!this.colorEnabled || this.customLogger) {
       // Plain text format when colors are disabled or custom logger is used
@@ -151,11 +151,15 @@ export class Logger {
     return `${coloredBracket}[${coloredTimestamp}] [${coloredLevel}${coloredBracket}] [${sourceCategory}]${COLORS.reset} ${message}`;
   }
 
-  private formatJsonMessage(level: LogLevel, message: string, meta?: any): string {
+  private formatJsonMessage(
+    level: LogLevel,
+    message: string,
+    meta?: any,
+  ): string {
     const logEntry: Record<string, any> = {
       timestamp: this.getFormattedTimestamp(),
       level: level.toUpperCase(),
-      sourceCategory: this.sourceCategory || 'GatrixServerSDK',
+      sourceCategory: this.sourceCategory || "GatrixServerSDK",
       message,
       hostname: this.hostname,
       internalIp: this.internalIp,
@@ -168,7 +172,7 @@ export class Logger {
 
     // Add meta if provided
     if (meta !== undefined) {
-      if (typeof meta === 'object' && meta !== null && !Array.isArray(meta)) {
+      if (typeof meta === "object" && meta !== null && !Array.isArray(meta)) {
         Object.assign(logEntry, meta);
       } else {
         logEntry.meta = meta;
@@ -176,7 +180,7 @@ export class Logger {
     }
 
     const replacer = (_key: string, value: any) => {
-      if (typeof value === 'bigint') {
+      if (typeof value === "bigint") {
         return value.toString();
       }
       return value;
@@ -203,29 +207,29 @@ export class Logger {
 
     // Determine source_category based on category
     // Determine source_category based on category
-    const category = this.sourceCategory || 'GatrixServerSDK';
+    const category = this.sourceCategory || "GatrixServerSDK";
     let sourceCategory = category;
 
-    if (category === 'GatrixServerSDK') {
-      sourceCategory = process.env.GATRIX_SOURCE_CATEGORY || 'gatrix';
-    } else if (category.toLowerCase().includes('infra')) {
-      sourceCategory = 'infra';
+    if (category === "GatrixServerSDK") {
+      sourceCategory = process.env.GATRIX_SOURCE_CATEGORY || "gatrix";
+    } else if (category.toLowerCase().includes("infra")) {
+      sourceCategory = "infra";
     }
 
     // JSON format
-    if (this.format === 'json') {
+    if (this.format === "json") {
       const jsonOutput = this.formatJsonMessage(level, message, meta);
       switch (level) {
-        case 'debug':
+        case "debug":
           console.debug(jsonOutput);
           break;
-        case 'info':
+        case "info":
           console.info(jsonOutput);
           break;
-        case 'warn':
+        case "warn":
           console.warn(jsonOutput);
           break;
-        case 'error':
+        case "error":
           console.error(jsonOutput);
           break;
       }
@@ -233,7 +237,7 @@ export class Logger {
       // Push to Loki if enabled (structured)
       if (this.lokiTransport) {
         this.lokiTransport.send(level, jsonOutput, {
-          source_category: sourceCategory
+          source_category: sourceCategory,
         });
       }
       return;
@@ -241,7 +245,14 @@ export class Logger {
 
     // Pretty format (default)
     const formatted = this.formatPrettyMessage(level, message);
-    const logFn = level === 'debug' ? console.debug : level === 'info' ? console.info : level === 'warn' ? console.warn : console.error;
+    const logFn =
+      level === "debug"
+        ? console.debug
+        : level === "info"
+          ? console.info
+          : level === "warn"
+            ? console.warn
+            : console.error;
 
     if (meta !== undefined) {
       logFn(`${formatted}:`, meta);
@@ -256,7 +267,7 @@ export class Logger {
         const jsonOutput = this.formatJsonMessage(level, message, meta);
 
         this.lokiTransport.send(level, jsonOutput, {
-          source_category: sourceCategory
+          source_category: sourceCategory,
         });
       } catch (err) {
         // Fallback if JSON serialization fails
@@ -264,29 +275,29 @@ export class Logger {
           const fallbackEntry = {
             timestamp: this.getFormattedTimestamp(),
             level: level.toUpperCase(),
-            sourceCategory: this.sourceCategory || 'GatrixServerSDK',
+            sourceCategory: this.sourceCategory || "GatrixServerSDK",
             message: `${message} [Serialization Error]`,
             meta: {
-              error: (err as Error).message
+              error: (err as Error).message,
             },
             hostname: this.hostname,
-            internalIp: this.internalIp
+            internalIp: this.internalIp,
           };
           const jsonOutput = JSON.stringify(fallbackEntry);
 
           this.lokiTransport.send(level, jsonOutput, {
             source_category: sourceCategory,
-            serialization_error: 'true'
+            serialization_error: "true",
           });
         } catch (_fallbackErr) {
           const minimalJson = JSON.stringify({
             timestamp: new Date().toISOString(),
             level: level.toUpperCase(),
-            message: 'Critical Serialization Error'
+            message: "Critical Serialization Error",
           });
           this.lokiTransport.send(level, minimalJson, {
             source_category: sourceCategory,
-            serialization_error: 'true'
+            serialization_error: "true",
           });
         }
       }
@@ -294,19 +305,19 @@ export class Logger {
   }
 
   debug(message: string, meta?: any): void {
-    this.log('debug', message, meta);
+    this.log("debug", message, meta);
   }
 
   info(message: string, meta?: any): void {
-    this.log('info', message, meta);
+    this.log("info", message, meta);
   }
 
   warn(message: string, meta?: any): void {
-    this.log('warn', message, meta);
+    this.log("warn", message, meta);
   }
 
   error(message: string, meta?: any): void {
-    this.log('error', message, meta);
+    this.log("error", message, meta);
   }
 
   setLevel(level: LogLevel): void {
@@ -333,11 +344,11 @@ export class Logger {
     return this.timeOffset;
   }
 
-  setTimestampFormat(format: 'iso8601' | 'local'): void {
+  setTimestampFormat(format: "iso8601" | "local"): void {
     this.timestampFormat = format;
   }
 
-  getTimestampFormat(): 'iso8601' | 'local' {
+  getTimestampFormat(): "iso8601" | "local" {
     return this.timestampFormat;
   }
 
@@ -394,7 +405,9 @@ export class Logger {
 /**
  * Factory function to create a logger with a specific source category
  */
-export function getLogger(sourceCategory: string, config?: LoggerConfig): Logger {
+export function getLogger(
+  sourceCategory: string,
+  config?: LoggerConfig,
+): Logger {
   return new Logger(config, sourceCategory);
 }
-

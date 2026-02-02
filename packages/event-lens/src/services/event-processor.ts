@@ -1,7 +1,7 @@
-import { ulid } from 'ulid';
-import { EventNormalizer } from './event-normalizer';
-import { eventQueue } from '../config/bullmq';
-import logger from '../utils/logger';
+import { ulid } from "ulid";
+import { EventNormalizer } from "./event-normalizer";
+import { eventQueue } from "../config/bullmq";
+import logger from "../utils/logger";
 
 export class EventProcessor {
   private normalizer: EventNormalizer;
@@ -22,15 +22,22 @@ export class EventProcessor {
       });
 
       // 3. 큐에 추가
-      await eventQueue.add('process-event', {
-        event: normalizedEvent,
-      }, {
-        jobId: eventId,
-      });
+      await eventQueue.add(
+        "process-event",
+        {
+          event: normalizedEvent,
+        },
+        {
+          jobId: eventId,
+        },
+      );
 
-      logger.debug('Event queued', { eventId, projectId: normalizedEvent.projectId });
+      logger.debug("Event queued", {
+        eventId,
+        projectId: normalizedEvent.projectId,
+      });
     } catch (error) {
-      logger.error('Failed to process event', { error, rawEvent });
+      logger.error("Failed to process event", { error, rawEvent });
       throw error;
     }
   }
@@ -40,17 +47,17 @@ export class EventProcessor {
       const { profileId, deviceId, projectId, ...traits } = rawEvent;
 
       // 프로필 큐에 추가
-      const { profileQueue } = await import('../config/bullmq');
-      await profileQueue.add('identify-profile', {
+      const { profileQueue } = await import("../config/bullmq");
+      await profileQueue.add("identify-profile", {
         projectId,
         profileId,
         deviceId,
         traits,
       });
 
-      logger.debug('Profile identify queued', { profileId, projectId });
+      logger.debug("Profile identify queued", { profileId, projectId });
     } catch (error) {
-      logger.error('Failed to process identify', { error, rawEvent });
+      logger.error("Failed to process identify", { error, rawEvent });
       throw error;
     }
   }
@@ -59,17 +66,17 @@ export class EventProcessor {
     try {
       const { profileId, projectId, property, value = 1 } = rawEvent;
 
-      const { profileQueue } = await import('../config/bullmq');
-      await profileQueue.add('increment-property', {
+      const { profileQueue } = await import("../config/bullmq");
+      await profileQueue.add("increment-property", {
         projectId,
         profileId,
         property,
         value,
       });
 
-      logger.debug('Profile increment queued', { profileId, property, value });
+      logger.debug("Profile increment queued", { profileId, property, value });
     } catch (error) {
-      logger.error('Failed to process increment', { error, rawEvent });
+      logger.error("Failed to process increment", { error, rawEvent });
       throw error;
     }
   }
@@ -78,21 +85,20 @@ export class EventProcessor {
     try {
       const { profileId, projectId, property, value = 1 } = rawEvent;
 
-      const { profileQueue } = await import('../config/bullmq');
-      await profileQueue.add('decrement-property', {
+      const { profileQueue } = await import("../config/bullmq");
+      await profileQueue.add("decrement-property", {
         projectId,
         profileId,
         property,
         value: -value,
       });
 
-      logger.debug('Profile decrement queued', { profileId, property, value });
+      logger.debug("Profile decrement queued", { profileId, property, value });
     } catch (error) {
-      logger.error('Failed to process decrement', { error, rawEvent });
+      logger.error("Failed to process decrement", { error, rawEvent });
       throw error;
     }
   }
 }
 
 export default EventProcessor;
-

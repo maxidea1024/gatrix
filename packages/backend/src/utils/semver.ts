@@ -1,6 +1,6 @@
 /**
  * Semantic Versioning (semver) utility functions
- * 
+ *
  * Supports version format: MAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]
  * Examples: 1.0.0, 1.2.3-alpha, 2.0.0-beta.1+build.123
  */
@@ -15,21 +15,22 @@ export interface SemanticVersion {
 
 /**
  * Parse a semantic version string into components
- * 
+ *
  * @param {string} version - Version string to parse
  * @returns {SemanticVersion} Parsed version object
  * @throws {Error} If version string is invalid
  */
 export function parseVersion(version: string): SemanticVersion {
-  if (!version || typeof version !== 'string') {
-    throw new Error('Invalid version: must be a non-empty string');
+  if (!version || typeof version !== "string") {
+    throw new Error("Invalid version: must be a non-empty string");
   }
 
   // Remove leading 'v' if present
-  const cleanVersion = version.trim().replace(/^v/, '');
+  const cleanVersion = version.trim().replace(/^v/, "");
 
   // Regex to parse semver: MAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]
-  const semverRegex = /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z-.]+))?(?:\+([0-9A-Za-z-.]+))?$/;
+  const semverRegex =
+    /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z-.]+))?(?:\+([0-9A-Za-z-.]+))?$/;
   const match = cleanVersion.match(semverRegex);
 
   if (!match) {
@@ -41,13 +42,13 @@ export function parseVersion(version: string): SemanticVersion {
     minor: parseInt(match[2], 10),
     patch: parseInt(match[3], 10),
     prerelease: match[4],
-    build: match[5]
+    build: match[5],
   };
 }
 
 /**
  * Compare two semantic versions
- * 
+ *
  * @param {string} version1 - First version to compare
  * @param {string} version2 - Second version to compare
  * @returns {number} -1 if version1 < version2, 0 if equal, 1 if version1 > version2
@@ -89,14 +90,14 @@ export function compareVersions(version1: string, version2: string): number {
 
 /**
  * Compare prerelease versions
- * 
+ *
  * @param {string} pre1 - First prerelease string
  * @param {string} pre2 - Second prerelease string
  * @returns {number} -1 if pre1 < pre2, 0 if equal, 1 if pre1 > pre2
  */
 function comparePrereleases(pre1: string, pre2: string): number {
-  const parts1 = pre1.split('.');
-  const parts2 = pre2.split('.');
+  const parts1 = pre1.split(".");
+  const parts2 = pre2.split(".");
 
   const maxLength = Math.max(parts1.length, parts2.length);
 
@@ -129,7 +130,7 @@ function comparePrereleases(pre1: string, pre2: string): number {
 
 /**
  * Check if version1 is greater than version2
- * 
+ *
  * @param {string} version1 - First version
  * @param {string} version2 - Second version
  * @returns {boolean} True if version1 > version2
@@ -140,7 +141,7 @@ export function isGreaterThan(version1: string, version2: string): boolean {
 
 /**
  * Check if version1 is less than version2
- * 
+ *
  * @param {string} version1 - First version
  * @param {string} version2 - Second version
  * @returns {boolean} True if version1 < version2
@@ -151,7 +152,7 @@ export function isLessThan(version1: string, version2: string): boolean {
 
 /**
  * Check if version1 equals version2
- * 
+ *
  * @param {string} version1 - First version
  * @param {string} version2 - Second version
  * @returns {boolean} True if versions are equal
@@ -162,18 +163,21 @@ export function isEqual(version1: string, version2: string): boolean {
 
 /**
  * Check if version1 is greater than or equal to version2
- * 
+ *
  * @param {string} version1 - First version
  * @param {string} version2 - Second version
  * @returns {boolean} True if version1 >= version2
  */
-export function isGreaterThanOrEqual(version1: string, version2: string): boolean {
+export function isGreaterThanOrEqual(
+  version1: string,
+  version2: string,
+): boolean {
   return compareVersions(version1, version2) >= 0;
 }
 
 /**
  * Check if version1 is less than or equal to version2
- * 
+ *
  * @param {string} version1 - First version
  * @param {string} version2 - Second version
  * @returns {boolean} True if version1 <= version2
@@ -184,7 +188,7 @@ export function isLessThanOrEqual(version1: string, version2: string): boolean {
 
 /**
  * Validate if a string is a valid semantic version
- * 
+ *
  * @param {string} version - Version string to validate
  * @returns {boolean} True if valid semver
  */
@@ -199,7 +203,7 @@ export function isValidVersion(version: string): boolean {
 
 /**
  * Get the maximum version from an array of versions
- * 
+ *
  * @param {string[]} versions - Array of version strings
  * @returns {string | null} Maximum version or null if array is empty
  */
@@ -215,7 +219,7 @@ export function getMaxVersion(versions: string[]): string | null {
 
 /**
  * Get the minimum version from an array of versions
- * 
+ *
  * @param {string[]} versions - Array of version strings
  * @returns {string | null} Minimum version or null if array is empty
  */
@@ -239,6 +243,5 @@ export default {
   isLessThanOrEqual,
   isValidVersion,
   getMaxVersion,
-  getMinVersion
+  getMinVersion,
 };
-

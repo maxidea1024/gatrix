@@ -1,5 +1,5 @@
-import { Model } from 'objection';
-import { generateULID } from '../utils/ulid';
+import { Model } from "objection";
+import { generateULID } from "../utils/ulid";
 
 export class MonitoringAlert extends Model {
   id!: string;
@@ -17,7 +17,7 @@ export class MonitoringAlert extends Model {
   updatedAt?: Date | null;
 
   static get tableName() {
-    return 'monitoring_alerts';
+    return "monitoring_alerts";
   }
 
   $beforeInsert() {
@@ -33,4 +33,3 @@ export class MonitoringAlert extends Model {
     this.updatedAt = new Date();
   }
 }
-

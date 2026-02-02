@@ -1,6 +1,6 @@
-import { Router } from 'express';
-import { AdminController } from '../../controllers/AdminController';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { Router } from "express";
+import { AdminController } from "../../controllers/AdminController";
+import { authenticate, requireAdmin } from "../../middleware/auth";
 
 const router = Router();
 
@@ -88,7 +88,7 @@ router.use(requireAdmin as any);
  *       403:
  *         $ref: '#/components/responses/Forbidden'
  */
-router.get('/', AdminController.getAuditLogs as any);
+router.get("/", AdminController.getAuditLogs as any);
 
 /**
  * @swagger
@@ -136,6 +136,6 @@ router.get('/', AdminController.getAuditLogs as any);
  *       403:
  *         $ref: '#/components/responses/Forbidden'
  */
-router.get('/stats', AdminController.getAuditStats as any);
+router.get("/stats", AdminController.getAuditStats as any);
 
 export default router;

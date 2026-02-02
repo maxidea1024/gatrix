@@ -1,8 +1,8 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import Handlebars, { TemplateDelegate } from 'handlebars';
-import logger from '../config/logger';
-import { SupportedLanguage } from '../types/user';
+import * as fs from "fs";
+import * as path from "path";
+import Handlebars, { TemplateDelegate } from "handlebars";
+import logger from "../config/logger";
+import { SupportedLanguage } from "../types/user";
 
 export interface EmailTemplateData {
   [key: string]: any;
@@ -20,7 +20,7 @@ export class EmailTemplateService {
   private readonly templatesPath: string;
 
   private constructor() {
-    this.templatesPath = path.join(__dirname, '../templates/email');
+    this.templatesPath = path.join(__dirname, "../templates/email");
     this.setupHelpers();
   }
 
@@ -36,28 +36,39 @@ export class EmailTemplateService {
    */
   private setupHelpers(): void {
     // Helper for formatting dates
-    Handlebars.registerHelper('formatDate', (date: Date) => {
-      if (!date) return '';
+    Handlebars.registerHelper("formatDate", (date: Date) => {
+      if (!date) return "";
       // Simple date formatting - you can enhance this with a proper date library
       return new Date(date).toLocaleDateString();
     });
 
     // Helper for conditional rendering
-    Handlebars.registerHelper('ifEquals', function (this: any, arg1: any, arg2: any, options: any) {
-      return (arg1 === arg2) ? options.fn(this) : options.inverse(this);
-    });
+    Handlebars.registerHelper(
+      "ifEquals",
+      function (this: any, arg1: any, arg2: any, options: any) {
+        return arg1 === arg2 ? options.fn(this) : options.inverse(this);
+      },
+    );
 
     // Helper for URL encoding
-    Handlebars.registerHelper('urlEncode', (str: string) => {
-      return encodeURIComponent(str || '');
+    Handlebars.registerHelper("urlEncode", (str: string) => {
+      return encodeURIComponent(str || "");
     });
   }
 
   /**
    * Get template file path for a specific language and template
    */
-  private getTemplatePath(templateName: string, language: SupportedLanguage, extension: 'hbs' | 'txt'): string {
-    return path.join(this.templatesPath, language, `${templateName}.${extension}`);
+  private getTemplatePath(
+    templateName: string,
+    language: SupportedLanguage,
+    extension: "hbs" | "txt",
+  ): string {
+    return path.join(
+      this.templatesPath,
+      language,
+      `${templateName}.${extension}`,
+    );
   }
 
   /**
@@ -78,7 +89,7 @@ export class EmailTemplateService {
       }
 
       // Read and compile template
-      const templateContent = fs.readFileSync(templatePath, 'utf-8');
+      const templateContent = fs.readFileSync(templatePath, "utf-8");
       const compiledTemplate = Handlebars.compile(templateContent);
 
       // Cache the compiled template
@@ -94,23 +105,26 @@ export class EmailTemplateService {
   /**
    * Get subject for email template based on template name and language
    */
-  private getEmailSubject(templateName: string, language: SupportedLanguage): string {
+  private getEmailSubject(
+    templateName: string,
+    language: SupportedLanguage,
+  ): string {
     const subjects: Record<string, Record<SupportedLanguage, string>> = {
-      'password-reset': {
-        en: 'Gatrix - Password Reset',
-        ko: 'Gatrix - 비밀번호 재설정',
-        zh: 'Gatrix - 密码重置'
+      "password-reset": {
+        en: "Gatrix - Password Reset",
+        ko: "Gatrix - 비밀번호 재설정",
+        zh: "Gatrix - 密码重置",
       },
-      'welcome': {
-        en: 'Welcome to Gatrix!',
-        ko: 'Gatrix에 오신 것을 환영합니다!',
-        zh: '欢迎来到 Gatrix！'
+      welcome: {
+        en: "Welcome to Gatrix!",
+        ko: "Gatrix에 오신 것을 환영합니다!",
+        zh: "欢迎来到 Gatrix！",
       },
-      'account-approval': {
-        en: '🎉 Gatrix Account Approved - Login Now!',
-        ko: '🎉 Gatrix 계정 승인 완료 - 이제 로그인하세요!',
-        zh: '🎉 Gatrix 账户已批准 - 立即登录！'
-      }
+      "account-approval": {
+        en: "🎉 Gatrix Account Approved - Login Now!",
+        ko: "🎉 Gatrix 계정 승인 완료 - 이제 로그인하세요!",
+        zh: "🎉 Gatrix 账户已批准 - 立即登录！",
+      },
     };
 
     return subjects[templateName]?.[language] || `Gatrix - ${templateName}`;
@@ -122,12 +136,20 @@ export class EmailTemplateService {
   async renderTemplate(
     templateName: string,
     language: SupportedLanguage,
-    data: EmailTemplateData
+    data: EmailTemplateData,
   ): Promise<RenderedEmailTemplate> {
     try {
       // Get template paths
-      const htmlTemplatePath = this.getTemplatePath(templateName, language, 'hbs');
-      const textTemplatePath = this.getTemplatePath(templateName, language, 'txt');
+      const htmlTemplatePath = this.getTemplatePath(
+        templateName,
+        language,
+        "hbs",
+      );
+      const textTemplatePath = this.getTemplatePath(
+        templateName,
+        language,
+        "txt",
+      );
 
       // Load and render HTML template
       const htmlTemplate = await this.loadTemplate(htmlTemplatePath);
@@ -146,10 +168,13 @@ export class EmailTemplateService {
       return {
         html,
         text,
-        subject
+        subject,
       };
     } catch (error) {
-      logger.error(`Failed to render email template: ${templateName} (${language})`, error);
+      logger.error(
+        `Failed to render email template: ${templateName} (${language})`,
+        error,
+      );
       throw error;
     }
   }
@@ -161,19 +186,24 @@ export class EmailTemplateService {
     templateName: string,
     preferredLanguage: SupportedLanguage,
     data: EmailTemplateData,
-    fallbackLanguage: SupportedLanguage = 'en'
+    fallbackLanguage: SupportedLanguage = "en",
   ): Promise<RenderedEmailTemplate> {
     try {
       // Try preferred language first
       return await this.renderTemplate(templateName, preferredLanguage, data);
     } catch (error) {
-      logger.warn(`Template not found for language ${preferredLanguage}, falling back to ${fallbackLanguage}`);
+      logger.warn(
+        `Template not found for language ${preferredLanguage}, falling back to ${fallbackLanguage}`,
+      );
 
       try {
         // Fallback to default language
         return await this.renderTemplate(templateName, fallbackLanguage, data);
       } catch (fallbackError) {
-        logger.error(`Failed to render template even with fallback language`, fallbackError);
+        logger.error(
+          `Failed to render template even with fallback language`,
+          fallbackError,
+        );
         throw fallbackError;
       }
     }
@@ -184,7 +214,7 @@ export class EmailTemplateService {
    */
   clearCache(): void {
     this.templateCache.clear();
-    logger.info('Email template cache cleared');
+    logger.info("Email template cache cleared");
   }
 
   /**
@@ -197,9 +227,10 @@ export class EmailTemplateService {
       return [];
     }
 
-    return fs.readdirSync(languagePath)
-      .filter(file => file.endsWith('.hbs'))
-      .map(file => file.replace('.hbs', ''));
+    return fs
+      .readdirSync(languagePath)
+      .filter((file) => file.endsWith(".hbs"))
+      .map((file) => file.replace(".hbs", ""));
   }
 }
 

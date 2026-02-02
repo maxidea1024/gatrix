@@ -15,7 +15,7 @@ export enum CrashState {
   CLOSED = 1,
   DELETED = 2,
   RESOLVED = 3,
-  REPEATED = 4
+  REPEATED = 4,
 }
 
 /**
@@ -160,7 +160,7 @@ export interface CrashRetentionSettings {
 export const CRASH_CONSTANTS = {
   MaxFirstLineLen: 200,
   MaxUserMsgLen: 255,
-  MaxLogTextLen: 1048576 // 1MB
+  MaxLogTextLen: 1048576, // 1MB
 } as const;
 
 /**

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -18,7 +18,7 @@ import {
   DialogContent,
   DialogActions,
   DialogContentText,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Visibility,
   VisibilityOff,
@@ -29,82 +29,85 @@ import {
   Warning,
   Cancel,
   CheckCircle,
-} from '@mui/icons-material';
-import QQIcon from '../../components/icons/QQIcon';
-import WeChatIcon from '../../components/icons/WeChatIcon';
-import BaiduIcon from '../../components/icons/BaiduIcon';
-import AuthLayout from '../../components/auth/AuthLayout';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/hooks/useAuth';
-import { LoginCredentials } from '@/types';
-import { AuthService } from '@/services/auth';
-import { LanguageSelector } from '@/components/LanguageSelector';
-import { devLogger } from '@/utils/logger';
+} from "@mui/icons-material";
+import QQIcon from "../../components/icons/QQIcon";
+import WeChatIcon from "../../components/icons/WeChatIcon";
+import BaiduIcon from "../../components/icons/BaiduIcon";
+import AuthLayout from "../../components/auth/AuthLayout";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { useNavigate, useLocation, Link as RouterLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useAuth } from "@/hooks/useAuth";
+import { LoginCredentials } from "@/types";
+import { AuthService } from "@/services/auth";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { devLogger } from "@/utils/logger";
 
 // Validation schema - will be created inside component to access t function
 
 // 사용자 친화적인 오류 메시지 함수
 const getErrorMessage = (error: any, t: any): string => {
-  if (!error) return '';
+  if (!error) return "";
 
-  const errorCode = error.message || error.error?.message || '';
+  const errorCode = error.message || error.error?.message || "";
   const status = error.status;
 
   // 상태 코드별 메시지
   if (status === 401) {
-    return t('auth.errors.invalidCredentials');
+    return t("auth.errors.invalidCredentials");
   }
 
   if (status === 404) {
-    return t('auth.errors.userNotFound');
+    return t("auth.errors.userNotFound");
   }
 
   if (status === 403) {
-    if (errorCode === 'ACCOUNT_PENDING') {
-      return t('auth.errors.accountPending');
+    if (errorCode === "ACCOUNT_PENDING") {
+      return t("auth.errors.accountPending");
     }
-    if (errorCode === 'ACCOUNT_SUSPENDED') {
-      return t('auth.errors.accountSuspended');
+    if (errorCode === "ACCOUNT_SUSPENDED") {
+      return t("auth.errors.accountSuspended");
     }
-    if (errorCode.includes('not active')) {
-      return t('auth.errors.accountInactive');
+    if (errorCode.includes("not active")) {
+      return t("auth.errors.accountInactive");
     }
-    return t('auth.errors.accessDenied');
+    return t("auth.errors.accessDenied");
   }
 
   if (status === 429) {
-    return t('auth.errors.tooManyAttempts');
+    return t("auth.errors.tooManyAttempts");
   }
 
   if (status >= 500) {
-    return t('auth.errors.serverError');
+    return t("auth.errors.serverError");
   }
 
   // 네트워크 오류
-  if (error.name === 'NetworkError' || !status) {
-    return t('auth.errors.networkError');
+  if (error.name === "NetworkError" || !status) {
+    return t("auth.errors.networkError");
   }
 
   // 기본 메시지
-  return t('auth.errors.loginFailed');
+  return t("auth.errors.loginFailed");
 };
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoading, error, clearError, isAuthenticated, user } = useAuth();
+  const { login, isLoading, error, clearError, isAuthenticated, user } =
+    useAuth();
   const { t } = useTranslation();
 
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [oauthLoading, setOauthLoading] = useState<string | null>(null); // 'google', 'github', 'qq', etc.
-  const [passwordFieldType, setPasswordFieldType] = useState<'text' | 'password'>('text'); // Start as text to prevent autofill
+  const [passwordFieldType, setPasswordFieldType] = useState<
+    "text" | "password"
+  >("text"); // Start as text to prevent autofill
   const isWebkit = useMemo(() => {
-    if (typeof navigator === 'undefined') return true;
+    if (typeof navigator === "undefined") return true;
     return /AppleWebKit|Chrome|Safari|Edg/.test(navigator.userAgent);
   }, []);
   const [showRememberMeWarning, setShowRememberMeWarning] = useState(false);
@@ -114,27 +117,30 @@ const LoginPage: React.FC = () => {
   const from = useMemo(() => {
     const fromLocation = (location.state as any)?.from;
     if (fromLocation) {
-      const pathname = fromLocation.pathname || '/dashboard';
-      const search = fromLocation.search || '';
-      const hash = fromLocation.hash || '';
+      const pathname = fromLocation.pathname || "/dashboard";
+      const search = fromLocation.search || "";
+      const hash = fromLocation.hash || "";
       return `${pathname}${search}${hash}`;
     }
-    return '/dashboard';
+    return "/dashboard";
   }, [location.state]);
 
   // Check if already authenticated and redirect
   useEffect(() => {
-    devLogger.debug('[LoginPage] Auth state check:', {
+    devLogger.debug("[LoginPage] Auth state check:", {
       isAuthenticated,
       isLoading,
       hasUser: !!user,
       userStatus: user?.status,
-      hasToken: !!localStorage.getItem('accessToken'),
-      hasStoredUser: !!localStorage.getItem('user')
+      hasToken: !!localStorage.getItem("accessToken"),
+      hasStoredUser: !!localStorage.getItem("user"),
     });
 
-    if (!isLoading && isAuthenticated && user?.status === 'active') {
-      devLogger.info('[LoginPage] User already authenticated, redirecting to:', from);
+    if (!isLoading && isAuthenticated && user?.status === "active") {
+      devLogger.info(
+        "[LoginPage] User already authenticated, redirecting to:",
+        from,
+      );
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, isLoading, user, from, navigate]);
@@ -142,14 +148,14 @@ const LoginPage: React.FC = () => {
   // Check for OAuth error in URL params
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
-    const oauthError = urlParams.get('error');
+    const oauthError = urlParams.get("error");
 
-    if (oauthError === 'oauth_failed') {
-      setLoginError(t('auth.errors.oauthFailed'));
+    if (oauthError === "oauth_failed") {
+      setLoginError(t("auth.errors.oauthFailed"));
       // Clear the error from URL
       navigate(location.pathname, { replace: true });
-    } else if (oauthError === 'oauth_timeout') {
-      setLoginError(t('auth.errors.oauthTimeout'));
+    } else if (oauthError === "oauth_timeout") {
+      setLoginError(t("auth.errors.oauthTimeout"));
       // Clear the error from URL
       navigate(location.pathname, { replace: true });
     }
@@ -159,17 +165,21 @@ const LoginPage: React.FC = () => {
   }, [location.search, location.pathname, navigate, t]);
 
   // Validation schema with translations
-  const loginSchema = useMemo(() => yup.object({
-    email: yup
-      .string()
-      .email(t('auth.emailInvalid'))
-      .required(t('auth.emailRequired')),
-    password: yup
-      .string()
-      .min(6, t('auth.passwordMinLength'))
-      .required(t('auth.passwordRequired')),
-    rememberMe: yup.boolean(),
-  }), [t]);
+  const loginSchema = useMemo(
+    () =>
+      yup.object({
+        email: yup
+          .string()
+          .email(t("auth.emailInvalid"))
+          .required(t("auth.emailRequired")),
+        password: yup
+          .string()
+          .min(6, t("auth.passwordMinLength"))
+          .required(t("auth.passwordRequired")),
+        rememberMe: yup.boolean(),
+      }),
+    [t],
+  );
 
   const resolver = useMemo(() => yupResolver(loginSchema), [loginSchema]);
 
@@ -184,17 +194,17 @@ const LoginPage: React.FC = () => {
     setValue,
   } = useForm<LoginCredentials & { rememberMe: boolean }>({
     resolver,
-    mode: 'onChange', // 실시간 validation 활성화
+    mode: "onChange", // 실시간 validation 활성화
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
       rememberMe: false,
     },
   });
 
   // 현재 이메일 값 감시
-  const emailValue = watch('email') || '';
-  const passwordValue = watch('password') || '';
+  const emailValue = watch("email") || "";
+  const passwordValue = watch("password") || "";
 
   // Initialize form with remembered credentials
   useEffect(() => {
@@ -205,7 +215,7 @@ const LoginPage: React.FC = () => {
       // Use registered email from signup (highest priority)
       reset({
         email: registeredEmail,
-        password: '',
+        password: "",
         rememberMe: false,
       });
     } else {
@@ -217,14 +227,14 @@ const LoginPage: React.FC = () => {
       if (rememberedEmail && isRememberMeEnabled) {
         reset({
           email: rememberedEmail,
-          password: '',
+          password: "",
           rememberMe: true,
         });
       } else {
         // 기억된 설정이 없거나 불일치하면 초기화
         reset({
-          email: '',
-          password: '',
+          email: "",
+          password: "",
           rememberMe: false,
         });
       }
@@ -238,15 +248,15 @@ const LoginPage: React.FC = () => {
   }, [clearErrors, trigger, t]);
 
   const onSubmit = async (data: LoginCredentials & { rememberMe: boolean }) => {
-    devLogger.debug('[LoginPage] onSubmit called with data:', {
+    devLogger.debug("[LoginPage] onSubmit called with data:", {
       email: data.email,
       hasPassword: !!data.password,
-      passwordLength: data.password?.length || 0
+      passwordLength: data.password?.length || 0,
     });
 
     // Validate data before proceeding
     if (!data.email || !data.password) {
-      devLogger.error('[LoginPage] Missing email or password');
+      devLogger.error("[LoginPage] Missing email or password");
       return;
     }
 
@@ -254,7 +264,7 @@ const LoginPage: React.FC = () => {
       setLoginError(null);
       clearError();
 
-      devLogger.debug('[LoginPage] Starting login...');
+      devLogger.debug("[LoginPage] Starting login...");
       // 최소 2초 대기
       const startTime = Date.now();
 
@@ -269,49 +279,66 @@ const LoginPage: React.FC = () => {
       if (elapsed < 2000) {
         await Promise.all([
           loginPromise,
-          new Promise(resolve => setTimeout(resolve, 2000 - elapsed))
+          new Promise((resolve) => setTimeout(resolve, 2000 - elapsed)),
         ]);
       } else {
         await loginPromise;
       }
 
-      devLogger.info('[LoginPage] Login successful, navigating to:', from);
+      devLogger.info("[LoginPage] Login successful, navigating to:", from);
       navigate(from, { replace: true });
     } catch (err: any) {
-      devLogger.error('[LoginPage] Login error:', err);
+      devLogger.error("[LoginPage] Login error:", err);
 
       // Handle network errors explicitly
-      if (err.message === 'Network Error' || err.code === 'ERR_NETWORK' || !err.status) {
-        const networkError = t('auth.errors.networkError') || '서버에 연결할 수 없습니다. 네트워크 연결을 확인하거나 잠시 후 다시 시도해주세요.';
+      if (
+        err.message === "Network Error" ||
+        err.code === "ERR_NETWORK" ||
+        !err.status
+      ) {
+        const networkError =
+          t("auth.errors.networkError") ||
+          "서버에 연결할 수 없습니다. 네트워크 연결을 확인하거나 잠시 후 다시 시도해주세요.";
         setLoginError(networkError);
         return;
       }
 
       // Check if the error is about user not found
-      if (err.status === 404 ||
-          err.message === 'USER_NOT_FOUND' ||
-          (err.error?.message === 'USER_NOT_FOUND')) {
+      if (
+        err.status === 404 ||
+        err.message === "USER_NOT_FOUND" ||
+        err.error?.message === "USER_NOT_FOUND"
+      ) {
         // Show error message for user not found
-        const errorMsg = t('auth.errors.userNotFound');
+        const errorMsg = t("auth.errors.userNotFound");
         setLoginError(errorMsg);
       } else if (err.status === 403) {
         // Check specific account status
-        if (err.message === 'ACCOUNT_PENDING' || err.error?.message === 'ACCOUNT_PENDING') {
+        if (
+          err.message === "ACCOUNT_PENDING" ||
+          err.error?.message === "ACCOUNT_PENDING"
+        ) {
           // Account is pending approval
-          navigate('/pending-approval', {
+          navigate("/pending-approval", {
             state: {
-              email: data.email
-            }
+              email: data.email,
+            },
           });
-        } else if (err.message === 'ACCOUNT_SUSPENDED' || err.error?.message === 'ACCOUNT_SUSPENDED') {
+        } else if (
+          err.message === "ACCOUNT_SUSPENDED" ||
+          err.error?.message === "ACCOUNT_SUSPENDED"
+        ) {
           // Account is suspended
-          navigate('/account-suspended');
-        } else if (err.message?.includes('not active') || err.error?.message?.includes('not active')) {
+          navigate("/account-suspended");
+        } else if (
+          err.message?.includes("not active") ||
+          err.error?.message?.includes("not active")
+        ) {
           // Generic not active (fallback)
-          navigate('/pending-approval', {
+          navigate("/pending-approval", {
             state: {
-              email: data.email
-            }
+              email: data.email,
+            },
           });
         } else {
           const errorMessage = getErrorMessage(err, t);
@@ -329,39 +356,39 @@ const LoginPage: React.FC = () => {
     setLoginError(null);
 
     // 최소 2초 대기
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // 타임아웃 설정 (30초)
     const timeout = setTimeout(() => {
       setOauthLoading(null);
-      setLoginError(t('auth.errors.oauthTimeout'));
+      setLoginError(t("auth.errors.oauthTimeout"));
     }, 30000);
 
     // 페이지 이동 전에 타임아웃 정보를 sessionStorage에 저장
-    sessionStorage.setItem('oauthTimeout', timeout.toString());
-    sessionStorage.setItem('oauthProvider', provider);
+    sessionStorage.setItem("oauthTimeout", timeout.toString());
+    sessionStorage.setItem("oauthProvider", provider);
 
     window.location.href = authUrl;
   };
 
   const handleGoogleLogin = () => {
-    handleOAuthLogin('google', AuthService.getGoogleAuthUrl());
+    handleOAuthLogin("google", AuthService.getGoogleAuthUrl());
   };
 
   const handleGitHubLogin = () => {
-    handleOAuthLogin('github', AuthService.getGitHubAuthUrl());
+    handleOAuthLogin("github", AuthService.getGitHubAuthUrl());
   };
 
   const handleQQLogin = () => {
-    handleOAuthLogin('qq', AuthService.getQQAuthUrl());
+    handleOAuthLogin("qq", AuthService.getQQAuthUrl());
   };
 
   const handleWeChatLogin = () => {
-    handleOAuthLogin('wechat', AuthService.getWeChatAuthUrl());
+    handleOAuthLogin("wechat", AuthService.getWeChatAuthUrl());
   };
 
   const handleBaiduLogin = () => {
-    handleOAuthLogin('baidu', AuthService.getBaiduAuthUrl());
+    handleOAuthLogin("baidu", AuthService.getBaiduAuthUrl());
   };
 
   const togglePasswordVisibility = () => {
@@ -369,7 +396,10 @@ const LoginPage: React.FC = () => {
   };
 
   // 이메일 기억하기 체크박스 변경 핸들러
-  const handleRememberMeChange = (checked: boolean, onChange: (value: boolean) => void) => {
+  const handleRememberMeChange = (
+    checked: boolean,
+    onChange: (value: boolean) => void,
+  ) => {
     if (checked) {
       // 체크하려고 할 때 보안 경고 표시
       setPendingRememberMe(true);
@@ -383,7 +413,7 @@ const LoginPage: React.FC = () => {
 
   // 보안 경고 확인 시
   const handleRememberMeConfirm = () => {
-    setValue('rememberMe', true);
+    setValue("rememberMe", true);
     setShowRememberMeWarning(false);
     setPendingRememberMe(false);
   };
@@ -394,22 +424,20 @@ const LoginPage: React.FC = () => {
     setPendingRememberMe(false);
   };
 
-
-
   return (
     <AuthLayout
-      title={t('auth.signIn')}
-      subtitle={t('auth.welcomeBack')}
+      title={t("auth.signIn")}
+      subtitle={t("auth.welcomeBack")}
       leftContent={{
-        title: t('auth.welcomeTitle'),
-        subtitle: '',
-        description: t('auth.welcomeDescription')
+        title: t("auth.welcomeTitle"),
+        subtitle: "",
+        description: t("auth.welcomeDescription"),
       }}
     >
       {/* Language Selector */}
       <Box
         sx={{
-          position: 'absolute',
+          position: "absolute",
           top: 16,
           right: 16,
           zIndex: 1000,
@@ -418,16 +446,18 @@ const LoginPage: React.FC = () => {
         <LanguageSelector variant="icon" size="medium" />
       </Box>
 
-
-
       {/* Login Form */}
-      <Box component="form" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+      <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        autoComplete="off"
+      >
         {/* Hidden real-named fields to absorb browser autofill */}
         <input
           type="text"
           name="username"
           autoComplete="username"
-          style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}
+          style={{ position: "absolute", top: "-9999px", left: "-9999px" }}
           tabIndex={-1}
           aria-hidden="true"
           readOnly
@@ -436,7 +466,7 @@ const LoginPage: React.FC = () => {
           type="password"
           name="password"
           autoComplete="current-password"
-          style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}
+          style={{ position: "absolute", top: "-9999px", left: "-9999px" }}
           tabIndex={-1}
           aria-hidden="true"
           readOnly
@@ -446,24 +476,24 @@ const LoginPage: React.FC = () => {
         <Box
           sx={{
             mb: loginError ? 3 : 0,
-            overflow: 'hidden',
-            height: loginError ? 'auto' : 0,
-            transition: 'all 0.3s ease-out',
+            overflow: "hidden",
+            height: loginError ? "auto" : 0,
+            transition: "all 0.3s ease-out",
           }}
         >
           {loginError && (
             <Box
               sx={{
-                width: '100%',
-                animation: 'slideDown 0.3s ease-out forwards',
-                '@keyframes slideDown': {
+                width: "100%",
+                animation: "slideDown 0.3s ease-out forwards",
+                "@keyframes slideDown": {
                   from: {
                     opacity: 0,
-                    transform: 'translateY(-10px)',
+                    transform: "translateY(-10px)",
                   },
                   to: {
                     opacity: 1,
-                    transform: 'translateY(0)',
+                    transform: "translateY(0)",
                   },
                 },
               }}
@@ -471,13 +501,13 @@ const LoginPage: React.FC = () => {
               <Alert
                 severity="error"
                 sx={{
-                  width: '100%',
-                  backgroundColor: 'rgba(244, 67, 54, 0.1)',
-                  color: '#ff6b6b',
-                  border: '1px solid rgba(244, 67, 54, 0.2)',
-                  '& .MuiAlert-icon': {
-                    color: '#ff6b6b'
-                  }
+                  width: "100%",
+                  backgroundColor: "rgba(244, 67, 54, 0.1)",
+                  color: "#ff6b6b",
+                  border: "1px solid rgba(244, 67, 54, 0.2)",
+                  "& .MuiAlert-icon": {
+                    color: "#ff6b6b",
+                  },
                 }}
                 onClose={() => setLoginError(null)}
               >
@@ -494,57 +524,62 @@ const LoginPage: React.FC = () => {
             <TextField
               {...field}
               fullWidth
-              label={t('auth.email')}
+              label={t("auth.email")}
               type="email"
               error={!!errors.email}
-              helperText={t('auth.emailLoginHelp')}
+              helperText={t("auth.emailLoginHelp")}
               margin="normal"
               autoComplete="off"
               autoFocus
               sx={{
                 mb: 2,
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  '& fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  "& fieldset": {
+                    borderColor: "rgba(255, 255, 255, 0.2)",
                   },
-                  '&:hover fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  "&:hover fieldset": {
+                    borderColor: "rgba(255, 255, 255, 0.3)",
                   },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#667eea',
-                  },
-                },
-                '& .MuiInputLabel-root': {
-                  color: 'rgba(255, 255, 255, 0.7)',
-                },
-                '& .MuiInputBase-input': {
-                  color: 'white',
-                  '&:-webkit-autofill': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
-                    WebkitTextFillColor: 'white !important',
-                  },
-                  '&:-webkit-autofill:hover': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
-                    WebkitTextFillColor: 'white !important',
-                  },
-                  '&:-webkit-autofill:focus': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
-                    WebkitTextFillColor: 'white !important',
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#667eea",
                   },
                 },
-                '& .MuiFormHelperText-root': {
-                  minHeight: '20px',
-                  height: '20px',
-                  lineHeight: '20px',
-                  color: errors.email ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                "& .MuiInputLabel-root": {
+                  color: "rgba(255, 255, 255, 0.7)",
+                },
+                "& .MuiInputBase-input": {
+                  color: "white",
+                  "&:-webkit-autofill": {
+                    WebkitBoxShadow:
+                      "0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important",
+                    WebkitTextFillColor: "white !important",
+                  },
+                  "&:-webkit-autofill:hover": {
+                    WebkitBoxShadow:
+                      "0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important",
+                    WebkitTextFillColor: "white !important",
+                  },
+                  "&:-webkit-autofill:focus": {
+                    WebkitBoxShadow:
+                      "0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important",
+                    WebkitTextFillColor: "white !important",
+                  },
+                },
+                "& .MuiFormHelperText-root": {
+                  minHeight: "20px",
+                  height: "20px",
+                  lineHeight: "20px",
+                  color: errors.email
+                    ? "rgba(255, 182, 193, 0.8)"
+                    : "rgba(255, 255, 255, 0.6)",
                 },
               }}
               inputProps={{
-                autoComplete: 'off',
-                'data-lpignore': 'true',
-                'data-form-type': 'other',
-                'data-1p-ignore': 'true',
+                autoComplete: "off",
+                "data-lpignore": "true",
+                "data-form-type": "other",
+                "data-1p-ignore": "true",
               }}
             />
           )}
@@ -557,69 +592,76 @@ const LoginPage: React.FC = () => {
             <TextField
               {...field}
               fullWidth
-              label={t('auth.password')}
-              type={isWebkit ? 'text' : (showPassword ? 'text' : passwordFieldType)}
+              label={t("auth.password")}
+              type={
+                isWebkit ? "text" : showPassword ? "text" : passwordFieldType
+              }
               error={false}
-              helperText={t('auth.passwordLoginHelp')}
+              helperText={t("auth.passwordLoginHelp")}
               margin="normal"
               autoComplete="off"
               onFocus={(e) => {
                 // Remove readonly on focus to allow user input
                 if (!isWebkit) {
                   // For non-WebKit, switch to password to maintain masking
-                  setPasswordFieldType('password');
+                  setPasswordFieldType("password");
                 }
-                e.target.removeAttribute('readonly');
+                e.target.removeAttribute("readonly");
               }}
               sx={{
                 mb: 2,
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  '& fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  "& fieldset": {
+                    borderColor: "rgba(255, 255, 255, 0.2)",
                   },
-                  '&:hover fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  "&:hover fieldset": {
+                    borderColor: "rgba(255, 255, 255, 0.3)",
                   },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#667eea',
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#667eea",
                   },
                 },
-                '& .MuiInputLabel-root': {
-                  color: 'rgba(255, 255, 255, 0.7)',
+                "& .MuiInputLabel-root": {
+                  color: "rgba(255, 255, 255, 0.7)",
                 },
-                '& .MuiInputBase-input': {
-                  color: 'white',
+                "& .MuiInputBase-input": {
+                  color: "white",
                   // Mask characters when using type=text on WebKit browsers
-                  ...(isWebkit && !showPassword ? {
-                    WebkitTextSecurity: 'disc',
-                  } : {}),
-                  '&:-webkit-autofill': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
-                    WebkitTextFillColor: 'white !important',
+                  ...(isWebkit && !showPassword
+                    ? {
+                        WebkitTextSecurity: "disc",
+                      }
+                    : {}),
+                  "&:-webkit-autofill": {
+                    WebkitBoxShadow:
+                      "0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important",
+                    WebkitTextFillColor: "white !important",
                   },
-                  '&:-webkit-autofill:hover': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
-                    WebkitTextFillColor: 'white !important',
+                  "&:-webkit-autofill:hover": {
+                    WebkitBoxShadow:
+                      "0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important",
+                    WebkitTextFillColor: "white !important",
                   },
-                  '&:-webkit-autofill:focus': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
-                    WebkitTextFillColor: 'white !important',
+                  "&:-webkit-autofill:focus": {
+                    WebkitBoxShadow:
+                      "0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important",
+                    WebkitTextFillColor: "white !important",
                   },
                 },
-                '& .MuiFormHelperText-root': {
-                  minHeight: '20px',
-                  height: '20px',
-                  lineHeight: '20px',
-                  color: 'rgba(255, 255, 255, 0.6)',
+                "& .MuiFormHelperText-root": {
+                  minHeight: "20px",
+                  height: "20px",
+                  lineHeight: "20px",
+                  color: "rgba(255, 255, 255, 0.6)",
                 },
               }}
               inputProps={{
-                autoComplete: 'off',
-                'data-lpignore': 'true',
-                'data-form-type': 'other',
-                'data-1p-ignore': 'true',
-                'aria-autocomplete': 'none',
+                autoComplete: "off",
+                "data-lpignore": "true",
+                "data-form-type": "other",
+                "data-1p-ignore": "true",
+                "aria-autocomplete": "none",
                 readOnly: true, // Prevent autofill, will be removed on focus
                 name: `password-${Math.random().toString(36).substring(7)}`, // Random name to prevent autofill
               }}
@@ -631,7 +673,7 @@ const LoginPage: React.FC = () => {
                       onClick={togglePasswordVisibility}
                       edge="end"
                       tabIndex={-1}
-                      sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                      sx={{ color: "rgba(255, 255, 255, 0.7)" }}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -642,7 +684,14 @@ const LoginPage: React.FC = () => {
           )}
         />
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 3,
+          }}
+        >
           <Controller
             name="rememberMe"
             control={control}
@@ -651,18 +700,25 @@ const LoginPage: React.FC = () => {
                 control={
                   <Checkbox
                     checked={field.value}
-                    onChange={(e) => handleRememberMeChange(e.target.checked, field.onChange)}
+                    onChange={(e) =>
+                      handleRememberMeChange(e.target.checked, field.onChange)
+                    }
                     sx={{
-                      color: 'rgba(255, 255, 255, 0.7)',
-                      '&.Mui-checked': {
-                        color: '#667eea',
+                      color: "rgba(255, 255, 255, 0.7)",
+                      "&.Mui-checked": {
+                        color: "#667eea",
                       },
                     }}
                   />
                 }
                 label={
-                  <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.875rem' }}>
-                    {t('auth.rememberMe')}
+                  <Typography
+                    sx={{
+                      color: "rgba(255, 255, 255, 0.7)",
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    {t("auth.rememberMe")}
                   </Typography>
                 }
               />
@@ -673,15 +729,15 @@ const LoginPage: React.FC = () => {
             component={RouterLink}
             to="/forgot-password"
             sx={{
-              color: 'rgba(255, 255, 255, 0.7)',
-              textDecoration: 'none',
-              fontSize: '0.875rem',
-              '&:hover': {
-                color: '#667eea',
-              }
+              color: "rgba(255, 255, 255, 0.7)",
+              textDecoration: "none",
+              fontSize: "0.875rem",
+              "&:hover": {
+                color: "#667eea",
+              },
             }}
           >
-            {t('auth.forgotPassword')}
+            {t("auth.forgotPassword")}
           </Link>
         </Box>
 
@@ -690,157 +746,185 @@ const LoginPage: React.FC = () => {
           fullWidth
           variant="contained"
           size="large"
-          disabled={isSubmitting || isLoading || !emailValue || !passwordValue || !!errors.email || !!errors.password}
-          startIcon={isSubmitting || isLoading ? <CircularProgress size={20} /> : <LoginIcon />}
+          disabled={
+            isSubmitting ||
+            isLoading ||
+            !emailValue ||
+            !passwordValue ||
+            !!errors.email ||
+            !!errors.password
+          }
+          startIcon={
+            isSubmitting || isLoading ? (
+              <CircularProgress size={20} />
+            ) : (
+              <LoginIcon />
+            )
+          }
           sx={{
             mt: 1,
             mb: 3,
             height: 48,
-            background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
-            '&:hover': {
-              background: 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
+            background: "linear-gradient(45deg, #667eea 30%, #764ba2 90%)",
+            "&:hover": {
+              background: "linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)",
             },
-            '&:disabled': {
-              background: 'rgba(255, 255, 255, 0.1)',
-              color: 'rgba(255, 255, 255, 0.3)',
+            "&:disabled": {
+              background: "rgba(255, 255, 255, 0.1)",
+              color: "rgba(255, 255, 255, 0.3)",
             },
             borderRadius: 2,
-            textTransform: 'none',
-            fontSize: '1rem',
+            textTransform: "none",
+            fontSize: "1rem",
             fontWeight: 600,
           }}
         >
-          {isSubmitting || isLoading ? t('auth.signingIn') : t('auth.signIn')}
+          {isSubmitting || isLoading ? t("auth.signingIn") : t("auth.signIn")}
         </Button>
 
         {/* Register Link */}
-        <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-            {t('auth.dontHaveAccount')}{' '}
+        <Box sx={{ textAlign: "center", mb: 3 }}>
+          <Typography
+            variant="body2"
+            sx={{ color: "rgba(255, 255, 255, 0.7)" }}
+          >
+            {t("auth.dontHaveAccount")}{" "}
             <Link
               component={RouterLink}
               to="/register"
               sx={{
-                color: '#667eea',
-                textDecoration: 'none',
-                '&:hover': {
-                  textDecoration: 'underline'
-                }
+                color: "#667eea",
+                textDecoration: "none",
+                "&:hover": {
+                  textDecoration: "underline",
+                },
               }}
             >
-              {t('auth.signUp')}
+              {t("auth.signUp")}
             </Link>
           </Typography>
         </Box>
 
         {/* Divider */}
-        <Divider sx={{
-          my: 3,
-          '&::before, &::after': {
-            borderColor: 'rgba(255, 255, 255, 0.3)',
-          }
-        }}>
-          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-            {t('auth.or')}
+        <Divider
+          sx={{
+            my: 3,
+            "&::before, &::after": {
+              borderColor: "rgba(255, 255, 255, 0.3)",
+            },
+          }}
+        >
+          <Typography
+            variant="body2"
+            sx={{ color: "rgba(255, 255, 255, 0.8)" }}
+          >
+            {t("auth.or")}
           </Typography>
         </Divider>
 
         {/* OAuth Buttons */}
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
-          <Tooltip title={t('auth.loginWithGoogle')} arrow>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
+          <Tooltip title={t("auth.loginWithGoogle")} arrow>
             <IconButton
               onClick={handleGoogleLogin}
               disabled={isSubmitting || isLoading || oauthLoading !== null}
               sx={{
                 width: 56,
                 height: 56,
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                borderRadius: "50%",
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.15)",
+                  borderColor: "rgba(255, 255, 255, 0.3)",
                 },
-                '&:disabled': {
+                "&:disabled": {
                   opacity: 0.7,
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  borderColor: 'rgba(255, 255, 255, 0.15)',
-                  color: 'rgba(255, 255, 255, 0.6)',
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  borderColor: "rgba(255, 255, 255, 0.15)",
+                  color: "rgba(255, 255, 255, 0.6)",
                 },
               }}
             >
-              {oauthLoading === 'google' ? (
-                <CircularProgress size={24} sx={{ color: 'white' }} />
+              {oauthLoading === "google" ? (
+                <CircularProgress size={24} sx={{ color: "white" }} />
               ) : (
                 <Google sx={{ fontSize: 24 }} />
               )}
             </IconButton>
           </Tooltip>
 
-          <Tooltip title={t('auth.loginWithGitHub')} arrow>
+          <Tooltip title={t("auth.loginWithGitHub")} arrow>
             <IconButton
               onClick={handleGitHubLogin}
               disabled={isSubmitting || isLoading || oauthLoading !== null}
               sx={{
                 width: 56,
                 height: 56,
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                borderRadius: "50%",
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.15)",
+                  borderColor: "rgba(255, 255, 255, 0.3)",
                 },
-                '&:disabled': {
+                "&:disabled": {
                   opacity: 0.7,
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  borderColor: 'rgba(255, 255, 255, 0.15)',
-                  color: 'rgba(255, 255, 255, 0.6)',
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  borderColor: "rgba(255, 255, 255, 0.15)",
+                  color: "rgba(255, 255, 255, 0.6)",
                 },
               }}
             >
-              {oauthLoading === 'github' ? (
-                <CircularProgress size={24} sx={{ color: 'white' }} />
+              {oauthLoading === "github" ? (
+                <CircularProgress size={24} sx={{ color: "white" }} />
               ) : (
                 <GitHub sx={{ fontSize: 24 }} />
               )}
             </IconButton>
           </Tooltip>
 
-          <Tooltip title={t('auth.loginWithQQ')} arrow>
+          <Tooltip title={t("auth.loginWithQQ")} arrow>
             <IconButton
               onClick={handleQQLogin}
               disabled={isSubmitting || isLoading || oauthLoading !== null}
               sx={{
                 width: 56,
                 height: 56,
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                borderRadius: "50%",
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.15)",
+                  borderColor: "rgba(255, 255, 255, 0.3)",
                 },
-                '&:disabled': {
+                "&:disabled": {
                   opacity: 0.7,
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  borderColor: 'rgba(255, 255, 255, 0.15)',
-                  color: 'rgba(255, 255, 255, 0.6)',
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  borderColor: "rgba(255, 255, 255, 0.15)",
+                  color: "rgba(255, 255, 255, 0.6)",
                 },
               }}
             >
-              {oauthLoading === 'qq' ? (
-                <CircularProgress size={24} sx={{ color: 'white' }} />
+              {oauthLoading === "qq" ? (
+                <CircularProgress size={24} sx={{ color: "white" }} />
               ) : (
                 <QQIcon sx={{ fontSize: 24 }} />
               )}
             </IconButton>
           </Tooltip>
 
-          <Tooltip title={t('auth.loginWithWeChat')} arrow>
+          <Tooltip title={t("auth.loginWithWeChat")} arrow>
             <span>
               <IconButton
                 onClick={handleWeChatLogin}
@@ -848,23 +932,28 @@ const LoginPage: React.FC = () => {
                 sx={{
                   width: 56,
                   height: 56,
-                  borderRadius: '50%',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  color: '#ffffff',
+                  borderRadius: "50%",
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  color: "#ffffff",
                   opacity: 1,
-                  '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    borderColor: 'rgba(255, 255, 255, 0.4)',
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.2)",
+                    borderColor: "rgba(255, 255, 255, 0.4)",
                   },
                 }}
               >
-                <WeChatIcon sx={{ fontSize: 24, color: 'rgba(255, 255, 255, 0.8) !important' }} />
+                <WeChatIcon
+                  sx={{
+                    fontSize: 24,
+                    color: "rgba(255, 255, 255, 0.8) !important",
+                  }}
+                />
               </IconButton>
             </span>
           </Tooltip>
 
-          <Tooltip title={t('auth.loginWithBaidu')} arrow>
+          <Tooltip title={t("auth.loginWithBaidu")} arrow>
             <span>
               <IconButton
                 onClick={handleBaiduLogin}
@@ -872,18 +961,23 @@ const LoginPage: React.FC = () => {
                 sx={{
                   width: 56,
                   height: 56,
-                  borderRadius: '50%',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  color: '#ffffff',
+                  borderRadius: "50%",
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  color: "#ffffff",
                   opacity: 1,
-                  '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    borderColor: 'rgba(255, 255, 255, 0.4)',
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.2)",
+                    borderColor: "rgba(255, 255, 255, 0.4)",
                   },
                 }}
               >
-                <BaiduIcon sx={{ fontSize: 24, color: 'rgba(255, 255, 255, 0.8) !important' }} />
+                <BaiduIcon
+                  sx={{
+                    fontSize: 24,
+                    color: "rgba(255, 255, 255, 0.8) !important",
+                  }}
+                />
               </IconButton>
             </span>
           </Tooltip>
@@ -898,38 +992,40 @@ const LoginPage: React.FC = () => {
         fullWidth
         PaperProps={{
           sx: {
-            backgroundColor: 'rgba(30, 30, 30, 0.95)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            color: 'white',
-          }
+            backgroundColor: "rgba(30, 30, 30, 0.95)",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            color: "white",
+          },
         }}
       >
-        <DialogTitle sx={{
-          color: '#ff9800',
-          fontWeight: 'bold',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1
-        }}>
-          <Warning /> {t('auth.rememberMeWarning.title')}
+        <DialogTitle
+          sx={{
+            color: "#ff9800",
+            fontWeight: "bold",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          <Warning /> {t("auth.rememberMeWarning.title")}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ color: 'rgba(255, 255, 255, 0.9)', mb: 2 }}>
-            {t('auth.rememberMeWarning.message')}
+          <DialogContentText sx={{ color: "rgba(255, 255, 255, 0.9)", mb: 2 }}>
+            {t("auth.rememberMeWarning.message")}
           </DialogContentText>
           <Alert
             severity="warning"
             sx={{
-              backgroundColor: 'rgba(255, 152, 0, 0.1)',
-              color: '#ffb74d',
-              border: '1px solid rgba(255, 152, 0, 0.2)',
-              '& .MuiAlert-icon': {
-                color: '#ffb74d'
-              }
+              backgroundColor: "rgba(255, 152, 0, 0.1)",
+              color: "#ffb74d",
+              border: "1px solid rgba(255, 152, 0, 0.2)",
+              "& .MuiAlert-icon": {
+                color: "#ffb74d",
+              },
             }}
           >
-            {t('auth.rememberMeWarning.publicDevice')}
+            {t("auth.rememberMeWarning.publicDevice")}
           </Alert>
         </DialogContent>
         <DialogActions sx={{ p: 3, gap: 1 }}>
@@ -938,28 +1034,28 @@ const LoginPage: React.FC = () => {
             variant="outlined"
             startIcon={<Cancel />}
             sx={{
-              borderColor: 'rgba(255, 255, 255, 0.3)',
-              color: 'rgba(255, 255, 255, 0.8)',
-              '&:hover': {
-                borderColor: 'rgba(255, 255, 255, 0.5)',
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              }
+              borderColor: "rgba(255, 255, 255, 0.3)",
+              color: "rgba(255, 255, 255, 0.8)",
+              "&:hover": {
+                borderColor: "rgba(255, 255, 255, 0.5)",
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+              },
             }}
           >
-            {t('auth.rememberMeWarning.cancel')}
+            {t("auth.rememberMeWarning.cancel")}
           </Button>
           <Button
             onClick={handleRememberMeConfirm}
             variant="contained"
             startIcon={<CheckCircle />}
             sx={{
-              background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
-              '&:hover': {
-                background: 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
-              }
+              background: "linear-gradient(45deg, #667eea 30%, #764ba2 90%)",
+              "&:hover": {
+                background: "linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)",
+              },
             }}
           >
-            {t('auth.rememberMeWarning.understand')}
+            {t("auth.rememberMeWarning.understand")}
           </Button>
         </DialogActions>
       </Dialog>

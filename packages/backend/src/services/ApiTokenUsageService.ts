@@ -1,8 +1,8 @@
-import redisClient from '../config/redis';
-import { ApiAccessToken } from '../models/ApiAccessToken';
-import logger from '../config/logger';
-import { queueService } from './QueueService';
-import { getInstanceId } from '../utils/AppInstance';
+import redisClient from "../config/redis";
+import { ApiAccessToken } from "../models/ApiAccessToken";
+import logger from "../config/logger";
+import { queueService } from "./QueueService";
+import { getInstanceId } from "../utils/AppInstance";
 
 interface TokenMeta {
   lastUsedAt: string; // ISO string
@@ -21,11 +21,13 @@ export class ApiTokenUsageService {
   private isInitialized = false;
 
   private constructor() {
-    this.syncIntervalMs = parseInt(process.env.API_TOKEN_SYNC_INTERVAL_MS || '60000');
+    this.syncIntervalMs = parseInt(
+      process.env.API_TOKEN_SYNC_INTERVAL_MS || "60000",
+    );
 
-    logger.info('ApiTokenUsageService initialized', {
+    logger.info("ApiTokenUsageService initialized", {
       instanceId: getInstanceId(),
-      syncIntervalMs: this.syncIntervalMs
+      syncIntervalMs: this.syncIntervalMs,
     });
   }
 
@@ -45,27 +47,35 @@ export class ApiTokenUsageService {
     }
 
     try {
-      if (!queueService.getQueue('token-usage-sync')) {
-        await queueService.createQueue('token-usage-sync', this.processTokenUsageSyncJob.bind(this), {
-          concurrency: 1,
-          removeOnComplete: 10,
-          removeOnFail: 5
-        });
+      if (!queueService.getQueue("token-usage-sync")) {
+        await queueService.createQueue(
+          "token-usage-sync",
+          this.processTokenUsageSyncJob.bind(this),
+          {
+            concurrency: 1,
+            removeOnComplete: 10,
+            removeOnFail: 5,
+          },
+        );
       }
 
-      await queueService.addJob('token-usage-sync', 'sync-token-usage', {}, {
-        repeat: {
-          every: this.syncIntervalMs
-        }
-      });
+      await queueService.addJob(
+        "token-usage-sync",
+        "sync-token-usage",
+        {},
+        {
+          repeat: {
+            every: this.syncIntervalMs,
+          },
+        },
+      );
 
       this.isInitialized = true;
-      logger.info('ApiTokenUsageService initialized with recurring sync job', {
-        intervalMs: this.syncIntervalMs
+      logger.info("ApiTokenUsageService initialized with recurring sync job", {
+        intervalMs: this.syncIntervalMs,
       });
-
     } catch (error) {
-      logger.error('Failed to initialize ApiTokenUsageService:', error);
+      logger.error("Failed to initialize ApiTokenUsageService:", error);
       throw error;
     }
   }
@@ -88,18 +98,21 @@ export class ApiTokenUsageService {
 
       // Update metadata (fire and forget)
       // We set TTL to 2x sync interval to prevent garbage accumulation if sync fails repeatedly
-      const ttlSeconds = Math.ceil(this.syncIntervalMs * 2 / 1000);
+      const ttlSeconds = Math.ceil((this.syncIntervalMs * 2) / 1000);
 
-      await client.set(metaKey, JSON.stringify({
-        lastUsedAt: now,
-        instanceId
-      }), { EX: ttlSeconds });
+      await client.set(
+        metaKey,
+        JSON.stringify({
+          lastUsedAt: now,
+          instanceId,
+        }),
+        { EX: ttlSeconds },
+      );
 
       // Ensure count key also has TTL (refresh on every usage)
       await client.expire(countKey, ttlSeconds);
-
     } catch (error) {
-      logger.error('Failed to record token usage in cache:', error);
+      logger.error("Failed to record token usage in cache:", error);
     }
   }
 
@@ -108,18 +121,17 @@ export class ApiTokenUsageService {
    */
   private async processTokenUsageSyncJob(): Promise<void> {
     try {
-      logger.info('Starting token usage synchronization', {
-        instanceId: getInstanceId()
+      logger.info("Starting token usage synchronization", {
+        instanceId: getInstanceId(),
       });
 
       await this.syncTokenUsageToDatabase();
 
-      logger.info('Token usage synchronization completed', {
-        instanceId: getInstanceId()
+      logger.info("Token usage synchronization completed", {
+        instanceId: getInstanceId(),
       });
-
     } catch (error) {
-      logger.error('Token usage synchronization failed:', error);
+      logger.error("Token usage synchronization failed:", error);
       throw error;
     }
   }
@@ -132,11 +144,14 @@ export class ApiTokenUsageService {
     if (!client) return;
 
     try {
-      const pattern = 'token_usage:count:*';
+      const pattern = "token_usage:count:*";
       const countKeys: string[] = [];
 
       // Use SCAN instead of KEYS to prevent blocking
-      for await (const key of client.scanIterator({ MATCH: pattern, COUNT: 100 })) {
+      for await (const key of client.scanIterator({
+        MATCH: pattern,
+        COUNT: 100,
+      })) {
         countKeys.push(key);
       }
 
@@ -151,12 +166,12 @@ export class ApiTokenUsageService {
       for (const countKey of countKeys) {
         try {
           // Atomic GETSET to 0 to claim the current count without losing concurrent increments
-          const countStr = await client.getSet(countKey, '0');
-          const count = parseInt(countStr || '0', 10);
+          const countStr = await client.getSet(countKey, "0");
+          const count = parseInt(countStr || "0", 10);
 
           if (count > 0) {
             // Extract info from key
-            const parts = countKey.split(':');
+            const parts = countKey.split(":");
             // token_usage:count:{tokenId}:{instanceId}
             if (parts.length === 4) {
               const tokenId = parseInt(parts[2], 10);
@@ -178,7 +193,7 @@ export class ApiTokenUsageService {
                 tokenAggregates.set(tokenId, {
                   totalUsageCount: count,
                   latestUsedAt: lastUsedAt,
-                  instances: [instanceId]
+                  instances: [instanceId],
                 });
               } else {
                 existing.totalUsageCount += count;
@@ -191,7 +206,7 @@ export class ApiTokenUsageService {
               }
             }
           } else {
-            // Count IS 0. 
+            // Count IS 0.
             // Either created by getset above (race?) or just empty.
             // Check if key should be deleted to keep Redis clean
             // Metadata key expiration handles cleanup, we can leave countKey to expire via TTL
@@ -208,14 +223,18 @@ export class ApiTokenUsageService {
         try {
           await this.updateTokenUsageInDatabase(tokenId, aggregate);
         } catch (error) {
-          logger.error(`Failed to update token ${tokenId} usage in database:`, error);
+          logger.error(
+            `Failed to update token ${tokenId} usage in database:`,
+            error,
+          );
         }
       }
 
-      logger.info(`Successfully synced usage data for ${tokenAggregates.size} tokens`);
-
+      logger.info(
+        `Successfully synced usage data for ${tokenAggregates.size} tokens`,
+      );
     } catch (error) {
-      logger.error('Failed to sync token usage to database:', error);
+      logger.error("Failed to sync token usage to database:", error);
       throw error;
     }
   }
@@ -223,7 +242,10 @@ export class ApiTokenUsageService {
   /**
    * Update usage in DB
    */
-  private async updateTokenUsageInDatabase(tokenId: number, aggregate: AggregatedStats): Promise<void> {
+  private async updateTokenUsageInDatabase(
+    tokenId: number,
+    aggregate: AggregatedStats,
+  ): Promise<void> {
     try {
       const currentToken = await ApiAccessToken.query().findById(tokenId);
       if (!currentToken) {
@@ -231,34 +253,37 @@ export class ApiTokenUsageService {
         return;
       }
 
-      const newUsageCount = (currentToken.usageCount || 0) + aggregate.totalUsageCount;
+      const newUsageCount =
+        (currentToken.usageCount || 0) + aggregate.totalUsageCount;
       const newLastUsedAt = aggregate.latestUsedAt;
 
       const formatForMySQL = (date: Date) => {
-        return date.toISOString().slice(0, 19).replace('T', ' ');
+        return date.toISOString().slice(0, 19).replace("T", " ");
       };
 
-      await ApiAccessToken.knex().raw(`
+      await ApiAccessToken.knex().raw(
+        `
         UPDATE g_api_access_tokens
         SET usageCount = ?, lastUsedAt = ?, updatedAt = ?
         WHERE id = ?
-      `, [
-        newUsageCount,
-        formatForMySQL(newLastUsedAt),
-        formatForMySQL(new Date()),
-        tokenId
-      ]);
+      `,
+        [
+          newUsageCount,
+          formatForMySQL(newLastUsedAt),
+          formatForMySQL(new Date()),
+          tokenId,
+        ],
+      );
 
-      logger.debug('Database updated for token', {
+      logger.debug("Database updated for token", {
         tokenId,
         added: aggregate.totalUsageCount,
         newTotal: newUsageCount,
-        instances: aggregate.instances
+        instances: aggregate.instances,
       });
 
       // Invalidate cache
       await this.invalidateTokenCache(tokenId);
-
     } catch (error) {
       logger.error(`Failed to update token ${tokenId} in database:`, error);
       throw error;
@@ -270,11 +295,14 @@ export class ApiTokenUsageService {
       const client = redisClient.getClient();
       if (!client) return;
 
-      const pattern = 'api_token:*';
+      const pattern = "api_token:*";
       const keys: string[] = [];
 
       // Use SCAN instead of KEYS
-      for await (const key of client.scanIterator({ MATCH: pattern, COUNT: 100 })) {
+      for await (const key of client.scanIterator({
+        MATCH: pattern,
+        COUNT: 100,
+      })) {
         keys.push(key);
       }
 
@@ -282,16 +310,19 @@ export class ApiTokenUsageService {
         await client.del(keys);
       }
     } catch (error) {
-      logger.error(`Failed to invalidate token cache for token ${tokenId}:`, error);
+      logger.error(
+        `Failed to invalidate token cache for token ${tokenId}:`,
+        error,
+      );
     }
   }
 
   async shutdown(): Promise<void> {
     try {
       await this.syncTokenUsageToDatabase();
-      logger.info('ApiTokenUsageService shutdown completed');
+      logger.info("ApiTokenUsageService shutdown completed");
     } catch (error) {
-      logger.error('Error during ApiTokenUsageService shutdown:', error);
+      logger.error("Error during ApiTokenUsageService shutdown:", error);
     }
   }
 }
