@@ -212,12 +212,10 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                                                 textAnchor="middle"
                                                 dominantBaseline="central"
                                                 fontSize="10"
-                                                fontWeight="800"
-                                                fontFamily="Arial, sans-serif"
+                                                fontWeight="bold"
+                                                fontFamily="system-ui, -apple-system, sans-serif"
                                                 fill="white"
-                                                stroke="rgba(0,0,0,0.5)"
-                                                strokeWidth="0.5"
-                                                paintOrder="stroke"
+                                                style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
                                             >
                                                 {yesPercent}%
                                             </text>
