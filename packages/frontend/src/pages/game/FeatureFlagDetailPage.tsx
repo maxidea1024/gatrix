@@ -1472,7 +1472,7 @@ const FeatureFlagDetailPage: React.FC = () => {
           <Tab label={t("featureFlags.overview")} />
           <Tab
             label={t("featureFlags.payload")}
-            disabled={isCreating || flag?.variantType === "none"}
+            disabled={isCreating}
           />
           <Tab label={t("featureFlags.metrics")} disabled={isCreating} />
         </Tabs>
@@ -3586,8 +3586,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                   </Select>
                 </FormControl>
 
-                {/* Warning when type is changed */}
-                {flag.variantType !== originalFlag?.variantType && (
+                {/* Warning when type is changed (but not when changing to 'none' - that has its own warning) */}
+                {flag.variantType !== originalFlag?.variantType && flag.variantType !== "none" && (
                   <Alert severity="warning" sx={{ mt: 1 }}>
                     {t("featureFlags.variantTypeChangeWarning")}
                   </Alert>
@@ -3599,11 +3599,27 @@ const FeatureFlagDetailPage: React.FC = () => {
                     <Typography variant="body2" fontWeight={500}>
                       {t("featureFlags.variantTypeNoneWarning")}
                     </Typography>
-                    {(flag.variants?.length ?? 0) > 0 && (
-                      <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
-                        {t("featureFlags.variantsToBeRemoved")}: {flag.variants?.map(v => v.variantName).join(", ")}
-                      </Typography>
-                    )}
+                    {/* Show strategies with variants */}
+                    {(() => {
+                      const strategiesWithVariants = flag.strategies?.filter(s => (s.variants?.length ?? 0) > 0) ?? [];
+                      if (strategiesWithVariants.length > 0) {
+                        return (
+                          <Box sx={{ mt: 1 }}>
+                            <Typography variant="caption" color="text.secondary" sx={{ display: "block", fontWeight: 500 }}>
+                              {t("featureFlags.strategiesWithVariantsToRemove")}:
+                            </Typography>
+                            <Box component="ul" sx={{ m: 0, pl: 2, mt: 0.5 }}>
+                              {strategiesWithVariants.map((strategy, idx) => (
+                                <Typography component="li" variant="caption" color="text.secondary" key={idx}>
+                                  {strategy.title || t(`featureFlags.strategies.${strategy.name}.title`)}: {strategy.variants?.map(v => v.name).join(", ")}
+                                </Typography>
+                              ))}
+                            </Box>
+                          </Box>
+                        );
+                      }
+                      return null;
+                    })()}
                   </Alert>
                 )}
               </Box>
