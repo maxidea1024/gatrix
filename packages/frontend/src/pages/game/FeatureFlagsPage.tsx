@@ -70,9 +70,9 @@ import {
   OpenInNew as OpenInNewIcon,
   BarChart as MetricsIcon,
   HelpOutline as HelpOutlineIcon,
-  TextFields as TextFieldsIcon,
-  Numbers as NumbersIcon,
-  DataObject as DataObjectIcon,
+  Abc as StringIcon,
+  Numbers as NumberIcon,
+  DataObject as JsonIcon,
 } from "@mui/icons-material";
 import JsonEditor from "../../components/common/JsonEditor";
 import { useTranslation } from "react-i18next";
@@ -1562,6 +1562,8 @@ const FeatureFlagsPage: React.FC = () => {
                             );
                           case "tags":
                             return <TableCell key={col.id}>{t("featureFlags.tags")}</TableCell>;
+                          case "variantType":
+                            return <TableCell key={col.id}>{t("featureFlags.variantType")}</TableCell>;
                           default:
                             return null;
                         }
@@ -1800,6 +1802,13 @@ const FeatureFlagsPage: React.FC = () => {
                               return (
                                 <TableCell key={col.id}>
                                   <Chip
+                                    icon={
+                                      flag.variantType === "json"
+                                        ? <JsonIcon fontSize="small" />
+                                        : flag.variantType === "number"
+                                          ? <NumberIcon fontSize="small" />
+                                          : <StringIcon fontSize="small" />
+                                    }
                                     label={t(`featureFlags.variantTypes.${flag.variantType || "string"}`)}
                                     size="small"
                                     variant="outlined"
