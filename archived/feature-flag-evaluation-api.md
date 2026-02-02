@@ -9,10 +9,16 @@ GET  /api/v1/client/features/evaluate
 
 - **POST**: Pass `context` object in the JSON body.
 - **GET**: 
-    - Pass `context` object as a Base64-encoded JSON string in the `X-Gatrix-Feature-Context` header.
-    - OR pass `context` query parameter (Base64 encoded JSON preferred).
+    - Pass context fields as individual query parameters (recommended for simple use cases).
+    - OR pass `context` query parameter (Base64 encoded JSON).
+    - OR pass `X-Gatrix-Feature-Context` header.
 
-Example GET Query:
+Example GET Query (Individual Params):
+```
+GET /api/v1/client/features/evaluate?userId=user123&sessionId=abc&properties[region]=asia
+```
+
+Example GET Query (Base64 Context):
 ```
 GET /api/v1/client/features/evaluate?context=eyJ1c2VySWQiOiAidXNlcjEifQ==
 ```
