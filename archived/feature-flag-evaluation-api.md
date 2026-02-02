@@ -7,14 +7,31 @@ POST /api/v1/client/features/evaluate
 GET  /api/v1/client/features/evaluate
 ```
 
+- **POST**: Pass `context` object in the JSON body.
+- **GET**: 
+    - Pass `context` object as a Base64-encoded JSON string in the `X-Gatrix-Feature-Context` header.
+    - OR pass `context` query parameter (Base64 encoded JSON preferred).
+
+Example GET Query:
+```
+GET /api/v1/client/features/evaluate?context=eyJ1c2VySWQiOiAidXNlcjEifQ==
+```
+
+Example GET Header:
+```
+X-Gatrix-Feature-Context: eyJ1c2VySWQiOiAidXNlci0xMjM0NSIsICJzZXNzaW9uSWQiOiAiYWJjZGUifQ==
+```
+(Decoded: `{"userId": "user-12345", "sessionId": "abcde"}`)
+
 ## Headers
 
 | Header | Required | Description |
 |--------|----------|-------------|
-| `X-API-Token` | Yes | Client API token |
-| `X-Application-Name` | Yes | Application name |
-| `X-Environment` | Yes | Environment name (e.g., `development`, `production`) |
-| `Content-Type` | POST only | `application/json` |
+| `X-API-Token` | Yes | Client API Token |
+| `X-Application-Name` | No | Name of the application |
+| `X-Environment` | No* | Environment name (e.g., `development`, `production`). Required if not inferred from token. |
+| `Content-Type` | Yes | `application/json` (for POST) |
+| `X-Gatrix-Feature-Context` | No | Base64 encoded JSON context for GET requests. |
 
 ## Request Body (POST)
 

@@ -381,13 +381,32 @@ export class ClientController {
     } else {
       // GET: context from x-gatrix-feature-context header (Base64 encoded JSON)
       const contextHeader = req.headers["x-gatrix-feature-context"] as string;
-      if (contextHeader) {
+      const contextQuery = req.query.context as string;
+
+      let contextStr = contextHeader;
+      if (!contextStr && contextQuery) {
+        contextStr = contextQuery;
+      }
+
+      if (contextStr) {
         try {
-          const jsonStr = Buffer.from(contextHeader, "base64").toString("utf-8");
-          context = JSON.parse(jsonStr);
+          // Try to determine if it is Base64 or plain JSON
+          // Ideally rely on Base64 for consistency and safety in URLs
+          const jsonStr = Buffer.from(contextStr, "base64").toString("utf-8");
+          // Simple validation to check if decoding resulted in valid JSON start
+          if (jsonStr.trim().startsWith("{")) {
+            context = JSON.parse(jsonStr);
+          } else {
+            // Fallback: maybe it was plain URL encoded JSON?
+            context = JSON.parse(contextStr);
+          }
         } catch (error) {
-          // If parsing fails, use empty context or error? SDK usually handles graceful degradation.
-          logger.warn("Failed to parse x-gatrix-feature-context header", { error });
+          try {
+            // Second attempt: Treat as plain JSON
+            context = JSON.parse(contextStr);
+          } catch (e) {
+            logger.warn("Failed to parse context from header/query", { error: e });
+          }
         }
       }
 
