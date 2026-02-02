@@ -138,6 +138,25 @@ GET  /api/v1/client/features/evaluate
 - **Flag enabled + no variants defined**: Returns `variant: { name: "disabled", enabled: false }`
 - **Flag disabled**: Returns `variant: { name: "disabled", enabled: false }` with `baselinePayload` if defined
 
+### Sticky Consistency (Important)
+
+If you use strategy rollouts or variants, the result depends on the **stickiness**.
+- By default, stickiness is based on `userId`, then `sessionId`, then `random`.
+- If you do not provide `userId` or `sessionId` in the `context`, evaluation will be **random on every request**.
+- To ensure consistent results for a user, always provide a unique identifier.
+
+## Request Body Context Parameters
+
+The `context` object supports the following standard Unleash fields:
+
+| Field | Description |
+|-------|-------------|
+| `userId` | Unique identifier for the user. Primary key for stickiness. |
+| `sessionId` | Session identifier. Used if `userId` is missing. |
+| `ip` | IP address of the client (automatically detected if not provided, but can be overridden). |
+| `remoteAddress` | Alias for `ip`. |
+| `properties` | Custom properties for constraints (e.g., `{ "region": "asia" }`). |
+
 ## Version Field
 
 Each flag has a `version` field that increments whenever:
