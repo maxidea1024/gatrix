@@ -1156,8 +1156,9 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                                             labels: {
                                                                 usePointStyle: true,
                                                                 pointStyle: 'circle',
-                                                                boxWidth: 8,
-                                                                padding: 16,
+                                                                boxWidth: 10,
+                                                                boxHeight: 10,
+                                                                padding: 20,
                                                             },
                                                         },
                                                         tooltip: {
@@ -1210,7 +1211,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                                 <TableContainer sx={{ maxHeight: 400, mt: 1 }}>
                                                     <Table size="small" stickyHeader>
                                                         <TableHead>
-                                                            <TableRow>
+                                                            <TableRow sx={{ '& th': { bgcolor: 'background.paper', zIndex: 1 } }}>
                                                                 <TableCell>{t('featureFlags.metrics.time')}</TableCell>
                                                                 {variantTimeSeriesData.variants.map((variant, idx) => (
                                                                     <TableCell key={variant} align="right">
