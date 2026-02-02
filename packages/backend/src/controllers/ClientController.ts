@@ -519,9 +519,7 @@ export class ClientController {
               name: "disabled",
               enabled: false,
             },
-            variantType: "string",
-            impressionData: false,
-            reason: "not_found",
+            matchReason: "not_found",
           };
         }
       }
