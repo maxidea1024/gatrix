@@ -397,6 +397,12 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
   const [staleConfirmOpen, setStaleConfirmOpen] = useState(false);
   const [strategyDialogOpen, setStrategyDialogOpen] = useState(false);
+  const [strategyDeleteConfirm, setStrategyDeleteConfirm] = useState<{
+    open: boolean;
+    strategyId?: string;
+    index?: number;
+    envName?: string;
+  }>({ open: false });
   const [strategyTabValue, setStrategyTabValue] = useState(0);
   const [editingStrategy, setEditingStrategy] = useState<Strategy | null>(null);
   const [originalEditingStrategy, setOriginalEditingStrategy] =
@@ -1188,6 +1194,37 @@ const FeatureFlagDetailPage: React.FC = () => {
         variant: "error",
       });
     }
+  };
+
+  const handleOpenDeleteStrategyConfirm = (
+    strategyId: string | undefined,
+    index: number,
+    envName: string,
+  ) => {
+    setStrategyDeleteConfirm({
+      open: true,
+      strategyId,
+      index,
+      envName,
+    });
+  };
+
+  const handleCloseDeleteStrategyConfirm = () => {
+    setStrategyDeleteConfirm({ open: false });
+  };
+
+  const handleConfirmDeleteStrategy = () => {
+    if (
+      strategyDeleteConfirm.index !== undefined &&
+      strategyDeleteConfirm.envName
+    ) {
+      handleDeleteStrategy(
+        strategyDeleteConfirm.strategyId,
+        strategyDeleteConfirm.index,
+        strategyDeleteConfirm.envName,
+      );
+    }
+    handleCloseDeleteStrategyConfirm();
   };
 
   const handleReorderStrategies = async (
@@ -2472,7 +2509,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                           <IconButton
                                                             size="small"
                                                             onClick={() =>
-                                                              handleDeleteStrategy(
+                                                              handleOpenDeleteStrategyConfirm(
                                                                 strategy.id,
                                                                 index,
                                                                 env.environment,
@@ -3694,13 +3731,38 @@ const FeatureFlagDetailPage: React.FC = () => {
       {/* Delete Confirmation Dialog */}
       <ConfirmDeleteDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        onConfirm={handleDelete}
         title={t("featureFlags.deleteConfirmTitle")}
-        message={t("featureFlags.deleteConfirmMessage", {
+        description={t("featureFlags.deleteConfirmMessage", {
           name: flag.flagName,
         })}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteDialogOpen(false)}
+        confirmText={t("common.delete")}
       />
+
+      {/* Strategy Delete Confirmation Dialog */}
+      <Dialog
+        open={strategyDeleteConfirm.open}
+        onClose={handleCloseDeleteStrategyConfirm}
+      >
+        <DialogTitle>{t("featureFlags.deleteStrategyTitle")}</DialogTitle>
+        <DialogContent>
+          <Typography>{t("featureFlags.deleteStrategyDescription")}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteStrategyConfirm}>
+            {t("common.cancel")}
+          </Button>
+          <Button
+            onClick={handleConfirmDeleteStrategy}
+            color="error"
+            variant="contained"
+            disabled={saving}
+          >
+            {t("common.delete")}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Edit Flag Settings Drawer */}
       <ResizableDrawer
