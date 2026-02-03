@@ -22,9 +22,20 @@ export class FeatureFlagEvaluator {
     segmentsMap: Map<string, FeatureSegment>
   ): EvaluationResult {
     if (!flag.isEnabled) {
+      // Return disabled variant with baselinePayload if available
+      const variant: Variant | undefined = flag.baselinePayload !== undefined && flag.baselinePayload !== null
+        ? {
+          name: 'disabled',
+          weight: 100,
+          payload: flag.baselinePayload,
+          payloadType: flag.variantType,
+        }
+        : undefined;
+
       return {
         flagName: flag.name,
         enabled: false,
+        variant,
         reason: 'disabled',
       };
     }

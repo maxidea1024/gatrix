@@ -781,7 +781,7 @@ function evaluateFlagWithDetails(
   segmentsMap: Map<string, any>
 ): {
   enabled: boolean;
-  variant?: { name: string; payload?: any };
+  variant?: { name: string; payload?: any; payloadType?: string; payloadSource?: string };
   reason: string;
   reasonDetails?: any;
   evaluationSteps?: any[];
@@ -796,7 +796,31 @@ function evaluateFlagWithDetails(
       passed: false,
       message: 'Flag is disabled in this environment',
     });
-    return { enabled: false, reason: 'FLAG_DISABLED', evaluationSteps };
+
+    // Return disabled variant with baselinePayload
+    // Priority: environment baselinePayload > flag baselinePayload
+    const envSettings = flag.environments?.[0];
+    let payload = envSettings?.baselinePayload;
+    let payloadSource: 'environment' | 'flag' | undefined;
+
+    if (payload !== undefined && payload !== null) {
+      payloadSource = 'environment';
+    } else if (flag.baselinePayload !== undefined && flag.baselinePayload !== null) {
+      payload = flag.baselinePayload;
+      payloadSource = 'flag';
+    }
+
+    return {
+      enabled: false,
+      variant: {
+        name: 'disabled',
+        payload,
+        payloadType: flag.variantType || 'string',
+        payloadSource,
+      },
+      reason: 'FLAG_DISABLED',
+      evaluationSteps,
+    };
   }
   evaluationSteps.push({
     step: 'ENVIRONMENT_CHECK',
