@@ -734,7 +734,13 @@ class FeatureFlagService {
 
     // Remote Config specific validations
     const isRemoteConfig = (flag as any).flagUsage === 'remoteConfig';
-    if (isRemoteConfig) {
+
+    // Check if this is just a metadata update (no variants provided) for Remote Config
+    // For Remote Config, we treat empty variants as "keep existing variants" because it must always have 1 variant
+    // For other flags, empty variants means "remove all variants"
+    const isRemoteConfigMetadataUpdate = isRemoteConfig && variants.length === 0;
+
+    if (isRemoteConfig && !isRemoteConfigMetadataUpdate) {
       // Cannot set variantType to 'none' for Remote Config
       if (variantType === 'none') {
         throw new GatrixError(
@@ -787,30 +793,37 @@ class FeatureFlagService {
       }
     }
 
-    // Delete existing variants for this environment
-    await FeatureVariantModel.deleteByFlagIdAndEnvironment(flag.id, environment);
+    let resultVariants: FeatureVariantAttributes[] = [];
 
-    // Insert new variants
-    const createdVariants: FeatureVariantAttributes[] = [];
-    for (const variant of variants) {
-      const created = await FeatureVariantModel.create({
-        flagId: flag.id,
-        environment,
-        variantName: variant.variantName,
-        weight: variant.weight,
-        payload: variant.payload,
-        payloadType: variant.payloadType || 'json',
-        weightLock: variant.weightLock || false,
-        createdBy: userId,
-      });
-      createdVariants.push(created);
+    // Only update variants table if not a metadata-only update for Remote Config
+    if (!isRemoteConfigMetadataUpdate) {
+      // Delete existing variants for this environment
+      await FeatureVariantModel.deleteByFlagIdAndEnvironment(flag.id, environment);
+
+      // Insert new variants
+      for (const variant of variants) {
+        const created = await FeatureVariantModel.create({
+          flagId: flag.id,
+          environment,
+          variantName: variant.variantName,
+          weight: variant.weight,
+          payload: variant.payload,
+          payloadType: variant.payloadType || 'json',
+          weightLock: variant.weightLock || false,
+          createdBy: userId,
+        });
+        resultVariants.push(created);
+      }
+    } else {
+      // If metadata only update, return existing variants
+      resultVariants = await FeatureVariantModel.findByFlagIdAndEnvironment(flag.id, environment);
     }
 
     // Increment version and invalidate cache after variants update
     await this.incrementFlagVersion(flag.id, environment);
     await this.invalidateCache(environment);
 
-    return createdVariants;
+    return resultVariants;
   }
 
   // ==================== Segments ====================

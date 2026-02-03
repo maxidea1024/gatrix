@@ -1230,8 +1230,8 @@ const FeatureFlagsPage: React.FC = () => {
         flagName: "",
         displayName: "",
         description: "",
-        flagUsage: "release",
-        flagType: "flag",
+        flagUsage: "flag",
+        flagType: "release",
         tags: [],
         impressionDataEnabled: false,
         variantType: "none",
@@ -1239,7 +1239,7 @@ const FeatureFlagsPage: React.FC = () => {
       });
       setNewFlagBaselinePayloadJsonError(null);
       // Navigate to the newly created flag's detail page
-      navigate(`/features/${encodeURIComponent(createdFlagName)}`);
+      navigate(`/feature-flags/${encodeURIComponent(createdFlagName)}`);
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.createFailed"), {
         variant: "error",
@@ -1859,46 +1859,35 @@ const FeatureFlagsPage: React.FC = () => {
                             case "variantType":
                               return (
                                 <TableCell key={col.id}>
-                                  <Chip
-                                    icon={
-                                      flag.variantType === "none"
-                                        ? <BlockIcon fontSize="small" />
-                                        : flag.variantType === "json"
-                                          ? <JsonIcon fontSize="small" />
-                                          : flag.variantType === "number"
-                                            ? <NumberIcon fontSize="small" />
-                                            : <StringIcon fontSize="small" />
-                                    }
-                                    label={t(`featureFlags.variantTypes.${flag.variantType || "string"}`)}
-                                    size="small"
-                                    variant="outlined"
-                                    color={
-                                      flag.variantType === "none"
-                                        ? "default"
-                                        : flag.variantType === "json"
-                                          ? "secondary"
-                                          : flag.variantType === "number"
-                                            ? "info"
-                                            : "default"
-                                    }
-                                    sx={{ borderRadius: "16px !important" }}
-                                  />
+                                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                    {flag.variantType === "none" ? (
+                                      <BlockIcon fontSize="small" color="disabled" />
+                                    ) : flag.variantType === "json" ? (
+                                      <JsonIcon fontSize="small" color="secondary" />
+                                    ) : flag.variantType === "number" ? (
+                                      <NumberIcon fontSize="small" color="info" />
+                                    ) : (
+                                      <StringIcon fontSize="small" color="action" />
+                                    )}
+                                    <Typography variant="body2">
+                                      {t(`featureFlags.variantTypes.${flag.variantType || "string"}`)}
+                                    </Typography>
+                                  </Box>
                                 </TableCell>
                               );
                             case "flagUsage":
                               return (
                                 <TableCell key={col.id}>
-                                  <Chip
-                                    icon={
-                                      flag.flagUsage === "remoteConfig"
-                                        ? <JsonIcon fontSize="small" />
-                                        : <FlagIcon fontSize="small" />
-                                    }
-                                    label={t(`featureFlags.flagUsages.${flag.flagUsage || "flag"}`)}
-                                    size="small"
-                                    color={flag.flagUsage === "remoteConfig" ? "secondary" : "primary"}
-                                    sx={{ borderRadius: "16px !important" }}
-                                  />
+                                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                    {flag.flagUsage === "remoteConfig" ? (
+                                      <JsonIcon fontSize="small" color="secondary" />
+                                    ) : (
+                                      <FlagIcon fontSize="small" color="primary" />
+                                    )}
+                                    <Typography variant="body2">
+                                      {t(`featureFlags.flagUsages.${flag.flagUsage || "flag"}`)}
+                                    </Typography>
+                                  </Box>
                                 </TableCell>
                               );
                             case "tags":
