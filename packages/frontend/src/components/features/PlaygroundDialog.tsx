@@ -68,6 +68,7 @@ import { Environment, environmentService } from '../../services/environmentServi
 import api from '../../services/api';
 import ConstraintDisplay from './ConstraintDisplay';
 import LocalizedDateTimePicker from '../common/LocalizedDateTimePicker';
+import JsonEditor from '../common/JsonEditor';
 
 
 interface ContextField {
@@ -93,7 +94,7 @@ interface EvaluationResult {
         name: string;
         payload?: any;
         payloadType?: string;
-        payloadSource?: 'variant' | 'baseline';
+        payloadSource?: 'environment' | 'flag' | 'variant';
     };
     reason: string;
     reasonDetails?: {
@@ -1047,11 +1048,15 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 </Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <Chip
-                                        label={selectedVariant.payloadSource === 'baseline'
-                                            ? t('playground.payloadSourceBaseline')
-                                            : t('playground.payloadSourceVariant')}
+                                        label={
+                                            selectedVariant.payloadSource === 'environment'
+                                                ? t('playground.payloadSourceEnvironment')
+                                                : selectedVariant.payloadSource === 'flag'
+                                                    ? t('playground.payloadSourceFlag')
+                                                    : t('playground.payloadSourceVariant')
+                                        }
                                         size="small"
-                                        color={selectedVariant.payloadSource === 'baseline' ? 'info' : 'default'}
+                                        color={selectedVariant.payloadSource === 'environment' || selectedVariant.payloadSource === 'flag' ? 'info' : 'default'}
                                         sx={{ borderRadius: '16px' }}
                                     />
                                     {selectedVariant.payloadType && (
@@ -1309,6 +1314,23 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     })}
                                 </Box>
                             )}
+
+                            {/* Raw Response JSON */}
+                            <Box sx={{ mt: 2 }}>
+                                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                                    {t('playground.rawResponse')}
+                                </Typography>
+                                <JsonEditor
+                                    value={JSON.stringify({
+                                        enabled: selectedEvaluation.result.enabled,
+                                        variant: selectedEvaluation.result.variant,
+                                        reason: selectedEvaluation.result.reason,
+                                    }, null, 2)}
+                                    onChange={() => { }}
+                                    readOnly
+                                    height={150}
+                                />
+                            </Box>
                         </>
                     )}
                 </Box>

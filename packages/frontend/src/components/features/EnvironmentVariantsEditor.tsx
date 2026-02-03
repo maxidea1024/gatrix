@@ -408,160 +408,22 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
   return (
     <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
-      {/* Fallback Value Section */}
-      {onSaveFallbackValue && variantType !== 'none' && (
-        <Box sx={{ mb: 2 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              mb: 1.5,
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="subtitle2" fontWeight={600}>
-                {t('featureFlags.fallbackValue')}
-              </Typography>
-              <Tooltip title={t('featureFlags.fallbackValueDesc')}>
-                <HelpOutlineIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-              </Tooltip>
-              {fallbackHasChanges && (
-                <Chip
-                  label={t('common.unsavedChanges')}
-                  size="small"
-                  color="warning"
-                  sx={{ fontWeight: 600, height: 20, borderRadius: '12px' }}
-                />
-              )}
-            </Box>
-          </Box>
-
-          {/* Override Toggle - Right aligned */}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1.5 }}>
-            <FormControlLabel
-              control={
-                <Switch
-                  size="small"
-                  checked={useEnvOverride}
-                  onChange={(e) => setUseEnvOverride(e.target.checked)}
-                  disabled={!canManage || isArchived}
-                />
-              }
-              label={
-                <Typography variant="body2" color="text.secondary">
-                  {t('featureFlags.overrideForEnv')}
-                </Typography>
-              }
-              labelPlacement="start"
-            />
-          </Box>
-
-          {/* Input Field - Same editor for both states, with type icon on left */}
-          <Box sx={{ mb: 1.5 }}>
-            {!useEnvOverride && (
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                {t('featureFlags.usingGlobalDefault')}
-              </Typography>
-            )}
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-              {/* Type Icon with Tooltip */}
-              <Box sx={{ mt: variantType === 'json' ? 1 : 0.75, display: 'flex', alignItems: 'center' }}>
-                <Tooltip title={variantType === 'json' ? 'JSON' : variantType === 'number' ? 'Number' : 'String'}>
-                  {variantType === 'json' ? (
-                    <JsonIcon sx={{ fontSize: 20, color: 'secondary.main' }} />
-                  ) : variantType === 'number' ? (
-                    <NumberIcon sx={{ fontSize: 20, color: 'info.main' }} />
-                  ) : (
-                    <StringIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
-                  )}
-                </Tooltip>
-              </Box>
-              {/* Editor */}
-              <Box sx={{ flex: 1 }}>
-                {variantType === 'json' ? (
-                  <JsonEditor
-                    value={useEnvOverride ? editingFallback : (typeof baselinePayload === 'string' ? baselinePayload : JSON.stringify(baselinePayload ?? {}, null, 2))}
-                    onChange={(val) => {
-                      if (useEnvOverride) {
-                        setEditingFallback(val);
-                        setFallbackJsonError(null);
-                      }
-                    }}
-                    onValidationError={(error) => useEnvOverride && setFallbackJsonError(error)}
-                    readOnly={!useEnvOverride || !canManage || isArchived}
-                    height={120}
-                  />
-                ) : (
-                  <TextField
-                    fullWidth
-                    size="small"
-                    type={variantType === 'number' ? 'number' : 'text'}
-                    value={useEnvOverride ? editingFallback : String(baselinePayload ?? '')}
-                    onChange={(e) => useEnvOverride && setEditingFallback(e.target.value)}
-                    disabled={!useEnvOverride || !canManage || isArchived}
-                    placeholder={t('featureFlags.fallbackValuePlaceholder')}
-                  />
-                )}
-                {fallbackJsonError && (
-                  <Typography variant="caption" color="error" sx={{ display: 'block', mt: 0.5 }}>
-                    {fallbackJsonError}
-                  </Typography>
-                )}
-              </Box>
-            </Box>
-          </Box>
-
-          {/* Actions */}
-          {canManage && !isArchived && (
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-              {fallbackHasChanges && (
-                <Button
-                  variant="text"
-                  size="small"
-                  onClick={handleResetFallback}
-                  disabled={savingFallback}
-                >
-                  {t('common.reset')}
-                </Button>
-              )}
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<SaveIcon />}
-                onClick={handleSaveFallback}
-                disabled={savingFallback || !fallbackHasChanges || !!fallbackJsonError}
-              >
-                {savingFallback ? t('common.saving') : t('common.save')}
-              </Button>
-            </Box>
-          )}
-
-          <Divider sx={{ mt: 2 }} />
-        </Box>
-      )}
-
-      {/* Header */}
+      {/* Unified Header for Fallback + Variants */}
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          mb: variantCount > 0 ? 2 : 0,
+          mb: expanded ? 2 : 0,
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography variant="subtitle2" fontWeight={600}>
             {flagUsage === 'remoteConfig'
-              ? t('featureFlags.configuration')
-              : t('featureFlags.variants')}
+              ? t('featureFlags.fallbackAndConfiguration')
+              : t('featureFlags.fallbackAndVariants')}
           </Typography>
-          {variantCount > 0 && flagUsage !== 'remoteConfig' && (
-            <Typography variant="caption" color="text.secondary">
-              ({variantCount})
-            </Typography>
-          )}
-          {hasChanges && (
+          {(hasChanges || fallbackHasChanges) && (
             <Chip
               label={t('common.unsavedChanges')}
               size="small"
@@ -571,11 +433,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           )}
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {variantCount > 0 && (
-            <IconButton size="small" onClick={() => setExpanded(!expanded)}>
-              {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </IconButton>
-          )}
+          <IconButton size="small" onClick={() => setExpanded(!expanded)}>
+            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
         </Box>
       </Box>
 
@@ -626,31 +486,62 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
         </Box>
       )}
 
-      {/* No variants message */}
-      {variantCount === 0 && (
-        <Box sx={{ textAlign: 'center', py: 2 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {flagUsage === 'remoteConfig'
-              ? t('featureFlags.noRemoteConfigValues')
-              : t('featureFlags.noVariantsGuide')}
-          </Typography>
-          {canManage && !isArchived && (
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={addVariant}
-            >
+      {/* Expanded content - Fallback + Variant editing */}
+      <Collapse in={expanded}>
+        {/* No variants/configuration message - same style as no strategies */}
+        {variantCount === 0 && (
+          <Box
+            sx={{
+              textAlign: 'center',
+              py: 4,
+              px: 3,
+              border: '2px dashed',
+              borderColor: 'divider',
+              borderRadius: 2,
+              backgroundColor: 'action.hover',
+              mb: 2,
+            }}
+          >
+            <Typography variant="body1" fontWeight={600} sx={{ mb: 1 }}>
               {flagUsage === 'remoteConfig'
-                ? t('featureFlags.addConfiguration')
-                : t('featureFlags.addVariant')}
-            </Button>
-          )}
-        </Box>
-      )}
+                ? t('featureFlags.noRemoteConfigValues')
+                : t('featureFlags.noVariantsConfigured')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              {flagUsage === 'remoteConfig'
+                ? t('featureFlags.noRemoteConfigValuesHint')
+                : t('featureFlags.noVariantsGuide')}
+            </Typography>
+            {canManage && !isArchived && (
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<AddIcon />}
+                onClick={addVariant}
+              >
+                {flagUsage === 'remoteConfig'
+                  ? t('featureFlags.addConfiguration')
+                  : t('featureFlags.addVariant')}
+              </Button>
+            )}
+          </Box>
+        )}
 
-      {/* Expanded variant editing */}
-      <Collapse in={expanded && variantCount > 0}>
+        {/* Variants/Configuration Section */}
+        {variantCount > 0 && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+            <Typography variant="subtitle2" fontWeight={600}>
+              {flagUsage === 'remoteConfig'
+                ? t('featureFlags.configuration')
+                : t('featureFlags.variants')}
+            </Typography>
+            {flagUsage !== 'remoteConfig' && (
+              <Typography variant="caption" color="text.secondary">
+                ({variantCount})
+              </Typography>
+            )}
+          </Box>
+        )}
         <Stack spacing={2}>
           {editingVariants.map((variant, index) => {
             const variantColor = VARIANT_COLORS[index % VARIANT_COLORS.length];
@@ -862,6 +753,130 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             );
           })}
         </Stack>
+
+        {/* Fallback Value Section - appears after variants */}
+        {onSaveFallbackValue && variantType !== 'none' && (
+          <Box sx={{ mt: variantCount > 0 ? 2 : 0 }}>
+            {variantCount > 0 && <Divider sx={{ mb: 2 }} />}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                mb: 1.5,
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="subtitle2" fontWeight={600}>
+                  {t('featureFlags.fallbackValue')}
+                </Typography>
+                <Tooltip title={t('featureFlags.fallbackValueDesc')}>
+                  <HelpOutlineIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                </Tooltip>
+              </Box>
+            </Box>
+
+            {/* Override Toggle - Right aligned */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1.5 }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    size="small"
+                    checked={useEnvOverride}
+                    onChange={(e) => setUseEnvOverride(e.target.checked)}
+                    disabled={!canManage || isArchived}
+                  />
+                }
+                label={
+                  <Typography variant="body2" color="text.secondary">
+                    {t('featureFlags.overrideForEnv')}
+                  </Typography>
+                }
+                labelPlacement="start"
+              />
+            </Box>
+
+            {/* Input Field - Same editor for both states, with type icon on left */}
+            <Box sx={{ mb: 1.5 }}>
+              {!useEnvOverride && (
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                  {t('featureFlags.usingGlobalDefault')}
+                </Typography>
+              )}
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                {/* Type Icon with Tooltip */}
+                <Box sx={{ mt: variantType === 'json' ? 1 : 0.75, display: 'flex', alignItems: 'center' }}>
+                  <Tooltip title={variantType === 'json' ? 'JSON' : variantType === 'number' ? 'Number' : 'String'}>
+                    {variantType === 'json' ? (
+                      <JsonIcon sx={{ fontSize: 20, color: 'secondary.main' }} />
+                    ) : variantType === 'number' ? (
+                      <NumberIcon sx={{ fontSize: 20, color: 'info.main' }} />
+                    ) : (
+                      <StringIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+                    )}
+                  </Tooltip>
+                </Box>
+                {/* Editor */}
+                <Box sx={{ flex: 1 }}>
+                  {variantType === 'json' ? (
+                    <JsonEditor
+                      value={useEnvOverride ? editingFallback : (typeof baselinePayload === 'string' ? baselinePayload : JSON.stringify(baselinePayload ?? {}, null, 2))}
+                      onChange={(val) => {
+                        if (useEnvOverride) {
+                          setEditingFallback(val);
+                          setFallbackJsonError(null);
+                        }
+                      }}
+                      onValidationError={(error) => useEnvOverride && setFallbackJsonError(error)}
+                      readOnly={!useEnvOverride || !canManage || isArchived}
+                      height={120}
+                    />
+                  ) : (
+                    <TextField
+                      fullWidth
+                      size="small"
+                      type={variantType === 'number' ? 'number' : 'text'}
+                      value={useEnvOverride ? editingFallback : String(baselinePayload ?? '')}
+                      onChange={(e) => useEnvOverride && setEditingFallback(e.target.value)}
+                      disabled={!useEnvOverride || !canManage || isArchived}
+                      placeholder={t('featureFlags.fallbackValuePlaceholder')}
+                    />
+                  )}
+                  {fallbackJsonError && (
+                    <Typography variant="caption" color="error" sx={{ display: 'block', mt: 0.5 }}>
+                      {fallbackJsonError}
+                    </Typography>
+                  )}
+                </Box>
+              </Box>
+            </Box>
+
+            {/* Actions */}
+            {canManage && !isArchived && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                {fallbackHasChanges && (
+                  <Button
+                    variant="text"
+                    size="small"
+                    onClick={handleResetFallback}
+                    disabled={savingFallback}
+                  >
+                    {t('common.reset')}
+                  </Button>
+                )}
+                <Button
+                  variant="contained"
+                  size="small"
+                  startIcon={<SaveIcon />}
+                  onClick={handleSaveFallback}
+                  disabled={savingFallback || !fallbackHasChanges || !!fallbackJsonError}
+                >
+                  {savingFallback ? t('common.saving') : t('common.save')}
+                </Button>
+              </Box>
+            )}
+          </Box>
+        )}
       </Collapse>
 
       {/* Actions - only show when expanded */}

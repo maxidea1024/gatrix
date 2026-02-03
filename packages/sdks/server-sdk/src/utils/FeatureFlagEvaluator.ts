@@ -21,33 +21,18 @@ export class FeatureFlagEvaluator {
     context: EvaluationContext,
     segmentsMap: Map<string, FeatureSegment>
   ): EvaluationResult {
-    if (!flag.isEnabled) {
-      // Return disabled variant with baselinePayload if available
-      const variant: Variant | undefined = flag.baselinePayload !== undefined && flag.baselinePayload !== null
-        ? {
-          name: 'disabled',
-          weight: 100,
-          payload: flag.baselinePayload,
-          payloadType: flag.variantType,
-        }
-        : undefined;
-
-      return {
-        flagName: flag.name,
-        enabled: false,
-        variant,
-        reason: 'disabled',
-      };
-    }
-
-    // Default result if no strategies match
+    // Default result if disabled or no strategies match
     let result: EvaluationResult = {
       flagName: flag.name,
       enabled: false,
-      reason: 'default',
+      reason: 'disabled',
     };
 
-    if (flag.strategies && flag.strategies.length > 0) {
+    if (!flag.isEnabled) {
+      // Flag is disabled - will add disabled variant at the end
+      result.reason = 'disabled';
+    } else if (flag.strategies && flag.strategies.length > 0) {
+      // Evaluate strategies
       for (const strategy of flag.strategies) {
         if (!strategy.isEnabled) continue;
 
@@ -62,9 +47,11 @@ export class FeatureFlagEvaluator {
           if (variant) {
             result.variant = variant;
           }
-          return result;
+          return result; // Early return for matched strategy
         }
       }
+      // No strategy matched
+      result.reason = 'default';
     } else {
       // No strategies, enabled by default
       result = {
@@ -76,7 +63,19 @@ export class FeatureFlagEvaluator {
       if (variant) {
         result.variant = variant;
       }
-      return result;
+      return result; // Early return for enabled by default
+    }
+
+    // If evaluation result is false, add disabled variant with baselinePayload
+    if (!result.enabled && !result.variant) {
+      if (flag.baselinePayload !== undefined && flag.baselinePayload !== null) {
+        result.variant = {
+          name: 'disabled',
+          weight: 100,
+          payload: flag.baselinePayload,
+          payloadType: flag.variantType,
+        };
+      }
     }
 
     return result;

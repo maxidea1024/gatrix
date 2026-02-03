@@ -748,7 +748,31 @@ router.post(
           if (!flag) continue;
 
           // Evaluate the flag
-          const evalResult = evaluateFlagWithDetails(flag, context || {}, segmentsMap);
+          let evalResult = evaluateFlagWithDetails(flag, context || {}, segmentsMap);
+
+          // If evaluation result is false, always add disabled variant with baselinePayload
+          if (!evalResult.enabled && !evalResult.variant) {
+            const envSettings = (flag as any).environments?.[0];
+            let payload = envSettings?.baselinePayload;
+            let payloadSource: 'environment' | 'flag' | undefined;
+
+            if (payload !== undefined && payload !== null) {
+              payloadSource = 'environment';
+            } else if ((flag as any).baselinePayload !== undefined && (flag as any).baselinePayload !== null) {
+              payload = (flag as any).baselinePayload;
+              payloadSource = 'flag';
+            }
+
+            evalResult = {
+              ...evalResult,
+              variant: {
+                name: 'disabled',
+                payload,
+                payloadType: (flag as any).variantType || 'string',
+                payloadSource,
+              },
+            };
+          }
 
           envResults.push({
             flagName: flag.flagName,
@@ -796,31 +820,7 @@ function evaluateFlagWithDetails(
       passed: false,
       message: 'Flag is disabled in this environment',
     });
-
-    // Return disabled variant with baselinePayload
-    // Priority: environment baselinePayload > flag baselinePayload
-    const envSettings = flag.environments?.[0];
-    let payload = envSettings?.baselinePayload;
-    let payloadSource: 'environment' | 'flag' | undefined;
-
-    if (payload !== undefined && payload !== null) {
-      payloadSource = 'environment';
-    } else if (flag.baselinePayload !== undefined && flag.baselinePayload !== null) {
-      payload = flag.baselinePayload;
-      payloadSource = 'flag';
-    }
-
-    return {
-      enabled: false,
-      variant: {
-        name: 'disabled',
-        payload,
-        payloadType: flag.variantType || 'string',
-        payloadSource,
-      },
-      reason: 'FLAG_DISABLED',
-      evaluationSteps,
-    };
+    return { enabled: false, reason: 'FLAG_DISABLED', evaluationSteps };
   }
   evaluationSteps.push({
     step: 'ENVIRONMENT_CHECK',

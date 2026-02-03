@@ -173,6 +173,7 @@ interface FeatureFlagEnvironment {
   flagId: string;
   environment: string;
   isEnabled: boolean;
+  baselinePayload?: any;
   lastSeenAt?: string;
 }
 
@@ -1273,6 +1274,27 @@ const FeatureFlagDetailPage: React.FC = () => {
       }
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.variantsSaveFailed"), {
+        variant: "error",
+      });
+    }
+  };
+
+  // Handler for saving environment-specific fallback value (baselinePayload)
+  const handleSaveEnvFallbackValue = async (envName: string, value: any, useGlobal: boolean) => {
+    if (!flag || isCreating) return;
+
+    try {
+      // Update flag with environment-specific baselinePayload
+      await api.put(
+        `/admin/features/${flag.flagName}`,
+        { environmentBaselinePayload: useGlobal ? null : value },
+        { headers: { "x-environment": envName } },
+      );
+      // Reload flag data
+      await loadFlag(flag.flagName, environments);
+      enqueueSnackbar(t("featureFlags.fallbackValueSaved"), { variant: "success" });
+    } catch (error: any) {
+      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.fallbackValueSaveFailed"), {
         variant: "error",
       });
     }
@@ -2420,9 +2442,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   variantType={flag.variantType || "none"}
                                   flagUsage={flag.flagUsage || "flag"}
                                   baselinePayload={flag.baselinePayload}
+                                  envFallbackValue={flag.environments?.find(e => e.environment === env.environment)?.baselinePayload}
                                   canManage={canManage}
                                   isArchived={flag.isArchived}
                                   onSave={(variants) => handleSaveEnvVariants(env.environment, variants)}
+                                  onSaveFallbackValue={(value, useGlobal) => handleSaveEnvFallbackValue(env.environment, value, useGlobal)}
                                   onGoToPayloadTab={() => setTabValue(1)}
                                 />
                               </>
@@ -3514,9 +3538,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   variantType={flag.variantType || "none"}
                                   flagUsage={flag.flagUsage || "flag"}
                                   baselinePayload={flag.baselinePayload}
+                                  envFallbackValue={flag.environments?.find(e => e.environment === env.environment)?.baselinePayload}
                                   canManage={canManage}
                                   isArchived={flag.isArchived}
                                   onSave={(variants) => handleSaveEnvVariants(env.environment, variants)}
+                                  onSaveFallbackValue={(value, useGlobal) => handleSaveEnvFallbackValue(env.environment, value, useGlobal)}
                                   onGoToPayloadTab={() => setTabValue(1)}
                                 />
                               </>
