@@ -92,6 +92,7 @@ export interface FeatureFlagEnvironmentAttributes {
   flagId: string;
   environment: string;
   isEnabled: boolean;
+  baselinePayload?: any; // Environment-specific baseline payload
   lastSeenAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
@@ -299,6 +300,7 @@ export class FeatureFlagModel {
             flagId: e.flagId,
             environment: e.environment,
             isEnabled: Boolean(e.isEnabled),
+            baselinePayload: parseJsonField(e.baselinePayload),
             lastSeenAt: e.lastSeenAt,
           })),
         };
@@ -358,6 +360,7 @@ export class FeatureFlagModel {
           flagId: e.flagId,
           environment: e.environment,
           isEnabled: Boolean(e.isEnabled),
+          baselinePayload: parseJsonField(e.baselinePayload),
           lastSeenAt: e.lastSeenAt,
         })),
       };
@@ -405,6 +408,7 @@ export class FeatureFlagModel {
               flagId: id,
               environment,
               isEnabled: Boolean(envSettings.isEnabled),
+              baselinePayload: parseJsonField(envSettings.baselinePayload),
               lastSeenAt: envSettings.lastSeenAt,
             },
           ]
@@ -528,6 +532,7 @@ export class FeatureFlagEnvironmentModel {
       return envs.map((e: any) => ({
         ...e,
         isEnabled: Boolean(e.isEnabled),
+        baselinePayload: parseJsonField(e.baselinePayload),
       }));
     } catch (error) {
       logger.error('Error finding flag environments:', error);
@@ -548,6 +553,7 @@ export class FeatureFlagEnvironmentModel {
       return {
         ...env,
         isEnabled: Boolean(env.isEnabled),
+        baselinePayload: parseJsonField(env.baselinePayload),
       };
     } catch (error) {
       logger.error('Error finding flag environment:', error);
@@ -565,6 +571,8 @@ export class FeatureFlagEnvironmentModel {
         flagId: data.flagId,
         environment: data.environment,
         isEnabled: data.isEnabled ?? false,
+        baselinePayload:
+          data.baselinePayload !== undefined ? JSON.stringify(data.baselinePayload) : null,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -594,6 +602,43 @@ export class FeatureFlagEnvironmentModel {
         .where('flagId', flagId)
         .where('environment', environment)
         .update({ isEnabled, updatedAt: new Date() });
+
+      return this.findByFlagIdAndEnvironment(
+        flagId,
+        environment
+      ) as Promise<FeatureFlagEnvironmentAttributes>;
+    } catch (error) {
+      logger.error('Error updating flag environment:', error);
+      throw error;
+    }
+  }
+
+  static async update(
+    flagId: string,
+    environment: string,
+    data: Partial<FeatureFlagEnvironmentAttributes>
+  ): Promise<FeatureFlagEnvironmentAttributes> {
+    try {
+      // Upsert - create if not exists
+      const existing = await this.findByFlagIdAndEnvironment(flagId, environment);
+      if (!existing) {
+        return this.create({
+          flagId,
+          environment,
+          isEnabled: data.isEnabled ?? false,
+          baselinePayload: data.baselinePayload,
+        });
+      }
+
+      const updateData: any = { updatedAt: new Date() };
+      if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
+      if (data.baselinePayload !== undefined)
+        updateData.baselinePayload = JSON.stringify(data.baselinePayload);
+
+      await db('g_feature_flag_environments')
+        .where('flagId', flagId)
+        .where('environment', environment)
+        .update(updateData);
 
       return this.findByFlagIdAndEnvironment(
         flagId,

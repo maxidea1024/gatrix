@@ -699,6 +699,494 @@ router.post(
   })
 );
 
+// ==================== Playground ====================
+
+// Evaluate all flags with custom context (for playground testing)
+router.post(
+  '/playground',
+  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { environments, context, flagNames } = req.body;
+
+    if (!environments || !Array.isArray(environments) || environments.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'At least one environment is required',
+      });
+    }
+
+    const results: Record<string, any[]> = {};
+
+    // Load all segments (global)
+    const segments = await featureFlagService.listSegments();
+    const segmentsMap = new Map(segments.map((s) => [s.segmentName, s]));
+
+    // If specific flags are requested, create a Set for faster lookup
+    const flagNamesSet = flagNames && Array.isArray(flagNames) && flagNames.length > 0
+      ? new Set(flagNames)
+      : null;
+
+    for (const env of environments) {
+      try {
+        // Load all flags for this environment
+        const flagsResult = await featureFlagService.listFlags({
+          environment: env,
+          isArchived: false,
+          page: 1,
+          limit: 10000,
+        });
+
+        const envResults: any[] = [];
+
+        for (const flagSummary of flagsResult.data) {
+          // Skip if specific flags are requested and this flag is not in the list
+          if (flagNamesSet && !flagNamesSet.has(flagSummary.flagName)) {
+            continue;
+          }
+
+          // Get detailed flag info
+          const flag = await featureFlagService.getFlag(env, flagSummary.flagName);
+          if (!flag) continue;
+
+          // Evaluate the flag
+          const evalResult = evaluateFlagWithDetails(flag, context || {}, segmentsMap);
+
+          envResults.push({
+            flagName: flag.flagName,
+            displayName: flag.displayName,
+            flagUsage: flag.flagUsage,
+            enabled: evalResult.enabled,
+            variant: evalResult.variant,
+            reason: evalResult.reason,
+            reasonDetails: evalResult.reasonDetails,
+            evaluationSteps: evalResult.evaluationSteps,
+          });
+        }
+
+        // Sort by flag name
+        envResults.sort((a, b) => a.flagName.localeCompare(b.flagName));
+        results[env] = envResults;
+      } catch (error: any) {
+        results[env] = [];
+      }
+    }
+
+    res.json({ success: true, data: { results } });
+  })
+);
+
+// Helper function for detailed flag evaluation
+function evaluateFlagWithDetails(
+  flag: any,
+  context: Record<string, any>,
+  segmentsMap: Map<string, any>
+): {
+  enabled: boolean;
+  variant?: { name: string; payload?: any };
+  reason: string;
+  reasonDetails?: any;
+  evaluationSteps?: any[];
+} {
+  const evaluationSteps: any[] = [];
+
+  // Step 2: Check if flag is enabled in environment
+  const envSettings = flag.environments?.[0];
+  if (!envSettings?.isEnabled) {
+    evaluationSteps.push({
+      step: 'ENVIRONMENT_CHECK',
+      passed: false,
+      message: 'Flag is disabled in this environment',
+    });
+    return { enabled: false, reason: 'FLAG_DISABLED', evaluationSteps };
+  }
+  evaluationSteps.push({
+    step: 'ENVIRONMENT_CHECK',
+    passed: true,
+    message: 'Flag is enabled in this environment',
+  });
+
+  const strategies = flag.strategies || [];
+
+  // Step 3: Check if strategies exist
+  if (strategies.length === 0) {
+    evaluationSteps.push({
+      step: 'STRATEGY_COUNT',
+      passed: true,
+      message: 'No strategies defined - enabled by default',
+    });
+    const variant = selectVariantForFlag(flag, context);
+    return {
+      enabled: true,
+      variant,
+      reason: 'NO_STRATEGIES',
+      evaluationSteps,
+    };
+  }
+  evaluationSteps.push({
+    step: 'STRATEGY_COUNT',
+    passed: true,
+    message: `${strategies.length} strategy(s) to evaluate`,
+  });
+
+  // Step 4+: Evaluate each strategy
+  for (let i = 0; i < strategies.length; i++) {
+    const strategy = strategies[i];
+    const strategyStep: any = {
+      step: 'STRATEGY_EVALUATION',
+      strategyIndex: i,
+      strategyName: strategy.strategyName,
+      isEnabled: strategy.isEnabled,
+      checks: [],
+    };
+
+    if (!strategy.isEnabled) {
+      strategyStep.passed = null; // Skipped
+      strategyStep.message = 'Strategy is disabled - skipped';
+      evaluationSteps.push(strategyStep);
+      continue;
+    }
+
+    // Evaluate segments
+    let segmentsPassed = true;
+    if (strategy.segments && strategy.segments.length > 0) {
+      for (const segmentName of strategy.segments) {
+        const segment = segmentsMap.get(segmentName);
+        if (!segment) {
+          strategyStep.checks.push({
+            type: 'SEGMENT',
+            name: segmentName,
+            passed: true,
+            message: 'Segment not found - skipped',
+          });
+          continue;
+        }
+
+        if (segment.constraints && segment.constraints.length > 0) {
+          for (const constraint of segment.constraints) {
+            const constraintPassed = evaluateConstraint(constraint, context);
+            strategyStep.checks.push({
+              type: 'SEGMENT_CONSTRAINT',
+              segment: segmentName,
+              constraint: constraint,
+              passed: constraintPassed,
+              contextValue: getContextValue(constraint.contextName, context),
+            });
+            if (!constraintPassed) {
+              segmentsPassed = false;
+            }
+          }
+        }
+      }
+    }
+
+    // Evaluate strategy constraints
+    let constraintsPassed = true;
+    if (strategy.constraints && strategy.constraints.length > 0) {
+      for (const constraint of strategy.constraints) {
+        const constraintPassed = evaluateConstraint(constraint, context);
+        strategyStep.checks.push({
+          type: 'STRATEGY_CONSTRAINT',
+          constraint: constraint,
+          passed: constraintPassed,
+          contextValue: getContextValue(constraint.contextName, context),
+        });
+        if (!constraintPassed) {
+          constraintsPassed = false;
+        }
+      }
+    }
+
+    // Evaluate rollout
+    let rolloutPassed = true;
+    const rollout = strategy.parameters?.rollout ?? 100;
+    if (rollout < 100) {
+      const stickiness = strategy.parameters?.stickiness || 'default';
+      const groupId = strategy.parameters?.groupId || flag.flagName;
+      const percentage = calculatePercentage(context, stickiness, groupId);
+      rolloutPassed = percentage <= rollout;
+      strategyStep.checks.push({
+        type: 'ROLLOUT',
+        rollout: rollout,
+        percentage: percentage,
+        passed: rolloutPassed,
+      });
+    }
+
+    // Determine if strategy matched
+    const strategyMatched = segmentsPassed && constraintsPassed && rolloutPassed;
+    strategyStep.passed = strategyMatched;
+    strategyStep.message = strategyMatched
+      ? 'All conditions met'
+      : 'One or more conditions failed';
+    evaluationSteps.push(strategyStep);
+
+    if (strategyMatched) {
+      const variant = selectVariantForFlag(flag, context, strategy);
+      return {
+        enabled: true,
+        variant,
+        reason: 'STRATEGY_MATCHED',
+        reasonDetails: {
+          strategyName: strategy.strategyName,
+          strategyIndex: i,
+          constraints: strategy.constraints,
+          segments: strategy.segments,
+        },
+        evaluationSteps,
+      };
+    }
+  }
+
+  // No strategy matched
+  return {
+    enabled: false,
+    reason: 'NO_MATCHING_STRATEGY',
+    reasonDetails: {
+      strategiesCount: strategies.length,
+    },
+    evaluationSteps,
+  };
+}
+
+function evaluateStrategyWithDetails(
+  strategy: any,
+  context: Record<string, any>,
+  flag: any,
+  segmentsMap: Map<string, any>,
+  strategyIndex: number
+): { matched: boolean; failReason?: string; details?: any } {
+  // Check segments
+  if (strategy.segments && strategy.segments.length > 0) {
+    for (const segmentName of strategy.segments) {
+      const segment = segmentsMap.get(segmentName);
+      if (!segment) continue;
+
+      if (segment.constraints && segment.constraints.length > 0) {
+        for (const constraint of segment.constraints) {
+          if (!evaluateConstraint(constraint, context)) {
+            return {
+              matched: false,
+              failReason: 'SEGMENT_NOT_MATCHED',
+              details: {
+                failedSegment: segmentName,
+                failedConstraint: constraint,
+              },
+            };
+          }
+        }
+      }
+    }
+  }
+
+  // Check constraints
+  if (strategy.constraints && strategy.constraints.length > 0) {
+    for (const constraint of strategy.constraints) {
+      if (!evaluateConstraint(constraint, context)) {
+        return {
+          matched: false,
+          failReason: 'CONSTRAINT_NOT_MATCHED',
+          details: { failedConstraint: constraint },
+        };
+      }
+    }
+  }
+
+  // Check rollout
+  const rollout = strategy.parameters?.rollout ?? 100;
+  if (rollout < 100) {
+    const stickiness = strategy.parameters?.stickiness || 'default';
+    const groupId = strategy.parameters?.groupId || flag.flagName;
+    const percentage = calculatePercentage(context, stickiness, groupId);
+    if (percentage > rollout) {
+      return {
+        matched: false,
+        failReason: 'ROLLOUT_EXCLUDED',
+        details: { rollout, percentage },
+      };
+    }
+  }
+
+  return { matched: true };
+}
+
+function evaluateConstraint(constraint: any, context: Record<string, any>): boolean {
+  const contextValue = getContextValue(constraint.contextName, context);
+  if (contextValue === undefined) {
+    return constraint.inverted ? true : false;
+  }
+
+  const stringValue = String(contextValue);
+  const compareValue = constraint.caseInsensitive ? stringValue.toLowerCase() : stringValue;
+  const targetValue = constraint.value
+    ? constraint.caseInsensitive
+      ? constraint.value.toLowerCase()
+      : constraint.value
+    : '';
+  const targetValues =
+    constraint.values?.map((v: string) => (constraint.caseInsensitive ? v.toLowerCase() : v)) || [];
+
+  let result = false;
+
+  switch (constraint.operator) {
+    case 'str_eq':
+      result = compareValue === targetValue;
+      break;
+    case 'str_neq':
+      result = compareValue !== targetValue;
+      break;
+    case 'str_contains':
+      result = compareValue.includes(targetValue);
+      break;
+    case 'str_starts_with':
+      result = compareValue.startsWith(targetValue);
+      break;
+    case 'str_ends_with':
+      result = compareValue.endsWith(targetValue);
+      break;
+    case 'str_in':
+      result = targetValues.includes(compareValue);
+      break;
+    case 'str_not_in':
+      result = !targetValues.includes(compareValue);
+      break;
+    case 'str_regex':
+      try {
+        const flags = constraint.caseInsensitive ? 'i' : '';
+        const regex = new RegExp(constraint.value || '', flags);
+        result = regex.test(stringValue);
+      } catch {
+        result = false;
+      }
+      break;
+    case 'num_eq':
+      result = Number(contextValue) === Number(constraint.value);
+      break;
+    case 'num_gt':
+      result = Number(contextValue) > Number(constraint.value);
+      break;
+    case 'num_gte':
+      result = Number(contextValue) >= Number(constraint.value);
+      break;
+    case 'num_lt':
+      result = Number(contextValue) < Number(constraint.value);
+      break;
+    case 'num_lte':
+      result = Number(contextValue) <= Number(constraint.value);
+      break;
+    case 'bool_is':
+      result = Boolean(contextValue) === (constraint.value === 'true');
+      break;
+    case 'date_gt':
+      result = new Date(stringValue) > new Date(targetValue);
+      break;
+    case 'date_gte':
+      result = new Date(stringValue) >= new Date(targetValue);
+      break;
+    case 'date_lt':
+      result = new Date(stringValue) < new Date(targetValue);
+      break;
+    case 'date_lte':
+      result = new Date(stringValue) <= new Date(targetValue);
+      break;
+    default:
+      result = false;
+  }
+
+  return constraint.inverted ? !result : result;
+}
+
+function getContextValue(name: string, context: Record<string, any>): any {
+  switch (name) {
+    case 'userId':
+      return context.userId;
+    case 'sessionId':
+      return context.sessionId;
+    case 'appName':
+      return context.appName;
+    case 'appVersion':
+      return context.appVersion;
+    case 'remoteAddress':
+      return context.remoteAddress;
+    default:
+      return context.properties?.[name] ?? context[name];
+  }
+}
+
+function calculatePercentage(
+  context: Record<string, any>,
+  stickiness: string,
+  groupId: string
+): number {
+  let stickinessValue = '';
+  if (stickiness === 'default' || stickiness === 'userId') {
+    stickinessValue = context.userId || context.sessionId || String(Math.random());
+  } else if (stickiness === 'sessionId') {
+    stickinessValue = context.sessionId || String(Math.random());
+  } else if (stickiness === 'random') {
+    stickinessValue = String(Math.random());
+  } else {
+    stickinessValue = String(getContextValue(stickiness, context) || Math.random());
+  }
+
+  const seed = `${groupId}:${stickinessValue}`;
+  // Simple hash function (murmurhash would be better but this works for playground)
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    const char = seed.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash % 10000) / 100;
+}
+
+function selectVariantForFlag(
+  flag: any,
+  context: Record<string, any>,
+  matchedStrategy?: any
+): { name: string; payload?: any; payloadType?: string; payloadSource?: string } | undefined {
+  const variants = flag.variants || [];
+  if (variants.length === 0) return undefined;
+
+  const totalWeight = variants.reduce((sum: number, v: any) => sum + v.weight, 0);
+  if (totalWeight <= 0) return undefined;
+
+  const stickiness = matchedStrategy?.parameters?.stickiness || 'default';
+  const percentage = calculatePercentage(context, stickiness, `${flag.flagName}-variant`);
+  const targetWeight = (percentage / 100) * totalWeight;
+
+  let cumulativeWeight = 0;
+  for (const variant of variants) {
+    cumulativeWeight += variant.weight;
+    if (targetWeight <= cumulativeWeight) {
+      // Determine payload and its source
+      let payload = variant.payload;
+      let payloadSource: 'variant' | 'baseline' = 'variant';
+      if (payload === undefined || payload === null) {
+        payload = flag.baselinePayload;
+        payloadSource = 'baseline';
+      }
+      return {
+        name: variant.variantName || variant.name,
+        payload,
+        payloadType: flag.variantType || 'string',
+        payloadSource: payload !== undefined ? payloadSource : undefined,
+      };
+    }
+  }
+  const lastVariant = variants[variants.length - 1];
+  let payload = lastVariant.payload;
+  let payloadSource: 'variant' | 'baseline' = 'variant';
+  if (payload === undefined || payload === null) {
+    payload = flag.baselinePayload;
+    payloadSource = 'baseline';
+  }
+  return {
+    name: lastVariant.variantName || lastVariant.name,
+    payload,
+    payloadType: flag.variantType || 'string',
+    payloadSource: payload !== undefined ? payloadSource : undefined,
+  };
+}
+
 // ==================== Clone ====================
 
 // Clone a feature flag to a new name

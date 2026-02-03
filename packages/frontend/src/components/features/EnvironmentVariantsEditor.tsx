@@ -23,6 +23,8 @@ import {
   Slider,
   Collapse,
   Chip,
+  Switch,
+  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -57,10 +59,12 @@ interface EnvironmentVariantsEditorProps {
   variants: Variant[];
   variantType: 'none' | 'string' | 'json' | 'number';
   flagUsage?: 'flag' | 'remoteConfig';
-  baselinePayload?: any;
+  baselinePayload?: any; // Global fallback value
+  envFallbackValue?: any; // Environment-specific fallback value (null means use global)
   canManage: boolean;
   isArchived?: boolean;
   onSave: (variants: Variant[]) => Promise<void>;
+  onSaveFallbackValue?: (value: any, useGlobal: boolean) => Promise<void>;
   onGoToPayloadTab: () => void;
 }
 
@@ -98,9 +102,11 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   variantType,
   flagUsage = 'flag',
   baselinePayload,
+  envFallbackValue,
   canManage,
   isArchived,
   onSave,
+  onSaveFallbackValue,
   onGoToPayloadTab,
 }) => {
   const { t } = useTranslation();
@@ -109,6 +115,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   const [saving, setSaving] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [jsonErrors, setJsonErrors] = useState<Record<number, string | null>>({});
+
+  // Fallback Value state
+  const [useEnvOverride, setUseEnvOverride] = useState(false);
+  const [editingFallback, setEditingFallback] = useState<string>('');
+  const [fallbackHasChanges, setFallbackHasChanges] = useState(false);
+  const [savingFallback, setSavingFallback] = useState(false);
+  const [fallbackJsonError, setFallbackJsonError] = useState<string | null>(null);
 
   // Ref to preserve expanded state across data reloads
   const preserveExpandedRef = React.useRef(false);
@@ -143,6 +156,83 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   useEffect(() => {
     setHasChanges(computedHasChanges);
   }, [computedHasChanges]);
+
+  // Initialize fallback value from props
+  useEffect(() => {
+    const hasEnvOverride = envFallbackValue !== undefined && envFallbackValue !== null;
+    setUseEnvOverride(hasEnvOverride);
+
+    // Set initial editing value
+    const initialValue = hasEnvOverride ? envFallbackValue : baselinePayload;
+    if (variantType === 'json') {
+      setEditingFallback(
+        typeof initialValue === 'string' ? initialValue : JSON.stringify(initialValue ?? {}, null, 2)
+      );
+    } else {
+      setEditingFallback(String(initialValue ?? ''));
+    }
+    setFallbackHasChanges(false);
+    setFallbackJsonError(null);
+  }, [envFallbackValue, baselinePayload, variantType]);
+
+  // Check fallback changes
+  const originalFallbackValue = useMemo(() => {
+    const hasEnvOverride = envFallbackValue !== undefined && envFallbackValue !== null;
+    const value = hasEnvOverride ? envFallbackValue : baselinePayload;
+    if (variantType === 'json') {
+      return typeof value === 'string' ? value : JSON.stringify(value ?? {}, null, 2);
+    }
+    return String(value ?? '');
+  }, [envFallbackValue, baselinePayload, variantType]);
+
+  const originalUseEnvOverride = useMemo(() => {
+    return envFallbackValue !== undefined && envFallbackValue !== null;
+  }, [envFallbackValue]);
+
+  useEffect(() => {
+    const valueChanged = editingFallback !== originalFallbackValue;
+    const overrideChanged = useEnvOverride !== originalUseEnvOverride;
+    setFallbackHasChanges(valueChanged || overrideChanged);
+  }, [editingFallback, originalFallbackValue, useEnvOverride, originalUseEnvOverride]);
+
+  // Handle save fallback value
+  const handleSaveFallback = useCallback(async () => {
+    if (!onSaveFallbackValue) return;
+
+    // Validate JSON if needed
+    if (variantType === 'json' && useEnvOverride) {
+      try {
+        JSON.parse(editingFallback);
+      } catch (e) {
+        setFallbackJsonError(t('featureFlags.errors.invalidJson'));
+        return;
+      }
+    }
+
+    setSavingFallback(true);
+    try {
+      if (useEnvOverride) {
+        // Save env-specific value
+        const valueToSave = variantType === 'json' ? editingFallback : editingFallback;
+        await onSaveFallbackValue(valueToSave, false);
+      } else {
+        // Clear env-specific, use global
+        await onSaveFallbackValue(null, true);
+      }
+      setFallbackHasChanges(false);
+    } catch (error) {
+      // Error handling done by parent
+    } finally {
+      setSavingFallback(false);
+    }
+  }, [onSaveFallbackValue, variantType, useEnvOverride, editingFallback, t]);
+
+  // Handle reset fallback value
+  const handleResetFallback = useCallback(() => {
+    setUseEnvOverride(originalUseEnvOverride);
+    setEditingFallback(originalFallbackValue);
+    setFallbackJsonError(null);
+  }, [originalUseEnvOverride, originalFallbackValue]);
 
   const addVariant = useCallback(() => {
     const lastVariant = editingVariants[editingVariants.length - 1];
@@ -318,6 +408,139 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
   return (
     <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
+      {/* Fallback Value Section */}
+      {onSaveFallbackValue && variantType !== 'none' && (
+        <Box sx={{ mb: 2 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              mb: 1.5,
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="subtitle2" fontWeight={600}>
+                {t('featureFlags.fallbackValue')}
+              </Typography>
+              <Tooltip title={t('featureFlags.fallbackValueDesc')}>
+                <HelpOutlineIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+              </Tooltip>
+              {fallbackHasChanges && (
+                <Chip
+                  label={t('common.unsavedChanges')}
+                  size="small"
+                  color="warning"
+                  sx={{ fontWeight: 600, height: 20, borderRadius: '12px' }}
+                />
+              )}
+            </Box>
+          </Box>
+
+          {/* Override Toggle - Right aligned */}
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1.5 }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  size="small"
+                  checked={useEnvOverride}
+                  onChange={(e) => setUseEnvOverride(e.target.checked)}
+                  disabled={!canManage || isArchived}
+                />
+              }
+              label={
+                <Typography variant="body2" color="text.secondary">
+                  {t('featureFlags.overrideForEnv')}
+                </Typography>
+              }
+              labelPlacement="start"
+            />
+          </Box>
+
+          {/* Input Field - Same editor for both states, with type icon on left */}
+          <Box sx={{ mb: 1.5 }}>
+            {!useEnvOverride && (
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                {t('featureFlags.usingGlobalDefault')}
+              </Typography>
+            )}
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+              {/* Type Icon with Tooltip */}
+              <Box sx={{ mt: variantType === 'json' ? 1 : 0.75, display: 'flex', alignItems: 'center' }}>
+                <Tooltip title={variantType === 'json' ? 'JSON' : variantType === 'number' ? 'Number' : 'String'}>
+                  {variantType === 'json' ? (
+                    <JsonIcon sx={{ fontSize: 20, color: 'secondary.main' }} />
+                  ) : variantType === 'number' ? (
+                    <NumberIcon sx={{ fontSize: 20, color: 'info.main' }} />
+                  ) : (
+                    <StringIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+                  )}
+                </Tooltip>
+              </Box>
+              {/* Editor */}
+              <Box sx={{ flex: 1 }}>
+                {variantType === 'json' ? (
+                  <JsonEditor
+                    value={useEnvOverride ? editingFallback : (typeof baselinePayload === 'string' ? baselinePayload : JSON.stringify(baselinePayload ?? {}, null, 2))}
+                    onChange={(val) => {
+                      if (useEnvOverride) {
+                        setEditingFallback(val);
+                        setFallbackJsonError(null);
+                      }
+                    }}
+                    onValidationError={(error) => useEnvOverride && setFallbackJsonError(error)}
+                    readOnly={!useEnvOverride || !canManage || isArchived}
+                    height={120}
+                  />
+                ) : (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    type={variantType === 'number' ? 'number' : 'text'}
+                    value={useEnvOverride ? editingFallback : String(baselinePayload ?? '')}
+                    onChange={(e) => useEnvOverride && setEditingFallback(e.target.value)}
+                    disabled={!useEnvOverride || !canManage || isArchived}
+                    placeholder={t('featureFlags.fallbackValuePlaceholder')}
+                  />
+                )}
+                {fallbackJsonError && (
+                  <Typography variant="caption" color="error" sx={{ display: 'block', mt: 0.5 }}>
+                    {fallbackJsonError}
+                  </Typography>
+                )}
+              </Box>
+            </Box>
+          </Box>
+
+          {/* Actions */}
+          {canManage && !isArchived && (
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+              {fallbackHasChanges && (
+                <Button
+                  variant="text"
+                  size="small"
+                  onClick={handleResetFallback}
+                  disabled={savingFallback}
+                >
+                  {t('common.reset')}
+                </Button>
+              )}
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<SaveIcon />}
+                onClick={handleSaveFallback}
+                disabled={savingFallback || !fallbackHasChanges || !!fallbackJsonError}
+              >
+                {savingFallback ? t('common.saving') : t('common.save')}
+              </Button>
+            </Box>
+          )}
+
+          <Divider sx={{ mt: 2 }} />
+        </Box>
+      )}
+
       {/* Header */}
       <Box
         sx={{

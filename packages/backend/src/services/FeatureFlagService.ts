@@ -57,6 +57,9 @@ export interface UpdateFlagInput {
   stale?: boolean;
   tags?: string[];
   links?: { url: string; title?: string }[];
+  variantType?: 'none' | 'string' | 'number' | 'json';
+  baselinePayload?: any;
+  environmentBaselinePayload?: any; // Environment-specific baseline payload
 }
 
 export interface CreateStrategyInput {
@@ -321,8 +324,8 @@ class FeatureFlagService {
       throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
     }
 
-    // Separate isEnabled from other properties (isEnabled is per-environment)
-    const { isEnabled, ...globalUpdates } = input;
+    // Separate environment-specific from global properties
+    const { isEnabled, environmentBaselinePayload, ...globalUpdates } = input;
 
     // Update global flag properties if any
     if (Object.keys(globalUpdates).length > 0) {
@@ -332,9 +335,12 @@ class FeatureFlagService {
       });
     }
 
-    // Update environment-specific isEnabled
-    if (isEnabled !== undefined) {
-      await FeatureFlagEnvironmentModel.updateIsEnabled(flag.id, environment, isEnabled);
+    // Update environment-specific settings (isEnabled, baselinePayload)
+    if (isEnabled !== undefined || environmentBaselinePayload !== undefined) {
+      await FeatureFlagEnvironmentModel.update(flag.id, environment, {
+        isEnabled,
+        baselinePayload: environmentBaselinePayload,
+      });
     }
 
     const updated = await this.getFlag(environment, flagName);

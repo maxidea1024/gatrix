@@ -41,31 +41,35 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
   const isUpdatingRef = useRef(false);
   const [internalError, setInternalError] = useState<string | null>(null);
 
-  // Real-time JSON validation
+  // Real-time JSON validation with debounce to prevent flickering
   useEffect(() => {
-    const trimmed = (value || "").trim();
-    if (trimmed.length === 0) {
-      if (onValidationError) onValidationError(null);
-      if (onValidation) onValidation(true, null);
-      setInternalError(null);
-      return;
-    }
-    try {
-      if (json5Mode) {
-        JSON5.parse(trimmed);
-      } else {
-        JSON.parse(trimmed);
+    const timer = setTimeout(() => {
+      const trimmed = (value || "").trim();
+      if (trimmed.length === 0) {
+        if (onValidationError) onValidationError(null);
+        if (onValidation) onValidation(true, null);
+        setInternalError(null);
+        return;
       }
-      if (onValidationError) onValidationError(null);
-      if (onValidation) onValidation(true, null);
-      setInternalError(null);
-    } catch (e: any) {
-      const errorMsg =
-        e.message || (json5Mode ? "Invalid JSON5" : "Invalid JSON");
-      if (onValidationError) onValidationError(errorMsg);
-      if (onValidation) onValidation(false, errorMsg);
-      setInternalError(errorMsg);
-    }
+      try {
+        if (json5Mode) {
+          JSON5.parse(trimmed);
+        } else {
+          JSON.parse(trimmed);
+        }
+        if (onValidationError) onValidationError(null);
+        if (onValidation) onValidation(true, null);
+        setInternalError(null);
+      } catch (e: any) {
+        const errorMsg =
+          e.message || (json5Mode ? "Invalid JSON5" : "Invalid JSON");
+        if (onValidationError) onValidationError(errorMsg);
+        if (onValidation) onValidation(false, errorMsg);
+        setInternalError(errorMsg);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
   }, [value, json5Mode]);
 
   // Displayed error: external error takes priority, then internal validation error
@@ -258,7 +262,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
               folding: true,
               lineDecorationsWidth: 0,
               lineNumbersMinChars: 3,
-              renderLineHighlight: "line",
+              renderLineHighlight: "none",
               selectionHighlight: false,
               occurrencesHighlight: false,
               overviewRulerLanes: 0,

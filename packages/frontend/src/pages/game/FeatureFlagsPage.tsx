@@ -75,6 +75,9 @@ import {
   DataObject as JsonIcon,
   Block as BlockIcon,
   ExpandMore as ExpandMoreIcon,
+  PlayArrow as PlaygroundIcon,
+  SportsEsports as JoystickIcon,
+  SwapVert as ImportExportIcon,
 } from "@mui/icons-material";
 import JsonEditor from "../../components/common/JsonEditor";
 import { useTranslation } from "react-i18next";
@@ -99,6 +102,7 @@ import { environmentService, Environment } from "../../services/environmentServi
 import ResizableDrawer from "../../components/common/ResizableDrawer";
 import FeatureSwitch from "../../components/common/FeatureSwitch";
 import api from "../../services/api";
+import PlaygroundDialog from "../../components/features/PlaygroundDialog";
 
 interface FlagTypeInfo {
   flagType: string;
@@ -157,10 +161,13 @@ const FeatureFlagsPage: React.FC = () => {
   });
 
   // Export/Import state
-  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
+  const [importExportMenuAnchor, setImportExportMenuAnchor] = useState<null | HTMLElement>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importData, setImportData] = useState<string>("");
   const [importing, setImporting] = useState(false);
+
+  // Playground dialog state
+  const [playgroundOpen, setPlaygroundOpen] = useState(false);
 
   // Action menu state
   const [actionMenuAnchor, setActionMenuAnchor] = useState<null | HTMLElement>(null);
@@ -1398,15 +1405,25 @@ const FeatureFlagsPage: React.FC = () => {
               </Menu>
             </>
           )}
+          <Button
+            variant="outlined"
+            startIcon={<ImportExportIcon />}
+            onClick={(e) => setImportExportMenuAnchor(e.currentTarget)}
+            endIcon={<ExpandMoreIcon sx={{ ml: -0.5 }} />}
+          >
+            {t("featureFlags.importExport")}
+          </Button>
           <Divider orientation="vertical" sx={{ height: 32, mx: 0.5 }} />
-          <Tooltip title={t("featureFlags.export")}>
-            <IconButton onClick={(e) => setExportMenuAnchor(e.currentTarget)}>
-              <ExportIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={t("featureFlags.import")}>
-            <IconButton onClick={() => setImportDialogOpen(true)} disabled={!canManage}>
-              <ImportIcon />
+          <Tooltip title={t("playground.title")}>
+            <IconButton
+              onClick={() => setPlaygroundOpen(true)}
+              sx={{
+                bgcolor: 'primary.main',
+                color: 'primary.contrastText',
+                '&:hover': { bgcolor: 'primary.dark' },
+              }}
+            >
+              <JoystickIcon />
             </IconButton>
           </Tooltip>
         </Box>
@@ -2701,14 +2718,29 @@ const FeatureFlagsPage: React.FC = () => {
         onClose={() => setColumnSettingsAnchor(null)}
       />
 
-      {/* Export Menu */}
+      {/* Import/Export Menu */}
       <Menu
-        anchorEl={exportMenuAnchor}
-        open={Boolean(exportMenuAnchor)}
-        onClose={() => setExportMenuAnchor(null)}
+        anchorEl={importExportMenuAnchor}
+        open={Boolean(importExportMenuAnchor)}
+        onClose={() => setImportExportMenuAnchor(null)}
       >
+        {/* Export section */}
+        <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
+          <ListItemIcon>
+            <ExportIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>
+            <Typography variant="subtitle2" color="text.secondary">
+              {t("featureFlags.export")}
+            </Typography>
+          </ListItemText>
+        </MenuItem>
         {environments.map((env) => (
-          <MenuItem key={env.environment} onClick={() => handleExport(env.environment)}>
+          <MenuItem
+            key={`export-${env.environment}`}
+            onClick={() => handleExport(env.environment)}
+            sx={{ pl: 4 }}
+          >
             <ListItemIcon>
               <Chip
                 size="small"
@@ -2724,6 +2756,20 @@ const FeatureFlagsPage: React.FC = () => {
             <ListItemText>{env.displayName}</ListItemText>
           </MenuItem>
         ))}
+        <Divider />
+        {/* Import section */}
+        <MenuItem
+          onClick={() => {
+            setImportExportMenuAnchor(null);
+            setImportDialogOpen(true);
+          }}
+          disabled={!canManage}
+        >
+          <ListItemIcon>
+            <ImportIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("featureFlags.import")}</ListItemText>
+        </MenuItem>
       </Menu>
 
       {/* Import Dialog */}
@@ -2821,6 +2867,12 @@ const FeatureFlagsPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Playground Dialog */}
+      <PlaygroundDialog
+        open={playgroundOpen}
+        onClose={() => setPlaygroundOpen(false)}
+      />
     </Box >
   );
 };
