@@ -512,11 +512,9 @@ const UnknownFlagsPage: React.FC = () => {
                         case "accessCount":
                           return (
                             <TableCell key={col.id} align="center">
-                              <Chip
-                                label={flag.accessCount}
-                                size="small"
-                                color={flag.accessCount > 100 ? "error" : "default"}
-                              />
+                              <Typography variant="body2">
+                                {flag.accessCount.toLocaleString()}
+                              </Typography>
                             </TableCell>
                           );
                         case "lastReportedAt":

@@ -1074,10 +1074,10 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 borderRadius: 1,
                 flex: 1,
                 textAlign: "center",
-                borderLeft: `4px solid ${theme.palette.info.main}`,
+                borderLeft: `4px solid ${theme.palette.secondary.main}`,
               }}
             >
-              <Typography variant="h5" fontWeight={600} color="info.main">
+              <Typography variant="h5" fontWeight={600} color="secondary.main">
                 {exposurePercentage}%
               </Typography>
               <Typography variant="body2" color="text.secondary">

@@ -135,6 +135,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import EnvironmentVariantsEditor, { Variant as EditorVariant } from "../../components/features/EnvironmentVariantsEditor";
+import FeatureFlagAuditLogs from "../../components/features/FeatureFlagAuditLogs";
 
 // ==================== Types ====================
 
@@ -360,22 +361,35 @@ const FeatureFlagDetailPage: React.FC = () => {
 
   // Get tab from URL query parameter, default to 0 (overview)
   const tabParam = searchParams.get("tab");
-  const tabValue = tabParam === "payload" ? 1 : tabParam === "metrics" ? 2 : 0;
+  const tabValue =
+    tabParam === "payload"
+      ? 1
+      : tabParam === "metrics"
+        ? 2
+        : tabParam === "history"
+          ? 3
+          : 0;
 
   const setTabValue = (newValue: number) => {
     // Reset payload changes when leaving payload tab (tab 1)
     if (tabValue === 1 && newValue !== 1 && originalFlag) {
-      setFlag((prev) => prev ? {
-        ...prev,
-        variantType: originalFlag.variantType,
-        baselinePayload: originalFlag.baselinePayload,
-      } : prev);
+      setFlag((prev) =>
+        prev
+          ? {
+            ...prev,
+            variantType: originalFlag.variantType,
+            baselinePayload: originalFlag.baselinePayload,
+          }
+          : prev
+      );
     }
     const newParams = new URLSearchParams(searchParams);
     if (newValue === 1) {
       newParams.set("tab", "payload");
     } else if (newValue === 2) {
       newParams.set("tab", "metrics");
+    } else if (newValue === 3) {
+      newParams.set("tab", "history");
     } else {
       newParams.delete("tab");
     }
@@ -1536,6 +1550,10 @@ const FeatureFlagDetailPage: React.FC = () => {
             disabled={isCreating}
           />
           <Tab label={t("featureFlags.metrics")} disabled={isCreating} />
+          <Tab
+            label={t("featureFlags.tabs.history")}
+            disabled={isCreating}
+          />
         </Tabs>
       </Box>
 
@@ -3828,7 +3846,10 @@ const FeatureFlagDetailPage: React.FC = () => {
             flag.environments?.[0]?.environment || "production"
           }
         />
-      </TabPanel >
+      </TabPanel>
+      <TabPanel value={tabValue} index={3}>
+        <FeatureFlagAuditLogs flagName={flag.flagName} />
+      </TabPanel>
 
       {/* Delete Confirmation Dialog */}
       < ConfirmDeleteDialog
