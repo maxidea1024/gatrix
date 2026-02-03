@@ -463,7 +463,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             <Dialog
                 open={open}
                 onClose={onClose}
-                maxWidth="lg"
+                maxWidth="md"
                 fullWidth
                 PaperProps={{
                     sx: { minHeight: '80vh' },

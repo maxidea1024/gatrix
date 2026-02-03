@@ -2120,7 +2120,6 @@ const FeatureFlagsPage: React.FC = () => {
               startIcon={<JoystickIcon />}
               onClick={() => {
                 setPlaygroundInitialFlags(Array.from(selectedFlags));
-                setPlaygroundAutoExecute(true);
                 setPlaygroundOpen(true);
               }}
             >
@@ -2178,7 +2177,6 @@ const FeatureFlagsPage: React.FC = () => {
           onClick={() => {
             if (actionMenuFlag) {
               setPlaygroundInitialFlags([actionMenuFlag.flagName]);
-              setPlaygroundAutoExecute(true);
               setPlaygroundOpen(true);
             }
             handleActionMenuClose();
