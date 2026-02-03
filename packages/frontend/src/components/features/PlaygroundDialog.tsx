@@ -58,6 +58,7 @@ import {
     ToggleOn as BooleanIcon,
     Schedule as DateTimeIcon,
     LocalOffer as SemverIcon,
+    SportsEsports as JoystickIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -471,7 +472,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             >
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <PlayIcon color="primary" />
+                        <JoystickIcon color="primary" />
                         <Box>
                             <Typography variant="h6">{t('playground.title')}</Typography>
                             <Typography variant="body2" color="text.secondary">
@@ -798,7 +799,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     onClick={handleEvaluate}
                                     disabled={!canEvaluate || loading}
                                 >
-                                    {loading ? t('playground.evaluating') : t('playground.tryConfiguration')}
+                                    {loading ? t('playground.evaluating') : t('playground.test')}
                                 </Button>
                             </Box>
                         </Paper>
@@ -857,11 +858,14 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                     <Chip
                                                                         label={envData?.displayName || env}
                                                                         size="small"
+                                                                        variant="outlined"
                                                                         sx={{
-                                                                            bgcolor: envData?.color || '#888',
-                                                                            color: '#fff',
-                                                                            borderRadius: '12px',
-                                                                            fontSize: '0.75rem'
+                                                                            borderColor: envData?.color || '#888',
+                                                                            color: envData?.color || '#888',
+                                                                            borderRadius: '4px',
+                                                                            borderWidth: 2,
+                                                                            fontSize: '0.75rem',
+                                                                            fontWeight: 600
                                                                         }}
                                                                     />
                                                                 </TableCell>
@@ -903,12 +907,16 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                     </Box>
                                                                 </TableCell>
                                                                 <TableCell>
-                                                                    <Chip
-                                                                        label={flagInfo.flagUsage === 'remoteConfig' ? t('featureFlags.flagUsages.remoteConfig') : t('featureFlags.flagUsages.flag')}
-                                                                        size="small"
-                                                                        variant="outlined"
-                                                                        sx={{ borderRadius: '12px' }}
-                                                                    />
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                        {flagInfo.flagUsage === 'remoteConfig' ? (
+                                                                            <RemoteConfigIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                                                        ) : (
+                                                                            <FlagIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                                                        )}
+                                                                        <Typography variant="body2" color="text.secondary">
+                                                                            {flagInfo.flagUsage === 'remoteConfig' ? t('featureFlags.flagUsages.remoteConfig') : t('featureFlags.flagUsages.flag')}
+                                                                        </Typography>
+                                                                    </Box>
                                                                 </TableCell>
                                                                 {evaluatedEnvs.map((env) => {
                                                                     const result = envResults[env];
@@ -945,7 +953,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                                     icon={result.enabled ? <TrueIcon /> : <FalseIcon />}
                                                                                     label={result.enabled ? 'true' : 'false'}
                                                                                     size="small"
-                                                                                    color={result.enabled ? 'success' : 'default'}
+                                                                                    color={result.enabled ? 'success' : 'error'}
                                                                                     sx={{ borderRadius: '16px' }}
                                                                                 />
                                                                                 {result.variant ? (
@@ -1165,7 +1173,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     icon={selectedEvaluation.result.enabled ? <TrueIcon /> : <FalseIcon />}
                                     label={selectedEvaluation.result.enabled ? 'true' : 'false'}
                                     size="small"
-                                    color={selectedEvaluation.result.enabled ? 'success' : 'default'}
+                                    color={selectedEvaluation.result.enabled ? 'success' : 'error'}
                                     sx={{ borderRadius: '16px' }}
                                 />
                             </Box>
