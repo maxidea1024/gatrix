@@ -83,6 +83,7 @@ import {
   ReportProblem as StaleIcon,
   Block as BlockIcon,
   Flag as FlagIcon,
+  SportsEsports as JoystickIcon,
 } from "@mui/icons-material";
 import { useAuth } from "../../contexts/AuthContext";
 import { PERMISSIONS } from "../../types/permissions";
@@ -136,6 +137,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import EnvironmentVariantsEditor, { Variant as EditorVariant } from "../../components/features/EnvironmentVariantsEditor";
 import FeatureFlagAuditLogs from "../../components/features/FeatureFlagAuditLogs";
+import PlaygroundDialog from "../../components/features/PlaygroundDialog";
 
 // ==================== Types ====================
 
@@ -466,6 +468,10 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [envVariants, setEnvVariants] = useState<
     Record<string, Variant[]>
   >({});
+
+  // Playground dialog state
+  const [playgroundOpen, setPlaygroundOpen] = useState(false);
+  const [playgroundInitialEnvironments, setPlaygroundInitialEnvironments] = useState<string[]>([]);
 
   // Drag and drop sensors for strategy reordering
   const sensors = useSensors(
@@ -2203,6 +2209,22 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 )}
                               </Box>
                             </Box>
+
+                            {/* Playground test button */}
+                            <Tooltip title={t("featureFlags.testInPlayground")}>
+                              <IconButton
+                                size="small"
+                                color="primary"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setPlaygroundInitialEnvironments([env.environment]);
+                                  setPlaygroundOpen(true);
+                                }}
+                                sx={{ mr: 0.5 }}
+                              >
+                                <JoystickIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
 
                             {/* Metrics mini pie chart */}
                             {(() => {
@@ -5016,6 +5038,17 @@ const FeatureFlagDetailPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog >
+
+      {/* Playground Dialog */}
+      <PlaygroundDialog
+        open={playgroundOpen}
+        onClose={() => {
+          setPlaygroundOpen(false);
+          setPlaygroundInitialEnvironments([]);
+        }}
+        initialFlags={flag?.flagName ? [flag.flagName] : []}
+        initialEnvironments={playgroundInitialEnvironments}
+      />
     </Box >
   );
 };
