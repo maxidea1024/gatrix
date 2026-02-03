@@ -51,13 +51,9 @@ export type ConstraintOperator =
 export interface EvaluationContext {
   userId?: string;
   sessionId?: string;
-  environmentName?: string;
   appName?: string;
   appVersion?: string;
-  country?: string;
-  city?: string;
-  ip?: string;
-  userAgent?: string;
+  remoteAddress?: string;
   currentTime?: Date;
   // Custom properties
   properties?: Record<string, string | number | boolean>;

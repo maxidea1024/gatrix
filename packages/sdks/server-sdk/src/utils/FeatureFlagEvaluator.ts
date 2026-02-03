@@ -227,13 +227,9 @@ export class FeatureFlagEvaluator {
         switch (name) {
             case "userId": return context.userId;
             case "sessionId": return context.sessionId;
-            case "environmentName": return context.environmentName;
             case "appName": return context.appName;
             case "appVersion": return context.appVersion;
-            case "country": return context.country;
-            case "city": return context.city;
-            case "ip": return context.ip;
-            case "userAgent": return context.userAgent;
+            case "remoteAddress": return context.remoteAddress;
             default: return context.properties?.[name];
         }
     }

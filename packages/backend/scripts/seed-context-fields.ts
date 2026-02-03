@@ -29,7 +29,7 @@ async function main() {
         { fieldName: 'vipTier', fieldType: 'number', description: 'VIP tier (0-10)', sortOrder: 70 },
         { fieldName: 'abGroup', fieldType: 'string', description: 'A/B test group', legalValues: ['control', 'A', 'B', 'C'], stickiness: true, sortOrder: 80 },
         { fieldName: 'currentTime', fieldType: 'datetime', description: 'Current timestamp', sortOrder: 90 },
-        { fieldName: 'ip', fieldType: 'string', description: 'IP address', sortOrder: 92 },
+        { fieldName: 'remoteAddress', fieldType: 'string', description: 'Remote IP address', sortOrder: 92 },
     ];
 
     for (const field of contextFields) {
