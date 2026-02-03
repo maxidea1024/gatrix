@@ -795,7 +795,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         enqueueSnackbar(t("featureFlags.createSuccess"), {
           variant: "success",
         });
-        navigate("/game/feature-flags");
+        navigate("/feature-flags");
       } else {
         await api.put(`/admin/features/${flag.flagName}`, {
           displayName: flag.displayName,

@@ -156,9 +156,11 @@ const FeatureFlagTypesPage: React.FC = () => {
           </Typography>
         </Box>
         <Tooltip title={t("common.refresh")}>
-          <IconButton onClick={loadTypes} disabled={loading}>
-            <RefreshIcon />
-          </IconButton>
+          <span>
+            <IconButton onClick={loadTypes} disabled={loading}>
+              <RefreshIcon />
+            </IconButton>
+          </span>
         </Tooltip>
       </Box>
 

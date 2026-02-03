@@ -33,6 +33,9 @@ import {
   Lock as LockIcon,
   LockOpen as LockOpenIcon,
   HelpOutline as HelpOutlineIcon,
+  Abc as StringIcon,
+  Numbers as NumberIcon,
+  DataObject as JsonIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import JsonEditor from '../common/JsonEditor';
@@ -123,9 +126,12 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       if (preserveExpandedRef.current) {
         setExpanded(true);
         preserveExpandedRef.current = false;
+      } else if (flagUsage === 'remoteConfig' && initialVariants.length > 0) {
+        // Auto expand for remote config if it has values
+        setExpanded(true);
       }
     }
-  }, [initialVariantsJson, initialVariants]);
+  }, [initialVariantsJson, initialVariants, flagUsage]);
 
   // Check for changes - use useMemo instead of useEffect to avoid render loop
   const computedHasChanges = useMemo(() => {
@@ -155,7 +161,10 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     }
 
     const newVariant: Variant = {
-      name: `variant-${editingVariants.length + 1}`,
+      name:
+        flagUsage === 'remoteConfig' && editingVariants.length === 0
+          ? 'default'
+          : `variant-${editingVariants.length + 1}`,
       weight: 0,
       weightLock: false,
       stickiness: 'default',
@@ -164,7 +173,8 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
     const updatedVariants = distributeWeights([...editingVariants, newVariant]);
     setEditingVariants(updatedVariants);
-  }, [editingVariants, variantType]);
+    setExpanded(true);
+  }, [editingVariants, variantType, flagUsage]);
 
   const removeVariant = useCallback(
     (index: number) => {
@@ -318,9 +328,11 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography variant="subtitle2" fontWeight={600}>
-            {t('featureFlags.variants')}
+            {flagUsage === 'remoteConfig'
+              ? t('featureFlags.configuration')
+              : t('featureFlags.variants')}
           </Typography>
-          {variantCount > 0 && (
+          {variantCount > 0 && flagUsage !== 'remoteConfig' && (
             <Typography variant="caption" color="text.secondary">
               ({variantCount})
             </Typography>
@@ -350,8 +362,8 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
         </Box>
       </Box>
 
-      {/* Weight Distribution Bar */}
-      {variantCount > 0 && (
+      {/* Weight Distribution Bar - hide for remoteConfig */}
+      {variantCount > 0 && flagUsage !== 'remoteConfig' && (
         <Box
           sx={{
             height: 28,
@@ -401,11 +413,20 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       {variantCount === 0 && (
         <Box sx={{ textAlign: 'center', py: 2 }}>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {t('featureFlags.noVariantsGuide')}
+            {flagUsage === 'remoteConfig'
+              ? t('featureFlags.noRemoteConfigValues')
+              : t('featureFlags.noVariantsGuide')}
           </Typography>
-          {canManage && !isArchived && flagUsage !== 'remoteConfig' && (
-            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={addVariant}>
-              {t('featureFlags.addVariant')}
+          {canManage && !isArchived && (
+            <Button
+              variant="contained"
+              size="small"
+              startIcon={<AddIcon />}
+              onClick={addVariant}
+            >
+              {flagUsage === 'remoteConfig'
+                ? t('featureFlags.addConfiguration')
+                : t('featureFlags.addVariant')}
             </Button>
           )}
         </Box>
@@ -429,41 +450,48 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             return (
               <Paper
                 key={index}
-                variant="outlined"
+                variant={flagUsage === 'remoteConfig' ? undefined : 'outlined'}
+                elevation={0}
                 sx={{
-                  p: 2,
-                  borderRadius: 2,
-                  borderLeft: 4,
-                  borderLeftColor: variantColor,
+                  p: flagUsage === 'remoteConfig' ? 0 : 2,
+                  borderRadius: flagUsage === 'remoteConfig' ? 0 : 2,
+                  borderLeft: flagUsage === 'remoteConfig' ? 0 : 4,
+                  borderLeftColor: flagUsage === 'remoteConfig' ? 'transparent' : variantColor,
+                  backgroundColor: 'transparent',
+                  border: flagUsage === 'remoteConfig' ? 'none' : undefined,
                 }}
               >
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    justifyContent: 'space-between',
-                    mb: 2,
-                  }}
-                >
-                  {/* Variant Name */}
-                  <TextField
-                    size="small"
-                    label={t('featureFlags.variantName')}
-                    value={variant.name}
-                    onChange={(e) => updateVariant(index, { name: e.target.value })}
-                    disabled={!canManage || isArchived}
-                    error={isDuplicateName}
-                    helperText={isDuplicateName ? t('featureFlags.duplicateVariantName') : undefined}
-                    sx={{ flex: 1, mr: 2 }}
-                  />
+                {flagUsage !== 'remoteConfig' && (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
+                      mb: 2,
+                    }}
+                  >
+                    {/* Variant Name */}
+                    <TextField
+                      size="small"
+                      label={t('featureFlags.variantName')}
+                      value={variant.name}
+                      onChange={(e) => updateVariant(index, { name: e.target.value })}
+                      disabled={!canManage || isArchived}
+                      error={isDuplicateName}
+                      helperText={
+                        isDuplicateName ? t('featureFlags.duplicateVariantName') : undefined
+                      }
+                      sx={{ flex: 1, mr: 2 }}
+                    />
 
-                  {/* Delete button - hidden for remoteConfig since it has exactly 1 variant */}
-                  {canManage && !isArchived && flagUsage !== 'remoteConfig' && (
-                    <IconButton size="small" color="error" onClick={() => removeVariant(index)}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  )}
-                </Box>
+                    {/* Delete button - hidden for remoteConfig since it has exactly 1 variant */}
+                    {canManage && !isArchived && (
+                      <IconButton size="small" color="error" onClick={() => removeVariant(index)}>
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                  </Box>
+                )}
 
                 {/* Weight controls */}
                 {showWeightControls && (
@@ -524,48 +552,79 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
                 {/* Payload */}
                 <Box>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    {t('featureFlags.payload')}
-                  </Typography>
-                  {variantType === 'json' ? (
-                    <JsonEditor
-                      value={variant.payload?.value || '{}'}
-                      onChange={(val) =>
-                        updateVariant(index, {
-                          payload: {
-                            type: 'json',
-                            value: val,
-                          },
-                        })
-                      }
-                      onValidation={(error) =>
-                        setJsonErrors((prev) => ({ ...prev, [index]: error }))
-                      }
-                      readOnly={!canManage || isArchived}
-                      height={120}
-                    />
-                  ) : (
-                    <TextField
-                      fullWidth
-                      size="small"
-                      type={variantType === 'number' ? 'number' : 'text'}
-                      value={variant.payload?.value || ''}
-                      onChange={(e) =>
-                        updateVariant(index, {
-                          payload: {
-                            type: 'string',
-                            value: e.target.value,
-                          },
-                        })
-                      }
-                      disabled={!canManage || isArchived}
-                    />
+                  {flagUsage !== 'remoteConfig' && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        {t('featureFlags.payload')}
+                      </Typography>
+                      {variantType === 'none' ? (
+                        <BlockIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+                      ) : variantType === 'json' ? (
+                        <JsonIcon sx={{ fontSize: 16, color: 'secondary.main' }} />
+                      ) : variantType === 'number' ? (
+                        <NumberIcon sx={{ fontSize: 16, color: 'info.main' }} />
+                      ) : (
+                        <StringIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                      )}
+                    </Box>
                   )}
-                  {hasJsonError && (
-                    <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
-                      {jsonErrors[index]}
-                    </Typography>
-                  )}
+
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                    {flagUsage === 'remoteConfig' && (
+                      <Box sx={{ mt: 1, display: 'flex', alignItems: 'center' }}>
+                        {variantType === 'none' ? (
+                          <BlockIcon sx={{ fontSize: 20, color: 'text.disabled' }} />
+                        ) : variantType === 'json' ? (
+                          <JsonIcon sx={{ fontSize: 20, color: 'secondary.main' }} />
+                        ) : variantType === 'number' ? (
+                          <NumberIcon sx={{ fontSize: 20, color: 'info.main' }} />
+                        ) : (
+                          <StringIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+                        )}
+                      </Box>
+                    )}
+                    <Box sx={{ flex: 1 }}>
+                      {variantType === 'json' ? (
+                        <JsonEditor
+                          value={variant.payload?.value || '{}'}
+                          onChange={(val) =>
+                            updateVariant(index, {
+                              payload: {
+                                type: 'json',
+                                value: val,
+                              },
+                            })
+                          }
+                          onValidation={(error) =>
+                            setJsonErrors((prev) => ({ ...prev, [index]: error }))
+                          }
+                          readOnly={!canManage || isArchived}
+                          height={120}
+                        />
+                      ) : (
+                        <TextField
+                          fullWidth
+                          size="small"
+                          type={variantType === 'number' ? 'number' : 'text'}
+                          value={variant.payload?.value || ''}
+                          onChange={(e) =>
+                            updateVariant(index, {
+                              payload: {
+                                type: 'string',
+                                value: e.target.value,
+                              },
+                            })
+                          }
+                          disabled={!canManage || isArchived}
+                        />
+                      )}
+                      {hasJsonError && (
+                        <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
+                          {jsonErrors[index]}
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
                 </Box>
               </Paper>
             );
@@ -582,7 +641,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             alignItems: 'center',
             mt: 2,
             pt: 2,
-            borderTop: 1,
+            borderTop: flagUsage === 'remoteConfig' ? 0 : 1,
             borderColor: 'divider',
           }}
         >
@@ -605,7 +664,11 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
               onClick={handleSave}
               disabled={saving || !hasChanges || hasDuplicateNames || hasJsonErrors}
             >
-              {saving ? t('common.saving') : t('featureFlags.saveVariants')}
+              {saving
+                ? t('common.saving')
+                : flagUsage === 'remoteConfig'
+                  ? t('featureFlags.saveConfiguration')
+                  : t('featureFlags.saveVariants')}
             </Button>
           </Box>
         </Box>

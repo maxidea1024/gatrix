@@ -16,20 +16,17 @@
 exports.up = async function (connection) {
   console.log('Creating Feature Flags system tables...');
 
-  // 1. Feature Flags table
+  // 1. Feature Flags table (global, environment settings are in g_feature_flag_environments)
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_feature_flags (
       id VARCHAR(26) PRIMARY KEY COMMENT 'ULID',
-      environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
-      flagName VARCHAR(255) NOT NULL COMMENT 'Unique flag identifier',
+      flagName VARCHAR(255) NOT NULL UNIQUE COMMENT 'Unique flag identifier',
       displayName VARCHAR(500) NULL COMMENT 'Human-readable name',
       description TEXT NULL COMMENT 'Flag description',
       flagType ENUM('release', 'experiment', 'operational', 'permission') NOT NULL DEFAULT 'release' COMMENT 'Type of flag',
-      isEnabled BOOLEAN NOT NULL DEFAULT TRUE COMMENT 'Whether flag is globally enabled',
       isArchived BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether flag is archived',
       archivedAt TIMESTAMP NULL COMMENT 'When flag was archived',
       impressionDataEnabled BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Track impression data',
-      lastSeenAt TIMESTAMP NULL COMMENT 'Last time flag was evaluated',
       staleAfterDays INT NOT NULL DEFAULT 30 COMMENT 'Days until flag is considered stale',
       tags JSON NULL COMMENT 'Tags array for categorization',
       createdBy INT NOT NULL,
@@ -38,24 +35,44 @@ exports.up = async function (connection) {
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       CONSTRAINT fk_feature_flags_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE RESTRICT,
       CONSTRAINT fk_feature_flags_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      UNIQUE KEY unique_env_flag (environment, flagName),
-      INDEX idx_environment (environment),
       INDEX idx_flag_name (flagName),
       INDEX idx_flag_type (flagType),
-      INDEX idx_is_enabled (isEnabled),
       INDEX idx_is_archived (isArchived),
-      INDEX idx_last_seen_at (lastSeenAt),
       INDEX idx_created_by (createdBy),
       INDEX idx_updated_by (updatedBy)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Feature flag definitions'
   `);
   console.log('✓ g_feature_flags table created');
 
+  // 1.5 Feature Flag Environments table (per-environment settings)
+  await connection.execute(`
+    CREATE TABLE IF NOT EXISTS g_feature_flag_environments (
+      id VARCHAR(26) PRIMARY KEY COMMENT 'ULID',
+      flagId VARCHAR(26) NOT NULL COMMENT 'Reference to feature flag',
+      environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
+      isEnabled BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether flag is enabled in this environment',
+      lastSeenAt TIMESTAMP NULL COMMENT 'Last time flag was evaluated in this environment',
+      createdBy INT NULL,
+      updatedBy INT NULL,
+      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      CONSTRAINT fk_flag_environments_flag FOREIGN KEY (flagId) REFERENCES g_feature_flags(id) ON DELETE CASCADE,
+      CONSTRAINT fk_flag_environments_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
+      CONSTRAINT fk_flag_environments_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
+      UNIQUE KEY unique_flag_env (flagId, environment),
+      INDEX idx_flag_id (flagId),
+      INDEX idx_environment (environment),
+      INDEX idx_is_enabled (isEnabled)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Per-environment feature flag settings'
+  `);
+  console.log('✓ g_feature_flag_environments table created');
+
   // 2. Feature Strategies table
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_feature_strategies (
       id VARCHAR(26) PRIMARY KEY COMMENT 'ULID',
       flagId VARCHAR(26) NOT NULL COMMENT 'Reference to feature flag',
+      environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
       strategyName VARCHAR(255) NOT NULL COMMENT 'Strategy name (default, userWithId, gradualRollout, etc.)',
       parameters JSON NULL COMMENT 'Strategy parameters (rollout, stickiness, groupId)',
       constraints JSON NULL COMMENT 'Array of constraints [{contextName, operator, values}]',
@@ -76,13 +93,15 @@ exports.up = async function (connection) {
   `);
   console.log('✓ g_feature_strategies table created');
 
-  // 3. Feature Variants table
+  // 3. Feature Variants table (per-environment)
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_feature_variants (
       id VARCHAR(26) PRIMARY KEY COMMENT 'ULID',
       flagId VARCHAR(26) NOT NULL COMMENT 'Reference to feature flag',
+      environment VARCHAR(100) NOT NULL COMMENT 'Environment name',
       variantName VARCHAR(255) NOT NULL COMMENT 'Variant identifier',
       weight INT NOT NULL DEFAULT 0 COMMENT 'Weight percentage (0-1000, divide by 10 for actual %)',
+      weightLock BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether the weight is locked',
       payload JSON NULL COMMENT 'Variant payload data',
       payloadType ENUM('string', 'number', 'boolean', 'json') NOT NULL DEFAULT 'json' COMMENT 'Type of payload',
       stickiness VARCHAR(100) NOT NULL DEFAULT 'default' COMMENT 'Stickiness attribute (userId, sessionId, default)',
@@ -94,8 +113,10 @@ exports.up = async function (connection) {
       CONSTRAINT fk_feature_variants_flag FOREIGN KEY (flagId) REFERENCES g_feature_flags(id) ON DELETE CASCADE,
       CONSTRAINT fk_feature_variants_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE RESTRICT,
       CONSTRAINT fk_feature_variants_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      UNIQUE KEY unique_flag_variant (flagId, variantName),
+      UNIQUE KEY unique_flag_variant (flagId, environment, variantName),
       INDEX idx_flag_id (flagId),
+      INDEX idx_environment (environment),
+      INDEX idx_flag_env (flagId, environment),
       INDEX idx_variant_name (variantName),
       INDEX idx_weight (weight)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Feature flag A/B test variants'
