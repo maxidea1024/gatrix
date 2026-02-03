@@ -1,6 +1,6 @@
 #!/usr/bin/env ts-node
 
-import database from "../config/database";
+import database from '../config/database';
 
 /**
  * Database Reset Script
@@ -9,13 +9,13 @@ import database from "../config/database";
 
 async function dropAllTables() {
   try {
-    console.log("Starting database reset...");
+    console.log('Starting database reset...');
 
     // Disable foreign key checks to allow dropping tables with dependencies
-    await database.query("SET FOREIGN_KEY_CHECKS = 0");
+    await database.query('SET FOREIGN_KEY_CHECKS = 0');
 
     // Get all tables using SHOW TABLES
-    const tables = (await database.query("SHOW TABLES")) as any;
+    const tables = (await database.query('SHOW TABLES')) as any;
 
     if (Array.isArray(tables) && tables.length > 0) {
       console.log(`Found ${tables.length} tables to drop`);
@@ -26,33 +26,33 @@ async function dropAllTables() {
         await database.query(`DROP TABLE IF EXISTS \`${tableName}\``);
       }
     } else {
-      console.log("No tables found to drop");
+      console.log('No tables found to drop');
     }
 
     // Also drop migrations table to force re-run
-    await database.query("DROP TABLE IF EXISTS `g_migrations`");
+    await database.query('DROP TABLE IF EXISTS `g_migrations`');
 
     // Re-enable foreign key checks
-    await database.query("SET FOREIGN_KEY_CHECKS = 1");
+    await database.query('SET FOREIGN_KEY_CHECKS = 1');
 
-    console.log("✓ All tables dropped successfully");
+    console.log('✓ All tables dropped successfully');
   } catch (error) {
-    console.error("Error dropping tables:", error);
+    console.error('Error dropping tables:', error);
     throw error;
   }
 }
 
 async function runMigrations() {
   try {
-    console.log("Running migrations...");
+    console.log('Running migrations...');
 
     // Import and run migrations
-    const { runMigrations: runMigrationsFunc } = await import("./migrate");
+    const { runMigrations: runMigrationsFunc } = await import('./migrate');
     await runMigrationsFunc();
 
-    console.log("✓ Migrations completed successfully");
+    console.log('✓ Migrations completed successfully');
   } catch (error) {
-    console.error("Error running migrations:", error);
+    console.error('Error running migrations:', error);
     throw error;
   }
 }
@@ -62,10 +62,10 @@ async function resetDatabase() {
     await dropAllTables();
     await runMigrations();
 
-    console.log("🎉 Database reset completed successfully!");
+    console.log('🎉 Database reset completed successfully!');
     process.exit(0);
   } catch (error) {
-    console.error("Database reset failed:", error);
+    console.error('Database reset failed:', error);
     process.exit(1);
   }
 }

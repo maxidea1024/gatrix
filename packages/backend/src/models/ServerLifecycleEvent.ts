@@ -1,5 +1,5 @@
-import { Model } from "objection";
-import { convertToMySQLDateTime } from "../utils/dateUtils";
+import { Model } from 'objection';
+import { convertToMySQLDateTime } from '../utils/dateUtils';
 
 export interface ServerLifecycleEventData {
   id?: number;
@@ -28,11 +28,8 @@ export interface ServerLifecycleEventData {
   createdAt?: string | Date;
 }
 
-export class ServerLifecycleEvent
-  extends Model
-  implements ServerLifecycleEventData
-{
-  static tableName = "g_server_lifecycle_events";
+export class ServerLifecycleEvent extends Model implements ServerLifecycleEventData {
+  static tableName = 'g_server_lifecycle_events';
 
   id?: number;
   environment!: string;
@@ -61,39 +58,33 @@ export class ServerLifecycleEvent
 
   static get jsonSchema() {
     return {
-      type: "object",
-      required: [
-        "environment",
-        "instanceId",
-        "serviceType",
-        "eventType",
-        "instanceStatus",
-      ],
+      type: 'object',
+      required: ['environment', 'instanceId', 'serviceType', 'eventType', 'instanceStatus'],
       properties: {
-        id: { type: "integer" },
-        environment: { type: "string", minLength: 1, maxLength: 127 },
-        instanceId: { type: "string", minLength: 1, maxLength: 127 },
-        serviceType: { type: "string", minLength: 1, maxLength: 63 },
-        serviceGroup: { type: "string", maxLength: 63 },
-        hostname: { type: "string", maxLength: 255 },
-        externalAddress: { type: "string", maxLength: 45 },
-        internalAddress: { type: "string", maxLength: 45 },
-        ports: { type: ["object", "null"] },
-        cloudProvider: { type: "string", maxLength: 63 },
-        cloudRegion: { type: "string", maxLength: 63 },
-        cloudZone: { type: "string", maxLength: 63 },
-        labels: { type: ["object", "null"] },
-        appVersion: { type: "string", maxLength: 63 },
-        sdkVersion: { type: "string", maxLength: 63 },
-        eventType: { type: "string", maxLength: 31 },
-        instanceStatus: { type: "string", maxLength: 31 },
-        uptimeSeconds: { type: "integer", minimum: 0 },
-        heartbeatCount: { type: "integer", minimum: 0 },
-        lastHeartbeatAt: { type: ["string", "null"], format: "date-time" },
-        errorMessage: { type: ["string", "null"] },
-        errorStack: { type: ["string", "null"] },
-        metadata: { type: ["object", "null"] },
-        createdAt: { type: "string", format: "date-time" },
+        id: { type: 'integer' },
+        environment: { type: 'string', minLength: 1, maxLength: 127 },
+        instanceId: { type: 'string', minLength: 1, maxLength: 127 },
+        serviceType: { type: 'string', minLength: 1, maxLength: 63 },
+        serviceGroup: { type: 'string', maxLength: 63 },
+        hostname: { type: 'string', maxLength: 255 },
+        externalAddress: { type: 'string', maxLength: 45 },
+        internalAddress: { type: 'string', maxLength: 45 },
+        ports: { type: ['object', 'null'] },
+        cloudProvider: { type: 'string', maxLength: 63 },
+        cloudRegion: { type: 'string', maxLength: 63 },
+        cloudZone: { type: 'string', maxLength: 63 },
+        labels: { type: ['object', 'null'] },
+        appVersion: { type: 'string', maxLength: 63 },
+        sdkVersion: { type: 'string', maxLength: 63 },
+        eventType: { type: 'string', maxLength: 31 },
+        instanceStatus: { type: 'string', maxLength: 31 },
+        uptimeSeconds: { type: 'integer', minimum: 0 },
+        heartbeatCount: { type: 'integer', minimum: 0 },
+        lastHeartbeatAt: { type: ['string', 'null'], format: 'date-time' },
+        errorMessage: { type: ['string', 'null'] },
+        errorStack: { type: ['string', 'null'] },
+        metadata: { type: ['object', 'null'] },
+        createdAt: { type: 'string', format: 'date-time' },
       },
     };
   }
@@ -107,14 +98,11 @@ export class ServerLifecycleEvent
     this.createdAt = convertToMySQLDateTime(this.createdAt) || this.createdAt;
 
     if (this.lastHeartbeatAt) {
-      this.lastHeartbeatAt =
-        convertToMySQLDateTime(this.lastHeartbeatAt) || this.lastHeartbeatAt;
+      this.lastHeartbeatAt = convertToMySQLDateTime(this.lastHeartbeatAt) || this.lastHeartbeatAt;
     }
   }
 
-  static async recordEvent(
-    data: ServerLifecycleEventData,
-  ): Promise<ServerLifecycleEvent> {
+  static async recordEvent(data: ServerLifecycleEventData): Promise<ServerLifecycleEvent> {
     // metadata is already JSON-ready
     return await this.query().insert(data);
   }
@@ -127,14 +115,9 @@ export class ServerLifecycleEvent
   static async deleteOldEvents(retentionDays: number): Promise<number> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
-    const cutoffDateStr = cutoffDate
-      .toISOString()
-      .slice(0, 19)
-      .replace("T", " ");
+    const cutoffDateStr = cutoffDate.toISOString().slice(0, 19).replace('T', ' ');
 
-    const result = await this.query()
-      .delete()
-      .where("createdAt", "<", cutoffDateStr);
+    const result = await this.query().delete().where('createdAt', '<', cutoffDateStr);
 
     return result;
   }

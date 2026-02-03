@@ -4,7 +4,7 @@
  * 모든 날짜는 UTC로 저장되며, MySQL DATETIME 형식으로 변환됩니다.
  */
 
-import logger from "../config/logger";
+import logger from '../config/logger';
 
 /**
  * ISO 8601 날짜 문자열을 MySQL DATETIME 형식(UTC)으로 변환
@@ -19,9 +19,7 @@ import logger from "../config/logger";
  * convertToMySQLDateTime(null) // null
  * convertToMySQLDateTime("invalid") // null
  */
-export function convertToMySQLDateTime(
-  dateValue: string | Date | null | undefined,
-): string | null {
+export function convertToMySQLDateTime(dateValue: string | Date | null | undefined): string | null {
   if (!dateValue) return null;
 
   try {
@@ -34,7 +32,7 @@ export function convertToMySQLDateTime(
     }
 
     // UTC 시간으로 MySQL DATETIME 형식 변환: YYYY-MM-DD HH:MM:SS
-    return date.toISOString().slice(0, 19).replace("T", " ");
+    return date.toISOString().slice(0, 19).replace('T', ' ');
   } catch (error) {
     logger.error(`Error converting date: ${dateValue}`, error);
     return null;
@@ -78,7 +76,7 @@ export function getCurrentMySQLDateTime(): string {
  */
 export function convertDateFieldsForMySQL(
   data: Record<string, any>,
-  dateFields: string[],
+  dateFields: string[]
 ): Record<string, any> {
   const converted = { ...data };
 
@@ -95,17 +93,12 @@ export function convertDateFieldsForMySQL(
  * 일반적인 엔티티 날짜 필드들
  */
 export const COMMON_DATE_FIELDS = {
-  AUDIT: ["createdAt", "updatedAt"],
-  AUDIT_WITH_DELETED: ["createdAt", "updatedAt", "deletedAt"],
-  USER: ["createdAt", "updatedAt", "lastLoginAt", "emailVerifiedAt"],
-  GAME_WORLD: [
-    "createdAt",
-    "updatedAt",
-    "maintenanceStartDate",
-    "maintenanceEndDate",
-  ],
-  MESSAGE: ["createdAt", "updatedAt", "deletedAt"],
-  CHANNEL: ["createdAt", "updatedAt"] as const,
+  AUDIT: ['createdAt', 'updatedAt'],
+  AUDIT_WITH_DELETED: ['createdAt', 'updatedAt', 'deletedAt'],
+  USER: ['createdAt', 'updatedAt', 'lastLoginAt', 'emailVerifiedAt'],
+  GAME_WORLD: ['createdAt', 'updatedAt', 'maintenanceStartDate', 'maintenanceEndDate'],
+  MESSAGE: ['createdAt', 'updatedAt', 'deletedAt'],
+  CHANNEL: ['createdAt', 'updatedAt'] as const,
 } as const;
 
 /**
@@ -120,7 +113,7 @@ export const COMMON_DATE_FIELDS = {
  * convertFromMySQLDateTime(null) // null
  */
 export function convertFromMySQLDateTime(
-  mysqlDateTime: string | Date | null | undefined,
+  mysqlDateTime: string | Date | null | undefined
 ): string | null {
   if (!mysqlDateTime) return null;
 
@@ -136,11 +129,11 @@ export function convertFromMySQLDateTime(
       // mysql2 interprets the UTC value from DB as local time
       // So we need to get the local components and create a UTC date from them
       const year = mysqlDateTime.getFullYear();
-      const month = String(mysqlDateTime.getMonth() + 1).padStart(2, "0");
-      const day = String(mysqlDateTime.getDate()).padStart(2, "0");
-      const hours = String(mysqlDateTime.getHours()).padStart(2, "0");
-      const minutes = String(mysqlDateTime.getMinutes()).padStart(2, "0");
-      const seconds = String(mysqlDateTime.getSeconds()).padStart(2, "0");
+      const month = String(mysqlDateTime.getMonth() + 1).padStart(2, '0');
+      const day = String(mysqlDateTime.getDate()).padStart(2, '0');
+      const hours = String(mysqlDateTime.getHours()).padStart(2, '0');
+      const minutes = String(mysqlDateTime.getMinutes()).padStart(2, '0');
+      const seconds = String(mysqlDateTime.getSeconds()).padStart(2, '0');
 
       // Create ISO string treating local components as UTC
       return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000Z`;
@@ -148,15 +141,15 @@ export function convertFromMySQLDateTime(
 
     // If already an ISO 8601 string (from knex postProcessResponse), return as-is
     if (
-      typeof mysqlDateTime === "string" &&
-      mysqlDateTime.includes("T") &&
-      mysqlDateTime.endsWith("Z")
+      typeof mysqlDateTime === 'string' &&
+      mysqlDateTime.includes('T') &&
+      mysqlDateTime.endsWith('Z')
     ) {
       return mysqlDateTime;
     }
 
     // MySQL DATETIME은 UTC로 저장되어 있으므로 'Z'를 추가하여 UTC임을 명시
-    const isoString = mysqlDateTime.replace(" ", "T") + ".000Z";
+    const isoString = mysqlDateTime.replace(' ', 'T') + '.000Z';
     const date = new Date(isoString);
 
     if (isNaN(date.getTime())) {
@@ -180,15 +173,13 @@ export function convertFromMySQLDateTime(
  */
 export function convertDateFieldsFromMySQL<T extends Record<string, any>>(
   data: T,
-  dateFields: (keyof T)[],
+  dateFields: (keyof T)[]
 ): T {
   const converted = { ...data };
 
   dateFields.forEach((field) => {
     if (converted[field] !== undefined) {
-      converted[field] = convertFromMySQLDateTime(
-        converted[field] as any,
-      ) as any;
+      converted[field] = convertFromMySQLDateTime(converted[field] as any) as any;
     }
   });
 
@@ -199,11 +190,11 @@ export function convertDateFieldsFromMySQL<T extends Record<string, any>>(
  * 타임존 정보
  */
 export const TIMEZONE = {
-  UTC: "UTC",
-  SEOUL: "Asia/Seoul",
-  TOKYO: "Asia/Tokyo",
-  NEW_YORK: "America/New_York",
-  LONDON: "Europe/London",
+  UTC: 'UTC',
+  SEOUL: 'Asia/Seoul',
+  TOKYO: 'Asia/Tokyo',
+  NEW_YORK: 'America/New_York',
+  LONDON: 'Europe/London',
 } as const;
 
 /**
@@ -219,13 +210,13 @@ export const TIMEZONE = {
  */
 export function convertMySQLDateTimeToTimezone(
   mysqlDateTimeStr: string | null | undefined,
-  timezone: string = "Asia/Seoul",
+  timezone: string = 'Asia/Seoul'
 ): string | null {
   if (!mysqlDateTimeStr) return null;
 
   try {
     // MySQL DATETIME은 UTC로 저장되므로 'Z'를 붙여서 UTC로 파싱
-    const date = new Date(mysqlDateTimeStr + "Z");
+    const date = new Date(mysqlDateTimeStr + 'Z');
 
     if (isNaN(date.getTime())) {
       logger.warn(`Invalid MySQL datetime: ${mysqlDateTimeStr}`);
@@ -233,31 +224,28 @@ export function convertMySQLDateTimeToTimezone(
     }
 
     // 지정된 타임존으로 포맷
-    const formatter = new Intl.DateTimeFormat("sv-SE", {
+    const formatter = new Intl.DateTimeFormat('sv-SE', {
       timeZone: timezone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
       hour12: false,
     });
 
     const parts = formatter.formatToParts(date);
-    const year = parts.find((p) => p.type === "year")?.value;
-    const month = parts.find((p) => p.type === "month")?.value;
-    const day = parts.find((p) => p.type === "day")?.value;
-    const hour = parts.find((p) => p.type === "hour")?.value;
-    const minute = parts.find((p) => p.type === "minute")?.value;
-    const second = parts.find((p) => p.type === "second")?.value;
+    const year = parts.find((p) => p.type === 'year')?.value;
+    const month = parts.find((p) => p.type === 'month')?.value;
+    const day = parts.find((p) => p.type === 'day')?.value;
+    const hour = parts.find((p) => p.type === 'hour')?.value;
+    const minute = parts.find((p) => p.type === 'minute')?.value;
+    const second = parts.find((p) => p.type === 'second')?.value;
 
     return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
   } catch (error) {
-    logger.error(
-      `Error converting MySQL datetime to timezone: ${mysqlDateTimeStr}`,
-      error,
-    );
+    logger.error(`Error converting MySQL datetime to timezone: ${mysqlDateTimeStr}`, error);
     return null;
   }
 }

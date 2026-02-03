@@ -1,27 +1,25 @@
-import express from "express";
-import multer from "multer";
-import { authenticateServerApiToken } from "../../middleware/apiTokenAuth";
-import { resolveEnvironment } from "../../middleware/environmentResolver";
-import ServerAuthController from "../../controllers/ServerAuthController";
-import ServerUserController from "../../controllers/ServerUserController";
-import ServerNotificationController from "../../controllers/ServerNotificationController";
-import ServerFileController from "../../controllers/ServerFileController";
-import ServerChatController from "../../controllers/ServerChatController";
-import { CouponRedeemController } from "../../controllers/CouponRedeemController";
-import ServerGameWorldController from "../../controllers/ServerGameWorldController";
-import IngamePopupNoticeController from "../../controllers/IngamePopupNoticeController";
-import { SurveyController } from "../../controllers/SurveyController";
-import { MaintenanceController } from "../../controllers/MaintenanceController";
-import serviceDiscoveryRoutes, {
-  getWhitelistsHandler,
-} from "./serviceDiscovery";
-import ServerClientVersionController from "../../controllers/ServerClientVersionController";
-import ServerServiceNoticeController from "../../controllers/ServerServiceNoticeController";
-import ServerBannerController from "../../controllers/ServerBannerController";
-import ServerStoreProductController from "../../controllers/ServerStoreProductController";
-import ServerEnvironmentController from "../../controllers/ServerEnvironmentController";
-import InternalApiTokensController from "../../controllers/InternalApiTokensController";
-import { PlanningDataController } from "../../controllers/PlanningDataController";
+import express from 'express';
+import multer from 'multer';
+import { authenticateServerApiToken } from '../../middleware/apiTokenAuth';
+import { resolveEnvironment } from '../../middleware/environmentResolver';
+import ServerAuthController from '../../controllers/ServerAuthController';
+import ServerUserController from '../../controllers/ServerUserController';
+import ServerNotificationController from '../../controllers/ServerNotificationController';
+import ServerFileController from '../../controllers/ServerFileController';
+import ServerChatController from '../../controllers/ServerChatController';
+import { CouponRedeemController } from '../../controllers/CouponRedeemController';
+import ServerGameWorldController from '../../controllers/ServerGameWorldController';
+import IngamePopupNoticeController from '../../controllers/IngamePopupNoticeController';
+import { SurveyController } from '../../controllers/SurveyController';
+import { MaintenanceController } from '../../controllers/MaintenanceController';
+import serviceDiscoveryRoutes, { getWhitelistsHandler } from './serviceDiscovery';
+import ServerClientVersionController from '../../controllers/ServerClientVersionController';
+import ServerServiceNoticeController from '../../controllers/ServerServiceNoticeController';
+import ServerBannerController from '../../controllers/ServerBannerController';
+import ServerStoreProductController from '../../controllers/ServerStoreProductController';
+import ServerEnvironmentController from '../../controllers/ServerEnvironmentController';
+import InternalApiTokensController from '../../controllers/InternalApiTokensController';
+import { PlanningDataController } from '../../controllers/PlanningDataController';
 
 const router = express.Router();
 
@@ -40,16 +38,16 @@ const upload = multer({
 
 // Get all valid API tokens for Edge mirroring
 router.get(
-  "/internal/tokens",
+  '/internal/tokens',
   authenticateServerApiToken,
-  InternalApiTokensController.getAllTokens as any,
+  InternalApiTokensController.getAllTokens as any
 );
 
 // Receive token usage report from Edge servers
 router.post(
-  "/internal/token-usage-report",
+  '/internal/token-usage-report',
   authenticateServerApiToken,
-  InternalApiTokensController.receiveUsageReport as any,
+  InternalApiTokensController.receiveUsageReport as any
 );
 
 // ============================================================================
@@ -57,12 +55,12 @@ router.post(
 // ============================================================================
 
 // Test SDK authentication
-router.get("/test", authenticateServerApiToken, (req: any, res: any) => {
+router.get('/test', authenticateServerApiToken, (req: any, res: any) => {
   const apiToken = req.apiToken;
 
   res.json({
     success: true,
-    message: "Server SDK authentication successful",
+    message: 'Server SDK authentication successful',
     data: {
       tokenId: apiToken?.id,
       tokenName: apiToken?.tokenName,
@@ -74,89 +72,45 @@ router.get("/test", authenticateServerApiToken, (req: any, res: any) => {
 
 // Environment list (for Edge to discover all environments) - No environment header required
 router.get(
-  "/environments",
+  '/environments',
   authenticateServerApiToken,
-  ServerEnvironmentController.getEnvironments,
+  ServerEnvironmentController.getEnvironments
 );
 
 // Authentication routes - No environment required
-router.post("/auth/verify-token", ServerAuthController.verifyToken); // JWT 토큰 검증 (API Token 불필요)
-router.get(
-  "/auth/user/:id",
-  authenticateServerApiToken,
-  ServerAuthController.getUserById,
-);
+router.post('/auth/verify-token', ServerAuthController.verifyToken); // JWT 토큰 검증 (API Token 불필요)
+router.get('/auth/user/:id', authenticateServerApiToken, ServerAuthController.getUserById);
 
 // User routes - No environment required (global users)
-router.get(
-  "/users/sync",
-  authenticateServerApiToken,
-  ServerUserController.syncUsers,
-);
-router.get(
-  "/users/:id",
-  authenticateServerApiToken,
-  ServerUserController.getUserById,
-);
-router.post(
-  "/users/batch",
-  authenticateServerApiToken,
-  ServerUserController.getUsersByIds,
-);
+router.get('/users/sync', authenticateServerApiToken, ServerUserController.syncUsers);
+router.get('/users/:id', authenticateServerApiToken, ServerUserController.getUserById);
+router.post('/users/batch', authenticateServerApiToken, ServerUserController.getUsersByIds);
 
 // Notification routes - No environment required (global notifications)
 router.post(
-  "/notifications",
+  '/notifications',
   authenticateServerApiToken,
-  ServerNotificationController.sendNotification,
+  ServerNotificationController.sendNotification
 );
 router.post(
-  "/notifications/bulk",
+  '/notifications/bulk',
   authenticateServerApiToken,
-  ServerNotificationController.sendBulkNotification,
+  ServerNotificationController.sendBulkNotification
 );
 
 // File routes - No environment required
-router.post(
-  "/files/upload-url",
-  authenticateServerApiToken,
-  ServerFileController.getUploadUrl,
-);
-router.get(
-  "/files/:fileId",
-  authenticateServerApiToken,
-  ServerFileController.getFileInfo,
-);
+router.post('/files/upload-url', authenticateServerApiToken, ServerFileController.getUploadUrl);
+router.get('/files/:fileId', authenticateServerApiToken, ServerFileController.getFileInfo);
 
 // Chat server routes - No environment required
-router.post(
-  "/chat/register",
-  authenticateServerApiToken,
-  ServerChatController.registerServer,
-);
-router.post(
-  "/chat/unregister",
-  authenticateServerApiToken,
-  ServerChatController.unregisterServer,
-);
-router.post(
-  "/chat/stats",
-  authenticateServerApiToken,
-  ServerChatController.reportStats,
-);
-router.post(
-  "/chat/activity",
-  authenticateServerApiToken,
-  ServerChatController.reportActivity,
-);
-router.get(
-  "/chat/servers",
-  authenticateServerApiToken,
-  ServerChatController.getRegisteredServers,
-);
+router.post('/chat/register', authenticateServerApiToken, ServerChatController.registerServer);
+router.post('/chat/unregister', authenticateServerApiToken, ServerChatController.unregisterServer);
+router.post('/chat/stats', authenticateServerApiToken, ServerChatController.reportStats);
+router.post('/chat/activity', authenticateServerApiToken, ServerChatController.reportActivity);
+router.get('/chat/servers', authenticateServerApiToken, ServerChatController.getRegisteredServers);
 
 // Service discovery routes
-router.use("/services", serviceDiscoveryRoutes);
+router.use('/services', serviceDiscoveryRoutes);
 
 // ============================================================================
 // Environment-specific routes: /api/v1/server/:env/...
@@ -166,178 +120,178 @@ router.use("/services", serviceDiscoveryRoutes);
 
 // Coupon routes
 router.post(
-  "/:env/coupons/:code/redeem",
+  '/:env/coupons/:code/redeem',
   authenticateServerApiToken,
   resolveEnvironment,
-  CouponRedeemController.redeem,
+  CouponRedeemController.redeem
 );
 
 // Game world routes
 router.get(
-  "/:env/game-worlds",
+  '/:env/game-worlds',
   authenticateServerApiToken,
   resolveEnvironment,
-  ServerGameWorldController.getGameWorlds,
+  ServerGameWorldController.getGameWorlds
 );
 router.get(
-  "/:env/game-worlds/world/:worldId",
+  '/:env/game-worlds/world/:worldId',
   authenticateServerApiToken,
   resolveEnvironment,
-  ServerGameWorldController.getGameWorldByWorldId,
+  ServerGameWorldController.getGameWorldByWorldId
 );
 router.get(
-  "/:env/game-worlds/:id",
+  '/:env/game-worlds/:id',
   authenticateServerApiToken,
   resolveEnvironment,
-  ServerGameWorldController.getGameWorldById,
+  ServerGameWorldController.getGameWorldById
 );
 
 // Ingame popup notice routes
 router.get(
-  "/:env/ingame-popup-notices",
+  '/:env/ingame-popup-notices',
   authenticateServerApiToken,
   resolveEnvironment,
-  IngamePopupNoticeController.getServerIngamePopupNotices,
+  IngamePopupNoticeController.getServerIngamePopupNotices
 );
 router.get(
-  "/:env/ingame-popup-notices/:id",
+  '/:env/ingame-popup-notices/:id',
   authenticateServerApiToken,
   resolveEnvironment,
-  IngamePopupNoticeController.getServerIngamePopupNoticeById,
+  IngamePopupNoticeController.getServerIngamePopupNoticeById
 );
 
 // Survey routes
 router.get(
-  "/:env/surveys/settings",
+  '/:env/surveys/settings',
   authenticateServerApiToken,
   resolveEnvironment,
-  SurveyController.getServerSurveySettings,
+  SurveyController.getServerSurveySettings
 );
 router.get(
-  "/:env/surveys",
+  '/:env/surveys',
   authenticateServerApiToken,
   resolveEnvironment,
-  SurveyController.getServerSurveys,
+  SurveyController.getServerSurveys
 );
 router.get(
-  "/:env/surveys/:id",
+  '/:env/surveys/:id',
   authenticateServerApiToken,
   resolveEnvironment,
-  SurveyController.getServerSurveyById,
+  SurveyController.getServerSurveyById
 );
 
 // Whitelist routes
 router.get(
-  "/:env/whitelists",
+  '/:env/whitelists',
   authenticateServerApiToken,
   resolveEnvironment,
-  getWhitelistsHandler,
+  getWhitelistsHandler
 );
 
 // Maintenance routes
 router.get(
-  "/:env/maintenance",
+  '/:env/maintenance',
   authenticateServerApiToken,
   resolveEnvironment,
-  MaintenanceController.getStatus as any,
+  MaintenanceController.getStatus as any
 );
 
 // Client version routes
 router.get(
-  "/:env/client-versions",
+  '/:env/client-versions',
   authenticateServerApiToken,
   resolveEnvironment,
-  ServerClientVersionController.getClientVersions,
+  ServerClientVersionController.getClientVersions
 );
 router.get(
-  "/:env/client-versions/:id",
+  '/:env/client-versions/:id',
   authenticateServerApiToken,
   resolveEnvironment,
-  ServerClientVersionController.getClientVersionById,
+  ServerClientVersionController.getClientVersionById
 );
 
 // Service notice routes
 router.get(
-  "/:env/service-notices",
+  '/:env/service-notices',
   authenticateServerApiToken,
   resolveEnvironment,
-  ServerServiceNoticeController.getServiceNotices,
+  ServerServiceNoticeController.getServiceNotices
 );
 router.get(
-  "/:env/service-notices/:id",
+  '/:env/service-notices/:id',
   authenticateServerApiToken,
   resolveEnvironment,
-  ServerServiceNoticeController.getServiceNoticeById,
+  ServerServiceNoticeController.getServiceNoticeById
 );
 
 // Banner routes
 router.get(
-  "/:env/banners",
+  '/:env/banners',
   authenticateServerApiToken,
   resolveEnvironment,
-  ServerBannerController.getBanners,
+  ServerBannerController.getBanners
 );
 router.get(
-  "/:env/banners/:bannerId",
+  '/:env/banners/:bannerId',
   authenticateServerApiToken,
   resolveEnvironment,
-  ServerBannerController.getBannerById,
+  ServerBannerController.getBannerById
 );
 
 // Store product routes
 router.get(
-  "/:env/store-products",
+  '/:env/store-products',
   authenticateServerApiToken,
   resolveEnvironment,
-  ServerStoreProductController.getStoreProducts,
+  ServerStoreProductController.getStoreProducts
 );
 router.get(
-  "/:env/store-products/:id",
+  '/:env/store-products/:id',
   authenticateServerApiToken,
   resolveEnvironment,
-  ServerStoreProductController.getStoreProductById,
+  ServerStoreProductController.getStoreProductById
 );
 
 // Planning data upload route (for external CLI uploads)
 router.post(
-  "/:env/planning-data/upload",
+  '/:env/planning-data/upload',
   authenticateServerApiToken as any,
   resolveEnvironment as any,
   upload.any() as any,
-  PlanningDataController.uploadPlanningData as any,
+  PlanningDataController.uploadPlanningData as any
 );
 
 // Feature flag routes
-import ServerFeatureFlagController from "../../controllers/ServerFeatureFlagController";
+import ServerFeatureFlagController from '../../controllers/ServerFeatureFlagController';
 router.get(
-  "/:env/features",
+  '/:env/features',
   authenticateServerApiToken as any,
   resolveEnvironment as any,
-  ServerFeatureFlagController.getFeatureFlags as any,
+  ServerFeatureFlagController.getFeatureFlags as any
 );
 router.get(
-  "/:env/features/:flagName",
+  '/:env/features/:flagName',
   authenticateServerApiToken as any,
   resolveEnvironment as any,
-  ServerFeatureFlagController.getFeatureFlag as any,
+  ServerFeatureFlagController.getFeatureFlag as any
 );
 router.post(
-  "/:env/features/metrics",
+  '/:env/features/metrics',
   authenticateServerApiToken as any,
   resolveEnvironment as any,
-  ServerFeatureFlagController.receiveMetrics as any,
+  ServerFeatureFlagController.receiveMetrics as any
 );
 router.post(
-  "/:env/features/unknown",
+  '/:env/features/unknown',
   authenticateServerApiToken as any,
   resolveEnvironment as any,
-  ServerFeatureFlagController.reportUnknownFlag as any,
+  ServerFeatureFlagController.reportUnknownFlag as any
 );
 router.get(
-  "/:env/segments",
+  '/:env/segments',
   authenticateServerApiToken as any,
   resolveEnvironment as any,
-  ServerFeatureFlagController.getSegments as any,
+  ServerFeatureFlagController.getSegments as any
 );
 
 export default router;

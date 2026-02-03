@@ -1,11 +1,5 @@
-import {
-  MailModel,
-  MailType,
-  MailPriority,
-  ContentType,
-  MailData,
-} from "../models/Mail";
-import logger from "../config/logger";
+import { MailModel, MailType, MailPriority, ContentType, MailData } from '../models/Mail';
+import logger from '../config/logger';
 
 export interface SendMailOptions {
   senderId?: number | null;
@@ -36,7 +30,7 @@ export class MailService {
       logger.info(`Mail sent: ${mail.id} to user ${options.recipientId}`);
       return mail;
     } catch (error) {
-      logger.error("Failed to send mail:", error);
+      logger.error('Failed to send mail:', error);
       throw error;
     }
   }
@@ -49,19 +43,14 @@ export class MailService {
     recipientId: number,
     subject: string,
     content: string,
-    options: SendSystemMailOptions = {},
+    options: SendSystemMailOptions = {}
   ) {
     try {
-      const mail = await MailModel.sendSystemMail(
-        recipientId,
-        subject,
-        content,
-        options,
-      );
+      const mail = await MailModel.sendSystemMail(recipientId, subject, content, options);
       logger.info(`System mail sent: ${mail.id} to user ${recipientId}`);
       return mail;
     } catch (error) {
-      logger.error("Failed to send system mail:", error);
+      logger.error('Failed to send system mail:', error);
       throw error;
     }
   }
@@ -78,12 +67,12 @@ export class MailService {
       category?: string;
       page?: number;
       limit?: number;
-    } = {},
+    } = {}
   ) {
     try {
       return await MailModel.getMailsForUser(userId, filters);
     } catch (error) {
-      logger.error("Failed to get mails:", error);
+      logger.error('Failed to get mails:', error);
       throw error;
     }
   }
@@ -96,12 +85,12 @@ export class MailService {
     options: {
       page?: number;
       limit?: number;
-    } = {},
+    } = {}
   ) {
     try {
       return await MailModel.getSentMailsForUser(userId, options);
     } catch (error) {
-      logger.error("Failed to get sent mails:", error);
+      logger.error('Failed to get sent mails:', error);
       throw error;
     }
   }
@@ -113,12 +102,12 @@ export class MailService {
     try {
       const mail = await MailModel.query()
         .findById(mailId)
-        .where("recipientId", userId)
-        .where("isDeleted", false);
+        .where('recipientId', userId)
+        .where('isDeleted', false);
 
       return mail;
     } catch (error) {
-      logger.error("Failed to get mail:", error);
+      logger.error('Failed to get mail:', error);
       throw error;
     }
   }
@@ -130,7 +119,7 @@ export class MailService {
     try {
       return await MailModel.getUnreadCount(userId);
     } catch (error) {
-      logger.error("Failed to get unread count:", error);
+      logger.error('Failed to get unread count:', error);
       throw error;
     }
   }
@@ -146,7 +135,7 @@ export class MailService {
       }
       return result;
     } catch (error) {
-      logger.error("Failed to mark mail as read:", error);
+      logger.error('Failed to mark mail as read:', error);
       throw error;
     }
   }
@@ -160,7 +149,7 @@ export class MailService {
       logger.info(`${count} mails marked as read by user ${userId}`);
       return count;
     } catch (error) {
-      logger.error("Failed to mark multiple mails as read:", error);
+      logger.error('Failed to mark multiple mails as read:', error);
       throw error;
     }
   }
@@ -171,13 +160,10 @@ export class MailService {
   async markAllAsRead(userId: number, filters: any = {}): Promise<number> {
     try {
       const count = await MailModel.markAllAsRead(userId, filters);
-      logger.info(
-        `${count} mails marked as read by user ${userId} with filters:`,
-        filters,
-      );
+      logger.info(`${count} mails marked as read by user ${userId} with filters:`, filters);
       return count;
     } catch (error) {
-      logger.error("Failed to mark all mails as read:", error);
+      logger.error('Failed to mark all mails as read:', error);
       throw error;
     }
   }
@@ -188,12 +174,10 @@ export class MailService {
   async toggleStarred(mailId: number, userId: number): Promise<boolean> {
     try {
       const isStarred = await MailModel.toggleStarred(mailId, userId);
-      logger.info(
-        `Mail ${mailId} starred status toggled to ${isStarred} by user ${userId}`,
-      );
+      logger.info(`Mail ${mailId} starred status toggled to ${isStarred} by user ${userId}`);
       return isStarred;
     } catch (error) {
-      logger.error("Failed to toggle starred status:", error);
+      logger.error('Failed to toggle starred status:', error);
       throw error;
     }
   }
@@ -209,7 +193,7 @@ export class MailService {
       }
       return result;
     } catch (error) {
-      logger.error("Failed to delete mail:", error);
+      logger.error('Failed to delete mail:', error);
       throw error;
     }
   }
@@ -223,7 +207,7 @@ export class MailService {
       logger.info(`${count} mails deleted by user ${userId}`);
       return count;
     } catch (error) {
-      logger.error("Failed to delete multiple mails:", error);
+      logger.error('Failed to delete multiple mails:', error);
       throw error;
     }
   }
@@ -234,13 +218,10 @@ export class MailService {
   async deleteAllMails(userId: number, filters: any = {}): Promise<number> {
     try {
       const count = await MailModel.deleteAllMails(userId, filters);
-      logger.info(
-        `${count} mails deleted by user ${userId} with filters:`,
-        filters,
-      );
+      logger.info(`${count} mails deleted by user ${userId} with filters:`, filters);
       return count;
     } catch (error) {
-      logger.error("Failed to delete all mails:", error);
+      logger.error('Failed to delete all mails:', error);
       throw error;
     }
   }
@@ -252,25 +233,25 @@ export class MailService {
     try {
       const [unreadCount, starredCount, totalCount] = await Promise.all([
         MailModel.query()
-          .where("recipientId", userId)
-          .where("isRead", false)
-          .where("isDeleted", false)
-          .count("* as count")
+          .where('recipientId', userId)
+          .where('isRead', false)
+          .where('isDeleted', false)
+          .count('* as count')
           .first()
           .then((r: any) => Number(r?.count || 0)),
 
         MailModel.query()
-          .where("recipientId", userId)
-          .where("isStarred", true)
-          .where("isDeleted", false)
-          .count("* as count")
+          .where('recipientId', userId)
+          .where('isStarred', true)
+          .where('isDeleted', false)
+          .count('* as count')
           .first()
           .then((r: any) => Number(r?.count || 0)),
 
         MailModel.query()
-          .where("recipientId", userId)
-          .where("isDeleted", false)
-          .count("* as count")
+          .where('recipientId', userId)
+          .where('isDeleted', false)
+          .count('* as count')
           .first()
           .then((r: any) => Number(r?.count || 0)),
       ]);
@@ -282,7 +263,7 @@ export class MailService {
         readCount: totalCount - unreadCount,
       };
     } catch (error) {
-      logger.error("Failed to get mail stats:", error);
+      logger.error('Failed to get mail stats:', error);
       throw error;
     }
   }
@@ -296,7 +277,7 @@ export async function sendSystemMail(
   recipientId: number,
   subject: string,
   content: string,
-  options: SendSystemMailOptions = {},
+  options: SendSystemMailOptions = {}
 ): Promise<void> {
   await mailService.sendSystemMail(recipientId, subject, content, options);
 }

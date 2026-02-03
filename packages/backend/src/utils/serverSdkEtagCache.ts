@@ -1,6 +1,6 @@
-import { Response } from "express";
-import crypto from "crypto";
-import { CacheService } from "../services/CacheService";
+import { Response } from 'express';
+import crypto from 'crypto';
+import { CacheService } from '../services/CacheService';
 
 interface EtagCacheEntry<TPayload> {
   etag: string;
@@ -23,7 +23,7 @@ interface RespondWithEtagCacheOptions<TPayload> {
  */
 export async function respondWithEtagCache<TPayload>(
   res: Response,
-  options: RespondWithEtagCacheOptions<TPayload>,
+  options: RespondWithEtagCacheOptions<TPayload>
 ): Promise<void> {
   const { cacheKey, ttlMs, requestEtag, buildPayload } = options;
 
@@ -38,9 +38,9 @@ export async function respondWithEtagCache<TPayload>(
       return;
     }
 
-    res.set("ETag", cached.etag);
+    res.set('ETag', cached.etag);
     if (ttlSeconds > 0) {
-      res.set("Cache-Control", `public, max-age=${ttlSeconds}`);
+      res.set('Cache-Control', `public, max-age=${ttlSeconds}`);
     }
     res.json(cached.payload as any);
     return;
@@ -52,12 +52,12 @@ export async function respondWithEtagCache<TPayload>(
   await CacheService.set<EtagCacheEntry<TPayload>>(
     cacheKey,
     { etag, payload },
-    ttlSeconds || undefined,
+    ttlSeconds || undefined
   );
 
-  res.set("ETag", etag);
+  res.set('ETag', etag);
   if (ttlSeconds > 0) {
-    res.set("Cache-Control", `public, max-age=${ttlSeconds}`);
+    res.set('Cache-Control', `public, max-age=${ttlSeconds}`);
   }
   res.json(payload as any);
 }
@@ -65,7 +65,7 @@ export async function respondWithEtagCache<TPayload>(
 function generateEtag(payload: unknown): string {
   try {
     const json = JSON.stringify(payload);
-    const hash = crypto.createHash("sha1").update(json).digest("hex");
+    const hash = crypto.createHash('sha1').update(json).digest('hex');
     return `"${hash}"`;
   } catch {
     // Fallback ETag if payload cannot be stringified for some reason

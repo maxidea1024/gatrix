@@ -1,9 +1,9 @@
-import { Response } from "express";
-import ServiceNoticeService from "../services/ServiceNoticeService";
-import logger from "../config/logger";
-import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from "../constants/cacheKeys";
-import { respondWithEtagCache } from "../utils/serverSdkEtagCache";
-import { EnvironmentRequest } from "../middleware/environmentResolver";
+import { Response } from 'express';
+import ServiceNoticeService from '../services/ServiceNoticeService';
+import logger from '../config/logger';
+import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
+import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
+import { EnvironmentRequest } from '../middleware/environmentResolver';
 
 /**
  * Server SDK Service Notice Controller
@@ -23,8 +23,8 @@ export class ServerServiceNoticeController {
         return res.status(400).json({
           success: false,
           error: {
-            code: "MISSING_ENVIRONMENT",
-            message: "Environment is required",
+            code: 'MISSING_ENVIRONMENT',
+            message: 'Environment is required',
           },
         });
       }
@@ -32,7 +32,7 @@ export class ServerServiceNoticeController {
       await respondWithEtagCache(res, {
         cacheKey: `${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environment}`,
         ttlMs: DEFAULT_CONFIG.SERVICE_NOTICE_TTL,
-        requestEtag: req.headers["if-none-match"],
+        requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
           // Helper function to filter active notices by time window
           const filterActiveNotices = (notices: any[]) => {
@@ -58,7 +58,7 @@ export class ServerServiceNoticeController {
           const activeNotices = filterActiveNotices(result.notices);
 
           logger.info(
-            `Server SDK: Retrieved ${activeNotices.length} active service notices for environment ${environment}`,
+            `Server SDK: Retrieved ${activeNotices.length} active service notices for environment ${environment}`
           );
 
           return {
@@ -71,15 +71,12 @@ export class ServerServiceNoticeController {
         },
       });
     } catch (error) {
-      logger.error(
-        "Error in ServerServiceNoticeController.getServiceNotices:",
-        error,
-      );
+      logger.error('Error in ServerServiceNoticeController.getServiceNotices:', error);
       res.status(500).json({
         success: false,
         error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to retrieve service notices",
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to retrieve service notices',
         },
       });
     }
@@ -99,8 +96,8 @@ export class ServerServiceNoticeController {
         return res.status(400).json({
           success: false,
           error: {
-            code: "MISSING_ENVIRONMENT",
-            message: "Environment is required",
+            code: 'MISSING_ENVIRONMENT',
+            message: 'Environment is required',
           },
         });
       }
@@ -109,30 +106,27 @@ export class ServerServiceNoticeController {
         return res.status(400).json({
           success: false,
           error: {
-            code: "INVALID_PARAMETERS",
-            message: "Invalid service notice ID",
-            details: { reason: "ID must be a valid number" },
+            code: 'INVALID_PARAMETERS',
+            message: 'Invalid service notice ID',
+            details: { reason: 'ID must be a valid number' },
           },
         });
       }
 
-      const notice = await ServiceNoticeService.getServiceNoticeById(
-        noticeId,
-        environment,
-      );
+      const notice = await ServiceNoticeService.getServiceNoticeById(noticeId, environment);
 
       if (!notice) {
         return res.status(404).json({
           success: false,
           error: {
-            code: "NOT_FOUND",
-            message: "Service notice not found",
+            code: 'NOT_FOUND',
+            message: 'Service notice not found',
           },
         });
       }
 
       logger.info(
-        `Server SDK: Retrieved service notice ${noticeId} for environment ${environment}`,
+        `Server SDK: Retrieved service notice ${noticeId} for environment ${environment}`
       );
 
       res.json({
@@ -140,15 +134,12 @@ export class ServerServiceNoticeController {
         data: notice,
       });
     } catch (error) {
-      logger.error(
-        "Error in ServerServiceNoticeController.getServiceNoticeById:",
-        error,
-      );
+      logger.error('Error in ServerServiceNoticeController.getServiceNoticeById:', error);
       res.status(500).json({
         success: false,
         error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to retrieve service notice",
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to retrieve service notice',
         },
       });
     }

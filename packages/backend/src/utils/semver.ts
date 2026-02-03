@@ -21,16 +21,15 @@ export interface SemanticVersion {
  * @throws {Error} If version string is invalid
  */
 export function parseVersion(version: string): SemanticVersion {
-  if (!version || typeof version !== "string") {
-    throw new Error("Invalid version: must be a non-empty string");
+  if (!version || typeof version !== 'string') {
+    throw new Error('Invalid version: must be a non-empty string');
   }
 
   // Remove leading 'v' if present
-  const cleanVersion = version.trim().replace(/^v/, "");
+  const cleanVersion = version.trim().replace(/^v/, '');
 
   // Regex to parse semver: MAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]
-  const semverRegex =
-    /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z-.]+))?(?:\+([0-9A-Za-z-.]+))?$/;
+  const semverRegex = /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z-.]+))?(?:\+([0-9A-Za-z-.]+))?$/;
   const match = cleanVersion.match(semverRegex);
 
   if (!match) {
@@ -96,8 +95,8 @@ export function compareVersions(version1: string, version2: string): number {
  * @returns {number} -1 if pre1 < pre2, 0 if equal, 1 if pre1 > pre2
  */
 function comparePrereleases(pre1: string, pre2: string): number {
-  const parts1 = pre1.split(".");
-  const parts2 = pre2.split(".");
+  const parts1 = pre1.split('.');
+  const parts2 = pre2.split('.');
 
   const maxLength = Math.max(parts1.length, parts2.length);
 
@@ -168,10 +167,7 @@ export function isEqual(version1: string, version2: string): boolean {
  * @param {string} version2 - Second version
  * @returns {boolean} True if version1 >= version2
  */
-export function isGreaterThanOrEqual(
-  version1: string,
-  version2: string,
-): boolean {
+export function isGreaterThanOrEqual(version1: string, version2: string): boolean {
   return compareVersions(version1, version2) >= 0;
 }
 

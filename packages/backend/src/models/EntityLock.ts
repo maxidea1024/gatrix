@@ -1,10 +1,10 @@
-import { Model } from "objection";
-import { User } from "./User";
+import { Model } from 'objection';
+import { User } from './User';
 
 /**
  * Lock type
  */
-export type LockType = "soft" | "hard";
+export type LockType = 'soft' | 'hard';
 
 /**
  * EntityLock model
@@ -18,7 +18,7 @@ export type LockType = "soft" | "hard";
  * Lock policies can be configured per entity type and environment.
  */
 export class EntityLock extends Model {
-  static tableName = "g_entity_locks";
+  static tableName = 'g_entity_locks';
 
   id!: string;
   entityType!: string;
@@ -34,26 +34,20 @@ export class EntityLock extends Model {
 
   static get jsonSchema() {
     return {
-      type: "object",
-      required: [
-        "entityType",
-        "entityId",
-        "environment",
-        "lockedBy",
-        "lockType",
-      ],
+      type: 'object',
+      required: ['entityType', 'entityId', 'environment', 'lockedBy', 'lockType'],
       properties: {
-        id: { type: "string" },
-        entityType: { type: "string", maxLength: 100 },
-        entityId: { type: "string", maxLength: 255 },
-        environment: { type: "string", maxLength: 100 },
-        lockedBy: { type: "integer" },
+        id: { type: 'string' },
+        entityType: { type: 'string', maxLength: 100 },
+        entityId: { type: 'string', maxLength: 255 },
+        environment: { type: 'string', maxLength: 100 },
+        lockedBy: { type: 'integer' },
         lockType: {
-          type: "string",
-          enum: ["soft", "hard"],
+          type: 'string',
+          enum: ['soft', 'hard'],
         },
-        expiresAt: { type: ["string", "null"], format: "date-time" },
-        createdAt: { type: "string", format: "date-time" },
+        expiresAt: { type: ['string', 'null'], format: 'date-time' },
+        createdAt: { type: 'string', format: 'date-time' },
       },
     };
   }
@@ -64,8 +58,8 @@ export class EntityLock extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: User,
         join: {
-          from: "g_entity_locks.lockedBy",
-          to: "g_users.id",
+          from: 'g_entity_locks.lockedBy',
+          to: 'g_users.id',
         },
       },
     };

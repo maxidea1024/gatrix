@@ -1,11 +1,11 @@
-import { Router } from "express";
-import { ClientController } from "../../controllers/ClientController";
-import { ClientCrashController } from "../../controllers/ClientCrashController";
-import { BannerClientController } from "../../controllers/BannerClientController";
-import { requestLogger } from "../../middleware/requestLogger";
-import { clientSDKAuth } from "../../middleware/apiTokenAuth";
-import { body, param, validationResult } from "express-validator";
-import { GatrixError } from "../../middleware/errorHandler";
+import { Router } from 'express';
+import { ClientController } from '../../controllers/ClientController';
+import { ClientCrashController } from '../../controllers/ClientCrashController';
+import { BannerClientController } from '../../controllers/BannerClientController';
+import { requestLogger } from '../../middleware/requestLogger';
+import { clientSDKAuth } from '../../middleware/apiTokenAuth';
+import { body, param, validationResult } from 'express-validator';
+import { GatrixError } from '../../middleware/errorHandler';
 
 const router = Router();
 /**
@@ -353,9 +353,7 @@ const validateRequest = (req: any, res: any, next: any) => {
       value: err.value,
     }));
 
-    const errorMessage = errorDetails
-      .map((err: any) => `${err.field}: ${err.message}`)
-      .join(", ");
+    const errorMessage = errorDetails.map((err: any) => `${err.field}: ${err.message}`).join(', ');
 
     const error = new GatrixError(`Validation failed: ${errorMessage}`, 400);
     (error as any).validationErrors = errorDetails;
@@ -366,30 +364,26 @@ const validateRequest = (req: any, res: any, next: any) => {
 
 router.use(requestLogger);
 
-router.get("/client-version", clientSDKAuth, ClientController.getClientVersion);
+router.get('/client-version', clientSDKAuth, ClientController.getClientVersion);
 
-router.get("/game-worlds", clientSDKAuth, ClientController.getGameWorlds);
+router.get('/game-worlds', clientSDKAuth, ClientController.getGameWorlds);
 
-router.get("/cache-stats", clientSDKAuth, ClientController.getCacheStats);
+router.get('/cache-stats', clientSDKAuth, ClientController.getCacheStats);
 
-router.post(
-  "/invalidate-cache",
-  clientSDKAuth,
-  ClientController.invalidateCache,
-);
+router.post('/invalidate-cache', clientSDKAuth, ClientController.invalidateCache);
 
 // Feature Flag evaluation routes (Server-side)
 // Environment is specified in the path: /features/:environment/eval
-router.post("/features/:environment/eval", clientSDKAuth, ClientController.evaluateFlags);
-router.get("/features/:environment/eval", clientSDKAuth, ClientController.evaluateFlags);
+router.post('/features/:environment/eval', clientSDKAuth, ClientController.evaluateFlags);
+router.get('/features/:environment/eval', clientSDKAuth, ClientController.evaluateFlags);
 
 // Client SDK routes (with API token authentication)
-router.get("/test", clientSDKAuth, (req: any, res: any) => {
+router.get('/test', clientSDKAuth, (req: any, res: any) => {
   const apiToken = req.apiToken;
 
   res.json({
     success: true,
-    message: "Client SDK authentication successful",
+    message: 'Client SDK authentication successful',
     data: {
       tokenId: apiToken?.id,
       tokenName: apiToken?.tokenName,
@@ -401,33 +395,29 @@ router.get("/test", clientSDKAuth, (req: any, res: any) => {
 
 // Crash upload endpoint (requires client API token)
 router.post(
-  "/crashes/upload",
+  '/crashes/upload',
   clientSDKAuth,
-  body("platform").isString().notEmpty(),
-  body("branch").isString().notEmpty(),
-  body("environment").isString().notEmpty(),
-  body("stack").isString().notEmpty(),
-  body("marketType").optional({ nullable: true }).isString(),
-  body("isEditor").optional({ nullable: true }).isBoolean(),
-  body("appVersion").optional({ nullable: true }).isString(),
-  body("resVersion").optional({ nullable: true }).isString(),
-  body("accountId").optional({ nullable: true }).isString(),
-  body("characterId").optional({ nullable: true }).isString(),
-  body("gameUserId").optional({ nullable: true }).isString(),
-  body("userName").optional({ nullable: true }).isString(),
-  body("gameServerId").optional({ nullable: true }).isString(),
-  body("userMessage").optional({ nullable: true }).isString(),
-  body("log").optional({ nullable: true }).isString(),
+  body('platform').isString().notEmpty(),
+  body('branch').isString().notEmpty(),
+  body('environment').isString().notEmpty(),
+  body('stack').isString().notEmpty(),
+  body('marketType').optional({ nullable: true }).isString(),
+  body('isEditor').optional({ nullable: true }).isBoolean(),
+  body('appVersion').optional({ nullable: true }).isString(),
+  body('resVersion').optional({ nullable: true }).isString(),
+  body('accountId').optional({ nullable: true }).isString(),
+  body('characterId').optional({ nullable: true }).isString(),
+  body('gameUserId').optional({ nullable: true }).isString(),
+  body('userName').optional({ nullable: true }).isString(),
+  body('gameServerId').optional({ nullable: true }).isString(),
+  body('userMessage').optional({ nullable: true }).isString(),
+  body('log').optional({ nullable: true }).isString(),
   validateRequest,
-  ClientCrashController.uploadCrash,
+  ClientCrashController.uploadCrash
 );
 
 // Banner routes for game client
-router.get("/banners", clientSDKAuth, BannerClientController.getBanners);
-router.get(
-  "/banners/:bannerId",
-  clientSDKAuth,
-  BannerClientController.getBannerById,
-);
+router.get('/banners', clientSDKAuth, BannerClientController.getBanners);
+router.get('/banners/:bannerId', clientSDKAuth, BannerClientController.getBannerById);
 
 export default router;

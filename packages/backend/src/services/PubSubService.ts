@@ -1,13 +1,13 @@
-import { EventEmitter } from "events";
-import { Queue, Worker, Job } from "bullmq";
-import { createClient, RedisClientType } from "redis";
-import { config } from "../config";
-import redisClient from "../config/redis";
-import logger from "../config/logger";
-import { cacheService } from "./CacheService";
+import { EventEmitter } from 'events';
+import { Queue, Worker, Job } from 'bullmq';
+import { createClient, RedisClientType } from 'redis';
+import { config } from '../config';
+import redisClient from '../config/redis';
+import logger from '../config/logger';
+import { cacheService } from './CacheService';
 
 export interface CacheInvalidationMessage {
-  type: "invalidate" | "clear";
+  type: 'invalidate' | 'clear';
   pattern?: string;
   key?: string;
   timestamp: number;
@@ -37,11 +37,11 @@ export class PubSubService extends EventEmitter {
 
   // Redis Pub/Sub for SSE broadcast
   private sseSubscriber: RedisClientType | null = null;
-  private readonly SSE_CHANNEL = "sse:notifications";
+  private readonly SSE_CHANNEL = 'sse:notifications';
 
   private isConnected = false;
-  private readonly QUEUE_NAME = "cache-invalidation";
-  private readonly SSE_QUEUE_NAME = "sse-notifications";
+  private readonly QUEUE_NAME = 'cache-invalidation';
+  private readonly SSE_QUEUE_NAME = 'sse-notifications';
 
   constructor() {
     super();
@@ -54,10 +54,10 @@ export class PubSubService extends EventEmitter {
   public async initialize(): Promise<void> {
     try {
       const redisConfig = {
-        host: process.env.REDIS_HOST || "localhost",
-        port: parseInt(process.env.REDIS_PORT || "6379"),
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379'),
         password: process.env.REDIS_PASSWORD,
-        db: parseInt(process.env.REDIS_DB || "0"),
+        db: parseInt(process.env.REDIS_DB || '0'),
         // BullMQ requires maxRetriesPerRequest to be null on Node-Redis v4
         maxRetriesPerRequest: null as any,
         retryDelayOnFailover: 100,
@@ -72,7 +72,7 @@ export class PubSubService extends EventEmitter {
           removeOnFail: 50,
           attempts: 3,
           backoff: {
-            type: "exponential",
+            type: 'exponential',
             delay: 2000,
           },
         },
@@ -87,7 +87,7 @@ export class PubSubService extends EventEmitter {
         {
           connection: redisConfig,
           concurrency: 5,
-        },
+        }
       );
 
       // [Deprecated path] Create SSE notification queue (kept for backward compatibility; not used for broadcast)
@@ -98,7 +98,7 @@ export class PubSubService extends EventEmitter {
           removeOnFail: 50,
           attempts: 3,
           backoff: {
-            type: "exponential",
+            type: 'exponential',
             delay: 1000,
           },
         },
@@ -113,7 +113,7 @@ export class PubSubService extends EventEmitter {
         {
           connection: redisConfig,
           concurrency: 10,
-        },
+        }
       );
 
       // [Deprecated] SDK events queue replaced with Redis Pub/Sub
@@ -129,7 +129,7 @@ export class PubSubService extends EventEmitter {
       //   },
       // });
 
-      logger.info("SDK events will be published via Redis Pub/Sub");
+      logger.info('SDK events will be published via Redis Pub/Sub');
 
       // New: Redis Pub/Sub subscriber for true broadcast to all instances
       try {
@@ -138,63 +138,60 @@ export class PubSubService extends EventEmitter {
           password: config.redis.password || undefined,
         });
         await this.sseSubscriber.connect();
-        await this.sseSubscriber.subscribe(
-          this.SSE_CHANNEL,
-          (payload: string) => {
-            try {
-              const message = JSON.parse(payload) as SSENotificationBusMessage;
-              this.emit("sse-notification", message);
-            } catch (err) {
-              logger.error("Failed to parse SSE Pub/Sub message:", err);
-            }
-          },
-        );
+        await this.sseSubscriber.subscribe(this.SSE_CHANNEL, (payload: string) => {
+          try {
+            const message = JSON.parse(payload) as SSENotificationBusMessage;
+            this.emit('sse-notification', message);
+          } catch (err) {
+            logger.error('Failed to parse SSE Pub/Sub message:', err);
+          }
+        });
         logger.info(`Subscribed to Redis channel: ${this.SSE_CHANNEL}`);
       } catch (err) {
         logger.warn(
-          "Failed to initialize Redis Pub/Sub for SSE; falling back to BullMQ path only",
-          err,
+          'Failed to initialize Redis Pub/Sub for SSE; falling back to BullMQ path only',
+          err
         );
       }
 
       // Setup event handlers - cache
-      this.cacheQueue.on("error", (error: Error) => {
-        logger.error("Cache queue error:", error);
+      this.cacheQueue.on('error', (error: Error) => {
+        logger.error('Cache queue error:', error);
       });
-      this.cacheWorker.on("error", (error: Error) => {
-        logger.error("Cache worker error:", error);
+      this.cacheWorker.on('error', (error: Error) => {
+        logger.error('Cache worker error:', error);
       });
-      this.cacheWorker.on("completed", (job: Job) => {
-        logger.debug("Cache invalidation job completed:", job.id);
+      this.cacheWorker.on('completed', (job: Job) => {
+        logger.debug('Cache invalidation job completed:', job.id);
       });
-      this.cacheWorker.on("failed", (job: Job | undefined, error: Error) => {
-        logger.error("Cache invalidation job failed:", {
+      this.cacheWorker.on('failed', (job: Job | undefined, error: Error) => {
+        logger.error('Cache invalidation job failed:', {
           jobId: job?.id,
           error: error.message,
         });
       });
 
       // Setup event handlers - sse
-      this.sseQueue.on("error", (error: Error) => {
-        logger.error("SSE queue error:", error);
+      this.sseQueue.on('error', (error: Error) => {
+        logger.error('SSE queue error:', error);
       });
-      this.sseWorker.on("error", (error: Error) => {
-        logger.error("SSE worker error:", error);
+      this.sseWorker.on('error', (error: Error) => {
+        logger.error('SSE worker error:', error);
       });
-      this.sseWorker.on("completed", (job: Job) => {
-        logger.debug("SSE notification job completed:", job.id);
+      this.sseWorker.on('completed', (job: Job) => {
+        logger.debug('SSE notification job completed:', job.id);
       });
-      this.sseWorker.on("failed", (job: Job | undefined, error: Error) => {
-        logger.error("SSE notification job failed:", {
+      this.sseWorker.on('failed', (job: Job | undefined, error: Error) => {
+        logger.error('SSE notification job failed:', {
           jobId: job?.id,
           error: error.message,
         });
       });
 
       this.isConnected = true;
-      logger.info("PubSub service initialized successfully with BullMQ");
+      logger.info('PubSub service initialized successfully with BullMQ');
     } catch (error) {
-      logger.error("Failed to initialize PubSub service:", error);
+      logger.error('Failed to initialize PubSub service:', error);
       // Continue without Redis - cache will still work locally
       this.isConnected = false;
     }
@@ -203,21 +200,19 @@ export class PubSubService extends EventEmitter {
   /**
    * Process cache invalidation job
    */
-  private async processCacheInvalidation(
-    data: CacheInvalidationMessage,
-  ): Promise<void> {
+  private async processCacheInvalidation(data: CacheInvalidationMessage): Promise<void> {
     try {
       // Ignore old messages (older than 30 seconds)
       if (Date.now() - data.timestamp > 30_000) {
-        logger.debug("Ignoring old cache invalidation message:", data);
+        logger.debug('Ignoring old cache invalidation message:', data);
         return;
       }
 
       switch (data.type) {
-        case "clear":
+        case 'clear':
           await cacheService.clear();
           break;
-        case "invalidate":
+        case 'invalidate':
           if (data.pattern) {
             await cacheService.deleteByPattern(data.pattern);
           } else if (data.key) {
@@ -226,9 +221,9 @@ export class PubSubService extends EventEmitter {
           break;
       }
 
-      logger.debug("Cache invalidation processed:", data);
+      logger.debug('Cache invalidation processed:', data);
     } catch (error: any) {
-      logger.error("Failed to process cache invalidation message:", error);
+      logger.error('Failed to process cache invalidation message:', error);
       throw error; // Re-throw to trigger job retry
     }
   }
@@ -236,20 +231,18 @@ export class PubSubService extends EventEmitter {
   /**
    * Process SSE notification job and emit locally
    */
-  private async processSSENotification(
-    message: SSENotificationBusMessage,
-  ): Promise<void> {
+  private async processSSENotification(message: SSENotificationBusMessage): Promise<void> {
     try {
       // Ignore very old messages (older than 2 minutes)
       const ts = message.timestamp ?? Date.now();
       if (Date.now() - ts > 120_000) {
-        logger.debug("Ignoring old SSE notification:", message.type);
+        logger.debug('Ignoring old SSE notification:', message.type);
         return;
       }
       // Emit for local fan-out (index.ts will bridge to SSENotificationService)
-      this.emit("sse-notification", message);
+      this.emit('sse-notification', message);
     } catch (error: any) {
-      logger.error("Failed to process SSE notification message:", error);
+      logger.error('Failed to process SSE notification message:', error);
       throw error;
     }
   }
@@ -258,12 +251,10 @@ export class PubSubService extends EventEmitter {
    * Add cache invalidation job to queue
    */
   private async addCacheInvalidationJob(
-    message: Omit<CacheInvalidationMessage, "timestamp">,
+    message: Omit<CacheInvalidationMessage, 'timestamp'>
   ): Promise<void> {
     if (!this.isConnected || !this.cacheQueue) {
-      logger.warn(
-        "PubSub not connected, skipping cache invalidation broadcast",
-      );
+      logger.warn('PubSub not connected, skipping cache invalidation broadcast');
       return;
     }
 
@@ -273,14 +264,14 @@ export class PubSubService extends EventEmitter {
         timestamp: Date.now(),
       };
 
-      await this.cacheQueue.add("invalidate-cache", fullMessage, {
+      await this.cacheQueue.add('invalidate-cache', fullMessage, {
         priority: 10, // High priority for cache invalidation
         delay: 0,
       });
 
-      logger.debug("Cache invalidation job added:", fullMessage);
+      logger.debug('Cache invalidation job added:', fullMessage);
     } catch (error: any) {
-      logger.error("Failed to add cache invalidation job:", error);
+      logger.error('Failed to add cache invalidation job:', error);
     }
   }
 
@@ -289,7 +280,7 @@ export class PubSubService extends EventEmitter {
    */
   private async addSSEJob(message: SSENotificationBusMessage): Promise<void> {
     if (!this.isConnected || !this.sseQueue) {
-      logger.warn("PubSub not connected, skipping SSE notification broadcast");
+      logger.warn('PubSub not connected, skipping SSE notification broadcast');
       return;
     }
 
@@ -299,14 +290,14 @@ export class PubSubService extends EventEmitter {
         timestamp: message.timestamp ?? Date.now(),
       };
 
-      await this.sseQueue.add("sse-notify", fullMessage, {
+      await this.sseQueue.add('sse-notify', fullMessage, {
         priority: 5,
         delay: 0,
       });
 
-      logger.debug("SSE notification job added:", { type: fullMessage.type });
+      logger.debug('SSE notification job added:', { type: fullMessage.type });
     } catch (error: any) {
-      logger.error("Failed to add SSE notification job:", error);
+      logger.error('Failed to add SSE notification job:', error);
     }
   }
 
@@ -332,17 +323,17 @@ export class PubSubService extends EventEmitter {
         if (keys.length > 0) {
           await client.del(keys);
           logger.info(
-            `Direct Redis invalidation: deleted ${keys.length} keys matching ${keyvPattern}`,
+            `Direct Redis invalidation: deleted ${keys.length} keys matching ${keyvPattern}`
           );
         }
       }
     } catch (error) {
-      logger.error("Failed to perform direct Redis invalidation:", error);
+      logger.error('Failed to perform direct Redis invalidation:', error);
     }
 
     // Broadcast to other instances via queue
     await this.addCacheInvalidationJob({
-      type: "invalidate",
+      type: 'invalidate',
       pattern,
     });
   }
@@ -359,7 +350,7 @@ export class PubSubService extends EventEmitter {
 
     // Broadcast to other instances via queue
     await this.addCacheInvalidationJob({
-      type: "invalidate",
+      type: 'invalidate',
       key,
     });
     logger.debug(`Cache invalidation job queued for key: ${key}`);
@@ -374,16 +365,14 @@ export class PubSubService extends EventEmitter {
 
     // Broadcast to other instances via queue
     await this.addCacheInvalidationJob({
-      type: "clear",
+      type: 'clear',
     });
   }
 
   /**
    * Publish SSE notification to all instances via Redis Pub/Sub (broadcast)
    */
-  async publishNotification(
-    message: Omit<SSENotificationBusMessage, "timestamp">,
-  ): Promise<void> {
+  async publishNotification(message: Omit<SSENotificationBusMessage, 'timestamp'>): Promise<void> {
     try {
       const fullMessage: SSENotificationBusMessage = {
         ...message,
@@ -391,14 +380,11 @@ export class PubSubService extends EventEmitter {
       };
       const client = redisClient.getClient();
       await client.publish(this.SSE_CHANNEL, JSON.stringify(fullMessage));
-      logger.debug("SSE notification published to channel", {
+      logger.debug('SSE notification published to channel', {
         type: fullMessage.type,
       });
     } catch (error: any) {
-      logger.error(
-        "Failed to publish SSE notification via Redis Pub/Sub:",
-        error,
-      );
+      logger.error('Failed to publish SSE notification via Redis Pub/Sub:', error);
       // Fallback: enqueue to BullMQ for at-least-once delivery (not broadcast)
       await this.addSSEJob(message as SSENotificationBusMessage);
     }
@@ -410,12 +396,10 @@ export class PubSubService extends EventEmitter {
   private convertBooleanFields(data: any): any {
     const converted = { ...data };
     if (converted.isVisible !== undefined) {
-      converted.isVisible =
-        converted.isVisible === 1 || converted.isVisible === true;
+      converted.isVisible = converted.isVisible === 1 || converted.isVisible === true;
     }
     if (converted.isActive !== undefined) {
-      converted.isActive =
-        converted.isActive === 1 || converted.isActive === true;
+      converted.isActive = converted.isActive === 1 || converted.isActive === true;
     }
     return converted;
   }
@@ -424,10 +408,7 @@ export class PubSubService extends EventEmitter {
    * Publish SDK event to Redis Pub/Sub for real-time delivery to all SDK instances
    * Uses Pub/Sub instead of BullMQ queue to ensure all subscribers receive the event
    */
-  async publishSDKEvent(event: {
-    type: string;
-    data: Record<string, any>;
-  }): Promise<void> {
+  async publishSDKEvent(event: { type: string; data: Record<string, any> }): Promise<void> {
     try {
       // Convert MySQL 0/1 to boolean
       const convertedEvent = {
@@ -439,25 +420,22 @@ export class PubSubService extends EventEmitter {
       const client = redisClient.getClient();
       const eventJson = JSON.stringify(convertedEvent);
 
-      logger.info("Publishing SDK event to Pub/Sub", {
+      logger.info('Publishing SDK event to Pub/Sub', {
         type: convertedEvent.type,
         id: convertedEvent.data.id,
-        channel: "gatrix-sdk-events",
+        channel: 'gatrix-sdk-events',
       });
 
-      const numSubscribers = await client.publish(
-        "gatrix-sdk-events",
-        eventJson,
-      );
+      const numSubscribers = await client.publish('gatrix-sdk-events', eventJson);
 
-      logger.info("SDK event published to Pub/Sub", {
+      logger.info('SDK event published to Pub/Sub', {
         type: convertedEvent.type,
         id: convertedEvent.data.id,
         numSubscribers,
         messageLength: eventJson.length,
       });
     } catch (error: any) {
-      logger.error("Failed to publish SDK event:", error);
+      logger.error('Failed to publish SDK event:', error);
     }
   }
 
@@ -470,15 +448,15 @@ export class PubSubService extends EventEmitter {
   }): Promise<void> {
     try {
       const client = redisClient.getClient();
-      const eventChannel = "gatrix-sdk-events";
+      const eventChannel = 'gatrix-sdk-events';
       await client.publish(eventChannel, JSON.stringify(event));
-      logger.info("Standard event published to SDK channel", {
+      logger.info('Standard event published to SDK channel', {
         type: event.type,
         id: event.data.id,
         channel: eventChannel,
       });
     } catch (error: any) {
-      logger.error("Failed to publish standard event:", error);
+      logger.error('Failed to publish standard event:', error);
     }
   }
 
@@ -503,11 +481,10 @@ export class PubSubService extends EventEmitter {
         active: active.length,
         completed: completed.length,
         failed: failed.length,
-        total:
-          waiting.length + active.length + completed.length + failed.length,
+        total: waiting.length + active.length + completed.length + failed.length,
       };
     } catch (error: any) {
-      logger.error("Failed to get queue stats:", error);
+      logger.error('Failed to get queue stats:', error);
       return null;
     }
   }
@@ -550,9 +527,9 @@ export class PubSubService extends EventEmitter {
       }
 
       this.isConnected = false;
-      logger.info("PubSub service shutdown completed");
+      logger.info('PubSub service shutdown completed');
     } catch (error: any) {
-      logger.error("Error during PubSub shutdown:", error);
+      logger.error('Error during PubSub shutdown:', error);
     }
   }
 

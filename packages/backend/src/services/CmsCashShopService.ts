@@ -1,8 +1,8 @@
-import logger from "../config/logger";
-import { PlanningDataService } from "./PlanningDataService";
+import logger from '../config/logger';
+import { PlanningDataService } from './PlanningDataService';
 
 // Supported language codes
-export type SupportedLanguage = "ko" | "en" | "zh";
+export type SupportedLanguage = 'ko' | 'en' | 'zh';
 
 /**
  * Multi-language text interface
@@ -42,12 +42,10 @@ export class CmsCashShopService {
     try {
       const data = await PlanningDataService.getCashShopLookup(environment);
       const products: CmsCashShopProduct[] = data.items || [];
-      logger.info(
-        `Loaded ${products.length} CMS CashShop products for environment ${environment}`,
-      );
+      logger.info(`Loaded ${products.length} CMS CashShop products for environment ${environment}`);
       return products;
     } catch (error) {
-      logger.error("Failed to load CMS CashShop products", {
+      logger.error('Failed to load CMS CashShop products', {
         error,
         environment,
       });
@@ -60,11 +58,8 @@ export class CmsCashShopService {
    * @param product CMS product
    * @param lang Language code (defaults to 'zh')
    */
-  static getLocalizedName(
-    product: CmsCashShopProduct,
-    lang: SupportedLanguage = "zh",
-  ): string {
-    return product.name[lang] || product.name.zh || product.name.ko || "";
+  static getLocalizedName(product: CmsCashShopProduct, lang: SupportedLanguage = 'zh'): string {
+    return product.name[lang] || product.name.zh || product.name.ko || '';
   }
 
   /**
@@ -74,13 +69,8 @@ export class CmsCashShopService {
    */
   static getLocalizedDescription(
     product: CmsCashShopProduct,
-    lang: SupportedLanguage = "zh",
+    lang: SupportedLanguage = 'zh'
   ): string {
-    return (
-      product.description[lang] ||
-      product.description.zh ||
-      product.description.ko ||
-      ""
-    );
+    return product.description[lang] || product.description.zh || product.description.ko || '';
   }
 }

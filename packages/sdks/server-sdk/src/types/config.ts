@@ -12,7 +12,7 @@ export interface RedisConfig {
 export interface CacheConfig {
   enabled?: boolean; // Enable caching (default: true)
   ttl?: number; // Cache TTL in seconds (default: 300)
-  refreshMethod?: "polling" | "event" | "manual"; // Cache refresh method. 'polling': periodic refresh, 'event': real-time via Redis PubSub, 'manual': manual refresh only (default: 'polling')
+  refreshMethod?: 'polling' | 'event' | 'manual'; // Cache refresh method. 'polling': periodic refresh, 'event': real-time via Redis PubSub, 'manual': manual refresh only (default: 'polling')
   skipBackendReady?: boolean; // Skip waiting for backend to be ready during initialization (default: false). Set to true for backend self-registration to avoid infinite wait.
 }
 
@@ -25,11 +25,11 @@ export interface LokiConfig {
 }
 
 export interface LoggerConfig {
-  level?: "debug" | "info" | "warn" | "error";
+  level?: 'debug' | 'info' | 'warn' | 'error';
   customLogger?: (level: string, message: string, meta?: any) => void;
   timeOffset?: number; // Time offset in hours (e.g., 9 for +09:00). Default: 0 (UTC)
-  timestampFormat?: "iso8601" | "local"; // Timestamp format. Default: 'iso8601'
-  format?: "pretty" | "json"; // Output format. Default: 'pretty'
+  timestampFormat?: 'iso8601' | 'local'; // Timestamp format. Default: 'iso8601'
+  format?: 'pretty' | 'json'; // Output format. Default: 'pretty'
   context?: Record<string, any>; // Additional context fields to include in every log entry (JSON format only)
   sourceCategory?: string; // Source category for logs
   loki?: LokiConfig; // Loki configuration for direct log push
@@ -79,13 +79,7 @@ export interface CloudConfig {
    * If not specified, SDK will auto-detect by trying all providers.
    * Supported providers: AWS, GCP, Azure, Tencent Cloud, Alibaba Cloud, Oracle Cloud
    */
-  provider?:
-    | "aws"
-    | "gcp"
-    | "azure"
-    | "tencentcloud"
-    | "alibabacloud"
-    | "oraclecloud";
+  provider?: 'aws' | 'gcp' | 'azure' | 'tencentcloud' | 'alibabacloud' | 'oraclecloud';
 }
 
 /**
@@ -159,7 +153,7 @@ export interface GatrixSDKConfig {
   //   - ['env1', 'env2', ...]: Specific environments mode - only handle listed environments
   //   - undefined or []: Single-environment mode - use current environment only
   // Example: '*' or ['development', 'production'] or ['env_prod', 'env_staging']
-  environments?: string[] | "*";
+  environments?: string[] | '*';
 }
 
 /**
@@ -203,6 +197,6 @@ export interface GatrixSDKInitOptions {
   retry?: Partial<RetryConfig>; // Override retry settings
   metrics?: Partial<MetricsConfig>; // Override metrics settings
   features?: Partial<FeaturesConfig>; // Override feature toggles
-  environments?: string[] | "*"; // Override target environments
+  environments?: string[] | '*'; // Override target environments
   cloud?: Partial<CloudConfig>; // Override cloud configuration
 }

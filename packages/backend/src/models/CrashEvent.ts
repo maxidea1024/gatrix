@@ -1,13 +1,13 @@
-import { Model } from "objection";
-import { CRASH_CONSTANTS } from "../types/crash";
-import { generateULID } from "../utils/ulid";
+import { Model } from 'objection';
+import { CRASH_CONSTANTS } from '../types/crash';
+import { generateULID } from '../utils/ulid';
 
 /**
  * CrashEvent Model
  * Represents an individual crash occurrence
  */
 export class CrashEvent extends Model {
-  static tableName = "crash_events";
+  static tableName = 'crash_events';
 
   id!: string; // ULID
   crashId!: string; // Reference to crashes.id
@@ -38,29 +38,29 @@ export class CrashEvent extends Model {
 
   static get jsonSchema() {
     return {
-      type: "object",
-      required: ["id", "crashId", "platform", "branch", "environment"],
+      type: 'object',
+      required: ['id', 'crashId', 'platform', 'branch', 'environment'],
       properties: {
-        id: { type: "string", maxLength: 26 }, // ULID
-        crashId: { type: "string", maxLength: 26 }, // ULID
-        firstLine: { type: ["string", "null"], maxLength: 200 },
-        platform: { type: "string", maxLength: 50 },
-        marketType: { type: ["string", "null"], maxLength: 50 },
-        branch: { type: "string", maxLength: 50 },
-        environment: { type: "string", maxLength: 50 },
-        isEditor: { type: "boolean", default: false },
-        appVersion: { type: ["string", "null"], maxLength: 50 },
-        resVersion: { type: ["string", "null"], maxLength: 50 },
-        accountId: { type: ["string", "null"], maxLength: 100 },
-        characterId: { type: ["string", "null"], maxLength: 100 },
-        gameUserId: { type: ["string", "null"], maxLength: 100 },
-        userName: { type: ["string", "null"], maxLength: 100 },
-        gameServerId: { type: ["string", "null"], maxLength: 100 },
-        userMessage: { type: ["string", "null"], maxLength: 255 },
-        logFilePath: { type: ["string", "null"], maxLength: 500 },
-        crashEventIp: { type: ["string", "null"], maxLength: 45 },
-        crashEventUserAgent: { type: ["string", "null"], maxLength: 500 },
-        createdAt: { type: "string", format: "date-time" },
+        id: { type: 'string', maxLength: 26 }, // ULID
+        crashId: { type: 'string', maxLength: 26 }, // ULID
+        firstLine: { type: ['string', 'null'], maxLength: 200 },
+        platform: { type: 'string', maxLength: 50 },
+        marketType: { type: ['string', 'null'], maxLength: 50 },
+        branch: { type: 'string', maxLength: 50 },
+        environment: { type: 'string', maxLength: 50 },
+        isEditor: { type: 'boolean', default: false },
+        appVersion: { type: ['string', 'null'], maxLength: 50 },
+        resVersion: { type: ['string', 'null'], maxLength: 50 },
+        accountId: { type: ['string', 'null'], maxLength: 100 },
+        characterId: { type: ['string', 'null'], maxLength: 100 },
+        gameUserId: { type: ['string', 'null'], maxLength: 100 },
+        userName: { type: ['string', 'null'], maxLength: 100 },
+        gameServerId: { type: ['string', 'null'], maxLength: 100 },
+        userMessage: { type: ['string', 'null'], maxLength: 255 },
+        logFilePath: { type: ['string', 'null'], maxLength: 500 },
+        crashEventIp: { type: ['string', 'null'], maxLength: 45 },
+        crashEventUserAgent: { type: ['string', 'null'], maxLength: 500 },
+        createdAt: { type: 'string', format: 'date-time' },
       },
     };
   }
@@ -69,10 +69,10 @@ export class CrashEvent extends Model {
     return {
       crash: {
         relation: Model.BelongsToOneRelation,
-        modelClass: "ClientCrash",
+        modelClass: 'ClientCrash',
         join: {
-          from: "crash_events.crashId",
-          to: "crashes.id",
+          from: 'crash_events.crashId',
+          to: 'crashes.id',
         },
       },
     };
@@ -109,14 +109,8 @@ export class CrashEvent extends Model {
     crashEventUserAgent?: string;
   }) {
     // Truncate user message if too long
-    if (
-      data.userMessage &&
-      data.userMessage.length > CRASH_CONSTANTS.MaxUserMsgLen
-    ) {
-      data.userMessage = data.userMessage.substring(
-        0,
-        CRASH_CONSTANTS.MaxUserMsgLen,
-      );
+    if (data.userMessage && data.userMessage.length > CRASH_CONSTANTS.MaxUserMsgLen) {
+      data.userMessage = data.userMessage.substring(0, CRASH_CONSTANTS.MaxUserMsgLen);
     }
 
     const eventId = generateULID();
@@ -129,7 +123,7 @@ export class CrashEvent extends Model {
 
     const event = await this.query().findById(eventId);
     if (!event) {
-      throw new Error("Failed to create crash event");
+      throw new Error('Failed to create crash event');
     }
 
     return event;
@@ -139,10 +133,7 @@ export class CrashEvent extends Model {
    * Get events by crash ID
    */
   static async getByCrashId(crashId: string, limit: number = 100) {
-    return await this.query()
-      .where("crashId", crashId)
-      .orderBy("createdAt", "desc")
-      .limit(limit);
+    return await this.query().where('crashId', crashId).orderBy('createdAt', 'desc').limit(limit);
   }
 
   /**
@@ -150,11 +141,11 @@ export class CrashEvent extends Model {
    */
   static async getVersionStats(crashId: string) {
     return await this.query()
-      .where("crashId", crashId)
-      .select("appVersion")
-      .count("* as count")
-      .groupBy("appVersion")
-      .orderBy("count", "desc");
+      .where('crashId', crashId)
+      .select('appVersion')
+      .count('* as count')
+      .groupBy('appVersion')
+      .orderBy('count', 'desc');
   }
 
   /**
@@ -162,11 +153,11 @@ export class CrashEvent extends Model {
    */
   static async getPlatformStats(crashId: string) {
     return await this.query()
-      .where("crashId", crashId)
-      .select("platform")
-      .count("* as count")
-      .groupBy("platform")
-      .orderBy("count", "desc");
+      .where('crashId', crashId)
+      .select('platform')
+      .count('* as count')
+      .groupBy('platform')
+      .orderBy('count', 'desc');
   }
 
   /**
@@ -174,11 +165,11 @@ export class CrashEvent extends Model {
    */
   static async getEnvironmentStats(crashId: string) {
     return await this.query()
-      .where("crashId", crashId)
-      .select("environment")
-      .count("* as count")
-      .groupBy("environment")
-      .orderBy("count", "desc");
+      .where('crashId', crashId)
+      .select('environment')
+      .count('* as count')
+      .groupBy('environment')
+      .orderBy('count', 'desc');
   }
 
   /**
@@ -186,12 +177,12 @@ export class CrashEvent extends Model {
    */
   static async getUserStats(crashId: string) {
     return await this.query()
-      .where("crashId", crashId)
-      .whereNotNull("accountId")
-      .select("accountId", "userName")
-      .count("* as count")
-      .groupBy("accountId", "userName")
-      .orderBy("count", "desc")
+      .where('crashId', crashId)
+      .whereNotNull('accountId')
+      .select('accountId', 'userName')
+      .count('* as count')
+      .groupBy('accountId', 'userName')
+      .orderBy('count', 'desc')
       .limit(20);
   }
 
@@ -199,10 +190,7 @@ export class CrashEvent extends Model {
    * Get latest events for a crash
    */
   static async getLatestEvents(crashId: string, limit: number = 10) {
-    return await this.query()
-      .where("crashId", crashId)
-      .orderBy("createdAt", "desc")
-      .limit(limit);
+    return await this.query().where('crashId', crashId).orderBy('createdAt', 'desc').limit(limit);
   }
 
   /**
@@ -212,6 +200,6 @@ export class CrashEvent extends Model {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
 
-    return await this.query().where("createdAt", "<", cutoffDate).delete();
+    return await this.query().where('createdAt', '<', cutoffDate).delete();
   }
 }

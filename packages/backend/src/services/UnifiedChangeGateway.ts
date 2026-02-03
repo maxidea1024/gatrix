@@ -1,16 +1,16 @@
-import { Environment } from "../models/Environment";
-import { ChangeRequest } from "../models/ChangeRequest";
-import { ChangeRequestService } from "./ChangeRequestService";
-import logger from "../config/logger";
-import knex from "../config/knex";
-import { ErrorCodes } from "@gatrix/shared";
-import { GatrixError } from "../middleware/errorHandler";
+import { Environment } from '../models/Environment';
+import { ChangeRequest } from '../models/ChangeRequest';
+import { ChangeRequestService } from './ChangeRequestService';
+import logger from '../config/logger';
+import knex from '../config/knex';
+import { ErrorCodes } from '@gatrix/shared';
+import { GatrixError } from '../middleware/errorHandler';
 
-export type ChangeOperationType = "create" | "update" | "delete";
+export type ChangeOperationType = 'create' | 'update' | 'delete';
 
 export interface ChangeGatewayResult {
-  status: "APPLIED_IMMEDIATELY" | "DRAFT_SAVED" | "ITEM_LOCKED";
-  mode: "DIRECT" | "CHANGE_REQUEST";
+  status: 'APPLIED_IMMEDIATELY' | 'DRAFT_SAVED' | 'ITEM_LOCKED';
+  mode: 'DIRECT' | 'CHANGE_REQUEST';
   data?: any; // Result data for direct operations
   changeRequestId?: string;
   error?: any;
@@ -25,15 +25,9 @@ export class UnifiedChangeGateway {
     environmentName: string,
     targetTable: string,
     targetId: string,
-    newData: any,
+    newData: any
   ): Promise<ChangeGatewayResult> {
-    return this.processChange(
-      userId,
-      environmentName,
-      targetTable,
-      targetId,
-      newData,
-    );
+    return this.processChange(userId, environmentName, targetTable, targetId, newData);
   }
 
   /**
@@ -44,7 +38,7 @@ export class UnifiedChangeGateway {
     environmentName: string,
     targetTable: string,
     createData: any,
-    createFunction: () => Promise<any>,
+    createFunction: () => Promise<any>
   ): Promise<ChangeGatewayResult> {
     try {
       // 1. Fetch Environment Policy
@@ -58,18 +52,18 @@ export class UnifiedChangeGateway {
         // Direct creation
         const result = await createFunction();
         return {
-          status: "APPLIED_IMMEDIATELY",
-          mode: "DIRECT",
+          status: 'APPLIED_IMMEDIATELY',
+          mode: 'DIRECT',
           data: result,
         };
       }
 
       // 3. CR Required - Create a change request for the new item
       const existingDraft = await ChangeRequest.query()
-        .where("requesterId", userId)
-        .where("environment", environmentName)
-        .where("status", "draft")
-        .orderBy("updatedAt", "desc")
+        .where('requesterId', userId)
+        .where('environment', environmentName)
+        .where('status', 'draft')
+        .orderBy('updatedAt', 'desc')
         .first();
 
       const result = await ChangeRequestService.upsertChangeRequestItem(
@@ -79,16 +73,16 @@ export class UnifiedChangeGateway {
         `NEW_${Date.now()}`, // Temporary ID for new items
         null, // beforeData is null for creation (record doesn't exist yet)
         createData,
-        existingDraft?.id,
+        existingDraft?.id
       );
 
       return {
-        status: "DRAFT_SAVED",
+        status: 'DRAFT_SAVED',
         changeRequestId: result.changeRequestId,
-        mode: "CHANGE_REQUEST",
+        mode: 'CHANGE_REQUEST',
       };
     } catch (error) {
-      logger.error("[UnifiedChangeGateway.requestCreation] Error:", error);
+      logger.error('[UnifiedChangeGateway.requestCreation] Error:', error);
       throw error;
     }
   }
@@ -101,7 +95,7 @@ export class UnifiedChangeGateway {
     environmentName: string,
     targetTable: string,
     targetId: string,
-    deleteFunction: () => Promise<void>,
+    deleteFunction: () => Promise<void>
   ): Promise<ChangeGatewayResult> {
     try {
       // 1. Fetch Environment Policy
@@ -112,12 +106,12 @@ export class UnifiedChangeGateway {
 
       // 2. Check for pending CR locks
       const pendingRequest = await ChangeRequest.query()
-        .alias("cr")
-        .join("g_change_items as ci", "cr.id", "ci.changeRequestId")
-        .where("ci.targetTable", targetTable)
-        .where("ci.targetId", targetId)
-        .whereIn("cr.status", ["open", "approved"])
-        .select("cr.id", "cr.title", "cr.requesterId")
+        .alias('cr')
+        .join('g_change_items as ci', 'cr.id', 'ci.changeRequestId')
+        .where('ci.targetTable', targetTable)
+        .where('ci.targetId', targetId)
+        .whereIn('cr.status', ['open', 'approved'])
+        .select('cr.id', 'cr.title', 'cr.requesterId')
         .first();
 
       if (pendingRequest) {
@@ -132,7 +126,7 @@ export class UnifiedChangeGateway {
           409, // Conflict
           true,
           ErrorCodes.RESOURCE_LOCKED,
-          conflictInfo,
+          conflictInfo
         );
       }
 
@@ -141,22 +135,22 @@ export class UnifiedChangeGateway {
         // Direct deletion
         await deleteFunction();
         return {
-          status: "APPLIED_IMMEDIATELY",
-          mode: "DIRECT",
+          status: 'APPLIED_IMMEDIATELY',
+          mode: 'DIRECT',
         };
       }
 
       // 4. CR Required - Get current data and create deletion request
-      const currentData = await knex(targetTable).where("id", targetId).first();
+      const currentData = await knex(targetTable).where('id', targetId).first();
       if (!currentData) {
         throw new Error(`Item ${targetId} not found in ${targetTable}`);
       }
 
       const existingDraft = await ChangeRequest.query()
-        .where("requesterId", userId)
-        .where("environment", environmentName)
-        .where("status", "draft")
-        .orderBy("updatedAt", "desc")
+        .where('requesterId', userId)
+        .where('environment', environmentName)
+        .where('status', 'draft')
+        .orderBy('updatedAt', 'desc')
         .first();
 
       const result = await ChangeRequestService.upsertChangeRequestItem(
@@ -166,16 +160,16 @@ export class UnifiedChangeGateway {
         targetId,
         currentData, // beforeData
         null, // afterData is null for deletion (determineOpType will recognize as DELETE)
-        existingDraft?.id,
+        existingDraft?.id
       );
 
       return {
-        status: "DRAFT_SAVED",
+        status: 'DRAFT_SAVED',
         changeRequestId: result.changeRequestId,
-        mode: "CHANGE_REQUEST",
+        mode: 'CHANGE_REQUEST',
       };
     } catch (error) {
-      logger.error("[UnifiedChangeGateway.requestDeletion] Error:", error);
+      logger.error('[UnifiedChangeGateway.requestDeletion] Error:', error);
       throw error;
     }
   }
@@ -189,7 +183,7 @@ export class UnifiedChangeGateway {
     targetTable: string,
     targetId: string,
     changeDataOrFunction: any | ((currentData: any) => Promise<any> | any),
-    directChangeFunction?: (processedData: any) => Promise<any>,
+    directChangeFunction?: (processedData: any) => Promise<any>
   ): Promise<ChangeGatewayResult> {
     try {
       // 1. Fetch Env Policy
@@ -200,12 +194,12 @@ export class UnifiedChangeGateway {
 
       // 2. Global Lock Check
       const pendingRequest = await ChangeRequest.query()
-        .alias("cr")
-        .join("g_change_items as ci", "cr.id", "ci.changeRequestId")
-        .where("ci.targetTable", targetTable)
-        .where("ci.targetId", targetId)
-        .whereIn("cr.status", ["open", "approved"])
-        .select("cr.id", "cr.title", "cr.requesterId")
+        .alias('cr')
+        .join('g_change_items as ci', 'cr.id', 'ci.changeRequestId')
+        .where('ci.targetTable', targetTable)
+        .where('ci.targetId', targetId)
+        .whereIn('cr.status', ['open', 'approved'])
+        .select('cr.id', 'cr.title', 'cr.requesterId')
         .first();
 
       if (pendingRequest) {
@@ -220,14 +214,14 @@ export class UnifiedChangeGateway {
           409, // Conflict
           true,
           ErrorCodes.RESOURCE_LOCKED,
-          conflictInfo,
+          conflictInfo
         );
       }
 
       // 3. Resolve New Data
-      const currentData = await knex(targetTable).where("id", targetId).first();
+      const currentData = await knex(targetTable).where('id', targetId).first();
       let newData;
-      if (typeof changeDataOrFunction === "function") {
+      if (typeof changeDataOrFunction === 'function') {
         newData = await changeDataOrFunction(currentData);
       } else {
         newData = changeDataOrFunction;
@@ -236,30 +230,29 @@ export class UnifiedChangeGateway {
       // 4. Branching Logic
       // CASE A: Direct Update
       if (!env.requiresApproval) {
-        if (!/^[a-zA-Z0-9_]+$/.test(targetTable))
-          throw new Error("Invalid table name");
+        if (!/^[a-zA-Z0-9_]+$/.test(targetTable)) throw new Error('Invalid table name');
 
         let result;
         if (directChangeFunction) {
           result = await directChangeFunction(newData);
         } else {
-          await knex(targetTable).where("id", targetId).update(newData);
+          await knex(targetTable).where('id', targetId).update(newData);
           result = { id: targetId, ...newData };
         }
 
         return {
-          status: "APPLIED_IMMEDIATELY",
-          mode: "DIRECT",
+          status: 'APPLIED_IMMEDIATELY',
+          mode: 'DIRECT',
           data: result,
         };
       }
 
       // CASE B: Change Request Required
       const existingDraft = await ChangeRequest.query()
-        .where("requesterId", userId)
-        .where("environment", environmentName)
-        .where("status", "draft")
-        .orderBy("updatedAt", "desc")
+        .where('requesterId', userId)
+        .where('environment', environmentName)
+        .where('status', 'draft')
+        .orderBy('updatedAt', 'desc')
         .first();
 
       const result = await ChangeRequestService.upsertChangeRequestItem(
@@ -269,16 +262,16 @@ export class UnifiedChangeGateway {
         targetId,
         currentData || {}, // Before
         newData, // After
-        existingDraft?.id,
+        existingDraft?.id
       );
 
       return {
-        status: "DRAFT_SAVED",
+        status: 'DRAFT_SAVED',
         changeRequestId: result.changeRequestId,
-        mode: "CHANGE_REQUEST",
+        mode: 'CHANGE_REQUEST',
       };
     } catch (error) {
-      logger.error("[UnifiedChangeGateway] Error:", error);
+      logger.error('[UnifiedChangeGateway] Error:', error);
       throw error;
     }
   }
@@ -295,7 +288,7 @@ export class UnifiedChangeGateway {
    * Get environment CR settings
    */
   static async getEnvironmentSettings(
-    environmentName: string,
+    environmentName: string
   ): Promise<{ requiresApproval: boolean; requiredApprovers: number } | null> {
     const env = await Environment.query().findById(environmentName);
     if (!env) return null;

@@ -13,9 +13,9 @@
  */
 export function withEnvironmentFilter<T>(query: T, environment: string): T {
   if (!environment) {
-    throw new Error("Environment must be explicitly specified for filtering.");
+    throw new Error('Environment must be explicitly specified for filtering.');
   }
-  return (query as any).where("environment", environment);
+  return (query as any).where('environment', environment);
 }
 
 /**
@@ -23,7 +23,7 @@ export function withEnvironmentFilter<T>(query: T, environment: string): T {
  * - environment: lowercase letters, numbers, underscore, hyphen (1-100 chars)
  */
 export function isValidEnvironment(environment: string): boolean {
-  if (!environment || typeof environment !== "string") return false;
+  if (!environment || typeof environment !== 'string') return false;
 
   // Validate environment: lowercase, numbers, underscore, hyphen
   if (environment.length < 1 || environment.length > 100) return false;
@@ -37,7 +37,7 @@ export function isValidEnvironment(environment: string): boolean {
  */
 export function getEnvironmentFromRequest(req: any): string {
   // Check header first
-  const headerEnv = req.headers?.["x-environment"];
+  const headerEnv = req.headers?.['x-environment'];
   if (headerEnv && isValidEnvironment(headerEnv)) {
     return headerEnv;
   }
@@ -54,24 +54,17 @@ export function getEnvironmentFromRequest(req: any): string {
     return bodyEnv;
   }
 
-  throw new Error(
-    "Environment not found in request. Environment must be explicitly specified.",
-  );
+  throw new Error('Environment not found in request. Environment must be explicitly specified.');
 }
 
 /**
  * Validate that an environment exists
  */
-export async function validateEnvironment(
-  db: any,
-  environment: string,
-): Promise<boolean> {
+export async function validateEnvironment(db: any, environment: string): Promise<boolean> {
   if (!isValidEnvironment(environment)) {
     return false;
   }
-  const result = await db("g_environments")
-    .where("environment", environment)
-    .first();
+  const result = await db('g_environments').where('environment', environment).first();
   return !!result;
 }
 
@@ -79,9 +72,9 @@ export async function validateEnvironment(
  * Get all available environments
  */
 export async function getAllEnvironments(db: any): Promise<string[]> {
-  const environments = await db("g_environments")
-    .select("environment")
-    .orderBy("displayOrder", "asc");
+  const environments = await db('g_environments')
+    .select('environment')
+    .orderBy('displayOrder', 'asc');
   return environments.map((e: any) => e.environment);
 }
 
@@ -91,7 +84,7 @@ export async function getAllEnvironments(db: any): Promise<string[]> {
 export async function hasEnvironmentAccess(
   _db: any,
   _userId: number,
-  _environment: string,
+  _environment: string
 ): Promise<boolean> {
   // TODO: Implement environment access control based on user roles and token permissions
   return true;
@@ -99,17 +92,15 @@ export async function hasEnvironmentAccess(
 
 // Deprecated/Removed functions (to be removed after fixing call sites)
 export const getCurrentEnvironment = () => {
-  throw new Error(
-    "getCurrentEnvironment is removed. Pass environment explicitly.",
-  );
+  throw new Error('getCurrentEnvironment is removed. Pass environment explicitly.');
 };
 export const getCurrentEnvironmentId = getCurrentEnvironment;
 export const getDefaultEnvironment = () => {
-  throw new Error("getDefaultEnvironment is removed.");
+  throw new Error('getDefaultEnvironment is removed.');
 };
 export const getDefaultEnvironmentId = getDefaultEnvironment;
 export const setDefaultEnvironment = () => {
-  throw new Error("setDefaultEnvironment is removed.");
+  throw new Error('setDefaultEnvironment is removed.');
 };
 export const setDefaultEnvironmentId = setDefaultEnvironment;
 export const getEnvironmentIdFromRequest = getEnvironmentFromRequest;

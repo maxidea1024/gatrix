@@ -19,7 +19,7 @@
 export function calculateMaintenanceStatus(
   isMaintenance: boolean,
   maintenanceStartDate?: Date | string | null,
-  maintenanceEndDate?: Date | string | null,
+  maintenanceEndDate?: Date | string | null
 ): boolean {
   // If maintenance is not enabled, return false
   if (!isMaintenance) {
@@ -68,7 +68,7 @@ export function applyMaintenanceStatusCalculation<
   const actualStatus = calculateMaintenanceStatus(
     obj.isMaintenance ?? false,
     obj.maintenanceStartDate,
-    obj.maintenanceEndDate,
+    obj.maintenanceEndDate
   );
 
   return {

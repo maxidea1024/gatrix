@@ -1,11 +1,10 @@
-import { Request, Response } from "express";
-import { ChatServerService } from "../services/ChatServerService";
-import { UserModel } from "../models/User";
-import { AuthenticatedRequest } from "../middleware/auth";
-import logger from "../config/logger";
+import { Request, Response } from 'express';
+import { ChatServerService } from '../services/ChatServerService';
+import { UserModel } from '../models/User';
+import { AuthenticatedRequest } from '../middleware/auth';
+import logger from '../config/logger';
 
-const DEFAULT_AVATAR_URL =
-  "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
 export class ChatSyncController {
   /**
@@ -19,7 +18,7 @@ export class ChatSyncController {
       if (!userId) {
         return res.status(401).json({
           success: false,
-          error: { message: "Authentication required" },
+          error: { message: 'Authentication required' },
         });
       }
 
@@ -28,7 +27,7 @@ export class ChatSyncController {
       if (!user) {
         return res.status(404).json({
           success: false,
-          error: { message: "User not found" },
+          error: { message: 'User not found' },
         });
       }
 
@@ -40,7 +39,7 @@ export class ChatSyncController {
         name: user.name || user.email,
         email: user.email,
         avatarUrl: user.avatarUrl || DEFAULT_AVATAR_URL,
-        status: "online",
+        status: 'online',
         lastSeenAt: new Date().toISOString(),
         createdAt: user.createdAt?.toISOString(),
         updatedAt: user.updatedAt?.toISOString(),
@@ -51,16 +50,16 @@ export class ChatSyncController {
       res.json({
         success: true,
         data: {
-          message: "User synchronized successfully",
+          message: 'User synchronized successfully',
           userId: user.id,
           username: user.email,
         },
       });
     } catch (error: any) {
-      logger.error("Error syncing user to Chat Server:", error);
+      logger.error('Error syncing user to Chat Server:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to sync user to Chat Server" },
+        error: { message: 'Failed to sync user to Chat Server' },
       });
     }
   }
@@ -76,7 +75,7 @@ export class ChatSyncController {
       if (isNaN(targetUserId)) {
         return res.status(400).json({
           success: false,
-          error: { message: "Invalid userId" },
+          error: { message: 'Invalid userId' },
         });
       }
 
@@ -85,7 +84,7 @@ export class ChatSyncController {
       if (!user) {
         return res.status(404).json({
           success: false,
-          error: { message: "User not found" },
+          error: { message: 'User not found' },
         });
       }
 
@@ -97,29 +96,27 @@ export class ChatSyncController {
         name: user.name || user.email,
         email: user.email,
         avatarUrl: user.avatarUrl || DEFAULT_AVATAR_URL,
-        status: "offline", // 관리자가 동기화하는 경우 기본값
+        status: 'offline', // 관리자가 동기화하는 경우 기본값
         lastSeenAt: new Date().toISOString(),
         createdAt: user.createdAt?.toISOString(),
         updatedAt: user.updatedAt?.toISOString(),
       });
 
-      logger.info(
-        `User ${targetUserId} synced to Chat Server by admin ${req.user?.userId}`,
-      );
+      logger.info(`User ${targetUserId} synced to Chat Server by admin ${req.user?.userId}`);
 
       res.json({
         success: true,
         data: {
-          message: "User synchronized successfully",
+          message: 'User synchronized successfully',
           userId: user.id,
           username: user.email,
         },
       });
     } catch (error: any) {
-      logger.error("Error syncing user to Chat Server:", error);
+      logger.error('Error syncing user to Chat Server:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to sync user to Chat Server" },
+        error: { message: 'Failed to sync user to Chat Server' },
       });
     }
   }
@@ -134,14 +131,14 @@ export class ChatSyncController {
   static async syncAllUsers(req: AuthenticatedRequest, res: Response) {
     try {
       // 모든 활성 사용자 조회
-      const result = await UserModel.findAll(1, 1000, { status: "active" });
+      const result = await UserModel.findAll(1, 1000, { status: 'active' });
       const users = result.users;
 
       if (users.length === 0) {
         return res.json({
           success: true,
           data: {
-            message: "No users to sync",
+            message: 'No users to sync',
             syncedCount: 0,
           },
         });
@@ -154,7 +151,7 @@ export class ChatSyncController {
         name: user.name || user.email,
         email: user.email,
         avatarUrl: user.avatarUrl || DEFAULT_AVATAR_URL,
-        status: "offline" as const,
+        status: 'offline' as const,
         lastSeenAt: new Date().toISOString(),
         createdAt: user.createdAt?.toISOString(),
         updatedAt: user.updatedAt?.toISOString(),
@@ -164,22 +161,20 @@ export class ChatSyncController {
       const chatServerService = ChatServerService.getInstance();
       await chatServerService.syncUsers(userData);
 
-      logger.info(
-        `${users.length} users synced to Chat Server by admin ${req.user?.userId}`,
-      );
+      logger.info(`${users.length} users synced to Chat Server by admin ${req.user?.userId}`);
 
       res.json({
         success: true,
         data: {
-          message: "All users synchronized successfully",
+          message: 'All users synchronized successfully',
           syncedCount: users.length,
         },
       });
     } catch (error: any) {
-      logger.error("Error syncing all users to Chat Server:", error);
+      logger.error('Error syncing all users to Chat Server:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to sync users to Chat Server" },
+        error: { message: 'Failed to sync users to Chat Server' },
       });
     }
   }
@@ -201,10 +196,10 @@ export class ChatSyncController {
         },
       });
     } catch (error: any) {
-      logger.error("Error checking Chat Server health:", error);
+      logger.error('Error checking Chat Server health:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to check Chat Server health" },
+        error: { message: 'Failed to check Chat Server health' },
       });
     }
   }
@@ -220,7 +215,7 @@ export class ChatSyncController {
       if (!userId) {
         return res.status(401).json({
           success: false,
-          error: { message: "Authentication required" },
+          error: { message: 'Authentication required' },
         });
       }
 
@@ -229,7 +224,7 @@ export class ChatSyncController {
       if (!user) {
         return res.status(404).json({
           success: false,
-          error: { message: "User not found" },
+          error: { message: 'User not found' },
         });
       }
 
@@ -242,17 +237,17 @@ export class ChatSyncController {
           name: user.name,
           email: user.email,
           avatarUrl: user.avatarUrl || undefined,
-          status: "online", // 기본값으로 online 설정
+          status: 'online', // 기본값으로 online 설정
         });
       } catch (syncError) {
         logger.warn(
-          "Failed to sync user to chat server, but continuing with token generation:",
-          syncError,
+          'Failed to sync user to chat server, but continuing with token generation:',
+          syncError
         );
       }
 
       // Chat Server용 JWT 토큰 생성
-      const jwt = require("jsonwebtoken");
+      const jwt = require('jsonwebtoken');
       const chatToken = jwt.sign(
         {
           userId: user.id,
@@ -262,7 +257,7 @@ export class ChatSyncController {
           iat: Math.floor(Date.now() / 1000),
           exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24시간
         },
-        process.env.JWT_SECRET || "your-secret-key",
+        process.env.JWT_SECRET || 'your-secret-key'
       );
 
       res.json({
@@ -278,10 +273,10 @@ export class ChatSyncController {
         },
       });
     } catch (error: any) {
-      logger.error("Error generating chat token:", error);
+      logger.error('Error generating chat token:', error);
       res.status(500).json({
         success: false,
-        error: { message: "Failed to generate chat token" },
+        error: { message: 'Failed to generate chat token' },
       });
     }
   }

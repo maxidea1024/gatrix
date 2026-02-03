@@ -1,9 +1,9 @@
-import { Response } from "express";
-import { BannerModel } from "../models/Banner";
-import logger from "../config/logger";
-import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from "../constants/cacheKeys";
-import { respondWithEtagCache } from "../utils/serverSdkEtagCache";
-import { EnvironmentRequest } from "../middleware/environmentResolver";
+import { Response } from 'express';
+import { BannerModel } from '../models/Banner';
+import logger from '../config/logger';
+import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
+import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
+import { EnvironmentRequest } from '../middleware/environmentResolver';
 
 /**
  * Server SDK Banner Controller
@@ -23,8 +23,8 @@ export class ServerBannerController {
         return res.status(400).json({
           success: false,
           error: {
-            code: "MISSING_ENVIRONMENT",
-            message: "Environment is required",
+            code: 'MISSING_ENVIRONMENT',
+            message: 'Environment is required',
           },
         });
       }
@@ -32,12 +32,12 @@ export class ServerBannerController {
       await respondWithEtagCache(res, {
         cacheKey: `${SERVER_SDK_ETAG.BANNERS}:${environment}`,
         ttlMs: DEFAULT_CONFIG.BANNER_TTL,
-        requestEtag: req.headers["if-none-match"],
+        requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
           const banners = await BannerModel.findPublished(environment);
 
           logger.info(
-            `Server SDK: Retrieved ${banners.length} published banners for environment ${environment}`,
+            `Server SDK: Retrieved ${banners.length} published banners for environment ${environment}`
           );
 
           return {
@@ -50,12 +50,12 @@ export class ServerBannerController {
         },
       });
     } catch (error) {
-      logger.error("Error in ServerBannerController.getBanners:", error);
+      logger.error('Error in ServerBannerController.getBanners:', error);
       res.status(500).json({
         success: false,
         error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to retrieve banners",
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to retrieve banners',
         },
       });
     }
@@ -74,8 +74,8 @@ export class ServerBannerController {
         return res.status(400).json({
           success: false,
           error: {
-            code: "MISSING_ENVIRONMENT",
-            message: "Environment is required",
+            code: 'MISSING_ENVIRONMENT',
+            message: 'Environment is required',
           },
         });
       }
@@ -84,9 +84,9 @@ export class ServerBannerController {
         return res.status(400).json({
           success: false,
           error: {
-            code: "INVALID_PARAMETERS",
-            message: "Invalid banner ID",
-            details: { reason: "Banner ID is required" },
+            code: 'INVALID_PARAMETERS',
+            message: 'Invalid banner ID',
+            details: { reason: 'Banner ID is required' },
           },
         });
       }
@@ -97,26 +97,24 @@ export class ServerBannerController {
         return res.status(404).json({
           success: false,
           error: {
-            code: "NOT_FOUND",
-            message: "Banner not found",
+            code: 'NOT_FOUND',
+            message: 'Banner not found',
           },
         });
       }
 
       // Only return published banners for server SDK
-      if (banner.status !== "published") {
+      if (banner.status !== 'published') {
         return res.status(404).json({
           success: false,
           error: {
-            code: "NOT_FOUND",
-            message: "Banner not found",
+            code: 'NOT_FOUND',
+            message: 'Banner not found',
           },
         });
       }
 
-      logger.info(
-        `Server SDK: Retrieved banner ${bannerId} for environment ${environment}`,
-      );
+      logger.info(`Server SDK: Retrieved banner ${bannerId} for environment ${environment}`);
 
       res.json({
         success: true,
@@ -125,12 +123,12 @@ export class ServerBannerController {
         },
       });
     } catch (error) {
-      logger.error("Error in ServerBannerController.getBannerById:", error);
+      logger.error('Error in ServerBannerController.getBannerById:', error);
       res.status(500).json({
         success: false,
         error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to retrieve banner",
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to retrieve banner',
         },
       });
     }

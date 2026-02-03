@@ -5,22 +5,18 @@
  * Extends BaseEnvironmentService for common fetch/caching logic
  */
 
-import { ApiClient } from "../client/ApiClient";
-import { Logger } from "../utils/logger";
-import { EnvironmentResolver } from "../utils/EnvironmentResolver";
-import { GameWorld, GameWorldListResponse } from "../types/api";
-import { BaseEnvironmentService } from "./BaseEnvironmentService";
+import { ApiClient } from '../client/ApiClient';
+import { Logger } from '../utils/logger';
+import { EnvironmentResolver } from '../utils/EnvironmentResolver';
+import { GameWorld, GameWorldListResponse } from '../types/api';
+import { BaseEnvironmentService } from './BaseEnvironmentService';
 
 export class GameWorldService extends BaseEnvironmentService<
   GameWorld,
   GameWorldListResponse,
   number
 > {
-  constructor(
-    apiClient: ApiClient,
-    logger: Logger,
-    envResolver: EnvironmentResolver,
-  ) {
+  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
     super(apiClient, logger, envResolver);
   }
 
@@ -35,7 +31,7 @@ export class GameWorldService extends BaseEnvironmentService<
   }
 
   protected getServiceName(): string {
-    return "game worlds";
+    return 'game worlds';
   }
 
   protected getItemId(item: GameWorld): number {
@@ -51,22 +47,20 @@ export class GameWorldService extends BaseEnvironmentService<
   async listByEnvironment(environment: string): Promise<GameWorld[]> {
     const endpoint = this.getEndpoint(environment);
 
-    this.logger.debug("Fetching game worlds", { environment });
+    this.logger.debug('Fetching game worlds', { environment });
 
     const response = await this.apiClient.get<GameWorldListResponse>(endpoint);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || "Failed to fetch game worlds");
+      throw new Error(response.error?.message || 'Failed to fetch game worlds');
     }
 
     const worlds = this.extractItems(response.data);
     // Sort by displayOrder (ascending)
-    const sortedWorlds = worlds.sort(
-      (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0),
-    );
+    const sortedWorlds = worlds.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
     this.cachedByEnv.set(environment, sortedWorlds);
 
-    this.logger.info("Game worlds fetched", {
+    this.logger.info('Game worlds fetched', {
       count: sortedWorlds.length,
       environment,
     });
@@ -83,17 +77,17 @@ export class GameWorldService extends BaseEnvironmentService<
    * @param environment Environment name (required)
    */
   async getById(id: number, environment: string): Promise<GameWorld> {
-    this.logger.debug("Fetching game world by ID", { id, environment });
+    this.logger.debug('Fetching game world by ID', { id, environment });
 
     const response = await this.apiClient.get<GameWorld>(
-      `/api/v1/server/${encodeURIComponent(environment)}/game-worlds/${id}`,
+      `/api/v1/server/${encodeURIComponent(environment)}/game-worlds/${id}`
     );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || "Failed to fetch game world");
+      throw new Error(response.error?.message || 'Failed to fetch game world');
     }
 
-    this.logger.info("Game world fetched", {
+    this.logger.info('Game world fetched', {
       id,
       worldId: response.data.worldId,
     });
@@ -108,20 +102,20 @@ export class GameWorldService extends BaseEnvironmentService<
    * @param environment Environment name (required)
    */
   async getByWorldId(worldId: string, environment: string): Promise<GameWorld> {
-    this.logger.debug("Fetching game world by worldId", {
+    this.logger.debug('Fetching game world by worldId', {
       worldId,
       environment,
     });
 
     const response = await this.apiClient.get<GameWorld>(
-      `/api/v1/server/${encodeURIComponent(environment)}/game-worlds/world/${encodeURIComponent(worldId)}`,
+      `/api/v1/server/${encodeURIComponent(environment)}/game-worlds/world/${encodeURIComponent(worldId)}`
     );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || "Failed to fetch game world");
+      throw new Error(response.error?.message || 'Failed to fetch game world');
     }
 
-    this.logger.info("Game world fetched", { worldId, id: response.data.id });
+    this.logger.info('Game world fetched', { worldId, id: response.data.id });
 
     return response.data;
   }
@@ -138,10 +132,10 @@ export class GameWorldService extends BaseEnvironmentService<
   async updateSingleWorld(
     id: number,
     environment: string,
-    isVisible?: boolean | number,
+    isVisible?: boolean | number
   ): Promise<void> {
     try {
-      this.logger.debug("Updating single game world in cache", {
+      this.logger.debug('Updating single game world in cache', {
         id,
         environment,
         isVisible,
@@ -149,7 +143,7 @@ export class GameWorldService extends BaseEnvironmentService<
 
       // If isVisible is explicitly false (0 or false), just remove from cache
       if (isVisible === false || isVisible === 0) {
-        this.logger.info("Game world isVisible=false, removing from cache", {
+        this.logger.info('Game world isVisible=false, removing from cache', {
           id,
           environment,
         });
@@ -170,11 +164,9 @@ export class GameWorldService extends BaseEnvironmentService<
 
       if (existsInCache) {
         // Immutable update: update existing world
-        const newWorlds = currentWorlds.map((world) =>
-          world.id === id ? updatedWorld : world,
-        );
+        const newWorlds = currentWorlds.map((world) => (world.id === id ? updatedWorld : world));
         this.cachedByEnv.set(environment, newWorlds);
-        this.logger.debug("Single game world updated in cache", {
+        this.logger.debug('Single game world updated in cache', {
           id,
           environment,
         });
@@ -184,13 +176,13 @@ export class GameWorldService extends BaseEnvironmentService<
         const newWorlds = [...currentWorlds, updatedWorld];
         newWorlds.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
         this.cachedByEnv.set(environment, newWorlds);
-        this.logger.debug("Single game world added to cache", {
+        this.logger.debug('Single game world added to cache', {
           id,
           environment,
         });
       }
     } catch (error: any) {
-      this.logger.error("Failed to update single game world in cache", {
+      this.logger.error('Failed to update single game world in cache', {
         id,
         environment,
         error: error.message,
@@ -253,7 +245,7 @@ export class GameWorldService extends BaseEnvironmentService<
   getWorldMaintenanceMessage(
     worldId: string,
     environment: string,
-    lang: "ko" | "en" | "zh" = "en",
+    lang: 'ko' | 'en' | 'zh' = 'en'
   ): string | null {
     const worlds = this.getCached(environment);
     const world = worlds.find((w) => w.worldId === worldId);

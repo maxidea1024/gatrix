@@ -1,10 +1,7 @@
-import { RowDataPacket, ResultSetHeader } from "mysql2";
-import database from "../config/database";
-import {
-  convertFromMySQLDateTime,
-  convertToMySQLDateTime,
-} from "../utils/dateUtils";
-import { pubSubService } from "./PubSubService";
+import { RowDataPacket, ResultSetHeader } from 'mysql2';
+import database from '../config/database';
+import { convertFromMySQLDateTime, convertToMySQLDateTime } from '../utils/dateUtils';
+import { pubSubService } from './PubSubService';
 
 export interface IngamePopupNotice {
   id: number;
@@ -66,7 +63,7 @@ export interface IngamePopupNoticeFilters {
   world?: string;
   market?: string;
   platform?: string | string[];
-  platformOperator?: "any_of" | "include_all";
+  platformOperator?: 'any_of' | 'include_all';
   clientVersion?: string;
   accountId?: string;
   search?: string;
@@ -80,7 +77,7 @@ class IngamePopupNoticeService {
   async getIngamePopupNotices(
     page: number = 1,
     limit: number = 10,
-    filters: IngamePopupNoticeFilters,
+    filters: IngamePopupNoticeFilters
   ): Promise<{ notices: IngamePopupNotice[]; total: number }> {
     const pool = database.getPool();
     const offset = (page - 1) * limit;
@@ -89,12 +86,12 @@ class IngamePopupNoticeService {
 
     // Environment filter (always applied)
     const environment = filters.environment;
-    whereClauses.push("environment = ?");
+    whereClauses.push('environment = ?');
     queryParams.push(environment);
 
     // Apply filters
     if (filters.isActive !== undefined) {
-      whereClauses.push("isActive = ?");
+      whereClauses.push('isActive = ?');
       queryParams.push(filters.isActive);
     }
 
@@ -104,11 +101,11 @@ class IngamePopupNoticeService {
       // endDate is optional - if null, treat as permanent (no end date)
       if (filters.currentlyVisible) {
         whereClauses.push(
-          "isActive = 1 AND (startDate IS NULL OR startDate <= UTC_TIMESTAMP()) AND (endDate IS NULL OR endDate >= UTC_TIMESTAMP())",
+          'isActive = 1 AND (startDate IS NULL OR startDate <= UTC_TIMESTAMP()) AND (endDate IS NULL OR endDate >= UTC_TIMESTAMP())'
         );
       } else {
         whereClauses.push(
-          "(isActive = 0 OR (startDate IS NOT NULL AND startDate > UTC_TIMESTAMP()) OR (endDate IS NOT NULL AND endDate < UTC_TIMESTAMP()))",
+          '(isActive = 0 OR (startDate IS NOT NULL AND startDate > UTC_TIMESTAMP()) OR (endDate IS NOT NULL AND endDate < UTC_TIMESTAMP()))'
         );
       }
     }
@@ -116,83 +113,76 @@ class IngamePopupNoticeService {
     // Target filters - check if JSON array contains the value OR is empty/null (all targets)
     if (filters.world) {
       whereClauses.push(
-        "(targetWorlds IS NULL OR JSON_LENGTH(targetWorlds) = 0 OR JSON_CONTAINS(targetWorlds, ?))",
+        '(targetWorlds IS NULL OR JSON_LENGTH(targetWorlds) = 0 OR JSON_CONTAINS(targetWorlds, ?))'
       );
       queryParams.push(JSON.stringify(filters.world));
     }
 
     if (filters.market) {
       whereClauses.push(
-        "(targetMarkets IS NULL OR JSON_LENGTH(targetMarkets) = 0 OR JSON_CONTAINS(targetMarkets, ?))",
+        '(targetMarkets IS NULL OR JSON_LENGTH(targetMarkets) = 0 OR JSON_CONTAINS(targetMarkets, ?))'
       );
       queryParams.push(JSON.stringify(filters.market));
     }
 
     if (filters.platform) {
-      const platforms = Array.isArray(filters.platform)
-        ? filters.platform
-        : [filters.platform];
-      const operator = filters.platformOperator || "any_of";
+      const platforms = Array.isArray(filters.platform) ? filters.platform : [filters.platform];
+      const operator = filters.platformOperator || 'any_of';
 
-      if (operator === "include_all") {
+      if (operator === 'include_all') {
         // All specified platforms must be included OR be empty/null (all platforms)
         const platformChecks = platforms
-          .map(() => "JSON_CONTAINS(targetPlatforms, ?)")
-          .join(" AND ");
+          .map(() => 'JSON_CONTAINS(targetPlatforms, ?)')
+          .join(' AND ');
         whereClauses.push(
-          `(targetPlatforms IS NULL OR JSON_LENGTH(targetPlatforms) = 0 OR (${platformChecks}))`,
+          `(targetPlatforms IS NULL OR JSON_LENGTH(targetPlatforms) = 0 OR (${platformChecks}))`
         );
-        platforms.forEach((platform) =>
-          queryParams.push(JSON.stringify(platform)),
-        );
+        platforms.forEach((platform) => queryParams.push(JSON.stringify(platform)));
       } else {
         // Any of the specified platforms (default) OR be empty/null (all platforms)
         const platformChecks = platforms
-          .map(() => "JSON_CONTAINS(targetPlatforms, ?)")
-          .join(" OR ");
+          .map(() => 'JSON_CONTAINS(targetPlatforms, ?)')
+          .join(' OR ');
         whereClauses.push(
-          `(targetPlatforms IS NULL OR JSON_LENGTH(targetPlatforms) = 0 OR (${platformChecks}))`,
+          `(targetPlatforms IS NULL OR JSON_LENGTH(targetPlatforms) = 0 OR (${platformChecks}))`
         );
-        platforms.forEach((platform) =>
-          queryParams.push(JSON.stringify(platform)),
-        );
+        platforms.forEach((platform) => queryParams.push(JSON.stringify(platform)));
       }
     }
 
     if (filters.clientVersion) {
       whereClauses.push(
-        "(targetClientVersions IS NULL OR JSON_LENGTH(targetClientVersions) = 0 OR JSON_CONTAINS(targetClientVersions, ?))",
+        '(targetClientVersions IS NULL OR JSON_LENGTH(targetClientVersions) = 0 OR JSON_CONTAINS(targetClientVersions, ?))'
       );
       queryParams.push(JSON.stringify(filters.clientVersion));
     }
 
     if (filters.accountId) {
       whereClauses.push(
-        "(targetAccountIds IS NULL OR JSON_LENGTH(targetAccountIds) = 0 OR JSON_CONTAINS(targetAccountIds, ?))",
+        '(targetAccountIds IS NULL OR JSON_LENGTH(targetAccountIds) = 0 OR JSON_CONTAINS(targetAccountIds, ?))'
       );
       queryParams.push(JSON.stringify(filters.accountId));
     }
 
     if (filters.search) {
-      whereClauses.push("(content LIKE ? OR description LIKE ?)");
+      whereClauses.push('(content LIKE ? OR description LIKE ?)');
       const searchPattern = `%${filters.search}%`;
       queryParams.push(searchPattern, searchPattern);
     }
 
-    const whereClause =
-      whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
+    const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
 
     // Get total count
     const [countRows] = await pool.execute<RowDataPacket[]>(
       `SELECT COUNT(*) as total FROM g_ingame_popup_notices ${whereClause}`,
-      queryParams,
+      queryParams
     );
     const total = countRows[0].total;
 
     // Get paginated results
     const [rows] = await pool.execute<RowDataPacket[]>(
       `SELECT * FROM g_ingame_popup_notices ${whereClause} ORDER BY displayPriority ASC, createdAt DESC LIMIT ${limit} OFFSET ${offset}`,
-      queryParams,
+      queryParams
     );
 
     const notices = rows.map((row) => this.formatNotice(row));
@@ -205,12 +195,12 @@ class IngamePopupNoticeService {
    */
   async getIngamePopupNoticeById(
     id: number,
-    environment: string,
+    environment: string
   ): Promise<IngamePopupNotice | null> {
     const pool = database.getPool();
     const [rows] = await pool.execute<RowDataPacket[]>(
-      "SELECT * FROM g_ingame_popup_notices WHERE id = ? AND environment = ?",
-      [id, environment],
+      'SELECT * FROM g_ingame_popup_notices WHERE id = ? AND environment = ?',
+      [id, environment]
     );
 
     if (rows.length === 0) {
@@ -226,7 +216,7 @@ class IngamePopupNoticeService {
   async createIngamePopupNotice(
     data: CreateIngamePopupNoticeData,
     createdBy: number,
-    environment: string,
+    environment: string
   ): Promise<IngamePopupNotice> {
     const pool = database.getPool();
 
@@ -260,20 +250,17 @@ class IngamePopupNoticeService {
         data.useTemplate ?? false,
         data.description ?? null,
         createdBy,
-      ],
+      ]
     );
 
-    const notice = await this.getIngamePopupNoticeById(
-      result.insertId,
-      environment,
-    );
+    const notice = await this.getIngamePopupNoticeById(result.insertId, environment);
     if (!notice) {
-      throw new Error("Failed to create ingame popup notice");
+      throw new Error('Failed to create ingame popup notice');
     }
 
     // Publish SDK event
     await pubSubService.publishSDKEvent({
-      type: "popup.created",
+      type: 'popup.created',
       data: {
         id: notice.id,
         timestamp: Date.now(),
@@ -292,119 +279,111 @@ class IngamePopupNoticeService {
     id: number,
     data: UpdateIngamePopupNoticeData,
     updatedBy: number,
-    environment: string,
+    environment: string
   ): Promise<IngamePopupNotice> {
     const pool = database.getPool();
     const updates: string[] = [];
     const values: (string | number | boolean | null)[] = [];
 
     if (data.isActive !== undefined) {
-      updates.push("isActive = ?");
+      updates.push('isActive = ?');
       values.push(data.isActive);
     }
 
     if (data.content !== undefined) {
-      updates.push("content = ?");
+      updates.push('content = ?');
       values.push(data.content);
     }
 
     if (data.targetWorlds !== undefined) {
-      updates.push("targetWorlds = ?");
+      updates.push('targetWorlds = ?');
       values.push(data.targetWorlds ? JSON.stringify(data.targetWorlds) : null);
     }
 
     if (data.targetWorldsInverted !== undefined) {
-      updates.push("targetWorldsInverted = ?");
+      updates.push('targetWorldsInverted = ?');
       values.push(data.targetWorldsInverted);
     }
 
     if (data.targetPlatforms !== undefined) {
-      updates.push("targetPlatforms = ?");
-      values.push(
-        data.targetPlatforms ? JSON.stringify(data.targetPlatforms) : null,
-      );
+      updates.push('targetPlatforms = ?');
+      values.push(data.targetPlatforms ? JSON.stringify(data.targetPlatforms) : null);
     }
 
     if (data.targetPlatformsInverted !== undefined) {
-      updates.push("targetPlatformsInverted = ?");
+      updates.push('targetPlatformsInverted = ?');
       values.push(data.targetPlatformsInverted);
     }
 
     if (data.targetChannels !== undefined) {
-      updates.push("targetChannels = ?");
-      values.push(
-        data.targetChannels ? JSON.stringify(data.targetChannels) : null,
-      );
+      updates.push('targetChannels = ?');
+      values.push(data.targetChannels ? JSON.stringify(data.targetChannels) : null);
     }
 
     if (data.targetChannelsInverted !== undefined) {
-      updates.push("targetChannelsInverted = ?");
+      updates.push('targetChannelsInverted = ?');
       values.push(data.targetChannelsInverted);
     }
 
     if (data.targetSubchannels !== undefined) {
-      updates.push("targetSubchannels = ?");
-      values.push(
-        data.targetSubchannels ? JSON.stringify(data.targetSubchannels) : null,
-      );
+      updates.push('targetSubchannels = ?');
+      values.push(data.targetSubchannels ? JSON.stringify(data.targetSubchannels) : null);
     }
 
     if (data.targetSubchannelsInverted !== undefined) {
-      updates.push("targetSubchannelsInverted = ?");
+      updates.push('targetSubchannelsInverted = ?');
       values.push(data.targetSubchannelsInverted);
     }
 
     if (data.targetUserIds !== undefined) {
-      updates.push("targetUserIds = ?");
+      updates.push('targetUserIds = ?');
       values.push(data.targetUserIds ?? null);
     }
 
     if (data.targetUserIdsInverted !== undefined) {
-      updates.push("targetUserIdsInverted = ?");
+      updates.push('targetUserIdsInverted = ?');
       values.push(data.targetUserIdsInverted);
     }
 
     if (data.displayPriority !== undefined) {
-      updates.push("displayPriority = ?");
+      updates.push('displayPriority = ?');
       values.push(data.displayPriority);
     }
 
     if (data.showOnce !== undefined) {
-      updates.push("showOnce = ?");
+      updates.push('showOnce = ?');
       values.push(data.showOnce);
     }
 
     if (data.startDate !== undefined) {
-      updates.push("startDate = ?");
-      values.push(
-        data.startDate ? convertToMySQLDateTime(data.startDate) : null,
-      );
+      updates.push('startDate = ?');
+      values.push(data.startDate ? convertToMySQLDateTime(data.startDate) : null);
     }
 
     if (data.endDate !== undefined) {
-      updates.push("endDate = ?");
+      updates.push('endDate = ?');
       values.push(data.endDate ? convertToMySQLDateTime(data.endDate) : null);
     }
 
-    updates.push("updatedBy = ?");
+    updates.push('updatedBy = ?');
     values.push(updatedBy);
 
-    updates.push("updatedAt = UTC_TIMESTAMP()");
+    updates.push('updatedAt = UTC_TIMESTAMP()');
     values.push(id, environment);
 
     await pool.execute(
-      `UPDATE g_ingame_popup_notices SET ${updates.join(", ")} WHERE id = ? AND environment = ?`,
-      values,
+      `UPDATE g_ingame_popup_notices SET ${updates.join(', ')} WHERE id = ? AND environment = ?`,
+      values
     );
 
     const notice = await this.getIngamePopupNoticeById(id, environment);
     if (!notice) {
-      throw new Error("Ingame popup notice not found");
+      throw new Error('Ingame popup notice not found');
     }
 
     // Publish SDK event
     await pubSubService.publishSDKEvent({
-      type: "popup.updated",
+      type: 'popup.updated',
       data: {
         id: notice.id,
         timestamp: Date.now(),
@@ -419,20 +398,17 @@ class IngamePopupNoticeService {
   /**
    * Delete ingame popup notice
    */
-  async deleteIngamePopupNotice(
-    id: number,
-    environment: string,
-  ): Promise<void> {
+  async deleteIngamePopupNotice(id: number, environment: string): Promise<void> {
     const pool = database.getPool();
 
-    await pool.execute(
-      "DELETE FROM g_ingame_popup_notices WHERE id = ? AND environment = ?",
-      [id, environment],
-    );
+    await pool.execute('DELETE FROM g_ingame_popup_notices WHERE id = ? AND environment = ?', [
+      id,
+      environment,
+    ]);
 
     // Publish SDK event
     await pubSubService.publishSDKEvent({
-      type: "popup.deleted",
+      type: 'popup.deleted',
       data: {
         id,
         timestamp: Date.now(),
@@ -444,22 +420,19 @@ class IngamePopupNoticeService {
   /**
    * Delete multiple ingame popup notices
    */
-  async deleteMultipleIngamePopupNotices(
-    ids: number[],
-    environment: string,
-  ): Promise<void> {
+  async deleteMultipleIngamePopupNotices(ids: number[], environment: string): Promise<void> {
     const pool = database.getPool();
-    const placeholders = ids.map(() => "?").join(",");
+    const placeholders = ids.map(() => '?').join(',');
 
     await pool.execute(
       `DELETE FROM g_ingame_popup_notices WHERE id IN (${placeholders}) AND environment = ?`,
-      [...ids, environment],
+      [...ids, environment]
     );
 
     // Publish SDK events for each deleted notice
     for (const id of ids) {
       await pubSubService.publishSDKEvent({
-        type: "popup.deleted",
+        type: 'popup.deleted',
         data: {
           id,
           timestamp: Date.now(),
@@ -472,24 +445,21 @@ class IngamePopupNoticeService {
   /**
    * Toggle active status
    */
-  async toggleActive(
-    id: number,
-    environment: string,
-  ): Promise<IngamePopupNotice> {
+  async toggleActive(id: number, environment: string): Promise<IngamePopupNotice> {
     const pool = database.getPool();
     await pool.execute(
-      "UPDATE g_ingame_popup_notices SET isActive = NOT isActive, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environment = ?",
-      [id, environment],
+      'UPDATE g_ingame_popup_notices SET isActive = NOT isActive, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environment = ?',
+      [id, environment]
     );
 
     const notice = await this.getIngamePopupNoticeById(id, environment);
     if (!notice) {
-      throw new Error("Ingame popup notice not found");
+      throw new Error('Ingame popup notice not found');
     }
 
     // Publish SDK event for toggle
     await pubSubService.publishSDKEvent({
-      type: "popup.updated",
+      type: 'popup.updated',
       data: {
         id: notice.id,
         timestamp: Date.now(),
@@ -512,12 +482,12 @@ class IngamePopupNoticeService {
       if (!date) return null;
       if (date instanceof Date) {
         const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        const hours = String(date.getHours()).padStart(2, "0");
-        const minutes = String(date.getMinutes()).padStart(2, "0");
-        const seconds = String(date.getSeconds()).padStart(2, "0");
-        const ms = String(date.getMilliseconds()).padStart(3, "0");
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        const ms = String(date.getMilliseconds()).padStart(3, '0');
         return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${ms}Z`;
       }
       return convertFromMySQLDateTime(date) || null;
@@ -536,22 +506,20 @@ class IngamePopupNoticeService {
       content: row.content, // Database field for admin UI
       message: row.content, // Map database 'content' field to SDK 'message' field
       targetWorlds:
-        typeof row.targetWorlds === "string"
-          ? JSON.parse(row.targetWorlds)
-          : row.targetWorlds,
+        typeof row.targetWorlds === 'string' ? JSON.parse(row.targetWorlds) : row.targetWorlds,
       targetWorldsInverted: Boolean(row.targetWorldsInverted),
       targetPlatforms:
-        typeof row.targetPlatforms === "string"
+        typeof row.targetPlatforms === 'string'
           ? JSON.parse(row.targetPlatforms)
           : row.targetPlatforms,
       targetPlatformsInverted: Boolean(row.targetPlatformsInverted),
       targetChannels:
-        typeof row.targetChannels === "string"
+        typeof row.targetChannels === 'string'
           ? JSON.parse(row.targetChannels)
           : row.targetChannels,
       targetChannelsInverted: Boolean(row.targetChannelsInverted),
       targetSubchannels:
-        typeof row.targetSubchannels === "string"
+        typeof row.targetSubchannels === 'string'
           ? JSON.parse(row.targetSubchannels)
           : row.targetSubchannels,
       targetSubchannelsInverted: Boolean(row.targetSubchannelsInverted),
@@ -580,7 +548,7 @@ class IngamePopupNoticeService {
     // Helper function to parse array fields
     const parseArray = (value: string | string[] | null | undefined): any[] => {
       if (Array.isArray(value)) return value;
-      if (typeof value === "string") {
+      if (typeof value === 'string') {
         try {
           return JSON.parse(value);
         } catch {
@@ -593,7 +561,7 @@ class IngamePopupNoticeService {
     // Parse targetUserIds from comma-separated string to array
     const targetUserIds = row.targetUserIds
       ? row.targetUserIds
-          .split(",")
+          .split(',')
           .map((id: string) => id.trim())
           .filter((id: string) => id)
       : [];
@@ -606,10 +574,10 @@ class IngamePopupNoticeService {
     // Filter out "channel:*" subchannels if channel-only targeting is used
     // If a channel is in targetChannels, remove "channel:*" from targetSubchannels
     const filteredSubchannels = targetSubchannels.filter((subchannel) => {
-      if (typeof subchannel === "string" && subchannel.includes(":")) {
-        const [channel] = subchannel.split(":");
+      if (typeof subchannel === 'string' && subchannel.includes(':')) {
+        const [channel] = subchannel.split(':');
         // If this is "channel:*" and the channel is in targetChannels, exclude it
-        if (subchannel.endsWith(":*") && targetChannels.includes(channel)) {
+        if (subchannel.endsWith(':*') && targetChannels.includes(channel)) {
           return false;
         }
       }
@@ -647,9 +615,7 @@ class IngamePopupNoticeService {
 
     if (filteredSubchannels.length > 0) {
       response.targetSubchannels = filteredSubchannels;
-      response.targetSubchannelsInverted = Boolean(
-        row.targetSubchannelsInverted,
-      );
+      response.targetSubchannelsInverted = Boolean(row.targetSubchannelsInverted);
     }
 
     if (targetWorlds.length > 0) {

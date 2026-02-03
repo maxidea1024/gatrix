@@ -38,87 +38,87 @@ export class SdkMetrics {
     if (!this.enabled) return;
 
     try {
-      const promClient = require("prom-client");
+      const promClient = require('prom-client');
       this.client = promClient;
       this.registry = opts.registry || new promClient.Registry();
 
       // Default labels to help multi-instance setups
       this.registry.setDefaultLabels({
-        sdk: "gatrix-server-sdk",
-        service: opts.service || "unknown",
-        group: opts.group || "unknown",
-        environment: opts.environment || "unknown",
-        application: opts.applicationName || "unknown",
+        sdk: 'gatrix-server-sdk',
+        service: opts.service || 'unknown',
+        group: opts.group || 'unknown',
+        environment: opts.environment || 'unknown',
+        application: opts.applicationName || 'unknown',
       });
 
       // Core metrics
       this.cacheRefreshCounter = new promClient.Counter({
-        name: "sdk_cache_refresh_total",
-        help: "Total number of cache refresh operations",
-        labelNames: ["target"],
+        name: 'sdk_cache_refresh_total',
+        help: 'Total number of cache refresh operations',
+        labelNames: ['target'],
         registers: [this.registry],
       });
 
       this.cacheRefreshDuration = new promClient.Histogram({
-        name: "sdk_cache_refresh_duration_seconds",
-        help: "Duration of cache refresh operations in seconds",
-        labelNames: ["target"],
+        name: 'sdk_cache_refresh_duration_seconds',
+        help: 'Duration of cache refresh operations in seconds',
+        labelNames: ['target'],
         buckets: [0.05, 0.1, 0.3, 1, 3, 5, 10],
         registers: [this.registry],
       });
 
       this.lastRefreshGauge = new promClient.Gauge({
-        name: "sdk_cache_last_refresh_timestamp_seconds",
-        help: "Unix timestamp of the last successful cache refresh",
-        labelNames: ["target"],
+        name: 'sdk_cache_last_refresh_timestamp_seconds',
+        help: 'Unix timestamp of the last successful cache refresh',
+        labelNames: ['target'],
         registers: [this.registry],
       });
 
       this.eventsReceivedCounter = new promClient.Counter({
-        name: "sdk_events_received_total",
-        help: "Total number of SDK events received",
-        labelNames: ["type"],
+        name: 'sdk_events_received_total',
+        help: 'Total number of SDK events received',
+        labelNames: ['type'],
         registers: [this.registry],
       });
 
       this.eventsPublishedCounter = new promClient.Counter({
-        name: "sdk_events_published_total",
-        help: "Total number of SDK events published",
-        labelNames: ["type"],
+        name: 'sdk_events_published_total',
+        help: 'Total number of SDK events published',
+        labelNames: ['type'],
         registers: [this.registry],
       });
 
       this.redisConnectedGauge = new promClient.Gauge({
-        name: "sdk_redis_connected",
-        help: "Redis connection state (1 connected, 0 disconnected)",
+        name: 'sdk_redis_connected',
+        help: 'Redis connection state (1 connected, 0 disconnected)',
         registers: [this.registry],
       });
 
       this.redisReconnectsCounter = new promClient.Counter({
-        name: "sdk_redis_reconnect_total",
-        help: "Total number of Redis reconnect occurrences",
+        name: 'sdk_redis_reconnect_total',
+        help: 'Total number of Redis reconnect occurrences',
         registers: [this.registry],
       });
 
       this.errorsCounter = new promClient.Counter({
-        name: "sdk_errors_total",
-        help: "Total number of SDK errors",
-        labelNames: ["scope", "op"],
+        name: 'sdk_errors_total',
+        help: 'Total number of SDK errors',
+        labelNames: ['scope', 'op'],
         registers: [this.registry],
       });
 
       // HTTP client metrics
       this.httpRequestsCounter = new promClient.Counter({
-        name: "sdk_http_requests_total",
-        help: "Total number of HTTP requests made by the SDK ApiClient",
-        labelNames: ["method", "route", "status"],
+        name: 'sdk_http_requests_total',
+        help: 'Total number of HTTP requests made by the SDK ApiClient',
+        labelNames: ['method', 'route', 'status'],
         registers: [this.registry],
       });
 
       this.httpRequestDuration = new promClient.Histogram({
-        name: "sdk_http_request_duration_seconds",
-        help: "Duration of HTTP requests made by the SDK ApiClient in seconds",
-        labelNames: ["method", "route", "status"],
+        name: 'sdk_http_request_duration_seconds',
+        help: 'Duration of HTTP requests made by the SDK ApiClient in seconds',
+        labelNames: ['method', 'route', 'status'],
         buckets: [0.05, 0.1, 0.3, 1, 3, 5, 10],
         registers: [this.registry],
       });
@@ -145,9 +145,7 @@ export class SdkMetrics {
 
   setLastRefresh(target: string, date: Date = new Date()): void {
     try {
-      this.lastRefreshGauge
-        ?.labels(target)
-        .set(Math.floor(date.getTime() / 1000));
+      this.lastRefreshGauge?.labels(target).set(Math.floor(date.getTime() / 1000));
     } catch (_) {}
   }
 
@@ -175,18 +173,14 @@ export class SdkMetrics {
     } catch (_) {}
   }
 
-  incError(scope: string, op: string = "unknown"): void {
+  incError(scope: string, op: string = 'unknown'): void {
     try {
       this.errorsCounter?.labels(scope, op).inc();
     } catch (_) {}
   }
 
   // HTTP helpers
-  incHttpRequestsTotal(
-    method: string,
-    route: string,
-    status: number | string,
-  ): void {
+  incHttpRequestsTotal(method: string, route: string, status: number | string): void {
     try {
       this.httpRequestsCounter?.labels(method, route, String(status)).inc();
     } catch (_) {}
@@ -196,12 +190,10 @@ export class SdkMetrics {
     method: string,
     route: string,
     status: number | string,
-    durationSeconds: number,
+    durationSeconds: number
   ): void {
     try {
-      this.httpRequestDuration
-        ?.labels(method, route, String(status))
-        .observe(durationSeconds);
+      this.httpRequestDuration?.labels(method, route, String(status)).observe(durationSeconds);
     } catch (_) {}
   }
 }

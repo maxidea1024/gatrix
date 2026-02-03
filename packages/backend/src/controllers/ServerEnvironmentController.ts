@@ -3,10 +3,10 @@
  * Handles environment listing for SDK
  */
 
-import { Response } from "express";
-import { SDKRequest } from "../middleware/apiTokenAuth";
-import { Environment } from "../models/Environment";
-import logger from "../config/logger";
+import { Response } from 'express';
+import { SDKRequest } from '../middleware/apiTokenAuth';
+import { Environment } from '../models/Environment';
+import logger from '../config/logger';
 
 export class ServerEnvironmentController {
   /**
@@ -16,8 +16,8 @@ export class ServerEnvironmentController {
   static async getEnvironments(req: SDKRequest, res: Response) {
     try {
       const environments = await Environment.query()
-        .orderBy("displayOrder", "asc")
-        .orderBy("environment", "asc");
+        .orderBy('displayOrder', 'asc')
+        .orderBy('environment', 'asc');
 
       const result = environments.map((env) => ({
         environment: env.environment,
@@ -36,15 +36,12 @@ export class ServerEnvironmentController {
         },
       });
     } catch (error) {
-      logger.error(
-        "Error in ServerEnvironmentController.getEnvironments:",
-        error,
-      );
+      logger.error('Error in ServerEnvironmentController.getEnvironments:', error);
       res.status(500).json({
         success: false,
         error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to retrieve environments",
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to retrieve environments',
         },
       });
     }

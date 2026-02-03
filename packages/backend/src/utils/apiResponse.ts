@@ -1,18 +1,13 @@
-import { Response } from "express";
-import logger from "../config/logger";
+import { Response } from 'express';
+import logger from '../config/logger';
 
 // Re-export ErrorCodes from shared package for backward compatibility
 // This allows existing imports to continue working
-export {
-  ErrorCodes,
-  isErrorCode,
-  extractErrorCode,
-  extractErrorMessage,
-} from "@gatrix/shared";
-export type { ErrorCode, ApiError, ApiResponse } from "@gatrix/shared";
+export { ErrorCodes, isErrorCode, extractErrorCode, extractErrorMessage } from '@gatrix/shared';
+export type { ErrorCode, ApiError, ApiResponse } from '@gatrix/shared';
 
 // Import for internal use
-import { ErrorCodes, ErrorCode } from "@gatrix/shared";
+import { ErrorCodes, ErrorCode } from '@gatrix/shared';
 
 /**
  * Standard error response structure (backward compatible)
@@ -42,7 +37,7 @@ export function sendErrorResponse(
   code: ErrorCode | string,
   message: string,
   details?: Record<string, any>,
-  logError?: unknown,
+  logError?: unknown
 ): Response {
   // Log internal server errors
   if (statusCode >= 500 && logError) {
@@ -75,7 +70,7 @@ export function sendErrorResponse(
 export function sendBadRequest(
   res: Response,
   message: string,
-  details?: Record<string, any>,
+  details?: Record<string, any>
 ): Response {
   return sendErrorResponse(res, 400, ErrorCodes.BAD_REQUEST, message, details);
 }
@@ -83,29 +78,23 @@ export function sendBadRequest(
 export function sendValidationError(
   res: Response,
   message: string,
-  details?: Record<string, any>,
+  details?: Record<string, any>
 ): Response {
-  return sendErrorResponse(
-    res,
-    400,
-    ErrorCodes.VALIDATION_ERROR,
-    message,
-    details,
-  );
+  return sendErrorResponse(res, 400, ErrorCodes.VALIDATION_ERROR, message, details);
 }
 
 export function sendUnauthorized(
   res: Response,
-  message: string = "Unauthorized",
-  code: ErrorCode | string = ErrorCodes.UNAUTHORIZED,
+  message: string = 'Unauthorized',
+  code: ErrorCode | string = ErrorCodes.UNAUTHORIZED
 ): Response {
   return sendErrorResponse(res, 401, code, message);
 }
 
 export function sendForbidden(
   res: Response,
-  message: string = "Forbidden",
-  code: ErrorCode | string = ErrorCodes.FORBIDDEN,
+  message: string = 'Forbidden',
+  code: ErrorCode | string = ErrorCodes.FORBIDDEN
 ): Response {
   return sendErrorResponse(res, 403, code, message);
 }
@@ -113,7 +102,7 @@ export function sendForbidden(
 export function sendNotFound(
   res: Response,
   message: string,
-  code: ErrorCode | string = ErrorCodes.NOT_FOUND,
+  code: ErrorCode | string = ErrorCodes.NOT_FOUND
 ): Response {
   return sendErrorResponse(res, 404, code, message);
 }
@@ -121,14 +110,14 @@ export function sendNotFound(
 export function sendConflict(
   res: Response,
   message: string,
-  code: ErrorCode | string = ErrorCodes.CONFLICT,
+  code: ErrorCode | string = ErrorCodes.CONFLICT
 ): Response {
   return sendErrorResponse(res, 409, code, message);
 }
 
 export function sendTooManyRequests(
   res: Response,
-  message: string = "Too many requests",
+  message: string = 'Too many requests'
 ): Response {
   return sendErrorResponse(res, 429, ErrorCodes.TOO_MANY_REQUESTS, message);
 }
@@ -137,7 +126,7 @@ export function sendInternalError(
   res: Response,
   message: string,
   error?: unknown,
-  code: ErrorCode | string = ErrorCodes.INTERNAL_SERVER_ERROR,
+  code: ErrorCode | string = ErrorCodes.INTERNAL_SERVER_ERROR
 ): Response {
   return sendErrorResponse(res, 500, code, message, undefined, error);
 }
@@ -158,7 +147,7 @@ export function sendSuccessResponse<T>(
   res: Response,
   data?: T,
   message?: string,
-  statusCode: number = 200,
+  statusCode: number = 200
 ): Response {
   const response: ApiSuccessResponse<T> = {
     success: true,

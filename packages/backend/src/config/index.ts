@@ -1,136 +1,119 @@
-import dotenv from "dotenv";
-import path from "path";
+import dotenv from 'dotenv';
+import path from 'path';
 
 // Load environment variables
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const config = {
   // Server configuration
-  port: parseInt(process.env.BACKEND_PORT || process.env.PORT || "45000", 10),
-  nodeEnv: process.env.NODE_ENV || "development",
+  port: parseInt(process.env.BACKEND_PORT || process.env.PORT || '45000', 10),
+  nodeEnv: process.env.NODE_ENV || 'development',
   corsOrigin:
     process.env.CORS_ORIGIN ||
-    (process.env.NODE_ENV === "production"
-      ? "http://frontend:80"
-      : "http://localhost:3000"),
+    (process.env.NODE_ENV === 'production' ? 'http://frontend:80' : 'http://localhost:3000'),
   frontendUrl:
     process.env.FRONTEND_URL ||
-    (process.env.NODE_ENV === "production"
-      ? "http://frontend:80"
-      : "http://localhost:3000"),
+    (process.env.NODE_ENV === 'production' ? 'http://frontend:80' : 'http://localhost:3000'),
 
   // Database configuration
   database: {
-    host: process.env.DB_HOST || "localhost",
-    port: parseInt(process.env.DB_PORT || "3306", 10),
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "",
-    name: process.env.DB_NAME || "admin_panel",
-    debug: process.env.DB_DEBUG === "true",
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '3306', 10),
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    name: process.env.DB_NAME || 'admin_panel',
+    debug: process.env.DB_DEBUG === 'true',
   },
 
   // Redis configuration
   redis: {
-    host: process.env.REDIS_HOST || "localhost",
-    port: parseInt(process.env.REDIS_PORT || "6379", 10),
-    password: process.env.REDIS_PASSWORD || "",
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379', 10),
+    password: process.env.REDIS_PASSWORD || '',
   },
 
   // JWT configuration
   jwt: {
-    secret: process.env.JWT_SECRET || "your-super-secret-jwt-key",
-    expiresIn: process.env.JWT_EXPIRES_IN || "30d", // 임시로 30일로 연장
+    secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key',
+    expiresIn: process.env.JWT_EXPIRES_IN || '30d', // 임시로 30일로 연장
   },
 
   // Session configuration
   session: {
-    secret: process.env.SESSION_SECRET || "your-super-secret-session-key",
-    maxAge: parseInt(process.env.SESSION_MAX_AGE || "86400000", 10), // 24 hours in milliseconds
-    ttl: parseInt(process.env.SESSION_TTL || "86400", 10), // 24 hours in seconds for Redis
+    secret: process.env.SESSION_SECRET || 'your-super-secret-session-key',
+    maxAge: parseInt(process.env.SESSION_MAX_AGE || '86400000', 10), // 24 hours in milliseconds
+    ttl: parseInt(process.env.SESSION_TTL || '86400', 10), // 24 hours in seconds for Redis
   },
 
   // OAuth configuration
   oauth: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     },
     github: {
-      clientId: process.env.GITHUB_CLIENT_ID || "",
-      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
+      clientId: process.env.GITHUB_CLIENT_ID || '',
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || '',
     },
     qq: {
-      clientId: process.env.QQ_CLIENT_ID || "",
-      clientSecret: process.env.QQ_CLIENT_SECRET || "",
+      clientId: process.env.QQ_CLIENT_ID || '',
+      clientSecret: process.env.QQ_CLIENT_SECRET || '',
     },
     wechat: {
-      clientId: process.env.WECHAT_CLIENT_ID || "",
-      clientSecret: process.env.WECHAT_CLIENT_SECRET || "",
+      clientId: process.env.WECHAT_CLIENT_ID || '',
+      clientSecret: process.env.WECHAT_CLIENT_SECRET || '',
     },
     baidu: {
-      clientId: process.env.BAIDU_CLIENT_ID || "",
-      clientSecret: process.env.BAIDU_CLIENT_SECRET || "",
+      clientId: process.env.BAIDU_CLIENT_ID || '',
+      clientSecret: process.env.BAIDU_CLIENT_SECRET || '',
     },
   },
 
   // Admin configuration
   admin: {
-    email: process.env.ADMIN_EMAIL || "admin@example.com",
-    password: process.env.ADMIN_PASSWORD || "admin123",
-    name: process.env.ADMIN_NAME || "Administrator",
+    email: process.env.ADMIN_EMAIL || 'admin@example.com',
+    password: process.env.ADMIN_PASSWORD || 'admin123',
+    name: process.env.ADMIN_NAME || 'Administrator',
   },
 
   // Logging configuration
   logging: {
-    level: process.env.LOG_LEVEL || "info",
-    dir: process.env.LOG_DIR || "logs",
+    level: process.env.LOG_LEVEL || 'info',
+    dir: process.env.LOG_DIR || 'logs',
   },
 
   // Chat Server configuration
   chatServer: {
-    url: process.env.CHAT_SERVER_URL || "http://localhost:5100",
-    apiToken: process.env.CHAT_SERVER_API_TOKEN || "gatrix-api-default-token",
+    url: process.env.CHAT_SERVER_URL || 'http://localhost:5100',
+    apiToken: process.env.CHAT_SERVER_API_TOKEN || 'gatrix-api-default-token',
     serviceToken:
       process.env.BACKEND_SERVICE_TOKEN ||
-      "gatrix-backend-service-token-default-key-change-in-production",
+      'gatrix-backend-service-token-default-key-change-in-production',
   },
 
   // Service Discovery configuration
   serviceDiscovery: {
-    heartbeatTTL: parseInt(
-      process.env.SERVICE_DISCOVERY_HEARTBEAT_TTL || "30",
-      10,
-    ), // Heartbeat TTL in seconds
-    inactiveKeepTTL: parseInt(
-      process.env.SERVICE_DISCOVERY_INACTIVE_KEEP_TTL || "60",
-      10,
-    ), // How long to keep inactive services (terminated, error, no-response) visible in UI
-    terminatedMarkerTTL: parseInt(
-      process.env.SERVICE_DISCOVERY_TERMINATED_MARKER_TTL || "300",
-      10,
-    ), // Terminated marker TTL in seconds (300 seconds / 5 minutes for audit trail)
-    lifecycleEventRetentionDays: parseInt(
-      process.env.SERVER_LIFECYCLE_RETENTION_DAYS || "14",
-      10,
-    ), // How many days to retain lifecycle events (default: 14 days)
+    heartbeatTTL: parseInt(process.env.SERVICE_DISCOVERY_HEARTBEAT_TTL || '30', 10), // Heartbeat TTL in seconds
+    inactiveKeepTTL: parseInt(process.env.SERVICE_DISCOVERY_INACTIVE_KEEP_TTL || '60', 10), // How long to keep inactive services (terminated, error, no-response) visible in UI
+    terminatedMarkerTTL: parseInt(process.env.SERVICE_DISCOVERY_TERMINATED_MARKER_TTL || '300', 10), // Terminated marker TTL in seconds (300 seconds / 5 minutes for audit trail)
+    lifecycleEventRetentionDays: parseInt(process.env.SERVER_LIFECYCLE_RETENTION_DAYS || '14', 10), // How many days to retain lifecycle events (default: 14 days)
   },
 
   // Monitoring configuration
   monitoring: {
-    enabled:
-      String(process.env.MONITORING_ENABLED || "").toLowerCase() === "true",
-    metricsPath: process.env.METRICS_PATH || "/metrics",
+    enabled: String(process.env.MONITORING_ENABLED || '').toLowerCase() === 'true',
+    metricsPath: process.env.METRICS_PATH || '/metrics',
   },
 };
 
 // Validate required environment variables
-const requiredEnvVars = ["JWT_SECRET", "SESSION_SECRET"];
+const requiredEnvVars = ['JWT_SECRET', 'SESSION_SECRET'];
 
 const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
 
-if (missingEnvVars.length > 0 && process.env.NODE_ENV === "production") {
+if (missingEnvVars.length > 0 && process.env.NODE_ENV === 'production') {
   // Note: logger may not be available yet during config initialization
-  console.error("Missing required environment variables:", missingEnvVars);
+  console.error('Missing required environment variables:', missingEnvVars);
   process.exit(1);
 }
 

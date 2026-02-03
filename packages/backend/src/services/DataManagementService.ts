@@ -1,19 +1,16 @@
-import fs from "fs";
-import path from "path";
-import AdmZip from "adm-zip";
-import db from "../config/knex";
-import { cacheService } from "./CacheService";
-import logger from "../config/logger";
-import { GatrixError } from "../middleware/errorHandler";
+import fs from 'fs';
+import path from 'path';
+import AdmZip from 'adm-zip';
+import db from '../config/knex';
+import { cacheService } from './CacheService';
+import logger from '../config/logger';
+import { GatrixError } from '../middleware/errorHandler';
 
 const knex = db;
 
 export class DataManagementService {
-  private static readonly PLANNING_DATA_PATH = path.join(
-    __dirname,
-    "../../data/planning",
-  );
-  private static readonly UPLOADS_PATH = path.join(__dirname, "../../uploads");
+  private static readonly PLANNING_DATA_PATH = path.join(__dirname, '../../data/planning');
+  private static readonly UPLOADS_PATH = path.join(__dirname, '../../uploads');
 
   /**
    * Export all data (DB tables, Planning Data, Uploads) to a ZIP file
@@ -24,33 +21,30 @@ export class DataManagementService {
 
       // 1. Export Database Tables
       const tables = await this.getAllTables();
-      const dbFolder = "database";
+      const dbFolder = 'database';
 
       for (const table of tables) {
         // Skip migration tables
-        if (table.includes("knex_") || table.includes("migration")) continue;
+        if (table.includes('knex_') || table.includes('migration')) continue;
 
-        const data = await knex(table).select("*");
-        zip.addFile(
-          `${dbFolder}/${table}.json`,
-          Buffer.from(JSON.stringify(data, null, 2)),
-        );
+        const data = await knex(table).select('*');
+        zip.addFile(`${dbFolder}/${table}.json`, Buffer.from(JSON.stringify(data, null, 2)));
       }
 
       // 2. Export Planning Data
       if (fs.existsSync(this.PLANNING_DATA_PATH)) {
-        zip.addLocalFolder(this.PLANNING_DATA_PATH, "planning_data");
+        zip.addLocalFolder(this.PLANNING_DATA_PATH, 'planning_data');
       }
 
       // 3. Export Uploads (if exists)
       if (fs.existsSync(this.UPLOADS_PATH)) {
-        zip.addLocalFolder(this.UPLOADS_PATH, "uploads");
+        zip.addLocalFolder(this.UPLOADS_PATH, 'uploads');
       }
 
       return zip.toBuffer();
     } catch (error) {
-      logger.error("Failed to export data", { error });
-      throw new GatrixError("Failed to export data", 500);
+      logger.error('Failed to export data', { error });
+      throw new GatrixError('Failed to export data', 500);
     }
   }
 
@@ -66,15 +60,12 @@ export class DataManagementService {
       // 1. Restore Database Tables
       await knex.transaction(async (trx: any) => {
         // Disable foreign key checks
-        await trx.raw("SET FOREIGN_KEY_CHECKS = 0");
+        await trx.raw('SET FOREIGN_KEY_CHECKS = 0');
 
         for (const entry of zipEntries) {
-          if (
-            entry.entryName.startsWith("database/") &&
-            entry.name.endsWith(".json")
-          ) {
-            const tableName = entry.name.replace(".json", "");
-            const data = JSON.parse(entry.getData().toString("utf8"));
+          if (entry.entryName.startsWith('database/') && entry.name.endsWith('.json')) {
+            const tableName = entry.name.replace('.json', '');
+            const data = JSON.parse(entry.getData().toString('utf8'));
 
             // Truncate table
             await trx(tableName).truncate();
@@ -91,13 +82,11 @@ export class DataManagementService {
         }
 
         // Enable foreign key checks
-        await trx.raw("SET FOREIGN_KEY_CHECKS = 1");
+        await trx.raw('SET FOREIGN_KEY_CHECKS = 1');
       });
 
       // 2. Restore Planning Data
-      const planningEntry = zipEntries.find((e: any) =>
-        e.entryName.startsWith("planning_data/"),
-      );
+      const planningEntry = zipEntries.find((e: any) => e.entryName.startsWith('planning_data/'));
       if (planningEntry) {
         // Clear existing planning data directory
         if (fs.existsSync(this.PLANNING_DATA_PATH)) {
@@ -107,11 +96,8 @@ export class DataManagementService {
 
         // Extract planning data
         zipEntries.forEach((entry: any) => {
-          if (
-            entry.entryName.startsWith("planning_data/") &&
-            !entry.isDirectory
-          ) {
-            const relativePath = entry.entryName.replace("planning_data/", "");
+          if (entry.entryName.startsWith('planning_data/') && !entry.isDirectory) {
+            const relativePath = entry.entryName.replace('planning_data/', '');
             const fullPath = path.join(this.PLANNING_DATA_PATH, relativePath);
             fs.mkdirSync(path.dirname(fullPath), { recursive: true });
             fs.writeFileSync(fullPath, entry.getData());
@@ -120,9 +106,7 @@ export class DataManagementService {
       }
 
       // 3. Restore Uploads
-      const uploadsEntry = zipEntries.find((e: any) =>
-        e.entryName.startsWith("uploads/"),
-      );
+      const uploadsEntry = zipEntries.find((e: any) => e.entryName.startsWith('uploads/'));
       if (uploadsEntry) {
         // Clear existing uploads directory
         if (fs.existsSync(this.UPLOADS_PATH)) {
@@ -132,8 +116,8 @@ export class DataManagementService {
 
         // Extract uploads
         zipEntries.forEach((entry: any) => {
-          if (entry.entryName.startsWith("uploads/") && !entry.isDirectory) {
-            const relativePath = entry.entryName.replace("uploads/", "");
+          if (entry.entryName.startsWith('uploads/') && !entry.isDirectory) {
+            const relativePath = entry.entryName.replace('uploads/', '');
             const fullPath = path.join(this.UPLOADS_PATH, relativePath);
             fs.mkdirSync(path.dirname(fullPath), { recursive: true });
             fs.writeFileSync(fullPath, entry.getData());
@@ -144,17 +128,15 @@ export class DataManagementService {
       // 4. Invalidate Caches
       await cacheService.clear();
 
-      logger.info("Data import completed successfully");
+      logger.info('Data import completed successfully');
     } catch (error) {
-      logger.error("Failed to import data", { error });
-      throw new GatrixError("Failed to import data", 500);
+      logger.error('Failed to import data', { error });
+      throw new GatrixError('Failed to import data', 500);
     }
   }
 
   private static async getAllTables(): Promise<string[]> {
-    const result = await knex.raw(
-      "SHOW FULL TABLES WHERE Table_Type = 'BASE TABLE'",
-    );
+    const result = await knex.raw("SHOW FULL TABLES WHERE Table_Type = 'BASE TABLE'");
     // Result structure depends on driver. For mysql2 it's [[RowDataPacket], [FieldPacket]]
     // RowDataPacket has key like 'Tables_in_gatrix'
     const rows = result[0];

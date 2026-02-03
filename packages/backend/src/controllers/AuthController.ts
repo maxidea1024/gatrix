@@ -1,10 +1,10 @@
-import { Request, Response } from "express";
-import { AuthService } from "../services/AuthService";
-import passwordResetService from "../services/PasswordResetService";
-import { asyncHandler, GatrixError } from "../middleware/errorHandler";
-import { AuthenticatedRequest } from "../middleware/auth";
-import logger from "../config/logger";
-import Joi from "joi";
+import { Request, Response } from 'express';
+import { AuthService } from '../services/AuthService';
+import passwordResetService from '../services/PasswordResetService';
+import { asyncHandler, GatrixError } from '../middleware/errorHandler';
+import { AuthenticatedRequest } from '../middleware/auth';
+import logger from '../config/logger';
+import Joi from 'joi';
 
 // Validation schemas
 const loginSchema = Joi.object({
@@ -26,8 +26,8 @@ const changePasswordSchema = Joi.object({
 
 const updateProfileSchema = Joi.object({
   name: Joi.string().min(2).max(100).optional(),
-  avatarUrl: Joi.string().uri().optional().allow(""),
-  preferredLanguage: Joi.string().valid("en", "ko", "zh").optional(),
+  avatarUrl: Joi.string().uri().optional().allow(''),
+  preferredLanguage: Joi.string().valid('en', 'ko', 'zh').optional(),
 });
 
 const forgotPasswordSchema = Joi.object({
@@ -56,10 +56,10 @@ export class AuthController {
     }
 
     // Set refresh token as httpOnly cookie
-    res.cookie("refreshToken", result.refreshToken, {
+    res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
@@ -69,7 +69,7 @@ export class AuthController {
         user: result.user,
         accessToken: result.accessToken,
       },
-      message: "Login successful",
+      message: 'Login successful',
     });
   });
 
@@ -81,20 +81,20 @@ export class AuthController {
       const field = error.details[0].path[0];
       const type = error.details[0].type;
 
-      if (field === "email" && type === "string.email") {
-        throw new GatrixError("INVALID_EMAIL_FORMAT", 400);
-      } else if (field === "password" && type === "string.min") {
-        throw new GatrixError("PASSWORD_TOO_SHORT", 400);
-      } else if (field === "name" && type === "string.min") {
-        throw new GatrixError("NAME_TOO_SHORT", 400);
-      } else if (field === "name" && type === "string.max") {
-        throw new GatrixError("NAME_TOO_LONG", 400);
-      } else if (type === "any.required") {
+      if (field === 'email' && type === 'string.email') {
+        throw new GatrixError('INVALID_EMAIL_FORMAT', 400);
+      } else if (field === 'password' && type === 'string.min') {
+        throw new GatrixError('PASSWORD_TOO_SHORT', 400);
+      } else if (field === 'name' && type === 'string.min') {
+        throw new GatrixError('NAME_TOO_SHORT', 400);
+      } else if (field === 'name' && type === 'string.max') {
+        throw new GatrixError('NAME_TOO_LONG', 400);
+      } else if (type === 'any.required') {
         throw new GatrixError(`${String(field).toUpperCase()}_REQUIRED`, 400);
       }
 
       // Fallback to original message
-      throw new GatrixError("VALIDATION_ERROR", 400);
+      throw new GatrixError('VALIDATION_ERROR', 400);
     }
 
     const user = await AuthService.register(value);
@@ -102,7 +102,7 @@ export class AuthController {
     res.status(201).json({
       success: true,
       data: { user },
-      message: "Registration successful. Please wait for admin approval.",
+      message: 'Registration successful. Please wait for admin approval.',
     });
   });
 
@@ -110,16 +110,16 @@ export class AuthController {
     const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
 
     if (!refreshToken) {
-      throw new GatrixError("Refresh token is required", 401);
+      throw new GatrixError('Refresh token is required', 401);
     }
 
     const result = await AuthService.refreshToken(refreshToken);
 
     // Set new refresh token as httpOnly cookie
-    res.cookie("refreshToken", result.refreshToken, {
+    res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
@@ -128,115 +128,103 @@ export class AuthController {
       data: {
         accessToken: result.accessToken,
       },
-      message: "Token refreshed successfully",
+      message: 'Token refreshed successfully',
     });
   });
 
   static logout = asyncHandler(async (req: Request, res: Response) => {
     // Clear refresh token cookie
-    res.clearCookie("refreshToken");
+    res.clearCookie('refreshToken');
 
     res.json({
       success: true,
-      message: "Logout successful",
+      message: 'Logout successful',
     });
   });
 
-  static getProfile = asyncHandler(
-    async (req: AuthenticatedRequest, res: Response) => {
-      if (!req.user) {
-        throw new GatrixError("User not authenticated", 401);
-      }
+  static getProfile = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) {
+      throw new GatrixError('User not authenticated', 401);
+    }
 
-      const user = await AuthService.getProfile(req.user.userId);
+    const user = await AuthService.getProfile(req.user.userId);
 
-      res.json({
-        success: true,
-        data: { user },
-      });
-    },
-  );
+    res.json({
+      success: true,
+      data: { user },
+    });
+  });
 
-  static updateProfile = asyncHandler(
-    async (req: AuthenticatedRequest, res: Response) => {
-      if (!req.user) {
-        throw new GatrixError("User not authenticated", 401);
-      }
+  static updateProfile = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) {
+      throw new GatrixError('User not authenticated', 401);
+    }
 
-      // Validate request body
-      const { error, value } = updateProfileSchema.validate(req.body);
-      if (error) {
-        throw new GatrixError(error.details[0].message, 400);
-      }
+    // Validate request body
+    const { error, value } = updateProfileSchema.validate(req.body);
+    if (error) {
+      throw new GatrixError(error.details[0].message, 400);
+    }
 
-      const user = await AuthService.updateProfile(req.user.userId, value);
+    const user = await AuthService.updateProfile(req.user.userId, value);
 
-      res.json({
-        success: true,
-        data: { user },
-        message: "Profile updated successfully",
-      });
-    },
-  );
+    res.json({
+      success: true,
+      data: { user },
+      message: 'Profile updated successfully',
+    });
+  });
 
-  static changePassword = asyncHandler(
-    async (req: AuthenticatedRequest, res: Response) => {
-      if (!req.user) {
-        throw new GatrixError("User not authenticated", 401);
-      }
+  static changePassword = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) {
+      throw new GatrixError('User not authenticated', 401);
+    }
 
-      // Validate request body
-      const { error, value } = changePasswordSchema.validate(req.body);
-      if (error) {
-        throw new GatrixError(error.details[0].message, 400);
-      }
+    // Validate request body
+    const { error, value } = changePasswordSchema.validate(req.body);
+    if (error) {
+      throw new GatrixError(error.details[0].message, 400);
+    }
 
-      const { currentPassword, newPassword } = value;
-      await AuthService.changePassword(
-        req.user.userId,
-        currentPassword,
-        newPassword,
-      );
+    const { currentPassword, newPassword } = value;
+    await AuthService.changePassword(req.user.userId, currentPassword, newPassword);
 
-      res.json({
-        success: true,
-        message: "Password changed successfully",
-      });
-    },
-  );
+    res.json({
+      success: true,
+      message: 'Password changed successfully',
+    });
+  });
 
-  static verifyEmail = asyncHandler(
-    async (req: AuthenticatedRequest, res: Response) => {
-      if (!req.user) {
-        throw new GatrixError("User not authenticated", 401);
-      }
+  static verifyEmail = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) {
+      throw new GatrixError('User not authenticated', 401);
+    }
 
-      await AuthService.verifyEmail(req.user.userId);
+    await AuthService.verifyEmail(req.user.userId);
 
-      res.json({
-        success: true,
-        message: "Email verified successfully",
-      });
-    },
-  );
+    res.json({
+      success: true,
+      message: 'Email verified successfully',
+    });
+  });
 
   // OAuth success callback
   static oauthSuccess = asyncHandler(async (req: Request, res: Response) => {
     const user = req.user as any;
 
     if (!user) {
-      throw new GatrixError("OAuth authentication failed", 401);
+      throw new GatrixError('OAuth authentication failed', 401);
     }
 
     // Check if user is active
-    if (user.status !== "active") {
+    if (user.status !== 'active') {
       // Get frontend origin dynamically
-      const referer = req.get("Referer");
+      const referer = req.get('Referer');
       let frontendOrigin = process.env.CORS_ORIGIN;
 
       // If CORS_ORIGIN is wildcard or invalid, use default frontend URL
-      if (!frontendOrigin || frontendOrigin === "*") {
-        frontendOrigin = "http://localhost:3000";
+      if (!frontendOrigin || frontendOrigin === '*') {
+        frontendOrigin = 'http://localhost:3000';
       }
 
       if (referer) {
@@ -245,10 +233,9 @@ export class AuthController {
           frontendOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
         } catch (e) {
           // Use default if referer parsing fails
-          logger.debug(
-            "Failed to parse referer for pending redirect, using default:",
-            { frontendOrigin },
-          );
+          logger.debug('Failed to parse referer for pending redirect, using default:', {
+            frontendOrigin,
+          });
         }
       }
 
@@ -257,25 +244,24 @@ export class AuthController {
     }
 
     // Generate tokens
-    const accessToken = require("../utils/jwt").JwtUtils.generateToken(user);
-    const refreshToken =
-      require("../utils/jwt").JwtUtils.generateRefreshToken(user);
+    const accessToken = require('../utils/jwt').JwtUtils.generateToken(user);
+    const refreshToken = require('../utils/jwt').JwtUtils.generateRefreshToken(user);
 
     // Set refresh token as httpOnly cookie
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
     // Get frontend origin dynamically
-    const referer = req.get("Referer");
+    const referer = req.get('Referer');
     let frontendOrigin = process.env.CORS_ORIGIN;
 
     // If CORS_ORIGIN is wildcard or invalid, use default frontend URL
-    if (!frontendOrigin || frontendOrigin === "*") {
-      frontendOrigin = "http://localhost:3000";
+    if (!frontendOrigin || frontendOrigin === '*') {
+      frontendOrigin = 'http://localhost:3000';
     }
 
     if (referer) {
@@ -284,14 +270,11 @@ export class AuthController {
         frontendOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
       } catch (e) {
         // Use default if referer parsing fails
-        logger.debug(
-          "Failed to parse referer, using default frontend origin:",
-          { frontendOrigin },
-        );
+        logger.debug('Failed to parse referer, using default frontend origin:', { frontendOrigin });
       }
     }
 
-    logger.debug("🔄 OAuth success redirect:", {
+    logger.debug('🔄 OAuth success redirect:', {
       frontendOrigin,
       referer,
       tokenLength: accessToken.length,
@@ -303,15 +286,15 @@ export class AuthController {
 
   // OAuth failure callback
   static oauthFailure = asyncHandler(async (req: Request, res: Response) => {
-    logger.error("OAuth authentication failed");
+    logger.error('OAuth authentication failed');
 
     // Try to get the origin from referer or use default
-    const referer = req.get("Referer");
+    const referer = req.get('Referer');
     let frontendOrigin = process.env.CORS_ORIGIN;
 
     // If CORS_ORIGIN is wildcard or invalid, use default frontend URL
-    if (!frontendOrigin || frontendOrigin === "*") {
-      frontendOrigin = "http://localhost:3000";
+    if (!frontendOrigin || frontendOrigin === '*') {
+      frontendOrigin = 'http://localhost:3000';
     }
 
     if (referer) {
@@ -320,15 +303,14 @@ export class AuthController {
         frontendOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
       } catch (e) {
         // Use default if referer parsing fails
-        logger.debug(
-          "Failed to parse referer for failure redirect, using default:",
-          { frontendOrigin },
-        );
+        logger.debug('Failed to parse referer for failure redirect, using default:', {
+          frontendOrigin,
+        });
       }
     }
 
     const redirectUrl = `${frontendOrigin}/login?error=oauth_failed`;
-    logger.debug("OAuth failure redirect URL:", {
+    logger.debug('OAuth failure redirect URL:', {
       redirectUrl,
       referer,
       frontendOrigin,
@@ -357,26 +339,24 @@ export class AuthController {
   });
 
   // Validate reset token
-  static validateResetToken = asyncHandler(
-    async (req: Request, res: Response) => {
-      const { token } = req.params;
+  static validateResetToken = asyncHandler(async (req: Request, res: Response) => {
+    const { token } = req.params;
 
-      if (!token) {
-        throw new GatrixError("토큰이 필요합니다.", 400);
-      }
+    if (!token) {
+      throw new GatrixError('토큰이 필요합니다.', 400);
+    }
 
-      const result = await passwordResetService.validateResetToken(token);
+    const result = await passwordResetService.validateResetToken(token);
 
-      res.json({
-        success: true,
-        data: {
-          success: result.valid,
-          message: result.message,
-        },
+    res.json({
+      success: true,
+      data: {
+        success: result.valid,
         message: result.message,
-      });
-    },
-  );
+      },
+      message: result.message,
+    });
+  });
 
   // Reset password with token
   static resetPassword = asyncHandler(async (req: Request, res: Response) => {

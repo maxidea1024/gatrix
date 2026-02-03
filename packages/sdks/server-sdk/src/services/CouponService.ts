@@ -4,14 +4,10 @@
  * Uses per-environment API pattern: POST /api/v1/server/:env/coupons/:code/redeem
  */
 
-import { ApiClient } from "../client/ApiClient";
-import { Logger } from "../utils/logger";
-import { RedeemCouponRequest, RedeemCouponResponse } from "../types/api";
-import {
-  CouponRedeemError,
-  CouponRedeemErrorCode,
-  isGatrixSDKError,
-} from "../utils/errors";
+import { ApiClient } from '../client/ApiClient';
+import { Logger } from '../utils/logger';
+import { RedeemCouponRequest, RedeemCouponResponse } from '../types/api';
+import { CouponRedeemError, CouponRedeemErrorCode, isGatrixSDKError } from '../utils/errors';
 
 export class CouponService {
   private apiClient: ApiClient;
@@ -44,11 +40,8 @@ export class CouponService {
    * @param request Coupon redemption request
    * @param environment Environment name (required)
    */
-  async redeem(
-    request: RedeemCouponRequest,
-    environment: string,
-  ): Promise<RedeemCouponResponse> {
-    this.logger.info("Redeeming coupon", {
+  async redeem(request: RedeemCouponRequest, environment: string): Promise<RedeemCouponResponse> {
+    this.logger.info('Redeeming coupon', {
       code: request.code,
       userId: request.userId,
       environment,
@@ -59,20 +52,20 @@ export class CouponService {
     try {
       const response = await this.apiClient.post<RedeemCouponResponse>(
         `/api/v1/server/${encodeURIComponent(environment)}/coupons/${encodeURIComponent(code)}/redeem`,
-        body,
+        body
       );
 
       if (!response.success || !response.data) {
         const errorCode = response.error?.code as CouponRedeemErrorCode;
-        const message = response.error?.message || "Failed to redeem coupon";
+        const message = response.error?.message || 'Failed to redeem coupon';
         throw new CouponRedeemError(
           errorCode || CouponRedeemErrorCode.CODE_NOT_FOUND,
           message,
-          400,
+          400
         );
       }
 
-      this.logger.info("Coupon redeemed successfully", {
+      this.logger.info('Coupon redeemed successfully', {
         code,
         userId: request.userId,
         sequence: response.data.sequence,
@@ -92,10 +85,7 @@ export class CouponService {
         const message = error.details?.error?.message || error.message;
         const statusCode = error.statusCode || 500;
 
-        if (
-          errorCode &&
-          Object.values(CouponRedeemErrorCode).includes(errorCode)
-        ) {
+        if (errorCode && Object.values(CouponRedeemErrorCode).includes(errorCode)) {
           throw new CouponRedeemError(errorCode, message, statusCode);
         }
       }

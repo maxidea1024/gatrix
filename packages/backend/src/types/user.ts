@@ -1,11 +1,5 @@
-export type SupportedLanguage = "en" | "ko" | "zh";
-export type AuthType =
-  | "local"
-  | "google"
-  | "github"
-  | "qq"
-  | "wechat"
-  | "baidu";
+export type SupportedLanguage = 'en' | 'ko' | 'zh';
+export type AuthType = 'local' | 'google' | 'github' | 'qq' | 'wechat' | 'baidu';
 
 export interface User {
   id: number;
@@ -14,8 +8,8 @@ export interface User {
   name: string;
   avatarUrl?: string;
   preferredLanguage: SupportedLanguage;
-  role: "admin" | "user";
-  status: "pending" | "active" | "suspended" | "deleted";
+  role: 'admin' | 'user';
+  status: 'pending' | 'active' | 'suspended' | 'deleted';
   authType: AuthType;
   emailVerified: boolean;
   emailVerifiedAt?: Date;
@@ -35,8 +29,8 @@ export interface CreateUserData {
   name: string;
   avatarUrl?: string;
   preferredLanguage?: SupportedLanguage;
-  role?: "admin" | "user";
-  status?: "pending" | "active" | "suspended" | "deleted";
+  role?: 'admin' | 'user';
+  status?: 'pending' | 'active' | 'suspended' | 'deleted';
   authType?: AuthType;
   emailVerified?: boolean;
   oauthProvider?: string;
@@ -49,19 +43,19 @@ export interface UpdateUserData {
   name?: string;
   avatarUrl?: string;
   preferredLanguage?: SupportedLanguage;
-  role?: "admin" | "user";
-  status?: "pending" | "active" | "suspended" | "deleted";
+  role?: 'admin' | 'user';
+  status?: 'pending' | 'active' | 'suspended' | 'deleted';
   authType?: AuthType;
   emailVerified?: boolean;
   lastLoginAt?: Date;
 }
 
-export interface UserWithoutPassword extends Omit<User, "passwordHash"> {}
+export interface UserWithoutPassword extends Omit<User, 'passwordHash'> {}
 
 export interface OAuthAccount {
   id: number;
   userId: number;
-  provider: "google" | "github" | "qq" | "wechat" | "baidu";
+  provider: 'google' | 'github' | 'qq' | 'wechat' | 'baidu';
   providerId: string;
   providerEmail?: string;
   providerName?: string;
@@ -75,7 +69,7 @@ export interface OAuthAccount {
 
 export interface CreateOAuthAccountData {
   userId: number;
-  provider: "google" | "github" | "qq" | "wechat" | "baidu";
+  provider: 'google' | 'github' | 'qq' | 'wechat' | 'baidu';
   providerId: string;
   providerEmail?: string;
   providerName?: string;

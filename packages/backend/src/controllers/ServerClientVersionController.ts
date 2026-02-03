@@ -1,13 +1,13 @@
-import { Response } from "express";
-import ClientVersionService from "../services/ClientVersionService";
-import { ClientVersionModel } from "../models/ClientVersion";
-import VarsModel from "../models/Vars";
-import { TagService } from "../services/TagService";
-import logger from "../config/logger";
-import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from "../constants/cacheKeys";
-import { respondWithEtagCache } from "../utils/serverSdkEtagCache";
-import { EnvironmentRequest } from "../middleware/environmentResolver";
-import { resolvePassiveData } from "../utils/passiveDataUtils";
+import { Response } from 'express';
+import ClientVersionService from '../services/ClientVersionService';
+import { ClientVersionModel } from '../models/ClientVersion';
+import VarsModel from '../models/Vars';
+import { TagService } from '../services/TagService';
+import logger from '../config/logger';
+import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
+import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
+import { EnvironmentRequest } from '../middleware/environmentResolver';
+import { resolvePassiveData } from '../utils/passiveDataUtils';
 
 /**
  * Server SDK Client Version Controller
@@ -27,8 +27,8 @@ export class ServerClientVersionController {
         return res.status(400).json({
           success: false,
           error: {
-            code: "MISSING_ENVIRONMENT",
-            message: "Environment is required",
+            code: 'MISSING_ENVIRONMENT',
+            message: 'Environment is required',
           },
         });
       }
@@ -36,49 +36,40 @@ export class ServerClientVersionController {
       await respondWithEtagCache(res, {
         cacheKey: `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environment}`,
         ttlMs: DEFAULT_CONFIG.CLIENT_VERSION_TTL,
-        requestEtag: req.headers["if-none-match"],
+        requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
           const result = await ClientVersionModel.findAll({
             environment: environment,
             limit: 1000,
             offset: 0,
-            sortBy: "clientVersion",
-            sortOrder: "DESC",
+            sortBy: 'clientVersion',
+            sortOrder: 'DESC',
           });
 
           // Get clientVersionPassiveData from KV settings
           let passiveDataStr: string | null = null;
           try {
-            passiveDataStr = await VarsModel.get(
-              "$clientVersionPassiveData",
-              environment,
-            );
+            passiveDataStr = await VarsModel.get('$clientVersionPassiveData', environment);
           } catch (error) {
-            logger.warn(
-              "Failed to fetch clientVersionPassiveData for Server SDK:",
-              error,
-            );
+            logger.warn('Failed to fetch clientVersionPassiveData for Server SDK:', error);
           }
 
           // Fetch tags for each client version
           const versionsWithTags = await Promise.all(
             result.clientVersions.map(async (version: any) => {
-              const tags = await TagService.listTagsForEntity(
-                "client_version",
-                version.id,
-              );
+              const tags = await TagService.listTagsForEntity('client_version', version.id);
 
               // Parse customPayload and merge with passiveData
               let customPayload = {};
               try {
                 if (version.customPayload) {
                   let parsed =
-                    typeof version.customPayload === "string"
+                    typeof version.customPayload === 'string'
                       ? JSON.parse(version.customPayload)
                       : version.customPayload;
 
                   // Handle double-encoded JSON string
-                  if (typeof parsed === "string") {
+                  if (typeof parsed === 'string') {
                     try {
                       parsed = JSON.parse(parsed);
                     } catch (e) {
@@ -86,26 +77,19 @@ export class ServerClientVersionController {
                     }
                   }
 
-                  if (
-                    parsed &&
-                    typeof parsed === "object" &&
-                    !Array.isArray(parsed)
-                  ) {
+                  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
                     customPayload = parsed;
                   }
                 }
               } catch (error) {
                 logger.warn(
                   `Failed to parse customPayload for client version ${version.id}:`,
-                  error,
+                  error
                 );
               }
 
               // Resolve passive data and merge: passiveData first, then customPayload (customPayload overwrites)
-              const passiveData = resolvePassiveData(
-                passiveDataStr,
-                version.clientVersion,
-              );
+              const passiveData = resolvePassiveData(passiveDataStr, version.clientVersion);
               const mergedMeta = { ...passiveData, ...customPayload };
 
               // Remove internal fields from response
@@ -117,11 +101,11 @@ export class ServerClientVersionController {
                 customPayload: mergedMeta, // Return as object
                 tags: tags || [],
               };
-            }),
+            })
           );
 
           logger.info(
-            `Server SDK: Retrieved ${versionsWithTags.length} client versions for environment ${environment}`,
+            `Server SDK: Retrieved ${versionsWithTags.length} client versions for environment ${environment}`
           );
 
           return {
@@ -134,15 +118,12 @@ export class ServerClientVersionController {
         },
       });
     } catch (error) {
-      logger.error(
-        "Error in ServerClientVersionController.getClientVersions:",
-        error,
-      );
+      logger.error('Error in ServerClientVersionController.getClientVersions:', error);
       res.status(500).json({
         success: false,
         error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to retrieve client versions",
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to retrieve client versions',
         },
       });
     }
@@ -162,8 +143,8 @@ export class ServerClientVersionController {
         return res.status(400).json({
           success: false,
           error: {
-            code: "MISSING_ENVIRONMENT",
-            message: "Environment is required",
+            code: 'MISSING_ENVIRONMENT',
+            message: 'Environment is required',
           },
         });
       }
@@ -172,47 +153,35 @@ export class ServerClientVersionController {
         return res.status(400).json({
           success: false,
           error: {
-            code: "INVALID_PARAMETERS",
-            message: "Invalid client version ID",
-            details: { reason: "ID must be a valid number" },
+            code: 'INVALID_PARAMETERS',
+            message: 'Invalid client version ID',
+            details: { reason: 'ID must be a valid number' },
           },
         });
       }
 
-      const version = await ClientVersionService.getClientVersionById(
-        versionId,
-        environment,
-      );
+      const version = await ClientVersionService.getClientVersionById(versionId, environment);
 
       if (!version) {
         return res.status(404).json({
           success: false,
           error: {
-            code: "NOT_FOUND",
-            message: "Client version not found",
+            code: 'NOT_FOUND',
+            message: 'Client version not found',
           },
         });
       }
 
       // Fetch tags
-      const tags = await TagService.listTagsForEntity(
-        "client_version",
-        version.id!,
-      );
+      const tags = await TagService.listTagsForEntity('client_version', version.id!);
 
       // Get clientVersionPassiveData from KV settings and resolve by version
       let passiveData = {};
       try {
-        const passiveDataStr = await VarsModel.get(
-          "$clientVersionPassiveData",
-          environment,
-        );
+        const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', environment);
         passiveData = resolvePassiveData(passiveDataStr, version.clientVersion);
       } catch (error) {
-        logger.warn(
-          "Failed to resolve clientVersionPassiveData for Server SDK (Single):",
-          error,
-        );
+        logger.warn('Failed to resolve clientVersionPassiveData for Server SDK (Single):', error);
       }
 
       // Parse customPayload and merge with passiveData
@@ -220,12 +189,12 @@ export class ServerClientVersionController {
       try {
         if (version.customPayload) {
           let parsed =
-            typeof version.customPayload === "string"
+            typeof version.customPayload === 'string'
               ? JSON.parse(version.customPayload)
               : version.customPayload;
 
           // Handle double-encoded JSON string
-          if (typeof parsed === "string") {
+          if (typeof parsed === 'string') {
             try {
               parsed = JSON.parse(parsed);
             } catch (e) {
@@ -233,22 +202,19 @@ export class ServerClientVersionController {
             }
           }
 
-          if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
             customPayload = parsed;
           }
         }
       } catch (error) {
-        logger.warn(
-          `Failed to parse customPayload for client version ${version.id}:`,
-          error,
-        );
+        logger.warn(`Failed to parse customPayload for client version ${version.id}:`, error);
       }
 
       // Merge: passiveData first, then customPayload (customPayload overwrites)
       const mergedMeta = { ...passiveData, ...customPayload };
 
       logger.info(
-        `Server SDK: Retrieved client version ${versionId} for environment ${environment}`,
+        `Server SDK: Retrieved client version ${versionId} for environment ${environment}`
       );
 
       res.json({
@@ -260,15 +226,12 @@ export class ServerClientVersionController {
         },
       });
     } catch (error) {
-      logger.error(
-        "Error in ServerClientVersionController.getClientVersionById:",
-        error,
-      );
+      logger.error('Error in ServerClientVersionController.getClientVersionById:', error);
       res.status(500).json({
         success: false,
         error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to retrieve client version",
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to retrieve client version',
         },
       });
     }

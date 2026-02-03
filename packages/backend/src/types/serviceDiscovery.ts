@@ -5,13 +5,13 @@
  */
 
 export type ServiceStatus =
-  | "initializing"
-  | "ready"
-  | "shutting_down"
-  | "error"
-  | "terminated"
-  | "no-response"
-  | "heartbeat";
+  | 'initializing'
+  | 'ready'
+  | 'shutting_down'
+  | 'error'
+  | 'terminated'
+  | 'no-response'
+  | 'heartbeat';
 
 /**
  * Service Ports - Named port mapping
@@ -84,7 +84,7 @@ export interface UpdateServiceStatusInput {
 }
 
 export interface WatchEvent {
-  type: "put" | "delete";
+  type: 'put' | 'delete';
   instance: ServiceInstance;
 }
 
@@ -110,45 +110,29 @@ export interface IServiceDiscoveryProvider {
    * Unregister a service instance
    * @param forceDelete - If true, permanently delete the service. If false, mark as terminated with TTL.
    */
-  unregister(
-    instanceId: string,
-    serviceType: string,
-    forceDelete?: boolean,
-  ): Promise<void>;
+  unregister(instanceId: string, serviceType: string, forceDelete?: boolean): Promise<void>;
 
   /**
    * Update service status (partial merge)
    * @param input - Partial update input (only changed fields)
    * @param autoRegisterIfMissing - Auto-register if instance doesn't exist
    */
-  updateStatus(
-    input: UpdateServiceStatusInput,
-    autoRegisterIfMissing?: boolean,
-  ): Promise<void>;
+  updateStatus(input: UpdateServiceStatusInput, autoRegisterIfMissing?: boolean): Promise<void>;
 
   /**
    * Get all active services or services of a specific type and/or group
    */
-  getServices(
-    serviceType?: string,
-    serviceGroup?: string,
-  ): Promise<ServiceInstance[]>;
+  getServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]>;
 
   /**
    * Get all inactive services (terminated, error, no-response)
    */
-  getInactiveServices(
-    serviceType?: string,
-    serviceGroup?: string,
-  ): Promise<ServiceInstance[]>;
+  getInactiveServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]>;
 
   /**
    * Get a specific service instance
    */
-  getService(
-    instanceId: string,
-    serviceType: string,
-  ): Promise<ServiceInstance | null>;
+  getService(instanceId: string, serviceType: string): Promise<ServiceInstance | null>;
 
   /**
    * Watch for service changes
@@ -173,7 +157,7 @@ export interface IServiceDiscoveryProvider {
    * @returns Object with deletedCount and serviceTypes
    */
   cleanupInactiveServices(
-    serviceTypes: string[],
+    serviceTypes: string[]
   ): Promise<{ deletedCount: number; serviceTypes: string[] }>;
 
   /**

@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import logger from "../config/logger";
-import { ErrorCodes } from "../utils/apiResponse";
+import { Request, Response, NextFunction } from 'express';
+import logger from '../config/logger';
+import { ErrorCodes } from '../utils/apiResponse';
 
 export interface AppError extends Error {
   statusCode?: number;
@@ -18,7 +18,7 @@ export class GatrixError extends Error implements AppError {
     statusCode: number = 500,
     isOperational: boolean = true,
     code?: string,
-    payload?: Record<string, any>,
+    payload?: Record<string, any>
   ) {
     super(message);
     this.statusCode = statusCode;
@@ -35,7 +35,7 @@ export const createError = (
   message: string,
   statusCode: number = 500,
   code?: string,
-  payload?: Record<string, any>,
+  payload?: Record<string, any>
 ): GatrixError => {
   return new GatrixError(message, statusCode, true, code, payload);
 };
@@ -44,69 +44,66 @@ export const errorHandler = (
   error: AppError,
   req: Request,
   res: Response,
-  _next: NextFunction,
+  _next: NextFunction
 ): void => {
   let { statusCode = 500, message } = error;
   let errorCode = (error as any).code || ErrorCodes.INTERNAL_SERVER_ERROR;
 
   // Check if this is a client abort error (common and expected)
   const isClientAbort =
-    error.message?.includes("request aborted") ||
-    error.message?.includes("aborted") ||
-    (error as any)?.code === "ECONNABORTED" ||
-    (error as any)?.code === "ECONNRESET" ||
-    (error as any)?.code === "EPIPE" ||
-    (error as any)?.type === "request.aborted" ||
-    error.name === "BadRequestError";
+    error.message?.includes('request aborted') ||
+    error.message?.includes('aborted') ||
+    (error as any)?.code === 'ECONNABORTED' ||
+    (error as any)?.code === 'ECONNRESET' ||
+    (error as any)?.code === 'EPIPE' ||
+    (error as any)?.type === 'request.aborted' ||
+    error.name === 'BadRequestError';
 
   if (isClientAbort) {
     // Log client aborts at debug level only
-    logger.debug("Client aborted request:", {
+    logger.debug('Client aborted request:', {
       method: req.method,
       url: req.url,
       ip: req.ip,
-      userAgent: req.get("User-Agent"),
+      userAgent: req.get('User-Agent'),
       code: (error as any)?.code,
       type: (error as any)?.type,
     });
   } else {
     // Log actual errors at error level
-    logger.error("Error occurred:", {
+    logger.error('Error occurred:', {
       error: message,
       errorCode,
       stack: error.stack,
       url: req.url,
       method: req.method,
       ip: req.ip,
-      userAgent: req.get("User-Agent"),
+      userAgent: req.get('User-Agent'),
     });
   }
 
   // Handle specific error types and set appropriate error codes
-  if (error.name === "ValidationError") {
+  if (error.name === 'ValidationError') {
     statusCode = 400;
     errorCode = ErrorCodes.VALIDATION_ERROR;
-    message = "Validation Error";
-  } else if (error.name === "UnauthorizedError") {
+    message = 'Validation Error';
+  } else if (error.name === 'UnauthorizedError') {
     statusCode = 401;
     errorCode = ErrorCodes.UNAUTHORIZED;
-    message = "Unauthorized";
-  } else if (error.name === "JsonWebTokenError") {
+    message = 'Unauthorized';
+  } else if (error.name === 'JsonWebTokenError') {
     statusCode = 401;
     errorCode = ErrorCodes.AUTH_TOKEN_INVALID;
-    message = "Invalid token";
-  } else if (error.name === "TokenExpiredError") {
+    message = 'Invalid token';
+  } else if (error.name === 'TokenExpiredError') {
     statusCode = 401;
     errorCode = ErrorCodes.AUTH_TOKEN_EXPIRED;
-    message = "Token expired";
-  } else if (error.name === "CastError") {
+    message = 'Token expired';
+  } else if (error.name === 'CastError') {
     statusCode = 400;
     errorCode = ErrorCodes.BAD_REQUEST;
-    message = "Invalid ID format";
-  } else if (
-    (error as any).errno === 1062 ||
-    (error as any).code === "ER_DUP_ENTRY"
-  ) {
+    message = 'Invalid ID format';
+  } else if ((error as any).errno === 1062 || (error as any).code === 'ER_DUP_ENTRY') {
     statusCode = 409;
     errorCode = ErrorCodes.DUPLICATE_ENTRY;
     // Extract duplicate value from MySQL error message if possible: "Duplicate entry '...' for key '...'"
@@ -114,7 +111,7 @@ export const errorHandler = (
     if (match) {
       message = `Duplicate entry: '${match[1]}' for index '${match[2]}'`;
     } else {
-      message = "A record with the same unique identifier already exists.";
+      message = 'A record with the same unique identifier already exists.';
     }
   }
 
@@ -124,8 +121,8 @@ export const errorHandler = (
   }
 
   // Don't leak error details in production
-  if (process.env.NODE_ENV === "production" && statusCode === 500) {
-    message = "Internal Server Error";
+  if (process.env.NODE_ENV === 'production' && statusCode === 500) {
+    message = 'Internal Server Error';
   }
 
   const errorResponse: any = {
@@ -151,7 +148,7 @@ export const errorHandler = (
 
 export const notFoundHandler = (req: Request, res: Response): void => {
   const message = `Route ${req.originalUrl} not found`;
-  if (req.originalUrl === "/metrics") {
+  if (req.originalUrl === '/metrics') {
     logger.debug(message, {
       url: req.originalUrl,
       method: req.method,
@@ -174,7 +171,6 @@ export const notFoundHandler = (req: Request, res: Response): void => {
   });
 };
 
-export const asyncHandler =
-  (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
+export const asyncHandler = (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};

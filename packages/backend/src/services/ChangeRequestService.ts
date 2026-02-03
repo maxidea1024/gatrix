@@ -1,29 +1,25 @@
-import { transaction } from "objection";
-import { ulid } from "ulid";
-import { ChangeRequest, ChangeRequestStatus } from "../models/ChangeRequest";
-import { ChangeItem, FieldOp, EntityOpType } from "../models/ChangeItem";
-import { Approval } from "../models/Approval";
-import { Environment } from "../models/Environment";
-import { User } from "../models/User";
-import {
-  ActionGroup,
-  ACTION_GROUP_TYPES,
-  ActionGroupType,
-} from "../models/ActionGroup";
-import logger from "../config/logger";
-import knex from "../config/knex";
-import { ChangeRequestNotifications } from "./sseNotificationService";
-import { GatrixError } from "../middleware/errorHandler";
-import { ErrorCodes } from "@gatrix/shared";
-import { diff } from "deep-diff";
-import { OutboxService } from "./OutboxService";
+import { transaction } from 'objection';
+import { ulid } from 'ulid';
+import { ChangeRequest, ChangeRequestStatus } from '../models/ChangeRequest';
+import { ChangeItem, FieldOp, EntityOpType } from '../models/ChangeItem';
+import { Approval } from '../models/Approval';
+import { Environment } from '../models/Environment';
+import { User } from '../models/User';
+import { ActionGroup, ACTION_GROUP_TYPES, ActionGroupType } from '../models/ActionGroup';
+import logger from '../config/logger';
+import knex from '../config/knex';
+import { ChangeRequestNotifications } from './sseNotificationService';
+import { GatrixError } from '../middleware/errorHandler';
+import { ErrorCodes } from '@gatrix/shared';
+import { diff } from 'deep-diff';
+import { OutboxService } from './OutboxService';
 
 /**
  * Generate ops from beforeData and afterData
  */
 function generateOps(
   beforeData: Record<string, any> | null,
-  afterData: Record<string, any> | null,
+  afterData: Record<string, any> | null
 ): FieldOp[] {
   const ops: FieldOp[] = [];
   const before = beforeData || {};
@@ -31,13 +27,7 @@ function generateOps(
   const allKeys = new Set([...Object.keys(before), ...Object.keys(after)]);
 
   // Skip internal fields
-  const skipFields = [
-    "createdAt",
-    "updatedAt",
-    "createdBy",
-    "updatedBy",
-    "version",
-  ];
+  const skipFields = ['createdAt', 'updatedAt', 'createdBy', 'updatedBy', 'version'];
 
   // Normalize value for comparison (handle MySQL TINYINT boolean)
   const normalizeValue = (val: any): any => {
@@ -58,11 +48,11 @@ function generateOps(
 
     // Only include if values differ (using normalized comparison)
     if (JSON.stringify(normalizedOld) !== JSON.stringify(normalizedNew)) {
-      let opType: "SET" | "DEL" | "MOD" = "MOD";
+      let opType: 'SET' | 'DEL' | 'MOD' = 'MOD';
       if (oldVal === undefined || oldVal === null) {
-        opType = "SET";
+        opType = 'SET';
       } else if (newVal === undefined || newVal === null) {
-        opType = "DEL";
+        opType = 'DEL';
       }
       // Store original values in ops for display (not normalized)
       ops.push({
@@ -82,14 +72,14 @@ function generateOps(
  */
 function determineOpType(
   beforeData: Record<string, any> | null,
-  afterData: Record<string, any> | null,
+  afterData: Record<string, any> | null
 ): EntityOpType {
   const isBeforeEmpty = !beforeData || Object.keys(beforeData).length === 0;
   const isAfterEmpty = !afterData || Object.keys(afterData).length === 0;
 
-  if (isBeforeEmpty && !isAfterEmpty) return "CREATE";
-  if (!isBeforeEmpty && isAfterEmpty) return "DELETE";
-  return "UPDATE";
+  if (isBeforeEmpty && !isAfterEmpty) return 'CREATE';
+  if (!isBeforeEmpty && isAfterEmpty) return 'DELETE';
+  return 'UPDATE';
 }
 
 /**
@@ -101,16 +91,16 @@ function determineOpType(
 function applyOpsToData(
   baseData: Record<string, any> | null,
   ops: FieldOp[],
-  opType: EntityOpType,
+  opType: EntityOpType
 ): Record<string, any> | null {
-  if (opType === "DELETE") {
+  if (opType === 'DELETE') {
     return null; // Delete operation
   }
 
   const result = { ...(baseData || {}) };
 
   for (const op of ops) {
-    if (op.opType === "DEL") {
+    if (op.opType === 'DEL') {
       delete result[op.path];
     } else {
       result[op.path] = op.newValue;
@@ -128,21 +118,21 @@ function applyOpsToData(
  */
 function generateInverseOps(ops: FieldOp[]): FieldOp[] {
   return ops.map((op) => {
-    if (op.opType === "SET") {
+    if (op.opType === 'SET') {
       // Was added, so remove it (or restore old if there was one)
       return {
         path: op.path,
         oldValue: op.newValue,
         newValue: op.oldValue,
-        opType: op.oldValue === null ? "DEL" : "MOD",
+        opType: op.oldValue === null ? 'DEL' : 'MOD',
       };
-    } else if (op.opType === "DEL") {
+    } else if (op.opType === 'DEL') {
       // Was removed, so add it back
       return {
         path: op.path,
         oldValue: op.newValue, // was null
         newValue: op.oldValue, // restore
-        opType: "SET",
+        opType: 'SET',
       };
     } else {
       // MOD: just swap
@@ -150,7 +140,7 @@ function generateInverseOps(ops: FieldOp[]): FieldOp[] {
         path: op.path,
         oldValue: op.newValue,
         newValue: op.oldValue,
-        opType: "MOD",
+        opType: 'MOD',
       };
     }
   });
@@ -160,9 +150,9 @@ function generateInverseOps(ops: FieldOp[]): FieldOp[] {
  * Determine inverse operation type for revert
  */
 function getInverseOpType(opType: EntityOpType): EntityOpType {
-  if (opType === "CREATE") return "DELETE";
-  if (opType === "DELETE") return "CREATE";
-  return "UPDATE";
+  if (opType === 'CREATE') return 'DELETE';
+  if (opType === 'DELETE') return 'CREATE';
+  return 'UPDATE';
 }
 
 export class ChangeRequestService {
@@ -177,7 +167,7 @@ export class ChangeRequestService {
     targetId: string,
     beforeData: Record<string, any> | null,
     afterData: Record<string, any> | null,
-    changeRequestId?: string,
+    changeRequestId?: string
   ): Promise<{ changeRequestId: string; status: ChangeRequestStatus }> {
     try {
       let cr: ChangeRequest | undefined;
@@ -185,28 +175,26 @@ export class ChangeRequestService {
       // Phase 3: Check if user has a pending review request (open status)
       // Block new edits when review is pending
       const pendingReview = await ChangeRequest.query()
-        .where("requesterId", userId)
-        .where("environment", environmentName)
-        .where("status", "open")
+        .where('requesterId', userId)
+        .where('environment', environmentName)
+        .where('status', 'open')
         .first();
 
       if (pendingReview) {
         throw new GatrixError(
-          "You have a pending review request. Withdraw it or wait for approval/rejection before making new changes.",
+          'You have a pending review request. Withdraw it or wait for approval/rejection before making new changes.',
           409,
           true,
-          "PENDING_REVIEW_EXISTS",
+          'PENDING_REVIEW_EXISTS'
         );
       }
 
       // 1. If ID provided, verify it exists and is in DRAFT
       if (changeRequestId) {
-        cr = await ChangeRequest.query()
-          .findById(changeRequestId)
-          .where("status", "draft");
+        cr = await ChangeRequest.query().findById(changeRequestId).where('status', 'draft');
 
         if (!cr) {
-          throw new Error("Change Request not found or not in DRAFT status.");
+          throw new Error('Change Request not found or not in DRAFT status.');
         }
 
         // Verify the CR belongs to this user
@@ -215,15 +203,15 @@ export class ChangeRequestService {
             "You cannot modify another user's draft.",
             403,
             true,
-            "NOT_DRAFT_OWNER",
+            'NOT_DRAFT_OWNER'
           );
         }
       } else {
         // Phase 2: Check if user already has a draft - enforce single draft rule
         const existingDraft = await ChangeRequest.query()
-          .where("requesterId", userId)
-          .where("environment", environmentName)
-          .where("status", "draft")
+          .where('requesterId', userId)
+          .where('environment', environmentName)
+          .where('status', 'draft')
           .first();
 
         if (existingDraft) {
@@ -231,31 +219,25 @@ export class ChangeRequestService {
           cr = existingDraft;
         } else {
           // 2. Create new Draft CR
-          const cleanTable = targetTable.startsWith("g_")
-            ? targetTable.slice(2)
-            : targetTable;
-          const isNew = targetId.startsWith("NEW_");
+          const cleanTable = targetTable.startsWith('g_') ? targetTable.slice(2) : targetTable;
+          const isNew = targetId.startsWith('NEW_');
           const identifier =
             afterData?.name ||
             afterData?.title ||
             afterData?.displayName ||
             afterData?.worldId ||
             afterData?.id ||
-            (isNew ? "New Item" : targetId);
-          const action = isNew
-            ? "Create"
-            : afterData === null
-              ? "Delete"
-              : "Update";
+            (isNew ? 'New Item' : targetId);
+          const action = isNew ? 'Create' : afterData === null ? 'Delete' : 'Update';
 
           cr = await ChangeRequest.query().insert({
             id: ulid(),
             requesterId: userId,
             environment: environmentName,
-            status: "draft",
+            status: 'draft',
             title: `[${cleanTable}] ${action}: ${identifier}`,
-            priority: "medium",
-            category: "general",
+            priority: 'medium',
+            category: 'general',
           });
         }
       }
@@ -265,7 +247,7 @@ export class ChangeRequestService {
 
       // For UPDATE, merge to get full object
       let mergedAfterData = afterData;
-      if (opType === "UPDATE" && beforeData && afterData) {
+      if (opType === 'UPDATE' && beforeData && afterData) {
         mergedAfterData = { ...beforeData, ...afterData };
       }
 
@@ -273,43 +255,33 @@ export class ChangeRequestService {
 
       // 4. Check if item for this target already exists
       const existingItem = await ChangeItem.query()
-        .where("changeRequestId", cr.id)
-        .where("targetTable", targetTable)
-        .where("targetId", targetId)
+        .where('changeRequestId', cr.id)
+        .where('targetTable', targetTable)
+        .where('targetId', targetId)
         .first();
 
       if (existingItem) {
         // Update existing item's ops
-        await ChangeItem.query()
-          .findById(existingItem.id)
-          .patch({ ops, opType });
+        await ChangeItem.query().findById(existingItem.id).patch({ ops, opType });
       } else {
         // Determine ActionGroup type
         let actionGroupType: ActionGroupType = ACTION_GROUP_TYPES.UPDATE_ENTITY;
-        if (opType === "CREATE")
-          actionGroupType = ACTION_GROUP_TYPES.CREATE_ENTITY;
-        else if (opType === "DELETE")
-          actionGroupType = ACTION_GROUP_TYPES.DELETE_ENTITY;
+        if (opType === 'CREATE') actionGroupType = ACTION_GROUP_TYPES.CREATE_ENTITY;
+        else if (opType === 'DELETE') actionGroupType = ACTION_GROUP_TYPES.DELETE_ENTITY;
 
         // Find or create ActionGroup
         let actionGroup = await ActionGroup.query()
-          .where("changeRequestId", cr.id)
-          .where("actionType", actionGroupType)
+          .where('changeRequestId', cr.id)
+          .where('actionType', actionGroupType)
           .first();
 
         if (!actionGroup) {
-          const cleanTable = targetTable.startsWith("g_")
-            ? targetTable.slice(2)
-            : targetTable;
+          const cleanTable = targetTable.startsWith('g_') ? targetTable.slice(2) : targetTable;
           const actionLabel =
-            opType === "CREATE"
-              ? "Create"
-              : opType === "DELETE"
-                ? "Delete"
-                : "Update";
+            opType === 'CREATE' ? 'Create' : opType === 'DELETE' ? 'Delete' : 'Update';
           const maxOrder = await ActionGroup.query()
-            .where("changeRequestId", cr.id)
-            .max("orderIndex as maxOrder")
+            .where('changeRequestId', cr.id)
+            .max('orderIndex as maxOrder')
             .first();
           const nextOrder = ((maxOrder as any)?.maxOrder ?? -1) + 1;
 
@@ -335,32 +307,30 @@ export class ChangeRequestService {
       }
 
       // 5. Update Title Dynamically if more than one item
-      const items = await ChangeItem.query().where("changeRequestId", cr.id);
+      const items = await ChangeItem.query().where('changeRequestId', cr.id);
       if (items.length > 1) {
         const user = await User.query().findById(userId);
-        const lang = user?.preferredLanguage || "en";
+        const lang = user?.preferredLanguage || 'en';
 
         const tables = [...new Set(items.map((i) => i.targetTable))];
-        const cleanTables = tables.map((t) =>
-          t.startsWith("g_") ? t.slice(2) : t,
-        );
+        const cleanTables = tables.map((t) => (t.startsWith('g_') ? t.slice(2) : t));
 
-        let newTitle = "";
+        let newTitle = '';
         if (tables.length === 1) {
           const table = cleanTables[0];
           const count = items.length;
-          if (lang === "ko") {
+          if (lang === 'ko') {
             newTitle = `[${table}] ${count}개 항목`;
-          } else if (lang === "zh") {
+          } else if (lang === 'zh') {
             newTitle = `[${table}] ${count} 个项目`;
           } else {
             newTitle = `[${table}] ${count} items`;
           }
         } else {
           const count = items.length;
-          if (lang === "ko") {
+          if (lang === 'ko') {
             newTitle = `복합 변경 (${count}개 항목)`;
-          } else if (lang === "zh") {
+          } else if (lang === 'zh') {
             newTitle = `混合变更 (${count} 个项目)`;
           } else {
             newTitle = `Mixed Changes (${count} items)`;
@@ -368,24 +338,19 @@ export class ChangeRequestService {
         }
 
         if (
-          cr.title.startsWith("[") ||
-          cr.title.includes("Change Request for") ||
-          cr.title.startsWith("Mixed Changes") ||
-          cr.title.startsWith("복합 변경") ||
-          cr.title.startsWith("混合变更")
+          cr.title.startsWith('[') ||
+          cr.title.includes('Change Request for') ||
+          cr.title.startsWith('Mixed Changes') ||
+          cr.title.startsWith('복합 변경') ||
+          cr.title.startsWith('混合变更')
         ) {
-          await ChangeRequest.query()
-            .findById(cr.id)
-            .patch({ title: newTitle });
+          await ChangeRequest.query().findById(cr.id).patch({ title: newTitle });
         }
       }
 
       return { changeRequestId: cr.id, status: cr.status };
     } catch (error) {
-      logger.error(
-        "[ChangeRequestService] Error upserting change request:",
-        error,
-      );
+      logger.error('[ChangeRequestService] Error upserting change request:', error);
       throw error;
     }
   }
@@ -397,31 +362,27 @@ export class ChangeRequestService {
       description?: string;
       reason?: string;
       impactAnalysis?: string;
-      priority?: "low" | "medium" | "high" | "critical";
+      priority?: 'low' | 'medium' | 'high' | 'critical';
       category?: string;
-    },
+    }
   ): Promise<ChangeRequest> {
     const cr = await ChangeRequest.query().findById(changeRequestId);
-    if (!cr) throw new Error("Change Request not found");
-    if (cr.status !== "draft")
-      throw new Error("Metadata can only be updated in DRAFT status");
+    if (!cr) throw new Error('Change Request not found');
+    if (cr.status !== 'draft') throw new Error('Metadata can only be updated in DRAFT status');
 
     return await cr.$query().patchAndFetch(metadata);
   }
 
-  static async submitChangeRequest(
-    changeRequestId: string,
-  ): Promise<ChangeRequest> {
+  static async submitChangeRequest(changeRequestId: string): Promise<ChangeRequest> {
     const cr = await ChangeRequest.query()
       .findById(changeRequestId)
-      .withGraphFetched("[requester, changeItems]");
-    if (!cr) throw new Error("Change Request not found");
-    if (cr.status !== "draft")
-      throw new Error("Only DRAFT requests can be submitted");
+      .withGraphFetched('[requester, changeItems]');
+    if (!cr) throw new Error('Change Request not found');
+    if (cr.status !== 'draft') throw new Error('Only DRAFT requests can be submitted');
 
     // Validation - only title is required
     if (!cr.title) {
-      throw new Error("Title is required for submission.");
+      throw new Error('Title is required for submission.');
     }
 
     // Capture entity versions at submission time for conflict detection later
@@ -429,29 +390,25 @@ export class ChangeRequestService {
       if (!/^[a-zA-Z0-9_]+$/.test(item.targetTable)) continue;
 
       // Skip new items (they have no existing version)
-      if (item.targetId.startsWith("NEW_")) continue;
+      if (item.targetId.startsWith('NEW_')) continue;
 
       try {
-        const currentData = await knex(item.targetTable)
-          .where("id", item.targetId)
-          .first();
+        const currentData = await knex(item.targetTable).where('id', item.targetId).first();
 
-        if (currentData && typeof currentData.version === "number") {
+        if (currentData && typeof currentData.version === 'number') {
           // Store the version at submission time
-          await ChangeItem.query()
-            .findById(item.id)
-            .patch({ entityVersion: currentData.version });
+          await ChangeItem.query().findById(item.id).patch({ entityVersion: currentData.version });
         }
       } catch (err) {
         logger.warn(
           `[ChangeRequest] Failed to capture version for ${item.targetTable}:${item.targetId}`,
-          err,
+          err
         );
       }
     }
 
     const updated = await cr.$query().patchAndFetch({
-      status: "open",
+      status: 'open',
       updatedAt: new Date().toISOString() as any,
     });
 
@@ -470,25 +427,20 @@ export class ChangeRequestService {
   static async approveChangeRequest(
     changeRequestId: string,
     approverId: number,
-    comment?: string,
+    comment?: string
   ): Promise<ChangeRequest> {
     return await transaction(ChangeRequest.knex(), async (trx) => {
       const cr = await ChangeRequest.query(trx)
         .findById(changeRequestId)
-        .withGraphFetched("[environmentModel, requester]");
+        .withGraphFetched('[environmentModel, requester]');
       if (!cr)
+        throw new GatrixError('Change Request not found', 404, true, ErrorCodes.CR_NOT_FOUND);
+      if (cr.status !== 'open')
         throw new GatrixError(
-          "Change Request not found",
-          404,
-          true,
-          ErrorCodes.CR_NOT_FOUND,
-        );
-      if (cr.status !== "open")
-        throw new GatrixError(
-          "Request is not OPEN for approval",
+          'Request is not OPEN for approval',
           400,
           true,
-          ErrorCodes.CR_INVALID_STATUS,
+          ErrorCodes.CR_INVALID_STATUS
         );
 
       // Get approver info for notification
@@ -497,16 +449,16 @@ export class ChangeRequestService {
       // 1. Record Approval
       // Check if already approved by this user
       const existing = await Approval.query(trx)
-        .where("changeRequestId", changeRequestId)
-        .where("approverId", approverId)
+        .where('changeRequestId', changeRequestId)
+        .where('approverId', approverId)
         .first();
 
       if (existing) {
         throw new GatrixError(
-          "You have already approved this request.",
+          'You have already approved this request.',
           400,
           true,
-          ErrorCodes.CR_ALREADY_APPROVED,
+          ErrorCodes.CR_ALREADY_APPROVED
         );
       }
 
@@ -519,10 +471,7 @@ export class ChangeRequestService {
 
       // 2. Check Threshold
       // Fetch all approvals to be absolutely sure of the count regardless of DB dialect
-      const allApprovals = await Approval.query(trx).where(
-        "changeRequestId",
-        changeRequestId,
-      );
+      const allApprovals = await Approval.query(trx).where('changeRequestId', changeRequestId);
       const currentApprovals = allApprovals.length;
 
       // Get required threshold from environment (default to 1)
@@ -531,9 +480,9 @@ export class ChangeRequestService {
         requiredApprovers = Number(cr.environmentModel.requiredApprovers);
       } else {
         // Fallback: fetch environment directly if relation failed to load
-        const env = await knex("g_environments")
+        const env = await knex('g_environments')
           .transacting(trx)
-          .where("environment", cr.environment)
+          .where('environment', cr.environment)
           .first();
         if (env) {
           requiredApprovers = Number(env.requiredApprovers);
@@ -541,21 +490,16 @@ export class ChangeRequestService {
       }
 
       logger.info(
-        `[ChangeRequest] Approval threshold check for ${cr.id}: ${currentApprovals}/${requiredApprovers} (Env: ${cr.environment})`,
+        `[ChangeRequest] Approval threshold check for ${cr.id}: ${currentApprovals}/${requiredApprovers} (Env: ${cr.environment})`
       );
 
       if (currentApprovals >= requiredApprovers) {
-        const updated = await ChangeRequest.query(trx).patchAndFetchById(
-          cr.id,
-          {
-            status: "approved",
-            updatedAt: new Date().toISOString() as any,
-          },
-        );
+        const updated = await ChangeRequest.query(trx).patchAndFetchById(cr.id, {
+          status: 'approved',
+          updatedAt: new Date().toISOString() as any,
+        });
 
-        logger.info(
-          `[ChangeRequest] Request ${cr.id} transitioned to APPROVED status.`,
-        );
+        logger.info(`[ChangeRequest] Request ${cr.id} transitioned to APPROVED status.`);
 
         // Send SSE notification to requester when approved
         await ChangeRequestNotifications.notifyApproved(
@@ -566,7 +510,7 @@ export class ChangeRequestService {
             requesterId: cr.requesterId,
           },
           approver?.name || approver?.email,
-          approverId,
+          approverId
         );
 
         return updated;
@@ -575,7 +519,7 @@ export class ChangeRequestService {
       // Still OPEN - but we should return the latest state including the new approval count
       const refreshed = await ChangeRequest.query(trx)
         .findById(cr.id)
-        .withGraphFetched("[environmentModel, requester, approvals]");
+        .withGraphFetched('[environmentModel, requester, approvals]');
 
       return refreshed || cr;
     });
@@ -585,10 +529,8 @@ export class ChangeRequestService {
    * Checks if an open Change Request meets the approval criteria
    * (Useful if environment config changes after CR creation)
    */
-  static async checkAndAutoApprove(
-    cr: ChangeRequest,
-  ): Promise<ChangeRequest | null> {
-    if (cr.status !== "open") return null;
+  static async checkAndAutoApprove(cr: ChangeRequest): Promise<ChangeRequest | null> {
+    if (cr.status !== 'open') return null;
 
     const effectiveMinApprovals = cr.environmentModel
       ? Number(cr.environmentModel.requiredApprovers)
@@ -597,11 +539,11 @@ export class ChangeRequestService {
 
     if (approvalCount >= effectiveMinApprovals) {
       logger.info(
-        `[ChangeRequest] Auto-approving ${cr.id} as threshold ${effectiveMinApprovals} is met via lazy check`,
+        `[ChangeRequest] Auto-approving ${cr.id} as threshold ${effectiveMinApprovals} is met via lazy check`
       );
 
       const updated = await ChangeRequest.query().patchAndFetchById(cr.id, {
-        status: "approved",
+        status: 'approved',
         updatedAt: new Date().toISOString() as any,
       });
 
@@ -614,14 +556,11 @@ export class ChangeRequestService {
             environment: cr.environment,
             requesterId: cr.requesterId,
           },
-          "System (Auto)",
-          0,
+          'System (Auto)',
+          0
         );
       } catch (err) {
-        logger.error(
-          "[ChangeRequest] Failed to send auto-approve notification",
-          err,
-        );
+        logger.error('[ChangeRequest] Failed to send auto-approve notification', err);
       }
 
       return updated;
@@ -633,36 +572,34 @@ export class ChangeRequestService {
   static async rejectChangeRequest(
     changeRequestId: string,
     rejectedBy: number | null,
-    comment: string,
+    comment: string
   ): Promise<ChangeRequest> {
-    if (!comment) throw new Error("Rejection comment is mandatory.");
+    if (!comment) throw new Error('Rejection comment is mandatory.');
 
     const cr = await ChangeRequest.query().findById(changeRequestId);
-    if (!cr) throw new Error("Change Request not found");
-    if (cr.status !== "open" && cr.status !== "approved") {
-      throw new Error("Only OPEN or APPROVED requests can be rejected");
+    if (!cr) throw new Error('Change Request not found');
+    if (cr.status !== 'open' && cr.status !== 'approved') {
+      throw new Error('Only OPEN or APPROVED requests can be rejected');
     }
 
     // Get rejector info for notification (null means system rejection)
-    const rejector = rejectedBy
-      ? await User.query().findById(rejectedBy)
-      : null;
-    const rejectorName = rejector?.name || rejector?.email || "System";
+    const rejector = rejectedBy ? await User.query().findById(rejectedBy) : null;
+    const rejectorName = rejector?.name || rejector?.email || 'System';
 
     // Update Status with rejection info
     await cr.$query().patch({
-      status: "rejected",
+      status: 'rejected',
       rejectedBy: rejectedBy ?? undefined, // Will be undefined for system rejections
       rejectedAt: knex.fn.now(),
       rejectionReason: comment,
     });
 
     // Create Audit Log with comment
-    await knex("g_audit_logs").insert({
-      action: "CHANGE_REQUEST_REJECTED",
+    await knex('g_audit_logs').insert({
+      action: 'CHANGE_REQUEST_REJECTED',
       userId: rejectedBy || 0, // 0 for system
       changeRequestId: cr.id,
-      entityType: "ChangeRequest",
+      entityType: 'ChangeRequest',
       entityId: 0,
       newValues: JSON.stringify({ comment }),
     });
@@ -677,75 +614,71 @@ export class ChangeRequestService {
       },
       rejectorName,
       comment,
-      rejectedBy || 0,
+      rejectedBy || 0
     );
 
     const updated = await cr.$query().findById(cr.id);
-    if (!updated) throw new Error("Failed to retrieve updated change request");
+    if (!updated) throw new Error('Failed to retrieve updated change request');
     return updated;
   }
 
   static async reopenChangeRequest(
     changeRequestId: string,
-    requesterId: number,
+    requesterId: number
   ): Promise<ChangeRequest> {
     return await transaction(ChangeRequest.knex(), async (trx) => {
       const cr = await ChangeRequest.query(trx).findById(changeRequestId);
-      if (!cr) throw new Error("Change Request not found");
-      if (cr.status !== "rejected" && cr.status !== "conflict") {
-        throw new Error("Only REJECTED or CONFLICT requests can be reopened");
+      if (!cr) throw new Error('Change Request not found');
+      if (cr.status !== 'rejected' && cr.status !== 'conflict') {
+        throw new Error('Only REJECTED or CONFLICT requests can be reopened');
       }
 
       const user = await User.query(trx).findById(requesterId);
-      const isAdmin = user?.role === "admin" || String(user?.role) === "0";
+      const isAdmin = user?.role === 'admin' || String(user?.role) === '0';
 
       // Validate ownership: Only the original requester or an admin can reopen
       if (cr.requesterId !== requesterId && !isAdmin) {
-        throw new Error(
-          "Only the original requester or an admin can reopen this request.",
-        );
+        throw new Error('Only the original requester or an admin can reopen this request.');
       }
 
       // Phase 4: Check for existing draft - prevent reopen conflict
       const existingDraft = await ChangeRequest.query(trx)
-        .where("requesterId", cr.requesterId)
-        .where("environment", cr.environment)
-        .where("status", "draft")
+        .where('requesterId', cr.requesterId)
+        .where('environment', cr.environment)
+        .where('status', 'draft')
         .first();
 
       if (existingDraft) {
         throw new GatrixError(
-          "Cannot reopen: you already have an active draft. Delete or submit it first.",
+          'Cannot reopen: you already have an active draft. Delete or submit it first.',
           409,
           true,
-          "REOPEN_CONFLICT",
-          { existingDraftId: existingDraft.id },
+          'REOPEN_CONFLICT',
+          { existingDraftId: existingDraft.id }
         );
       }
 
       // Also check for pending review
       const pendingReview = await ChangeRequest.query(trx)
-        .where("requesterId", cr.requesterId)
-        .where("environment", cr.environment)
-        .where("status", "open")
+        .where('requesterId', cr.requesterId)
+        .where('environment', cr.environment)
+        .where('status', 'open')
         .first();
 
       if (pendingReview) {
         throw new GatrixError(
-          "Cannot reopen: you have a pending review request. Wait for approval/rejection first.",
+          'Cannot reopen: you have a pending review request. Wait for approval/rejection first.',
           409,
           true,
-          "PENDING_REVIEW_EXISTS",
+          'PENDING_REVIEW_EXISTS'
         );
       }
 
       // Reset to Draft
-      const updated = await cr.$query(trx).patchAndFetch({ status: "draft" });
+      const updated = await cr.$query(trx).patchAndFetch({ status: 'draft' });
 
       // CRITICAL: Delete ALL approvals (Reset progress)
-      await Approval.query(trx)
-        .where("changeRequestId", changeRequestId)
-        .delete();
+      await Approval.query(trx).where('changeRequestId', changeRequestId).delete();
 
       return updated;
     });
@@ -753,20 +686,18 @@ export class ChangeRequestService {
 
   static async executeChangeRequest(
     changeRequestId: string,
-    userId: number,
+    userId: number
   ): Promise<ChangeRequest> {
     // Import service registry
-    const { hasServiceHandler, getServiceHandler } =
-      await import("./ServiceRegistry");
+    const { hasServiceHandler, getServiceHandler } = await import('./ServiceRegistry');
 
     const result = await transaction(ChangeRequest.knex(), async (trx) => {
       const cr = await ChangeRequest.query(trx)
         .findById(changeRequestId)
-        .withGraphFetched("changeItems");
+        .withGraphFetched('changeItems');
 
-      if (!cr) throw new Error("Change Request not found");
-      if (cr.status !== "approved")
-        throw new Error("Change Request must be APPROVED to execute");
+      if (!cr) throw new Error('Change Request not found');
+      if (cr.status !== 'approved') throw new Error('Change Request must be APPROVED to execute');
 
       // Get environment settings for conflict check policy
       const env = await Environment.query(trx).findById(cr.environment);
@@ -789,7 +720,7 @@ export class ChangeRequestService {
         }
 
         const targetRow = await trx(item.targetTable)
-          .where("id", item.targetId)
+          .where('id', item.targetId)
           .first()
           .forUpdate(); // ROW LOCK
 
@@ -798,19 +729,14 @@ export class ChangeRequestService {
         const isCreate = !liveData;
 
         // Check version if available (preferred method)
-        const hasVersionColumn =
-          liveData && typeof liveData.version === "number";
+        const hasVersionColumn = liveData && typeof liveData.version === 'number';
         const storedEntityVersion = item.entityVersion;
         const liveVersion = liveData?.version;
 
         let hasConflict = false;
-        let conflictReason = "";
+        let conflictReason = '';
 
-        if (
-          hasVersionColumn &&
-          storedEntityVersion !== undefined &&
-          storedEntityVersion !== null
-        ) {
+        if (hasVersionColumn && storedEntityVersion !== undefined && storedEntityVersion !== null) {
           // Version-based conflict detection
           if (liveVersion !== storedEntityVersion) {
             hasConflict = true;
@@ -821,8 +747,7 @@ export class ChangeRequestService {
           const isMatch = compareData(liveData, item.beforeData);
           if (!isMatch) {
             hasConflict = true;
-            conflictReason =
-              "Data has changed since this request was created (deep-diff)";
+            conflictReason = 'Data has changed since this request was created (deep-diff)';
           }
         }
 
@@ -832,45 +757,36 @@ export class ChangeRequestService {
             await ChangeRequest.query(trx)
               .findById(changeRequestId)
               .patch({
-                status: "conflict",
+                status: 'conflict',
                 rejectionReason: `Data conflict: ${conflictReason}`,
-                updatedAt: new Date()
-                  .toISOString()
-                  .slice(0, 19)
-                  .replace("T", " ") as any,
+                updatedAt: new Date().toISOString().slice(0, 19).replace('T', ' ') as any,
               });
 
-            throw new GatrixError(
-              conflictReason,
-              409,
-              true,
-              "CR_DATA_CONFLICT",
-              {
-                originalDraftBase: item.beforeData,
-                currentLive: liveData,
-                userDraft: item.afterData,
-                storedVersion: storedEntityVersion,
-                liveVersion: liveVersion,
-              },
-            );
+            throw new GatrixError(conflictReason, 409, true, 'CR_DATA_CONFLICT', {
+              originalDraftBase: item.beforeData,
+              currentLive: liveData,
+              userDraft: item.afterData,
+              storedVersion: storedEntityVersion,
+              liveVersion: liveVersion,
+            });
           } else {
             // Warn but continue (dev/test environments)
             logger.warn(
-              `[ChangeRequest] Conflict detected but continuing (non-strict): ${conflictReason}`,
+              `[ChangeRequest] Conflict detected but continuing (non-strict): ${conflictReason}`
             );
           }
         }
 
         // 4. Apply Update based on opType
         // For DELETE operations, remove the record with optimistic lock
-        if (item.opType === "DELETE") {
+        if (item.opType === 'DELETE') {
           let affectedRows: number;
 
           // Use optimistic locking if version column exists
           if (hasVersionColumn && storedEntityVersion !== undefined) {
             affectedRows = await trx(item.targetTable)
-              .where("id", item.targetId)
-              .where("version", storedEntityVersion)
+              .where('id', item.targetId)
+              .where('version', storedEntityVersion)
               .delete();
 
             if (affectedRows === 0) {
@@ -878,18 +794,14 @@ export class ChangeRequestService {
                 `Optimistic lock failed: version changed during delete (table: ${item.targetTable}, id: ${item.targetId})`,
                 409,
                 true,
-                "CR_DATA_CONFLICT",
+                'CR_DATA_CONFLICT'
               );
             }
           } else {
-            affectedRows = await trx(item.targetTable)
-              .where("id", item.targetId)
-              .delete();
+            affectedRows = await trx(item.targetTable).where('id', item.targetId).delete();
           }
 
-          logger.info(
-            `[ChangeRequest] Deleted ${item.targetTable}:${item.targetId}`,
-          );
+          logger.info(`[ChangeRequest] Deleted ${item.targetTable}:${item.targetId}`);
 
           if (hasServiceHandler(item.targetTable)) {
             serviceCallsNeeded.push({
@@ -906,19 +818,19 @@ export class ChangeRequestService {
         // For CREATE/UPDATE: apply ops to get final data
         const afterData = applyOpsToData(liveData, item.ops, item.opType);
         if (afterData) {
-          const isCreate = item.opType === "CREATE";
+          const isCreate = item.opType === 'CREATE';
 
           // Common non-column fields to strip for direct DB operations
           const fieldsToStrip = [
-            "maintenanceLocales",
-            "tagIds",
-            "createdByName",
-            "createdByEmail",
-            "updatedByName",
-            "updatedByEmail",
-            "tags", // Often a list of tag objects from joins
-            "approvals", // Joined data
-            "environmentModel", // Joined data
+            'maintenanceLocales',
+            'tagIds',
+            'createdByName',
+            'createdByEmail',
+            'updatedByName',
+            'updatedByEmail',
+            'tags', // Often a list of tag objects from joins
+            'approvals', // Joined data
+            'environmentModel', // Joined data
           ];
 
           const dbData = { ...afterData };
@@ -929,30 +841,26 @@ export class ChangeRequestService {
 
           // Convert ISO 8601 datetime strings to MySQL format
           const dateFields = [
-            "createdAt",
-            "updatedAt",
-            "startDate",
-            "endDate",
-            "saleStartAt",
-            "saleEndAt",
-            "maintenanceStartDate",
-            "maintenanceEndDate",
+            'createdAt',
+            'updatedAt',
+            'startDate',
+            'endDate',
+            'saleStartAt',
+            'saleEndAt',
+            'maintenanceStartDate',
+            'maintenanceEndDate',
           ];
           for (const field of dateFields) {
-            if (dbData[field] && typeof dbData[field] === "string") {
+            if (dbData[field] && typeof dbData[field] === 'string') {
               // Check if it's ISO 8601 format (ends with Z or has timezone offset)
               if (
-                dbData[field].includes("T") &&
-                (dbData[field].endsWith("Z") ||
-                  dbData[field].match(/[+-]\d{2}:\d{2}$/))
+                dbData[field].includes('T') &&
+                (dbData[field].endsWith('Z') || dbData[field].match(/[+-]\d{2}:\d{2}$/))
               ) {
                 const date = new Date(dbData[field]);
                 if (!isNaN(date.getTime())) {
                   // Convert to MySQL DATETIME format: YYYY-MM-DD HH:MM:SS
-                  dbData[field] = date
-                    .toISOString()
-                    .slice(0, 19)
-                    .replace("T", " ");
+                  dbData[field] = date.toISOString().slice(0, 19).replace('T', ' ');
                 }
               }
             }
@@ -962,7 +870,7 @@ export class ChangeRequestService {
           for (const key in dbData) {
             if (
               dbData[key] !== null &&
-              typeof dbData[key] === "object" &&
+              typeof dbData[key] === 'object' &&
               !(dbData[key] instanceof Date)
             ) {
               dbData[key] = JSON.stringify(dbData[key]);
@@ -976,12 +884,11 @@ export class ChangeRequestService {
             if (isCreate) {
               // Check if table uses VARCHAR id (ULID) or INT auto_increment
               const [columns] = await trx.raw(
-                `SHOW COLUMNS FROM ${item.targetTable} WHERE Field = 'id'`,
+                `SHOW COLUMNS FROM ${item.targetTable} WHERE Field = 'id'`
               );
-              const idColumnType = columns[0]?.Type?.toLowerCase() || "";
+              const idColumnType = columns[0]?.Type?.toLowerCase() || '';
               const usesStringId =
-                idColumnType.includes("varchar") ||
-                idColumnType.includes("char");
+                idColumnType.includes('varchar') || idColumnType.includes('char');
 
               if (usesStringId) {
                 // Generate a new ULID for VARCHAR id columns
@@ -999,16 +906,10 @@ export class ChangeRequestService {
               }
               // Ensure timestamps are set for new records
               if (!dbData.createdAt) {
-                dbData.createdAt = new Date()
-                  .toISOString()
-                  .slice(0, 19)
-                  .replace("T", " ");
+                dbData.createdAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
               }
               if (!dbData.updatedAt) {
-                dbData.updatedAt = new Date()
-                  .toISOString()
-                  .slice(0, 19)
-                  .replace("T", " ");
+                dbData.updatedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
               }
               // Set createdBy for new records (use the executor's userId)
               if (dbData.createdBy === undefined) {
@@ -1025,29 +926,23 @@ export class ChangeRequestService {
               }
 
               // Update ChangeItem's targetId to the real ID for future rollback
-              if (
-                item.targetId.startsWith("NEW_") &&
-                realId !== item.targetId
-              ) {
+              if (item.targetId.startsWith('NEW_') && realId !== item.targetId) {
                 await ChangeItem.query(trx)
                   .findById(item.id)
                   .patch({
                     targetId: String(realId),
                   });
                 logger.info(
-                  `[ChangeRequest] Updated ChangeItem targetId: ${item.targetId} -> ${realId}`,
+                  `[ChangeRequest] Updated ChangeItem targetId: ${item.targetId} -> ${realId}`
                 );
               }
             } else {
               // Optimistic locking: increment version and add to WHERE clause
-              if (
-                typeof liveData?.version === "number" &&
-                storedEntityVersion !== undefined
-              ) {
+              if (typeof liveData?.version === 'number' && storedEntityVersion !== undefined) {
                 dbData.version = liveData.version + 1;
                 const affectedRows = await trx(item.targetTable)
-                  .where("id", item.targetId)
-                  .where("version", storedEntityVersion)
+                  .where('id', item.targetId)
+                  .where('version', storedEntityVersion)
                   .update(dbData);
 
                 if (affectedRows === 0) {
@@ -1055,14 +950,12 @@ export class ChangeRequestService {
                     `Optimistic lock failed: version changed during update (table: ${item.targetTable}, id: ${item.targetId})`,
                     409,
                     true,
-                    "CR_DATA_CONFLICT",
+                    'CR_DATA_CONFLICT'
                   );
                 }
               } else {
                 // No version column - update without optimistic lock
-                await trx(item.targetTable)
-                  .where("id", item.targetId)
-                  .update(dbData);
+                await trx(item.targetTable).where('id', item.targetId).update(dbData);
               }
             }
 
@@ -1079,12 +972,11 @@ export class ChangeRequestService {
             if (isCreate) {
               // Check if table uses VARCHAR id (ULID) or INT auto_increment
               const [columns] = await trx.raw(
-                `SHOW COLUMNS FROM ${item.targetTable} WHERE Field = 'id'`,
+                `SHOW COLUMNS FROM ${item.targetTable} WHERE Field = 'id'`
               );
-              const idColumnType = columns[0]?.Type?.toLowerCase() || "";
+              const idColumnType = columns[0]?.Type?.toLowerCase() || '';
               const usesStringId =
-                idColumnType.includes("varchar") ||
-                idColumnType.includes("char");
+                idColumnType.includes('varchar') || idColumnType.includes('char');
 
               if (usesStringId) {
                 // Generate a new ULID for VARCHAR id columns
@@ -1113,30 +1005,23 @@ export class ChangeRequestService {
 
               // Update ChangeItem's targetId to the real ID for future rollback
               const realId: string | number = dbData.id || insertResult;
-              if (
-                item.targetId.startsWith("NEW_") &&
-                realId &&
-                realId !== item.targetId
-              ) {
+              if (item.targetId.startsWith('NEW_') && realId && realId !== item.targetId) {
                 await ChangeItem.query(trx)
                   .findById(item.id)
                   .patch({
                     targetId: String(realId),
                   });
                 logger.info(
-                  `[ChangeRequest] Updated ChangeItem targetId: ${item.targetId} -> ${realId}`,
+                  `[ChangeRequest] Updated ChangeItem targetId: ${item.targetId} -> ${realId}`
                 );
               }
             } else {
               // Optimistic locking: increment version and add to WHERE clause
-              if (
-                typeof liveData?.version === "number" &&
-                storedEntityVersion !== undefined
-              ) {
+              if (typeof liveData?.version === 'number' && storedEntityVersion !== undefined) {
                 dbData.version = liveData.version + 1;
                 const affectedRows = await trx(item.targetTable)
-                  .where("id", item.targetId)
-                  .where("version", storedEntityVersion)
+                  .where('id', item.targetId)
+                  .where('version', storedEntityVersion)
                   .update(dbData);
 
                 if (affectedRows === 0) {
@@ -1144,18 +1029,16 @@ export class ChangeRequestService {
                     `Optimistic lock failed: version changed during update (table: ${item.targetTable}, id: ${item.targetId})`,
                     409,
                     true,
-                    "CR_DATA_CONFLICT",
+                    'CR_DATA_CONFLICT'
                   );
                 }
               } else {
                 // No version column - update without optimistic lock
-                await trx(item.targetTable)
-                  .where("id", item.targetId)
-                  .update(dbData);
+                await trx(item.targetTable).where('id', item.targetId).update(dbData);
               }
             }
             logger.warn(
-              `[ChangeRequest] No service handler for ${item.targetTable}, events not published`,
+              `[ChangeRequest] No service handler for ${item.targetTable}, events not published`
             );
           }
         }
@@ -1173,13 +1056,13 @@ export class ChangeRequestService {
             isCreate: call.isCreate,
             isDelete: false, // TODO: Handle deletes when supported
           })),
-          trx,
+          trx
         );
       }
 
       // 6. Finalize
       const finalInfo = await cr.$query(trx).patchAndFetch({
-        status: "applied",
+        status: 'applied',
         executedBy: userId, // Store who executed this request
       });
 
@@ -1195,15 +1078,15 @@ export class ChangeRequestService {
           requesterId: cr.requesterId,
         },
         executor?.name || executor?.email,
-        userId,
+        userId
       );
 
       // Log Execution
-      await knex("g_audit_logs").transacting(trx).insert({
-        action: "CHANGE_REQUEST_EXECUTED",
+      await knex('g_audit_logs').transacting(trx).insert({
+        action: 'CHANGE_REQUEST_EXECUTED',
         userId,
         changeRequestId: cr.id,
-        entityType: "ChangeRequest",
+        entityType: 'ChangeRequest',
         entityId: 0,
       });
 
@@ -1221,12 +1104,12 @@ export class ChangeRequestService {
               call.targetId,
               call.afterData,
               result.cr.environment, // Use environment from result CR
-              userId, // Pass executor ID to service for audit/context
+              userId // Pass executor ID to service for audit/context
             );
           } catch (err) {
             logger.error(
               `[ChangeRequest] Post-execution service hook failed for ${call.targetTable}:${call.targetId}`,
-              err,
+              err
             );
             // We do NOT rollback transaction here as data is already committed.
             // Just log error. Ideally this should be robust or queue-based.
@@ -1254,11 +1137,11 @@ export class ChangeRequestService {
   }> {
     const originalCr = await ChangeRequest.query()
       .findById(changeRequestId)
-      .withGraphFetched("changeItems");
+      .withGraphFetched('changeItems');
 
-    if (!originalCr) throw new GatrixError("Change Request not found", 404);
-    if (originalCr.status !== "applied")
-      throw new GatrixError("Only APPLIED requests can be reverted", 400);
+    if (!originalCr) throw new GatrixError('Change Request not found', 404);
+    if (originalCr.status !== 'applied')
+      throw new GatrixError('Only APPLIED requests can be reverted', 400);
 
     const revertItems: Array<{
       targetTable: string;
@@ -1272,9 +1155,9 @@ export class ChangeRequestService {
       const inverseOpType = getInverseOpType(item.opType);
       const inverseOps = generateInverseOps(item.ops);
 
-      let actionType = "UPDATE_ENTITY";
-      if (inverseOpType === "CREATE") actionType = "CREATE_ENTITY";
-      else if (inverseOpType === "DELETE") actionType = "DELETE_ENTITY";
+      let actionType = 'UPDATE_ENTITY';
+      if (inverseOpType === 'CREATE') actionType = 'CREATE_ENTITY';
+      else if (inverseOpType === 'DELETE') actionType = 'DELETE_ENTITY';
 
       revertItems.push({
         targetTable: item.targetTable,
@@ -1290,16 +1173,16 @@ export class ChangeRequestService {
 
   static async revertChangeRequest(
     changeRequestId: string,
-    userId: number,
+    userId: number
   ): Promise<ChangeRequest> {
     return await transaction(ChangeRequest.knex(), async (trx) => {
       const originalCr = await ChangeRequest.query(trx)
         .findById(changeRequestId)
-        .withGraphFetched("changeItems");
+        .withGraphFetched('changeItems');
 
-      if (!originalCr) throw new GatrixError("Change Request not found", 404);
-      if (originalCr.status !== "applied")
-        throw new GatrixError("Only APPLIED requests can be reverted", 400);
+      if (!originalCr) throw new GatrixError('Change Request not found', 404);
+      if (originalCr.status !== 'applied')
+        throw new GatrixError('Only APPLIED requests can be reverted', 400);
 
       // Create new CR for revert
       const newCrKey = ulid();
@@ -1309,10 +1192,10 @@ export class ChangeRequestService {
         description: `Revert of request #${originalCr.id}`,
         requesterId: userId,
         environment: originalCr.environment,
-        status: "open",
-        type: "revert",
-        priority: originalCr.priority || "medium",
-        category: originalCr.category || "general",
+        status: 'open',
+        type: 'revert',
+        priority: originalCr.priority || 'medium',
+        category: originalCr.category || 'general',
       });
 
       // Process items - Generate inverse operations
@@ -1322,31 +1205,29 @@ export class ChangeRequestService {
 
         // Determine ActionGroup type for revert
         let actionGroupType: ActionGroupType = ACTION_GROUP_TYPES.UPDATE_ENTITY;
-        if (inverseOpType === "CREATE")
-          actionGroupType = ACTION_GROUP_TYPES.CREATE_ENTITY;
-        else if (inverseOpType === "DELETE")
-          actionGroupType = ACTION_GROUP_TYPES.DELETE_ENTITY;
+        if (inverseOpType === 'CREATE') actionGroupType = ACTION_GROUP_TYPES.CREATE_ENTITY;
+        else if (inverseOpType === 'DELETE') actionGroupType = ACTION_GROUP_TYPES.DELETE_ENTITY;
 
         // Find or create ActionGroup for the new CR
         let actionGroup = await ActionGroup.query(trx)
-          .where("changeRequestId", newCrKey)
-          .where("actionType", actionGroupType)
+          .where('changeRequestId', newCrKey)
+          .where('actionType', actionGroupType)
           .first();
 
         if (!actionGroup) {
-          const cleanTable = item.targetTable.startsWith("g_")
+          const cleanTable = item.targetTable.startsWith('g_')
             ? item.targetTable.slice(2)
             : item.targetTable;
           const actionLabel =
-            inverseOpType === "CREATE"
-              ? "Restore"
-              : inverseOpType === "DELETE"
-                ? "Remove"
-                : "Revert";
+            inverseOpType === 'CREATE'
+              ? 'Restore'
+              : inverseOpType === 'DELETE'
+                ? 'Remove'
+                : 'Revert';
 
           const maxOrder = (await ActionGroup.query(trx)
-            .where("changeRequestId", newCrKey)
-            .max("orderIndex as maxOrder")
+            .where('changeRequestId', newCrKey)
+            .max('orderIndex as maxOrder')
             .first()) as any;
           const nextOrder = (maxOrder?.maxOrder ?? -1) + 1;
 
@@ -1366,26 +1247,24 @@ export class ChangeRequestService {
         let currentLiveData: Record<string, any> | null = null;
         let currentVersion: number | undefined;
 
-        if (inverseOpType !== "CREATE") {
+        if (inverseOpType !== 'CREATE') {
           // For UPDATE/DELETE revert, need to capture current state
           try {
-            currentLiveData = await trx(item.targetTable)
-              .where("id", item.targetId)
-              .first();
+            currentLiveData = await trx(item.targetTable).where('id', item.targetId).first();
             if (currentLiveData?.version !== undefined) {
               currentVersion = currentLiveData.version;
             }
           } catch (err) {
             logger.warn(
               `[Revert] Could not fetch live data for ${item.targetTable}:${item.targetId}`,
-              err,
+              err
             );
           }
         }
 
         // Calculate afterData by applying inverse ops to current live data
         const afterData =
-          inverseOpType === "DELETE"
+          inverseOpType === 'DELETE'
             ? null
             : applyOpsToData(currentLiveData, inverseOps, inverseOpType);
 
@@ -1415,16 +1294,16 @@ export class ChangeRequestService {
           requesterName: requester?.name || requester?.email,
         });
       } catch (err) {
-        logger.error("[ChangeRequest] Failed to send revert notification", err);
+        logger.error('[ChangeRequest] Failed to send revert notification', err);
       }
 
       // Return the full CR with items AND action groups
       const result = await ChangeRequest.query(trx)
         .findById(newCr.id)
-        .withGraphFetched("[changeItems, actionGroups.changeItems]");
+        .withGraphFetched('[changeItems, actionGroups.changeItems]');
 
       if (!result) {
-        throw new Error("Failed to create revert request");
+        throw new Error('Failed to create revert request');
       }
 
       return result;
@@ -1437,31 +1316,26 @@ export class ChangeRequestService {
   static async cleanupRejected(retentionDays: number): Promise<number> {
     const thresholdDate = new Date();
     thresholdDate.setDate(thresholdDate.getDate() - retentionDays);
-    const isoThreshold = thresholdDate
-      .toISOString()
-      .slice(0, 19)
-      .replace("T", " ");
+    const isoThreshold = thresholdDate.toISOString().slice(0, 19).replace('T', ' ');
 
     return await transaction(ChangeRequest.knex(), async (trx) => {
       // Find IDs to delete first to handle related data
       const oldRequests = await ChangeRequest.query(trx)
-        .where("status", "rejected")
-        .where("rejectedAt", "<", isoThreshold)
-        .select("id");
+        .where('status', 'rejected')
+        .where('rejectedAt', '<', isoThreshold)
+        .select('id');
 
       const ids = oldRequests.map((r) => r.id);
       if (ids.length === 0) return 0;
 
       // Delete related items and approvals
-      await ChangeItem.query(trx).whereIn("changeRequestId", ids).delete();
-      await Approval.query(trx).whereIn("changeRequestId", ids).delete();
+      await ChangeItem.query(trx).whereIn('changeRequestId', ids).delete();
+      await Approval.query(trx).whereIn('changeRequestId', ids).delete();
 
       // Delete requests
-      const deleted = await ChangeRequest.query(trx)
-        .whereIn("id", ids)
-        .delete();
+      const deleted = await ChangeRequest.query(trx).whereIn('id', ids).delete();
 
-      logger.info("[ChangeRequest] Cleanup completed", {
+      logger.info('[ChangeRequest] Cleanup completed', {
         deleted,
         retentionDays,
       });
@@ -1476,18 +1350,18 @@ export class ChangeRequestService {
    */
   static async getChangeRequestCounts(
     environment: string,
-    userId: number,
+    userId: number
   ): Promise<Record<string, number>> {
     const counts = await ChangeRequest.query()
-      .where("environment", environment)
+      .where('environment', environment)
       .where((builder) => {
-        builder.whereNot("status", "draft").orWhere((subBuilder) => {
-          subBuilder.where("status", "draft").where("requesterId", userId);
+        builder.whereNot('status', 'draft').orWhere((subBuilder) => {
+          subBuilder.where('status', 'draft').where('requesterId', userId);
         });
       })
-      .groupBy("status")
-      .select("status")
-      .count("* as count");
+      .groupBy('status')
+      .select('status')
+      .count('* as count');
 
     const result: Record<string, number> = {
       all: 0,
@@ -1539,11 +1413,11 @@ function normalizeForComparison(value: unknown): unknown {
 
   // Normalize boolean/number for MySQL TINYINT compatibility
   // MySQL stores boolean as 0/1, but JS may have true/false
-  if (typeof value === "boolean") {
+  if (typeof value === 'boolean') {
     return value ? 1 : 0;
   }
   // Also normalize 0/1 to stay consistent
-  if (typeof value === "number" && (value === 0 || value === 1)) {
+  if (typeof value === 'number' && (value === 0 || value === 1)) {
     return value;
   }
 
@@ -1551,7 +1425,7 @@ function normalizeForComparison(value: unknown): unknown {
     return value.map((item) => normalizeForComparison(item));
   }
 
-  if (typeof value === "object") {
+  if (typeof value === 'object') {
     const obj = value as Record<string, unknown>;
     const sortedKeys = Object.keys(obj).sort();
     const result: Record<string, unknown> = {};

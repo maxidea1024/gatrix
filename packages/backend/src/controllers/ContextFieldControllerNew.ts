@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
-import { CONTEXT_FIELDS, CONTEXT_OPERATORS } from "../types/contextFields";
-import logger from "../config/logger";
-import { ContextFieldModel } from "../models/ContextField";
+import { Request, Response } from 'express';
+import { CONTEXT_FIELDS, CONTEXT_OPERATORS } from '../types/contextFields';
+import logger from '../config/logger';
+import { ContextFieldModel } from '../models/ContextField';
 
 export class ContextFieldController {
   /**
@@ -14,11 +14,7 @@ export class ContextFieldController {
       const search = req.query.search as string;
       const type = req.query.type as string;
       const isActive =
-        req.query.isActive === "true"
-          ? true
-          : req.query.isActive === "false"
-            ? false
-            : undefined;
+        req.query.isActive === 'true' ? true : req.query.isActive === 'false' ? false : undefined;
 
       // Get fields from database only (no more mock data)
       const { fields, total } = await ContextFieldModel.findAll({
@@ -43,10 +39,10 @@ export class ContextFieldController {
         },
       });
     } catch (error) {
-      logger.error("Error getting context fields:", error);
+      logger.error('Error getting context fields:', error);
       res.status(500).json({
         success: false,
-        message: "Failed to get context fields",
+        message: 'Failed to get context fields',
       });
     }
   }
@@ -62,7 +58,7 @@ export class ContextFieldController {
       if (!field) {
         res.status(404).json({
           success: false,
-          message: "Context field not found",
+          message: 'Context field not found',
         });
         return;
       }
@@ -72,10 +68,10 @@ export class ContextFieldController {
         data: field,
       });
     } catch (error) {
-      logger.error("Error getting context field:", error);
+      logger.error('Error getting context field:', error);
       res.status(500).json({
         success: false,
-        message: "Failed to get context field",
+        message: 'Failed to get context field',
       });
     }
   }
@@ -83,15 +79,12 @@ export class ContextFieldController {
   /**
    * Get operators for a specific field type
    */
-  static async getOperatorsForFieldType(
-    req: Request,
-    res: Response,
-  ): Promise<void> {
+  static async getOperatorsForFieldType(req: Request, res: Response): Promise<void> {
     try {
       const { fieldType } = req.params;
 
       const operators = CONTEXT_OPERATORS.filter((op) =>
-        op.supportedFieldTypes.includes(fieldType as any),
+        op.supportedFieldTypes.includes(fieldType as any)
       );
 
       res.json({
@@ -99,10 +92,10 @@ export class ContextFieldController {
         data: operators,
       });
     } catch (error) {
-      logger.error("Error getting operators for field type:", error);
+      logger.error('Error getting operators for field type:', error);
       res.status(500).json({
         success: false,
-        message: "Failed to get operators",
+        message: 'Failed to get operators',
       });
     }
   }
@@ -117,10 +110,10 @@ export class ContextFieldController {
         data: CONTEXT_OPERATORS,
       });
     } catch (error) {
-      logger.error("Error getting all operators:", error);
+      logger.error('Error getting all operators:', error);
       res.status(500).json({
         success: false,
-        message: "Failed to get operators",
+        message: 'Failed to get operators',
       });
     }
   }
@@ -131,22 +124,14 @@ export class ContextFieldController {
   static async createContextField(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.userId || (req as any).user?.id || 1;
-      const {
-        key,
-        name,
-        description,
-        type,
-        defaultValue,
-        isRequired,
-        options,
-      } = req.body;
+      const { key, name, description, type, defaultValue, isRequired, options } = req.body;
 
       // Validate key format
       if (!ContextFieldModel.validateKey(key)) {
         res.status(400).json({
           success: false,
           message:
-            "Invalid key format. Key must start with a letter and contain only letters, numbers, and underscores.",
+            'Invalid key format. Key must start with a letter and contain only letters, numbers, and underscores.',
         });
         return;
       }
@@ -156,20 +141,16 @@ export class ContextFieldController {
       if (existing) {
         res.status(409).json({
           success: false,
-          message: "Context field with this key already exists",
+          message: 'Context field with this key already exists',
         });
         return;
       }
 
       // Validate options for array type
-      if (
-        type === "array" &&
-        options &&
-        !ContextFieldModel.validateOptions(type, options)
-      ) {
+      if (type === 'array' && options && !ContextFieldModel.validateOptions(type, options)) {
         res.status(400).json({
           success: false,
-          message: "Invalid options format for array type",
+          message: 'Invalid options format for array type',
         });
         return;
       }
@@ -190,13 +171,13 @@ export class ContextFieldController {
       res.status(201).json({
         success: true,
         data: created,
-        message: "Context field created successfully",
+        message: 'Context field created successfully',
       });
     } catch (error) {
-      logger.error("Error creating context field:", error);
+      logger.error('Error creating context field:', error);
       res.status(500).json({
         success: false,
-        message: "Failed to create context field",
+        message: 'Failed to create context field',
       });
     }
   }
@@ -215,7 +196,7 @@ export class ContextFieldController {
       if (!existing) {
         res.status(404).json({
           success: false,
-          message: "Context field not found",
+          message: 'Context field not found',
         });
         return;
       }
@@ -224,20 +205,20 @@ export class ContextFieldController {
       if (existing.isSystem) {
         res.status(403).json({
           success: false,
-          message: "Cannot update system context fields",
+          message: 'Cannot update system context fields',
         });
         return;
       }
 
       // Validate options for array type
       if (
-        existing.type === "array" &&
+        existing.type === 'array' &&
         options &&
         !ContextFieldModel.validateOptions(existing.type, options)
       ) {
         res.status(400).json({
           success: false,
-          message: "Invalid options format for array type",
+          message: 'Invalid options format for array type',
         });
         return;
       }
@@ -256,13 +237,13 @@ export class ContextFieldController {
       res.json({
         success: true,
         data: updated,
-        message: "Context field updated successfully",
+        message: 'Context field updated successfully',
       });
     } catch (error) {
-      logger.error("Error updating context field:", error);
+      logger.error('Error updating context field:', error);
       res.status(500).json({
         success: false,
-        message: "Failed to update context field",
+        message: 'Failed to update context field',
       });
     }
   }
@@ -279,7 +260,7 @@ export class ContextFieldController {
       if (!existing) {
         res.status(404).json({
           success: false,
-          message: "Context field not found",
+          message: 'Context field not found',
         });
         return;
       }
@@ -288,7 +269,7 @@ export class ContextFieldController {
       if (existing.isSystem) {
         res.status(403).json({
           success: false,
-          message: "Cannot delete system context fields",
+          message: 'Cannot delete system context fields',
         });
         return;
       }
@@ -298,19 +279,19 @@ export class ContextFieldController {
       if (deleted) {
         res.json({
           success: true,
-          message: "Context field deleted successfully",
+          message: 'Context field deleted successfully',
         });
       } else {
         res.status(500).json({
           success: false,
-          message: "Failed to delete context field",
+          message: 'Failed to delete context field',
         });
       }
     } catch (error) {
-      logger.error("Error deleting context field:", error);
+      logger.error('Error deleting context field:', error);
       res.status(500).json({
         success: false,
-        message: "Failed to delete context field",
+        message: 'Failed to delete context field',
       });
     }
   }
@@ -326,20 +307,20 @@ export class ContextFieldController {
       if (!Array.isArray(conditions)) {
         res.status(400).json({
           success: false,
-          message: "Conditions must be an array",
+          message: 'Conditions must be an array',
         });
         return;
       }
 
       res.json({
         success: true,
-        data: { valid: true, message: "Conditions are valid" },
+        data: { valid: true, message: 'Conditions are valid' },
       });
     } catch (error) {
-      logger.error("Error validating conditions:", error);
+      logger.error('Error validating conditions:', error);
       res.status(500).json({
         success: false,
-        message: "Failed to validate conditions",
+        message: 'Failed to validate conditions',
       });
     }
   }
@@ -356,15 +337,15 @@ export class ContextFieldController {
         success: true,
         data: {
           result: true,
-          message: "Conditions test completed",
+          message: 'Conditions test completed',
           matchedConditions: conditions?.length || 0,
         },
       });
     } catch (error) {
-      logger.error("Error testing conditions:", error);
+      logger.error('Error testing conditions:', error);
       res.status(500).json({
         success: false,
-        message: "Failed to test conditions",
+        message: 'Failed to test conditions',
       });
     }
   }
@@ -376,22 +357,22 @@ export class ContextFieldController {
     try {
       const sampleContexts = [
         {
-          userId: "12345",
+          userId: '12345',
           userLevel: 25,
           isPremium: true,
-          platform: "ios",
-          country: "KR",
+          platform: 'ios',
+          country: 'KR',
           registrationDays: 30,
           lastLoginDays: 1,
           totalPurchases: 5,
           averageSessionMinutes: 45,
         },
         {
-          userId: "67890",
+          userId: '67890',
           userLevel: 5,
           isPremium: false,
-          platform: "android",
-          country: "US",
+          platform: 'android',
+          country: 'US',
           registrationDays: 3,
           lastLoginDays: 0,
           totalPurchases: 0,
@@ -404,10 +385,10 @@ export class ContextFieldController {
         data: { contexts: sampleContexts },
       });
     } catch (error) {
-      logger.error("Error getting sample contexts:", error);
+      logger.error('Error getting sample contexts:', error);
       res.status(500).json({
         success: false,
-        message: "Failed to get sample contexts",
+        message: 'Failed to get sample contexts',
       });
     }
   }

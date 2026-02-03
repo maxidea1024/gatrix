@@ -1,5 +1,5 @@
-import db from "../config/knex";
-import logger from "../config/logger";
+import db from '../config/knex';
+import logger from '../config/logger';
 
 export interface ClientVersionFilters {
   environment: string;
@@ -10,9 +10,9 @@ export interface ClientVersionFilters {
   limit?: number;
   offset?: number;
   sortBy?: string;
-  sortOrder?: "ASC" | "DESC";
+  sortOrder?: 'ASC' | 'DESC';
   tags?: string[];
-  tagsOperator?: "any_of" | "include_all"; // For tags filtering logic
+  tagsOperator?: 'any_of' | 'include_all'; // For tags filtering logic
 }
 
 export interface ClientVersionListResult {
@@ -21,13 +21,13 @@ export interface ClientVersionListResult {
 }
 
 export enum ClientStatus {
-  ONLINE = "ONLINE",
-  OFFLINE = "OFFLINE",
-  RECOMMENDED_UPDATE = "RECOMMENDED_UPDATE",
-  FORCED_UPDATE = "FORCED_UPDATE",
-  UNDER_REVIEW = "UNDER_REVIEW",
-  BLOCKED_PATCH_ALLOWED = "BLOCKED_PATCH_ALLOWED",
-  MAINTENANCE = "MAINTENANCE",
+  ONLINE = 'ONLINE',
+  OFFLINE = 'OFFLINE',
+  RECOMMENDED_UPDATE = 'RECOMMENDED_UPDATE',
+  FORCED_UPDATE = 'FORCED_UPDATE',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  BLOCKED_PATCH_ALLOWED = 'BLOCKED_PATCH_ALLOWED',
+  MAINTENANCE = 'MAINTENANCE',
 }
 
 export interface ClientVersionAttributes {
@@ -57,7 +57,7 @@ export interface ClientVersionAttributes {
 export interface ClientVersionMaintenanceLocale {
   id?: number;
   clientVersionId: number;
-  lang: "ko" | "en" | "zh";
+  lang: 'ko' | 'en' | 'zh';
   message: string;
   createdBy?: number;
   updatedBy?: number;
@@ -67,11 +67,11 @@ export interface ClientVersionMaintenanceLocale {
 
 export interface ClientVersionCreationAttributes extends Omit<
   ClientVersionAttributes,
-  "id" | "createdAt" | "updatedAt"
+  'id' | 'createdAt' | 'updatedAt'
 > {
   maintenanceLocales?: Omit<
     ClientVersionMaintenanceLocale,
-    "id" | "clientVersionId" | "createdAt" | "updatedAt"
+    'id' | 'clientVersionId' | 'createdAt' | 'updatedAt'
   >[];
 }
 
@@ -83,66 +83,60 @@ export class ClientVersionModel {
   // 사용 가능한 버전 목록 조회 (distinct)
   static async getDistinctVersions(environment: string): Promise<string[]> {
     try {
-      const result = await db("g_client_versions")
-        .distinct("clientVersion")
-        .where("environment", environment)
-        .orderBy("clientVersion", "desc");
+      const result = await db('g_client_versions')
+        .distinct('clientVersion')
+        .where('environment', environment)
+        .orderBy('clientVersion', 'desc');
 
       return result.map((row) => row.clientVersion);
     } catch (error) {
-      logger.error("Error getting distinct versions:", error);
+      logger.error('Error getting distinct versions:', error);
       throw error;
     }
   }
 
-  static async findAll(
-    filters: ClientVersionFilters,
-  ): Promise<ClientVersionListResult> {
+  static async findAll(filters: ClientVersionFilters): Promise<ClientVersionListResult> {
     try {
       // 기본값 설정
-      const limit = filters?.limit
-        ? parseInt(filters.limit.toString(), 10)
-        : 10;
-      const offset = filters?.offset
-        ? parseInt(filters.offset.toString(), 10)
-        : 0;
-      const sortBy = filters?.sortBy || "clientVersion";
-      const sortOrder = filters?.sortOrder || "DESC";
+      const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 10;
+      const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
+      const sortBy = filters?.sortBy || 'clientVersion';
+      const sortOrder = filters?.sortOrder || 'DESC';
       const environment = filters.environment;
 
       // 기본 쿼리 빌더 with environment filter
       const baseQuery = () =>
-        db("g_client_versions as cv")
-          .leftJoin("g_users as creator", "cv.createdBy", "creator.id")
-          .leftJoin("g_users as updater", "cv.updatedBy", "updater.id")
-          .where("cv.environment", environment);
+        db('g_client_versions as cv')
+          .leftJoin('g_users as creator', 'cv.createdBy', 'creator.id')
+          .leftJoin('g_users as updater', 'cv.updatedBy', 'updater.id')
+          .where('cv.environment', environment);
 
       // 필터 적용 함수
       const applyFilters = (query: any) => {
         // clientVersion filter - support both single value and array (any_of)
         if (filters?.clientVersion) {
           if (Array.isArray(filters.clientVersion)) {
-            query.whereIn("cv.clientVersion", filters.clientVersion);
+            query.whereIn('cv.clientVersion', filters.clientVersion);
           } else {
-            query.where("cv.clientVersion", filters.clientVersion);
+            query.where('cv.clientVersion', filters.clientVersion);
           }
         }
 
         // platform filter - support both single value and array (any_of)
         if (filters?.platform) {
           if (Array.isArray(filters.platform)) {
-            query.whereIn("cv.platform", filters.platform);
+            query.whereIn('cv.platform', filters.platform);
           } else {
-            query.where("cv.platform", filters.platform);
+            query.where('cv.platform', filters.platform);
           }
         }
 
         // clientStatus filter - support both single value and array (any_of)
         if (filters?.clientStatus) {
           if (Array.isArray(filters.clientStatus)) {
-            query.whereIn("cv.clientStatus", filters.clientStatus);
+            query.whereIn('cv.clientStatus', filters.clientStatus);
           } else {
-            query.where("cv.clientStatus", filters.clientStatus);
+            query.where('cv.clientStatus', filters.clientStatus);
           }
         }
 
@@ -150,42 +144,40 @@ export class ClientVersionModel {
         if (filters?.guestModeAllowed !== undefined) {
           if (Array.isArray(filters.guestModeAllowed)) {
             // Convert boolean array to number array (true -> 1, false -> 0)
-            const guestModeValues = filters.guestModeAllowed.map((val) =>
-              val ? 1 : 0,
-            );
-            query.whereIn("cv.guestModeAllowed", guestModeValues);
+            const guestModeValues = filters.guestModeAllowed.map((val) => (val ? 1 : 0));
+            query.whereIn('cv.guestModeAllowed', guestModeValues);
           } else {
             // TINYINT 타입이므로 boolean을 숫자로 변환 (true -> 1, false -> 0)
             const guestModeValue = filters.guestModeAllowed ? 1 : 0;
-            query.where("cv.guestModeAllowed", guestModeValue);
+            query.where('cv.guestModeAllowed', guestModeValue);
           }
         }
 
         // 태그 필터링 - support both any_of and include_all
         if (filters?.tags && filters.tags.length > 0) {
-          const tagsOperator = filters.tagsOperator || "any_of";
+          const tagsOperator = filters.tagsOperator || 'any_of';
 
-          if (tagsOperator === "include_all") {
+          if (tagsOperator === 'include_all') {
             // AND 조건: 모든 태그를 포함해야 함
             filters.tags.forEach((tagId) => {
               query.whereExists((subquery: any) => {
                 subquery
-                  .select("*")
-                  .from("g_tag_assignments as ta")
-                  .whereRaw("ta.entityId = cv.id")
-                  .where("ta.entityType", "client_version")
-                  .where("ta.tagId", tagId);
+                  .select('*')
+                  .from('g_tag_assignments as ta')
+                  .whereRaw('ta.entityId = cv.id')
+                  .where('ta.entityType', 'client_version')
+                  .where('ta.tagId', tagId);
               });
             });
           } else {
             // OR 조건: 태그 중 하나라도 포함하면 됨
             query.whereExists((subquery: any) => {
               subquery
-                .select("*")
-                .from("g_tag_assignments as ta")
-                .whereRaw("ta.entityId = cv.id")
-                .where("ta.entityType", "client_version")
-                .whereIn("ta.tagId", filters.tags);
+                .select('*')
+                .from('g_tag_assignments as ta')
+                .whereRaw('ta.entityId = cv.id')
+                .where('ta.entityType', 'client_version')
+                .whereIn('ta.tagId', filters.tags);
             });
           }
         }
@@ -194,28 +186,23 @@ export class ClientVersionModel {
       };
 
       // Count 쿼리
-      const countQuery = applyFilters(baseQuery())
-        .count("cv.id as total")
-        .first();
+      const countQuery = applyFilters(baseQuery()).count('cv.id as total').first();
 
       // Data 쿼리
       const dataQuery = applyFilters(baseQuery())
         .select([
-          "cv.*",
-          "creator.name as createdByName",
-          "creator.email as createdByEmail",
-          "updater.name as updatedByName",
-          "updater.email as updatedByEmail",
+          'cv.*',
+          'creator.name as createdByName',
+          'creator.email as createdByEmail',
+          'updater.name as updatedByName',
+          'updater.email as updatedByEmail',
         ])
         .orderBy(`cv.${sortBy}`, sortOrder)
         .limit(limit)
         .offset(offset);
 
       // 병렬 실행
-      const [countResult, dataResults] = await Promise.all([
-        countQuery,
-        dataQuery,
-      ]);
+      const [countResult, dataResults] = await Promise.all([countQuery, dataQuery]);
 
       const total = countResult?.total || 0;
 
@@ -227,7 +214,7 @@ export class ClientVersionModel {
             ...cv,
             tags,
           };
-        }),
+        })
       );
 
       return {
@@ -235,32 +222,26 @@ export class ClientVersionModel {
         total,
       };
     } catch (error) {
-      logger.error("Error finding client versions:", error);
+      logger.error('Error finding client versions:', error);
       throw error;
     }
   }
 
-  static async findById(
-    id: number,
-    environment: string,
-    trx?: any,
-  ): Promise<any | null> {
+  static async findById(id: number, environment: string, trx?: any): Promise<any | null> {
     try {
-      const query = trx
-        ? trx("g_client_versions as cv")
-        : db("g_client_versions as cv");
+      const query = trx ? trx('g_client_versions as cv') : db('g_client_versions as cv');
       const clientVersion = await query
-        .leftJoin("g_users as creator", "cv.createdBy", "creator.id")
-        .leftJoin("g_users as updater", "cv.updatedBy", "updater.id")
+        .leftJoin('g_users as creator', 'cv.createdBy', 'creator.id')
+        .leftJoin('g_users as updater', 'cv.updatedBy', 'updater.id')
         .select([
-          "cv.*",
-          "creator.name as createdByName",
-          "creator.email as createdByEmail",
-          "updater.name as updatedByName",
-          "updater.email as updatedByEmail",
+          'cv.*',
+          'creator.name as createdByName',
+          'creator.email as createdByEmail',
+          'updater.name as updatedByName',
+          'updater.email as updatedByEmail',
         ])
-        .where("cv.id", id)
-        .where("cv.environment", environment)
+        .where('cv.id', id)
+        .where('cv.environment', environment)
         .first();
 
       if (!clientVersion) {
@@ -272,11 +253,11 @@ export class ClientVersionModel {
 
       // 점검 메시지 로케일 정보 로드
       const localesQuery = trx
-        ? trx("g_client_version_maintenance_locales")
-        : db("g_client_version_maintenance_locales");
+        ? trx('g_client_version_maintenance_locales')
+        : db('g_client_version_maintenance_locales');
       const maintenanceLocales = await localesQuery
-        .where("clientVersionId", id)
-        .select("lang", "message");
+        .where('clientVersionId', id)
+        .select('lang', 'message');
 
       return {
         ...clientVersion,
@@ -284,7 +265,7 @@ export class ClientVersionModel {
         maintenanceLocales: maintenanceLocales || [],
       };
     } catch (error) {
-      logger.error("Error finding client version by ID:", error);
+      logger.error('Error finding client version by ID:', error);
       throw error;
     }
   }
@@ -295,7 +276,7 @@ export class ClientVersionModel {
         // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
         const { tags, maintenanceLocales, ...clientVersionData } = data;
 
-        const [insertId] = await trx("g_client_versions").insert({
+        const [insertId] = await trx('g_client_versions').insert({
           ...clientVersionData,
           environment: environment,
           createdAt: new Date(),
@@ -314,32 +295,26 @@ export class ClientVersionModel {
             updatedAt: new Date(),
           }));
 
-          await trx("g_client_version_maintenance_locales").insert(
-            localeInserts,
-          );
+          await trx('g_client_version_maintenance_locales').insert(localeInserts);
         }
 
         return await this.findById(insertId, environment, trx);
       });
     } catch (error) {
-      logger.error("Error creating client version:", error);
+      logger.error('Error creating client version:', error);
       throw error;
     }
   }
 
-  static async update(
-    id: number,
-    data: any,
-    environment: string,
-  ): Promise<any> {
+  static async update(id: number, data: any, environment: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
         // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
         const { tags, maintenanceLocales, ...clientVersionData } = data;
 
-        await trx("g_client_versions")
-          .where("id", id)
-          .where("environment", environment)
+        await trx('g_client_versions')
+          .where('id', id)
+          .where('environment', environment)
           .update({
             ...clientVersionData,
             updatedAt: new Date(),
@@ -348,9 +323,7 @@ export class ClientVersionModel {
         // 점검 메시지 로케일 처리
         if (maintenanceLocales !== undefined) {
           // 기존 로케일 삭제
-          await trx("g_client_version_maintenance_locales")
-            .where("clientVersionId", id)
-            .del();
+          await trx('g_client_version_maintenance_locales').where('clientVersionId', id).del();
 
           // 새 로케일 추가
           if (maintenanceLocales.length > 0) {
@@ -364,28 +337,23 @@ export class ClientVersionModel {
               updatedAt: new Date(),
             }));
 
-            await trx("g_client_version_maintenance_locales").insert(
-              localeInserts,
-            );
+            await trx('g_client_version_maintenance_locales').insert(localeInserts);
           }
         }
 
         return await this.findById(id, environment, trx);
       });
     } catch (error) {
-      logger.error("Error updating client version:", error);
+      logger.error('Error updating client version:', error);
       throw error;
     }
   }
 
   static async delete(id: number, environment: string): Promise<void> {
     try {
-      await db("g_client_versions")
-        .where("id", id)
-        .where("environment", environment)
-        .del();
+      await db('g_client_versions').where('id', id).where('environment', environment).del();
     } catch (error) {
-      logger.error("Error deleting client version:", error);
+      logger.error('Error deleting client version:', error);
       throw error;
     }
   }
@@ -393,7 +361,7 @@ export class ClientVersionModel {
   // 추가 메서드들
   static async bulkCreate(
     data: ClientVersionCreationAttributes[],
-    environment: string,
+    environment: string
   ): Promise<any> {
     try {
       const insertedIds: number[] = [];
@@ -404,7 +372,7 @@ export class ClientVersionModel {
           // tags 필드는 별도 테이블에서 관리하므로 제거
           const { maintenanceLocales, ...clientVersionData } = item as any;
 
-          const [insertId] = await trx("g_client_versions").insert({
+          const [insertId] = await trx('g_client_versions').insert({
             ...clientVersionData,
             environment: environment,
             createdAt: new Date(),
@@ -423,13 +391,13 @@ export class ClientVersionModel {
         } else {
           logger.warn(`Failed to find created client version with id: ${id}`);
           // 기본 객체라도 반환하여 null 방지
-          results.push({ id, platform: "unknown", clientVersion: "unknown" });
+          results.push({ id, platform: 'unknown', clientVersion: 'unknown' });
         }
       }
 
       return results;
     } catch (error) {
-      logger.error("Error bulk creating client versions:", error);
+      logger.error('Error bulk creating client versions:', error);
       throw error;
     }
   }
@@ -459,17 +427,15 @@ export class ClientVersionModel {
         updateData.messageTemplateId = data.messageTemplateId;
       }
 
-      await db("g_client_versions")
-        .whereIn("id", data.ids)
-        .where("environment", environment)
+      await db('g_client_versions')
+        .whereIn('id', data.ids)
+        .where('environment', environment)
         .update(updateData);
 
       // 언어별 메시지 처리
       if (data.maintenanceLocales && Array.isArray(data.maintenanceLocales)) {
         // 기존 언어별 메시지 삭제
-        await db("g_client_version_maintenance_locales")
-          .whereIn("clientVersionId", data.ids)
-          .del();
+        await db('g_client_version_maintenance_locales').whereIn('clientVersionId', data.ids).del();
 
         // 새로운 언어별 메시지 추가
         if (data.maintenanceLocales.length > 0) {
@@ -486,31 +452,29 @@ export class ClientVersionModel {
             }
           }
           if (localeInserts.length > 0) {
-            await db("g_client_version_maintenance_locales").insert(
-              localeInserts,
-            );
+            await db('g_client_version_maintenance_locales').insert(localeInserts);
           }
         }
       }
 
       return data.ids.length;
     } catch (error) {
-      logger.error("Error bulk updating client version status:", error);
+      logger.error('Error bulk updating client version status:', error);
       throw error;
     }
   }
 
   static async getPlatforms(environment: string): Promise<string[]> {
     try {
-      const result = await db("g_client_versions")
-        .distinct("platform")
-        .select("platform")
-        .where("environment", environment)
-        .whereNotNull("platform")
-        .orderBy("platform");
+      const result = await db('g_client_versions')
+        .distinct('platform')
+        .select('platform')
+        .where('environment', environment)
+        .whereNotNull('platform')
+        .orderBy('platform');
       return result.map((row) => row.platform);
     } catch (error) {
-      logger.error("Error getting platforms:", error);
+      logger.error('Error getting platforms:', error);
       throw error;
     }
   }
@@ -519,28 +483,26 @@ export class ClientVersionModel {
     platform: string,
     clientVersion: string,
     excludeId?: number,
-    environment?: string,
+    environment?: string
   ): Promise<boolean> {
     try {
       if (!environment) {
-        throw new Error(
-          "Environment is required for checking duplicate client versions",
-        );
+        throw new Error('Environment is required for checking duplicate client versions');
       }
 
-      let query = db("g_client_versions")
-        .where("platform", platform)
-        .where("clientVersion", clientVersion)
-        .where("environment", environment);
+      let query = db('g_client_versions')
+        .where('platform', platform)
+        .where('clientVersion', clientVersion)
+        .where('environment', environment);
 
       if (excludeId) {
-        query = query.where("id", "!=", excludeId);
+        query = query.where('id', '!=', excludeId);
       }
 
       const result = await query.first();
       return !!result;
     } catch (error) {
-      logger.error("Error checking duplicate:", error);
+      logger.error('Error checking duplicate:', error);
       throw error;
     }
   }
@@ -549,82 +511,74 @@ export class ClientVersionModel {
   static async setTags(
     clientVersionId: number,
     tagIds: number[],
-    createdBy?: number,
+    createdBy?: number
   ): Promise<void> {
     try {
-      logger.info(
-        `Setting tags for client version ${clientVersionId}:`,
-        tagIds,
-      );
+      logger.info(`Setting tags for client version ${clientVersionId}:`, tagIds);
 
       await db.transaction(async (trx) => {
         // 기존 태그 할당 삭제
-        const deletedCount = await trx("g_tag_assignments")
-          .where("entityType", "client_version")
-          .where("entityId", clientVersionId)
+        const deletedCount = await trx('g_tag_assignments')
+          .where('entityType', 'client_version')
+          .where('entityId', clientVersionId)
           .del();
 
         logger.info(
-          `Deleted ${deletedCount} existing tag assignments for client version ${clientVersionId}`,
+          `Deleted ${deletedCount} existing tag assignments for client version ${clientVersionId}`
         );
 
         // 새 태그 할당 추가
         if (tagIds.length > 0) {
           const assignments = tagIds.map((tagId) => ({
-            entityType: "client_version",
+            entityType: 'client_version',
             entityId: clientVersionId,
             tagId: tagId,
             createdBy: createdBy || 1,
             createdAt: new Date(),
           }));
 
+          logger.info(`Inserting ${assignments.length} new tag assignments:`, assignments);
+          await trx('g_tag_assignments').insert(assignments);
           logger.info(
-            `Inserting ${assignments.length} new tag assignments:`,
-            assignments,
-          );
-          await trx("g_tag_assignments").insert(assignments);
-          logger.info(
-            `Successfully inserted tag assignments for client version ${clientVersionId}`,
+            `Successfully inserted tag assignments for client version ${clientVersionId}`
           );
         }
       });
     } catch (error) {
-      logger.error("Error setting client version tags:", error);
+      logger.error('Error setting client version tags:', error);
       throw error;
     }
   }
 
   static async getTags(clientVersionId: number, trx?: any): Promise<any[]> {
     try {
-      const query = trx
-        ? trx("g_tag_assignments as ta")
-        : db("g_tag_assignments as ta");
+      const query = trx ? trx('g_tag_assignments as ta') : db('g_tag_assignments as ta');
       const tags = await query
-        .join("g_tags as t", "ta.tagId", "t.id")
-        .select(["t.id", "t.name", "t.color", "t.description"])
-        .where("ta.entityType", "client_version")
-        .where("ta.entityId", clientVersionId)
-        .orderBy("t.name");
+        .join('g_tags as t', 'ta.tagId', 't.id')
+        .select(['t.id', 't.name', 't.color', 't.description'])
+        .where('ta.entityType', 'client_version')
+        .where('ta.entityId', clientVersionId)
+        .orderBy('t.name');
 
       return tags;
     } catch (error) {
-      logger.error("Error getting client version tags:", error);
+      logger.error('Error getting client version tags:', error);
       throw error;
     }
   }
 
   static async getMaintenanceLocales(
-    clientVersionId: number,
+    clientVersionId: number
   ): Promise<ClientVersionMaintenanceLocale[]> {
     try {
-      const locales = await db("g_client_version_maintenance_locales")
-        .select(["lang", "message"])
-        .where("clientVersionId", clientVersionId)
-        .orderBy("lang");
+      const locales = await db('g_client_version_maintenance_locales')
+        .select(['lang', 'message'])
+        .where('clientVersionId', clientVersionId)
+        .orderBy('lang');
 
       return locales;
     } catch (error) {
-      logger.error("Error getting maintenance locales:", error);
+      logger.error('Error getting maintenance locales:', error);
       throw error;
     }
   }
@@ -635,18 +589,18 @@ export class ClientVersionModel {
   static async deleteAll(): Promise<number> {
     try {
       // First delete all maintenance locales
-      await db("g_client_version_maintenance_locales").del();
+      await db('g_client_version_maintenance_locales').del();
 
       // Then delete all tag assignments
-      await db("g_tag_assignments").where("entityType", "client_version").del();
+      await db('g_tag_assignments').where('entityType', 'client_version').del();
 
       // Finally delete all client versions
-      const deletedCount = await db("g_client_versions").del();
+      const deletedCount = await db('g_client_versions').del();
 
       logger.info(`Deleted all client versions: ${deletedCount} records`);
       return deletedCount;
     } catch (error) {
-      logger.error("Error deleting all client versions:", error);
+      logger.error('Error deleting all client versions:', error);
       throw error;
     }
   }

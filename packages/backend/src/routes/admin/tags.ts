@@ -1,50 +1,50 @@
-﻿import { Router } from "express";
-import { authenticate, requireAdmin } from "../../middleware/auth";
-import { auditLog } from "../../middleware/auditLog";
-import { TagController } from "../../controllers/TagController";
+﻿import { Router } from 'express';
+import { authenticate, requireAdmin } from '../../middleware/auth';
+import { auditLog } from '../../middleware/auditLog';
+import { TagController } from '../../controllers/TagController';
 
 const router = Router();
 
 router.use(authenticate as any);
 router.use(requireAdmin as any);
 
-router.get("/", TagController.list as any);
+router.get('/', TagController.list as any);
 router.post(
-  "/",
+  '/',
   auditLog({
-    action: "tag_create",
-    resourceType: "tag",
+    action: 'tag_create',
+    resourceType: 'tag',
     // ?쒓렇 ?앹꽦 ?쒖뿉??ID媛 ?꾩쭅 ?놁쑝誘濡?getResourceId ?쒓굅
     getNewValues: (req) => req.body,
     getResourceIdFromResponse: (res: any) => res?.data?.tag?.id,
   }) as any,
-  TagController.create as any,
+  TagController.create as any
 );
 router.put(
-  "/:id",
+  '/:id',
   auditLog({
-    action: "tag_update",
-    resourceType: "tag",
+    action: 'tag_update',
+    resourceType: 'tag',
     getResourceId: (req: any) => req.params?.id,
     getNewValues: (req) => req.body,
   }) as any,
-  TagController.update as any,
+  TagController.update as any
 );
 router.delete(
-  "/:id",
+  '/:id',
   auditLog({
-    action: "tag_delete",
-    resourceType: "tag",
+    action: 'tag_delete',
+    resourceType: 'tag',
     getResourceId: (req: any) => req.params?.id,
     getNewValues: (req: any) => ({
       id: req.params?.id,
     }),
   }) as any,
-  TagController.delete as any,
+  TagController.delete as any
 );
 
 // Generic assignments
-router.get("/assignments", TagController.listForEntity as any);
-router.put("/assignments", TagController.setForEntity as any);
+router.get('/assignments', TagController.listForEntity as any);
+router.put('/assignments', TagController.setForEntity as any);
 
 export default router;

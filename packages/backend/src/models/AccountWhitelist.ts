@@ -1,6 +1,6 @@
-import db from "../config/knex";
-import { GatrixError } from "../middleware/errorHandler";
-import TagAssignmentModel from "./TagAssignment";
+import db from '../config/knex';
+import { GatrixError } from '../middleware/errorHandler';
+import TagAssignmentModel from './TagAssignment';
 
 export interface Whitelist {
   id: number;
@@ -66,63 +66,61 @@ export class WhitelistModel {
   static async findAll(
     page: number = 1,
     limit: number = 10,
-    filters: WhitelistFilters = { environment: "" },
+    filters: WhitelistFilters = { environment: '' }
   ): Promise<WhitelistListResponse> {
     try {
       const offset = (page - 1) * limit;
       const environment = filters.environment;
 
       // Build base query with environment filter
-      let query = db("g_account_whitelist as w")
-        .leftJoin("g_users as c", "w.createdBy", "c.id")
-        .leftJoin("g_users as u", "w.updatedBy", "u.id")
-        .where("w.environment", environment)
+      let query = db('g_account_whitelist as w')
+        .leftJoin('g_users as c', 'w.createdBy', 'c.id')
+        .leftJoin('g_users as u', 'w.updatedBy', 'u.id')
+        .where('w.environment', environment)
         .select([
-          "w.id",
-          "w.environment",
-          "w.accountId",
-          "w.ipAddress",
-          "w.startDate",
-          "w.endDate",
-          "w.purpose",
-          "w.isEnabled",
-          db.raw("CAST(w.tags AS CHAR) as tags"),
-          "w.createdBy",
-          "w.updatedBy",
-          "w.createdAt",
-          "w.updatedAt",
-          "c.name as createdByName",
-          "c.email as createdByEmail",
-          "u.name as updatedByName",
-          "u.email as updatedByEmail",
+          'w.id',
+          'w.environment',
+          'w.accountId',
+          'w.ipAddress',
+          'w.startDate',
+          'w.endDate',
+          'w.purpose',
+          'w.isEnabled',
+          db.raw('CAST(w.tags AS CHAR) as tags'),
+          'w.createdBy',
+          'w.updatedBy',
+          'w.createdAt',
+          'w.updatedAt',
+          'c.name as createdByName',
+          'c.email as createdByEmail',
+          'u.name as updatedByName',
+          'u.email as updatedByEmail',
         ]);
 
       // Apply filters
       if (filters.accountId) {
-        query = query.where("w.accountId", "like", `%${filters.accountId}%`);
+        query = query.where('w.accountId', 'like', `%${filters.accountId}%`);
       }
 
       if (filters.ipAddress) {
-        query = query.where("w.ipAddress", "like", `%${filters.ipAddress}%`);
+        query = query.where('w.ipAddress', 'like', `%${filters.ipAddress}%`);
       }
 
       if (filters.createdBy) {
-        query = query.where("w.createdBy", filters.createdBy);
+        query = query.where('w.createdBy', filters.createdBy);
       }
 
       if (filters.isEnabled !== undefined) {
-        query = query.where("w.isEnabled", filters.isEnabled);
+        query = query.where('w.isEnabled', filters.isEnabled);
       }
 
       if (filters.tags && filters.tags.length > 0) {
         query = query.where(function () {
           filters.tags!.forEach((tag, index) => {
             if (index === 0) {
-              this.whereRaw("JSON_CONTAINS(w.tags, ?)", [JSON.stringify(tag)]);
+              this.whereRaw('JSON_CONTAINS(w.tags, ?)', [JSON.stringify(tag)]);
             } else {
-              this.orWhereRaw("JSON_CONTAINS(w.tags, ?)", [
-                JSON.stringify(tag),
-              ]);
+              this.orWhereRaw('JSON_CONTAINS(w.tags, ?)', [JSON.stringify(tag)]);
             }
           });
         });
@@ -130,26 +128,19 @@ export class WhitelistModel {
 
       if (filters.search) {
         query = query.where(function () {
-          this.where("w.accountId", "like", `%${filters.search}%`)
-            .orWhere("w.ipAddress", "like", `%${filters.search}%`)
-            .orWhere("w.purpose", "like", `%${filters.search}%`);
+          this.where('w.accountId', 'like', `%${filters.search}%`)
+            .orWhere('w.ipAddress', 'like', `%${filters.search}%`)
+            .orWhere('w.purpose', 'like', `%${filters.search}%`);
         });
       }
 
       // Get total count
-      const countQuery = query
-        .clone()
-        .clearSelect()
-        .count("* as total")
-        .first();
+      const countQuery = query.clone().clearSelect().count('* as total').first();
       const countResult = await countQuery;
       const total = Number(countResult?.total || 0);
 
       // Get paginated results
-      const whitelists = await query
-        .orderBy("w.createdAt", "desc")
-        .limit(limit)
-        .offset(offset);
+      const whitelists = await query.orderBy('w.createdAt', 'desc').limit(limit).offset(offset);
 
       return {
         whitelists: whitelists.map(this.mapRowToWhitelist),
@@ -159,54 +150,48 @@ export class WhitelistModel {
         totalPages: Math.ceil(total / limit),
       };
     } catch (error) {
-      console.error("AccountWhitelist.findAll error:", error);
-      throw new GatrixError("Failed to fetch whitelists", 500);
+      console.error('AccountWhitelist.findAll error:', error);
+      throw new GatrixError('Failed to fetch whitelists', 500);
     }
   }
 
-  static async findById(
-    id: number,
-    environment: string,
-  ): Promise<Whitelist | null> {
+  static async findById(id: number, environment: string): Promise<Whitelist | null> {
     try {
-      const result = await db("g_account_whitelist as w")
-        .leftJoin("g_users as c", "w.createdBy", "c.id")
-        .leftJoin("g_users as u", "w.updatedBy", "u.id")
+      const result = await db('g_account_whitelist as w')
+        .leftJoin('g_users as c', 'w.createdBy', 'c.id')
+        .leftJoin('g_users as u', 'w.updatedBy', 'u.id')
         .select([
-          "w.id",
-          "w.environment",
-          "w.accountId",
-          "w.ipAddress",
-          "w.startDate",
-          "w.endDate",
-          "w.purpose",
-          "w.isEnabled",
-          db.raw("CAST(w.tags AS CHAR) as tags"),
-          "w.createdBy",
-          "w.updatedBy",
-          "w.createdAt",
-          "w.updatedAt",
-          "c.name as createdByName",
-          "c.email as createdByEmail",
-          "u.name as updatedByName",
-          "u.email as updatedByEmail",
+          'w.id',
+          'w.environment',
+          'w.accountId',
+          'w.ipAddress',
+          'w.startDate',
+          'w.endDate',
+          'w.purpose',
+          'w.isEnabled',
+          db.raw('CAST(w.tags AS CHAR) as tags'),
+          'w.createdBy',
+          'w.updatedBy',
+          'w.createdAt',
+          'w.updatedAt',
+          'c.name as createdByName',
+          'c.email as createdByEmail',
+          'u.name as updatedByName',
+          'u.email as updatedByEmail',
         ])
-        .where("w.id", id)
-        .where("w.environment", environment)
+        .where('w.id', id)
+        .where('w.environment', environment)
         .first();
 
       return result ? this.mapRowToWhitelist(result) : null;
     } catch (error) {
-      throw new GatrixError("Failed to fetch whitelist entry", 500);
+      throw new GatrixError('Failed to fetch whitelist entry', 500);
     }
   }
 
-  static async create(
-    data: CreateWhitelistData,
-    environment: string,
-  ): Promise<Whitelist> {
+  static async create(data: CreateWhitelistData, environment: string): Promise<Whitelist> {
     try {
-      const [insertId] = await db("g_account_whitelist").insert({
+      const [insertId] = await db('g_account_whitelist').insert({
         environment: environment,
         accountId: data.accountId,
         ipAddress: data.ipAddress || null,
@@ -220,19 +205,19 @@ export class WhitelistModel {
 
       const created = await this.findById(insertId, environment);
       if (!created) {
-        throw new GatrixError("Failed to create whitelist entry", 500);
+        throw new GatrixError('Failed to create whitelist entry', 500);
       }
 
       return created;
     } catch (error) {
-      throw new GatrixError("Failed to create whitelist entry", 500);
+      throw new GatrixError('Failed to create whitelist entry', 500);
     }
   }
 
   static async update(
     id: number,
     data: UpdateWhitelistData,
-    environment: string,
+    environment: string
   ): Promise<Whitelist | null> {
     try {
       const updateData: any = {};
@@ -270,38 +255,35 @@ export class WhitelistModel {
       }
 
       if (Object.keys(updateData).length === 0) {
-        throw new GatrixError("No fields to update", 400);
+        throw new GatrixError('No fields to update', 400);
       }
 
       updateData.updatedAt = db.fn.now();
 
-      await db("g_account_whitelist")
-        .where("id", id)
-        .where("environment", environment)
+      await db('g_account_whitelist')
+        .where('id', id)
+        .where('environment', environment)
         .update(updateData);
 
       return await this.findById(id, environment);
     } catch (error) {
-      throw new GatrixError("Failed to update whitelist entry", 500);
+      throw new GatrixError('Failed to update whitelist entry', 500);
     }
   }
 
   static async delete(id: number, environment: string): Promise<boolean> {
     try {
-      const result = await db("g_account_whitelist")
-        .where("id", id)
-        .where("environment", environment)
+      const result = await db('g_account_whitelist')
+        .where('id', id)
+        .where('environment', environment)
         .del();
       return result > 0;
     } catch (error) {
-      throw new GatrixError("Failed to delete whitelist entry", 500);
+      throw new GatrixError('Failed to delete whitelist entry', 500);
     }
   }
 
-  static async bulkCreate(
-    entries: CreateWhitelistData[],
-    environment: string,
-  ): Promise<number> {
+  static async bulkCreate(entries: CreateWhitelistData[], environment: string): Promise<number> {
     try {
       if (entries.length === 0) {
         return 0;
@@ -319,10 +301,10 @@ export class WhitelistModel {
         tags: entry.tags ? JSON.stringify(entry.tags) : null,
       }));
 
-      const result = await db("g_account_whitelist").insert(insertData);
+      const result = await db('g_account_whitelist').insert(insertData);
       return Array.isArray(result) ? result.length : 1;
     } catch (error) {
-      throw new GatrixError("Failed to bulk create whitelist entries", 500);
+      throw new GatrixError('Failed to bulk create whitelist entries', 500);
     }
   }
 
@@ -334,13 +316,11 @@ export class WhitelistModel {
         tags = JSON.parse(row.tags);
       } catch (error) {
         // JSON 파싱 실패 시 문자열을 배열로 변환
-        console.warn(
-          `Invalid JSON in tags for whitelist ${row.id}: ${row.tags}`,
-        );
-        if (typeof row.tags === "string") {
+        console.warn(`Invalid JSON in tags for whitelist ${row.id}: ${row.tags}`);
+        if (typeof row.tags === 'string') {
           // 쉼표로 구분된 문자열을 배열로 변환
           tags = row.tags
-            .split(",")
+            .split(',')
             .map((tag: string) => tag.trim())
             .filter((tag: string) => tag.length > 0);
         }
@@ -368,49 +348,34 @@ export class WhitelistModel {
     };
   }
 
-  static async findByAccountId(
-    accountId: string,
-    environment: string,
-  ): Promise<Whitelist[]> {
+  static async findByAccountId(accountId: string, environment: string): Promise<Whitelist[]> {
     try {
-      const rows = await db("g_account_whitelist as w")
-        .leftJoin("g_users as c", "w.createdBy", "c.id")
-        .leftJoin("g_users as u", "w.updatedBy", "u.id")
+      const rows = await db('g_account_whitelist as w')
+        .leftJoin('g_users as c', 'w.createdBy', 'c.id')
+        .leftJoin('g_users as u', 'w.updatedBy', 'u.id')
         .select([
-          "w.*",
-          "c.name as createdByName",
-          "c.email as createdByEmail",
-          "u.name as updatedByName",
-          "u.email as updatedByEmail",
+          'w.*',
+          'c.name as createdByName',
+          'c.email as createdByEmail',
+          'u.name as updatedByName',
+          'u.email as updatedByEmail',
         ])
-        .where("w.accountId", accountId)
-        .where("w.environment", environment)
-        .orderBy("w.createdAt", "desc");
+        .where('w.accountId', accountId)
+        .where('w.environment', environment)
+        .orderBy('w.createdAt', 'desc');
 
       return rows.map(this.mapRowToWhitelist);
     } catch (error) {
-      throw new GatrixError(
-        "Failed to find whitelist entries by account ID",
-        500,
-      );
+      throw new GatrixError('Failed to find whitelist entries by account ID', 500);
     }
   }
 
   // 태그 관련 메서드들
-  static async setTags(
-    whitelistId: number,
-    tagIds: number[],
-    createdBy?: number,
-  ): Promise<void> {
-    await TagAssignmentModel.setTagsForEntity(
-      "whitelist",
-      whitelistId,
-      tagIds,
-      createdBy,
-    );
+  static async setTags(whitelistId: number, tagIds: number[], createdBy?: number): Promise<void> {
+    await TagAssignmentModel.setTagsForEntity('whitelist', whitelistId, tagIds, createdBy);
   }
 
   static async getTags(whitelistId: number): Promise<any[]> {
-    return await TagAssignmentModel.listTagsForEntity("whitelist", whitelistId);
+    return await TagAssignmentModel.listTagsForEntity('whitelist', whitelistId);
   }
 }

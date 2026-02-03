@@ -1,12 +1,9 @@
-import { Job } from "bullmq";
-import { ulid } from "ulid";
-import database from "../../config/database";
-import logger from "../../config/logger";
-import { RowDataPacket } from "mysql2/promise";
-import {
-  generateCouponCode,
-  CodePattern,
-} from "../../utils/couponCodeGenerator";
+import { Job } from 'bullmq';
+import { ulid } from 'ulid';
+import database from '../../config/database';
+import logger from '../../config/logger';
+import { RowDataPacket } from 'mysql2/promise';
+import { generateCouponCode, CodePattern } from '../../utils/couponCodeGenerator';
 
 export interface CouponGenerationJobData {
   type: string;
@@ -33,20 +30,20 @@ export class CouponGenerationJob {
   private static readonly PROGRESS_UPDATE_INTERVAL = 10000; // Update progress every 10,000 codes
 
   static async process(job: Job<any>): Promise<void> {
-    const jobId = job.id || "unknown";
+    const jobId = job.id || 'unknown';
     const pool = database.getPool();
     let settingId: string | undefined;
     let quantity: number | undefined;
 
     try {
       // Debug: log raw job data
-      logger.info("Job data received", {
+      logger.info('Job data received', {
         jobId,
         jobData: JSON.stringify(job.data),
       });
 
       // Extract payload - handle both direct and wrapped formats
-      if (job.data && typeof job.data === "object") {
+      if (job.data && typeof job.data === 'object') {
         if ((job.data as any).payload) {
           // Wrapped format: { type, payload, timestamp }
           settingId = (job.data as any).payload?.settingId;
@@ -60,41 +57,38 @@ export class CouponGenerationJob {
 
       // Validate input parameters
       if (!settingId || !quantity) {
-        logger.error("Invalid job data", {
+        logger.error('Invalid job data', {
           jobId,
           jobData: job.data,
           settingId,
           quantity,
         });
-        throw new Error(
-          "Invalid job data: settingId and quantity are required",
-        );
+        throw new Error('Invalid job data: settingId and quantity are required');
       }
 
-      logger.info("Starting coupon generation job", {
+      logger.info('Starting coupon generation job', {
         jobId,
         settingId,
         quantity,
       });
 
       // Update status to IN_PROGRESS
-      const jobIdForDb = jobId === "unknown" ? null : jobId;
+      const jobIdForDb = jobId === 'unknown' ? null : jobId;
       await pool.execute(
-        "UPDATE g_coupon_settings SET generationStatus = ?, generatedCount = 0, generationJobId = ? WHERE id = ?",
-        ["IN_PROGRESS", jobIdForDb, settingId],
+        'UPDATE g_coupon_settings SET generationStatus = ?, generatedCount = 0, generationJobId = ? WHERE id = ?',
+        ['IN_PROGRESS', jobIdForDb, settingId]
       );
 
       // Get codePattern and environment from settings
       const [settings] = await pool.execute<RowDataPacket[]>(
-        "SELECT codePattern, environment FROM g_coupon_settings WHERE id = ?",
-        [settingId],
+        'SELECT codePattern, environment FROM g_coupon_settings WHERE id = ?',
+        [settingId]
       );
-      const codePattern = (settings[0]?.codePattern ||
-        "ALPHANUMERIC_8") as CodePattern;
+      const codePattern = (settings[0]?.codePattern || 'ALPHANUMERIC_8') as CodePattern;
       const environment = settings[0]?.environment;
 
       if (!environment) {
-        throw new Error("Setting not found or missing environment");
+        throw new Error('Setting not found or missing environment');
       }
 
       // Generate and insert codes in streaming batches
@@ -102,7 +96,7 @@ export class CouponGenerationJob {
       let totalGenerated = 0;
       let lastProgressUpdate = 0;
 
-      logger.info("Starting streaming batch generation", {
+      logger.info('Starting streaming batch generation', {
         settingId,
         quantity,
         codePattern,
@@ -126,8 +120,8 @@ export class CouponGenerationJob {
             // Check database for duplicates less frequently
             if ((i + j) % this.DUPLICATE_CHECK_BATCH === 0) {
               const [dup] = await pool.execute<RowDataPacket[]>(
-                "SELECT 1 as ok FROM g_coupons WHERE code = ? LIMIT 1",
-                [code],
+                'SELECT 1 as ok FROM g_coupons WHERE code = ? LIMIT 1',
+                [code]
               );
               if (dup.length === 0) {
                 found = true;
@@ -140,7 +134,7 @@ export class CouponGenerationJob {
           }
 
           if (!found) {
-            logger.warn("Failed to generate unique code after 10 attempts", {
+            logger.warn('Failed to generate unique code after 10 attempts', {
               jobId,
               settingId,
               codeIndex: i + j,
@@ -154,26 +148,23 @@ export class CouponGenerationJob {
 
         // Insert batch immediately (streaming approach)
         if (batchCodes.length > 0) {
-          const placeholders = batchCodes.map(() => "(?, ?, ?, ?)").join(",");
+          const placeholders = batchCodes.map(() => '(?, ?, ?, ?)').join(',');
           await pool.execute(
             `INSERT INTO g_coupons (id, settingId, code, environment) VALUES ${placeholders}`,
-            batchCodes.flat(),
+            batchCodes.flat()
           );
 
           totalGenerated += batchCodes.length;
 
           // Update progress less frequently
-          if (
-            totalGenerated - lastProgressUpdate >=
-            this.PROGRESS_UPDATE_INTERVAL
-          ) {
+          if (totalGenerated - lastProgressUpdate >= this.PROGRESS_UPDATE_INTERVAL) {
             const progress = Math.round((totalGenerated / quantity) * 100);
-            await pool.execute(
-              "UPDATE g_coupon_settings SET generatedCount = ? WHERE id = ?",
-              [totalGenerated, settingId],
-            );
+            await pool.execute('UPDATE g_coupon_settings SET generatedCount = ? WHERE id = ?', [
+              totalGenerated,
+              settingId,
+            ]);
             await job.updateProgress(progress);
-            logger.info("Coupon generation progress", {
+            logger.info('Coupon generation progress', {
               jobId,
               settingId,
               progress,
@@ -188,33 +179,27 @@ export class CouponGenerationJob {
       // Final progress update - set both generatedCount and totalCount to actual generated count
       // Also update issuedCount cache
       await pool.execute(
-        "UPDATE g_coupon_settings SET generationStatus = ?, generatedCount = ?, totalCount = ?, issuedCount = ?, generationJobId = NULL WHERE id = ?",
-        [
-          "COMPLETED",
-          totalGenerated,
-          totalGenerated,
-          totalGenerated,
-          settingId,
-        ],
+        'UPDATE g_coupon_settings SET generationStatus = ?, generatedCount = ?, totalCount = ?, issuedCount = ?, generationJobId = NULL WHERE id = ?',
+        ['COMPLETED', totalGenerated, totalGenerated, totalGenerated, settingId]
       );
       await job.updateProgress(100);
 
-      logger.info("Coupon generation job completed successfully", {
+      logger.info('Coupon generation job completed successfully', {
         jobId,
         settingId,
         totalGenerated,
       });
     } catch (error) {
-      logger.error("Coupon generation job failed", { jobId, settingId, error });
+      logger.error('Coupon generation job failed', { jobId, settingId, error });
 
       // Update status to FAILED
       try {
         await pool.execute(
-          "UPDATE g_coupon_settings SET generationStatus = ?, generationJobId = NULL WHERE id = ?",
-          ["FAILED", settingId],
+          'UPDATE g_coupon_settings SET generationStatus = ?, generationJobId = NULL WHERE id = ?',
+          ['FAILED', settingId]
         );
       } catch (updateError) {
-        logger.error("Failed to update coupon status to FAILED", {
+        logger.error('Failed to update coupon status to FAILED', {
           jobId,
           settingId,
           error: updateError,

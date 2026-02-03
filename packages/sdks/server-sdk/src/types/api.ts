@@ -41,13 +41,13 @@ export interface EnvironmentListResponse {
 // ============================================================================
 
 export type ClientStatus =
-  | "ONLINE"
-  | "OFFLINE"
-  | "RECOMMENDED_UPDATE"
-  | "FORCED_UPDATE"
-  | "UNDER_REVIEW"
-  | "BLOCKED_PATCH_ALLOWED"
-  | "MAINTENANCE";
+  | 'ONLINE'
+  | 'OFFLINE'
+  | 'RECOMMENDED_UPDATE'
+  | 'FORCED_UPDATE'
+  | 'UNDER_REVIEW'
+  | 'BLOCKED_PATCH_ALLOWED'
+  | 'MAINTENANCE';
 
 export interface ClientVersionMaintenanceLocale {
   lang: string;
@@ -93,12 +93,7 @@ export interface ClientVersionByEnvResponse {
 // Service Notice Types
 // ============================================================================
 
-export type ServiceNoticeCategory =
-  | "maintenance"
-  | "event"
-  | "notice"
-  | "promotion"
-  | "other";
+export type ServiceNoticeCategory = 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
 
 export interface ServiceNotice {
   id: number;
@@ -134,12 +129,12 @@ export interface ServiceNoticeByEnvResponse {
 // Banner Types
 // ============================================================================
 
-export type BannerStatus = "draft" | "published" | "archived";
-export type FrameActionType = "openUrl" | "command" | "deepLink" | "none";
-export type FrameActionTarget = "webview" | "external";
-export type TransitionType = "fade" | "slide" | "crossfade" | "none";
-export type LoopModeType = "loop" | "pingpong" | "once";
-export type FrameType = "jpg" | "png" | "gif" | "mp4";
+export type BannerStatus = 'draft' | 'published' | 'archived';
+export type FrameActionType = 'openUrl' | 'command' | 'deepLink' | 'none';
+export type FrameActionTarget = 'webview' | 'external';
+export type TransitionType = 'fade' | 'slide' | 'crossfade' | 'none';
+export type LoopModeType = 'loop' | 'pingpong' | 'once';
+export type FrameType = 'jpg' | 'png' | 'gif' | 'mp4';
 
 export interface FrameAction {
   type: FrameActionType;
@@ -331,7 +326,7 @@ export interface Reward {
 // ============================================================================
 
 export interface TriggerCondition {
-  type: "userLevel" | "joinDays"; // Trigger condition type
+  type: 'userLevel' | 'joinDays'; // Trigger condition type
   value: number; // Condition value
 }
 
@@ -370,13 +365,13 @@ export interface SurveyListParams {
 // ============================================================================
 
 export type ServiceStatus =
-  | "initializing"
-  | "ready"
-  | "shutting_down"
-  | "error"
-  | "terminated"
-  | "no-response"
-  | "heartbeat";
+  | 'initializing'
+  | 'ready'
+  | 'shutting_down'
+  | 'error'
+  | 'terminated'
+  | 'no-response'
+  | 'heartbeat';
 
 /**
  * Service Ports - Named port mapping
@@ -499,7 +494,7 @@ export interface WhitelistData {
 // ============================================================================
 
 export interface MaintenanceDetail {
-  type: "regular" | "emergency";
+  type: 'regular' | 'emergency';
   startsAt: string | null;
   endsAt: string | null;
   message: string;
@@ -542,7 +537,7 @@ export interface MaintenanceInfo {
   /** Whether the service/world is currently in maintenance (time-based check) */
   isMaintenanceActive: boolean;
   /** Source of maintenance: 'service' for global, 'world' for world-level, null if not in maintenance */
-  source: "service" | "world" | null;
+  source: 'service' | 'world' | null;
   /** World ID if source is 'world' */
   worldId?: string;
   /** Localized maintenance message */
@@ -595,7 +590,7 @@ export interface CurrentMaintenanceStatus {
   /** Whether currently in maintenance (calculated at query time, not just cached flag) */
   isMaintenanceActive: boolean;
   /** Source of maintenance: 'service' for global, 'world' for world-level (only present when isInMaintenance is true) */
-  source?: "service" | "world";
+  source?: 'service' | 'world';
   /** World ID if source is 'world' */
   worldId?: string;
   /** Maintenance detail (only present when isMaintenanceActive is true) */

@@ -4,65 +4,65 @@
  * Supports AWS, GCP, Azure, Tencent Cloud, Alibaba Cloud, and Oracle Cloud.
  */
 
-import * as http from "http";
+import * as http from 'http';
 
 // Cloud provider types
 export type CloudProvider =
-  | "aws"
-  | "gcp"
-  | "azure"
-  | "tencentcloud"
-  | "alibabacloud"
-  | "oraclecloud"
-  | "unknown";
+  | 'aws'
+  | 'gcp'
+  | 'azure'
+  | 'tencentcloud'
+  | 'alibabacloud'
+  | 'oraclecloud'
+  | 'unknown';
 
 // Metadata endpoints for each cloud provider
 const METADATA_ENDPOINTS = {
   aws: {
-    base: "http://169.254.169.254",
+    base: 'http://169.254.169.254',
     // IMDSv1 endpoint (simpler, no token required)
-    identity: "/latest/dynamic/instance-identity/document",
+    identity: '/latest/dynamic/instance-identity/document',
     timeout: 1000,
   },
   gcp: {
-    base: "http://169.254.169.254",
-    zone: "/computeMetadata/v1/instance/zone",
-    instanceId: "/computeMetadata/v1/instance/id",
-    projectId: "/computeMetadata/v1/project/project-id",
+    base: 'http://169.254.169.254',
+    zone: '/computeMetadata/v1/instance/zone',
+    instanceId: '/computeMetadata/v1/instance/id',
+    projectId: '/computeMetadata/v1/project/project-id',
     timeout: 1000,
     headers: {
-      "Metadata-Flavor": "Google",
+      'Metadata-Flavor': 'Google',
     },
   },
   azure: {
-    base: "http://169.254.169.254",
-    instance: "/metadata/instance?api-version=2021-02-01",
+    base: 'http://169.254.169.254',
+    instance: '/metadata/instance?api-version=2021-02-01',
     timeout: 1000,
     headers: {
-      Metadata: "true",
+      Metadata: 'true',
     },
   },
   tencentcloud: {
-    base: "http://metadata.tencentyun.com",
-    region: "/latest/meta-data/placement/region",
-    zone: "/latest/meta-data/placement/zone",
-    instanceId: "/latest/meta-data/instance-id",
+    base: 'http://metadata.tencentyun.com',
+    region: '/latest/meta-data/placement/region',
+    zone: '/latest/meta-data/placement/zone',
+    instanceId: '/latest/meta-data/instance-id',
     timeout: 1000,
   },
   alibabacloud: {
-    base: "http://100.100.100.200",
-    region: "/latest/meta-data/region-id",
-    zone: "/latest/meta-data/zone-id",
-    instanceId: "/latest/meta-data/instance-id",
-    instanceType: "/latest/meta-data/instance/instance-type",
+    base: 'http://100.100.100.200',
+    region: '/latest/meta-data/region-id',
+    zone: '/latest/meta-data/zone-id',
+    instanceId: '/latest/meta-data/instance-id',
+    instanceType: '/latest/meta-data/instance/instance-type',
     timeout: 1000,
   },
   oraclecloud: {
-    base: "http://169.254.169.254",
-    instance: "/opc/v2/instance/",
+    base: 'http://169.254.169.254',
+    instance: '/opc/v2/instance/',
     timeout: 1000,
     headers: {
-      Authorization: "Bearer Oracle",
+      Authorization: 'Bearer Oracle',
     },
   },
 } as const;
@@ -93,7 +93,7 @@ export interface CloudMetadata {
  */
 function httpGet(
   url: string,
-  options: { timeout: number; headers?: Record<string, string> },
+  options: { timeout: number; headers?: Record<string, string> }
 ): Promise<string | null> {
   return new Promise((resolve) => {
     const parsedUrl = new URL(url);
@@ -112,21 +112,21 @@ function httpGet(
           return;
         }
 
-        let data = "";
-        res.on("data", (chunk) => {
+        let data = '';
+        res.on('data', (chunk) => {
           data += chunk;
         });
-        res.on("end", () => {
+        res.on('end', () => {
           resolve(data);
         });
-      },
+      }
     );
 
-    req.on("error", () => {
+    req.on('error', () => {
       resolve(null);
     });
 
-    req.on("timeout", () => {
+    req.on('timeout', () => {
       req.destroy();
       resolve(null);
     });
@@ -148,7 +148,7 @@ async function detectAWS(): Promise<CloudMetadata | null> {
   try {
     const doc = JSON.parse(response);
     return {
-      provider: "aws",
+      provider: 'aws',
       region: doc.region,
       zone: doc.availabilityZone,
       instanceId: doc.instanceId,
@@ -180,14 +180,13 @@ async function detectGCP(): Promise<CloudMetadata | null> {
   // Parse zone to extract region
   // Zone format: projects/123456789/zones/us-central1-a
   // Region is derived from zone: us-central1
-  const zoneParts = zoneResponse.split("/");
+  const zoneParts = zoneResponse.split('/');
   const zone = zoneParts[zoneParts.length - 1]; // e.g., "us-central1-a"
 
   // Extract region from zone (remove the last part after the last hyphen)
   // us-central1-a -> us-central1
-  const zoneSplit = zone.split("-");
-  const region =
-    zoneSplit.length >= 3 ? zoneSplit.slice(0, -1).join("-") : zone;
+  const zoneSplit = zone.split('-');
+  const region = zoneSplit.length >= 3 ? zoneSplit.slice(0, -1).join('-') : zone;
 
   // Get instance ID
   const instanceId = await httpGet(`${endpoint.base}${endpoint.instanceId}`, {
@@ -202,7 +201,7 @@ async function detectGCP(): Promise<CloudMetadata | null> {
   });
 
   return {
-    provider: "gcp",
+    provider: 'gcp',
     region,
     zone,
     instanceId: instanceId || undefined,
@@ -231,7 +230,7 @@ async function detectAzure(): Promise<CloudMetadata | null> {
     const compute = doc.compute || {};
 
     return {
-      provider: "azure",
+      provider: 'azure',
       region: compute.location, // Azure uses 'location' instead of 'region'
       zone: compute.zone || undefined,
       instanceId: compute.vmId,
@@ -266,15 +265,12 @@ async function detectTencentCloud(): Promise<CloudMetadata | null> {
   });
 
   // Get instance ID
-  const instanceIdResponse = await httpGet(
-    `${endpoint.base}${endpoint.instanceId}`,
-    {
-      timeout: endpoint.timeout,
-    },
-  );
+  const instanceIdResponse = await httpGet(`${endpoint.base}${endpoint.instanceId}`, {
+    timeout: endpoint.timeout,
+  });
 
   return {
-    provider: "tencentcloud",
+    provider: 'tencentcloud',
     region: regionResponse,
     zone: zoneResponse || undefined,
     instanceId: instanceIdResponse || undefined,
@@ -302,23 +298,17 @@ async function detectAlibabaCloud(): Promise<CloudMetadata | null> {
   });
 
   // Get instance ID
-  const instanceIdResponse = await httpGet(
-    `${endpoint.base}${endpoint.instanceId}`,
-    {
-      timeout: endpoint.timeout,
-    },
-  );
+  const instanceIdResponse = await httpGet(`${endpoint.base}${endpoint.instanceId}`, {
+    timeout: endpoint.timeout,
+  });
 
   // Get instance type
-  const instanceTypeResponse = await httpGet(
-    `${endpoint.base}${endpoint.instanceType}`,
-    {
-      timeout: endpoint.timeout,
-    },
-  );
+  const instanceTypeResponse = await httpGet(`${endpoint.base}${endpoint.instanceType}`, {
+    timeout: endpoint.timeout,
+  });
 
   return {
-    provider: "alibabacloud",
+    provider: 'alibabacloud',
     region: regionResponse,
     zone: zoneResponse || undefined,
     instanceId: instanceIdResponse || undefined,
@@ -346,7 +336,7 @@ async function detectOracleCloud(): Promise<CloudMetadata | null> {
     const doc = JSON.parse(response);
 
     return {
-      provider: "oraclecloud",
+      provider: 'oraclecloud',
       region: doc.region || doc.canonicalRegionName,
       zone: doc.availabilityDomain,
       instanceId: doc.id,
@@ -367,15 +357,15 @@ async function detectOracleCloud(): Promise<CloudMetadata | null> {
  * @param preferredProvider Optional preferred provider to try first
  */
 export async function detectCloudMetadata(
-  preferredProvider?: CloudProvider,
+  preferredProvider?: CloudProvider
 ): Promise<CloudMetadata> {
   // Default result for non-cloud environments
-  const defaultResult: CloudMetadata = { provider: "unknown" };
+  const defaultResult: CloudMetadata = { provider: 'unknown' };
 
   // If preferred provider is specified, try it first
-  if (preferredProvider && preferredProvider !== "unknown") {
+  if (preferredProvider && preferredProvider !== 'unknown') {
     const detectors: Record<
-      Exclude<CloudProvider, "unknown">,
+      Exclude<CloudProvider, 'unknown'>,
       () => Promise<CloudMetadata | null>
     > = {
       aws: detectAWS,
@@ -428,5 +418,5 @@ export async function detectCloudMetadata(
  * Check if region is specified or needs auto-detection
  */
 export function needsRegionDetection(region?: string): boolean {
-  return !region || region === "" || region === "unspecified-region";
+  return !region || region === '' || region === 'unspecified-region';
 }

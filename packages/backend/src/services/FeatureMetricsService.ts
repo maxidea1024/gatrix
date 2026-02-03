@@ -4,14 +4,14 @@
  * Uses QueueService for efficient batch processing
  */
 
-import db from "../config/knex";
-import logger from "../config/logger";
-import { queueService } from "./QueueService";
-import { Job } from "bullmq";
-import { FeatureFlagModel } from "../models/FeatureFlag";
+import db from '../config/knex';
+import logger from '../config/logger';
+import { queueService } from './QueueService';
+import { Job } from 'bullmq';
+import { FeatureFlagModel } from '../models/FeatureFlag';
 
 // Queue name for feature metrics
-const QUEUE_NAME = "feature-metrics";
+const QUEUE_NAME = 'feature-metrics';
 
 interface AggregatedMetric {
   flagName: string;
@@ -41,21 +41,17 @@ class FeatureMetricsService {
     }
 
     try {
-      await queueService.createQueue(
-        QUEUE_NAME,
-        this.processMetricsJob.bind(this),
-        {
-          concurrency: 2,
-          removeOnComplete: 1000, // Keep last 1000 completed jobs
-          removeOnFail: 500, // Keep last 500 failed jobs
-          attempts: 3, // Retry up to 3 times
-        },
-      );
+      await queueService.createQueue(QUEUE_NAME, this.processMetricsJob.bind(this), {
+        concurrency: 2,
+        removeOnComplete: 1000, // Keep last 1000 completed jobs
+        removeOnFail: 500, // Keep last 500 failed jobs
+        attempts: 3, // Retry up to 3 times
+      });
 
       this.isInitialized = true;
-      logger.info("Feature metrics queue initialized");
+      logger.info('Feature metrics queue initialized');
     } catch (error) {
-      logger.error("Failed to initialize feature metrics queue", { error });
+      logger.error('Failed to initialize feature metrics queue', { error });
       throw error;
     }
   }
@@ -74,7 +70,7 @@ class FeatureMetricsService {
     metrics: AggregatedMetric[],
     timestamp?: string,
     appName?: string,
-    bucketStart?: string,
+    bucketStart?: string
   ): Promise<void> {
     if (!metrics || metrics.length === 0) {
       return;
@@ -83,7 +79,7 @@ class FeatureMetricsService {
     const reportedAt = timestamp || new Date().toISOString();
 
     // Add to queue for batch processing
-    await queueService.addJob(QUEUE_NAME, "aggregate-metrics", {
+    await queueService.addJob(QUEUE_NAME, 'aggregate-metrics', {
       environment,
       appName,
       metrics,
@@ -91,7 +87,7 @@ class FeatureMetricsService {
       bucketStart, // Pass bucket start time for accurate hourBucket calculation
     } as MetricsJobPayload);
 
-    logger.debug("Feature metrics queued for processing", {
+    logger.debug('Feature metrics queued for processing', {
       environment,
       appName,
       count: metrics.length,
@@ -103,7 +99,7 @@ class FeatureMetricsService {
    * Process metrics job from queue
    */
   private async processMetricsJob(
-    job: Job<{ type: string; payload: MetricsJobPayload; timestamp: number }>,
+    job: Job<{ type: string; payload: MetricsJobPayload; timestamp: number }>
   ): Promise<void> {
     const { environment, appName, metrics, reportedAt, bucketStart } = job.data.payload;
 
@@ -127,27 +123,25 @@ class FeatureMetricsService {
       for (const flagName of uniqueFlagNames) {
         try {
           // Get flag by name to get the ID
-          const flag = await db("g_feature_flags")
-            .where("flagName", flagName)
-            .first();
+          const flag = await db('g_feature_flags').where('flagName', flagName).first();
           if (flag) {
             await FeatureFlagModel.updateLastSeenAt(flag.id, environment);
           }
         } catch (err) {
-          logger.debug("Failed to update lastSeenAt for flag", {
+          logger.debug('Failed to update lastSeenAt for flag', {
             flagName,
             error: err,
           });
         }
       }
 
-      logger.debug("Feature metrics processed", {
+      logger.debug('Feature metrics processed', {
         environment,
         count: metrics.length,
         jobId: job.id,
       });
     } catch (error) {
-      logger.error("Failed to process feature metrics job", {
+      logger.error('Failed to process feature metrics job', {
         error,
         jobId: job.id,
       });
@@ -162,13 +156,12 @@ class FeatureMetricsService {
     environment: string,
     appName: string | undefined,
     metric: AggregatedMetric,
-    hourBucket: Date,
+    hourBucket: Date
   ): Promise<void> {
     const { flagName, enabled, variantName, count } = metric;
 
     // Format hour bucket for MySQL DATETIME (YYYY-MM-DD HH:00:00)
-    const bucketDateTime =
-      hourBucket.toISOString().slice(0, 13).replace("T", " ") + ":00:00";
+    const bucketDateTime = hourBucket.toISOString().slice(0, 13).replace('T', ' ') + ':00:00';
 
     // Update yesCount or noCount based on enabled value
     const yesIncrement = enabled ? count : 0;
@@ -184,14 +177,14 @@ class FeatureMetricsService {
                 noCount = noCount + VALUES(noCount)
         `,
       [
-        require("ulid").ulid(),
+        require('ulid').ulid(),
         environment,
         appName || null,
         flagName,
         bucketDateTime,
         yesIncrement,
         noIncrement,
-      ],
+      ]
     );
 
     // If there's a variant, upsert to variant metrics table with appName
@@ -204,14 +197,14 @@ class FeatureMetricsService {
                     count = count + VALUES(count)
             `,
         [
-          require("ulid").ulid(),
+          require('ulid').ulid(),
           environment,
           appName || null,
           flagName,
           bucketDateTime,
           variantName,
           count,
-        ],
+        ]
       );
     }
   }
@@ -223,17 +216,17 @@ class FeatureMetricsService {
     environment: string,
     flagName: string,
     startDate: Date,
-    endDate: Date,
+    endDate: Date
   ): Promise<any[]> {
     try {
-      const metrics = await db("g_feature_metrics")
+      const metrics = await db('g_feature_metrics')
         .where({ environment, flagName })
-        .whereBetween("hourBucket", [startDate, endDate])
-        .orderBy("hourBucket", "asc");
+        .whereBetween('hourBucket', [startDate, endDate])
+        .orderBy('hourBucket', 'asc');
 
       return metrics;
     } catch (error) {
-      logger.error("Failed to get metrics for flag", {
+      logger.error('Failed to get metrics for flag', {
         error,
         environment,
         flagName,

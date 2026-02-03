@@ -1,6 +1,6 @@
-import { createClient, RedisClientType } from "redis";
-import { config } from "./index";
-import logger from "./logger";
+import { createClient, RedisClientType } from 'redis';
+import { config } from './index';
+import logger from './logger';
 
 export class RedisClient {
   private static instance: RedisClient;
@@ -15,20 +15,20 @@ export class RedisClient {
       password: config.redis.password || undefined,
     });
 
-    this.client.on("error", (err) => {
-      logger.error("Redis Client Error:", err);
+    this.client.on('error', (err) => {
+      logger.error('Redis Client Error:', err);
     });
 
-    this.client.on("connect", () => {
-      logger.info("Redis client connected");
+    this.client.on('connect', () => {
+      logger.info('Redis client connected');
     });
 
-    this.client.on("ready", () => {
-      logger.info("Redis client ready");
+    this.client.on('ready', () => {
+      logger.info('Redis client ready');
     });
 
-    this.client.on("end", () => {
-      logger.info("Redis client disconnected");
+    this.client.on('end', () => {
+      logger.info('Redis client disconnected');
     });
   }
 
@@ -42,9 +42,9 @@ export class RedisClient {
   public async connect(): Promise<void> {
     try {
       await this.client.connect();
-      logger.info("Redis connection established");
+      logger.info('Redis connection established');
     } catch (error) {
-      logger.error("Failed to connect to Redis:", error);
+      logger.error('Failed to connect to Redis:', error);
       throw error;
     }
   }
@@ -53,11 +53,7 @@ export class RedisClient {
     return this.client;
   }
 
-  public async set(
-    key: string,
-    value: string,
-    expireInSeconds?: number,
-  ): Promise<void> {
+  public async set(key: string, value: string, expireInSeconds?: number): Promise<void> {
     try {
       if (expireInSeconds) {
         await this.client.setEx(key, expireInSeconds, value);
@@ -65,7 +61,7 @@ export class RedisClient {
         await this.client.set(key, value);
       }
     } catch (error) {
-      logger.error("Redis SET error:", error);
+      logger.error('Redis SET error:', error);
       throw error;
     }
   }
@@ -74,7 +70,7 @@ export class RedisClient {
     try {
       return await this.client.get(key);
     } catch (error) {
-      logger.error("Redis GET error:", error);
+      logger.error('Redis GET error:', error);
       throw error;
     }
   }
@@ -83,7 +79,7 @@ export class RedisClient {
     try {
       await this.client.del(key);
     } catch (error) {
-      logger.error("Redis DEL error:", error);
+      logger.error('Redis DEL error:', error);
       throw error;
     }
   }
@@ -93,7 +89,7 @@ export class RedisClient {
       const result = await this.client.exists(key);
       return result === 1;
     } catch (error) {
-      logger.error("Redis EXISTS error:", error);
+      logger.error('Redis EXISTS error:', error);
       throw error;
     }
   }
@@ -104,18 +100,15 @@ export class RedisClient {
    * @param ttlSeconds - Time-to-live for the lock in seconds
    * @returns true if lock was acquired, false otherwise
    */
-  public async acquireLock(
-    lockKey: string,
-    ttlSeconds: number,
-  ): Promise<boolean> {
+  public async acquireLock(lockKey: string, ttlSeconds: number): Promise<boolean> {
     try {
       const result = await this.client.set(lockKey, Date.now().toString(), {
         NX: true, // Only set if key doesn't exist
         EX: ttlSeconds, // Set expiration time
       });
-      return result === "OK";
+      return result === 'OK';
     } catch (error) {
-      logger.error("Redis acquireLock error:", error);
+      logger.error('Redis acquireLock error:', error);
       return false;
     }
   }
@@ -128,16 +121,16 @@ export class RedisClient {
     try {
       await this.client.del(lockKey);
     } catch (error) {
-      logger.error("Redis releaseLock error:", error);
+      logger.error('Redis releaseLock error:', error);
     }
   }
 
   public async disconnect(): Promise<void> {
     try {
       await this.client.disconnect();
-      logger.info("Redis client disconnected");
+      logger.info('Redis client disconnected');
     } catch (error) {
-      logger.error("Error disconnecting Redis:", error);
+      logger.error('Error disconnecting Redis:', error);
     }
   }
 }

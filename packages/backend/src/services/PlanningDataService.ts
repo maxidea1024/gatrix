@@ -1,11 +1,11 @@
-import fs from "fs/promises";
-import path from "path";
-import crypto from "crypto";
-import { diff as deepDiff, Diff } from "deep-diff";
-import { GatrixError } from "../middleware/errorHandler";
-import logger from "../config/logger";
-import { cacheService } from "./CacheService";
-import db from "../config/knex";
+import fs from 'fs/promises';
+import path from 'path';
+import crypto from 'crypto';
+import { diff as deepDiff, Diff } from 'deep-diff';
+import { GatrixError } from '../middleware/errorHandler';
+import logger from '../config/logger';
+import { cacheService } from './CacheService';
+import db from '../config/knex';
 
 export interface RewardTypeInfo {
   value: number;
@@ -41,31 +41,28 @@ export interface RewardLookupData {
 
 export class PlanningDataService {
   // Source CMS files (read-only, from src/contents/cms)
-  private static sourceCmsPath = path.join(__dirname, "../contents/cms");
+  private static sourceCmsPath = path.join(__dirname, '../contents/cms');
 
   // Base runtime data path (read-write, for dynamically generated files)
   // Now environment-specific: data/planning/{environmentId}/
-  private static baseRuntimeDataPath = path.join(
-    __dirname,
-    "../../data/planning",
-  );
+  private static baseRuntimeDataPath = path.join(__dirname, '../../data/planning');
 
   private static initialized = false;
 
   // Redis cache key prefixes for environment-scoped data
-  private static readonly CACHE_KEY_PREFIX = "env";
+  private static readonly CACHE_KEY_PREFIX = 'env';
   private static readonly CACHE_KEYS = {
-    REWARD_LOOKUP_KR: "planning:reward-lookup-kr",
-    REWARD_LOOKUP_EN: "planning:reward-lookup-en",
-    REWARD_LOOKUP_ZH: "planning:reward-lookup-zh",
-    REWARD_TYPE_LIST: "planning:reward-type-list",
-    UI_LIST_DATA: "planning:ui-list-data",
-    HOT_TIME_BUFF: "planning:hottimebuff-lookup",
-    EVENT_PAGE: "planning:eventpage-lookup",
-    LIVE_EVENT: "planning:liveevent-lookup",
-    MATE_RECRUITING: "planning:materecruiting-lookup",
-    OCEAN_NPC_AREA: "planning:oceannpcarea-lookup",
-    CASH_SHOP: "planning:cashshop-lookup",
+    REWARD_LOOKUP_KR: 'planning:reward-lookup-kr',
+    REWARD_LOOKUP_EN: 'planning:reward-lookup-en',
+    REWARD_LOOKUP_ZH: 'planning:reward-lookup-zh',
+    REWARD_TYPE_LIST: 'planning:reward-type-list',
+    UI_LIST_DATA: 'planning:ui-list-data',
+    HOT_TIME_BUFF: 'planning:hottimebuff-lookup',
+    EVENT_PAGE: 'planning:eventpage-lookup',
+    LIVE_EVENT: 'planning:liveevent-lookup',
+    MATE_RECRUITING: 'planning:materecruiting-lookup',
+    OCEAN_NPC_AREA: 'planning:oceannpcarea-lookup',
+    CASH_SHOP: 'planning:cashshop-lookup',
   };
 
   /**
@@ -94,29 +91,29 @@ export class PlanningDataService {
    */
   private static getFileCacheKey(fileName: string): string | null {
     const fileKeyMap: Record<string, string> = {
-      "reward-lookup-kr.json": this.CACHE_KEYS.REWARD_LOOKUP_KR,
-      "reward-lookup-en.json": this.CACHE_KEYS.REWARD_LOOKUP_EN,
-      "reward-lookup-zh.json": this.CACHE_KEYS.REWARD_LOOKUP_ZH,
-      "reward-type-list.json": this.CACHE_KEYS.REWARD_TYPE_LIST,
-      "ui-list-data-kr.json": `${this.CACHE_KEYS.UI_LIST_DATA}:kr`,
-      "ui-list-data-en.json": `${this.CACHE_KEYS.UI_LIST_DATA}:en`,
-      "ui-list-data-zh.json": `${this.CACHE_KEYS.UI_LIST_DATA}:zh`,
-      "hottimebuff-lookup-kr.json": `${this.CACHE_KEYS.HOT_TIME_BUFF}:kr`,
-      "hottimebuff-lookup-en.json": `${this.CACHE_KEYS.HOT_TIME_BUFF}:en`,
-      "hottimebuff-lookup-zh.json": `${this.CACHE_KEYS.HOT_TIME_BUFF}:zh`,
-      "eventpage-lookup-kr.json": `${this.CACHE_KEYS.EVENT_PAGE}:kr`,
-      "eventpage-lookup-en.json": `${this.CACHE_KEYS.EVENT_PAGE}:en`,
-      "eventpage-lookup-zh.json": `${this.CACHE_KEYS.EVENT_PAGE}:zh`,
-      "liveevent-lookup-kr.json": `${this.CACHE_KEYS.LIVE_EVENT}:kr`,
-      "liveevent-lookup-en.json": `${this.CACHE_KEYS.LIVE_EVENT}:en`,
-      "liveevent-lookup-zh.json": `${this.CACHE_KEYS.LIVE_EVENT}:zh`,
-      "materecruiting-lookup-kr.json": `${this.CACHE_KEYS.MATE_RECRUITING}:kr`,
-      "materecruiting-lookup-en.json": `${this.CACHE_KEYS.MATE_RECRUITING}:en`,
-      "materecruiting-lookup-zh.json": `${this.CACHE_KEYS.MATE_RECRUITING}:zh`,
-      "oceannpcarea-lookup-kr.json": `${this.CACHE_KEYS.OCEAN_NPC_AREA}:kr`,
-      "oceannpcarea-lookup-en.json": `${this.CACHE_KEYS.OCEAN_NPC_AREA}:en`,
-      "oceannpcarea-lookup-zh.json": `${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`,
-      "cashshop-lookup.json": this.CACHE_KEYS.CASH_SHOP,
+      'reward-lookup-kr.json': this.CACHE_KEYS.REWARD_LOOKUP_KR,
+      'reward-lookup-en.json': this.CACHE_KEYS.REWARD_LOOKUP_EN,
+      'reward-lookup-zh.json': this.CACHE_KEYS.REWARD_LOOKUP_ZH,
+      'reward-type-list.json': this.CACHE_KEYS.REWARD_TYPE_LIST,
+      'ui-list-data-kr.json': `${this.CACHE_KEYS.UI_LIST_DATA}:kr`,
+      'ui-list-data-en.json': `${this.CACHE_KEYS.UI_LIST_DATA}:en`,
+      'ui-list-data-zh.json': `${this.CACHE_KEYS.UI_LIST_DATA}:zh`,
+      'hottimebuff-lookup-kr.json': `${this.CACHE_KEYS.HOT_TIME_BUFF}:kr`,
+      'hottimebuff-lookup-en.json': `${this.CACHE_KEYS.HOT_TIME_BUFF}:en`,
+      'hottimebuff-lookup-zh.json': `${this.CACHE_KEYS.HOT_TIME_BUFF}:zh`,
+      'eventpage-lookup-kr.json': `${this.CACHE_KEYS.EVENT_PAGE}:kr`,
+      'eventpage-lookup-en.json': `${this.CACHE_KEYS.EVENT_PAGE}:en`,
+      'eventpage-lookup-zh.json': `${this.CACHE_KEYS.EVENT_PAGE}:zh`,
+      'liveevent-lookup-kr.json': `${this.CACHE_KEYS.LIVE_EVENT}:kr`,
+      'liveevent-lookup-en.json': `${this.CACHE_KEYS.LIVE_EVENT}:en`,
+      'liveevent-lookup-zh.json': `${this.CACHE_KEYS.LIVE_EVENT}:zh`,
+      'materecruiting-lookup-kr.json': `${this.CACHE_KEYS.MATE_RECRUITING}:kr`,
+      'materecruiting-lookup-en.json': `${this.CACHE_KEYS.MATE_RECRUITING}:en`,
+      'materecruiting-lookup-zh.json': `${this.CACHE_KEYS.MATE_RECRUITING}:zh`,
+      'oceannpcarea-lookup-kr.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:kr`,
+      'oceannpcarea-lookup-en.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:en`,
+      'oceannpcarea-lookup-zh.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`,
+      'cashshop-lookup.json': this.CACHE_KEYS.CASH_SHOP,
     };
     return fileKeyMap[fileName] || null;
   }
@@ -135,13 +132,13 @@ export class PlanningDataService {
     try {
       // Ensure base runtime data directory exists
       await fs.mkdir(this.baseRuntimeDataPath, { recursive: true });
-      logger.info("Runtime data directory ready", {
+      logger.info('Runtime data directory ready', {
         path: this.baseRuntimeDataPath,
       });
 
       this.initialized = true;
     } catch (error) {
-      logger.error("Failed to initialize planning data", { error });
+      logger.error('Failed to initialize planning data', { error });
       // Don't throw error - allow server to start even if planning data fails
     }
   }
@@ -162,13 +159,13 @@ export class PlanningDataService {
    */
   static async getRewardLookup(
     environment: string,
-    lang: "kr" | "en" | "zh" = "kr",
+    lang: 'kr' | 'en' | 'zh' = 'kr'
   ): Promise<RewardLookupData> {
     try {
       const baseCacheKey =
-        lang === "en"
+        lang === 'en'
           ? this.CACHE_KEYS.REWARD_LOOKUP_EN
-          : lang === "zh"
+          : lang === 'zh'
             ? this.CACHE_KEYS.REWARD_LOOKUP_ZH
             : this.CACHE_KEYS.REWARD_LOOKUP_KR;
       const cacheKey = this.getEnvCacheKey(environment, baseCacheKey);
@@ -188,12 +185,12 @@ export class PlanningDataService {
       });
       return {};
     } catch (error) {
-      logger.error("Failed to read reward lookup data", {
+      logger.error('Failed to read reward lookup data', {
         error,
         lang,
         environment,
       });
-      throw new GatrixError("Failed to load reward lookup data", 500);
+      throw new GatrixError('Failed to load reward lookup data', 500);
     }
   }
 
@@ -202,28 +199,23 @@ export class PlanningDataService {
    * Data is stored only in Redis cache
    * @param environment Environment name
    */
-  static async getRewardTypeList(
-    environment: string,
-  ): Promise<RewardTypeInfo[]> {
+  static async getRewardTypeList(environment: string): Promise<RewardTypeInfo[]> {
     try {
-      const cacheKey = this.getEnvCacheKey(
-        environment,
-        this.CACHE_KEYS.REWARD_TYPE_LIST,
-      );
+      const cacheKey = this.getEnvCacheKey(environment, this.CACHE_KEYS.REWARD_TYPE_LIST);
 
       // Get from Redis cache only
       const cached = await cacheService.get<RewardTypeInfo[]>(cacheKey);
       if (cached) {
-        logger.debug("Reward type list retrieved from cache", { environment });
+        logger.debug('Reward type list retrieved from cache', { environment });
         return cached;
       }
 
       // No data in cache - return empty
-      logger.debug("Reward type list not found in cache", { environment });
+      logger.debug('Reward type list not found in cache', { environment });
       return [];
     } catch (error) {
-      logger.error("Failed to read reward type list", { error, environment });
-      throw new GatrixError("Failed to load reward type list", 500);
+      logger.error('Failed to read reward type list', { error, environment });
+      throw new GatrixError('Failed to load reward type list', 500);
     }
   }
 
@@ -236,14 +228,11 @@ export class PlanningDataService {
   static async getRewardTypeItems(
     environment: string,
     rewardType: number,
-    language: "kr" | "en" | "zh" = "kr",
+    language: 'kr' | 'en' | 'zh' = 'kr'
   ): Promise<RewardItem[]> {
     try {
       // Load the language-specific reward lookup data
-      const lookupData = await PlanningDataService.getRewardLookup(
-        environment,
-        language,
-      );
+      const lookupData = await PlanningDataService.getRewardLookup(environment, language);
       const typeData = lookupData[rewardType.toString()];
 
       if (!typeData) {
@@ -256,12 +245,12 @@ export class PlanningDataService {
       if (error instanceof GatrixError) {
         throw error;
       }
-      logger.error("Failed to get reward type items", {
+      logger.error('Failed to get reward type items', {
         error,
         rewardType,
         language,
       });
-      throw new GatrixError("Failed to load reward type items", 500);
+      throw new GatrixError('Failed to load reward type items', 500);
     }
   }
 
@@ -271,15 +260,9 @@ export class PlanningDataService {
    * @param environment Environment name
    * @param lang Language code: 'kr', 'en', 'zh'
    */
-  static async getUIListData(
-    environment: string,
-    lang: "kr" | "en" | "zh" = "kr",
-  ): Promise<any> {
+  static async getUIListData(environment: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<any> {
     try {
-      const cacheKey = this.getEnvCacheKey(
-        environment,
-        `${this.CACHE_KEYS.UI_LIST_DATA}:${lang}`,
-      );
+      const cacheKey = this.getEnvCacheKey(environment, `${this.CACHE_KEYS.UI_LIST_DATA}:${lang}`);
 
       // Get from Redis cache only
       const cached = await cacheService.get<any>(cacheKey);
@@ -296,8 +279,8 @@ export class PlanningDataService {
       });
       return { nations: [], towns: [], villages: [] };
     } catch (error) {
-      logger.error("Failed to read UI list data", { error, environment });
-      throw new GatrixError("Failed to load UI list data", 500);
+      logger.error('Failed to read UI list data', { error, environment });
+      throw new GatrixError('Failed to load UI list data', 500);
     }
   }
 
@@ -310,13 +293,10 @@ export class PlanningDataService {
   static async getUIListItems(
     environment: string,
     category: string,
-    language: "kr" | "en" | "zh" = "kr",
+    language: 'kr' | 'en' | 'zh' = 'kr'
   ): Promise<any[]> {
     try {
-      const uiListData = await PlanningDataService.getUIListData(
-        environment,
-        language,
-      );
+      const uiListData = await PlanningDataService.getUIListData(environment, language);
 
       if (!uiListData[category]) {
         throw new GatrixError(`Category '${category}' not found`, 404);
@@ -327,13 +307,13 @@ export class PlanningDataService {
       if (error instanceof GatrixError) {
         throw error;
       }
-      logger.error("Failed to get UI list items", {
+      logger.error('Failed to get UI list items', {
         error,
         category,
         language,
         environment,
       });
-      throw new GatrixError("Failed to load UI list items", 500);
+      throw new GatrixError('Failed to load UI list items', 500);
     }
   }
 
@@ -352,23 +332,23 @@ export class PlanningDataService {
       // Check which files exist
       const filesExist = {
         rewardLookupKo: await fs
-          .access(path.join(envDataPath, "reward-lookup-kr.json"))
+          .access(path.join(envDataPath, 'reward-lookup-kr.json'))
           .then(() => true)
           .catch(() => false),
         rewardLookupEn: await fs
-          .access(path.join(envDataPath, "reward-lookup-en.json"))
+          .access(path.join(envDataPath, 'reward-lookup-en.json'))
           .then(() => true)
           .catch(() => false),
         rewardLookupZh: await fs
-          .access(path.join(envDataPath, "reward-lookup-zh.json"))
+          .access(path.join(envDataPath, 'reward-lookup-zh.json'))
           .then(() => true)
           .catch(() => false),
         rewardTypeList: await fs
-          .access(path.join(envDataPath, "reward-type-list.json"))
+          .access(path.join(envDataPath, 'reward-type-list.json'))
           .then(() => true)
           .catch(() => false),
         uiListData: await fs
-          .access(path.join(envDataPath, "ui-list-data-kr.json"))
+          .access(path.join(envDataPath, 'ui-list-data-kr.json'))
           .then(() => true)
           .catch(() => false),
       };
@@ -385,10 +365,7 @@ export class PlanningDataService {
         totalRewardTypes: typeList.length,
         rewardTypesWithTable: typeList.filter((t) => t.hasTable).length,
         rewardTypesWithoutTable: typeList.filter((t) => !t.hasTable).length,
-        totalItems: Object.values(lookupData).reduce(
-          (sum, type) => sum + type.itemCount,
-          0,
-        ),
+        totalItems: Object.values(lookupData).reduce((sum, type) => sum + type.itemCount, 0),
         filesExist,
         uiListCounts,
         rewardTypes: typeList.map((t) => ({
@@ -400,8 +377,8 @@ export class PlanningDataService {
         })),
       };
     } catch (error) {
-      logger.error("Failed to get planning data stats", { error, environment });
-      throw new GatrixError("Failed to load planning data statistics", 500);
+      logger.error('Failed to get planning data stats', { error, environment });
+      throw new GatrixError('Failed to load planning data statistics', 500);
     }
   }
 
@@ -413,13 +390,10 @@ export class PlanningDataService {
    */
   static async getHotTimeBuffLookup(
     environment: string,
-    lang: "kr" | "en" | "zh" = "kr",
+    lang: 'kr' | 'en' | 'zh' = 'kr'
   ): Promise<Record<string, any>> {
     try {
-      const cacheKey = this.getEnvCacheKey(
-        environment,
-        `${this.CACHE_KEYS.HOT_TIME_BUFF}:${lang}`,
-      );
+      const cacheKey = this.getEnvCacheKey(environment, `${this.CACHE_KEYS.HOT_TIME_BUFF}:${lang}`);
 
       // Get from Redis cache only
       const cached = await cacheService.get<Record<string, any>>(cacheKey);
@@ -436,11 +410,11 @@ export class PlanningDataService {
       });
       return {};
     } catch (error) {
-      logger.error("Failed to read HotTimeBuff lookup data", {
+      logger.error('Failed to read HotTimeBuff lookup data', {
         error,
         environment,
       });
-      throw new GatrixError("Failed to load HotTimeBuff lookup data", 500);
+      throw new GatrixError('Failed to load HotTimeBuff lookup data', 500);
     }
   }
 
@@ -452,13 +426,10 @@ export class PlanningDataService {
    */
   static async getEventPageLookup(
     environment: string,
-    lang: "kr" | "en" | "zh" = "kr",
+    lang: 'kr' | 'en' | 'zh' = 'kr'
   ): Promise<Record<string, any>> {
     try {
-      const cacheKey = this.getEnvCacheKey(
-        environment,
-        `${this.CACHE_KEYS.EVENT_PAGE}:${lang}`,
-      );
+      const cacheKey = this.getEnvCacheKey(environment, `${this.CACHE_KEYS.EVENT_PAGE}:${lang}`);
 
       // Get from Redis cache only
       const cached = await cacheService.get<Record<string, any>>(cacheKey);
@@ -475,11 +446,11 @@ export class PlanningDataService {
       });
       return { totalCount: 0, items: [] };
     } catch (error) {
-      logger.error("Failed to read EventPage lookup data", {
+      logger.error('Failed to read EventPage lookup data', {
         error,
         environment,
       });
-      throw new GatrixError("Failed to load EventPage lookup data", 500);
+      throw new GatrixError('Failed to load EventPage lookup data', 500);
     }
   }
 
@@ -491,13 +462,10 @@ export class PlanningDataService {
    */
   static async getLiveEventLookup(
     environment: string,
-    lang: "kr" | "en" | "zh" = "kr",
+    lang: 'kr' | 'en' | 'zh' = 'kr'
   ): Promise<Record<string, any>> {
     try {
-      const cacheKey = this.getEnvCacheKey(
-        environment,
-        `${this.CACHE_KEYS.LIVE_EVENT}:${lang}`,
-      );
+      const cacheKey = this.getEnvCacheKey(environment, `${this.CACHE_KEYS.LIVE_EVENT}:${lang}`);
 
       // Get from Redis cache only
       const cached = await cacheService.get<Record<string, any>>(cacheKey);
@@ -514,11 +482,11 @@ export class PlanningDataService {
       });
       return { totalCount: 0, items: [] };
     } catch (error) {
-      logger.error("Failed to read LiveEvent lookup data", {
+      logger.error('Failed to read LiveEvent lookup data', {
         error,
         environment,
       });
-      throw new GatrixError("Failed to load LiveEvent lookup data", 500);
+      throw new GatrixError('Failed to load LiveEvent lookup data', 500);
     }
   }
 
@@ -530,39 +498,32 @@ export class PlanningDataService {
    */
   static async getMateRecruitingGroupLookup(
     environment: string,
-    lang: "kr" | "en" | "zh" = "kr",
+    lang: 'kr' | 'en' | 'zh' = 'kr'
   ): Promise<Record<string, any>> {
     try {
       const cacheKey = this.getEnvCacheKey(
         environment,
-        `${this.CACHE_KEYS.MATE_RECRUITING}:${lang}`,
+        `${this.CACHE_KEYS.MATE_RECRUITING}:${lang}`
       );
 
       // Get from Redis cache only
       const cached = await cacheService.get<Record<string, any>>(cacheKey);
       if (cached) {
-        logger.debug(
-          `MateRecruitingGroup lookup data (${lang}) retrieved from cache`,
-          { environment },
-        );
+        logger.debug(`MateRecruitingGroup lookup data (${lang}) retrieved from cache`, {
+          environment,
+        });
         return cached;
       }
 
       // No data in cache - return empty
-      logger.debug(
-        `MateRecruitingGroup lookup data (${lang}) not found in cache`,
-        { environment },
-      );
+      logger.debug(`MateRecruitingGroup lookup data (${lang}) not found in cache`, { environment });
       return { totalCount: 0, items: [] };
     } catch (error) {
-      logger.error("Failed to read MateRecruitingGroup lookup data", {
+      logger.error('Failed to read MateRecruitingGroup lookup data', {
         error,
         environment,
       });
-      throw new GatrixError(
-        "Failed to load MateRecruitingGroup lookup data",
-        500,
-      );
+      throw new GatrixError('Failed to load MateRecruitingGroup lookup data', 500);
     }
   }
 
@@ -574,39 +535,32 @@ export class PlanningDataService {
    */
   static async getOceanNpcAreaSpawnerLookup(
     environment: string,
-    lang: "kr" | "en" | "zh" = "kr",
+    lang: 'kr' | 'en' | 'zh' = 'kr'
   ): Promise<Record<string, any>> {
     try {
       const cacheKey = this.getEnvCacheKey(
         environment,
-        `${this.CACHE_KEYS.OCEAN_NPC_AREA}:${lang}`,
+        `${this.CACHE_KEYS.OCEAN_NPC_AREA}:${lang}`
       );
 
       // Get from Redis cache only
       const cached = await cacheService.get<Record<string, any>>(cacheKey);
       if (cached) {
-        logger.debug(
-          `OceanNpcAreaSpawner lookup data (${lang}) retrieved from cache`,
-          { environment },
-        );
+        logger.debug(`OceanNpcAreaSpawner lookup data (${lang}) retrieved from cache`, {
+          environment,
+        });
         return cached;
       }
 
       // No data in cache - return empty
-      logger.debug(
-        `OceanNpcAreaSpawner lookup data (${lang}) not found in cache`,
-        { environment },
-      );
+      logger.debug(`OceanNpcAreaSpawner lookup data (${lang}) not found in cache`, { environment });
       return { totalCount: 0, items: [] };
     } catch (error) {
-      logger.error("Failed to read OceanNpcAreaSpawner lookup data", {
+      logger.error('Failed to read OceanNpcAreaSpawner lookup data', {
         error,
         environment,
       });
-      throw new GatrixError(
-        "Failed to load OceanNpcAreaSpawner lookup data",
-        500,
-      );
+      throw new GatrixError('Failed to load OceanNpcAreaSpawner lookup data', 500);
     }
   }
 
@@ -615,33 +569,28 @@ export class PlanningDataService {
    * Data is stored only in Redis cache
    * @param environment Environment name
    */
-  static async getCashShopLookup(
-    environment: string,
-  ): Promise<Record<string, any>> {
+  static async getCashShopLookup(environment: string): Promise<Record<string, any>> {
     try {
-      const cacheKey = this.getEnvCacheKey(
-        environment,
-        this.CACHE_KEYS.CASH_SHOP,
-      );
+      const cacheKey = this.getEnvCacheKey(environment, this.CACHE_KEYS.CASH_SHOP);
 
       // Get from Redis cache only
       const cached = await cacheService.get<Record<string, any>>(cacheKey);
       if (cached) {
-        logger.debug("CashShop lookup data retrieved from cache", {
+        logger.debug('CashShop lookup data retrieved from cache', {
           environment,
         });
         return cached;
       }
 
       // No data in cache - return empty
-      logger.debug("CashShop lookup data not found in cache", { environment });
+      logger.debug('CashShop lookup data not found in cache', { environment });
       return { totalCount: 0, items: [] };
     } catch (error) {
-      logger.error("Failed to read CashShop lookup data", {
+      logger.error('Failed to read CashShop lookup data', {
         error,
         environment,
       });
-      throw new GatrixError("Failed to load CashShop lookup data", 500);
+      throw new GatrixError('Failed to load CashShop lookup data', 500);
     }
   }
 
@@ -658,10 +607,10 @@ export class PlanningDataService {
     uploadInfo?: {
       uploadedBy?: number;
       uploaderName?: string;
-      uploadSource?: "web" | "cli";
+      uploadSource?: 'web' | 'cli';
       uploadComment?: string;
       forceUpload?: boolean;
-    },
+    }
   ): Promise<{
     success: boolean;
     message: string;
@@ -670,7 +619,7 @@ export class PlanningDataService {
     uploadRecord?: any;
   }> {
     try {
-      logger.info("Starting planning data upload...", {
+      logger.info('Starting planning data upload...', {
         environment,
         uploadInfo,
       });
@@ -678,41 +627,41 @@ export class PlanningDataService {
       // Expected file names
       const expectedFiles = [
         // Reward data
-        "reward-type-list.json",
-        "reward-lookup-kr.json",
-        "reward-lookup-en.json",
-        "reward-lookup-zh.json",
+        'reward-type-list.json',
+        'reward-lookup-kr.json',
+        'reward-lookup-en.json',
+        'reward-lookup-zh.json',
         // UI data
-        "ui-list-data-kr.json",
-        "ui-list-data-en.json",
-        "ui-list-data-zh.json",
+        'ui-list-data-kr.json',
+        'ui-list-data-en.json',
+        'ui-list-data-zh.json',
         // Event data - HotTimeBuff
-        "hottimebuff-lookup-kr.json",
-        "hottimebuff-lookup-en.json",
-        "hottimebuff-lookup-zh.json",
+        'hottimebuff-lookup-kr.json',
+        'hottimebuff-lookup-en.json',
+        'hottimebuff-lookup-zh.json',
         // Event data - EventPage
-        "eventpage-lookup-kr.json",
-        "eventpage-lookup-en.json",
-        "eventpage-lookup-zh.json",
+        'eventpage-lookup-kr.json',
+        'eventpage-lookup-en.json',
+        'eventpage-lookup-zh.json',
         // Event data - LiveEvent
-        "liveevent-lookup-kr.json",
-        "liveevent-lookup-en.json",
-        "liveevent-lookup-zh.json",
+        'liveevent-lookup-kr.json',
+        'liveevent-lookup-en.json',
+        'liveevent-lookup-zh.json',
         // Event data - MateRecruiting
-        "materecruiting-lookup-kr.json",
-        "materecruiting-lookup-en.json",
-        "materecruiting-lookup-zh.json",
+        'materecruiting-lookup-kr.json',
+        'materecruiting-lookup-en.json',
+        'materecruiting-lookup-zh.json',
         // Event data - OceanNpcArea
-        "oceannpcarea-lookup-kr.json",
-        "oceannpcarea-lookup-en.json",
-        "oceannpcarea-lookup-zh.json",
+        'oceannpcarea-lookup-kr.json',
+        'oceannpcarea-lookup-en.json',
+        'oceannpcarea-lookup-zh.json',
         // CashShop data (unified multi-language file)
-        "cashshop-lookup.json",
+        'cashshop-lookup.json',
       ];
 
       // Validate uploaded files
       if (!files || Object.keys(files).length === 0) {
-        throw new GatrixError("No files uploaded", 400);
+        throw new GatrixError('No files uploaded', 400);
       }
 
       const uploadedFiles: string[] = [];
@@ -743,20 +692,17 @@ export class PlanningDataService {
 
         // Validate JSON format
         try {
-          const content = file.buffer.toString("utf-8");
+          const content = file.buffer.toString('utf-8');
           JSON.parse(content);
         } catch (error) {
           throw new GatrixError(`File ${fileName} is not valid JSON`, 400);
         }
 
         // Calculate file hash
-        const fileHash = crypto
-          .createHash("sha256")
-          .update(file.buffer)
-          .digest("hex");
+        const fileHash = crypto.createHash('sha256').update(file.buffer).digest('hex');
         fileHashes[fileName] = fileHash;
-        fileContents[fileName] = file.buffer.toString("utf-8");
-        fileParsedData[fileName] = JSON.parse(file.buffer.toString("utf-8"));
+        fileContents[fileName] = file.buffer.toString('utf-8');
+        fileParsedData[fileName] = JSON.parse(file.buffer.toString('utf-8'));
         allBuffers.push(file.buffer);
 
         uploadedFiles.push(fileName);
@@ -773,45 +719,35 @@ export class PlanningDataService {
 
       if (uploadedFiles.length === 0) {
         if (invalidFiles.length > 0) {
-          throw new GatrixError(
-            `인식할 수 없는 파일입니다: ${invalidFiles.join(", ")}`,
-            400,
-          );
+          throw new GatrixError(`인식할 수 없는 파일입니다: ${invalidFiles.join(', ')}`, 400);
         }
-        throw new GatrixError("No valid files were uploaded", 400);
+        throw new GatrixError('No valid files were uploaded', 400);
       }
 
       // Calculate overall upload hash
-      const combinedHash = crypto.createHash("sha256");
+      const combinedHash = crypto.createHash('sha256');
       allBuffers.forEach((buf) => combinedHash.update(buf));
-      const uploadHash = combinedHash.digest("hex");
+      const uploadHash = combinedHash.digest('hex');
 
       // Get previous upload to determine changed files
-      const previousUpload = await db("planningDataUploads")
+      const previousUpload = await db('planningDataUploads')
         .where({ environment })
-        .orderBy("uploadedAt", "desc")
+        .orderBy('uploadedAt', 'desc')
         .first();
 
       // Check if upload hash is the same - skip if no changes (unless forceUpload is true)
-      if (
-        !uploadInfo?.forceUpload &&
-        previousUpload &&
-        previousUpload.uploadHash === uploadHash
-      ) {
-        logger.info("Planning data upload skipped - no changes detected", {
+      if (!uploadInfo?.forceUpload && previousUpload && previousUpload.uploadHash === uploadHash) {
+        logger.info('Planning data upload skipped - no changes detected', {
           environment,
           uploadHash: uploadHash.substring(0, 16),
         });
         return {
           success: true,
-          message: "No changes detected - upload skipped",
+          message: 'No changes detected - upload skipped',
           filesUploaded: uploadedFiles,
           stats: {
             filesUploaded: uploadedFiles.length,
-            totalSize: Object.values(fileStats).reduce(
-              (sum, stat) => sum + stat.size,
-              0,
-            ),
+            totalSize: Object.values(fileStats).reduce((sum, stat) => sum + stat.size, 0),
             timestamp: new Date().toISOString(),
             uploadHash: uploadHash.substring(0, 16),
             changedFilesCount: 0,
@@ -822,7 +758,7 @@ export class PlanningDataService {
       }
 
       if (uploadInfo?.forceUpload) {
-        logger.info("Force upload enabled - bypassing hash check", {
+        logger.info('Force upload enabled - bypassing hash check', {
           environment,
         });
       }
@@ -860,11 +796,7 @@ export class PlanningDataService {
 
                 // Calculate detailed diff
                 const diff = this.calculateJsonDiff(prevContent, currentJson);
-                if (
-                  diff.added.length > 0 ||
-                  diff.removed.length > 0 ||
-                  diff.modified.length > 0
-                ) {
+                if (diff.added.length > 0 || diff.removed.length > 0 || diff.modified.length > 0) {
                   fileDiffs[fileName] = diff;
                 }
                 logger.debug(`File changed: ${fileName}`, {
@@ -891,13 +823,10 @@ export class PlanningDataService {
       }
 
       // Calculate total size
-      const totalSize = Object.values(fileStats).reduce(
-        (sum, stat) => sum + stat.size,
-        0,
-      );
+      const totalSize = Object.values(fileStats).reduce((sum, stat) => sum + stat.size, 0);
 
       // Save upload record to database
-      const [uploadRecordId] = await db("planningDataUploads").insert({
+      const [uploadRecordId] = await db('planningDataUploads').insert({
         environment,
         uploadHash,
         filesUploaded: JSON.stringify(uploadedFiles),
@@ -906,22 +835,20 @@ export class PlanningDataService {
         totalSize,
         uploadedBy: uploadInfo?.uploadedBy || null,
         uploaderName: uploadInfo?.uploaderName || null,
-        uploadSource: uploadInfo?.uploadSource || "web",
+        uploadSource: uploadInfo?.uploadSource || 'web',
         uploadComment: uploadInfo?.uploadComment || null,
         changedFiles: JSON.stringify(changedFiles),
         fileDiffs: JSON.stringify(fileDiffs),
-        uploadedAt: db.raw("UTC_TIMESTAMP()"),
+        uploadedAt: db.raw('UTC_TIMESTAMP()'),
       });
 
       // Fetch the created record
-      const uploadRecord = await db("planningDataUploads")
-        .where({ id: uploadRecordId })
-        .first();
+      const uploadRecord = await db('planningDataUploads').where({ id: uploadRecordId }).first();
 
       // Cache all uploaded files in Redis (environment-scoped) - directly from parsed data
       await this.cacheUploadedFiles(environment, uploadedFiles, fileParsedData);
 
-      logger.info("Planning data uploaded and cached successfully", {
+      logger.info('Planning data uploaded and cached successfully', {
         filesUploaded: uploadedFiles,
         uploadHash: uploadHash.substring(0, 8),
         changedFiles,
@@ -952,8 +879,8 @@ export class PlanningDataService {
       };
     } catch (error) {
       if (error instanceof GatrixError) throw error;
-      logger.error("Failed to upload planning data", { error, environment });
-      throw new GatrixError("Failed to upload planning data", 500);
+      logger.error('Failed to upload planning data', { error, environment });
+      throw new GatrixError('Failed to upload planning data', 500);
     }
   }
 
@@ -962,21 +889,18 @@ export class PlanningDataService {
    * @param environment Environment name
    * @param limit Maximum number of records to return
    */
-  static async getUploadHistory(
-    environment: string,
-    limit: number = 20,
-  ): Promise<any[]> {
+  static async getUploadHistory(environment: string, limit: number = 20): Promise<any[]> {
     try {
-      const uploads = await db("planningDataUploads")
+      const uploads = await db('planningDataUploads')
         .where({ environment })
-        .orderBy("uploadedAt", "desc")
+        .orderBy('uploadedAt', 'desc')
         .limit(limit);
 
       return uploads.map((upload) => ({
         id: upload.id,
         uploadHash: upload.uploadHash.substring(0, 16),
         filesUploaded:
-          typeof upload.filesUploaded === "string"
+          typeof upload.filesUploaded === 'string'
             ? JSON.parse(upload.filesUploaded)
             : upload.filesUploaded,
         filesCount: upload.filesCount,
@@ -985,18 +909,18 @@ export class PlanningDataService {
         uploadSource: upload.uploadSource,
         uploadComment: upload.uploadComment,
         changedFiles:
-          typeof upload.changedFiles === "string"
+          typeof upload.changedFiles === 'string'
             ? JSON.parse(upload.changedFiles)
             : upload.changedFiles || [],
         fileDiffs:
-          typeof upload.fileDiffs === "string"
+          typeof upload.fileDiffs === 'string'
             ? JSON.parse(upload.fileDiffs)
             : upload.fileDiffs || {},
         uploadedAt: upload.uploadedAt,
       }));
     } catch (error) {
-      logger.error("Failed to get upload history", { error, environment });
-      throw new GatrixError("Failed to get upload history", 500);
+      logger.error('Failed to get upload history', { error, environment });
+      throw new GatrixError('Failed to get upload history', 500);
     }
   }
 
@@ -1006,9 +930,9 @@ export class PlanningDataService {
    */
   static async getLatestUpload(environment: string): Promise<any | null> {
     try {
-      const upload = await db("planningDataUploads")
+      const upload = await db('planningDataUploads')
         .where({ environment })
-        .orderBy("uploadedAt", "desc")
+        .orderBy('uploadedAt', 'desc')
         .first();
 
       if (!upload) return null;
@@ -1017,7 +941,7 @@ export class PlanningDataService {
         id: upload.id,
         uploadHash: upload.uploadHash.substring(0, 16),
         filesUploaded:
-          typeof upload.filesUploaded === "string"
+          typeof upload.filesUploaded === 'string'
             ? JSON.parse(upload.filesUploaded)
             : upload.filesUploaded,
         filesCount: upload.filesCount,
@@ -1026,18 +950,18 @@ export class PlanningDataService {
         uploadSource: upload.uploadSource,
         uploadComment: upload.uploadComment,
         changedFiles:
-          typeof upload.changedFiles === "string"
+          typeof upload.changedFiles === 'string'
             ? JSON.parse(upload.changedFiles)
             : upload.changedFiles || [],
         fileDiffs:
-          typeof upload.fileDiffs === "string"
+          typeof upload.fileDiffs === 'string'
             ? JSON.parse(upload.fileDiffs)
             : upload.fileDiffs || {},
         uploadedAt: upload.uploadedAt,
       };
     } catch (error) {
-      logger.error("Failed to get latest upload", { error, environment });
-      throw new GatrixError("Failed to get latest upload", 500);
+      logger.error('Failed to get latest upload', { error, environment });
+      throw new GatrixError('Failed to get latest upload', 500);
     }
   }
 
@@ -1048,15 +972,13 @@ export class PlanningDataService {
    */
   static async resetUploadHistory(environment: string): Promise<number> {
     try {
-      const deletedCount = await db("planningDataUploads")
-        .where({ environment })
-        .delete();
+      const deletedCount = await db('planningDataUploads').where({ environment }).delete();
 
-      logger.info("Upload history reset", { deletedCount, environment });
+      logger.info('Upload history reset', { deletedCount, environment });
       return deletedCount;
     } catch (error) {
-      logger.error("Failed to reset upload history", { error, environment });
-      throw new GatrixError("Failed to reset upload history", 500);
+      logger.error('Failed to reset upload history', { error, environment });
+      throw new GatrixError('Failed to reset upload history', 500);
     }
   }
 
@@ -1065,24 +987,19 @@ export class PlanningDataService {
    * @param environment Environment name
    * @param retentionDays Number of days to keep records (default from env: PLANNING_DATA_RETENTION_DAYS)
    */
-  static async cleanupOldRecords(
-    environment: string,
-    retentionDays?: number,
-  ): Promise<number> {
+  static async cleanupOldRecords(environment: string, retentionDays?: number): Promise<number> {
     try {
-      const days =
-        retentionDays ||
-        parseInt(process.env.PLANNING_DATA_RETENTION_DAYS || "14", 10);
+      const days = retentionDays || parseInt(process.env.PLANNING_DATA_RETENTION_DAYS || '14', 10);
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - days);
 
-      const deletedCount = await db("planningDataUploads")
+      const deletedCount = await db('planningDataUploads')
         .where({ environment })
-        .where("uploadedAt", "<", cutoffDate)
+        .where('uploadedAt', '<', cutoffDate)
         .delete();
 
       if (deletedCount > 0) {
-        logger.info("Old upload records cleaned up", {
+        logger.info('Old upload records cleaned up', {
           environment,
           deletedCount,
           retentionDays: days,
@@ -1091,11 +1008,11 @@ export class PlanningDataService {
 
       return deletedCount;
     } catch (error) {
-      logger.error("Failed to cleanup old upload records", {
+      logger.error('Failed to cleanup old upload records', {
         error,
         environment,
       });
-      throw new GatrixError("Failed to cleanup old upload records", 500);
+      throw new GatrixError('Failed to cleanup old upload records', 500);
     }
   }
 
@@ -1108,9 +1025,9 @@ export class PlanningDataService {
     byEnvironment: Record<string, number>;
   }> {
     try {
-      const environments = await db("planningDataUploads")
-        .distinct("environment")
-        .pluck("environment");
+      const environments = await db('planningDataUploads')
+        .distinct('environment')
+        .pluck('environment');
 
       const byEnvironment: Record<string, number> = {};
       let total = 0;
@@ -1122,7 +1039,7 @@ export class PlanningDataService {
       }
 
       if (total > 0) {
-        logger.info("Planning data upload records cleanup completed", {
+        logger.info('Planning data upload records cleanup completed', {
           total,
           byEnvironment,
         });
@@ -1130,8 +1047,8 @@ export class PlanningDataService {
 
       return { total, byEnvironment };
     } catch (error) {
-      logger.error("Failed to cleanup all environments", { error });
-      throw new GatrixError("Failed to cleanup old upload records", 500);
+      logger.error('Failed to cleanup all environments', { error });
+      throw new GatrixError('Failed to cleanup old upload records', 500);
     }
   }
 
@@ -1145,36 +1062,36 @@ export class PlanningDataService {
   private static async cacheUploadedFiles(
     environment: string,
     uploadedFiles: string[],
-    fileParsedData: Record<string, any>,
+    fileParsedData: Record<string, any>
   ): Promise<void> {
     try {
-      logger.info("Caching uploaded files in Redis...", { environment });
+      logger.info('Caching uploaded files in Redis...', { environment });
 
       // Map file names to base cache keys
       const fileKeyMap: Record<string, string> = {
-        "reward-lookup-kr.json": this.CACHE_KEYS.REWARD_LOOKUP_KR,
-        "reward-lookup-en.json": this.CACHE_KEYS.REWARD_LOOKUP_EN,
-        "reward-lookup-zh.json": this.CACHE_KEYS.REWARD_LOOKUP_ZH,
-        "reward-type-list.json": this.CACHE_KEYS.REWARD_TYPE_LIST,
-        "ui-list-data-kr.json": `${this.CACHE_KEYS.UI_LIST_DATA}:kr`,
-        "ui-list-data-en.json": `${this.CACHE_KEYS.UI_LIST_DATA}:en`,
-        "ui-list-data-zh.json": `${this.CACHE_KEYS.UI_LIST_DATA}:zh`,
-        "hottimebuff-lookup-kr.json": `${this.CACHE_KEYS.HOT_TIME_BUFF}:kr`,
-        "hottimebuff-lookup-en.json": `${this.CACHE_KEYS.HOT_TIME_BUFF}:en`,
-        "hottimebuff-lookup-zh.json": `${this.CACHE_KEYS.HOT_TIME_BUFF}:zh`,
-        "eventpage-lookup-kr.json": `${this.CACHE_KEYS.EVENT_PAGE}:kr`,
-        "eventpage-lookup-en.json": `${this.CACHE_KEYS.EVENT_PAGE}:en`,
-        "eventpage-lookup-zh.json": `${this.CACHE_KEYS.EVENT_PAGE}:zh`,
-        "liveevent-lookup-kr.json": `${this.CACHE_KEYS.LIVE_EVENT}:kr`,
-        "liveevent-lookup-en.json": `${this.CACHE_KEYS.LIVE_EVENT}:en`,
-        "liveevent-lookup-zh.json": `${this.CACHE_KEYS.LIVE_EVENT}:zh`,
-        "materecruiting-lookup-kr.json": `${this.CACHE_KEYS.MATE_RECRUITING}:kr`,
-        "materecruiting-lookup-en.json": `${this.CACHE_KEYS.MATE_RECRUITING}:en`,
-        "materecruiting-lookup-zh.json": `${this.CACHE_KEYS.MATE_RECRUITING}:zh`,
-        "oceannpcarea-lookup-kr.json": `${this.CACHE_KEYS.OCEAN_NPC_AREA}:kr`,
-        "oceannpcarea-lookup-en.json": `${this.CACHE_KEYS.OCEAN_NPC_AREA}:en`,
-        "oceannpcarea-lookup-zh.json": `${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`,
-        "cashshop-lookup.json": this.CACHE_KEYS.CASH_SHOP,
+        'reward-lookup-kr.json': this.CACHE_KEYS.REWARD_LOOKUP_KR,
+        'reward-lookup-en.json': this.CACHE_KEYS.REWARD_LOOKUP_EN,
+        'reward-lookup-zh.json': this.CACHE_KEYS.REWARD_LOOKUP_ZH,
+        'reward-type-list.json': this.CACHE_KEYS.REWARD_TYPE_LIST,
+        'ui-list-data-kr.json': `${this.CACHE_KEYS.UI_LIST_DATA}:kr`,
+        'ui-list-data-en.json': `${this.CACHE_KEYS.UI_LIST_DATA}:en`,
+        'ui-list-data-zh.json': `${this.CACHE_KEYS.UI_LIST_DATA}:zh`,
+        'hottimebuff-lookup-kr.json': `${this.CACHE_KEYS.HOT_TIME_BUFF}:kr`,
+        'hottimebuff-lookup-en.json': `${this.CACHE_KEYS.HOT_TIME_BUFF}:en`,
+        'hottimebuff-lookup-zh.json': `${this.CACHE_KEYS.HOT_TIME_BUFF}:zh`,
+        'eventpage-lookup-kr.json': `${this.CACHE_KEYS.EVENT_PAGE}:kr`,
+        'eventpage-lookup-en.json': `${this.CACHE_KEYS.EVENT_PAGE}:en`,
+        'eventpage-lookup-zh.json': `${this.CACHE_KEYS.EVENT_PAGE}:zh`,
+        'liveevent-lookup-kr.json': `${this.CACHE_KEYS.LIVE_EVENT}:kr`,
+        'liveevent-lookup-en.json': `${this.CACHE_KEYS.LIVE_EVENT}:en`,
+        'liveevent-lookup-zh.json': `${this.CACHE_KEYS.LIVE_EVENT}:zh`,
+        'materecruiting-lookup-kr.json': `${this.CACHE_KEYS.MATE_RECRUITING}:kr`,
+        'materecruiting-lookup-en.json': `${this.CACHE_KEYS.MATE_RECRUITING}:en`,
+        'materecruiting-lookup-zh.json': `${this.CACHE_KEYS.MATE_RECRUITING}:zh`,
+        'oceannpcarea-lookup-kr.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:kr`,
+        'oceannpcarea-lookup-en.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:en`,
+        'oceannpcarea-lookup-zh.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`,
+        'cashshop-lookup.json': this.CACHE_KEYS.CASH_SHOP,
       };
 
       // Cache each file directly from memory
@@ -1203,15 +1120,15 @@ export class PlanningDataService {
         });
       }
 
-      logger.info("All uploaded files cached in Redis successfully", {
+      logger.info('All uploaded files cached in Redis successfully', {
         environment,
       });
     } catch (error) {
-      logger.error("Failed to cache uploaded files in Redis", {
+      logger.error('Failed to cache uploaded files in Redis', {
         error,
         environment,
       });
-      throw new GatrixError("Failed to cache planning data", 500);
+      throw new GatrixError('Failed to cache planning data', 500);
     }
   }
 
@@ -1223,10 +1140,10 @@ export class PlanningDataService {
    */
   static async copyPlanningData(
     sourceEnv: string,
-    targetEnv: string,
+    targetEnv: string
   ): Promise<{ success: boolean; filesCopied: number }> {
     try {
-      logger.info("Copying planning data between environments...", {
+      logger.info('Copying planning data between environments...', {
         sourceEnv,
         targetEnv,
       });
@@ -1275,19 +1192,19 @@ export class PlanningDataService {
         }
       }
 
-      logger.info("Planning data copied successfully", {
+      logger.info('Planning data copied successfully', {
         sourceEnv,
         targetEnv,
         filesCopied,
       });
       return { success: true, filesCopied };
     } catch (error) {
-      logger.error("Failed to copy planning data", {
+      logger.error('Failed to copy planning data', {
         error,
         sourceEnv,
         targetEnv,
       });
-      throw new GatrixError("Failed to copy planning data", 500);
+      throw new GatrixError('Failed to copy planning data', 500);
     }
   }
 
@@ -1297,7 +1214,7 @@ export class PlanningDataService {
    */
   static async deletePlanningData(environment: string): Promise<void> {
     try {
-      logger.info("Deleting planning data for environment...", { environment });
+      logger.info('Deleting planning data for environment...', { environment });
 
       const envDataPath = this.getEnvironmentDataPath(environment);
 
@@ -1328,40 +1245,20 @@ export class PlanningDataService {
         this.getEnvCacheKey(environment, `${this.CACHE_KEYS.LIVE_EVENT}:kr`),
         this.getEnvCacheKey(environment, `${this.CACHE_KEYS.LIVE_EVENT}:en`),
         this.getEnvCacheKey(environment, `${this.CACHE_KEYS.LIVE_EVENT}:zh`),
-        this.getEnvCacheKey(
-          environment,
-          `${this.CACHE_KEYS.MATE_RECRUITING}:kr`,
-        ),
-        this.getEnvCacheKey(
-          environment,
-          `${this.CACHE_KEYS.MATE_RECRUITING}:en`,
-        ),
-        this.getEnvCacheKey(
-          environment,
-          `${this.CACHE_KEYS.MATE_RECRUITING}:zh`,
-        ),
-        this.getEnvCacheKey(
-          environment,
-          `${this.CACHE_KEYS.OCEAN_NPC_AREA}:kr`,
-        ),
-        this.getEnvCacheKey(
-          environment,
-          `${this.CACHE_KEYS.OCEAN_NPC_AREA}:en`,
-        ),
-        this.getEnvCacheKey(
-          environment,
-          `${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`,
-        ),
+        this.getEnvCacheKey(environment, `${this.CACHE_KEYS.MATE_RECRUITING}:kr`),
+        this.getEnvCacheKey(environment, `${this.CACHE_KEYS.MATE_RECRUITING}:en`),
+        this.getEnvCacheKey(environment, `${this.CACHE_KEYS.MATE_RECRUITING}:zh`),
+        this.getEnvCacheKey(environment, `${this.CACHE_KEYS.OCEAN_NPC_AREA}:kr`),
+        this.getEnvCacheKey(environment, `${this.CACHE_KEYS.OCEAN_NPC_AREA}:en`),
+        this.getEnvCacheKey(environment, `${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`),
       ];
 
-      await Promise.all(
-        cacheKeysToDelete.map((key) => cacheService.delete(key)),
-      );
+      await Promise.all(cacheKeysToDelete.map((key) => cacheService.delete(key)));
 
-      logger.info("Planning data deleted successfully", { environment });
+      logger.info('Planning data deleted successfully', { environment });
     } catch (error) {
-      logger.error("Failed to delete planning data", { error, environment });
-      throw new GatrixError("Failed to delete planning data", 500);
+      logger.error('Failed to delete planning data', { error, environment });
+      throw new GatrixError('Failed to delete planning data', 500);
     }
   }
 
@@ -1371,10 +1268,7 @@ export class PlanningDataService {
    */
   static async previewDiff(
     environment: string,
-    files:
-      | { [fieldname: string]: Express.Multer.File[] }
-      | Express.Multer.File[]
-      | undefined,
+    files: { [fieldname: string]: Express.Multer.File[] } | Express.Multer.File[] | undefined
   ): Promise<{
     changedFiles: string[];
     fileDiffs: Record<
@@ -1400,14 +1294,12 @@ export class PlanningDataService {
     }
 
     // Normalize files array
-    const fileArray = Array.isArray(files)
-      ? files
-      : Object.values(files).flat();
+    const fileArray = Array.isArray(files) ? files : Object.values(files).flat();
 
     // Read file contents
     const fileContents: Record<string, string> = {};
     for (const file of fileArray) {
-      const content = file.buffer.toString("utf-8");
+      const content = file.buffer.toString('utf-8');
       fileContents[file.originalname] = content;
     }
 
@@ -1445,11 +1337,7 @@ export class PlanningDataService {
 
               // Calculate detailed diff
               const diff = this.calculateJsonDiff(prevContent, currentJson);
-              if (
-                diff.added.length > 0 ||
-                diff.removed.length > 0 ||
-                diff.modified.length > 0
-              ) {
+              if (diff.added.length > 0 || diff.removed.length > 0 || diff.modified.length > 0) {
                 fileDiffs[fileName] = diff;
                 totalAdded += diff.added.length;
                 totalRemoved += diff.removed.length;
@@ -1464,9 +1352,7 @@ export class PlanningDataService {
               ? currentJson.length
               : Object.keys(currentJson).length;
             fileDiffs[fileName] = {
-              added: [
-                { path: "root", value: `New file with ${itemCount} items` },
-              ],
+              added: [{ path: 'root', value: `New file with ${itemCount} items` }],
               removed: [],
               modified: [],
             };
@@ -1494,7 +1380,7 @@ export class PlanningDataService {
    */
   private static calculateJsonDiff(
     oldJson: any,
-    newJson: any,
+    newJson: any
   ): {
     added: Array<{ path: string; value: any }>;
     removed: Array<{ path: string; value: any }>;
@@ -1508,12 +1394,7 @@ export class PlanningDataService {
     const normalizeForDiff = (obj: any): any => {
       if (Array.isArray(obj)) {
         // Check if array items have 'id' field
-        if (
-          obj.length > 0 &&
-          typeof obj[0] === "object" &&
-          obj[0] !== null &&
-          "id" in obj[0]
-        ) {
+        if (obj.length > 0 && typeof obj[0] === 'object' && obj[0] !== null && 'id' in obj[0]) {
           // Convert to object keyed by id
           const result: Record<string, any> = {};
           for (const item of obj) {
@@ -1523,7 +1404,7 @@ export class PlanningDataService {
         }
         // Regular array without id - keep as is
         return obj.map(normalizeForDiff);
-      } else if (typeof obj === "object" && obj !== null) {
+      } else if (typeof obj === 'object' && obj !== null) {
         const result: Record<string, any> = {};
         for (const [key, value] of Object.entries(obj)) {
           result[key] = normalizeForDiff(value);
@@ -1541,27 +1422,27 @@ export class PlanningDataService {
     if (differences) {
       for (const d of differences) {
         // Build path string from diff path array
-        const pathStr = d.path ? d.path.join(".") : "root";
+        const pathStr = d.path ? d.path.join('.') : 'root';
 
         switch (d.kind) {
-          case "N": // New (added)
+          case 'N': // New (added)
             added.push({ path: pathStr, value: d.rhs });
             break;
-          case "D": // Deleted (removed)
+          case 'D': // Deleted (removed)
             removed.push({ path: pathStr, value: d.lhs });
             break;
-          case "E": // Edited (modified)
+          case 'E': // Edited (modified)
             modified.push({ path: pathStr, before: d.lhs, after: d.rhs });
             break;
-          case "A": // Array change
+          case 'A': // Array change
             // For array changes, include the index and nested path
-            const arrayPath = d.path ? d.path.join(".") : "root";
+            const arrayPath = d.path ? d.path.join('.') : 'root';
             const indexPath = `${arrayPath}[${d.index}]`;
-            if (d.item.kind === "N") {
+            if (d.item.kind === 'N') {
               added.push({ path: indexPath, value: d.item.rhs });
-            } else if (d.item.kind === "D") {
+            } else if (d.item.kind === 'D') {
               removed.push({ path: indexPath, value: d.item.lhs });
-            } else if (d.item.kind === "E") {
+            } else if (d.item.kind === 'E') {
               modified.push({
                 path: indexPath,
                 before: d.item.lhs,

@@ -4,7 +4,7 @@
  * Returns only data fields required for runtime evaluation
  */
 
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import {
   FeatureFlagModel,
   FeatureStrategyModel,
@@ -13,9 +13,9 @@ import {
   FeatureFlagAttributes,
   FeatureStrategyAttributes,
   FeatureVariantAttributes,
-} from "../models/FeatureFlag";
-import { featureMetricsService } from "../services/FeatureMetricsService";
-import { networkTrafficService } from "../services/NetworkTrafficService";
+} from '../models/FeatureFlag';
+import { featureMetricsService } from '../services/FeatureMetricsService';
+import { networkTrafficService } from '../services/NetworkTrafficService';
 
 // Type for minimal flag data needed for runtime evaluation
 interface EvaluationFlag {
@@ -60,18 +60,13 @@ export default class ServerFeatureFlagController {
       const environment = req.params.env;
 
       if (!environment) {
-        res
-          .status(400)
-          .json({ success: false, error: "Environment is required" });
+        res.status(400).json({ success: false, error: 'Environment is required' });
         return;
       }
 
       // Record network traffic (fire-and-forget)
-      const appName =
-        (req.headers["x-application-name"] as string) || "unknown";
-      networkTrafficService
-        .recordTraffic(environment, appName, "features")
-        .catch(() => { });
+      const appName = (req.headers['x-application-name'] as string) || 'unknown';
+      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => {});
 
       // Get all enabled, non-archived flags for this environment
       const result = await FeatureFlagModel.findAll({
@@ -86,67 +81,61 @@ export default class ServerFeatureFlagController {
 
       // Get strategies and variants for each flag
       const flags: EvaluationFlag[] = await Promise.all(
-        rawFlags.map(
-          async (flag: FeatureFlagAttributes & { isEnabled: boolean }) => {
-            const strategies =
-              await FeatureStrategyModel.findByFlagIdAndEnvironment(
-                flag.id,
-                environment,
-              );
-            const variants =
-              await FeatureVariantModel.findByFlagIdAndEnvironment(
-                flag.id,
-                environment,
-              );
+        rawFlags.map(async (flag: FeatureFlagAttributes & { isEnabled: boolean }) => {
+          const strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(
+            flag.id,
+            environment
+          );
+          const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(
+            flag.id,
+            environment
+          );
 
-            // Transform to minimal evaluation format
-            const evaluationStrategies: EvaluationStrategy[] = strategies
-              .sort(
-                (a: FeatureStrategyAttributes, b: FeatureStrategyAttributes) =>
-                  a.sortOrder - b.sortOrder,
-              )
-              .map((s: FeatureStrategyAttributes) => {
-                // s.segments is already string[] from enrichStrategiesWithSegments
-                const segmentNames: string[] = s.segments || [];
-                // Collect for referenced segments lookup
-                segmentNames.forEach((name) =>
-                  referencedSegmentNames.add(name),
-                );
+          // Transform to minimal evaluation format
+          const evaluationStrategies: EvaluationStrategy[] = strategies
+            .sort(
+              (a: FeatureStrategyAttributes, b: FeatureStrategyAttributes) =>
+                a.sortOrder - b.sortOrder
+            )
+            .map((s: FeatureStrategyAttributes) => {
+              // s.segments is already string[] from enrichStrategiesWithSegments
+              const segmentNames: string[] = s.segments || [];
+              // Collect for referenced segments lookup
+              segmentNames.forEach((name) => referencedSegmentNames.add(name));
 
-                return {
-                  name: s.strategyName,
-                  parameters: s.parameters,
-                  constraints: s.constraints || [],
-                  segments: segmentNames, // Segment names only
-                  isEnabled: s.isEnabled,
-                };
-              });
+              return {
+                name: s.strategyName,
+                parameters: s.parameters,
+                constraints: s.constraints || [],
+                segments: segmentNames, // Segment names only
+                isEnabled: s.isEnabled,
+              };
+            });
 
-            const evaluationVariants: EvaluationVariant[] = variants.map(
-              (v: FeatureVariantAttributes) => ({
-                name: v.variantName,
-                weight: v.weight,
-                payload: v.payload,
-                payloadType: v.payloadType,
-              }),
-            );
+          const evaluationVariants: EvaluationVariant[] = variants.map(
+            (v: FeatureVariantAttributes) => ({
+              name: v.variantName,
+              weight: v.weight,
+              payload: v.payload,
+              payloadType: v.payloadType,
+            })
+          );
 
-            return {
-              name: flag.flagName,
-              isEnabled: flag.isEnabled,
-              impressionDataEnabled: flag.impressionDataEnabled,
-              strategies: evaluationStrategies,
-              variants: evaluationVariants,
-            };
-          },
-        ),
+          return {
+            name: flag.flagName,
+            isEnabled: flag.isEnabled,
+            impressionDataEnabled: flag.impressionDataEnabled,
+            strategies: evaluationStrategies,
+            variants: evaluationVariants,
+          };
+        })
       );
 
       // Fetch only referenced segments
       let segments: EvaluationSegment[] = [];
       if (referencedSegmentNames.size > 0) {
         const rawSegments = await FeatureSegmentModel.findByNames(
-          Array.from(referencedSegmentNames),
+          Array.from(referencedSegmentNames)
         );
         segments = rawSegments.map((s) => ({
           name: s.segmentName,
@@ -160,10 +149,8 @@ export default class ServerFeatureFlagController {
         data: { flags, segments },
       });
     } catch (error: any) {
-      console.error("Error fetching feature flags:", error);
-      res
-        .status(500)
-        .json({ success: false, error: "Failed to fetch feature flags" });
+      console.error('Error fetching feature flags:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch feature flags' });
     }
   }
 
@@ -176,30 +163,25 @@ export default class ServerFeatureFlagController {
       const { env: environment, flagName } = req.params;
 
       if (!environment || !flagName) {
-        res
-          .status(400)
-          .json({
-            success: false,
-            error: "Environment and flag name are required",
-          });
+        res.status(400).json({
+          success: false,
+          error: 'Environment and flag name are required',
+        });
         return;
       }
 
       const flag = await FeatureFlagModel.findByName(environment, flagName);
 
       if (!flag || flag.isArchived) {
-        res.status(404).json({ success: false, error: "Flag not found" });
+        res.status(404).json({ success: false, error: 'Flag not found' });
         return;
       }
 
       const strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(
         flag.id,
-        environment,
+        environment
       );
-      const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(
-        flag.id,
-        environment,
-      );
+      const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(flag.id, environment);
 
       const evaluationFlag: EvaluationFlag = {
         name: flag.flagName,
@@ -208,7 +190,7 @@ export default class ServerFeatureFlagController {
         strategies: strategies
           .sort(
             (a: FeatureStrategyAttributes, b: FeatureStrategyAttributes) =>
-              a.sortOrder - b.sortOrder,
+              a.sortOrder - b.sortOrder
           )
           .map((s: FeatureStrategyAttributes) => ({
             name: s.strategyName,
@@ -230,10 +212,8 @@ export default class ServerFeatureFlagController {
         data: { flag: evaluationFlag },
       });
     } catch (error: any) {
-      console.error("Error fetching feature flag:", error);
-      res
-        .status(500)
-        .json({ success: false, error: "Failed to fetch feature flag" });
+      console.error('Error fetching feature flag:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch feature flag' });
     }
   }
 
@@ -245,12 +225,9 @@ export default class ServerFeatureFlagController {
   static async getSegments(req: Request, res: Response): Promise<void> {
     try {
       // Record network traffic (fire-and-forget)
-      const appName =
-        (req.headers["x-application-name"] as string) || "unknown";
-      const environment = req.params.env || "global";
-      networkTrafficService
-        .recordTraffic(environment, appName, "segments")
-        .catch(() => { });
+      const appName = (req.headers['x-application-name'] as string) || 'unknown';
+      const environment = req.params.env || 'global';
+      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => {});
 
       const rawSegments = await FeatureSegmentModel.findAll();
 
@@ -266,10 +243,8 @@ export default class ServerFeatureFlagController {
         data: { segments },
       });
     } catch (error: any) {
-      console.error("Error fetching segments:", error);
-      res
-        .status(500)
-        .json({ success: false, error: "Failed to fetch segments" });
+      console.error('Error fetching segments:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch segments' });
     }
   }
 
@@ -280,14 +255,12 @@ export default class ServerFeatureFlagController {
   static async receiveMetrics(req: Request, res: Response): Promise<void> {
     try {
       const { metrics, timestamp, bucket } = req.body;
-      const environment = req.params.env || "production";
+      const environment = req.params.env || 'production';
       // Get appName from X-Application-Name header
-      const appName = req.headers["x-application-name"] as string | undefined;
+      const appName = req.headers['x-application-name'] as string | undefined;
 
       if (!Array.isArray(metrics)) {
-        res
-          .status(400)
-          .json({ success: false, error: "metrics must be an array" });
+        res.status(400).json({ success: false, error: 'metrics must be an array' });
         return;
       }
 
@@ -302,15 +275,13 @@ export default class ServerFeatureFlagController {
         metrics,
         reportedAt,
         appName,
-        bucketStart,
+        bucketStart
       );
 
       res.json({ success: true });
     } catch (error: any) {
-      console.error("Error processing metrics:", error);
-      res
-        .status(500)
-        .json({ success: false, error: "Failed to process metrics" });
+      console.error('Error processing metrics:', error);
+      res.status(500).json({ success: false, error: 'Failed to process metrics' });
     }
   }
 
@@ -321,21 +292,17 @@ export default class ServerFeatureFlagController {
   static async reportUnknownFlag(req: Request, res: Response): Promise<void> {
     try {
       const { flagName } = req.body;
-      const environment = req.params.env || "production";
-      const appName = req.headers["x-application-name"] as string | undefined;
-      const sdkVersion = req.headers["x-sdk-version"] as string | undefined;
+      const environment = req.params.env || 'production';
+      const appName = req.headers['x-application-name'] as string | undefined;
+      const sdkVersion = req.headers['x-sdk-version'] as string | undefined;
 
-      if (!flagName || typeof flagName !== "string") {
-        res
-          .status(400)
-          .json({ success: false, error: "flagName is required" });
+      if (!flagName || typeof flagName !== 'string') {
+        res.status(400).json({ success: false, error: 'flagName is required' });
         return;
       }
 
       // Import and use unknown flag service
-      const { unknownFlagService } = await import(
-        "../services/UnknownFlagService"
-      );
+      const { unknownFlagService } = await import('../services/UnknownFlagService');
       await unknownFlagService.reportUnknownFlag({
         flagName,
         environment,
@@ -345,10 +312,8 @@ export default class ServerFeatureFlagController {
 
       res.json({ success: true });
     } catch (error: any) {
-      console.error("Error reporting unknown flag:", error);
-      res
-        .status(500)
-        .json({ success: false, error: "Failed to report unknown flag" });
+      console.error('Error reporting unknown flag:', error);
+      res.status(500).json({ success: false, error: 'Failed to report unknown flag' });
     }
   }
 }

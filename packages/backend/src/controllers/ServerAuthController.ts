@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
-import { UserService } from "../services/userService";
-import logger from "../config/logger";
+import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import { UserService } from '../services/userService';
+import logger from '../config/logger';
 
 export interface ServerAuthRequest extends Request {
   apiToken?: any;
@@ -16,7 +16,7 @@ class ServerAuthController {
       if (!token) {
         return res.status(400).json({
           success: false,
-          error: "Token is required",
+          error: 'Token is required',
         });
       }
 
@@ -26,7 +26,7 @@ class ServerAuthController {
       if (!decoded || !decoded.userId) {
         return res.status(401).json({
           success: false,
-          error: "Invalid token",
+          error: 'Invalid token',
         });
       }
 
@@ -36,15 +36,15 @@ class ServerAuthController {
       if (!user) {
         return res.status(404).json({
           success: false,
-          error: "User not found",
+          error: 'User not found',
         });
       }
 
       // 사용자가 활성 상태인지 확인
-      if (user.status !== "active") {
+      if (user.status !== 'active') {
         return res.status(401).json({
           success: false,
-          error: "User account is not active",
+          error: 'User account is not active',
         });
       }
 
@@ -63,18 +63,18 @@ class ServerAuthController {
         },
       });
     } catch (error) {
-      logger.error("Token verification failed:", error);
+      logger.error('Token verification failed:', error);
 
       if (error instanceof jwt.JsonWebTokenError) {
         return res.status(401).json({
           success: false,
-          error: "Invalid token",
+          error: 'Invalid token',
         });
       }
 
       res.status(500).json({
         success: false,
-        error: "Internal server error",
+        error: 'Internal server error',
       });
     }
   }
@@ -87,7 +87,7 @@ class ServerAuthController {
       if (isNaN(userId)) {
         return res.status(400).json({
           success: false,
-          error: "Invalid user ID",
+          error: 'Invalid user ID',
         });
       }
 
@@ -96,7 +96,7 @@ class ServerAuthController {
       if (!user) {
         return res.status(404).json({
           success: false,
-          error: "User not found",
+          error: 'User not found',
         });
       }
 
@@ -115,10 +115,10 @@ class ServerAuthController {
         },
       });
     } catch (error) {
-      logger.error("Failed to get user by ID:", error);
+      logger.error('Failed to get user by ID:', error);
       res.status(500).json({
         success: false,
-        error: "Internal server error",
+        error: 'Internal server error',
       });
     }
   }

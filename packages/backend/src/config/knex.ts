@@ -1,7 +1,7 @@
-import knex from "knex";
-import { Model } from "objection";
-import dotenv from "dotenv";
-import { config } from "./index";
+import knex from 'knex';
+import { Model } from 'objection';
+import dotenv from 'dotenv';
+import { config } from './index';
 
 dotenv.config();
 
@@ -25,19 +25,19 @@ const convertBitToBoolean = (obj: any): any => {
     return obj;
   }
 
-  if (typeof obj === "object") {
+  if (typeof obj === 'object') {
     const converted: any = {};
     for (const [key, value] of Object.entries(obj)) {
       // Convert boolean field names from 0/1 to true/false
       // Pattern: fields starting with 'is' or other known boolean fields
       const isBooleanField =
-        key.startsWith("is") ||
-        key === "supportsMultiLanguage" ||
-        key === "emailVerified" ||
-        key === "showOnce" ||
-        key.endsWith("Inverted") ||
-        key === "allowAllEnvironments" ||
-        key === "requiresApproval";
+        key.startsWith('is') ||
+        key === 'supportsMultiLanguage' ||
+        key === 'emailVerified' ||
+        key === 'showOnce' ||
+        key.endsWith('Inverted') ||
+        key === 'allowAllEnvironments' ||
+        key === 'requiresApproval';
       if (isBooleanField && (value === 0 || value === 1)) {
         converted[key] = value === 1;
       } else if (value instanceof Buffer) {
@@ -51,7 +51,7 @@ const convertBitToBoolean = (obj: any): any => {
         } else {
           converted[key] = value.toISOString();
         }
-      } else if (typeof value === "object") {
+      } else if (typeof value === 'object') {
         converted[key] = convertBitToBoolean(value);
       } else {
         converted[key] = value;
@@ -64,15 +64,15 @@ const convertBitToBoolean = (obj: any): any => {
 };
 
 const knexConfig = {
-  client: "mysql2",
+  client: 'mysql2',
   connection: {
     host: config.database.host,
     port: config.database.port,
     user: config.database.user,
     password: config.database.password,
     database: config.database.name,
-    charset: "utf8mb4",
-    timezone: "Z",
+    charset: 'utf8mb4',
+    timezone: 'Z',
   },
   debug: config.database.debug, // .env의 DB_DEBUG 설정으로 제어
   pool: {
@@ -86,11 +86,11 @@ const knexConfig = {
     createRetryIntervalMillis: 100,
   },
   migrations: {
-    directory: "./migrations",
-    tableName: "knex_migrations",
+    directory: './migrations',
+    tableName: 'knex_migrations',
   },
   seeds: {
-    directory: "./seeds",
+    directory: './seeds',
   },
   postProcessResponse: (result: any) => {
     return convertBitToBoolean(result);

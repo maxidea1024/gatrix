@@ -3,15 +3,15 @@
  * Handles feature flag evaluation logic including constraints, rollout, and variants
  */
 
-import murmurhash from "murmurhash";
-import logger from "../config/logger";
+import murmurhash from 'murmurhash';
+import logger from '../config/logger';
 import {
   FeatureFlagAttributes,
   FeatureStrategyAttributes,
   FeatureVariantAttributes,
   Constraint,
   ConstraintOperator,
-} from "../models/FeatureFlag";
+} from '../models/FeatureFlag';
 
 // ==================== Types ====================
 
@@ -40,13 +40,13 @@ export interface EvaluationResult {
 
 export interface EvaluationReason {
   kind:
-  | "enabled"
-  | "disabled"
-  | "notFound"
-  | "constraintFailed"
-  | "rolloutFailed"
-  | "fallback"
-  | "archived";
+    | 'enabled'
+    | 'disabled'
+    | 'notFound'
+    | 'constraintFailed'
+    | 'rolloutFailed'
+    | 'fallback'
+    | 'archived';
   message?: string;
   failedConstraint?: {
     contextName: string;
@@ -61,15 +61,12 @@ export class FeatureEvaluator {
   /**
    * Evaluate a feature flag for a given context
    */
-  evaluate(
-    flag: EvaluatableFlagAttributes | null,
-    context: EvaluationContext,
-  ): EvaluationResult {
+  evaluate(flag: EvaluatableFlagAttributes | null, context: EvaluationContext): EvaluationResult {
     // Flag not found
     if (!flag) {
       return {
         enabled: false,
-        reason: { kind: "notFound", message: "Flag not found" },
+        reason: { kind: 'notFound', message: 'Flag not found' },
       };
     }
 
@@ -77,7 +74,7 @@ export class FeatureEvaluator {
     if (flag.isArchived) {
       return {
         enabled: false,
-        reason: { kind: "archived", message: "Flag is archived" },
+        reason: { kind: 'archived', message: 'Flag is archived' },
       };
     }
 
@@ -85,7 +82,7 @@ export class FeatureEvaluator {
     if (!flag.isEnabled) {
       return {
         enabled: false,
-        reason: { kind: "disabled", message: "Flag is disabled" },
+        reason: { kind: 'disabled', message: 'Flag is disabled' },
       };
     }
 
@@ -93,14 +90,12 @@ export class FeatureEvaluator {
     if (!flag.strategies || flag.strategies.length === 0) {
       return this.selectVariant(flag, context, {
         enabled: true,
-        reason: { kind: "enabled", message: "No strategies, default enabled" },
+        reason: { kind: 'enabled', message: 'No strategies, default enabled' },
       });
     }
 
     // Sort strategies by sortOrder
-    const sortedStrategies = [...flag.strategies].sort(
-      (a, b) => a.sortOrder - b.sortOrder,
-    );
+    const sortedStrategies = [...flag.strategies].sort((a, b) => a.sortOrder - b.sortOrder);
 
     // Evaluate each strategy in order
     for (const strategy of sortedStrategies) {
@@ -115,7 +110,7 @@ export class FeatureEvaluator {
     // No strategy matched
     return {
       enabled: false,
-      reason: { kind: "constraintFailed", message: "No strategy matched" },
+      reason: { kind: 'constraintFailed', message: 'No strategy matched' },
     };
   }
 
@@ -124,7 +119,7 @@ export class FeatureEvaluator {
    */
   private evaluateStrategy(
     strategy: FeatureStrategyAttributes,
-    context: EvaluationContext,
+    context: EvaluationContext
   ): EvaluationResult {
     // Check constraints
     if (strategy.constraints && strategy.constraints.length > 0) {
@@ -133,12 +128,12 @@ export class FeatureEvaluator {
           return {
             enabled: false,
             reason: {
-              kind: "constraintFailed",
+              kind: 'constraintFailed',
               message: `Constraint failed: ${constraint.contextName}`,
               failedConstraint: {
                 contextName: constraint.contextName,
                 operator: constraint.operator,
-                value: constraint.value || constraint.values?.join(", "),
+                value: constraint.value || constraint.values?.join(', '),
               },
             },
           };
@@ -149,10 +144,10 @@ export class FeatureEvaluator {
     // Check rollout percentage if defined
     const params = strategy.parameters;
     if (params?.rollout !== undefined && params.rollout < 100) {
-      const stickiness = params.stickiness || "userId";
+      const stickiness = params.stickiness || 'userId';
       const groupId = params.groupId || strategy.id;
       const stickinessValue = String(
-        context[stickiness] || context.sessionId || context.userId || "",
+        context[stickiness] || context.sessionId || context.userId || ''
       );
 
       const hash = this.normalizedHash(groupId, stickinessValue);
@@ -160,7 +155,7 @@ export class FeatureEvaluator {
         return {
           enabled: false,
           reason: {
-            kind: "rolloutFailed",
+            kind: 'rolloutFailed',
             message: `Rollout percentage not met: ${hash} > ${params.rollout}`,
           },
         };
@@ -170,7 +165,7 @@ export class FeatureEvaluator {
     return {
       enabled: true,
       reason: {
-        kind: "enabled",
+        kind: 'enabled',
         message: `Strategy ${strategy.strategyName} matched`,
       },
     };
@@ -179,28 +174,16 @@ export class FeatureEvaluator {
   /**
    * Evaluate a constraint against context
    */
-  private evaluateConstraint(
-    constraint: Constraint,
-    context: EvaluationContext,
-  ): boolean {
+  private evaluateConstraint(constraint: Constraint, context: EvaluationContext): boolean {
     const contextValue = context[constraint.contextName];
     const { operator, value, values, caseInsensitive, inverted } = constraint;
 
     let result = false;
 
     try {
-      result = this.evaluateOperator(
-        operator,
-        contextValue,
-        value,
-        values,
-        caseInsensitive,
-      );
+      result = this.evaluateOperator(operator, contextValue, value, values, caseInsensitive);
     } catch (error) {
-      logger.warn(
-        `Error evaluating constraint ${constraint.contextName}:`,
-        error,
-      );
+      logger.warn(`Error evaluating constraint ${constraint.contextName}:`, error);
       result = false;
     }
 
@@ -215,94 +198,92 @@ export class FeatureEvaluator {
     contextValue: any,
     constraintValue?: string,
     constraintValues?: string[],
-    caseInsensitive?: boolean,
+    caseInsensitive?: boolean
   ): boolean {
     // Normalize for case insensitive comparison
     const normalize = (v: any): string => {
-      if (v === null || v === undefined) return "";
+      if (v === null || v === undefined) return '';
       const str = String(v);
       return caseInsensitive ? str.toLowerCase() : str;
     };
 
     const ctx = normalize(contextValue);
-    const val = constraintValue ? normalize(constraintValue) : "";
+    const val = constraintValue ? normalize(constraintValue) : '';
     const vals = constraintValues?.map(normalize) || [];
 
     switch (operator) {
       // String operators
-      case "str_in":
+      case 'str_in':
         return vals.includes(ctx);
 
-      case "str_not_in":
+      case 'str_not_in':
         return !vals.includes(ctx);
 
-      case "str_eq":
+      case 'str_eq':
         return ctx === val;
 
-      case "str_neq":
+      case 'str_neq':
         return ctx !== val;
 
-      case "str_ends_with":
+      case 'str_ends_with':
         return ctx.endsWith(val);
 
-      case "str_starts_with":
+      case 'str_starts_with':
         return ctx.startsWith(val);
 
-      case "str_contains":
+      case 'str_contains':
         return ctx.includes(val);
 
       // Boolean operators
-      case "bool_is":
+      case 'bool_is':
         return (
-          ctx === val ||
-          (val === "true" && !!contextValue) ||
-          (val === "false" && !contextValue)
+          ctx === val || (val === 'true' && !!contextValue) || (val === 'false' && !contextValue)
         );
 
       // Number operators
-      case "num_eq":
-        return parseFloat(contextValue) === parseFloat(constraintValue || "0");
+      case 'num_eq':
+        return parseFloat(contextValue) === parseFloat(constraintValue || '0');
 
-      case "num_gt":
-        return parseFloat(contextValue) > parseFloat(constraintValue || "0");
+      case 'num_gt':
+        return parseFloat(contextValue) > parseFloat(constraintValue || '0');
 
-      case "num_gte":
-        return parseFloat(contextValue) >= parseFloat(constraintValue || "0");
+      case 'num_gte':
+        return parseFloat(contextValue) >= parseFloat(constraintValue || '0');
 
-      case "num_lt":
-        return parseFloat(contextValue) < parseFloat(constraintValue || "0");
+      case 'num_lt':
+        return parseFloat(contextValue) < parseFloat(constraintValue || '0');
 
-      case "num_lte":
-        return parseFloat(contextValue) <= parseFloat(constraintValue || "0");
+      case 'num_lte':
+        return parseFloat(contextValue) <= parseFloat(constraintValue || '0');
 
       // Date operators
-      case "date_gt":
-        return new Date(contextValue) > new Date(constraintValue || "");
+      case 'date_gt':
+        return new Date(contextValue) > new Date(constraintValue || '');
 
-      case "date_gte":
-        return new Date(contextValue) >= new Date(constraintValue || "");
+      case 'date_gte':
+        return new Date(contextValue) >= new Date(constraintValue || '');
 
-      case "date_lt":
-        return new Date(contextValue) < new Date(constraintValue || "");
+      case 'date_lt':
+        return new Date(contextValue) < new Date(constraintValue || '');
 
-      case "date_lte":
-        return new Date(contextValue) <= new Date(constraintValue || "");
+      case 'date_lte':
+        return new Date(contextValue) <= new Date(constraintValue || '');
 
       // Semver operators
-      case "semver_eq":
-        return this.compareSemver(contextValue, constraintValue || "") === 0;
+      case 'semver_eq':
+        return this.compareSemver(contextValue, constraintValue || '') === 0;
 
-      case "semver_gt":
-        return this.compareSemver(contextValue, constraintValue || "") > 0;
+      case 'semver_gt':
+        return this.compareSemver(contextValue, constraintValue || '') > 0;
 
-      case "semver_gte":
-        return this.compareSemver(contextValue, constraintValue || "") >= 0;
+      case 'semver_gte':
+        return this.compareSemver(contextValue, constraintValue || '') >= 0;
 
-      case "semver_lt":
-        return this.compareSemver(contextValue, constraintValue || "") < 0;
+      case 'semver_lt':
+        return this.compareSemver(contextValue, constraintValue || '') < 0;
 
-      case "semver_lte":
-        return this.compareSemver(contextValue, constraintValue || "") <= 0;
+      case 'semver_lte':
+        return this.compareSemver(contextValue, constraintValue || '') <= 0;
 
       default:
         logger.warn(`Unknown operator: ${operator}`);
@@ -316,16 +297,16 @@ export class FeatureEvaluator {
   private selectVariant(
     flag: FeatureFlagAttributes,
     context: EvaluationContext,
-    baseResult: EvaluationResult,
+    baseResult: EvaluationResult
   ): EvaluationResult {
     if (!flag.variants || flag.variants.length === 0) {
       return baseResult;
     }
 
     // Calculate variant based on stickiness (use default since stickiness is not per-variant)
-    const stickiness = "userId";
+    const stickiness = 'userId';
     const stickinessValue = String(
-      context[stickiness] || context.sessionId || context.userId || "",
+      context[stickiness] || context.sessionId || context.userId || ''
     );
     const seed = `${flag.id}:${stickinessValue}`;
     const hash = this.normalizedHash(flag.id, stickinessValue);
@@ -363,12 +344,12 @@ export class FeatureEvaluator {
     if (!variant.payload) return undefined;
 
     switch (variant.payloadType) {
-      case "number":
+      case 'number':
         return Number(variant.payload);
-      case "boolean":
-        return variant.payload === true || variant.payload === "true";
-      case "json":
-        if (typeof variant.payload === "string") {
+      case 'boolean':
+        return variant.payload === true || variant.payload === 'true';
+      case 'json':
+        if (typeof variant.payload === 'string') {
           try {
             return JSON.parse(variant.payload);
           } catch {
@@ -376,7 +357,7 @@ export class FeatureEvaluator {
           }
         }
         return variant.payload;
-      case "string":
+      case 'string':
       default:
         return String(variant.payload);
     }
@@ -401,8 +382,8 @@ export class FeatureEvaluator {
   private compareSemver(a: string, b: string): number {
     const parseVersion = (v: string): number[] => {
       // Remove 'v' prefix if present and split
-      const cleaned = v.replace(/^v/, "");
-      return cleaned.split(".").map((n) => parseInt(n, 10) || 0);
+      const cleaned = v.replace(/^v/, '');
+      return cleaned.split('.').map((n) => parseInt(n, 10) || 0);
     };
 
     const aParts = parseVersion(a);

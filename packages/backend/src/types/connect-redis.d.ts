@@ -1,6 +1,6 @@
-declare module "connect-redis" {
-  import { Store } from "express-session";
-  import { RedisClientType } from "redis";
+declare module 'connect-redis' {
+  import { Store } from 'express-session';
+  import { RedisClientType } from 'redis';
 
   interface RedisStoreOptions {
     client: RedisClientType;

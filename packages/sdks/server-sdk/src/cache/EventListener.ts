@@ -4,17 +4,12 @@
  * Uses Redis Pub/Sub to ensure all SDK instances receive the same events
  */
 
-import Redis from "ioredis";
-import { Logger } from "../utils/logger";
-import { RedisConfig } from "../types/config";
-import {
-  StandardEvent,
-  CustomEvent,
-  EventCallback,
-  EventListenerMap,
-} from "../types/events";
-import { CacheManager } from "./CacheManager";
-import { SdkMetrics } from "../utils/sdkMetrics";
+import Redis from 'ioredis';
+import { Logger } from '../utils/logger';
+import { RedisConfig } from '../types/config';
+import { StandardEvent, CustomEvent, EventCallback, EventListenerMap } from '../types/events';
+import { CacheManager } from './CacheManager';
+import { SdkMetrics } from '../utils/sdkMetrics';
 
 export class EventListener {
   private logger: Logger;
@@ -22,7 +17,7 @@ export class EventListener {
   private subscriber?: Redis;
   private eventListeners: EventListenerMap = {};
   private cacheManager: CacheManager;
-  private readonly CHANNEL_NAME = "gatrix-sdk-events";
+  private readonly CHANNEL_NAME = 'gatrix-sdk-events';
   private isConnected: boolean = false;
   // Flag to suppress noisy logs during intentional shutdown
   private isShuttingDown: boolean = false;
@@ -36,7 +31,7 @@ export class EventListener {
     redisConfig: RedisConfig,
     cacheManager: CacheManager,
     logger: Logger,
-    metrics?: SdkMetrics,
+    metrics?: SdkMetrics
   ) {
     this.redisConfig = redisConfig;
     this.cacheManager = cacheManager;
@@ -48,7 +43,7 @@ export class EventListener {
    * Initialize event listener with retry logic
    */
   async initialize(): Promise<void> {
-    this.logger.info("Initializing event listener...");
+    this.logger.info('Initializing event listener...');
 
     try {
       // Create subscriber connection for Pub/Sub
@@ -73,67 +68,64 @@ export class EventListener {
       });
 
       // Suppress ioredis internal logs
-      this.subscriber.on("error", (error) => {
+      this.subscriber.on('error', (error) => {
         if (this.isShuttingDown) {
           // Avoid noisy error logs during intentional shutdown
           this.isConnected = false;
           try {
             this.metrics?.setRedisConnected(false);
-          } catch (_) { }
+          } catch (_) {}
           return;
         }
         // Only log actual connection errors, not retry attempts
-        if (
-          !error.message.includes("ECONNREFUSED") &&
-          !error.message.includes("connect")
-        ) {
-          this.logger.error("Subscriber error", { error: error.message });
+        if (!error.message.includes('ECONNREFUSED') && !error.message.includes('connect')) {
+          this.logger.error('Subscriber error', { error: error.message });
         }
         // Mark as disconnected but do not attempt manual reconnect here
         // ioredis will handle reconnection automatically with retryStrategy
         this.isConnected = false;
         try {
           this.metrics?.setRedisConnected(false);
-        } catch (_) { }
+        } catch (_) {}
       });
 
-      this.subscriber.on("close", () => {
+      this.subscriber.on('close', () => {
         if (this.isShuttingDown) {
           // Avoid noisy close logs during intentional shutdown
           this.isConnected = false;
           try {
             this.metrics?.setRedisConnected(false);
-          } catch (_) { }
+          } catch (_) {}
           return;
         }
-        this.logger.warn("Subscriber connection closed");
+        this.logger.warn('Subscriber connection closed');
         // Mark as disconnected; rely on ioredis auto-reconnect
         this.isConnected = false;
         try {
           this.metrics?.setRedisConnected(false);
-        } catch (_) { }
+        } catch (_) {}
       });
 
       // Log reconnection attempts and refresh cache once reconnected
-      this.subscriber.on("reconnecting", (time: number) => {
-        this.logger.warn("Subscriber reconnecting...", { delay: time });
+      this.subscriber.on('reconnecting', (time: number) => {
+        this.logger.warn('Subscriber reconnecting...', { delay: time });
       });
 
       // Track if this is the first connection (to skip reinitializeCache on initial connect)
       let isFirstConnection = true;
 
-      this.subscriber.on("ready", async () => {
+      this.subscriber.on('ready', async () => {
         if (!this.isConnected) {
           this.isConnected = true;
 
           // Only reinitialize cache on reconnection, not on first connect
           // (CacheManager.initialize() already loads initial data)
           if (!isFirstConnection) {
-            this.logger.info("Redis connection restored successfully");
+            this.logger.info('Redis connection restored successfully');
             try {
               this.metrics?.setRedisConnected(true);
               this.metrics?.incRedisReconnect();
-            } catch (_) { }
+            } catch (_) {}
             try {
               await this.reinitializeCache();
             } catch {
@@ -148,27 +140,27 @@ export class EventListener {
       isFirstConnection = false; // Mark first connection complete
       try {
         this.metrics?.setRedisConnected(true);
-      } catch (_) { }
+      } catch (_) {}
 
       // Subscribe to SDK events channel
       await this.subscriber.subscribe(this.CHANNEL_NAME);
-      this.logger.info("Event listener connected and subscribed");
+      this.logger.info('Event listener connected and subscribed');
 
       // Handle incoming messages
-      this.subscriber.on("message", async (channel, message) => {
+      this.subscriber.on('message', async (channel, message) => {
         if (channel === this.CHANNEL_NAME) {
           try {
             const event = JSON.parse(message);
-            this.logger.info("SDK Event received", {
+            this.logger.info('SDK Event received', {
               type: event.type,
               id: event.data?.id,
             });
             try {
               this.metrics?.incEventReceived(event.type);
-            } catch (_) { }
+            } catch (_) {}
             await this.processEvent(event);
           } catch (error: any) {
-            this.logger.error("Failed to parse event message", {
+            this.logger.error('Failed to parse event message', {
               error: error.message,
             });
           }
@@ -177,9 +169,9 @@ export class EventListener {
 
       this.isConnected = true;
       this.reconnectAttempts = 0;
-      this.logger.info("Event listener initialized successfully");
+      this.logger.info('Event listener initialized successfully');
     } catch (error: any) {
-      this.logger.error("Failed to initialize event listener", {
+      this.logger.error('Failed to initialize event listener', {
         error: error.message,
       });
       throw error;
@@ -195,7 +187,7 @@ export class EventListener {
     }
 
     if (this.reconnectAttempts >= this.MAX_RECONNECT_ATTEMPTS) {
-      this.logger.error("Max reconnection attempts reached. Giving up.");
+      this.logger.error('Max reconnection attempts reached. Giving up.');
       return;
     }
 
@@ -216,9 +208,7 @@ export class EventListener {
         await this.initialize();
 
         // After successful reconnection, reinitialize all cache data
-        this.logger.info(
-          "Event listener reconnected. Reinitializing cache data...",
-        );
+        this.logger.info('Event listener reconnected. Reinitializing cache data...');
         await this.reinitializeCache();
       } catch (_error: any) {
         // Silently continue on reconnection failures
@@ -235,9 +225,9 @@ export class EventListener {
       // Refresh all cache data using refreshAll which handles all environments
       await this.cacheManager.refreshAll();
 
-      this.logger.info("Cache reinitialized after reconnection");
+      this.logger.info('Cache reinitialized after reconnection');
     } catch (error: any) {
-      this.logger.error("Failed to reinitialize cache", {
+      this.logger.error('Failed to reinitialize cache', {
         error: error.message,
       });
       throw error;
@@ -248,7 +238,7 @@ export class EventListener {
    * Process incoming event
    */
   private async processEvent(event: any): Promise<void> {
-    this.logger.debug("Processing event", {
+    this.logger.debug('Processing event', {
       type: event.type,
       data: event.data,
     });
@@ -260,7 +250,7 @@ export class EventListener {
         // Update last refreshed timestamp since we successfully processed an event
         this.cacheManager.updateLastRefreshedAt();
       } catch (error: any) {
-        this.logger.error("Failed to handle standard event", {
+        this.logger.error('Failed to handle standard event', {
           type: event.type,
           error: error.message,
         });
@@ -278,7 +268,7 @@ export class EventListener {
    * because they are local events emitted by MaintenanceWatcher, not backend events
    */
   private isStandardEvent(type: string): boolean {
-    return !type.startsWith("local.") && !type.startsWith("custom.");
+    return !type.startsWith('local.') && !type.startsWith('custom.');
   }
 
   /**
@@ -286,7 +276,7 @@ export class EventListener {
    * All event handlers check feature flags before processing
    */
   private async handleStandardEvent(event: StandardEvent): Promise<void> {
-    this.logger.info("Handling standard event", {
+    this.logger.info('Handling standard event', {
       type: event.type,
       id: event.data.id,
     });
@@ -294,10 +284,10 @@ export class EventListener {
     const features = this.cacheManager.getFeatures();
 
     switch (event.type) {
-      case "gameworld.created":
-      case "gameworld.updated": {
+      case 'gameworld.created':
+      case 'gameworld.updated': {
         if (features.gameWorld === false) {
-          this.logger.debug("Game world event ignored - feature is disabled", {
+          this.logger.debug('Game world event ignored - feature is disabled', {
             event: event.type,
           });
           break;
@@ -307,7 +297,7 @@ export class EventListener {
         // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
         const gwEnv = event.data.environment as string;
         if (!gwEnv) {
-          this.logger.warn("Game world event missing environment", {
+          this.logger.warn('Game world event missing environment', {
             event: event.type,
           });
           break;
@@ -321,14 +311,14 @@ export class EventListener {
         await this.cacheManager.updateSingleGameWorld(
           Number(event.data.id),
           gwEnv,
-          gameWorldIsVisible,
+          gameWorldIsVisible
         );
         break;
       }
 
-      case "gameworld.deleted": {
+      case 'gameworld.deleted': {
         if (features.gameWorld === false) {
-          this.logger.debug("Game world event ignored - feature is disabled", {
+          this.logger.debug('Game world event ignored - feature is disabled', {
             event: event.type,
           });
           break;
@@ -336,7 +326,7 @@ export class EventListener {
         // Remove the deleted game world from cache (immutable)
         const gwDeleteEnv = event.data.environment as string;
         if (!gwDeleteEnv) {
-          this.logger.warn("Game world deleted event missing environment", {
+          this.logger.warn('Game world deleted event missing environment', {
             event: event.type,
           });
           break;
@@ -345,9 +335,9 @@ export class EventListener {
         break;
       }
 
-      case "gameworld.order_changed": {
+      case 'gameworld.order_changed': {
         if (features.gameWorld === false) {
-          this.logger.debug("Game world event ignored - feature is disabled", {
+          this.logger.debug('Game world event ignored - feature is disabled', {
             event: event.type,
           });
           break;
@@ -355,26 +345,24 @@ export class EventListener {
         // Clear entire game worlds cache when order changes
         const gwOrderEnv = event.data.environment as string;
         if (!gwOrderEnv) {
-          this.logger.warn(
-            "Game world order changed event missing environment",
-            { event: event.type },
-          );
+          this.logger.warn('Game world order changed event missing environment', {
+            event: event.type,
+          });
           break;
         }
-        this.logger.info("Game world order changed, refreshing cache", {
+        this.logger.info('Game world order changed, refreshing cache', {
           environment: gwOrderEnv,
         });
         await this.cacheManager.refreshGameWorlds(gwOrderEnv);
         break;
       }
 
-      case "popup.created":
-      case "popup.updated": {
+      case 'popup.created':
+      case 'popup.updated': {
         if (features.popupNotice === false) {
-          this.logger.debug(
-            "Popup notice event ignored - feature is disabled",
-            { event: event.type },
-          );
+          this.logger.debug('Popup notice event ignored - feature is disabled', {
+            event: event.type,
+          });
           break;
         }
         // Update only the affected popup notice (immutable)
@@ -382,7 +370,7 @@ export class EventListener {
         // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
         const popupEnv = event.data.environment as string;
         if (!popupEnv) {
-          this.logger.warn("Popup notice event missing environment", {
+          this.logger.warn('Popup notice event missing environment', {
             event: event.type,
           });
           break;
@@ -396,38 +384,34 @@ export class EventListener {
         await this.cacheManager.updateSinglePopupNotice(
           Number(event.data.id),
           popupEnv,
-          popupIsVisible,
+          popupIsVisible
         );
         break;
       }
 
-      case "popup.deleted": {
+      case 'popup.deleted': {
         if (features.popupNotice === false) {
-          this.logger.debug(
-            "Popup notice event ignored - feature is disabled",
-            { event: event.type },
-          );
+          this.logger.debug('Popup notice event ignored - feature is disabled', {
+            event: event.type,
+          });
           break;
         }
         // Remove the deleted popup notice from cache (immutable)
         const popupDeleteEnv = event.data.environment as string;
         if (!popupDeleteEnv) {
-          this.logger.warn("Popup notice deleted event missing environment", {
+          this.logger.warn('Popup notice deleted event missing environment', {
             event: event.type,
           });
           break;
         }
-        this.cacheManager.removePopupNotice(
-          Number(event.data.id),
-          popupDeleteEnv,
-        );
+        this.cacheManager.removePopupNotice(Number(event.data.id), popupDeleteEnv);
         break;
       }
 
-      case "survey.created":
-      case "survey.updated": {
+      case 'survey.created':
+      case 'survey.updated': {
         if (features.survey === false) {
-          this.logger.debug("Survey event ignored - feature is disabled", {
+          this.logger.debug('Survey event ignored - feature is disabled', {
             event: event.type,
           });
           break;
@@ -437,7 +421,7 @@ export class EventListener {
         // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
         const surveyEnv = event.data.environment as string;
         if (!surveyEnv) {
-          this.logger.warn("Survey event missing environment", {
+          this.logger.warn('Survey event missing environment', {
             event: event.type,
           });
           break;
@@ -451,14 +435,14 @@ export class EventListener {
         await this.cacheManager.updateSingleSurvey(
           String(event.data.id),
           surveyEnv,
-          surveyIsActive,
+          surveyIsActive
         );
         break;
       }
 
-      case "survey.deleted": {
+      case 'survey.deleted': {
         if (features.survey === false) {
-          this.logger.debug("Survey event ignored - feature is disabled", {
+          this.logger.debug('Survey event ignored - feature is disabled', {
             event: event.type,
           });
           break;
@@ -466,7 +450,7 @@ export class EventListener {
         // Remove the deleted survey from cache (immutable)
         const surveyDeleteEnv = event.data.environment as string;
         if (!surveyDeleteEnv) {
-          this.logger.warn("Survey deleted event missing environment", {
+          this.logger.warn('Survey deleted event missing environment', {
             event: event.type,
           });
           break;
@@ -475,9 +459,9 @@ export class EventListener {
         break;
       }
 
-      case "survey.settings.updated": {
+      case 'survey.settings.updated': {
         if (features.survey === false) {
-          this.logger.debug("Survey event ignored - feature is disabled", {
+          this.logger.debug('Survey event ignored - feature is disabled', {
             event: event.type,
           });
           break;
@@ -485,31 +469,27 @@ export class EventListener {
         // Refresh survey settings only when configuration changes
         const surveySettingsEnv = event.data.environment as string;
         if (!surveySettingsEnv) {
-          this.logger.warn(
-            "Survey settings updated event missing environment",
-            { event: event.type },
-          );
+          this.logger.warn('Survey settings updated event missing environment', {
+            event: event.type,
+          });
           break;
         }
-        this.logger.info(
-          "Survey settings updated event received, refreshing settings",
-          {
-            eventData: event.data,
-            environment: surveySettingsEnv,
-          },
-        );
+        this.logger.info('Survey settings updated event received, refreshing settings', {
+          eventData: event.data,
+          environment: surveySettingsEnv,
+        });
         try {
           await this.cacheManager.refreshSurveySettings(surveySettingsEnv);
-          this.logger.info("Survey settings refreshed successfully");
+          this.logger.info('Survey settings refreshed successfully');
         } catch (error) {
-          this.logger.error("Failed to refresh survey settings", { error });
+          this.logger.error('Failed to refresh survey settings', { error });
         }
         break;
       }
 
-      case "whitelist.updated": {
+      case 'whitelist.updated': {
         if (features.whitelist === false) {
-          this.logger.debug("Whitelist event ignored - feature is disabled", {
+          this.logger.debug('Whitelist event ignored - feature is disabled', {
             event: event.type,
           });
           break;
@@ -517,27 +497,26 @@ export class EventListener {
         // Refresh whitelist cache when whitelist is updated
         const whitelistEnv = event.data.environment as string;
         if (!whitelistEnv) {
-          this.logger.warn("Whitelist updated event missing environment", {
+          this.logger.warn('Whitelist updated event missing environment', {
             event: event.type,
           });
           break;
         }
-        this.logger.info(
-          "Whitelist updated event received, refreshing whitelist cache",
-          { environment: whitelistEnv },
-        );
+        this.logger.info('Whitelist updated event received, refreshing whitelist cache', {
+          environment: whitelistEnv,
+        });
         try {
           await this.cacheManager.refreshWhitelists(whitelistEnv);
-          this.logger.info("Whitelist cache refreshed successfully");
+          this.logger.info('Whitelist cache refreshed successfully');
         } catch (error) {
-          this.logger.error("Failed to refresh whitelist cache", { error });
+          this.logger.error('Failed to refresh whitelist cache', { error });
         }
         break;
       }
 
-      case "maintenance.settings.updated": {
+      case 'maintenance.settings.updated': {
         if (features.serviceMaintenance === false) {
-          this.logger.debug("Maintenance event ignored - feature is disabled", {
+          this.logger.debug('Maintenance event ignored - feature is disabled', {
             event: event.type,
           });
           break;
@@ -547,39 +526,37 @@ export class EventListener {
         // and emit maintenance.started/maintenance.ended events if needed
         const maintenanceEnv = event.data.environment as string;
         if (!maintenanceEnv) {
-          this.logger.warn(
-            "Maintenance settings updated event missing environment",
-            { event: event.type },
-          );
+          this.logger.warn('Maintenance settings updated event missing environment', {
+            event: event.type,
+          });
           break;
         }
         this.logger.info(
-          "Service maintenance settings updated event received, refreshing service maintenance cache",
-          { environment: maintenanceEnv },
+          'Service maintenance settings updated event received, refreshing service maintenance cache',
+          { environment: maintenanceEnv }
         );
         try {
           await this.cacheManager.refreshServiceMaintenance(maintenanceEnv);
-          this.logger.info("Service maintenance cache refreshed successfully");
+          this.logger.info('Service maintenance cache refreshed successfully');
         } catch (error) {
-          this.logger.error("Failed to refresh service maintenance cache", {
+          this.logger.error('Failed to refresh service maintenance cache', {
             error,
           });
         }
         break;
       }
 
-      case "client_version.created":
-      case "client_version.updated": {
+      case 'client_version.created':
+      case 'client_version.updated': {
         if (features.clientVersion !== true) {
-          this.logger.debug(
-            "Client version event ignored - feature is disabled",
-            { event: event.type },
-          );
+          this.logger.debug('Client version event ignored - feature is disabled', {
+            event: event.type,
+          });
           break;
         }
         const cvEnvironment = event.data.environment as string;
         if (!cvEnvironment) {
-          this.logger.warn("Client version updated event missing environment", {
+          this.logger.warn('Client version updated event missing environment', {
             event: event.type,
           });
           break;
@@ -588,32 +565,24 @@ export class EventListener {
         // Check if full data is available in event payload
         const clientVersionData = event.data.clientVersion;
         if (clientVersionData) {
-          this.logger.info(
-            "Client version event received, updating cache directly",
-            {
-              id: event.data.id,
-              environment: cvEnvironment,
-            },
-          );
+          this.logger.info('Client version event received, updating cache directly', {
+            id: event.data.id,
+            environment: cvEnvironment,
+          });
           this.cacheManager
             .getClientVersionService()
             ?.updateSingleClientVersion(clientVersionData, cvEnvironment);
         } else {
           // Fallback to refresh if full data not available
-          this.logger.info(
-            "Client version event received (no full data), refreshing cache",
-            {
-              id: event.data.id,
-              environment: cvEnvironment,
-            },
-          );
+          this.logger.info('Client version event received (no full data), refreshing cache', {
+            id: event.data.id,
+            environment: cvEnvironment,
+          });
           try {
-            await this.cacheManager
-              .getClientVersionService()
-              ?.refreshByEnvironment(cvEnvironment);
-            this.logger.info("Client version cache refreshed successfully");
+            await this.cacheManager.getClientVersionService()?.refreshByEnvironment(cvEnvironment);
+            this.logger.info('Client version cache refreshed successfully');
           } catch (error: any) {
-            this.logger.error("Failed to refresh client version cache", {
+            this.logger.error('Failed to refresh client version cache', {
               error: error.message,
             });
           }
@@ -621,40 +590,34 @@ export class EventListener {
         break;
       }
 
-      case "client_version.deleted": {
+      case 'client_version.deleted': {
         if (features.clientVersion !== true) {
-          this.logger.debug(
-            "Client version event ignored - feature is disabled",
-            { event: event.type },
-          );
+          this.logger.debug('Client version event ignored - feature is disabled', {
+            event: event.type,
+          });
           break;
         }
         const cvEnvironment = event.data.environment as string;
         if (!cvEnvironment) {
-          this.logger.warn("Client version deleted event missing environment", {
+          this.logger.warn('Client version deleted event missing environment', {
             event: event.type,
           });
           break;
         }
         const id = Number(event.data.id);
-        this.logger.info(
-          "Client version deleted event received, removing from cache",
-          {
-            id: id,
-            environment: cvEnvironment,
-          },
-        );
+        this.logger.info('Client version deleted event received, removing from cache', {
+          id: id,
+          environment: cvEnvironment,
+        });
 
-        this.cacheManager
-          .getClientVersionService()
-          ?.removeFromCache(id, cvEnvironment);
+        this.cacheManager.getClientVersionService()?.removeFromCache(id, cvEnvironment);
         break;
       }
 
-      case "banner.created":
-      case "banner.updated": {
+      case 'banner.created':
+      case 'banner.updated': {
         if (features.banner !== true) {
-          this.logger.debug("Banner event ignored - feature is disabled", {
+          this.logger.debug('Banner event ignored - feature is disabled', {
             event: event.type,
           });
           break;
@@ -663,23 +626,19 @@ export class EventListener {
         // Pass status from event data to avoid unnecessary API calls
         const bannerEnv = event.data.environment as string;
         if (!bannerEnv) {
-          this.logger.warn("Banner event missing environment", {
+          this.logger.warn('Banner event missing environment', {
             event: event.type,
           });
           break;
         }
         const bannerStatus = event.data.status as string | undefined;
-        await this.cacheManager.updateSingleBanner(
-          String(event.data.id),
-          bannerEnv,
-          bannerStatus,
-        );
+        await this.cacheManager.updateSingleBanner(String(event.data.id), bannerEnv, bannerStatus);
         break;
       }
 
-      case "banner.deleted": {
+      case 'banner.deleted': {
         if (features.banner !== true) {
-          this.logger.debug("Banner event ignored - feature is disabled", {
+          this.logger.debug('Banner event ignored - feature is disabled', {
             event: event.type,
           });
           break;
@@ -687,7 +646,7 @@ export class EventListener {
         // Remove the deleted banner from cache (immutable)
         const bannerDeleteEnv = event.data.environment as string;
         if (!bannerDeleteEnv) {
-          this.logger.warn("Banner deleted event missing environment", {
+          this.logger.warn('Banner deleted event missing environment', {
             event: event.type,
           });
           break;
@@ -696,18 +655,17 @@ export class EventListener {
         break;
       }
 
-      case "service_notice.created":
-      case "service_notice.updated": {
+      case 'service_notice.created':
+      case 'service_notice.updated': {
         if (features.serviceNotice !== true) {
-          this.logger.debug(
-            "Service notice event ignored - feature is disabled",
-            { event: event.type },
-          );
+          this.logger.debug('Service notice event ignored - feature is disabled', {
+            event: event.type,
+          });
           break;
         }
         const noticeEnvironment = event.data.environment as string;
         if (!noticeEnvironment) {
-          this.logger.warn("Service notice updated event missing environment", {
+          this.logger.warn('Service notice updated event missing environment', {
             event: event.type,
           });
           break;
@@ -716,34 +674,28 @@ export class EventListener {
         // Check if full data is available in event payload
         const serviceNoticeData = event.data.serviceNotice;
         if (serviceNoticeData) {
-          this.logger.info(
-            "Service notice event received, updating cache directly",
-            {
-              id: event.data.id,
-              environment: noticeEnvironment,
-              isActive: serviceNoticeData.isActive,
-              updatedAt: serviceNoticeData.updatedAt,
-            },
-          );
+          this.logger.info('Service notice event received, updating cache directly', {
+            id: event.data.id,
+            environment: noticeEnvironment,
+            isActive: serviceNoticeData.isActive,
+            updatedAt: serviceNoticeData.updatedAt,
+          });
           this.cacheManager
             .getServiceNoticeService()
             ?.updateSingleServiceNotice(serviceNoticeData, noticeEnvironment);
         } else {
           // Fallback to refresh if full data not available
-          this.logger.info(
-            "Service notice event received (no full data), refreshing cache",
-            {
-              id: event.data.id,
-              environment: noticeEnvironment,
-            },
-          );
+          this.logger.info('Service notice event received (no full data), refreshing cache', {
+            id: event.data.id,
+            environment: noticeEnvironment,
+          });
           try {
             await this.cacheManager
               .getServiceNoticeService()
               ?.refreshByEnvironment(noticeEnvironment);
-            this.logger.info("Service notice cache refreshed successfully");
+            this.logger.info('Service notice cache refreshed successfully');
           } catch (error: any) {
-            this.logger.error("Failed to refresh service notice cache", {
+            this.logger.error('Failed to refresh service notice cache', {
               error: error.message,
             });
           }
@@ -751,42 +703,35 @@ export class EventListener {
         break;
       }
 
-      case "service_notice.deleted": {
+      case 'service_notice.deleted': {
         if (features.serviceNotice !== true) {
-          this.logger.debug(
-            "Service notice event ignored - feature is disabled",
-            { event: event.type },
-          );
+          this.logger.debug('Service notice event ignored - feature is disabled', {
+            event: event.type,
+          });
           break;
         }
         const noticeEnvironment = event.data.environment as string;
         if (!noticeEnvironment) {
-          this.logger.warn("Service notice deleted event missing environment", {
+          this.logger.warn('Service notice deleted event missing environment', {
             event: event.type,
           });
           break;
         }
         const id = Number(event.data.id);
-        this.logger.info(
-          "Service notice deleted event received, removing from cache",
-          {
-            id: id,
-            environment: noticeEnvironment,
-          },
-        );
-        this.cacheManager
-          .getServiceNoticeService()
-          ?.removeFromCache(id, noticeEnvironment);
+        this.logger.info('Service notice deleted event received, removing from cache', {
+          id: id,
+          environment: noticeEnvironment,
+        });
+        this.cacheManager.getServiceNoticeService()?.removeFromCache(id, noticeEnvironment);
         break;
       }
 
-      case "store_product.created":
-      case "store_product.updated": {
+      case 'store_product.created':
+      case 'store_product.updated': {
         if (features.storeProduct !== true) {
-          this.logger.debug(
-            "Store product event ignored - feature is disabled",
-            { event: event.type },
-          );
+          this.logger.debug('Store product event ignored - feature is disabled', {
+            event: event.type,
+          });
           break;
         }
         // Update only the affected store product (immutable)
@@ -794,7 +739,7 @@ export class EventListener {
         // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
         const productEnv = event.data.environment as string;
         if (!productEnv) {
-          this.logger.warn("Store product event missing environment", {
+          this.logger.warn('Store product event missing environment', {
             event: event.type,
           });
           break;
@@ -808,165 +753,141 @@ export class EventListener {
         await this.cacheManager.updateSingleStoreProduct(
           String(event.data.id),
           productEnv,
-          productIsActive,
+          productIsActive
         );
         break;
       }
 
-      case "store_product.deleted": {
+      case 'store_product.deleted': {
         if (features.storeProduct !== true) {
-          this.logger.debug(
-            "Store product event ignored - feature is disabled",
-            { event: event.type },
-          );
+          this.logger.debug('Store product event ignored - feature is disabled', {
+            event: event.type,
+          });
           break;
         }
         // Remove the deleted store product from cache (immutable)
         const productDeleteEnv = event.data.environment as string;
         if (!productDeleteEnv) {
-          this.logger.warn("Store product deleted event missing environment", {
+          this.logger.warn('Store product deleted event missing environment', {
             event: event.type,
           });
           break;
         }
-        this.cacheManager.removeStoreProduct(
-          String(event.data.id),
-          productDeleteEnv,
-        );
+        this.cacheManager.removeStoreProduct(String(event.data.id), productDeleteEnv);
         break;
       }
 
-      case "store_product.bulk_updated": {
+      case 'store_product.bulk_updated': {
         if (features.storeProduct !== true) {
-          this.logger.debug(
-            "Store product bulk update event ignored - feature is disabled",
-            { event: event.type },
-          );
+          this.logger.debug('Store product bulk update event ignored - feature is disabled', {
+            event: event.type,
+          });
           break;
         }
         // For bulk updates, refresh all store products for the environment
         const bulkEnv = event.data.environment as string;
         if (!bulkEnv) {
-          this.logger.warn(
-            "Store product bulk update event missing environment",
-            { event: event.type },
-          );
+          this.logger.warn('Store product bulk update event missing environment', {
+            event: event.type,
+          });
           break;
         }
-        this.logger.info(
-          "Store product bulk update event received, refreshing cache",
-          {
-            count: event.data.count,
-            environment: bulkEnv,
-            isActive: event.data.isActive,
-          },
-        );
+        this.logger.info('Store product bulk update event received, refreshing cache', {
+          count: event.data.count,
+          environment: bulkEnv,
+          isActive: event.data.isActive,
+        });
         await this.cacheManager.refreshStoreProducts(bulkEnv);
         break;
       }
 
-      case "environment.created":
-      case "environment.deleted":
+      case 'environment.created':
+      case 'environment.deleted':
         // When environments are added or removed, refresh environment list and load/clear data
         // This is essential for "all environments" mode (environments: '*')
-        this.logger.info("Environment change event received", {
+        this.logger.info('Environment change event received', {
           type: event.type,
           environment: event.data.environment,
         });
         try {
           const result = await this.cacheManager.refreshEnvironmentList();
-          this.logger.info(
-            "Environment list refreshed after environment change",
-            {
-              added: result.added,
-              removed: result.removed,
-            },
-          );
+          this.logger.info('Environment list refreshed after environment change', {
+            added: result.added,
+            removed: result.removed,
+          });
         } catch (error: any) {
-          this.logger.error(
-            "Failed to refresh environment list after environment change",
-            { error: error.message },
-          );
+          this.logger.error('Failed to refresh environment list after environment change', {
+            error: error.message,
+          });
         }
         break;
 
       // Note: maintenance.started and maintenance.ended are NOT handled here
       // They are local events emitted by MaintenanceWatcher based on cache state changes
 
-      case "feature_flag.changed":
-      case "feature_flag.created":
-      case "feature_flag.updated":
-      case "feature_flag.deleted": {
+      case 'feature_flag.changed':
+      case 'feature_flag.created':
+      case 'feature_flag.updated':
+      case 'feature_flag.deleted': {
         if (features.featureFlag !== true) {
-          this.logger.debug(
-            "Feature flag event ignored - feature is disabled",
-            { event: event.type },
-          );
-          break;
-        }
-        const ffEnv = event.data.environment as string;
-        if (!ffEnv) {
-          this.logger.warn("Feature flag event missing environment", {
+          this.logger.debug('Feature flag event ignored - feature is disabled', {
             event: event.type,
           });
           break;
         }
-        this.logger.info(
-          "Feature flag event received, refreshing feature flags cache",
-          {
-            type: event.type,
-            environment: ffEnv,
-          },
-        );
+        const ffEnv = event.data.environment as string;
+        if (!ffEnv) {
+          this.logger.warn('Feature flag event missing environment', {
+            event: event.type,
+          });
+          break;
+        }
+        this.logger.info('Feature flag event received, refreshing feature flags cache', {
+          type: event.type,
+          environment: ffEnv,
+        });
         try {
-          await this.cacheManager
-            .getFeatureFlagService()
-            ?.refreshByEnvironment(ffEnv);
-          this.logger.info("Feature flags cache refreshed successfully");
+          await this.cacheManager.getFeatureFlagService()?.refreshByEnvironment(ffEnv);
+          this.logger.info('Feature flags cache refreshed successfully');
         } catch (error: any) {
-          this.logger.error("Failed to refresh feature flags cache", {
+          this.logger.error('Failed to refresh feature flags cache', {
             error: error.message,
           });
         }
         break;
       }
 
-      case "segment.created":
-      case "segment.updated":
-      case "segment.deleted": {
+      case 'segment.created':
+      case 'segment.updated':
+      case 'segment.deleted': {
         if (features.featureFlag !== true) {
-          this.logger.debug(
-            "Segment event ignored - featureFlag feature is disabled",
-            { event: event.type },
-          );
+          this.logger.debug('Segment event ignored - featureFlag feature is disabled', {
+            event: event.type,
+          });
           break;
         }
         // Segments are global (not environment-specific) and can be used by any flag
         // When a segment changes, refresh feature flags for ALL environments
-        this.logger.info(
-          "Segment event received, refreshing feature flags for all environments",
-          {
-            type: event.type,
-            segmentId: event.data.id,
-            segmentName: event.data.segmentName,
-          },
-        );
+        this.logger.info('Segment event received, refreshing feature flags for all environments', {
+          type: event.type,
+          segmentId: event.data.id,
+          segmentName: event.data.segmentName,
+        });
         try {
           await this.cacheManager.getFeatureFlagService()?.refreshAll();
           this.logger.info(
-            "Feature flags cache refreshed for all environments after segment change",
+            'Feature flags cache refreshed for all environments after segment change'
           );
         } catch (error: any) {
-          this.logger.error(
-            "Failed to refresh feature flags cache after segment change",
-            { error: error.message },
-          );
+          this.logger.error('Failed to refresh feature flags cache after segment change', {
+            error: error.message,
+          });
         }
         break;
       }
 
       default:
-        this.logger.warn("Unknown standard event type", { type: event.type });
+        this.logger.warn('Unknown standard event type', { type: event.type });
     }
   }
 
@@ -975,7 +896,7 @@ export class EventListener {
    */
   private async emitEvent(event: StandardEvent | CustomEvent): Promise<void> {
     const listeners = this.eventListeners[event.type] || [];
-    const wildcardListeners = this.eventListeners["*"] || [];
+    const wildcardListeners = this.eventListeners['*'] || [];
 
     const allListeners = [...listeners, ...wildcardListeners];
 
@@ -983,7 +904,7 @@ export class EventListener {
       return;
     }
 
-    this.logger.debug("Emitting event to listeners", {
+    this.logger.debug('Emitting event to listeners', {
       type: event.type,
       listenerCount: allListeners.length,
     });
@@ -999,7 +920,7 @@ export class EventListener {
       try {
         await listener(sdkEvent);
       } catch (error: any) {
-        this.logger.error("Event listener error", {
+        this.logger.error('Event listener error', {
           type: event.type,
           error: error.message,
         });
@@ -1018,7 +939,7 @@ export class EventListener {
 
     this.eventListeners[eventType].push(callback);
 
-    this.logger.debug("Event listener registered", { eventType });
+    this.logger.debug('Event listener registered', { eventType });
 
     // Return a function to unregister this specific listener
     return () => {
@@ -1034,11 +955,9 @@ export class EventListener {
       return;
     }
 
-    this.eventListeners[eventType] = this.eventListeners[eventType].filter(
-      (cb) => cb !== callback,
-    );
+    this.eventListeners[eventType] = this.eventListeners[eventType].filter((cb) => cb !== callback);
 
-    this.logger.debug("Event listener unregistered", { eventType });
+    this.logger.debug('Event listener unregistered', { eventType });
   }
 
   /**
@@ -1047,10 +966,10 @@ export class EventListener {
   removeAllListeners(eventType?: string): void {
     if (eventType) {
       delete this.eventListeners[eventType];
-      this.logger.debug("All listeners removed for event type", { eventType });
+      this.logger.debug('All listeners removed for event type', { eventType });
     } else {
       this.eventListeners = {};
-      this.logger.debug("All event listeners removed");
+      this.logger.debug('All event listeners removed');
     }
   }
 
@@ -1060,18 +979,18 @@ export class EventListener {
    */
   async publishEvent(event: StandardEvent | CustomEvent): Promise<void> {
     if (!this.subscriber) {
-      throw new Error("Event listener not initialized");
+      throw new Error('Event listener not initialized');
     }
 
     try {
       const message = JSON.stringify(event);
       await this.subscriber.publish(this.CHANNEL_NAME, message);
-      this.logger.debug("Event published", { type: event.type });
+      this.logger.debug('Event published', { type: event.type });
       try {
         this.metrics?.incEventPublished(event.type);
-      } catch (_) { }
+      } catch (_) {}
     } catch (error: any) {
-      this.logger.error("Failed to publish event", {
+      this.logger.error('Failed to publish event', {
         type: event.type,
         error: error.message,
       });
@@ -1086,14 +1005,14 @@ export class EventListener {
    * Close event listener and cleanup
    */
   async close(): Promise<void> {
-    this.logger.info("Closing event listener...");
+    this.logger.info('Closing event listener...');
 
     // Mark as shutting down to suppress noisy connection logs
     this.isShuttingDown = true;
     this.isConnected = false;
     try {
       this.metrics?.setRedisConnected(false);
-    } catch (_) { }
+    } catch (_) {}
 
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
@@ -1108,6 +1027,6 @@ export class EventListener {
 
     this.removeAllListeners();
 
-    this.logger.info("Event listener closed");
+    this.logger.info('Event listener closed');
   }
 }

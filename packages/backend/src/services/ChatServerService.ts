@@ -1,8 +1,8 @@
-import axios, { AxiosInstance } from "axios";
-import { config } from "../config";
-import { createLogger } from "../config/logger";
+import axios, { AxiosInstance } from 'axios';
+import { config } from '../config';
+import { createLogger } from '../config/logger';
 
-const logger = createLogger("ChatServerService");
+const logger = createLogger('ChatServerService');
 
 interface UserData {
   id: number;
@@ -11,7 +11,7 @@ interface UserData {
   email?: string;
   avatar?: string;
   avatarUrl?: string;
-  status?: "online" | "offline" | "away" | "busy";
+  status?: 'online' | 'offline' | 'away' | 'busy';
   customStatus?: string;
   lastSeenAt?: string;
   createdAt?: string;
@@ -29,14 +29,14 @@ export class ChatServerService {
     this.apiToken = config.chatServer.apiToken;
     this.serviceToken =
       (config.chatServer as any).serviceToken ||
-      "gatrix-backend-service-token-default-key-change-in-production";
+      'gatrix-backend-service-token-default-key-change-in-production';
 
     this.axiosInstance = axios.create({
       baseURL: config.chatServer.url,
       timeout: 30000,
       headers: {
-        "Content-Type": "application/json",
-        "X-API-Token": this.serviceToken, // Backend -> Chat Server 특수 토큰 사용
+        'Content-Type': 'application/json',
+        'X-API-Token': this.serviceToken, // Backend -> Chat Server 특수 토큰 사용
       },
     });
 
@@ -44,14 +44,14 @@ export class ChatServerService {
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       (error) => {
-        logger.error("Chat Server API Error:", {
+        logger.error('Chat Server API Error:', {
           url: error.config?.url,
           method: error.config?.method,
           status: error.response?.status,
           data: error.response?.data,
         });
         throw error;
-      },
+      }
     );
   }
 
@@ -71,19 +71,12 @@ export class ChatServerService {
    */
   async syncUser(userData: UserData): Promise<void> {
     try {
-      logger.info(
-        `🔄 Syncing user ${userData.id} (${userData.username}) to Chat Server...`,
-      );
+      logger.info(`🔄 Syncing user ${userData.id} (${userData.username}) to Chat Server...`);
 
-      const response = await this.axiosInstance.post(
-        "/api/v1/users/upsert",
-        userData,
-      );
+      const response = await this.axiosInstance.post('/api/v1/users/upsert', userData);
 
       if (!response.data.success) {
-        throw new Error(
-          `Chat Server responded with error: ${response.data.error?.message}`,
-        );
+        throw new Error(`Chat Server responded with error: ${response.data.error?.message}`);
       }
 
       logger.info(`✅ User ${userData.id} synced successfully to Chat Server`);
@@ -101,9 +94,7 @@ export class ChatServerService {
   async ensureUserSynced(userData: UserData): Promise<void> {
     try {
       // 먼저 사용자가 존재하는지 확인
-      const checkResponse = await this.axiosInstance.get(
-        `/api/v1/users/check/${userData.id}`,
-      );
+      const checkResponse = await this.axiosInstance.get(`/api/v1/users/check/${userData.id}`);
 
       if (checkResponse.data.success && checkResponse.data.data?.exists) {
         // 사용자가 이미 존재하면 동기화 스킵
@@ -111,9 +102,7 @@ export class ChatServerService {
       }
     } catch (error) {
       // 확인 실패하면 동기화 시도
-      logger.debug(
-        `🔍 Could not check user existence, proceeding with sync...`,
-      );
+      logger.debug(`🔍 Could not check user existence, proceeding with sync...`);
     }
 
     // 사용자가 없거나 확인 실패한 경우 동기화
@@ -127,20 +116,13 @@ export class ChatServerService {
     logger.info(`🔄 Bulk syncing ${users.length} users to Chat Server...`);
 
     try {
-      const response = await this.axiosInstance.post(
-        "/api/v1/users/sync-users",
-        { users },
-      );
+      const response = await this.axiosInstance.post('/api/v1/users/sync-users', { users });
 
       if (!response.data.success) {
-        throw new Error(
-          `Chat Server responded with error: ${response.data.error?.message}`,
-        );
+        throw new Error(`Chat Server responded with error: ${response.data.error?.message}`);
       }
 
-      logger.info(
-        `✅ Bulk synced ${users.length} users successfully to Chat Server`,
-      );
+      logger.info(`✅ Bulk synced ${users.length} users successfully to Chat Server`);
     } catch (error: any) {
       logger.error(`❌ Failed to bulk sync users to Chat Server:`, {
         message: error.message,
@@ -148,19 +130,13 @@ export class ChatServerService {
 
       // Fallback to individual sync if bulk fails
       logger.info(`🔄 Falling back to individual sync...`);
-      const results = await Promise.allSettled(
-        users.map((user) => this.syncUser(user)),
-      );
+      const results = await Promise.allSettled(users.map((user) => this.syncUser(user)));
 
-      const failed = results.filter((result) => result.status === "rejected");
+      const failed = results.filter((result) => result.status === 'rejected');
       if (failed.length > 0) {
-        logger.error(
-          `❌ Failed to sync ${failed.length} out of ${users.length} users`,
-        );
+        logger.error(`❌ Failed to sync ${failed.length} out of ${users.length} users`);
       } else {
-        logger.info(
-          `✅ All ${users.length} users synced successfully (fallback)`,
-        );
+        logger.info(`✅ All ${users.length} users synced successfully (fallback)`);
       }
     }
   }
@@ -168,21 +144,15 @@ export class ChatServerService {
   /**
    * 사용자 상태 업데이트
    */
-  async updateUserStatus(
-    userId: number,
-    status: string,
-    customStatus?: string,
-  ): Promise<void> {
+  async updateUserStatus(userId: number, status: string, customStatus?: string): Promise<void> {
     try {
-      const response = await this.axiosInstance.put(
-        `/api/v1/users/${userId}/status`,
-        { status, customStatus },
-      );
+      const response = await this.axiosInstance.put(`/api/v1/users/${userId}/status`, {
+        status,
+        customStatus,
+      });
 
       if (!response.data.success) {
-        throw new Error(
-          `Chat Server responded with error: ${response.data.error?.message}`,
-        );
+        throw new Error(`Chat Server responded with error: ${response.data.error?.message}`);
       }
 
       logger.info(`✅ User ${userId} status updated to ${status}`);
@@ -199,14 +169,10 @@ export class ChatServerService {
    */
   async deleteUser(userId: number): Promise<void> {
     try {
-      const response = await this.axiosInstance.delete(
-        `/api/v1/users/${userId}`,
-      );
+      const response = await this.axiosInstance.delete(`/api/v1/users/${userId}`);
 
       if (!response.data.success) {
-        throw new Error(
-          `Chat Server responded with error: ${response.data.error?.message}`,
-        );
+        throw new Error(`Chat Server responded with error: ${response.data.error?.message}`);
       }
 
       logger.info(`✅ User ${userId} deleted from Chat Server`);
@@ -223,18 +189,18 @@ export class ChatServerService {
    */
   async generateChatToken(userId: number): Promise<string> {
     try {
-      const response = await this.axiosInstance.post("/api/v1/auth/token", {
+      const response = await this.axiosInstance.post('/api/v1/auth/token', {
         userId,
       });
 
       if (!response.data.success || !response.data.data?.token) {
-        throw new Error("Failed to generate chat token");
+        throw new Error('Failed to generate chat token');
       }
 
       return response.data.data.token;
     } catch (error) {
-      logger.error("Error generating chat token:", error);
-      throw new Error("Failed to generate chat token");
+      logger.error('Error generating chat token:', error);
+      throw new Error('Failed to generate chat token');
     }
   }
 
@@ -245,21 +211,21 @@ export class ChatServerService {
     try {
       // Chat Server의 /api/v1/channels/my 엔드포인트 사용
       // 사용자 ID를 헤더로 전달
-      const response = await this.axiosInstance.get("/api/v1/channels/my", {
+      const response = await this.axiosInstance.get('/api/v1/channels/my', {
         headers: {
-          "X-User-ID": userId.toString(),
+          'X-User-ID': userId.toString(),
         },
       });
 
       if (!response.data.success) {
-        throw new Error("Failed to get user channels");
+        throw new Error('Failed to get user channels');
       }
 
       // Chat Server의 응답 구조를 그대로 반환 (data: [], pagination: {...})
       return response.data.data || { data: [], pagination: {} };
     } catch (error) {
-      logger.error("Error getting user channels:", error);
-      throw new Error("Failed to get user channels");
+      logger.error('Error getting user channels:', error);
+      throw new Error('Failed to get user channels');
     }
   }
 
@@ -273,19 +239,16 @@ export class ChatServerService {
     createdBy: number;
   }): Promise<any> {
     try {
-      const response = await this.axiosInstance.post(
-        "/api/v1/channels",
-        channelData,
-      );
+      const response = await this.axiosInstance.post('/api/v1/channels', channelData);
 
       if (!response.data.success) {
-        throw new Error("Failed to create channel");
+        throw new Error('Failed to create channel');
       }
 
       return response.data.data?.channel;
     } catch (error) {
-      logger.error("Error creating channel:", error);
-      throw new Error("Failed to create channel");
+      logger.error('Error creating channel:', error);
+      throw new Error('Failed to create channel');
     }
   }
 
@@ -294,9 +257,7 @@ export class ChatServerService {
    */
   async getChannel(channelId: number): Promise<any> {
     try {
-      const response = await this.axiosInstance.get(
-        `/api/v1/channels/${channelId}`,
-      );
+      const response = await this.axiosInstance.get(`/api/v1/channels/${channelId}`);
 
       if (!response.data.success) {
         return null;
@@ -304,7 +265,7 @@ export class ChatServerService {
 
       return response.data.data?.channel;
     } catch (error) {
-      logger.error("Error getting channel:", error);
+      logger.error('Error getting channel:', error);
       return null;
     }
   }
@@ -317,24 +278,21 @@ export class ChatServerService {
     options: {
       page: number;
       limit: number;
-    },
+    }
   ): Promise<any[]> {
     try {
-      const response = await this.axiosInstance.get(
-        `/api/v1/channels/${channelId}/messages`,
-        {
-          params: options,
-        },
-      );
+      const response = await this.axiosInstance.get(`/api/v1/channels/${channelId}/messages`, {
+        params: options,
+      });
 
       if (!response.data.success) {
-        throw new Error("Failed to get channel messages");
+        throw new Error('Failed to get channel messages');
       }
 
       return response.data.data?.messages || [];
     } catch (error) {
-      logger.error("Error getting channel messages:", error);
-      throw new Error("Failed to get channel messages");
+      logger.error('Error getting channel messages:', error);
+      throw new Error('Failed to get channel messages');
     }
   }
 
@@ -343,7 +301,7 @@ export class ChatServerService {
    */
   async healthCheck(): Promise<boolean> {
     try {
-      const response = await this.axiosInstance.get("/api/v1/");
+      const response = await this.axiosInstance.get('/api/v1/');
       return response.data.success === true;
     } catch (error) {
       return false;
@@ -360,21 +318,21 @@ export class ChatServerService {
         params.search = search;
       }
 
-      const response = await this.axiosInstance.get("/api/v1/users", {
+      const response = await this.axiosInstance.get('/api/v1/users', {
         params,
         headers: {
-          "X-User-ID": userId.toString(),
+          'X-User-ID': userId.toString(),
         },
       });
 
       if (!response.data.success) {
-        throw new Error("Failed to get users");
+        throw new Error('Failed to get users');
       }
 
       return response.data.data || [];
     } catch (error) {
-      logger.error("Error getting users:", error);
-      throw new Error("Failed to get users");
+      logger.error('Error getting users:', error);
+      throw new Error('Failed to get users');
     }
   }
 
@@ -383,34 +341,29 @@ export class ChatServerService {
    */
   async generateChatApiToken(
     tokenName: string,
-    permissions: string[] = ["read", "write", "admin"],
+    permissions: string[] = ['read', 'write', 'admin']
   ): Promise<string> {
     try {
       logger.info(`🔑 Generating Chat Server API token: ${tokenName}`);
 
-      const response = await this.axiosInstance.post("/api/v1/admin/tokens", {
+      const response = await this.axiosInstance.post('/api/v1/admin/tokens', {
         name: tokenName,
         permissions,
       });
 
       if (!response.data.success) {
-        throw new Error(
-          `Chat Server responded with error: ${response.data.error?.message}`,
-        );
+        throw new Error(`Chat Server responded with error: ${response.data.error?.message}`);
       }
 
       const token = response.data.data?.token;
       if (!token) {
-        throw new Error("No token returned from Chat Server");
+        throw new Error('No token returned from Chat Server');
       }
 
       logger.info(`✅ Chat Server API token generated successfully`);
       return token;
     } catch (error: any) {
-      logger.error(
-        `❌ Failed to generate Chat Server API token:`,
-        error.message,
-      );
+      logger.error(`❌ Failed to generate Chat Server API token:`, error.message);
       throw error;
     }
   }

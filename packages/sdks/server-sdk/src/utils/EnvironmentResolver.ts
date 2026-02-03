@@ -13,7 +13,7 @@ export class EnvironmentResolver {
   private readonly defaultEnvironment: string;
   private multiEnvironmentMode: boolean = false;
 
-  constructor(defaultEnvironment: string = "development") {
+  constructor(defaultEnvironment: string = 'development') {
     this.defaultEnvironment = defaultEnvironment;
   }
 
@@ -49,15 +49,13 @@ export class EnvironmentResolver {
    * @returns Resolved environment name
    * @throws Error if environment is not provided in multi-environment mode
    */
-  resolve(environment?: string, context: string = "method"): string {
+  resolve(environment?: string, context: string = 'method'): string {
     if (environment) {
       return environment;
     }
 
     if (this.multiEnvironmentMode) {
-      throw new Error(
-        `${context}(): environment parameter is required in multi-environment mode`,
-      );
+      throw new Error(`${context}(): environment parameter is required in multi-environment mode`);
     }
 
     return this.defaultEnvironment;

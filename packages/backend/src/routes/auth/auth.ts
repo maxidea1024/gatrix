@@ -1,14 +1,14 @@
-import { Router } from "express";
-import passport from "../../config/passport";
-import { AuthController } from "../../controllers/AuthController";
-import { authenticate } from "../../middleware/auth";
-import { authLimiter } from "../../middleware/rateLimiter";
-import { auditUserLogin, auditUserRegister } from "../../middleware/auditLog";
-import redisClient from "../../config/redis";
+import { Router } from 'express';
+import passport from '../../config/passport';
+import { AuthController } from '../../controllers/AuthController';
+import { authenticate } from '../../middleware/auth';
+import { authLimiter } from '../../middleware/rateLimiter';
+import { auditUserLogin, auditUserRegister } from '../../middleware/auditLog';
+import redisClient from '../../config/redis';
 // import { WeChatOAuthService } from '../../services/WeChatOAuth';
 // import { BaiduOAuthService } from '../../services/BaiduOAuth';
-import { UserModel } from "../../models/User";
-import logger from "../../config/logger";
+import { UserModel } from '../../models/User';
+import logger from '../../config/logger';
 
 const router = Router();
 
@@ -251,77 +251,73 @@ router.use(authLimiter as any);
  */
 
 // Local authentication routes
-router.post("/login", auditUserLogin as any, AuthController.login);
-router.post("/register", auditUserRegister as any, AuthController.register);
-router.post("/refresh", AuthController.refreshToken);
-router.post("/logout", AuthController.logout);
+router.post('/login', auditUserLogin as any, AuthController.login);
+router.post('/register', auditUserRegister as any, AuthController.register);
+router.post('/refresh', AuthController.refreshToken);
+router.post('/logout', AuthController.logout);
 
 // Password reset routes
-router.post("/forgot-password", AuthController.forgotPassword);
-router.get("/validate-reset-token/:token", AuthController.validateResetToken);
-router.post("/reset-password", AuthController.resetPassword);
+router.post('/forgot-password', AuthController.forgotPassword);
+router.get('/validate-reset-token/:token', AuthController.validateResetToken);
+router.post('/reset-password', AuthController.resetPassword);
 
 // Protected routes (require authentication)
-router.get("/profile", authenticate as any, AuthController.getProfile);
-router.put("/profile", authenticate as any, AuthController.updateProfile);
-router.post(
-  "/change-password",
-  authenticate as any,
-  AuthController.changePassword,
-);
-router.post("/verify-email", authenticate as any, AuthController.verifyEmail);
+router.get('/profile', authenticate as any, AuthController.getProfile);
+router.put('/profile', authenticate as any, AuthController.updateProfile);
+router.post('/change-password', authenticate as any, AuthController.changePassword);
+router.post('/verify-email', authenticate as any, AuthController.verifyEmail);
 
 // Google OAuth routes
 router.get(
-  "/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-  }),
+  '/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+  })
 );
 
 router.get(
-  "/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: "/api/v1/auth/failure",
+  '/google/callback',
+  passport.authenticate('google', {
+    failureRedirect: '/api/v1/auth/failure',
     session: false,
   }),
-  AuthController.oauthSuccess,
+  AuthController.oauthSuccess
 );
 
 // GitHub OAuth routes
-router.get("/github", (req, res, next) => {
-  const callbackURL = `${req.protocol}://${req.get("host")}/api/v1/auth/github/callback`;
-  console.log("🚀 GitHub OAuth initiated:", {
+router.get('/github', (req, res, next) => {
+  const callbackURL = `${req.protocol}://${req.get('host')}/api/v1/auth/github/callback`;
+  console.log('🚀 GitHub OAuth initiated:', {
     callbackURL,
-    host: req.get("host"),
+    host: req.get('host'),
     protocol: req.protocol,
   });
 
-  return (passport.authenticate as any)("github", {
-    scope: ["user:email"],
+  return (passport.authenticate as any)('github', {
+    scope: ['user:email'],
     callbackURL,
   })(req, res, next);
 });
 
-router.get("/github/callback", async (req, res, next) => {
-  console.log("🔍 GitHub callback received:", {
+router.get('/github/callback', async (req, res, next) => {
+  console.log('🔍 GitHub callback received:', {
     url: req.url,
     originalUrl: req.originalUrl,
     path: req.path,
     query: req.query,
     headers: {
-      host: req.get("host"),
-      referer: req.get("referer"),
-      userAgent: req.get("user-agent"),
+      host: req.get('host'),
+      referer: req.get('referer'),
+      userAgent: req.get('user-agent'),
     },
   });
 
-  const callbackURL = `${req.protocol}://${req.get("host")}/api/v1/auth/github/callback`;
+  const callbackURL = `${req.protocol}://${req.get('host')}/api/v1/auth/github/callback`;
   const code = req.query.code as string;
 
   if (!code) {
-    console.log("❌ No code in GitHub callback, redirecting to failure");
-    return res.redirect("/api/v1/auth/failure");
+    console.log('❌ No code in GitHub callback, redirecting to failure');
+    return res.redirect('/api/v1/auth/failure');
   }
 
   // Check if this code has already been used
@@ -329,49 +325,49 @@ router.get("/github/callback", async (req, res, next) => {
   const alreadyUsed = await redisClient.get(cacheKey);
 
   if (alreadyUsed) {
-    console.log("GitHub OAuth: Code already used, redirecting to failure");
-    return res.redirect("/api/v1/auth/failure");
+    console.log('GitHub OAuth: Code already used, redirecting to failure');
+    return res.redirect('/api/v1/auth/failure');
   }
 
   // Mark code as used (expires in 10 minutes)
-  await redisClient.set(cacheKey, "used", 600);
+  await redisClient.set(cacheKey, 'used', 600);
 
   (passport.authenticate as any)(
-    "github",
+    'github',
     {
-      failureRedirect: "/api/v1/auth/failure",
+      failureRedirect: '/api/v1/auth/failure',
       session: false,
       callbackURL,
     },
     (err: any, user: any, info: any) => {
       if (err) {
-        console.error("GitHub OAuth error:", err);
-        return res.redirect("/api/v1/auth/failure");
+        console.error('GitHub OAuth error:', err);
+        return res.redirect('/api/v1/auth/failure');
       }
       if (!user) {
-        console.error("GitHub OAuth: No user returned", info);
-        return res.redirect("/api/v1/auth/failure");
+        console.error('GitHub OAuth: No user returned', info);
+        return res.redirect('/api/v1/auth/failure');
       }
-      console.log("GitHub OAuth success:", user?.email);
+      console.log('GitHub OAuth success:', user?.email);
       (req as any).user = user;
       return (AuthController.oauthSuccess as any)(req, res, next);
-    },
+    }
   )(req, res, next);
 });
 
 // QQ OAuth routes
-router.get("/qq", (req, res, next) =>
-  (passport.authenticate as any)("qq", {
-    callbackURL: `${req.protocol}://${req.get("host")}/api/v1/auth/qq/callback`,
-  })(req, res, next),
+router.get('/qq', (req, res, next) =>
+  (passport.authenticate as any)('qq', {
+    callbackURL: `${req.protocol}://${req.get('host')}/api/v1/auth/qq/callback`,
+  })(req, res, next)
 );
 
-router.get("/qq/callback", async (req, res, next) => {
-  const callbackURL = `${req.protocol}://${req.get("host")}/api/v1/auth/qq/callback`;
+router.get('/qq/callback', async (req, res, next) => {
+  const callbackURL = `${req.protocol}://${req.get('host')}/api/v1/auth/qq/callback`;
   const code = req.query.code as string;
 
   if (!code) {
-    return res.redirect("/api/v1/auth/failure");
+    return res.redirect('/api/v1/auth/failure');
   }
 
   // Check if this code has already been used
@@ -379,33 +375,33 @@ router.get("/qq/callback", async (req, res, next) => {
   const alreadyUsed = await redisClient.get(cacheKey);
 
   if (alreadyUsed) {
-    console.log("QQ OAuth: Code already used, redirecting to failure");
-    return res.redirect("/api/v1/auth/failure");
+    console.log('QQ OAuth: Code already used, redirecting to failure');
+    return res.redirect('/api/v1/auth/failure');
   }
 
   // Mark code as used (expires in 10 minutes)
-  await redisClient.set(cacheKey, "used", 600);
+  await redisClient.set(cacheKey, 'used', 600);
 
   (passport.authenticate as any)(
-    "qq",
+    'qq',
     {
-      failureRedirect: "/api/v1/auth/failure",
+      failureRedirect: '/api/v1/auth/failure',
       session: false,
       callbackURL,
     },
     (err: any, user: any, info: any) => {
       if (err) {
-        console.error("QQ OAuth error:", err);
-        return res.redirect("/api/v1/auth/failure");
+        console.error('QQ OAuth error:', err);
+        return res.redirect('/api/v1/auth/failure');
       }
       if (!user) {
-        console.error("QQ OAuth: No user returned", info);
-        return res.redirect("/api/v1/auth/failure");
+        console.error('QQ OAuth: No user returned', info);
+        return res.redirect('/api/v1/auth/failure');
       }
-      console.log("QQ OAuth success:", user?.email);
+      console.log('QQ OAuth success:', user?.email);
       (req as any).user = user;
       return (AuthController.oauthSuccess as any)(req, res, next);
-    },
+    }
   )(req, res, next);
 });
 
@@ -543,21 +539,21 @@ router.get("/qq/callback", async (req, res, next) => {
 // });
 
 // OAuth callback routes
-router.get("/success", AuthController.oauthSuccess);
-router.get("/failure", AuthController.oauthFailure);
+router.get('/success', AuthController.oauthSuccess);
+router.get('/failure', AuthController.oauthFailure);
 
 // Catch-all route for debugging unknown auth routes
-router.all("*", (req, res) => {
-  console.log("❌ Unknown auth route accessed:", {
+router.all('*', (req, res) => {
+  console.log('❌ Unknown auth route accessed:', {
     method: req.method,
     url: req.url,
     originalUrl: req.originalUrl,
     path: req.path,
     query: req.query,
     headers: {
-      host: req.get("host"),
-      referer: req.get("referer"),
-      userAgent: req.get("user-agent"),
+      host: req.get('host'),
+      referer: req.get('referer'),
+      userAgent: req.get('user-agent'),
     },
   });
 

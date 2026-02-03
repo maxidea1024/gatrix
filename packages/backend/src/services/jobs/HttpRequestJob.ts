@@ -1,13 +1,13 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { BaseJob, JobExecutionResult } from "./JobFactory";
-import logger from "../../config/logger";
-import { HEADERS, HEADER_VALUES } from "../../constants/headers";
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { BaseJob, JobExecutionResult } from './JobFactory';
+import logger from '../../config/logger';
+import { HEADERS, HEADER_VALUES } from '../../constants/headers';
 
 export class HttpRequestJob extends BaseJob {
   async execute(): Promise<JobExecutionResult> {
     try {
       // 필수 필드 검증
-      this.validateRequiredFields(["url", "method"]);
+      this.validateRequiredFields(['url', 'method']);
 
       const {
         url,
@@ -29,13 +29,13 @@ export class HttpRequestJob extends BaseJob {
       };
 
       // 요청 본문 설정
-      if (body && ["POST", "PUT", "PATCH"].includes(method.toUpperCase())) {
-        if (typeof body === "string") {
+      if (body && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
+        if (typeof body === 'string') {
           config.data = body;
         } else {
           config.data = body;
           // JSON 요청인 경우 Content-Type 설정
-          if (!headers[HEADERS.CONTENT_TYPE] && !headers["content-type"]) {
+          if (!headers[HEADERS.CONTENT_TYPE] && !headers['content-type']) {
             config.headers = {
               ...config.headers,
               [HEADERS.CONTENT_TYPE]: HEADER_VALUES.APPLICATION_JSON,
@@ -46,12 +46,12 @@ export class HttpRequestJob extends BaseJob {
 
       // 인증 설정
       if (auth) {
-        if (auth.type === "basic" && auth.username && auth.password) {
+        if (auth.type === 'basic' && auth.username && auth.password) {
           config.auth = {
             username: auth.username,
             password: auth.password,
           };
-        } else if (auth.type === "bearer" && auth.token) {
+        } else if (auth.type === 'bearer' && auth.token) {
           config.headers = {
             ...config.headers,
             [HEADERS.AUTHORIZATION]: `${HEADER_VALUES.BEARER_PREFIX}${auth.token}`,
@@ -90,8 +90,7 @@ export class HttpRequestJob extends BaseJob {
         executionTimeMs: 0, // Will be set by executeWithTimeout
       };
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
       logger.error(`HTTP request job failed`, {
         jobId: this.context.jobId,

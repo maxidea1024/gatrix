@@ -1,12 +1,12 @@
-import multer from "multer";
-import path from "path";
-import fs from "fs";
-import { Request, Response, NextFunction } from "express";
-import { Express } from "express-serve-static-core";
-import { GatrixError } from "./errorHandler";
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { Request, Response, NextFunction } from 'express';
+import { Express } from 'express-serve-static-core';
+import { GatrixError } from './errorHandler';
 
 // Ensure uploads directory exists
-const uploadsDir = path.join(process.cwd(), "uploads");
+const uploadsDir = path.join(process.cwd(), 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
@@ -16,17 +16,17 @@ const storage = multer.diskStorage({
   destination: (
     req: any,
     file: Express.Multer.File,
-    cb: (error: Error | null, destination: string) => void,
+    cb: (error: Error | null, destination: string) => void
   ) => {
     cb(null, uploadsDir);
   },
   filename: (
     req: any,
     file: Express.Multer.File,
-    cb: (error: Error | null, filename: string) => void,
+    cb: (error: Error | null, filename: string) => void
   ) => {
     // Generate unique filename
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     const ext = path.extname(file.originalname);
     cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
   },
@@ -36,25 +36,14 @@ const storage = multer.diskStorage({
 const fileFilter = (
   req: any,
   file: Express.Multer.File,
-  cb: (error: Error | null, acceptFile?: boolean) => void,
+  cb: (error: Error | null, acceptFile?: boolean) => void
 ) => {
-  const allowedTypes = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/gif",
-    "image/webp",
-  ];
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
 
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(
-      new GatrixError(
-        "Only image files are allowed (JPEG, PNG, GIF, WebP)",
-        400,
-      ),
-    );
+    cb(new GatrixError('Only image files are allowed (JPEG, PNG, GIF, WebP)', 400));
   }
 };
 
@@ -68,4 +57,4 @@ export const upload = multer({
 });
 
 // Avatar upload middleware
-export const uploadAvatar = upload.single("avatar") as any;
+export const uploadAvatar = upload.single('avatar') as any;

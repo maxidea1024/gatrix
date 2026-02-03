@@ -1,6 +1,6 @@
-import TagModel, { CreateTagData, UpdateTagData } from "../models/Tag";
-import TagAssignmentModel from "../models/TagAssignment";
-import { GatrixError } from "../middleware/errorHandler";
+import TagModel, { CreateTagData, UpdateTagData } from '../models/Tag';
+import TagAssignmentModel from '../models/TagAssignment';
+import { GatrixError } from '../middleware/errorHandler';
 
 export class TagService {
   static async list() {
@@ -9,27 +9,26 @@ export class TagService {
 
   static async create(data: CreateTagData, userId?: number) {
     const name = data.name?.trim();
-    if (!name) throw new GatrixError("Tag name is required", 400);
+    if (!name) throw new GatrixError('Tag name is required', 400);
     const existing = await TagModel.findByName(name);
-    if (existing)
-      throw new GatrixError("Tag with this name already exists", 409);
+    if (existing) throw new GatrixError('Tag with this name already exists', 409);
     return await TagModel.create({ ...data, name, createdBy: userId ?? null });
   }
 
   static async update(id: number, data: UpdateTagData, userId?: number) {
     if (data.name !== undefined) {
       const name = data.name?.trim();
-      if (!name) throw new GatrixError("Tag name is required", 400);
+      if (!name) throw new GatrixError('Tag name is required', 400);
       const existing = await TagModel.findByName(name);
       if (existing && existing.id !== id)
-        throw new GatrixError("Tag with this name already exists", 409);
+        throw new GatrixError('Tag with this name already exists', 409);
       data.name = name;
     }
     const tag = await TagModel.update(id, {
       ...data,
       updatedBy: userId ?? null,
     });
-    if (!tag) throw new GatrixError("Tag not found", 404);
+    if (!tag) throw new GatrixError('Tag not found', 404);
     return tag;
   }
 
@@ -41,20 +40,12 @@ export class TagService {
     entityType: string,
     entityId: string | number,
     tagIds: number[],
-    createdBy?: number,
+    createdBy?: number
   ): Promise<void> {
-    await TagAssignmentModel.setTagsForEntity(
-      entityType,
-      entityId,
-      tagIds,
-      createdBy,
-    );
+    await TagAssignmentModel.setTagsForEntity(entityType, entityId, tagIds, createdBy);
   }
 
-  static async listTagsForEntity(
-    entityType: string,
-    entityId: string | number,
-  ) {
+  static async listTagsForEntity(entityType: string, entityId: string | number) {
     return await TagAssignmentModel.listTagsForEntity(entityType, entityId);
   }
 }

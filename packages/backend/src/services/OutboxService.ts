@@ -5,16 +5,12 @@
  * Events are recorded in the database within the same transaction as data changes,
  * then processed asynchronously by a worker.
  */
-import { Transaction } from "objection";
-import { ulid } from "ulid";
-import {
-  OutboxEvent,
-  OutboxEventType,
-  OUTBOX_EVENT_TYPES,
-} from "../models/OutboxEvent";
-import logger from "../config/logger";
-import { pubSubService } from "./PubSubService";
-import knex from "../config/knex";
+import { Transaction } from 'objection';
+import { ulid } from 'ulid';
+import { OutboxEvent, OutboxEventType, OUTBOX_EVENT_TYPES } from '../models/OutboxEvent';
+import logger from '../config/logger';
+import { pubSubService } from './PubSubService';
+import knex from '../config/knex';
 
 export interface OutboxEventData {
   changeRequestId: string;
@@ -28,10 +24,7 @@ export class OutboxService {
   /**
    * Record an event in the outbox (within a transaction)
    */
-  static async recordEvent(
-    data: OutboxEventData,
-    trx?: Transaction,
-  ): Promise<OutboxEvent> {
+  static async recordEvent(data: OutboxEventData, trx?: Transaction): Promise<OutboxEvent> {
     const event = await OutboxEvent.query(trx).insert({
       id: ulid(),
       changeRequestId: data.changeRequestId,
@@ -39,12 +32,12 @@ export class OutboxService {
       entityId: data.entityId,
       eventType: data.eventType,
       payload: data.payload,
-      status: "pending",
+      status: 'pending',
       retryCount: 0,
     });
 
     logger.debug(
-      `[OutboxService] Event recorded: ${data.entityType}:${data.entityId} (${data.eventType})`,
+      `[OutboxService] Event recorded: ${data.entityType}:${data.entityId} (${data.eventType})`
     );
     return event;
   }
@@ -68,7 +61,7 @@ export class OutboxService {
       isCreate: boolean;
       isDelete: boolean;
     }>,
-    trx?: Transaction,
+    trx?: Transaction
   ): Promise<OutboxEvent[]> {
     // Group by entity to detect redundant operations
     const entityMap = new Map<
@@ -109,7 +102,7 @@ export class OutboxService {
       // Skip if created and then deleted (no net change)
       if (entity.wasCreated && entity.wasDeleted) {
         logger.debug(
-          `[OutboxService] Pruned event: ${entity.entityType}:${entity.entityId} (created then deleted)`,
+          `[OutboxService] Pruned event: ${entity.entityType}:${entity.entityId} (created then deleted)`
         );
         continue;
       }
@@ -117,11 +110,10 @@ export class OutboxService {
       // Skip if no actual change (before === after)
       if (!entity.wasCreated && !entity.wasDeleted) {
         const hasChange =
-          JSON.stringify(entity.originalBefore) !==
-          JSON.stringify(entity.finalAfter);
+          JSON.stringify(entity.originalBefore) !== JSON.stringify(entity.finalAfter);
         if (!hasChange) {
           logger.debug(
-            `[OutboxService] Pruned event: ${entity.entityType}:${entity.entityId} (no net change)`,
+            `[OutboxService] Pruned event: ${entity.entityType}:${entity.entityId} (no net change)`
           );
           continue;
         }
@@ -148,14 +140,14 @@ export class OutboxService {
             after: entity.finalAfter,
           },
         },
-        trx,
+        trx
       );
 
       events.push(event);
     }
 
     logger.info(
-      `[OutboxService] Recorded ${events.length} events for CR ${changeRequestId} (pruned ${changes.length - events.length})`,
+      `[OutboxService] Recorded ${events.length} events for CR ${changeRequestId} (pruned ${changes.length - events.length})`
     );
     return events;
   }
@@ -168,21 +160,21 @@ export class OutboxService {
 
     // Get pending events
     const events = await OutboxEvent.query()
-      .where("status", "pending")
-      .orderBy("createdAt", "asc")
+      .where('status', 'pending')
+      .orderBy('createdAt', 'asc')
       .limit(batchSize);
 
     for (const event of events) {
       try {
         // Mark as processing
-        await event.$query().patch({ status: "processing" });
+        await event.$query().patch({ status: 'processing' });
 
         // Publish event
         await this.publishEvent(event);
 
         // Mark as completed
         await event.$query().patch({
-          status: "completed",
+          status: 'completed',
           processedAt: new Date(),
         });
 
@@ -195,22 +187,22 @@ export class OutboxService {
 
         if (newRetryCount >= maxRetries) {
           await event.$query().patch({
-            status: "failed",
+            status: 'failed',
             retryCount: newRetryCount,
             errorMessage: error.message,
           });
           logger.error(
             `[OutboxService] Event ${event.id} failed after ${maxRetries} retries:`,
-            error,
+            error
           );
         } else {
           await event.$query().patch({
-            status: "pending", // Back to pending for retry
+            status: 'pending', // Back to pending for retry
             retryCount: newRetryCount,
             errorMessage: error.message,
           });
           logger.warn(
-            `[OutboxService] Event ${event.id} failed, will retry (${newRetryCount}/${maxRetries})`,
+            `[OutboxService] Event ${event.id} failed, will retry (${newRetryCount}/${maxRetries})`
           );
         }
       }
@@ -225,19 +217,18 @@ export class OutboxService {
   private static async publishEvent(event: OutboxEvent): Promise<void> {
     // Map entity type to event channel
     const channelMap: Record<string, string> = {
-      g_service_notices: "service_notice",
-      g_client_versions: "client_version",
-      g_store_products: "store_product",
-      g_surveys: "survey",
-      g_ingame_popup_notices: "ingame_popup_notice",
-      g_game_worlds: "game_world",
-      g_banners: "banner",
-      g_vars: "vars",
-      g_message_templates: "message_template",
+      g_service_notices: 'service_notice',
+      g_client_versions: 'client_version',
+      g_store_products: 'store_product',
+      g_surveys: 'survey',
+      g_ingame_popup_notices: 'ingame_popup_notice',
+      g_game_worlds: 'game_world',
+      g_banners: 'banner',
+      g_vars: 'vars',
+      g_message_templates: 'message_template',
     };
 
-    const channel =
-      channelMap[event.entityType] || event.entityType.replace("g_", "");
+    const channel = channelMap[event.entityType] || event.entityType.replace('g_', '');
     const eventName = `${channel}.${event.eventType}`;
 
     await pubSubService.publishSDKEvent({
@@ -260,14 +251,11 @@ export class OutboxService {
   static async cleanupOldEvents(retentionDays: number = 7): Promise<number> {
     const thresholdDate = new Date();
     thresholdDate.setDate(thresholdDate.getDate() - retentionDays);
-    const isoThreshold = thresholdDate
-      .toISOString()
-      .slice(0, 19)
-      .replace("T", " ");
+    const isoThreshold = thresholdDate.toISOString().slice(0, 19).replace('T', ' ');
 
     const deleted = await OutboxEvent.query()
-      .whereIn("status", ["completed", "failed"])
-      .where("createdAt", "<", isoThreshold)
+      .whereIn('status', ['completed', 'failed'])
+      .where('createdAt', '<', isoThreshold)
       .delete();
 
     if (deleted > 0) {
@@ -285,10 +273,10 @@ export class OutboxService {
     completed: number;
     failed: number;
   }> {
-    const stats = await knex("g_outbox_events")
-      .select("status")
-      .count("* as count")
-      .groupBy("status");
+    const stats = await knex('g_outbox_events')
+      .select('status')
+      .count('* as count')
+      .groupBy('status');
 
     const result = {
       pending: 0,

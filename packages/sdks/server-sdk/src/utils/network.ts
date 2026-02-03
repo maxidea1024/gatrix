@@ -1,4 +1,4 @@
-import * as os from "os";
+import * as os from 'os';
 
 /**
  * Get the first non-internal IPv4 address from network interfaces
@@ -14,7 +14,7 @@ export function getFirstNicAddress(): string {
 
     for (const addr of iface) {
       // Skip non-IPv4 and internal addresses
-      if (addr.family === "IPv4" && !addr.internal) {
+      if (addr.family === 'IPv4' && !addr.internal) {
         return addr.address;
       }
     }
@@ -26,12 +26,12 @@ export function getFirstNicAddress(): string {
     if (!iface) continue;
 
     for (const addr of iface) {
-      if (addr.family === "IPv4") {
+      if (addr.family === 'IPv4') {
         return addr.address;
       }
     }
   }
 
   // Ultimate fallback
-  return "127.0.0.1";
+  return '127.0.0.1';
 }

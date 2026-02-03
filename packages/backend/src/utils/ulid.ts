@@ -1,4 +1,4 @@
-import { ulid } from "ulid";
+import { ulid } from 'ulid';
 
 /**
  * Generate a new ULID (Universally Unique Lexicographically Sortable Identifier)
@@ -48,14 +48,14 @@ export function isValidULID(id: string): boolean {
  */
 export function getTimestampFromULID(id: string): number {
   if (!isValidULID(id)) {
-    throw new Error("Invalid ULID format");
+    throw new Error('Invalid ULID format');
   }
 
   // First 10 characters represent the timestamp
   const timestampPart = id.substring(0, 10);
 
   // Decode from Crockford's base32
-  const crockfordBase32 = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+  const crockfordBase32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
   let timestamp = 0;
 
   for (let i = 0; i < timestampPart.length; i++) {

@@ -1,5 +1,5 @@
-import axios from "axios";
-import { LokiConfig } from "../types/config";
+import axios from 'axios';
+import { LokiConfig } from '../types/config';
 
 /**
  * Loki Stream Interface
@@ -31,21 +31,17 @@ export class LokiTransport {
     };
 
     // Shutdown handler to flush remaining logs
-    if (typeof process !== "undefined") {
-      process.on("beforeExit", () => this.shutdown());
-      process.on("SIGINT", () => this.shutdown());
-      process.on("SIGTERM", () => this.shutdown());
+    if (typeof process !== 'undefined') {
+      process.on('beforeExit', () => this.shutdown());
+      process.on('SIGINT', () => this.shutdown());
+      process.on('SIGTERM', () => this.shutdown());
     }
   }
 
   /**
    * Add a log entry to the buffer
    */
-  send(
-    level: string,
-    message: string,
-    extraLabels: Record<string, string> = {},
-  ) {
+  send(level: string, message: string, extraLabels: Record<string, string> = {}) {
     if (!this.config.enabled || this.isShuttingDown) return;
 
     const nanoseconds = (BigInt(Date.now()) * BigInt(1000000)).toString();
@@ -60,10 +56,7 @@ export class LokiTransport {
     if (this.buffer.length >= (this.config.batchSize || 20)) {
       this.flush();
     } else if (!this.timer) {
-      this.timer = setTimeout(
-        () => this.flush(),
-        this.config.batchInterval || 5000,
-      );
+      this.timer = setTimeout(() => this.flush(), this.config.batchInterval || 5000);
     }
   }
 
@@ -106,7 +99,7 @@ export class LokiTransport {
 
     try {
       await axios.post(this.config.url, payload, {
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
         timeout: 5000,
       });
     } catch (error: any) {

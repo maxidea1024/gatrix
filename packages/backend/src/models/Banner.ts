@@ -1,34 +1,34 @@
-import db from "../config/knex";
-import logger from "../config/logger";
+import db from '../config/knex';
+import logger from '../config/logger';
 
 // Frame action types
-export type FrameActionType = "openUrl" | "command" | "deepLink" | "none";
-export type FrameActionTarget = "webview" | "external";
+export type FrameActionType = 'openUrl' | 'command' | 'deepLink' | 'none';
+export type FrameActionTarget = 'webview' | 'external';
 
 // Frame effect types
 export type FrameEffectType =
-  | "fadeIn"
-  | "fadeOut"
-  | "slideLeft"
-  | "slideRight"
-  | "slideUp"
-  | "slideDown"
-  | "zoomIn"
-  | "zoomOut"
-  | "shake"
-  | "none";
+  | 'fadeIn'
+  | 'fadeOut'
+  | 'slideLeft'
+  | 'slideRight'
+  | 'slideUp'
+  | 'slideDown'
+  | 'zoomIn'
+  | 'zoomOut'
+  | 'shake'
+  | 'none';
 
 // Transition types
-export type TransitionType = "fade" | "slide" | "crossfade" | "none";
+export type TransitionType = 'fade' | 'slide' | 'crossfade' | 'none';
 
 // Loop mode types
-export type LoopModeType = "loop" | "pingpong" | "once";
+export type LoopModeType = 'loop' | 'pingpong' | 'once';
 
 // Frame type
-export type FrameType = "jpg" | "png" | "gif" | "mp4";
+export type FrameType = 'jpg' | 'png' | 'gif' | 'mp4';
 
 // Banner status
-export type BannerStatus = "draft" | "published" | "archived";
+export type BannerStatus = 'draft' | 'published' | 'archived';
 
 export interface FrameAction {
   type: FrameActionType;
@@ -48,7 +48,7 @@ export interface FrameTransition {
 }
 
 // Frame filter logic type
-export type FrameFilterLogic = "and" | "or";
+export type FrameFilterLogic = 'and' | 'or';
 
 // Frame targeting/filtering options
 export interface FrameTargeting {
@@ -125,7 +125,7 @@ export interface BannerFilters {
   limit?: number;
   offset?: number;
   sortBy?: string;
-  sortOrder?: "ASC" | "DESC";
+  sortOrder?: 'ASC' | 'DESC';
 }
 
 export interface BannerListResult {
@@ -138,49 +138,47 @@ export class BannerModel {
     try {
       const limit = filters?.limit ?? 10;
       const offset = filters?.offset ?? 0;
-      const sortBy = filters?.sortBy || "createdAt";
-      const sortOrder = filters?.sortOrder || "DESC";
+      const sortBy = filters?.sortBy || 'createdAt';
+      const sortOrder = filters?.sortOrder || 'DESC';
       const environment = filters.environment;
 
       const baseQuery = () =>
-        db("g_banners as b")
-          .leftJoin("g_users as creator", "b.createdBy", "creator.id")
-          .leftJoin("g_users as updater", "b.updatedBy", "updater.id")
-          .where("b.environment", environment);
+        db('g_banners as b')
+          .leftJoin('g_users as creator', 'b.createdBy', 'creator.id')
+          .leftJoin('g_users as updater', 'b.updatedBy', 'updater.id')
+          .where('b.environment', environment);
 
       const applyFilters = (query: any) => {
         if (filters?.search) {
           query.where((qb: any) => {
-            qb.where("b.name", "like", `%${filters.search}%`).orWhere(
-              "b.description",
-              "like",
-              `%${filters.search}%`,
+            qb.where('b.name', 'like', `%${filters.search}%`).orWhere(
+              'b.description',
+              'like',
+              `%${filters.search}%`
             );
           });
         }
 
         if (filters?.status) {
           if (Array.isArray(filters.status)) {
-            query.whereIn("b.status", filters.status);
+            query.whereIn('b.status', filters.status);
           } else {
-            query.where("b.status", filters.status);
+            query.where('b.status', filters.status);
           }
         }
 
         return query;
       };
 
-      const countQuery = applyFilters(baseQuery())
-        .count("b.bannerId as total")
-        .first();
+      const countQuery = applyFilters(baseQuery()).count('b.bannerId as total').first();
 
       const dataQuery = applyFilters(baseQuery())
         .select([
-          "b.*",
-          "creator.name as createdByName",
-          "creator.email as createdByEmail",
-          "updater.name as updatedByName",
-          "updater.email as updatedByEmail",
+          'b.*',
+          'creator.name as createdByName',
+          'creator.email as createdByEmail',
+          'updater.name as updatedByName',
+          'updater.email as updatedByEmail',
         ])
         .orderBy(`b.${sortBy}`, sortOrder)
         .limit(limit)
@@ -194,12 +192,9 @@ export class BannerModel {
       const parsedBanners = banners.map((b: any) => ({
         ...b,
         shuffle: Boolean(b.shuffle),
-        sequences:
-          typeof b.sequences === "string"
-            ? JSON.parse(b.sequences)
-            : b.sequences,
+        sequences: typeof b.sequences === 'string' ? JSON.parse(b.sequences) : b.sequences,
         metadata: b.metadata
-          ? typeof b.metadata === "string"
+          ? typeof b.metadata === 'string'
             ? JSON.parse(b.metadata)
             : b.metadata
           : null,
@@ -207,28 +202,25 @@ export class BannerModel {
 
       return { banners: parsedBanners, total };
     } catch (error) {
-      logger.error("Error finding banners:", error);
+      logger.error('Error finding banners:', error);
       throw error;
     }
   }
 
-  static async findById(
-    bannerId: string,
-    environment: string,
-  ): Promise<BannerAttributes | null> {
+  static async findById(bannerId: string, environment: string): Promise<BannerAttributes | null> {
     try {
-      const banner = await db("g_banners as b")
-        .leftJoin("g_users as creator", "b.createdBy", "creator.id")
-        .leftJoin("g_users as updater", "b.updatedBy", "updater.id")
+      const banner = await db('g_banners as b')
+        .leftJoin('g_users as creator', 'b.createdBy', 'creator.id')
+        .leftJoin('g_users as updater', 'b.updatedBy', 'updater.id')
         .select([
-          "b.*",
-          "creator.name as createdByName",
-          "creator.email as createdByEmail",
-          "updater.name as updatedByName",
-          "updater.email as updatedByEmail",
+          'b.*',
+          'creator.name as createdByName',
+          'creator.email as createdByEmail',
+          'updater.name as updatedByName',
+          'updater.email as updatedByEmail',
         ])
-        .where("b.bannerId", bannerId)
-        .where("b.environment", environment)
+        .where('b.bannerId', bannerId)
+        .where('b.environment', environment)
         .first();
 
       if (!banner) {
@@ -239,17 +231,15 @@ export class BannerModel {
         ...banner,
         shuffle: Boolean(banner.shuffle),
         sequences:
-          typeof banner.sequences === "string"
-            ? JSON.parse(banner.sequences)
-            : banner.sequences,
+          typeof banner.sequences === 'string' ? JSON.parse(banner.sequences) : banner.sequences,
         metadata: banner.metadata
-          ? typeof banner.metadata === "string"
+          ? typeof banner.metadata === 'string'
             ? JSON.parse(banner.metadata)
             : banner.metadata
           : null,
       };
     } catch (error) {
-      logger.error("Error finding banner by ID:", error);
+      logger.error('Error finding banner by ID:', error);
       throw error;
     }
   }
@@ -262,14 +252,12 @@ export class BannerModel {
   static async findByName(
     name: string,
     environment: string,
-    excludeBannerId?: string,
+    excludeBannerId?: string
   ): Promise<BannerAttributes | null> {
     try {
-      let query = db("g_banners")
-        .where("name", name)
-        .where("environment", environment);
+      let query = db('g_banners').where('name', name).where('environment', environment);
       if (excludeBannerId) {
-        query = query.whereNot("bannerId", excludeBannerId);
+        query = query.whereNot('bannerId', excludeBannerId);
       }
       const banner = await query.first();
       if (!banner) {
@@ -279,27 +267,25 @@ export class BannerModel {
         ...banner,
         shuffle: Boolean(banner.shuffle),
         sequences:
-          typeof banner.sequences === "string"
-            ? JSON.parse(banner.sequences)
-            : banner.sequences,
+          typeof banner.sequences === 'string' ? JSON.parse(banner.sequences) : banner.sequences,
         metadata: banner.metadata
-          ? typeof banner.metadata === "string"
+          ? typeof banner.metadata === 'string'
             ? JSON.parse(banner.metadata)
             : banner.metadata
           : null,
       };
     } catch (error) {
-      logger.error("Error finding banner by name:", error);
+      logger.error('Error finding banner by name:', error);
       throw error;
     }
   }
 
   static async create(
-    data: Omit<BannerAttributes, "createdAt" | "updatedAt">,
+    data: Omit<BannerAttributes, 'createdAt' | 'updatedAt'>
   ): Promise<BannerAttributes> {
     try {
       const environment = data.environment;
-      await db("g_banners").insert({
+      await db('g_banners').insert({
         bannerId: data.bannerId,
         environment: environment,
         name: data.name,
@@ -311,7 +297,7 @@ export class BannerModel {
         shuffle: data.shuffle ? 1 : 0,
         sequences: JSON.stringify(data.sequences),
         version: data.version || 1,
-        status: data.status || "draft",
+        status: data.status || 'draft',
         createdBy: data.createdBy || null,
         updatedBy: data.updatedBy || null,
         createdAt: new Date(),
@@ -320,11 +306,11 @@ export class BannerModel {
 
       const banner = await this.findById(data.bannerId, environment);
       if (!banner) {
-        throw new Error("Failed to create banner");
+        throw new Error('Failed to create banner');
       }
       return banner;
     } catch (error) {
-      logger.error("Error creating banner:", error);
+      logger.error('Error creating banner:', error);
       throw error;
     }
   }
@@ -332,7 +318,7 @@ export class BannerModel {
   static async update(
     bannerId: string,
     data: Partial<BannerAttributes>,
-    environment: string,
+    environment: string
   ): Promise<BannerAttributes> {
     try {
       const updateData: any = {
@@ -340,48 +326,41 @@ export class BannerModel {
       };
 
       if (data.name !== undefined) updateData.name = data.name;
-      if (data.description !== undefined)
-        updateData.description = data.description;
+      if (data.description !== undefined) updateData.description = data.description;
       if (data.width !== undefined) updateData.width = data.width;
       if (data.height !== undefined) updateData.height = data.height;
-      if (data.metadata !== undefined)
-        updateData.metadata = JSON.stringify(data.metadata);
-      if (data.playbackSpeed !== undefined)
-        updateData.playbackSpeed = data.playbackSpeed;
+      if (data.metadata !== undefined) updateData.metadata = JSON.stringify(data.metadata);
+      if (data.playbackSpeed !== undefined) updateData.playbackSpeed = data.playbackSpeed;
       if (data.shuffle !== undefined) updateData.shuffle = data.shuffle ? 1 : 0;
-      if (data.sequences !== undefined)
-        updateData.sequences = JSON.stringify(data.sequences);
+      if (data.sequences !== undefined) updateData.sequences = JSON.stringify(data.sequences);
       if (data.status !== undefined) updateData.status = data.status;
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
       // Increment version on update
-      await db("g_banners")
-        .where("bannerId", bannerId)
-        .where("environment", environment)
+      await db('g_banners')
+        .where('bannerId', bannerId)
+        .where('environment', environment)
         .update({
           ...updateData,
-          version: db.raw("version + 1"),
+          version: db.raw('version + 1'),
         });
 
       const banner = await this.findById(bannerId, environment);
       if (!banner) {
-        throw new Error("Banner not found after update");
+        throw new Error('Banner not found after update');
       }
       return banner;
     } catch (error) {
-      logger.error("Error updating banner:", error);
+      logger.error('Error updating banner:', error);
       throw error;
     }
   }
 
   static async delete(bannerId: string, environment: string): Promise<void> {
     try {
-      await db("g_banners")
-        .where("bannerId", bannerId)
-        .where("environment", environment)
-        .del();
+      await db('g_banners').where('bannerId', bannerId).where('environment', environment).del();
     } catch (error) {
-      logger.error("Error deleting banner:", error);
+      logger.error('Error deleting banner:', error);
       throw error;
     }
   }
@@ -390,26 +369,26 @@ export class BannerModel {
     bannerId: string,
     status: BannerStatus,
     environment: string,
-    updatedBy?: number,
+    updatedBy?: number
   ): Promise<BannerAttributes> {
     try {
-      await db("g_banners")
-        .where("bannerId", bannerId)
-        .where("environment", environment)
+      await db('g_banners')
+        .where('bannerId', bannerId)
+        .where('environment', environment)
         .update({
           status,
           updatedBy: updatedBy || null,
           updatedAt: new Date(),
-          version: db.raw("version + 1"),
+          version: db.raw('version + 1'),
         });
 
       const banner = await this.findById(bannerId, environment);
       if (!banner) {
-        throw new Error("Banner not found after status update");
+        throw new Error('Banner not found after status update');
       }
       return banner;
     } catch (error) {
-      logger.error("Error updating banner status:", error);
+      logger.error('Error updating banner status:', error);
       throw error;
     }
   }
@@ -418,12 +397,12 @@ export class BannerModel {
     bannerId: string,
     newBannerId: string,
     environment: string,
-    createdBy?: number,
+    createdBy?: number
   ): Promise<BannerAttributes> {
     try {
       const original = await this.findById(bannerId, environment);
       if (!original) {
-        throw new Error("Original banner not found");
+        throw new Error('Original banner not found');
       }
 
       return await this.create({
@@ -438,12 +417,12 @@ export class BannerModel {
         shuffle: original.shuffle,
         sequences: original.sequences,
         version: 1,
-        status: "draft",
+        status: 'draft',
         createdBy,
         updatedBy: createdBy,
       });
     } catch (error) {
-      logger.error("Error duplicating banner:", error);
+      logger.error('Error duplicating banner:', error);
       throw error;
     }
   }
@@ -451,26 +430,23 @@ export class BannerModel {
   // Get only published banners for client API
   static async findPublished(environment: string): Promise<BannerAttributes[]> {
     try {
-      const banners = await db("g_banners")
-        .select("*")
-        .where("status", "published")
-        .where("environment", environment)
-        .orderBy("createdAt", "DESC");
+      const banners = await db('g_banners')
+        .select('*')
+        .where('status', 'published')
+        .where('environment', environment)
+        .orderBy('createdAt', 'DESC');
 
       return banners.map((b: any) => ({
         ...b,
-        sequences:
-          typeof b.sequences === "string"
-            ? JSON.parse(b.sequences)
-            : b.sequences,
+        sequences: typeof b.sequences === 'string' ? JSON.parse(b.sequences) : b.sequences,
         metadata: b.metadata
-          ? typeof b.metadata === "string"
+          ? typeof b.metadata === 'string'
             ? JSON.parse(b.metadata)
             : b.metadata
           : null,
       }));
     } catch (error) {
-      logger.error("Error finding published banners:", error);
+      logger.error('Error finding published banners:', error);
       throw error;
     }
   }

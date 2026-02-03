@@ -1,7 +1,7 @@
-import { Queue, Worker, Job, QueueEvents, RepeatableJob } from "bullmq";
-import logger from "../config/logger";
-import { BullBoardConfig } from "../config/bullboard";
-import { CouponSettingsService } from "./CouponSettingsService";
+import { Queue, Worker, Job, QueueEvents, RepeatableJob } from 'bullmq';
+import logger from '../config/logger';
+import { BullBoardConfig } from '../config/bullboard';
+import { CouponSettingsService } from './CouponSettingsService';
 
 export interface QueueJobData {
   type: string;
@@ -17,10 +17,10 @@ export class QueueService {
 
   private getRedisConfig() {
     return {
-      host: process.env.REDIS_HOST || "localhost",
-      port: parseInt(process.env.REDIS_PORT || "6379"),
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
       password: process.env.REDIS_PASSWORD,
-      db: parseInt(process.env.REDIS_DB || "0"),
+      db: parseInt(process.env.REDIS_DB || '0'),
       // Per BullMQ recommendation, set to null so BullMQ can manage retries
       maxRetriesPerRequest: null as any,
       retryDelayOnFailover: 100,
@@ -38,101 +38,82 @@ export class QueueService {
 
     try {
       // Initialize default queues
-      await this.createQueue("email", this.processEmailJob.bind(this));
-      await this.createQueue("audit-log", this.processAuditLogJob.bind(this));
-      await this.createQueue("cleanup", this.processCleanupJob.bind(this));
-      await this.createQueue("scheduler", this.processSchedulerJob.bind(this));
+      await this.createQueue('email', this.processEmailJob.bind(this));
+      await this.createQueue('audit-log', this.processAuditLogJob.bind(this));
+      await this.createQueue('cleanup', this.processCleanupJob.bind(this));
+      await this.createQueue('scheduler', this.processSchedulerJob.bind(this));
 
       // Initialize feature metrics queue
-      const { featureMetricsService } = await import("./FeatureMetricsService");
+      const { featureMetricsService } = await import('./FeatureMetricsService');
       await featureMetricsService.initialize();
 
       // Unknown flags now uses Redis buffering, no queue initialization needed
 
       // Register repeatable scheduler jobs (idempotent)
       try {
-        const repeatables = await this.listRepeatable("scheduler");
-        const exists = repeatables.some((r) => r.name === "coupon:expire");
+        const repeatables = await this.listRepeatable('scheduler');
+        const exists = repeatables.some((r) => r.name === 'coupon:expire');
         if (!exists) {
-          await this.addJob(
-            "scheduler",
-            "coupon:expire",
-            {},
-            { repeat: { pattern: "* * * * *" } },
-          );
-          logger.info(
-            "Registered repeatable job: coupon:expire (every minute)",
-          );
+          await this.addJob('scheduler', 'coupon:expire', {}, { repeat: { pattern: '* * * * *' } });
+          logger.info('Registered repeatable job: coupon:expire (every minute)');
         } else {
-          logger.info("Repeatable job already exists: coupon:expire");
+          logger.info('Repeatable job already exists: coupon:expire');
         }
 
         // Register planning data cleanup job (daily at 3 AM)
-        const planningCleanupExists = repeatables.some(
-          (r) => r.name === "planning:cleanup",
-        );
+        const planningCleanupExists = repeatables.some((r) => r.name === 'planning:cleanup');
         if (!planningCleanupExists) {
           await this.addJob(
-            "scheduler",
-            "planning:cleanup",
+            'scheduler',
+            'planning:cleanup',
             {},
-            { repeat: { pattern: "0 3 * * *" } },
+            { repeat: { pattern: '0 3 * * *' } }
           );
-          logger.info(
-            "Registered repeatable job: planning:cleanup (daily at 3 AM)",
-          );
+          logger.info('Registered repeatable job: planning:cleanup (daily at 3 AM)');
         } else {
-          logger.info("Repeatable job already exists: planning:cleanup");
+          logger.info('Repeatable job already exists: planning:cleanup');
         }
 
         // Register change request cleanup job (daily at 4 AM)
-        const crCleanupExists = repeatables.some(
-          (r) => r.name === "change-request:cleanup",
-        );
+        const crCleanupExists = repeatables.some((r) => r.name === 'change-request:cleanup');
         if (!crCleanupExists) {
           await this.addJob(
-            "scheduler",
-            "change-request:cleanup",
+            'scheduler',
+            'change-request:cleanup',
             {},
-            { repeat: { pattern: "0 4 * * *" } },
+            { repeat: { pattern: '0 4 * * *' } }
           );
-          logger.info(
-            "Registered repeatable job: change-request:cleanup (daily at 4 AM)",
-          );
+          logger.info('Registered repeatable job: change-request:cleanup (daily at 4 AM)');
         } else {
-          logger.info("Repeatable job already exists: change-request:cleanup");
+          logger.info('Repeatable job already exists: change-request:cleanup');
         }
 
         // Register unknown flags flush job (every minute)
-        const unknownFlagsFlushExists = repeatables.some(
-          (r) => r.name === "unknown-flags:flush",
-        );
+        const unknownFlagsFlushExists = repeatables.some((r) => r.name === 'unknown-flags:flush');
         if (!unknownFlagsFlushExists) {
           await this.addJob(
-            "scheduler",
-            "unknown-flags:flush",
+            'scheduler',
+            'unknown-flags:flush',
             {},
-            { repeat: { pattern: "* * * * *" } },
+            { repeat: { pattern: '* * * * *' } }
           );
-          logger.info(
-            "Registered repeatable job: unknown-flags:flush (every minute)",
-          );
+          logger.info('Registered repeatable job: unknown-flags:flush (every minute)');
         } else {
-          logger.info("Repeatable job already exists: unknown-flags:flush");
+          logger.info('Repeatable job already exists: unknown-flags:flush');
         }
       } catch (e) {
-        logger.error("Failed to register repeatable scheduler jobs:", e);
+        logger.error('Failed to register repeatable scheduler jobs:', e);
       }
 
       // Note: Maintenance scheduler job is now handled by SDK internally
       // Backend only publishes maintenance.settings.updated events
       // SDK handles time-based logic and emits virtual maintenance.started/ended events
-      logger.info("Maintenance scheduling delegated to SDK");
+      logger.info('Maintenance scheduling delegated to SDK');
 
       this.isInitialized = true;
-      logger.info("Queue service initialized successfully");
+      logger.info('Queue service initialized successfully');
     } catch (error) {
-      logger.error("Failed to initialize queue service:", error);
+      logger.error('Failed to initialize queue service:', error);
       throw error;
     }
   }
@@ -148,7 +129,7 @@ export class QueueService {
       removeOnComplete?: number;
       removeOnFail?: number;
       attempts?: number;
-    } = {},
+    } = {}
   ): Promise<void> {
     const redisConfig = this.getRedisConfig();
 
@@ -160,7 +141,7 @@ export class QueueService {
         removeOnFail: options.removeOnFail || 50,
         attempts: options.attempts || 3,
         backoff: {
-          type: "exponential",
+          type: 'exponential',
           delay: 2000,
         },
       },
@@ -178,38 +159,32 @@ export class QueueService {
     });
 
     // Setup event handlers
-    queue.on("error", (error: Error) => {
+    queue.on('error', (error: Error) => {
       logger.error(`Queue ${queueName} error:`, error);
     });
 
-    worker.on("error", (error: Error) => {
+    worker.on('error', (error: Error) => {
       logger.error(`Worker ${queueName} error:`, error);
     });
 
-    worker.on("completed", (job: Job) => {
+    worker.on('completed', (job: Job) => {
       logger.debug(`Job completed in queue ${queueName}:`, job.id);
     });
 
-    worker.on("failed", (job: Job | undefined, error: Error) => {
+    worker.on('failed', (job: Job | undefined, error: Error) => {
       logger.error(`Job failed in queue ${queueName}:`, {
         jobId: job?.id,
         error: error.message,
       });
     });
 
-    queueEvents.on("completed", ({ jobId }: { jobId: string }) => {
+    queueEvents.on('completed', ({ jobId }: { jobId: string }) => {
       logger.debug(`Job ${jobId} completed in queue ${queueName}`);
     });
 
-    queueEvents.on(
-      "failed",
-      ({ jobId, failedReason }: { jobId: string; failedReason: string }) => {
-        logger.error(
-          `Job ${jobId} failed in queue ${queueName}:`,
-          failedReason,
-        );
-      },
-    );
+    queueEvents.on('failed', ({ jobId, failedReason }: { jobId: string; failedReason: string }) => {
+      logger.error(`Job ${jobId} failed in queue ${queueName}:`, failedReason);
+    });
 
     // Store references
     this.queues.set(queueName, queue);
@@ -233,7 +208,7 @@ export class QueueService {
       priority?: number;
       delay?: number;
       repeat?: any;
-    } = {},
+    } = {}
   ): Promise<Job<QueueJobData> | null> {
     const queue = this.queues.get(queueName);
     if (!queue) {
@@ -291,12 +266,7 @@ export class QueueService {
         completed: completed.length,
         failed: failed.length,
         delayed: delayed.length,
-        total:
-          waiting.length +
-          active.length +
-          completed.length +
-          failed.length +
-          delayed.length,
+        total: waiting.length + active.length + completed.length + failed.length + delayed.length,
       };
     } catch (error) {
       logger.error(`Failed to get stats for queue ${queueName}:`, error);
@@ -320,34 +290,26 @@ export class QueueService {
   /**
    * List delayed jobs in range [startMs, endMs]
    */
-  async getScheduledJobsInRange(
-    queueName: string,
-    startMs: number,
-    endMs: number,
-  ) {
+  async getScheduledJobsInRange(queueName: string, startMs: number, endMs: number) {
     const queue = this.queues.get(queueName);
     if (!queue) return [];
 
     try {
-      const jobs = await queue.getJobs(["delayed", "waiting"], 0, -1, true);
+      const jobs = await queue.getJobs(['delayed', 'waiting'], 0, -1, true);
       const events = jobs
         .map((job) => {
           const delay = (job.opts as any)?.delay || 0;
           const payload: any = (job.data as any)?.payload || {};
-          const payloadStart = payload.start
-            ? Date.parse(payload.start)
-            : undefined;
+          const payloadStart = payload.start ? Date.parse(payload.start) : undefined;
           const scheduledAt = Number.isFinite(payloadStart)
             ? (payloadStart as number)
             : (job.timestamp || 0) + delay;
           return {
             id: job.id,
-            title: payload.title || payload.message || "Scheduled Job",
+            title: payload.title || payload.message || 'Scheduled Job',
             description: payload.description,
             start: scheduledAt,
-            end: payload.end
-              ? new Date(payload.end).getTime()
-              : scheduledAt + 60 * 60 * 1000,
+            end: payload.end ? new Date(payload.end).getTime() : scheduledAt + 60 * 60 * 1000,
             tags: payload.tags,
             resource: payload.resource,
             payload,
@@ -357,7 +319,7 @@ export class QueueService {
 
       return events;
     } catch (error) {
-      logger.error("Failed to list scheduled jobs:", error);
+      logger.error('Failed to list scheduled jobs:', error);
       return [];
     }
   }
@@ -385,22 +347,19 @@ export class QueueService {
     try {
       return await queue.getRepeatableJobs();
     } catch (e) {
-      logger.error("Failed to list repeatable jobs:", e);
+      logger.error('Failed to list repeatable jobs:', e);
       return [] as any;
     }
   }
 
-  async removeRepeatable(
-    queueName: string,
-    repeatJobKey: string,
-  ): Promise<boolean> {
+  async removeRepeatable(queueName: string, repeatJobKey: string): Promise<boolean> {
     const queue = this.queues.get(queueName);
     if (!queue) return false;
     try {
       await queue.removeRepeatableByKey(repeatJobKey);
       return true;
     } catch (e) {
-      logger.error("Failed to remove repeatable job:", e);
+      logger.error('Failed to remove repeatable job:', e);
       return false;
     }
   }
@@ -408,27 +367,22 @@ export class QueueService {
   /** History listing */
   async listHistory(
     queueName: string,
-    status:
-      | "completed"
-      | "failed"
-      | "waiting"
-      | "active"
-      | "delayed" = "completed",
+    status: 'completed' | 'failed' | 'waiting' | 'active' | 'delayed' = 'completed',
     start = 0,
-    end = 50,
+    end = 50
   ) {
     const queue = this.queues.get(queueName);
     if (!queue) return [];
     switch (status) {
-      case "completed":
+      case 'completed':
         return queue.getCompleted(start, end);
-      case "failed":
+      case 'failed':
         return queue.getFailed(start, end);
-      case "waiting":
+      case 'waiting':
         return queue.getWaiting(start, end);
-      case "active":
+      case 'active':
         return queue.getActive(start, end);
-      case "delayed":
+      case 'delayed':
         return queue.getDelayed(start, end);
       default:
         return [];
@@ -447,13 +401,7 @@ export class QueueService {
   async getJobCounts(queueName: string) {
     const queue = this.queues.get(queueName);
     if (!queue) return {} as any;
-    return queue.getJobCounts(
-      "completed",
-      "failed",
-      "waiting",
-      "active",
-      "delayed",
-    );
+    return queue.getJobCounts('completed', 'failed', 'waiting', 'active', 'delayed');
   }
 
   /** Expose queues for integrations (read-only) */
@@ -469,42 +417,42 @@ export class QueueService {
    */
   private async processEmailJob(job: Job<QueueJobData>): Promise<void> {
     const { payload } = job.data;
-    logger.info("Processing email job:", { jobId: job.id, to: payload.to });
+    logger.info('Processing email job:', { jobId: job.id, to: payload.to });
 
     try {
       // 이메일 발송 로직 구현
-      const nodemailer = require("nodemailer");
+      const nodemailer = require('nodemailer');
 
       // 개발 환경에서는 Ethereal Email 사용
       const transporter = nodemailer.createTransporter({
-        host: process.env.SMTP_HOST || "smtp.ethereal.email",
-        port: parseInt(process.env.SMTP_PORT || "587"),
+        host: process.env.SMTP_HOST || 'smtp.ethereal.email',
+        port: parseInt(process.env.SMTP_PORT || '587'),
         secure: false,
         auth: {
-          user: process.env.SMTP_USER || "ethereal.user@ethereal.email",
-          pass: process.env.SMTP_PASS || "ethereal.pass",
+          user: process.env.SMTP_USER || 'ethereal.user@ethereal.email',
+          pass: process.env.SMTP_PASS || 'ethereal.pass',
         },
       });
 
       const mailOptions = {
-        from: process.env.SMTP_FROM || "noreply@gatrix.com",
+        from: process.env.SMTP_FROM || 'noreply@gatrix.com',
         to: payload.to,
-        subject: payload.subject || "Notification",
+        subject: payload.subject || 'Notification',
         text: payload.body || payload.text,
         html: payload.html,
       };
 
       const info = await transporter.sendMail(mailOptions);
-      logger.info("Email sent successfully:", {
+      logger.info('Email sent successfully:', {
         jobId: job.id,
         messageId: info.messageId,
       });
     } catch (error) {
-      logger.error("Email sending failed:", { jobId: job.id, error });
+      logger.error('Email sending failed:', { jobId: job.id, error });
       throw error;
     }
 
-    logger.info("Email job completed:", job.id);
+    logger.info('Email job completed:', job.id);
   }
 
   /**
@@ -512,12 +460,12 @@ export class QueueService {
    */
   private async processAuditLogJob(job: Job<QueueJobData>): Promise<void> {
     // const { payload } = job.data;
-    logger.info("Processing audit log job:", { jobId: job.id });
+    logger.info('Processing audit log job:', { jobId: job.id });
 
     // TODO: Implement audit log processing
     // await auditLogService.processLog(payload);
 
-    logger.info("Audit log job completed:", job.id);
+    logger.info('Audit log job completed:', job.id);
   }
 
   /**
@@ -525,7 +473,7 @@ export class QueueService {
    */
   private async processCleanupJob(job: Job<QueueJobData>): Promise<void> {
     const { payload } = job.data;
-    logger.info("Processing cleanup job:", {
+    logger.info('Processing cleanup job:', {
       jobId: job.id,
       type: payload.type,
     });
@@ -533,7 +481,7 @@ export class QueueService {
     // TODO: Implement cleanup logic
     // await cleanupService.cleanup(payload);
 
-    logger.info("Cleanup job completed:", job.id);
+    logger.info('Cleanup job completed:', job.id);
   }
 
   /**
@@ -541,98 +489,93 @@ export class QueueService {
    */
   private async processSchedulerJob(job: Job<QueueJobData>): Promise<void> {
     const jobType = job.name || job.data?.type;
-    logger.info("Processing scheduler job:", { jobId: job.id, jobType });
+    logger.info('Processing scheduler job:', { jobId: job.id, jobType });
 
     try {
       switch (jobType) {
-        case "coupon:expire": {
+        case 'coupon:expire': {
           const affected = await CouponSettingsService.disableExpiredCoupons();
-          logger.info("coupon:expire completed", { jobId: job.id, affected });
+          logger.info('coupon:expire completed', { jobId: job.id, affected });
           break;
         }
-        case "campaign-check": {
+        case 'campaign-check': {
           // Dynamic import to avoid circular dependency
-          const { CampaignScheduler } = await import("./campaignScheduler");
+          const { CampaignScheduler } = await import('./campaignScheduler');
           await CampaignScheduler.getInstance().checkAndUpdateCampaigns();
-          logger.info("campaign-check completed", { jobId: job.id });
+          logger.info('campaign-check completed', { jobId: job.id });
           break;
         }
-        case "lifecycle:cleanup": {
+        case 'lifecycle:cleanup': {
           // Dynamic import to avoid circular dependency
-          const { processLifecycleCleanupJob } =
-            await import("./lifecycleCleanupScheduler");
+          const { processLifecycleCleanupJob } = await import('./lifecycleCleanupScheduler');
           const retentionDays = job.data?.payload?.retentionDays ?? 14;
           const deleted = await processLifecycleCleanupJob(retentionDays);
-          logger.info("lifecycle:cleanup completed", {
+          logger.info('lifecycle:cleanup completed', {
             jobId: job.id,
             deleted,
           });
           break;
         }
-        case "planning:cleanup": {
+        case 'planning:cleanup': {
           // Dynamic import to avoid circular dependency
-          const { PlanningDataService } = await import("./PlanningDataService");
+          const { PlanningDataService } = await import('./PlanningDataService');
           const result = await PlanningDataService.cleanupAllEnvironments();
-          logger.info("planning:cleanup completed", {
+          logger.info('planning:cleanup completed', {
             jobId: job.id,
             ...result,
           });
           break;
         }
-        case "change-request:cleanup": {
+        case 'change-request:cleanup': {
           // Dynamic import to avoid circular dependency
-          const { ChangeRequestService } =
-            await import("./ChangeRequestService");
+          const { ChangeRequestService } = await import('./ChangeRequestService');
           const retentionDays = parseInt(
-            process.env.CHANGE_REQUEST_REJECTION_RETENTION_DAYS || "14",
-            10,
+            process.env.CHANGE_REQUEST_REJECTION_RETENTION_DAYS || '14',
+            10
           );
-          const deleted =
-            await ChangeRequestService.cleanupRejected(retentionDays);
-          logger.info("change-request:cleanup completed", {
+          const deleted = await ChangeRequestService.cleanupRejected(retentionDays);
+          logger.info('change-request:cleanup completed', {
             jobId: job.id,
             deleted,
             retentionDays,
           });
           break;
         }
-        case "outbox:process": {
+        case 'outbox:process': {
           // Dynamic import to avoid circular dependency
-          const { processOutboxJob } = await import("./outboxScheduler");
+          const { processOutboxJob } = await import('./outboxScheduler');
           const batchSize = job.data?.payload?.batchSize ?? 20;
           const processed = await processOutboxJob(batchSize);
-          logger.info("outbox:process completed", { jobId: job.id, processed });
+          logger.info('outbox:process completed', { jobId: job.id, processed });
           break;
         }
-        case "outbox:cleanup": {
+        case 'outbox:cleanup': {
           // Dynamic import to avoid circular dependency
-          const { cleanupOutboxJob } = await import("./outboxScheduler");
+          const { cleanupOutboxJob } = await import('./outboxScheduler');
           const outboxRetentionDays = job.data?.payload?.retentionDays ?? 7;
           const outboxDeleted = await cleanupOutboxJob(outboxRetentionDays);
-          logger.info("outbox:cleanup completed", {
+          logger.info('outbox:cleanup completed', {
             jobId: job.id,
             deleted: outboxDeleted,
           });
           break;
         }
-        case "lock:cleanup": {
+        case 'lock:cleanup': {
           // Dynamic import to avoid circular dependency
-          const { cleanupLocksJob } = await import("./outboxScheduler");
+          const { cleanupLocksJob } = await import('./outboxScheduler');
           const locksDeleted = await cleanupLocksJob();
-          logger.info("lock:cleanup completed", {
+          logger.info('lock:cleanup completed', {
             jobId: job.id,
             deleted: locksDeleted,
           });
           break;
         }
-        case "unknown-flags:flush": {
+        case 'unknown-flags:flush': {
           // Dynamic import to avoid circular dependency
-          const { processUnknownFlagsFlushJob } = await import(
-            "./UnknownFlagService"
-          );
+          const { processUnknownFlagsFlushJob } = await import('./UnknownFlagService');
           const result = await processUnknownFlagsFlushJob();
           if (result.flushed > 0 || result.errors > 0) {
-            logger.info("unknown-flags:flush completed", {
+            logger.info('unknown-flags:flush completed', {
               jobId: job.id,
               ...result,
             });
@@ -640,7 +583,7 @@ export class QueueService {
           break;
         }
         default: {
-          logger.info("Unhandled scheduler job type, logging only", {
+          logger.info('Unhandled scheduler job type, logging only', {
             jobId: job.id,
             jobType,
             payload: job.data?.payload,
@@ -648,7 +591,7 @@ export class QueueService {
         }
       }
     } catch (error) {
-      logger.error("Scheduler job failed", { jobId: job.id, jobType, error });
+      logger.error('Scheduler job failed', { jobId: job.id, jobType, error });
       throw error;
     }
   }
@@ -677,9 +620,9 @@ export class QueueService {
       }
 
       this.isInitialized = false;
-      logger.info("Queue service shutdown completed");
+      logger.info('Queue service shutdown completed');
     } catch (error) {
-      logger.error("Error during queue service shutdown:", error);
+      logger.error('Error during queue service shutdown:', error);
     }
   }
 

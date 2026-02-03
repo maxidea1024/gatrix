@@ -1,10 +1,10 @@
 // import bcrypt from 'bcryptjs'; // Removed as it's not used directly here
-import { UserModel } from "../models/User";
-import { JwtUtils } from "../utils/jwt";
-import { GatrixError } from "../middleware/errorHandler";
-import logger from "../config/logger";
-import { CreateUserData, UserWithoutPassword } from "../types/user";
-import db from "../config/knex";
+import { UserModel } from '../models/User';
+import { JwtUtils } from '../utils/jwt';
+import { GatrixError } from '../middleware/errorHandler';
+import logger from '../config/logger';
+import { CreateUserData, UserWithoutPassword } from '../types/user';
+import db from '../config/knex';
 
 export interface LoginCredentials {
   email: string;
@@ -31,27 +31,24 @@ export class AuthService {
       // Find user by email
       const user = await UserModel.findByEmail(email);
       if (!user) {
-        throw new GatrixError("USER_NOT_FOUND", 404);
+        throw new GatrixError('USER_NOT_FOUND', 404);
       }
 
       // Check if user is active
-      if (user.status !== "active") {
-        if (user.status === "pending") {
-          throw new GatrixError("ACCOUNT_PENDING", 403);
-        } else if (user.status === "suspended") {
-          throw new GatrixError("ACCOUNT_SUSPENDED", 403);
+      if (user.status !== 'active') {
+        if (user.status === 'pending') {
+          throw new GatrixError('ACCOUNT_PENDING', 403);
+        } else if (user.status === 'suspended') {
+          throw new GatrixError('ACCOUNT_SUSPENDED', 403);
         } else {
-          throw new GatrixError(
-            "Account is not active. Please contact an administrator.",
-            403,
-          );
+          throw new GatrixError('Account is not active. Please contact an administrator.', 403);
         }
       }
 
       // Verify password
       const isValidPassword = await UserModel.verifyPassword(user, password);
       if (!isValidPassword) {
-        throw new GatrixError("Invalid email or password", 401);
+        throw new GatrixError('Invalid email or password', 401);
       }
 
       // Update last login
@@ -63,11 +60,9 @@ export class AuthService {
 
       // Generate tokens
       const accessToken = JwtUtils.generateToken(userWithoutPassword as any);
-      const refreshToken = JwtUtils.generateRefreshToken(
-        userWithoutPassword as any,
-      );
+      const refreshToken = JwtUtils.generateRefreshToken(userWithoutPassword as any);
 
-      logger.info("User logged in successfully:", {
+      logger.info('User logged in successfully:', {
         userId: user.id,
         email: user.email,
       });
@@ -81,21 +76,19 @@ export class AuthService {
       if (error instanceof GatrixError) {
         throw error;
       }
-      logger.error("Login error:", error);
-      throw new GatrixError("Login failed", 500);
+      logger.error('Login error:', error);
+      throw new GatrixError('Login failed', 500);
     }
   }
 
-  static async register(
-    registerData: RegisterData,
-  ): Promise<UserWithoutPassword> {
+  static async register(registerData: RegisterData): Promise<UserWithoutPassword> {
     try {
       const { email, password, name } = registerData;
 
       // Check if user already exists
       const existingUser = await UserModel.findByEmail(email);
       if (existingUser) {
-        throw new GatrixError("EMAIL_ALREADY_EXISTS", 409);
+        throw new GatrixError('EMAIL_ALREADY_EXISTS', 409);
       }
 
       // Create user data
@@ -103,14 +96,14 @@ export class AuthService {
         email,
         password,
         name,
-        status: "pending", // New users need admin approval
+        status: 'pending', // New users need admin approval
         emailVerified: false,
       };
 
       // Create user
       const user = await UserModel.create(userData);
 
-      logger.info("User registered successfully:", {
+      logger.info('User registered successfully:', {
         userId: user.id,
         email: user.email,
       });
@@ -120,43 +113,41 @@ export class AuthService {
       if (error instanceof GatrixError) {
         throw error;
       }
-      logger.error("Registration error:", error);
-      throw new GatrixError("REGISTRATION_FAILED", 500);
+      logger.error('Registration error:', error);
+      throw new GatrixError('REGISTRATION_FAILED', 500);
     }
   }
 
   static async refreshToken(
-    refreshToken: string,
+    refreshToken: string
   ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       // Verify refresh token
       const payload = JwtUtils.verifyRefreshToken(refreshToken);
       if (!payload) {
-        logger.warn(
-          "Refresh token verification failed: invalid or expired token",
-        );
-        throw new GatrixError("Invalid or expired refresh token", 401);
+        logger.warn('Refresh token verification failed: invalid or expired token');
+        throw new GatrixError('Invalid or expired refresh token', 401);
       }
 
-      logger.debug("Refresh token verified, looking up user:", {
+      logger.debug('Refresh token verified, looking up user:', {
         userId: payload.userId,
       });
 
       // Get user details
       const user = await UserModel.findById(payload.userId);
       if (!user) {
-        logger.warn("User not found during token refresh:", {
+        logger.warn('User not found during token refresh:', {
           userId: payload.userId,
         });
-        throw new GatrixError("User not found", 401);
+        throw new GatrixError('User not found', 401);
       }
 
-      if (user.status !== "active") {
-        logger.warn("User account is not active during token refresh:", {
+      if (user.status !== 'active') {
+        logger.warn('User account is not active during token refresh:', {
           userId: payload.userId,
           status: user.status,
         });
-        throw new GatrixError("User account is not active", 401);
+        throw new GatrixError('User account is not active', 401);
       }
 
       // Generate new tokens
@@ -171,59 +162,51 @@ export class AuthService {
       if (error instanceof GatrixError) {
         throw error;
       }
-      logger.error("Token refresh error:", error);
-      throw new GatrixError("Token refresh failed", 500);
+      logger.error('Token refresh error:', error);
+      throw new GatrixError('Token refresh failed', 500);
     }
   }
 
   static async changePassword(
     userId: number,
     currentPassword: string,
-    newPassword: string,
+    newPassword: string
   ): Promise<void> {
     try {
       // Get user with password hash
-      const user = await UserModel.findByEmail(
-        (await UserModel.findById(userId))!.email,
-      );
+      const user = await UserModel.findByEmail((await UserModel.findById(userId))!.email);
       if (!user) {
-        throw new GatrixError("User not found", 404);
+        throw new GatrixError('User not found', 404);
       }
 
       // OAuth 사용자들은 비밀번호 변경 불가
-      if (user.authType !== "local") {
-        throw new GatrixError(
-          "Password change is not available for OAuth users",
-          400,
-        );
+      if (user.authType !== 'local') {
+        throw new GatrixError('Password change is not available for OAuth users', 400);
       }
 
       // Verify current password
       if (user.passwordHash) {
-        const isValidPassword = await UserModel.verifyPassword(
-          user,
-          currentPassword,
-        );
+        const isValidPassword = await UserModel.verifyPassword(user, currentPassword);
         if (!isValidPassword) {
-          throw new GatrixError("Current password is incorrect", 400);
+          throw new GatrixError('Current password is incorrect', 400);
         }
       } else {
         // local 사용자인데 passwordHash가 없는 경우 (데이터 불일치)
-        throw new GatrixError("Password not set for this account", 400);
+        throw new GatrixError('Password not set for this account', 400);
       }
 
       // Update password
       await UserModel.updatePassword(userId, newPassword);
 
-      logger.info("Password changed successfully:", {
+      logger.info('Password changed successfully:', {
         userId,
       });
     } catch (error) {
       if (error instanceof GatrixError) {
         throw error;
       }
-      logger.error("Change password error:", error);
-      throw new GatrixError("Password change failed", 500);
+      logger.error('Change password error:', error);
+      throw new GatrixError('Password change failed', 500);
     }
   }
 
@@ -232,19 +215,19 @@ export class AuthService {
       const user = await UserModel.findByEmail(email);
       if (!user) {
         // Don't reveal if user exists or not
-        logger.info("Password reset requested for non-existent email:", {
+        logger.info('Password reset requested for non-existent email:', {
           email,
         });
         return;
       }
 
       // 1. 보안 리셋 토큰 생성
-      const crypto = require("crypto");
-      const resetToken = crypto.randomBytes(32).toString("hex");
+      const crypto = require('crypto');
+      const resetToken = crypto.randomBytes(32).toString('hex');
       const expiresAt = new Date(Date.now() + 3600000); // 1시간 후 만료
 
       // 2. 데이터베이스에 토큰 저장
-      await db("g_password_reset_tokens").insert({
+      await db('g_password_reset_tokens').insert({
         userId: user.id,
         token: resetToken,
         expiresAt,
@@ -252,13 +235,13 @@ export class AuthService {
       });
 
       // 3. 이메일 발송
-      const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/reset-password?token=${resetToken}`;
+      const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
 
       // QueueService를 통해 이메일 발송 (비동기)
-      const QueueService = require("./QueueService").default;
+      const QueueService = require('./QueueService').default;
       await QueueService.addEmailJob({
         to: user.email,
-        subject: "Password Reset Request",
+        subject: 'Password Reset Request',
         html: `
           <h2>Password Reset Request</h2>
           <p>You requested a password reset. Click the link below to reset your password:</p>
@@ -269,13 +252,13 @@ export class AuthService {
         text: `Password reset requested. Visit: ${resetUrl} (expires in 1 hour)`,
       });
 
-      logger.info("Password reset email sent:", {
+      logger.info('Password reset email sent:', {
         userId: user.id,
         email: user.email,
       });
     } catch (error) {
-      logger.error("Password reset error:", error);
-      throw new GatrixError("Password reset failed", 500);
+      logger.error('Password reset error:', error);
+      throw new GatrixError('Password reset failed', 500);
     }
   }
 
@@ -285,12 +268,12 @@ export class AuthService {
         emailVerified: true,
       });
 
-      logger.info("Email verified successfully:", {
+      logger.info('Email verified successfully:', {
         userId,
       });
     } catch (error) {
-      logger.error("Email verification error:", error);
-      throw new GatrixError("Email verification failed", 500);
+      logger.error('Email verification error:', error);
+      throw new GatrixError('Email verification failed', 500);
     }
   }
 
@@ -298,7 +281,7 @@ export class AuthService {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
-        throw new GatrixError("User not found", 404);
+        throw new GatrixError('User not found', 404);
       }
 
       return user;
@@ -306,8 +289,8 @@ export class AuthService {
       if (error instanceof GatrixError) {
         throw error;
       }
-      logger.error("Get profile error:", error);
-      throw new GatrixError("Failed to get user profile", 500);
+      logger.error('Get profile error:', error);
+      throw new GatrixError('Failed to get user profile', 500);
     }
   }
 
@@ -317,11 +300,11 @@ export class AuthService {
       name?: string;
       avatarUrl?: string;
       preferredLanguage?: string;
-    },
+    }
   ): Promise<UserWithoutPassword> {
     try {
       // Only allow specific fields for profile updates
-      const allowedFields = ["name", "avatarUrl", "preferredLanguage"];
+      const allowedFields = ['name', 'avatarUrl', 'preferredLanguage'];
       const filteredData: any = {};
 
       for (const [key, value] of Object.entries(updateData)) {
@@ -331,15 +314,15 @@ export class AuthService {
       }
 
       if (Object.keys(filteredData).length === 0) {
-        throw new GatrixError("No valid fields to update", 400);
+        throw new GatrixError('No valid fields to update', 400);
       }
 
       const user = await UserModel.update(userId, filteredData);
       if (!user) {
-        throw new GatrixError("User not found", 404);
+        throw new GatrixError('User not found', 404);
       }
 
-      logger.info("Profile updated successfully:", {
+      logger.info('Profile updated successfully:', {
         userId,
         updates: Object.keys(filteredData),
       });
@@ -349,8 +332,8 @@ export class AuthService {
       if (error instanceof GatrixError) {
         throw error;
       }
-      logger.error("Update profile error:", error);
-      throw new GatrixError("Profile update failed", 500);
+      logger.error('Update profile error:', error);
+      throw new GatrixError('Profile update failed', 500);
     }
   }
 }

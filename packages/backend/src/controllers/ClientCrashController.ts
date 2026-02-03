@@ -1,19 +1,15 @@
-import { Request, Response } from "express";
-import { asyncHandler, GatrixError } from "../middleware/errorHandler";
-import { ClientCrash } from "../models/ClientCrash";
-import { CrashEvent } from "../models/CrashEvent";
-import {
-  CrashUploadRequest,
-  CrashState,
-  CRASH_CONSTANTS,
-} from "../types/crash";
-import crypto from "crypto";
-import fs from "fs/promises";
-import path from "path";
-import logger from "../config/logger";
-import { cacheService } from "../services/CacheService";
-import { isGreaterThan } from "../utils/semver";
-import { generateULID } from "../utils/ulid";
+import { Request, Response } from 'express';
+import { asyncHandler, GatrixError } from '../middleware/errorHandler';
+import { ClientCrash } from '../models/ClientCrash';
+import { CrashEvent } from '../models/CrashEvent';
+import { CrashUploadRequest, CrashState, CRASH_CONSTANTS } from '../types/crash';
+import crypto from 'crypto';
+import fs from 'fs/promises';
+import path from 'path';
+import logger from '../config/logger';
+import { cacheService } from '../services/CacheService';
+import { isGreaterThan } from '../utils/semver';
+import { generateULID } from '../utils/ulid';
 
 export class ClientCrashController {
   /**
@@ -26,14 +22,14 @@ export class ClientCrashController {
     // Validate required fields
     if (!body.platform || !body.branch || !body.environment || !body.stack) {
       throw new GatrixError(
-        "Bad request body: Missing required fields (platform, branch, environment, stack)",
-        400,
+        'Bad request body: Missing required fields (platform, branch, environment, stack)',
+        400
       );
     }
 
     try {
       // Generate crash hash from stack trace
-      const chash = crypto.createHash("md5").update(body.stack).digest("hex");
+      const chash = crypto.createHash('md5').update(body.stack).digest('hex');
 
       // Check if crash already exists (Redis cache + branch)
       const cacheKey = `crash:${chash}:${body.branch}`;
@@ -43,10 +39,7 @@ export class ClientCrashController {
 
       if (!crashId) {
         // Check database for existing crash
-        const existingCrash = await ClientCrash.findByHashAndBranch(
-          chash,
-          body.branch,
-        );
+        const existingCrash = await ClientCrash.findByHashAndBranch(chash, body.branch);
 
         if (existingCrash) {
           crashId = existingCrash.id;
@@ -60,24 +53,20 @@ export class ClientCrashController {
 
       // Get client IP address and remove IPv6 prefix if present
       let clientIp =
-        (req.headers["x-forwarded-for"] as string)?.split(",")[0] ||
-        req.socket.remoteAddress ||
-        "";
+        (req.headers['x-forwarded-for'] as string)?.split(',')[0] || req.socket.remoteAddress || '';
 
       // Remove "::ffff:" prefix from IPv4-mapped IPv6 addresses
-      if (clientIp.startsWith("::ffff:")) {
+      if (clientIp.startsWith('::ffff:')) {
         clientIp = clientIp.substring(7);
       }
 
       // Get user agent
-      const userAgent = req.headers["user-agent"] || "";
+      const userAgent = req.headers['user-agent'] || '';
 
       if (isNewCrash) {
         // Extract first line from stack trace (max 200 chars)
         const firstLine =
-          body.stack
-            .split("\n")[0]
-            ?.substring(0, CRASH_CONSTANTS.MaxFirstLineLen) || "";
+          body.stack.split('\n')[0]?.substring(0, CRASH_CONSTANTS.MaxFirstLineLen) || '';
 
         const newCrashId = generateULID();
 
@@ -103,7 +92,7 @@ export class ClientCrashController {
         const insertedCrash = await ClientCrash.query().findById(newCrashId);
 
         if (!insertedCrash) {
-          throw new GatrixError("Failed to create crash record", 500);
+          throw new GatrixError('Failed to create crash record', 500);
         }
 
         crash = insertedCrash;
@@ -122,7 +111,7 @@ export class ClientCrashController {
         if (!crash!) {
           const foundCrash = await ClientCrash.query().findById(crashId!);
           if (!foundCrash) {
-            throw new GatrixError("Crash not found", 404);
+            throw new GatrixError('Crash not found', 404);
           }
           crash = foundCrash;
         }
@@ -130,9 +119,7 @@ export class ClientCrashController {
 
       // Extract first line from stack trace (max 200 chars)
       const eventFirstLine =
-        body.stack
-          .split("\n")[0]
-          ?.substring(0, CRASH_CONSTANTS.MaxFirstLineLen) || "";
+        body.stack.split('\n')[0]?.substring(0, CRASH_CONSTANTS.MaxFirstLineLen) || '';
 
       // Create crash event
       const event = await CrashEvent.create({
@@ -184,7 +171,7 @@ export class ClientCrashController {
         await event.$query().patch({ logFilePath });
       }
 
-      logger.info("Crash uploaded successfully", {
+      logger.info('Crash uploaded successfully', {
         crashId: crash.id,
         eventId: event.id,
         isNewCrash,
@@ -201,11 +188,11 @@ export class ClientCrashController {
         },
       });
     } catch (error) {
-      logger.error("Error uploading crash:", error);
+      logger.error('Error uploading crash:', error);
       if (error instanceof GatrixError) {
         throw error;
       }
-      throw new GatrixError("Failed to upload crash", 500);
+      throw new GatrixError('Failed to upload crash', 500);
     }
   });
 
@@ -213,37 +200,28 @@ export class ClientCrashController {
    * Save stack trace to file
    * Returns the relative file path
    */
-  private static async saveStackTraceFile(
-    chash: string,
-    stack: string,
-  ): Promise<string> {
+  private static async saveStackTraceFile(chash: string, stack: string): Promise<string> {
     try {
       // Create directory structure: public/crashes/hash[0:2]/hash[2:4]/
       const hashDir1 = chash.substring(0, 2);
       const hashDir2 = chash.substring(2, 4);
-      const dirPath = path.join(
-        process.cwd(),
-        "public",
-        "crashes",
-        hashDir1,
-        hashDir2,
-      );
+      const dirPath = path.join(process.cwd(), 'public', 'crashes', hashDir1, hashDir2);
 
       // Ensure directory exists
       await fs.mkdir(dirPath, { recursive: true });
 
       // Save stack trace file
       const filePath = path.join(dirPath, chash);
-      await fs.writeFile(filePath, stack, "utf8");
+      await fs.writeFile(filePath, stack, 'utf8');
 
       const relativePath = `/crashes/${hashDir1}/${hashDir2}/${chash}`;
-      logger.debug("Stack trace saved", { chash, relativePath });
+      logger.debug('Stack trace saved', { chash, relativePath });
 
       return relativePath;
     } catch (error) {
-      logger.error("Failed to save stack trace file:", error);
+      logger.error('Failed to save stack trace file:', error);
       // Don't throw error - file saving failure shouldn't block crash upload
-      return "";
+      return '';
     }
   }
 
@@ -251,14 +229,11 @@ export class ClientCrashController {
    * Save log file
    * Returns the relative file path
    */
-  private static async saveLogFile(
-    eventId: string,
-    log: string,
-  ): Promise<string> {
+  private static async saveLogFile(eventId: string, log: string): Promise<string> {
     try {
       // Check log size limit (1MB)
       if (log.length > CRASH_CONSTANTS.MaxLogTextLen) {
-        logger.warn("Log text exceeds maximum length", {
+        logger.warn('Log text exceeds maximum length', {
           eventId,
           logLength: log.length,
           maxLength: CRASH_CONSTANTS.MaxLogTextLen,
@@ -269,48 +244,34 @@ export class ClientCrashController {
       // Create directory structure: public/crashes/logs/YYYY/MM/DD/
       const now = new Date();
       const year = now.getFullYear().toString();
-      const month = (now.getMonth() + 1).toString().padStart(2, "0");
-      const day = now.getDate().toString().padStart(2, "0");
-      const dirPath = path.join(
-        process.cwd(),
-        "public",
-        "crashes",
-        "logs",
-        year,
-        month,
-        day,
-      );
+      const month = (now.getMonth() + 1).toString().padStart(2, '0');
+      const day = now.getDate().toString().padStart(2, '0');
+      const dirPath = path.join(process.cwd(), 'public', 'crashes', 'logs', year, month, day);
 
       // Ensure directory exists
       await fs.mkdir(dirPath, { recursive: true });
 
       // Save log file
       const filePath = path.join(dirPath, `${eventId}.txt`);
-      await fs.writeFile(filePath, log, "utf8");
+      await fs.writeFile(filePath, log, 'utf8');
 
       const relativePath = `/crashes/logs/${year}/${month}/${day}/${eventId}.txt`;
-      logger.debug("Log file saved", { eventId, relativePath });
+      logger.debug('Log file saved', { eventId, relativePath });
 
       return relativePath;
     } catch (error) {
-      logger.error("Failed to save log file:", error);
+      logger.error('Failed to save log file:', error);
       // Don't throw error - file saving failure shouldn't block crash upload
-      return "";
+      return '';
     }
   }
 
   /**
    * Check reopen logic for closed/resolved crashes
    */
-  private static async checkReopenLogic(
-    crash: ClientCrash,
-    body: CrashUploadRequest,
-  ) {
+  private static async checkReopenLogic(crash: ClientCrash, body: CrashUploadRequest) {
     // Only check reopen for CLOSED or RESOLVED crashes
-    if (
-      crash.crashesState !== CrashState.CLOSED &&
-      crash.crashesState !== CrashState.RESOLVED
-    ) {
+    if (crash.crashesState !== CrashState.CLOSED && crash.crashesState !== CrashState.RESOLVED) {
       return;
     }
 
@@ -324,7 +285,7 @@ export class ClientCrashController {
       try {
         shouldReopen = isGreaterThan(body.appVersion, crash.maxAppVersion);
       } catch (error) {
-        logger.warn("Failed to compare versions for reopen logic", {
+        logger.warn('Failed to compare versions for reopen logic', {
           crashId: crash.id,
           currentVersion: body.appVersion,
           maxVersion: crash.maxAppVersion,
@@ -335,7 +296,7 @@ export class ClientCrashController {
 
     if (shouldReopen) {
       await crash.reopen();
-      logger.info("Crash reopened", {
+      logger.info('Crash reopened', {
         crashId: crash.id,
         branch: body.branch,
         currentVersion: body.appVersion,

@@ -9,9 +9,9 @@
  * - In multi-environment mode (edge), environment MUST always be provided
  */
 
-import { ApiClient } from "../client/ApiClient";
-import { Logger } from "../utils/logger";
-import { EnvironmentResolver } from "../utils/EnvironmentResolver";
+import { ApiClient } from '../client/ApiClient';
+import { Logger } from '../utils/logger';
+import { EnvironmentResolver } from '../utils/EnvironmentResolver';
 
 export interface IpWhitelistEntry {
   id: number;
@@ -45,11 +45,7 @@ export class WhitelistService {
   // Whether this feature is enabled
   private featureEnabled: boolean = true;
 
-  constructor(
-    apiClient: ApiClient,
-    logger: Logger,
-    envResolver: EnvironmentResolver,
-  ) {
+  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
     this.apiClient = apiClient;
     this.logger = logger;
     this.envResolver = envResolver;
@@ -77,16 +73,16 @@ export class WhitelistService {
   async listByEnvironment(environment: string): Promise<WhitelistData> {
     const endpoint = `/api/v1/server/${encodeURIComponent(environment)}/whitelists`;
 
-    this.logger.debug("Fetching whitelists", { environment });
+    this.logger.debug('Fetching whitelists', { environment });
 
     const response = await this.apiClient.get<WhitelistData>(endpoint);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || "Failed to fetch whitelists");
+      throw new Error(response.error?.message || 'Failed to fetch whitelists');
     }
 
     this.cachedWhitelistByEnv.set(environment, response.data);
-    this.logger.info("Whitelists fetched", {
+    this.logger.info('Whitelists fetched', {
       environment,
       ipCount: response.data.ipWhitelist.length,
       accountCount: response.data.accountWhitelist.length,
@@ -99,7 +95,7 @@ export class WhitelistService {
    * Get whitelists for multiple environments
    */
   async listByEnvironments(environments: string[]): Promise<WhitelistData[]> {
-    this.logger.debug("Fetching whitelists for multiple environments", {
+    this.logger.debug('Fetching whitelists for multiple environments', {
       environments,
     });
 
@@ -126,15 +122,14 @@ export class WhitelistService {
    */
   async refreshByEnvironment(
     environment: string,
-    suppressWarnings?: boolean,
+    suppressWarnings?: boolean
   ): Promise<WhitelistData> {
     if (!this.featureEnabled && !suppressWarnings) {
-      this.logger.warn(
-        "WhitelistService.refreshByEnvironment() called but feature is disabled",
-        { environment },
-      );
+      this.logger.warn('WhitelistService.refreshByEnvironment() called but feature is disabled', {
+        environment,
+      });
     }
-    this.logger.debug("Refreshing whitelist cache", { environment });
+    this.logger.debug('Refreshing whitelist cache', { environment });
     return await this.listByEnvironment(environment);
   }
 
@@ -163,7 +158,7 @@ export class WhitelistService {
    */
   clearCache(): void {
     this.cachedWhitelistByEnv.clear();
-    this.logger.debug("Whitelist cache cleared");
+    this.logger.debug('Whitelist cache cleared');
   }
 
   /**
@@ -171,7 +166,7 @@ export class WhitelistService {
    */
   clearCacheForEnvironment(environment: string): void {
     this.cachedWhitelistByEnv.delete(environment);
-    this.logger.debug("Whitelist cache cleared for environment", {
+    this.logger.debug('Whitelist cache cleared for environment', {
       environment,
     });
   }
@@ -207,7 +202,7 @@ export class WhitelistService {
       }
 
       // Check CIDR match if ipAddress contains CIDR notation
-      if (entry.ipAddress.includes("/")) {
+      if (entry.ipAddress.includes('/')) {
         return this.isIpInCIDR(ip, entry.ipAddress);
       }
 
@@ -221,11 +216,11 @@ export class WhitelistService {
    */
   private isIpInCIDR(ip: string, cidr: string): boolean {
     try {
-      const [cidrIp, cidrMask] = cidr.split("/");
+      const [cidrIp, cidrMask] = cidr.split('/');
       const mask = parseInt(cidrMask, 10);
 
       if (isNaN(mask) || mask < 0 || mask > 32) {
-        this.logger.warn("Invalid CIDR mask", { cidr });
+        this.logger.warn('Invalid CIDR mask', { cidr });
         return false;
       }
 
@@ -243,7 +238,7 @@ export class WhitelistService {
       // Check if IP is in CIDR range
       return (ipNum & maskBits) === (cidrIpNum & maskBits);
     } catch (error) {
-      this.logger.warn("Error checking CIDR", { ip, cidr, error });
+      this.logger.warn('Error checking CIDR', { ip, cidr, error });
       return false;
     }
   }
@@ -252,7 +247,7 @@ export class WhitelistService {
    * Convert IP address string to 32-bit number
    */
   private ipToNumber(ip: string): number | null {
-    const parts = ip.split(".");
+    const parts = ip.split('.');
     if (parts.length !== 4) {
       return null;
     }
@@ -289,7 +284,7 @@ export class WhitelistService {
    * @param environment Environment name (required)
    */
   updateCache(whitelist: WhitelistData, environment: string): void {
-    this.logger.debug("Updating whitelist cache", {
+    this.logger.debug('Updating whitelist cache', {
       environment,
       ipCount: whitelist.ipWhitelist.length,
       accountCount: whitelist.accountWhitelist.length,

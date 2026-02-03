@@ -5,22 +5,18 @@
  * Extends BaseEnvironmentService for common fetch/caching logic
  */
 
-import { ApiClient } from "../client/ApiClient";
-import { Logger } from "../utils/logger";
-import { EnvironmentResolver } from "../utils/EnvironmentResolver";
-import { ClientVersion, ClientVersionListResponse } from "../types/api";
-import { BaseEnvironmentService } from "./BaseEnvironmentService";
+import { ApiClient } from '../client/ApiClient';
+import { Logger } from '../utils/logger';
+import { EnvironmentResolver } from '../utils/EnvironmentResolver';
+import { ClientVersion, ClientVersionListResponse } from '../types/api';
+import { BaseEnvironmentService } from './BaseEnvironmentService';
 
 export class ClientVersionService extends BaseEnvironmentService<
   ClientVersion,
   ClientVersionListResponse,
   number
 > {
-  constructor(
-    apiClient: ApiClient,
-    logger: Logger,
-    envResolver: EnvironmentResolver,
-  ) {
+  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
     super(apiClient, logger, envResolver);
   }
 
@@ -35,7 +31,7 @@ export class ClientVersionService extends BaseEnvironmentService<
   }
 
   protected getServiceName(): string {
-    return "client versions";
+    return 'client versions';
   }
 
   protected getItemId(item: ClientVersion): number {
@@ -48,7 +44,7 @@ export class ClientVersionService extends BaseEnvironmentService<
    * Refresh cached client versions for a specific environment
    */
   async refreshByEnvironment(environment: string): Promise<ClientVersion[]> {
-    this.logger.info("Refreshing client versions cache", { environment });
+    this.logger.info('Refreshing client versions cache', { environment });
     // Invalidate ETag cache to force fresh data fetch
     this.apiClient.invalidateEtagCache(this.getEndpoint(environment));
     return await this.listByEnvironment(environment);
@@ -74,14 +70,10 @@ export class ClientVersionService extends BaseEnvironmentService<
   getByPlatformAndVersion(
     platform: string,
     version: string,
-    environment: string,
+    environment: string
   ): ClientVersion | null {
     const versions = this.getCached(environment);
-    return (
-      versions.find(
-        (v) => v.platform === platform && v.clientVersion === version,
-      ) || null
-    );
+    return versions.find((v) => v.platform === platform && v.clientVersion === version) || null;
   }
 
   /**
@@ -94,7 +86,7 @@ export class ClientVersionService extends BaseEnvironmentService<
   getLatestByPlatform(
     platform: string,
     environment: string,
-    status?: string,
+    status?: string
   ): ClientVersion | null {
     const versions = this.getCached(environment);
     const filtered = versions.filter((v) => {
@@ -128,8 +120,8 @@ export class ClientVersionService extends BaseEnvironmentService<
    * Returns positive if a > b, negative if a < b, 0 if equal
    */
   private compareSemver(a: string, b: string): number {
-    const partsA = a.split(".").map((p) => parseInt(p, 10) || 0);
-    const partsB = b.split(".").map((p) => parseInt(p, 10) || 0);
+    const partsA = a.split('.').map((p) => parseInt(p, 10) || 0);
+    const partsB = b.split('.').map((p) => parseInt(p, 10) || 0);
     const maxLen = Math.max(partsA.length, partsB.length);
 
     for (let i = 0; i < maxLen; i++) {
@@ -147,7 +139,7 @@ export class ClientVersionService extends BaseEnvironmentService<
    * Check if a client version is in maintenance based on time window
    */
   isMaintenanceActive(version: ClientVersion): boolean {
-    if (version.clientStatus !== "MAINTENANCE") {
+    if (version.clientStatus !== 'MAINTENANCE') {
       return false;
     }
 
@@ -175,10 +167,7 @@ export class ClientVersionService extends BaseEnvironmentService<
   /**
    * Get maintenance message for a client version with language support
    */
-  getMaintenanceMessage(
-    version: ClientVersion,
-    lang: "ko" | "en" | "zh" = "en",
-  ): string | null {
+  getMaintenanceMessage(version: ClientVersion, lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
     if (!this.isMaintenanceActive(version)) {
       return null;
     }

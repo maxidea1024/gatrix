@@ -1,4 +1,4 @@
-import db from "../config/knex";
+import db from '../config/knex';
 
 export interface TagAttributes {
   id: number;
@@ -32,34 +32,34 @@ export interface UpdateTagData {
 
 export default class TagModel {
   static async list(): Promise<TagAttributes[]> {
-    return await db("g_tags as t")
-      .leftJoin("g_users as c", "c.id", "t.createdBy")
-      .leftJoin("g_users as u", "u.id", "t.updatedBy")
+    return await db('g_tags as t')
+      .leftJoin('g_users as c', 'c.id', 't.createdBy')
+      .leftJoin('g_users as u', 'u.id', 't.updatedBy')
       .select([
-        "t.*",
-        "c.name as createdByName",
-        "c.email as createdByEmail",
-        "u.name as updatedByName",
-        "u.email as updatedByEmail",
+        't.*',
+        'c.name as createdByName',
+        'c.email as createdByEmail',
+        'u.name as updatedByName',
+        'u.email as updatedByEmail',
       ])
-      .orderBy("t.createdAt", "desc"); // Sort by most recent first
+      .orderBy('t.createdAt', 'desc'); // Sort by most recent first
   }
 
   static async findById(id: number): Promise<TagAttributes | null> {
-    const row = await db("g_tags").where("id", id).first();
+    const row = await db('g_tags').where('id', id).first();
     return row || null;
   }
 
   static async findByName(name: string): Promise<TagAttributes | null> {
-    const row = await db("g_tags").where("name", name).first();
+    const row = await db('g_tags').where('name', name).first();
     return row || null;
   }
 
   static async upsertByName(data: CreateTagData): Promise<TagAttributes> {
     const existing = await this.findByName(data.name);
     if (existing) {
-      await db("g_tags")
-        .where("id", existing.id)
+      await db('g_tags')
+        .where('id', existing.id)
         .update({
           color: data.color || existing.color,
           description: data.description ?? existing.description ?? null,
@@ -68,9 +68,9 @@ export default class TagModel {
         });
       return (await this.findById(existing.id))!;
     }
-    const [id] = await db("g_tags").insert({
+    const [id] = await db('g_tags').insert({
       name: data.name,
-      color: data.color || "#607D8B",
+      color: data.color || '#607D8B',
       description: data.description || null,
       createdBy: data.createdBy ?? null,
     });
@@ -80,18 +80,15 @@ export default class TagModel {
   static async create(data: CreateTagData): Promise<TagAttributes> {
     const insertData = {
       name: data.name,
-      color: data.color || "#607D8B",
+      color: data.color || '#607D8B',
       description: data.description || null,
       createdBy: data.createdBy ?? null,
     };
-    const [id] = await db("g_tags").insert(insertData);
+    const [id] = await db('g_tags').insert(insertData);
     return (await this.findById(id))!;
   }
 
-  static async update(
-    id: number,
-    data: UpdateTagData,
-  ): Promise<TagAttributes | null> {
+  static async update(id: number, data: UpdateTagData): Promise<TagAttributes | null> {
     const updateData: any = {};
     Object.entries(data).forEach(([k, v]) => {
       if (v !== undefined) {
@@ -105,12 +102,12 @@ export default class TagModel {
 
     updateData.updatedAt = db.fn.now();
 
-    await db("g_tags").where("id", id).update(updateData);
+    await db('g_tags').where('id', id).update(updateData);
 
     return this.findById(id);
   }
 
   static async delete(id: number): Promise<void> {
-    await db("g_tags").where("id", id).del();
+    await db('g_tags').where('id', id).del();
   }
 }

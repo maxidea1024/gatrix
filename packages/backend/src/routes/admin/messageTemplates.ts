@@ -1,69 +1,69 @@
-﻿import { Router } from "express";
-import { authenticate, requireAdmin } from "../../middleware/auth";
-import { MessageTemplateController } from "../../controllers/MessageTemplateController";
-import { auditLog } from "../../middleware/auditLog";
+﻿import { Router } from 'express';
+import { authenticate, requireAdmin } from '../../middleware/auth';
+import { MessageTemplateController } from '../../controllers/MessageTemplateController';
+import { auditLog } from '../../middleware/auditLog';
 
 const router = Router();
 
 router.use(authenticate as any);
 router.use(requireAdmin as any);
 
-router.get("/", MessageTemplateController.list as any);
-router.get("/:id", MessageTemplateController.get as any);
+router.get('/', MessageTemplateController.list as any);
+router.get('/:id', MessageTemplateController.get as any);
 router.post(
-  "/",
+  '/',
   auditLog({
-    action: "message_template_create",
-    resourceType: "message_template",
+    action: 'message_template_create',
+    resourceType: 'message_template',
     // 硫붿떆吏 ?쒗뵆由??앹꽦 ?쒖뿉??ID媛 ?꾩쭅 ?놁쑝誘濡?getResourceId ?쒓굅
     getNewValues: (req) => req.body,
     getResourceIdFromResponse: (res: any) => res?.data?.id,
   }) as any,
-  MessageTemplateController.create as any,
+  MessageTemplateController.create as any
 );
 router.post(
-  "/bulk-delete",
+  '/bulk-delete',
   auditLog({
-    action: "message_template_bulk_delete",
-    resourceType: "message_template",
+    action: 'message_template_bulk_delete',
+    resourceType: 'message_template',
     getNewValues: (req) => req.body,
   }) as any,
-  MessageTemplateController.bulkDelete as any,
+  MessageTemplateController.bulkDelete as any
 );
 router.put(
-  "/:id",
+  '/:id',
   auditLog({
-    action: "message_template_update",
-    resourceType: "message_template",
+    action: 'message_template_update',
+    resourceType: 'message_template',
     getResourceId: (req: any) => req.params?.id,
     getNewValues: (req) => req.body,
   }) as any,
-  MessageTemplateController.update as any,
+  MessageTemplateController.update as any
 );
 router.delete(
-  "/:id",
+  '/:id',
   auditLog({
-    action: "message_template_delete",
-    resourceType: "message_template",
+    action: 'message_template_delete',
+    resourceType: 'message_template',
     getResourceId: (req: any) => req.params?.id,
     getNewValues: (req: any) => ({
       id: req.params?.id,
     }),
   }) as any,
-  MessageTemplateController.remove as any,
+  MessageTemplateController.remove as any
 );
 
 // ?쒓렇 愿???쇱슦??(愿由ъ옄留?
-router.get("/:id/tags", MessageTemplateController.getTags as any);
+router.get('/:id/tags', MessageTemplateController.getTags as any);
 router.put(
-  "/:id/tags",
+  '/:id/tags',
   auditLog({
-    action: "message_template_set_tags",
-    resourceType: "message_template",
+    action: 'message_template_set_tags',
+    resourceType: 'message_template',
     getResourceId: (req: any) => req.params?.id,
     getNewValues: (req) => req.body,
   }) as any,
-  MessageTemplateController.setTags as any,
+  MessageTemplateController.setTags as any
 );
 
 export default router;

@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import logger from "../config/logger";
+import { Request, Response } from 'express';
+import logger from '../config/logger';
 
 export interface ServerChatRequest extends Request {
   apiToken?: any;
@@ -19,7 +19,7 @@ class ServerChatController {
       if (!serverId || !host || !port) {
         return res.status(400).json({
           success: false,
-          error: "serverId, host, and port are required",
+          error: 'serverId, host, and port are required',
         });
       }
 
@@ -30,7 +30,7 @@ class ServerChatController {
         port,
         maxConnections: maxConnections || 10000,
         capabilities: capabilities || [],
-        status: "active",
+        status: 'active',
         registeredAt: new Date(),
         lastHeartbeat: new Date(),
         apiTokenId: req.apiToken?.id,
@@ -47,18 +47,18 @@ class ServerChatController {
 
       res.json({
         success: true,
-        message: "Chat server registered successfully",
+        message: 'Chat server registered successfully',
         data: {
           serverId,
-          status: "registered",
+          status: 'registered',
           registeredAt: serverInfo.registeredAt,
         },
       });
     } catch (error) {
-      logger.error("Failed to register chat server:", error);
+      logger.error('Failed to register chat server:', error);
       res.status(500).json({
         success: false,
-        error: "Internal server error",
+        error: 'Internal server error',
       });
     }
   }
@@ -71,7 +71,7 @@ class ServerChatController {
       if (!serverId) {
         return res.status(400).json({
           success: false,
-          error: "serverId is required",
+          error: 'serverId is required',
         });
       }
 
@@ -80,7 +80,7 @@ class ServerChatController {
       if (!serverInfo) {
         return res.status(404).json({
           success: false,
-          error: "Chat server not found",
+          error: 'Chat server not found',
         });
       }
 
@@ -92,18 +92,18 @@ class ServerChatController {
 
       res.json({
         success: true,
-        message: "Chat server unregistered successfully",
+        message: 'Chat server unregistered successfully',
         data: {
           serverId,
-          status: "unregistered",
+          status: 'unregistered',
           unregisteredAt: new Date(),
         },
       });
     } catch (error) {
-      logger.error("Failed to unregister chat server:", error);
+      logger.error('Failed to unregister chat server:', error);
       res.status(500).json({
         success: false,
-        error: "Internal server error",
+        error: 'Internal server error',
       });
     }
   }
@@ -111,23 +111,13 @@ class ServerChatController {
   // 채팅 통계 보고
   static async reportStats(req: ServerChatRequest, res: Response) {
     try {
-      const {
-        serverId,
-        connectedUsers,
-        activeChannels,
-        messagesPerSecond,
-        timestamp,
-      } = req.body;
+      const { serverId, connectedUsers, activeChannels, messagesPerSecond, timestamp } = req.body;
 
       // 필수 필드 검증
-      if (
-        !serverId ||
-        connectedUsers === undefined ||
-        activeChannels === undefined
-      ) {
+      if (!serverId || connectedUsers === undefined || activeChannels === undefined) {
         return res.status(400).json({
           success: false,
-          error: "serverId, connectedUsers, and activeChannels are required",
+          error: 'serverId, connectedUsers, and activeChannels are required',
         });
       }
 
@@ -136,7 +126,7 @@ class ServerChatController {
       if (!serverInfo) {
         return res.status(404).json({
           success: false,
-          error: "Chat server not registered",
+          error: 'Chat server not registered',
         });
       }
 
@@ -164,17 +154,17 @@ class ServerChatController {
 
       res.json({
         success: true,
-        message: "Chat statistics reported successfully",
+        message: 'Chat statistics reported successfully',
         data: {
           serverId,
           reportedAt: statsData.reportedAt,
         },
       });
     } catch (error) {
-      logger.error("Failed to report chat stats:", error);
+      logger.error('Failed to report chat stats:', error);
       res.status(500).json({
         success: false,
-        error: "Internal server error",
+        error: 'Internal server error',
       });
     }
   }
@@ -188,7 +178,7 @@ class ServerChatController {
       if (!userId || !channelId || messageCount === undefined) {
         return res.status(400).json({
           success: false,
-          error: "userId, channelId, and messageCount are required",
+          error: 'userId, channelId, and messageCount are required',
         });
       }
 
@@ -202,7 +192,7 @@ class ServerChatController {
 
       res.json({
         success: true,
-        message: "Chat activity reported successfully",
+        message: 'Chat activity reported successfully',
         data: {
           userId,
           channelId,
@@ -210,10 +200,10 @@ class ServerChatController {
         },
       });
     } catch (error) {
-      logger.error("Failed to report chat activity:", error);
+      logger.error('Failed to report chat activity:', error);
       res.status(500).json({
         success: false,
-        error: "Internal server error",
+        error: 'Internal server error',
       });
     }
   }
@@ -231,10 +221,10 @@ class ServerChatController {
         },
       });
     } catch (error) {
-      logger.error("Failed to get registered servers:", error);
+      logger.error('Failed to get registered servers:', error);
       res.status(500).json({
         success: false,
-        error: "Internal server error",
+        error: 'Internal server error',
       });
     }
   }

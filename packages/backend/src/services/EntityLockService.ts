@@ -4,9 +4,9 @@
  * Provides soft-lock functionality for entities being edited.
  * Uses Redis with TTL for automatic expiration.
  */
-import redisClient from "../config/redis";
-import logger from "../config/logger";
-import { pubSubService } from "./PubSubService";
+import redisClient from '../config/redis';
+import logger from '../config/logger';
+import { pubSubService } from './PubSubService';
 
 interface LockInfo {
   userId: number;
@@ -20,17 +20,13 @@ interface LockInfo {
 const DEFAULT_LOCK_TTL_SECONDS = 5 * 60;
 
 // Lock key prefix
-const LOCK_KEY_PREFIX = "entity_lock";
+const LOCK_KEY_PREFIX = 'entity_lock';
 
 class EntityLockService {
   /**
    * Generate Redis key for entity lock
    */
-  private getLockKey(
-    table: string,
-    entityId: string | number,
-    environment: string,
-  ): string {
+  private getLockKey(table: string, entityId: string | number, environment: string): string {
     return `${LOCK_KEY_PREFIX}:${environment}:${table}:${entityId}`;
   }
 
@@ -45,7 +41,7 @@ class EntityLockService {
     userId: number,
     userName: string,
     userEmail: string,
-    ttlSeconds: number = DEFAULT_LOCK_TTL_SECONDS,
+    ttlSeconds: number = DEFAULT_LOCK_TTL_SECONDS
   ): Promise<{ success: boolean; existingLock?: LockInfo }> {
     const key = this.getLockKey(table, entityId, environment);
 
@@ -86,7 +82,7 @@ class EntityLockService {
       logger.debug(`[EntityLock] Lock acquired: ${key} by user ${userId}`);
       return { success: true };
     } catch (error) {
-      logger.error("[EntityLock] Failed to acquire lock", error);
+      logger.error('[EntityLock] Failed to acquire lock', error);
       // On error, allow editing (fail open)
       return { success: true };
     }
@@ -102,7 +98,7 @@ class EntityLockService {
     userId: number,
     userName: string,
     userEmail: string,
-    ttlSeconds: number = DEFAULT_LOCK_TTL_SECONDS,
+    ttlSeconds: number = DEFAULT_LOCK_TTL_SECONDS
   ): Promise<boolean> {
     const key = this.getLockKey(table, entityId, environment);
 
@@ -129,7 +125,7 @@ class EntityLockService {
       if (previousOwner && previousOwner.userId !== userId) {
         try {
           await pubSubService.publishNotification({
-            type: "entity_lock.taken_over",
+            type: 'entity_lock.taken_over',
             data: {
               table,
               entityId: String(entityId),
@@ -147,16 +143,13 @@ class EntityLockService {
             },
           });
         } catch (sseError) {
-          logger.warn(
-            "[EntityLock] Failed to send SSE notification for force takeover",
-            sseError,
-          );
+          logger.warn('[EntityLock] Failed to send SSE notification for force takeover', sseError);
         }
       }
 
       return true;
     } catch (error) {
-      logger.error("[EntityLock] Failed to force acquire lock", error);
+      logger.error('[EntityLock] Failed to force acquire lock', error);
       return false;
     }
   }
@@ -168,7 +161,7 @@ class EntityLockService {
     table: string,
     entityId: string | number,
     environment: string,
-    userId: number,
+    userId: number
   ): Promise<boolean> {
     const key = this.getLockKey(table, entityId, environment);
 
@@ -178,9 +171,7 @@ class EntityLockService {
       if (existingLockStr) {
         const existingLock: LockInfo = JSON.parse(existingLockStr);
         if (existingLock.userId !== userId) {
-          logger.warn(
-            `[EntityLock] Cannot release lock owned by another user: ${key}`,
-          );
+          logger.warn(`[EntityLock] Cannot release lock owned by another user: ${key}`);
           return false;
         }
       }
@@ -191,7 +182,7 @@ class EntityLockService {
       // Send SSE notification for lock release
       try {
         await pubSubService.publishNotification({
-          type: "entity_lock.released",
+          type: 'entity_lock.released',
           data: {
             table,
             entityId: String(entityId),
@@ -200,15 +191,12 @@ class EntityLockService {
           },
         });
       } catch (sseError) {
-        logger.warn(
-          "[EntityLock] Failed to send SSE notification for lock release",
-          sseError,
-        );
+        logger.warn('[EntityLock] Failed to send SSE notification for lock release', sseError);
       }
 
       return true;
     } catch (error) {
-      logger.error("[EntityLock] Failed to release lock", error);
+      logger.error('[EntityLock] Failed to release lock', error);
       return false;
     }
   }
@@ -219,7 +207,7 @@ class EntityLockService {
   async checkLock(
     table: string,
     entityId: string | number,
-    environment: string,
+    environment: string
   ): Promise<LockInfo | null> {
     const key = this.getLockKey(table, entityId, environment);
 
@@ -230,7 +218,7 @@ class EntityLockService {
       }
       return null;
     } catch (error) {
-      logger.error("[EntityLock] Failed to check lock", error);
+      logger.error('[EntityLock] Failed to check lock', error);
       return null;
     }
   }
@@ -243,7 +231,7 @@ class EntityLockService {
     entityId: string | number,
     environment: string,
     userId: number,
-    ttlSeconds: number = DEFAULT_LOCK_TTL_SECONDS,
+    ttlSeconds: number = DEFAULT_LOCK_TTL_SECONDS
   ): Promise<boolean> {
     const key = this.getLockKey(table, entityId, environment);
 
@@ -264,7 +252,7 @@ class EntityLockService {
 
       return true;
     } catch (error) {
-      logger.error("[EntityLock] Failed to extend lock", error);
+      logger.error('[EntityLock] Failed to extend lock', error);
       return false;
     }
   }
@@ -275,30 +263,28 @@ class EntityLockService {
   async checkPendingCR(
     table: string,
     entityId: string | number,
-    environment: string,
+    environment: string
   ): Promise<{ hasPending: boolean; crId?: string; crTitle?: string }> {
     // Import dynamically to avoid circular dependency
-    const { ChangeRequest } = await import("../models/ChangeRequest");
-    const { ChangeItem } = await import("../models/ChangeItem");
+    const { ChangeRequest } = await import('../models/ChangeRequest');
+    const { ChangeItem } = await import('../models/ChangeItem');
 
     try {
       // Find open or approved CRs that affect this entity
       const pendingItem = await ChangeItem.query()
-        .where("targetTable", table)
-        .where("targetId", String(entityId))
-        .whereIn("opType", ["UPDATE", "DELETE"])
+        .where('targetTable', table)
+        .where('targetId', String(entityId))
+        .whereIn('opType', ['UPDATE', 'DELETE'])
         .whereExists(
           ChangeRequest.query()
-            .whereRaw("g_change_requests.id = g_change_items.changeRequestId")
-            .where("environment", environment)
-            .whereIn("status", ["open", "approved"]),
+            .whereRaw('g_change_requests.id = g_change_items.changeRequestId')
+            .where('environment', environment)
+            .whereIn('status', ['open', 'approved'])
         )
         .first();
 
       if (pendingItem) {
-        const cr = await ChangeRequest.query().findById(
-          pendingItem.changeRequestId,
-        );
+        const cr = await ChangeRequest.query().findById(pendingItem.changeRequestId);
 
         return {
           hasPending: true,
@@ -309,7 +295,7 @@ class EntityLockService {
 
       return { hasPending: false };
     } catch (error) {
-      logger.error("[EntityLock] Failed to check pending CR", error);
+      logger.error('[EntityLock] Failed to check pending CR', error);
       return { hasPending: false };
     }
   }

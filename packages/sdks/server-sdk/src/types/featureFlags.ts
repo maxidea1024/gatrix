@@ -4,44 +4,39 @@
 
 // ==================== Core Types ====================
 
-export type FlagType =
-  | "release"
-  | "experiment"
-  | "operational"
-  | "killSwitch"
-  | "permission";
-export type PayloadType = "string" | "number" | "json";
-export type FieldType = "string" | "number" | "boolean" | "date" | "semver";
+export type FlagType = 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission';
+export type PayloadType = 'string' | 'number' | 'json';
+export type FieldType = 'string' | 'number' | 'boolean' | 'date' | 'semver';
 
 export type ConstraintOperator =
   // String operators
-  | "str_eq"
-  | "str_neq"
-  | "str_contains"
-  | "str_starts_with"
-  | "str_ends_with"
-  | "str_in"
-  | "str_not_in"
-  | "str_regex"
+  | 'str_eq'
+  | 'str_neq'
+  | 'str_contains'
+  | 'str_starts_with'
+  | 'str_ends_with'
+  | 'str_in'
+  | 'str_not_in'
+  | 'str_regex'
   // Number operators
-  | "num_eq"
-  | "num_gt"
-  | "num_gte"
-  | "num_lt"
-  | "num_lte"
+  | 'num_eq'
+  | 'num_gt'
+  | 'num_gte'
+  | 'num_lt'
+  | 'num_lte'
   // Boolean operators
-  | "bool_is"
+  | 'bool_is'
   // Date operators
-  | "date_gt"
-  | "date_gte"
-  | "date_lt"
-  | "date_lte"
+  | 'date_gt'
+  | 'date_gte'
+  | 'date_lt'
+  | 'date_lte'
   // Semver operators
-  | "semver_eq"
-  | "semver_gt"
-  | "semver_gte"
-  | "semver_lt"
-  | "semver_lte";
+  | 'semver_eq'
+  | 'semver_gt'
+  | 'semver_gte'
+  | 'semver_lt'
+  | 'semver_lte';
 
 // ==================== Evaluation Context ====================
 
@@ -132,14 +127,14 @@ export interface FeatureFlag {
 // ==================== Evaluation Result ====================
 
 export type EvaluationReason =
-  | "enabled"
-  | "disabled"
-  | "strategy_match"
-  | "constraint_match"
-  | "rollout"
-  | "default"
-  | "not_found"
-  | "error";
+  | 'enabled'
+  | 'disabled'
+  | 'strategy_match'
+  | 'constraint_match'
+  | 'rollout'
+  | 'default'
+  | 'not_found'
+  | 'error';
 
 export interface EvaluationResult {
   flagName: string;

@@ -1,7 +1,7 @@
-import { Router } from "express";
-import { UserController } from "../controllers/UserController";
-import { authenticate } from "../middleware/auth";
-import { generalLimiter } from "../middleware/rateLimiter";
+import { Router } from 'express';
+import { UserController } from '../controllers/UserController';
+import { authenticate } from '../middleware/auth';
+import { generalLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 /**
@@ -158,23 +158,23 @@ router.use(authenticate as any);
 
 // 사용자 검색 (채팅 시스템용)
 router.get(
-  "/search",
+  '/search',
   generalLimiter as any, // Rate limiting
-  UserController.searchUsers,
+  UserController.searchUsers
 );
 
 // 현재 사용자 정보 조회
 router.get(
-  "/me",
+  '/me',
   generalLimiter as any, // Rate limiting
-  UserController.getCurrentUser,
+  UserController.getCurrentUser
 );
 
 // 현재 사용자 정보 업데이트
 router.put(
-  "/me",
+  '/me',
   generalLimiter as any, // Rate limiting
-  UserController.updateCurrentUser,
+  UserController.updateCurrentUser
 );
 
 export default router;

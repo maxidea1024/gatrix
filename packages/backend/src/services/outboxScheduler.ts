@@ -4,10 +4,10 @@
  * Schedules periodic processing of outbox events.
  * Uses BullMQ to ensure only one instance processes at a time across all backend instances.
  */
-import logger from "../config/logger";
-import { queueService } from "./QueueService";
-import { OutboxService } from "./OutboxService";
-import { LockService } from "./LockService";
+import logger from '../config/logger';
+import { queueService } from './QueueService';
+import { OutboxService } from './OutboxService';
+import { LockService } from './LockService';
 
 /**
  * Initialize outbox processing job
@@ -17,69 +17,61 @@ export async function initializeOutboxProcessorJob(): Promise<void> {
   const batchSize = 20;
   const cleanupRetentionDays = 7;
 
-  logger.info("Initializing outbox event processor job");
+  logger.info('Initializing outbox event processor job');
 
   try {
     // Check if job already exists
-    const repeatables = await queueService.listRepeatable("scheduler");
-    const processorExists = repeatables.some(
-      (r) => r.name === "outbox:process",
-    );
-    const cleanupExists = repeatables.some((r) => r.name === "outbox:cleanup");
-    const lockCleanupExists = repeatables.some(
-      (r) => r.name === "lock:cleanup",
-    );
+    const repeatables = await queueService.listRepeatable('scheduler');
+    const processorExists = repeatables.some((r) => r.name === 'outbox:process');
+    const cleanupExists = repeatables.some((r) => r.name === 'outbox:cleanup');
+    const lockCleanupExists = repeatables.some((r) => r.name === 'lock:cleanup');
 
     // Register outbox processor job - runs every 30 seconds
     if (!processorExists) {
       await queueService.addJob(
-        "scheduler",
-        "outbox:process",
+        'scheduler',
+        'outbox:process',
         { batchSize },
         {
-          repeat: { pattern: "*/30 * * * * *" }, // Every 30 seconds
-        },
+          repeat: { pattern: '*/30 * * * * *' }, // Every 30 seconds
+        }
       );
-      logger.info(
-        "Registered repeatable job: outbox:process (every 30 seconds)",
-      );
+      logger.info('Registered repeatable job: outbox:process (every 30 seconds)');
     } else {
-      logger.info("Repeatable job already exists: outbox:process");
+      logger.info('Repeatable job already exists: outbox:process');
     }
 
     // Register outbox cleanup job - runs daily at 4:00 AM
     if (!cleanupExists) {
       await queueService.addJob(
-        "scheduler",
-        "outbox:cleanup",
+        'scheduler',
+        'outbox:cleanup',
         { retentionDays: cleanupRetentionDays },
         {
-          repeat: { pattern: "0 4 * * *" }, // Every day at 4:00 AM
-        },
+          repeat: { pattern: '0 4 * * *' }, // Every day at 4:00 AM
+        }
       );
-      logger.info(
-        "Registered repeatable job: outbox:cleanup (daily at 4:00 AM)",
-      );
+      logger.info('Registered repeatable job: outbox:cleanup (daily at 4:00 AM)');
     } else {
-      logger.info("Repeatable job already exists: outbox:cleanup");
+      logger.info('Repeatable job already exists: outbox:cleanup');
     }
 
     // Register lock cleanup job - runs every 5 minutes
     if (!lockCleanupExists) {
       await queueService.addJob(
-        "scheduler",
-        "lock:cleanup",
+        'scheduler',
+        'lock:cleanup',
         {},
         {
-          repeat: { pattern: "*/5 * * * *" }, // Every 5 minutes
-        },
+          repeat: { pattern: '*/5 * * * *' }, // Every 5 minutes
+        }
       );
-      logger.info("Registered repeatable job: lock:cleanup (every 5 minutes)");
+      logger.info('Registered repeatable job: lock:cleanup (every 5 minutes)');
     } else {
-      logger.info("Repeatable job already exists: lock:cleanup");
+      logger.info('Repeatable job already exists: lock:cleanup');
     }
   } catch (error) {
-    logger.error("Failed to register outbox processor jobs:", error);
+    logger.error('Failed to register outbox processor jobs:', error);
   }
 }
 
@@ -95,7 +87,7 @@ export async function processOutboxJob(batchSize: number): Promise<number> {
     }
     return processed;
   } catch (error) {
-    logger.error("Failed to process outbox events:", error);
+    logger.error('Failed to process outbox events:', error);
     throw error;
   }
 }
@@ -112,7 +104,7 @@ export async function cleanupOutboxJob(retentionDays: number): Promise<number> {
     }
     return deleted;
   } catch (error) {
-    logger.error("Failed to cleanup outbox events:", error);
+    logger.error('Failed to cleanup outbox events:', error);
     throw error;
   }
 }
@@ -129,7 +121,7 @@ export async function cleanupLocksJob(): Promise<number> {
     }
     return deleted;
   } catch (error) {
-    logger.error("Failed to cleanup expired locks:", error);
+    logger.error('Failed to cleanup expired locks:', error);
     throw error;
   }
 }

@@ -1,10 +1,10 @@
-import { Model } from "objection";
-import { ChangeRequest } from "./ChangeRequest";
+import { Model } from 'objection';
+import { ChangeRequest } from './ChangeRequest';
 
 /**
  * Operation types for field-level changes
  */
-export type OpType = "SET" | "DEL" | "MOD";
+export type OpType = 'SET' | 'DEL' | 'MOD';
 
 /**
  * Single field-level operation
@@ -19,10 +19,10 @@ export interface FieldOp {
 /**
  * Entity-level operation type
  */
-export type EntityOpType = "CREATE" | "UPDATE" | "DELETE";
+export type EntityOpType = 'CREATE' | 'UPDATE' | 'DELETE';
 
 export class ChangeItem extends Model {
-  static tableName = "g_change_items";
+  static tableName = 'g_change_items';
 
   id!: string;
   changeRequestId!: string;
@@ -39,26 +39,26 @@ export class ChangeItem extends Model {
 
   static get jsonSchema() {
     return {
-      type: "object",
-      required: ["changeRequestId", "targetTable", "targetId", "ops"],
+      type: 'object',
+      required: ['changeRequestId', 'targetTable', 'targetId', 'ops'],
       properties: {
-        id: { type: "string" },
-        changeRequestId: { type: "string" },
-        actionGroupId: { type: ["string", "null"] },
-        targetTable: { type: "string", maxLength: 100 },
-        targetId: { type: "string", maxLength: 255 },
-        entityVersion: { type: ["integer", "null"] },
-        opType: { type: "string", enum: ["CREATE", "UPDATE", "DELETE"] },
+        id: { type: 'string' },
+        changeRequestId: { type: 'string' },
+        actionGroupId: { type: ['string', 'null'] },
+        targetTable: { type: 'string', maxLength: 100 },
+        targetId: { type: 'string', maxLength: 255 },
+        entityVersion: { type: ['integer', 'null'] },
+        opType: { type: 'string', enum: ['CREATE', 'UPDATE', 'DELETE'] },
         ops: {
-          type: "array",
+          type: 'array',
           items: {
-            type: "object",
-            required: ["path", "opType"],
+            type: 'object',
+            required: ['path', 'opType'],
             properties: {
-              path: { type: "string" },
+              path: { type: 'string' },
               oldValue: {},
               newValue: {},
-              opType: { type: "string", enum: ["SET", "DEL", "MOD"] },
+              opType: { type: 'string', enum: ['SET', 'DEL', 'MOD'] },
             },
           },
         },
@@ -68,27 +68,27 @@ export class ChangeItem extends Model {
 
   // JSON parsing for ops column
   static get jsonAttributes() {
-    return ["ops"];
+    return ['ops'];
   }
 
   static get relationMappings() {
-    const { ActionGroup } = require("./ActionGroup");
+    const { ActionGroup } = require('./ActionGroup');
 
     return {
       changeRequest: {
         relation: Model.BelongsToOneRelation,
         modelClass: ChangeRequest,
         join: {
-          from: "g_change_items.changeRequestId",
-          to: "g_change_requests.id",
+          from: 'g_change_items.changeRequestId',
+          to: 'g_change_requests.id',
         },
       },
       actionGroup: {
         relation: Model.BelongsToOneRelation,
         modelClass: ActionGroup,
         join: {
-          from: "g_change_items.actionGroupId",
-          to: "g_action_groups.id",
+          from: 'g_change_items.actionGroupId',
+          to: 'g_action_groups.id',
         },
       },
     };

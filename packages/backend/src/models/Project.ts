@@ -1,6 +1,6 @@
-import { Model } from "objection";
-import { User } from "./User";
-import { ulid } from "ulid";
+import { Model } from 'objection';
+import { User } from './User';
+import { ulid } from 'ulid';
 
 export interface ProjectData {
   id?: string; // ULID (26 characters)
@@ -16,7 +16,7 @@ export interface ProjectData {
 }
 
 export class Project extends Model implements ProjectData {
-  static tableName = "g_projects";
+  static tableName = 'g_projects';
 
   id!: string; // ULID
   projectName!: string;
@@ -35,53 +35,53 @@ export class Project extends Model implements ProjectData {
 
   static get jsonSchema() {
     return {
-      type: "object",
-      required: ["projectName", "displayName", "createdBy"],
+      type: 'object',
+      required: ['projectName', 'displayName', 'createdBy'],
       properties: {
-        id: { type: "string", minLength: 26, maxLength: 26 }, // ULID
+        id: { type: 'string', minLength: 26, maxLength: 26 }, // ULID
         projectName: {
-          type: "string",
+          type: 'string',
           minLength: 1,
           maxLength: 100,
-          pattern: "^[a-z0-9_-]+$",
+          pattern: '^[a-z0-9_-]+$',
         },
-        displayName: { type: "string", minLength: 1, maxLength: 200 },
-        description: { type: ["string", "null"], maxLength: 1000 },
-        isDefault: { type: "boolean" },
-        isActive: { type: "boolean" },
-        createdBy: { type: "integer" },
-        updatedBy: { type: ["integer", "null"] },
-        createdAt: { type: "string", format: "date-time" },
-        updatedAt: { type: "string", format: "date-time" },
+        displayName: { type: 'string', minLength: 1, maxLength: 200 },
+        description: { type: ['string', 'null'], maxLength: 1000 },
+        isDefault: { type: 'boolean' },
+        isActive: { type: 'boolean' },
+        createdBy: { type: 'integer' },
+        updatedBy: { type: ['integer', 'null'] },
+        createdAt: { type: 'string', format: 'date-time' },
+        updatedAt: { type: 'string', format: 'date-time' },
       },
     };
   }
 
   static get relationMappings() {
-    const { Environment } = require("./Environment");
+    const { Environment } = require('./Environment');
     return {
       creator: {
         relation: Model.BelongsToOneRelation,
         modelClass: User,
         join: {
-          from: "g_projects.createdBy",
-          to: "g_users.id",
+          from: 'g_projects.createdBy',
+          to: 'g_users.id',
         },
       },
       updater: {
         relation: Model.BelongsToOneRelation,
         modelClass: User,
         join: {
-          from: "g_projects.updatedBy",
-          to: "g_users.id",
+          from: 'g_projects.updatedBy',
+          to: 'g_users.id',
         },
       },
       environments: {
         relation: Model.HasManyRelation,
         modelClass: Environment,
         join: {
-          from: "g_projects.id",
-          to: "g_environments.projectId",
+          from: 'g_projects.id',
+          to: 'g_environments.projectId',
         },
       },
     };
@@ -103,14 +103,14 @@ export class Project extends Model implements ProjectData {
    * Get default project
    */
   static async getDefault(): Promise<Project | undefined> {
-    return await this.query().where("isDefault", true).first();
+    return await this.query().where('isDefault', true).first();
   }
 
   /**
    * Get project by name
    */
   static async getByName(projectName: string): Promise<Project | undefined> {
-    return await this.query().where("projectName", projectName).first();
+    return await this.query().where('projectName', projectName).first();
   }
 
   /**
@@ -118,9 +118,9 @@ export class Project extends Model implements ProjectData {
    */
   static async getAllActive(): Promise<Project[]> {
     return await this.query()
-      .where("isActive", true)
-      .orderBy("isDefault", "desc")
-      .orderBy("displayName");
+      .where('isActive', true)
+      .orderBy('isDefault', 'desc')
+      .orderBy('displayName');
   }
 
   /**
@@ -134,11 +134,11 @@ export class Project extends Model implements ProjectData {
    * Create new project
    */
   static async createProject(
-    data: Omit<ProjectData, "id" | "createdAt" | "updatedAt">,
+    data: Omit<ProjectData, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<Project> {
     if (!this.isValidProjectName(data.projectName)) {
       throw new Error(
-        "Invalid project name. Use only lowercase letters, numbers, underscore, and hyphen.",
+        'Invalid project name. Use only lowercase letters, numbers, underscore, and hyphen.'
       );
     }
 

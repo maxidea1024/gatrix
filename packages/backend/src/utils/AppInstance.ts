@@ -1,6 +1,6 @@
-import { ulid } from "ulid";
-import os from "os";
-import logger from "../config/logger";
+import { ulid } from 'ulid';
+import os from 'os';
+import logger from '../config/logger';
 
 export interface AppInstanceInfo {
   instanceId: string;
@@ -23,7 +23,7 @@ class AppInstance {
   private readonly _instanceInfo: AppInstanceInfo;
 
   private constructor() {
-    const packageJson = require("../../package.json");
+    const packageJson = require('../../package.json');
 
     this._instanceInfo = {
       instanceId: ulid(),
@@ -31,13 +31,13 @@ class AppInstance {
       hostname: os.hostname(),
       platform: `${os.platform()}-${os.arch()}`,
       nodeVersion: process.version,
-      appVersion: packageJson.version || "1.0.0",
-      environment: process.env.NODE_ENV || "development",
+      appVersion: packageJson.version || '1.0.0',
+      environment: process.env.NODE_ENV || 'development',
       startedAt: new Date(),
       uptime: 0,
     };
 
-    logger.info("App instance initialized", {
+    logger.info('App instance initialized', {
       instanceId: this._instanceInfo.instanceId,
       processId: this._instanceInfo.processId,
       hostname: this._instanceInfo.hostname,
@@ -69,9 +69,7 @@ class AppInstance {
   public get info(): AppInstanceInfo {
     return {
       ...this._instanceInfo,
-      uptime: Math.floor(
-        (Date.now() - this._instanceInfo.startedAt.getTime()) / 1000,
-      ),
+      uptime: Math.floor((Date.now() - this._instanceInfo.startedAt.getTime()) / 1000),
     };
   }
 
@@ -104,7 +102,7 @@ class AppInstance {
     const info = this.info;
     return {
       instanceId: info.instanceId,
-      status: "healthy",
+      status: 'healthy',
       uptime: info.uptime,
       memory: process.memoryUsage(),
       environment: info.environment,

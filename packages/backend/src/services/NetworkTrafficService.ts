@@ -3,7 +3,7 @@
  * Records and retrieves SDK API traffic data with 1-hour buckets
  */
 
-import db from "../config/knex";
+import db from '../config/knex';
 
 export interface TrafficRecord {
   id: number;
@@ -40,7 +40,7 @@ class NetworkTrafficService {
   private getBucket(date: Date = new Date()): string {
     const d = new Date(date);
     d.setMinutes(0, 0, 0);
-    return d.toISOString().slice(0, 19).replace("T", " ");
+    return d.toISOString().slice(0, 19).replace('T', ' ');
   }
 
   /**
@@ -50,7 +50,7 @@ class NetworkTrafficService {
   async recordTraffic(
     environment: string,
     appName: string,
-    endpoint: "features" | "segments",
+    endpoint: 'features' | 'segments'
   ): Promise<void> {
     const bucket = this.getBucket();
 
@@ -59,11 +59,11 @@ class NetworkTrafficService {
         `INSERT INTO NetworkTraffic (environment, appName, endpoint, trafficBucket, requestCount, createdAt, updatedAt)
                  VALUES (?, ?, ?, ?, 1, UTC_TIMESTAMP(), UTC_TIMESTAMP())
                  ON DUPLICATE KEY UPDATE requestCount = requestCount + 1, updatedAt = UTC_TIMESTAMP()`,
-        [environment, appName || "unknown", endpoint, bucket],
+        [environment, appName || 'unknown', endpoint, bucket]
       );
     } catch (error) {
       // Log but don't throw - this is fire-and-forget
-      console.error("[NetworkTrafficService] Failed to record traffic:", error);
+      console.error('[NetworkTrafficService] Failed to record traffic:', error);
     }
   }
 
@@ -84,32 +84,30 @@ class NetworkTrafficService {
       totalCount: number;
     }[]
   > {
-    let query = db("NetworkTraffic")
+    let query = db('NetworkTraffic')
       .select(
-        "trafficBucket as bucket",
+        'trafficBucket as bucket',
         db.raw("DATE_FORMAT(trafficBucket, '%m/%d %H:00') as displayTime"),
         db.raw(
-          "SUM(CASE WHEN endpoint = 'features' THEN requestCount ELSE 0 END) as featuresCount",
+          "SUM(CASE WHEN endpoint = 'features' THEN requestCount ELSE 0 END) as featuresCount"
         ),
         db.raw(
-          "SUM(CASE WHEN endpoint = 'segments' THEN requestCount ELSE 0 END) as segmentsCount",
+          "SUM(CASE WHEN endpoint = 'segments' THEN requestCount ELSE 0 END) as segmentsCount"
         ),
-        db.raw("SUM(requestCount) as totalCount"),
+        db.raw('SUM(requestCount) as totalCount')
       )
-      .where("trafficBucket", ">=", params.startDate)
-      .where("trafficBucket", "<=", params.endDate);
+      .where('trafficBucket', '>=', params.startDate)
+      .where('trafficBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn("environment", params.environments);
+      query = query.whereIn('environment', params.environments);
     }
 
     if (params.appNames && params.appNames.length > 0) {
-      query = query.whereIn("appName", params.appNames);
+      query = query.whereIn('appName', params.appNames);
     }
 
-    const rows = await query
-      .groupBy("trafficBucket")
-      .orderBy("trafficBucket", "asc");
+    const rows = await query.groupBy('trafficBucket').orderBy('trafficBucket', 'asc');
 
     return rows.map((row: any) => ({
       bucket: row.bucket,
@@ -139,34 +137,34 @@ class NetworkTrafficService {
       totalCount: number;
     }[]
   > {
-    let query = db("NetworkTraffic")
+    let query = db('NetworkTraffic')
       .select(
-        "trafficBucket as bucket",
+        'trafficBucket as bucket',
         db.raw("DATE_FORMAT(trafficBucket, '%m/%d %H:00') as displayTime"),
-        "environment",
-        "appName",
+        'environment',
+        'appName',
         db.raw(
-          "SUM(CASE WHEN endpoint = 'features' THEN requestCount ELSE 0 END) as featuresCount",
+          "SUM(CASE WHEN endpoint = 'features' THEN requestCount ELSE 0 END) as featuresCount"
         ),
         db.raw(
-          "SUM(CASE WHEN endpoint = 'segments' THEN requestCount ELSE 0 END) as segmentsCount",
+          "SUM(CASE WHEN endpoint = 'segments' THEN requestCount ELSE 0 END) as segmentsCount"
         ),
-        db.raw("SUM(requestCount) as totalCount"),
+        db.raw('SUM(requestCount) as totalCount')
       )
-      .where("trafficBucket", ">=", params.startDate)
-      .where("trafficBucket", "<=", params.endDate);
+      .where('trafficBucket', '>=', params.startDate)
+      .where('trafficBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn("environment", params.environments);
+      query = query.whereIn('environment', params.environments);
     }
 
     if (params.appNames && params.appNames.length > 0) {
-      query = query.whereIn("appName", params.appNames);
+      query = query.whereIn('appName', params.appNames);
     }
 
     const rows = await query
-      .groupBy("trafficBucket", "environment", "appName")
-      .orderBy("trafficBucket", "asc");
+      .groupBy('trafficBucket', 'environment', 'appName')
+      .orderBy('trafficBucket', 'asc');
 
     return rows.map((row: any) => ({
       bucket: row.bucket,
@@ -198,34 +196,34 @@ class NetworkTrafficService {
       totalCount: number;
     }[]
   > {
-    let query = db("NetworkTraffic")
+    let query = db('NetworkTraffic')
       .select(
-        "trafficBucket as bucket",
+        'trafficBucket as bucket',
         db.raw("DATE_FORMAT(trafficBucket, '%m/%d %H:00') as displayTime"),
-        "environment",
-        "appName",
+        'environment',
+        'appName',
         db.raw(
-          "SUM(CASE WHEN endpoint = 'features' THEN requestCount ELSE 0 END) as featuresCount",
+          "SUM(CASE WHEN endpoint = 'features' THEN requestCount ELSE 0 END) as featuresCount"
         ),
         db.raw(
-          "SUM(CASE WHEN endpoint = 'segments' THEN requestCount ELSE 0 END) as segmentsCount",
+          "SUM(CASE WHEN endpoint = 'segments' THEN requestCount ELSE 0 END) as segmentsCount"
         ),
-        db.raw("SUM(requestCount) as totalCount"),
+        db.raw('SUM(requestCount) as totalCount')
       )
-      .where("trafficBucket", ">=", params.startDate)
-      .where("trafficBucket", "<=", params.endDate);
+      .where('trafficBucket', '>=', params.startDate)
+      .where('trafficBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn("environment", params.environments);
+      query = query.whereIn('environment', params.environments);
     }
 
     if (params.appNames && params.appNames.length > 0) {
-      query = query.whereIn("appName", params.appNames);
+      query = query.whereIn('appName', params.appNames);
     }
 
     const rows = await query
-      .groupBy("trafficBucket", "environment", "appName")
-      .orderBy("trafficBucket", "desc");
+      .groupBy('trafficBucket', 'environment', 'appName')
+      .orderBy('trafficBucket', 'desc');
 
     return rows.map((row: any) => ({
       bucket: row.bucket,
@@ -246,16 +244,16 @@ class NetworkTrafficService {
     startDate: Date;
     endDate: Date;
   }): Promise<string[]> {
-    let query = db("NetworkTraffic")
-      .distinct("appName")
-      .where("trafficBucket", ">=", params.startDate)
-      .where("trafficBucket", "<=", params.endDate);
+    let query = db('NetworkTraffic')
+      .distinct('appName')
+      .where('trafficBucket', '>=', params.startDate)
+      .where('trafficBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn("environment", params.environments);
+      query = query.whereIn('environment', params.environments);
     }
 
-    const rows = await query.orderBy("appName", "asc");
+    const rows = await query.orderBy('appName', 'asc');
 
     return rows.map((row: any) => row.appName);
   }
@@ -269,27 +267,27 @@ class NetworkTrafficService {
     startDate: Date;
     endDate: Date;
   }): Promise<TrafficSummary> {
-    let query = db("NetworkTraffic")
+    let query = db('NetworkTraffic')
       .select(
-        db.raw("COALESCE(SUM(requestCount), 0) as totalRequests"),
+        db.raw('COALESCE(SUM(requestCount), 0) as totalRequests'),
         db.raw(
-          "COALESCE(SUM(CASE WHEN endpoint = 'features' THEN requestCount ELSE 0 END), 0) as featuresCount",
+          "COALESCE(SUM(CASE WHEN endpoint = 'features' THEN requestCount ELSE 0 END), 0) as featuresCount"
         ),
         db.raw(
-          "COALESCE(SUM(CASE WHEN endpoint = 'segments' THEN requestCount ELSE 0 END), 0) as segmentsCount",
+          "COALESCE(SUM(CASE WHEN endpoint = 'segments' THEN requestCount ELSE 0 END), 0) as segmentsCount"
         ),
-        db.raw("COUNT(DISTINCT appName) as activeApplications"),
-        db.raw("COUNT(DISTINCT trafficBucket) as bucketCount"),
+        db.raw('COUNT(DISTINCT appName) as activeApplications'),
+        db.raw('COUNT(DISTINCT trafficBucket) as bucketCount')
       )
-      .where("trafficBucket", ">=", params.startDate)
-      .where("trafficBucket", "<=", params.endDate);
+      .where('trafficBucket', '>=', params.startDate)
+      .where('trafficBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn("environment", params.environments);
+      query = query.whereIn('environment', params.environments);
     }
 
     if (params.appNames && params.appNames.length > 0) {
-      query = query.whereIn("appName", params.appNames);
+      query = query.whereIn('appName', params.appNames);
     }
 
     const rows = await query;
@@ -302,9 +300,7 @@ class NetworkTrafficService {
     };
 
     const bucketCount = Number(row.bucketCount) || 1;
-    const avgRequestsPerHour = Math.round(
-      Number(row.totalRequests) / bucketCount,
-    );
+    const avgRequestsPerHour = Math.round(Number(row.totalRequests) / bucketCount);
 
     return {
       totalRequests: Number(row.totalRequests) || 0,
@@ -322,9 +318,7 @@ class NetworkTrafficService {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
 
-    const result = await db("NetworkTraffic")
-      .where("trafficBucket", "<", cutoffDate)
-      .del();
+    const result = await db('NetworkTraffic').where('trafficBucket', '<', cutoffDate).del();
 
     return result;
   }
@@ -338,21 +332,21 @@ class NetworkTrafficService {
     startDate: Date;
     endDate: Date;
   }): Promise<{ totalEvaluations: number; yesCount: number; noCount: number }> {
-    let query = db("g_feature_metrics")
+    let query = db('g_feature_metrics')
       .select(
-        db.raw("COALESCE(SUM(yesCount + noCount), 0) as totalEvaluations"),
-        db.raw("COALESCE(SUM(yesCount), 0) as yesCount"),
-        db.raw("COALESCE(SUM(noCount), 0) as noCount"),
+        db.raw('COALESCE(SUM(yesCount + noCount), 0) as totalEvaluations'),
+        db.raw('COALESCE(SUM(yesCount), 0) as yesCount'),
+        db.raw('COALESCE(SUM(noCount), 0) as noCount')
       )
-      .where("metricsBucket", ">=", params.startDate)
-      .where("metricsBucket", "<=", params.endDate);
+      .where('metricsBucket', '>=', params.startDate)
+      .where('metricsBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn("environment", params.environments);
+      query = query.whereIn('environment', params.environments);
     }
 
     if (params.appNames && params.appNames.length > 0) {
-      query = query.whereIn("appName", params.appNames);
+      query = query.whereIn('appName', params.appNames);
     }
 
     const rows = await query;
@@ -382,28 +376,26 @@ class NetworkTrafficService {
       noCount: number;
     }[]
   > {
-    let query = db("g_feature_metrics")
+    let query = db('g_feature_metrics')
       .select(
-        "metricsBucket as bucket",
+        'metricsBucket as bucket',
         db.raw("DATE_FORMAT(metricsBucket, '%m/%d %H:00') as displayTime"),
-        db.raw("COALESCE(SUM(yesCount + noCount), 0) as evaluations"),
-        db.raw("COALESCE(SUM(yesCount), 0) as yesCount"),
-        db.raw("COALESCE(SUM(noCount), 0) as noCount"),
+        db.raw('COALESCE(SUM(yesCount + noCount), 0) as evaluations'),
+        db.raw('COALESCE(SUM(yesCount), 0) as yesCount'),
+        db.raw('COALESCE(SUM(noCount), 0) as noCount')
       )
-      .where("metricsBucket", ">=", params.startDate)
-      .where("metricsBucket", "<=", params.endDate);
+      .where('metricsBucket', '>=', params.startDate)
+      .where('metricsBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn("environment", params.environments);
+      query = query.whereIn('environment', params.environments);
     }
 
     if (params.appNames && params.appNames.length > 0) {
-      query = query.whereIn("appName", params.appNames);
+      query = query.whereIn('appName', params.appNames);
     }
 
-    const rows = await query
-      .groupBy("metricsBucket")
-      .orderBy("metricsBucket", "asc");
+    const rows = await query.groupBy('metricsBucket').orderBy('metricsBucket', 'asc');
 
     return rows.map((row: any) => ({
       bucket: row.bucket,
@@ -433,30 +425,30 @@ class NetworkTrafficService {
       noCount: number;
     }[]
   > {
-    let query = db("g_feature_metrics")
+    let query = db('g_feature_metrics')
       .select(
-        "metricsBucket as bucket",
+        'metricsBucket as bucket',
         db.raw("DATE_FORMAT(metricsBucket, '%m/%d %H:00') as displayTime"),
-        "environment",
-        "appName",
-        db.raw("COALESCE(SUM(yesCount + noCount), 0) as evaluations"),
-        db.raw("COALESCE(SUM(yesCount), 0) as yesCount"),
-        db.raw("COALESCE(SUM(noCount), 0) as noCount"),
+        'environment',
+        'appName',
+        db.raw('COALESCE(SUM(yesCount + noCount), 0) as evaluations'),
+        db.raw('COALESCE(SUM(yesCount), 0) as yesCount'),
+        db.raw('COALESCE(SUM(noCount), 0) as noCount')
       )
-      .where("metricsBucket", ">=", params.startDate)
-      .where("metricsBucket", "<=", params.endDate);
+      .where('metricsBucket', '>=', params.startDate)
+      .where('metricsBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn("environment", params.environments);
+      query = query.whereIn('environment', params.environments);
     }
 
     if (params.appNames && params.appNames.length > 0) {
-      query = query.whereIn("appName", params.appNames);
+      query = query.whereIn('appName', params.appNames);
     }
 
     const rows = await query
-      .groupBy("metricsBucket", "environment", "appName")
-      .orderBy("metricsBucket", "asc");
+      .groupBy('metricsBucket', 'environment', 'appName')
+      .orderBy('metricsBucket', 'asc');
 
     return rows.map((row: any) => ({
       bucket: row.bucket,

@@ -3,10 +3,10 @@
  *
  * Manages entity locks for concurrent modification control.
  */
-import { ulid } from "ulid";
-import { EntityLock, LockType } from "../models/EntityLock";
-import { User } from "../models/User";
-import logger from "../config/logger";
+import { ulid } from 'ulid';
+import { EntityLock, LockType } from '../models/EntityLock';
+import { User } from '../models/User';
+import logger from '../config/logger';
 
 export interface LockCheckResult {
   isLocked: boolean;
@@ -38,13 +38,13 @@ export class LockService {
     entityType: string,
     entityId: string,
     environment: string,
-    currentUserId?: number,
+    currentUserId?: number
   ): Promise<LockCheckResult> {
     const lock = await EntityLock.query()
-      .where("entityType", entityType)
-      .where("entityId", entityId)
-      .where("environment", environment)
-      .withGraphFetched("user")
+      .where('entityType', entityType)
+      .where('entityId', entityId)
+      .where('environment', environment)
+      .withGraphFetched('user')
       .first();
 
     if (!lock) {
@@ -74,10 +74,10 @@ export class LockService {
     }
 
     // Soft lock: warning but allow
-    if (lock.lockType === "soft") {
+    if (lock.lockType === 'soft') {
       return {
         isLocked: true,
-        lockType: "soft",
+        lockType: 'soft',
         lockedBy: {
           id: lock.lockedBy,
           name: lock.user?.name,
@@ -85,14 +85,14 @@ export class LockService {
         },
         expiresAt: lock.expiresAt,
         canProceed: true,
-        warning: `Entity is being edited by ${lock.user?.name || lock.user?.email || "another user"}`,
+        warning: `Entity is being edited by ${lock.user?.name || lock.user?.email || 'another user'}`,
       };
     }
 
     // Hard lock: block
     return {
       isLocked: true,
-      lockType: "hard",
+      lockType: 'hard',
       lockedBy: {
         id: lock.lockedBy,
         name: lock.user?.name,
@@ -112,15 +112,15 @@ export class LockService {
       entityId,
       environment,
       userId,
-      lockType = "soft",
+      lockType = 'soft',
       expiresInMinutes = 30,
     } = options;
 
     // Check existing lock
     const existing = await EntityLock.query()
-      .where("entityType", entityType)
-      .where("entityId", entityId)
-      .where("environment", environment)
+      .where('entityType', entityType)
+      .where('entityId', entityId)
+      .where('environment', environment)
       .first();
 
     if (existing) {
@@ -129,8 +129,8 @@ export class LockService {
         await EntityLock.query().deleteById(existing.id);
       } else if (existing.lockedBy !== userId) {
         // Cannot acquire lock if someone else holds it (for hard locks)
-        if (existing.lockType === "hard") {
-          throw new Error("Entity is locked by another user");
+        if (existing.lockType === 'hard') {
+          throw new Error('Entity is locked by another user');
         }
         // For soft locks, we allow creating a new lock (last editor wins)
         await EntityLock.query().deleteById(existing.id);
@@ -162,7 +162,7 @@ export class LockService {
     });
 
     logger.info(
-      `[LockService] Lock acquired: ${entityType}:${entityId} by user ${userId} (${lockType})`,
+      `[LockService] Lock acquired: ${entityType}:${entityId} by user ${userId} (${lockType})`
     );
     return lock;
   }
@@ -174,16 +174,16 @@ export class LockService {
     entityType: string,
     entityId: string,
     environment: string,
-    userId?: number,
+    userId?: number
   ): Promise<boolean> {
     let query = EntityLock.query()
-      .where("entityType", entityType)
-      .where("entityId", entityId)
-      .where("environment", environment);
+      .where('entityType', entityType)
+      .where('entityId', entityId)
+      .where('environment', environment);
 
     // If userId provided, only release own lock
     if (userId) {
-      query = query.where("lockedBy", userId);
+      query = query.where('lockedBy', userId);
     }
 
     const deleted = await query.delete();
@@ -198,10 +198,10 @@ export class LockService {
    * Release all expired locks (cleanup job)
    */
   static async cleanupExpiredLocks(): Promise<number> {
-    const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+    const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
     const deleted = await EntityLock.query()
-      .where("expiresAt", "<", now)
-      .whereNotNull("expiresAt")
+      .where('expiresAt', '<', now)
+      .whereNotNull('expiresAt')
       .delete();
 
     if (deleted > 0) {
@@ -214,21 +214,17 @@ export class LockService {
    * Get all locks for a user
    */
   static async getUserLocks(userId: number): Promise<EntityLock[]> {
-    return await EntityLock.query()
-      .where("lockedBy", userId)
-      .orderBy("createdAt", "desc");
+    return await EntityLock.query().where('lockedBy', userId).orderBy('createdAt', 'desc');
   }
 
   /**
    * Release all locks for a user (e.g., on logout)
    */
   static async releaseAllUserLocks(userId: number): Promise<number> {
-    const deleted = await EntityLock.query().where("lockedBy", userId).delete();
+    const deleted = await EntityLock.query().where('lockedBy', userId).delete();
 
     if (deleted > 0) {
-      logger.info(
-        `[LockService] Released all locks for user ${userId}: ${deleted} locks`,
-      );
+      logger.info(`[LockService] Released all locks for user ${userId}: ${deleted} locks`);
     }
     return deleted;
   }

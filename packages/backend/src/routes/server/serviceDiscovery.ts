@@ -4,17 +4,17 @@
  * Server SDK endpoints for service discovery
  */
 
-import express from "express";
-import { serverSDKAuth } from "../../middleware/apiTokenAuth";
-import serviceDiscoveryService from "../../services/serviceDiscoveryService";
-import { IpWhitelistModel } from "../../models/IpWhitelist";
-import { WhitelistModel } from "../../models/AccountWhitelist";
-import logger from "../../config/logger";
-import { ulid } from "ulid";
-import { pubSubService } from "../../services/PubSubService";
-import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from "../../constants/cacheKeys";
-import { respondWithEtagCache } from "../../utils/serverSdkEtagCache";
-import { EnvironmentRequest } from "../../middleware/environmentResolver";
+import express from 'express';
+import { serverSDKAuth } from '../../middleware/apiTokenAuth';
+import serviceDiscoveryService from '../../services/serviceDiscoveryService';
+import { IpWhitelistModel } from '../../models/IpWhitelist';
+import { WhitelistModel } from '../../models/AccountWhitelist';
+import logger from '../../config/logger';
+import { ulid } from 'ulid';
+import { pubSubService } from '../../services/PubSubService';
+import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../../constants/cacheKeys';
+import { respondWithEtagCache } from '../../utils/serverSdkEtagCache';
+import { EnvironmentRequest } from '../../middleware/environmentResolver';
 
 const router = express.Router();
 
@@ -25,16 +25,13 @@ const router = express.Router();
  * Returns enabled whitelists for server-side validation
  * Exported as a separate handler for use in both /services/whitelists and /whitelists paths
  */
-export const getWhitelistsHandler = async (
-  req: EnvironmentRequest,
-  res: any,
-) => {
+export const getWhitelistsHandler = async (req: EnvironmentRequest, res: any) => {
   const environment = req.environment!;
   try {
     await respondWithEtagCache(res, {
       cacheKey: `${SERVER_SDK_ETAG.WHITELISTS}:${environment}`,
       ttlMs: DEFAULT_CONFIG.WHITELIST_TTL,
-      requestEtag: req.headers?.["if-none-match"],
+      requestEtag: req.headers?.['if-none-match'],
       buildPayload: async () => {
         // Get all enabled IP whitelists for this environment
         const ipWhitelistsResult = await IpWhitelistModel.findAll(1, 10000, {
@@ -44,13 +41,11 @@ export const getWhitelistsHandler = async (
         const now = new Date();
 
         // Filter by date range
-        const activeIpWhitelists = ipWhitelistsResult.ipWhitelists.filter(
-          (ip: any) => {
-            if (ip.startDate && new Date(ip.startDate) > now) return false;
-            if (ip.endDate && new Date(ip.endDate) < now) return false;
-            return true;
-          },
-        );
+        const activeIpWhitelists = ipWhitelistsResult.ipWhitelists.filter((ip: any) => {
+          if (ip.startDate && new Date(ip.startDate) > now) return false;
+          if (ip.endDate && new Date(ip.endDate) < now) return false;
+          return true;
+        });
 
         // Get all enabled account whitelists for this environment
         const accountWhitelistsResult = await WhitelistModel.findAll(1, 10000, {
@@ -59,14 +54,13 @@ export const getWhitelistsHandler = async (
         });
 
         // Filter by date range
-        const activeAccountWhitelists =
-          accountWhitelistsResult.whitelists.filter((account: any) => {
-            if (account.startDate && new Date(account.startDate) > now)
-              return false;
-            if (account.endDate && new Date(account.endDate) < now)
-              return false;
+        const activeAccountWhitelists = accountWhitelistsResult.whitelists.filter(
+          (account: any) => {
+            if (account.startDate && new Date(account.startDate) > now) return false;
+            if (account.endDate && new Date(account.endDate) < now) return false;
             return true;
-          });
+          }
+        );
 
         // Format response to match SDK expectations
         const ipWhitelist = activeIpWhitelists.map((ip: any) => ({
@@ -74,12 +68,10 @@ export const getWhitelistsHandler = async (
           ipAddress: ip.ipAddress,
         }));
 
-        const accountWhitelist = activeAccountWhitelists.map(
-          (account: any) => ({
-            id: account.id,
-            accountId: account.accountId,
-          }),
-        );
+        const accountWhitelist = activeAccountWhitelists.map((account: any) => ({
+          id: account.id,
+          accountId: account.accountId,
+        }));
 
         return {
           success: true,
@@ -91,10 +83,10 @@ export const getWhitelistsHandler = async (
       },
     });
   } catch (error: any) {
-    logger.error("Failed to get whitelists:", error);
+    logger.error('Failed to get whitelists:', error);
     res.status(500).json({
       success: false,
-      error: error.message || "Failed to get whitelists",
+      error: error.message || 'Failed to get whitelists',
     });
   }
 };
@@ -103,7 +95,7 @@ export const getWhitelistsHandler = async (
  * Get whitelists route
  * GET /api/v1/server/services/whitelists
  */
-router.get("/whitelists", serverSDKAuth, getWhitelistsHandler);
+router.get('/whitelists', serverSDKAuth, getWhitelistsHandler);
 
 /**
  * Register service instance (full snapshot)
@@ -122,7 +114,7 @@ router.get("/whitelists", serverSDKAuth, getWhitelistsHandler);
  *
  * Note: externalAddress is auto-detected from req.ip
  */
-router.post("/register", serverSDKAuth, async (req: any, res: any) => {
+router.post('/register', serverSDKAuth, async (req: any, res: any) => {
   try {
     const {
       instanceId: providedInstanceId,
@@ -139,7 +131,7 @@ router.post("/register", serverSDKAuth, async (req: any, res: any) => {
     if (!labels || !labels.service) {
       return res.status(400).json({
         success: false,
-        error: { message: "Missing required field: labels.service" },
+        error: { message: 'Missing required field: labels.service' },
       });
     }
 
@@ -147,7 +139,7 @@ router.post("/register", serverSDKAuth, async (req: any, res: any) => {
       return res.status(400).json({
         success: false,
         error: {
-          message: "Missing required fields: hostname, internalAddress, ports",
+          message: 'Missing required fields: hostname, internalAddress, ports',
         },
       });
     }
@@ -156,10 +148,10 @@ router.post("/register", serverSDKAuth, async (req: any, res: any) => {
     const instanceId = providedInstanceId || ulid();
 
     // Auto-detect external address from request IP
-    let externalAddress = req.ip || req.connection.remoteAddress || "0.0.0.0";
+    let externalAddress = req.ip || req.connection.remoteAddress || '0.0.0.0';
 
     // Remove "::ffff:" prefix from IPv4-mapped IPv6 addresses
-    if (externalAddress.startsWith("::ffff:")) {
+    if (externalAddress.startsWith('::ffff:')) {
       externalAddress = externalAddress.substring(7);
     }
 
@@ -172,7 +164,7 @@ router.post("/register", serverSDKAuth, async (req: any, res: any) => {
       externalAddress,
       internalAddress,
       ports,
-      status: status || "ready",
+      status: status || 'ready',
       createdAt: now,
       updatedAt: now,
       stats,
@@ -190,9 +182,9 @@ router.post("/register", serverSDKAuth, async (req: any, res: any) => {
 
     // Publish event for SDK real-time updates
     await pubSubService.publishNotification({
-      type: "service.registered",
+      type: 'service.registered',
       data: { instance },
-      targetChannels: ["service", "admin"],
+      targetChannels: ['service', 'admin'],
     });
 
     res.json({
@@ -200,10 +192,10 @@ router.post("/register", serverSDKAuth, async (req: any, res: any) => {
       data: { instanceId, hostname, externalAddress },
     });
   } catch (error: any) {
-    logger.error("Failed to register service:", error);
+    logger.error('Failed to register service:', error);
     res.status(500).json({
       success: false,
-      error: { message: error.message || "Failed to register service" },
+      error: { message: error.message || 'Failed to register service' },
     });
   }
 });
@@ -218,7 +210,7 @@ router.post("/register", serverSDKAuth, async (req: any, res: any) => {
  *   "labels": { "service": "world" }
  * }
  */
-router.post("/unregister", serverSDKAuth, async (req: any, res: any) => {
+router.post('/unregister', serverSDKAuth, async (req: any, res: any) => {
   try {
     const { instanceId, labels } = req.body;
 
@@ -226,7 +218,7 @@ router.post("/unregister", serverSDKAuth, async (req: any, res: any) => {
       return res.status(400).json({
         success: false,
         error: {
-          message: "Missing required fields: instanceId, labels.service",
+          message: 'Missing required fields: instanceId, labels.service',
         },
       });
     }
@@ -238,9 +230,9 @@ router.post("/unregister", serverSDKAuth, async (req: any, res: any) => {
 
     // Publish event for SDK real-time updates
     await pubSubService.publishNotification({
-      type: "service.terminated",
+      type: 'service.terminated',
       data: { instanceId, serviceType },
-      targetChannels: ["service", "admin"],
+      targetChannels: ['service', 'admin'],
     });
 
     res.json({
@@ -248,10 +240,10 @@ router.post("/unregister", serverSDKAuth, async (req: any, res: any) => {
       message: `Service ${serviceType}:${instanceId} unregistered successfully`,
     });
   } catch (error: any) {
-    logger.error("Failed to unregister service:", error);
+    logger.error('Failed to unregister service:', error);
     res.status(500).json({
       success: false,
-      error: { message: error.message || "Failed to unregister service" },
+      error: { message: error.message || 'Failed to unregister service' },
     });
   }
 });
@@ -271,25 +263,16 @@ router.post("/unregister", serverSDKAuth, async (req: any, res: any) => {
  *
  * Note: meta is not included - it's immutable after registration
  */
-router.post("/status", serverSDKAuth, async (req: any, res: any) => {
+router.post('/status', serverSDKAuth, async (req: any, res: any) => {
   try {
-    const {
-      instanceId,
-      labels,
-      status,
-      stats,
-      hostname,
-      internalAddress,
-      ports,
-      meta,
-    } = req.body;
+    const { instanceId, labels, status, stats, hostname, internalAddress, ports, meta } = req.body;
     const autoRegisterIfMissing = req.body.autoRegisterIfMissing || false;
 
     if (!instanceId || !labels || !labels.service) {
       return res.status(400).json({
         success: false,
         error: {
-          message: "Missing required fields: instanceId, labels.service",
+          message: 'Missing required fields: instanceId, labels.service',
         },
       });
     }
@@ -299,8 +282,7 @@ router.post("/status", serverSDKAuth, async (req: any, res: any) => {
       return res.status(400).json({
         success: false,
         error: {
-          message:
-            "Auto-register requires hostname, internalAddress, and ports fields",
+          message: 'Auto-register requires hostname, internalAddress, and ports fields',
         },
       });
     }
@@ -330,9 +312,9 @@ router.post("/status", serverSDKAuth, async (req: any, res: any) => {
 
     // Publish event for SDK real-time updates
     await pubSubService.publishNotification({
-      type: "service.updated",
+      type: 'service.updated',
       data: { instanceId, serviceType, status, stats },
-      targetChannels: ["service", "admin"],
+      targetChannels: ['service', 'admin'],
     });
 
     res.json({
@@ -340,10 +322,10 @@ router.post("/status", serverSDKAuth, async (req: any, res: any) => {
       message: `Service ${serviceType}:${instanceId} status updated successfully`,
     });
   } catch (error: any) {
-    logger.error("Failed to update service status:", error);
+    logger.error('Failed to update service status:', error);
     res.status(500).json({
       success: false,
-      error: { message: error.message || "Failed to update service status" },
+      error: { message: error.message || 'Failed to update service status' },
     });
   }
 });
@@ -360,28 +342,19 @@ router.post("/status", serverSDKAuth, async (req: any, res: any) => {
  * - excludeSelf: Exclude self instance (default: true)
  * - Any label key: Filter by label value (e.g., region=ap-northeast-2)
  */
-router.get("/", serverSDKAuth, async (req: any, res: any) => {
+router.get('/', serverSDKAuth, async (req: any, res: any) => {
   try {
-    const {
-      serviceType,
-      group,
-      environment,
-      status,
-      excludeSelf,
-      ...otherLabels
-    } = req.query;
+    const { serviceType, group, environment, status, excludeSelf, ...otherLabels } = req.query;
 
     // Get all services or services of a specific type and/or group
     let services = await serviceDiscoveryService.getServices(
       serviceType as string,
-      group as string,
+      group as string
     );
 
     // Filter by environment
     if (environment) {
-      services = services.filter(
-        (s: any) => s.labels.environment === environment,
-      );
+      services = services.filter((s: any) => s.labels.environment === environment);
     }
 
     // Filter by other labels (e.g., region=ap-northeast-2)
@@ -397,9 +370,9 @@ router.get("/", serverSDKAuth, async (req: any, res: any) => {
     }
 
     // Exclude self (default: true)
-    const shouldExcludeSelf = excludeSelf !== "false";
-    if (shouldExcludeSelf && req.headers["x-instance-id"]) {
-      const instanceId = req.headers["x-instance-id"];
+    const shouldExcludeSelf = excludeSelf !== 'false';
+    if (shouldExcludeSelf && req.headers['x-instance-id']) {
+      const instanceId = req.headers['x-instance-id'];
       services = services.filter((s: any) => s.instanceId !== instanceId);
     }
 
@@ -408,10 +381,10 @@ router.get("/", serverSDKAuth, async (req: any, res: any) => {
       data: services,
     });
   } catch (error: any) {
-    logger.error("Failed to get services:", error);
+    logger.error('Failed to get services:', error);
     res.status(500).json({
       success: false,
-      error: error.message || "Failed to get services",
+      error: error.message || 'Failed to get services',
     });
   }
 });
@@ -420,35 +393,31 @@ router.get("/", serverSDKAuth, async (req: any, res: any) => {
  * Get a specific service instance
  * GET /api/v1/server/services/:serviceType/:instanceId
  */
-router.get(
-  "/:serviceType/:instanceId",
-  serverSDKAuth,
-  async (req: any, res: any) => {
-    try {
-      const { serviceType, instanceId } = req.params;
+router.get('/:serviceType/:instanceId', serverSDKAuth, async (req: any, res: any) => {
+  try {
+    const { serviceType, instanceId } = req.params;
 
-      const services = await serviceDiscoveryService.getServices(serviceType);
-      const service = services.find((s: any) => s.instanceId === instanceId);
+    const services = await serviceDiscoveryService.getServices(serviceType);
+    const service = services.find((s: any) => s.instanceId === instanceId);
 
-      if (!service) {
-        return res.status(404).json({
-          success: false,
-          error: "Service instance not found",
-        });
-      }
-
-      res.json({
-        success: true,
-        data: service,
-      });
-    } catch (error: any) {
-      logger.error("Failed to get service:", error);
-      res.status(500).json({
+    if (!service) {
+      return res.status(404).json({
         success: false,
-        error: error.message || "Failed to get service",
+        error: 'Service instance not found',
       });
     }
-  },
-);
+
+    res.json({
+      success: true,
+      data: service,
+    });
+  } catch (error: any) {
+    logger.error('Failed to get service:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to get service',
+    });
+  }
+});
 
 export default router;

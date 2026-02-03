@@ -1,7 +1,7 @@
-import { Router, Response } from "express";
-import { CmsCashShopService } from "../../services/CmsCashShopService";
-import { AuthenticatedRequest } from "../../middleware/auth";
-import { asyncHandler, GatrixError } from "../../middleware/errorHandler";
+import { Router, Response } from 'express';
+import { CmsCashShopService } from '../../services/CmsCashShopService';
+import { AuthenticatedRequest } from '../../middleware/auth';
+import { asyncHandler, GatrixError } from '../../middleware/errorHandler';
 
 const router = Router() as any;
 
@@ -10,11 +10,11 @@ const router = Router() as any;
  * Get all valid CMS CashShop products for the current environment
  */
 router.get(
-  "/",
+  '/',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const environment = req.environment;
     if (!environment) {
-      throw new GatrixError("Environment is required", 400);
+      throw new GatrixError('Environment is required', 400);
     }
 
     // Get all products with multi-language structure
@@ -27,7 +27,7 @@ router.get(
         total: products.length,
       },
     });
-  }),
+  })
 );
 
 export default router;

@@ -1,13 +1,13 @@
-import { ulid } from "ulid";
-import database from "../config/database";
-import { RowDataPacket, ResultSetHeader } from "mysql2";
-import { GatrixError } from "../middleware/errorHandler";
-import logger from "../config/logger";
-import { TagService } from "./TagService";
-import { PlanningDataService } from "./PlanningDataService";
-import { CmsCashShopProduct } from "./CmsCashShopService";
-import { pubSubService } from "./PubSubService";
-import { SERVER_SDK_ETAG } from "../constants/cacheKeys";
+import { ulid } from 'ulid';
+import database from '../config/database';
+import { RowDataPacket, ResultSetHeader } from 'mysql2';
+import { GatrixError } from '../middleware/errorHandler';
+import logger from '../config/logger';
+import { TagService } from './TagService';
+import { PlanningDataService } from './PlanningDataService';
+import { CmsCashShopProduct } from './CmsCashShopService';
+import { pubSubService } from './PubSubService';
+import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 
 export interface StoreProduct {
   id: string;
@@ -88,7 +88,7 @@ export interface GetStoreProductsParams {
   limit?: number;
   search?: string;
   sortBy?: string;
-  sortOrder?: "asc" | "desc";
+  sortOrder?: 'asc' | 'desc';
   store?: string;
   isActive?: boolean;
   environment: string;
@@ -105,22 +105,20 @@ class StoreProductService {
   /**
    * Get all store products with pagination
    */
-  static async getStoreProducts(
-    params: GetStoreProductsParams,
-  ): Promise<GetStoreProductsResponse> {
+  static async getStoreProducts(params: GetStoreProductsParams): Promise<GetStoreProductsResponse> {
     const pool = database.getPool();
     // Ensure page and limit are numbers (query params come as strings)
     const page = Number(params.page) || 1;
     const limit = Number(params.limit) || 10;
-    const search = params.search || "";
-    const sortBy = params.sortBy || "createdAt";
-    const sortOrder = (params.sortOrder || "desc").toUpperCase();
+    const search = params.search || '';
+    const sortBy = params.sortBy || 'createdAt';
+    const sortOrder = (params.sortOrder || 'desc').toUpperCase();
     const environment = params.environment;
 
     const offset = (page - 1) * limit;
 
     // Build WHERE clause
-    const conditions: string[] = ["environment = ?"];
+    const conditions: string[] = ['environment = ?'];
     const queryParams: (string | number | boolean | null)[] = [environment];
 
     if (search) {
@@ -129,7 +127,7 @@ class StoreProductService {
       if (!isNaN(searchNumber) && String(searchNumber) === search.trim()) {
         // Search by CMS ID if input is a pure number
         conditions.push(
-          "(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ? OR description LIKE ? OR cmsProductId = ?)",
+          '(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ? OR description LIKE ? OR cmsProductId = ?)'
         );
         const searchPattern = `%${search}%`;
         queryParams.push(
@@ -139,12 +137,12 @@ class StoreProductService {
           searchPattern,
           searchPattern,
           searchPattern,
-          searchNumber,
+          searchNumber
         );
       } else {
         // Search by all name fields including localized names
         conditions.push(
-          "(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ? OR description LIKE ?)",
+          '(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ? OR description LIKE ?)'
         );
         const searchPattern = `%${search}%`;
         queryParams.push(
@@ -153,73 +151,67 @@ class StoreProductService {
           searchPattern,
           searchPattern,
           searchPattern,
-          searchPattern,
+          searchPattern
         );
       }
     }
 
     if (params?.store) {
-      conditions.push("store = ?");
+      conditions.push('store = ?');
       queryParams.push(params.store);
     }
 
     if (params?.isActive !== undefined) {
-      conditions.push("isActive = ?");
+      conditions.push('isActive = ?');
       queryParams.push(params.isActive ? 1 : 0);
     }
 
-    const whereClause =
-      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     // Validate sort column
     const allowedSortColumns = [
-      "cmsProductId",
-      "productId",
-      "productName",
-      "store",
-      "price",
-      "isActive",
-      "saleStartAt",
-      "saleEndAt",
-      "createdAt",
-      "updatedAt",
+      'cmsProductId',
+      'productId',
+      'productName',
+      'store',
+      'price',
+      'isActive',
+      'saleStartAt',
+      'saleEndAt',
+      'createdAt',
+      'updatedAt',
     ];
-    const safeSortBy = allowedSortColumns.includes(sortBy)
-      ? sortBy
-      : "createdAt";
-    const safeSortOrder = sortOrder === "ASC" ? "ASC" : "DESC";
+    const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : 'createdAt';
+    const safeSortOrder = sortOrder === 'ASC' ? 'ASC' : 'DESC';
 
     try {
       // Get total count
       const [countResult] = await pool.execute<RowDataPacket[]>(
         `SELECT COUNT(*) as total FROM g_store_products ${whereClause}`,
-        queryParams,
+        queryParams
       );
       const total = countResult[0].total;
 
       // Get products (use template literal for LIMIT/OFFSET as they are already validated numbers)
       const [products] = await pool.execute<RowDataPacket[]>(
         `SELECT * FROM g_store_products ${whereClause} ORDER BY ${safeSortBy} ${safeSortOrder} LIMIT ${limit} OFFSET ${offset}`,
-        queryParams,
+        queryParams
       );
 
       // Load tags for each product
       const productsWithTags = await Promise.all(
         products.map(async (product) => {
-          const tags = await TagService.listTagsForEntity(
-            "store_product",
-            product.id,
-          );
+          const tags = await TagService.listTagsForEntity('store_product', product.id);
           return {
             ...product,
             isActive: Boolean(product.isActive),
             metadata:
-              typeof product.metadata === "string"
+              typeof product.metadata === 'string'
                 ? JSON.parse(product.metadata)
                 : product.metadata,
             tags,
           };
-        }),
+        })
       );
 
       return {
@@ -229,8 +221,8 @@ class StoreProductService {
         limit,
       };
     } catch (error) {
-      logger.error("Failed to get store products", { error, params });
-      throw new GatrixError("Failed to get store products", 500);
+      logger.error('Failed to get store products', { error, params });
+      throw new GatrixError('Failed to get store products', 500);
     }
   }
 
@@ -238,7 +230,7 @@ class StoreProductService {
    * Get store product statistics
    */
   static async getStats(
-    environment: string,
+    environment: string
   ): Promise<{ total: number; active: number; inactive: number }> {
     const pool = database.getPool();
 
@@ -249,7 +241,7 @@ class StoreProductService {
           SUM(CASE WHEN isActive = 1 THEN 1 ELSE 0 END) as active,
           SUM(CASE WHEN isActive = 0 THEN 1 ELSE 0 END) as inactive
         FROM g_store_products WHERE environment = ?`,
-        [environment],
+        [environment]
       );
 
       return {
@@ -258,46 +250,41 @@ class StoreProductService {
         inactive: result[0].inactive || 0,
       };
     } catch (error) {
-      logger.error("Failed to get store product stats", { error });
-      throw new GatrixError("Failed to get store product stats", 500);
+      logger.error('Failed to get store product stats', { error });
+      throw new GatrixError('Failed to get store product stats', 500);
     }
   }
 
   /**
    * Get store product by ID
    */
-  static async getStoreProductById(
-    id: string,
-    environment: string,
-  ): Promise<StoreProduct> {
+  static async getStoreProductById(id: string, environment: string): Promise<StoreProduct> {
     const pool = database.getPool();
 
     try {
       const [products] = await pool.execute<RowDataPacket[]>(
-        "SELECT * FROM g_store_products WHERE id = ? AND environment = ?",
-        [id, environment],
+        'SELECT * FROM g_store_products WHERE id = ? AND environment = ?',
+        [id, environment]
       );
 
       if (products.length === 0) {
-        throw new GatrixError("Store product not found", 404);
+        throw new GatrixError('Store product not found', 404);
       }
 
       const product = products[0];
-      const tags = await TagService.listTagsForEntity("store_product", id);
+      const tags = await TagService.listTagsForEntity('store_product', id);
 
       return {
         ...product,
         isActive: Boolean(product.isActive),
         metadata:
-          typeof product.metadata === "string"
-            ? JSON.parse(product.metadata)
-            : product.metadata,
+          typeof product.metadata === 'string' ? JSON.parse(product.metadata) : product.metadata,
         tags,
       } as StoreProduct;
     } catch (error) {
       if (error instanceof GatrixError) throw error;
-      logger.error("Failed to get store product by ID", { error, id });
-      throw new GatrixError("Failed to get store product", 500);
+      logger.error('Failed to get store product by ID', { error, id });
+      throw new GatrixError('Failed to get store product', 500);
     }
   }
 
@@ -305,15 +292,13 @@ class StoreProductService {
    * Get store product by ID across all environments (for Server SDK)
    * This is used when the SDK receives an event and needs to fetch a specific product
    */
-  static async getStoreProductByIdAcrossEnvironments(
-    id: string,
-  ): Promise<StoreProduct | null> {
+  static async getStoreProductByIdAcrossEnvironments(id: string): Promise<StoreProduct | null> {
     const pool = database.getPool();
 
     try {
       const [products] = await pool.execute<RowDataPacket[]>(
-        "SELECT * FROM g_store_products WHERE id = ?",
-        [id],
+        'SELECT * FROM g_store_products WHERE id = ?',
+        [id]
       );
 
       if (products.length === 0) {
@@ -321,19 +306,17 @@ class StoreProductService {
       }
 
       const product = products[0];
-      const tags = await TagService.listTagsForEntity("store_product", id);
+      const tags = await TagService.listTagsForEntity('store_product', id);
 
       return {
         ...product,
         isActive: Boolean(product.isActive),
         metadata:
-          typeof product.metadata === "string"
-            ? JSON.parse(product.metadata)
-            : product.metadata,
+          typeof product.metadata === 'string' ? JSON.parse(product.metadata) : product.metadata,
         tags,
       } as StoreProduct;
     } catch (error) {
-      logger.error("Failed to get store product by ID across environments", {
+      logger.error('Failed to get store product by ID across environments', {
         error,
         id,
       });
@@ -344,9 +327,7 @@ class StoreProductService {
   /**
    * Create a new store product
    */
-  static async createStoreProduct(
-    input: CreateStoreProductInput,
-  ): Promise<StoreProduct> {
+  static async createStoreProduct(input: CreateStoreProductInput): Promise<StoreProduct> {
     const pool = database.getPool();
     const id = ulid();
     const environment = input.environment;
@@ -369,7 +350,7 @@ class StoreProductService {
           input.nameZh || null,
           input.store,
           input.price,
-          input.currency || "USD",
+          input.currency || 'USD',
           input.saleStartAt || null,
           input.saleEndAt || null,
           input.description || null,
@@ -378,7 +359,7 @@ class StoreProductService {
           input.descriptionZh || null,
           input.metadata ? JSON.stringify(input.metadata) : null,
           input.createdBy || null,
-        ],
+        ]
       );
 
       const product = await this.getStoreProductById(id, environment);
@@ -386,12 +367,10 @@ class StoreProductService {
       // Invalidate ETag cache and publish SDK event
       try {
         // Invalidate ETag cache so SDK fetches fresh data
-        await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`,
-        );
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`);
 
         await pubSubService.publishSDKEvent({
-          type: "store_product.created",
+          type: 'store_product.created',
           data: {
             id,
             environment: environment,
@@ -400,7 +379,7 @@ class StoreProductService {
           },
         });
       } catch (eventError) {
-        logger.warn("Failed to publish store product SDK event", {
+        logger.warn('Failed to publish store product SDK event', {
           eventError,
           id,
         });
@@ -408,14 +387,11 @@ class StoreProductService {
 
       return product;
     } catch (error: any) {
-      if (error.code === "ER_DUP_ENTRY") {
-        throw new GatrixError(
-          "A product with this ID and store already exists",
-          409,
-        );
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new GatrixError('A product with this ID and store already exists', 409);
       }
-      logger.error("Failed to create store product", { error, input });
-      throw new GatrixError("Failed to create store product", 500);
+      logger.error('Failed to create store product', { error, input });
+      throw new GatrixError('Failed to create store product', 500);
     }
   }
 
@@ -425,7 +401,7 @@ class StoreProductService {
   static async updateStoreProduct(
     id: string,
     input: UpdateStoreProductInput,
-    environment: string,
+    environment: string
   ): Promise<StoreProduct> {
     const pool = database.getPool();
 
@@ -434,73 +410,73 @@ class StoreProductService {
     const values: (string | number | boolean | null)[] = [];
 
     if (input.productId !== undefined) {
-      updates.push("productId = ?");
+      updates.push('productId = ?');
       values.push(input.productId);
     }
     if (input.productName !== undefined) {
-      updates.push("productName = ?");
+      updates.push('productName = ?');
       values.push(input.productName);
     }
     // Multi-language name fields
     if (input.nameKo !== undefined) {
-      updates.push("nameKo = ?");
+      updates.push('nameKo = ?');
       values.push(input.nameKo);
     }
     if (input.nameEn !== undefined) {
-      updates.push("nameEn = ?");
+      updates.push('nameEn = ?');
       values.push(input.nameEn);
     }
     if (input.nameZh !== undefined) {
-      updates.push("nameZh = ?");
+      updates.push('nameZh = ?');
       values.push(input.nameZh);
     }
     if (input.store !== undefined) {
-      updates.push("store = ?");
+      updates.push('store = ?');
       values.push(input.store);
     }
     if (input.price !== undefined) {
-      updates.push("price = ?");
+      updates.push('price = ?');
       values.push(input.price);
     }
     if (input.currency !== undefined) {
-      updates.push("currency = ?");
+      updates.push('currency = ?');
       values.push(input.currency);
     }
     if (input.isActive !== undefined) {
-      updates.push("isActive = ?");
+      updates.push('isActive = ?');
       values.push(input.isActive ? 1 : 0);
     }
     if (input.saleStartAt !== undefined) {
-      updates.push("saleStartAt = ?");
+      updates.push('saleStartAt = ?');
       values.push(input.saleStartAt ? input.saleStartAt.toISOString() : null);
     }
     if (input.saleEndAt !== undefined) {
-      updates.push("saleEndAt = ?");
+      updates.push('saleEndAt = ?');
       values.push(input.saleEndAt ? input.saleEndAt.toISOString() : null);
     }
     if (input.description !== undefined) {
-      updates.push("description = ?");
+      updates.push('description = ?');
       values.push(input.description);
     }
     // Multi-language description fields
     if (input.descriptionKo !== undefined) {
-      updates.push("descriptionKo = ?");
+      updates.push('descriptionKo = ?');
       values.push(input.descriptionKo);
     }
     if (input.descriptionEn !== undefined) {
-      updates.push("descriptionEn = ?");
+      updates.push('descriptionEn = ?');
       values.push(input.descriptionEn);
     }
     if (input.descriptionZh !== undefined) {
-      updates.push("descriptionZh = ?");
+      updates.push('descriptionZh = ?');
       values.push(input.descriptionZh);
     }
     if (input.metadata !== undefined) {
-      updates.push("metadata = ?");
+      updates.push('metadata = ?');
       values.push(JSON.stringify(input.metadata));
     }
     if (input.updatedBy !== undefined) {
-      updates.push("updatedBy = ?");
+      updates.push('updatedBy = ?');
       values.push(input.updatedBy);
     }
 
@@ -508,17 +484,17 @@ class StoreProductService {
       return this.getStoreProductById(id, environment);
     }
 
-    updates.push("updatedAt = UTC_TIMESTAMP()");
+    updates.push('updatedAt = UTC_TIMESTAMP()');
     values.push(id, environment);
 
     try {
       const [result] = await pool.execute<ResultSetHeader>(
-        `UPDATE g_store_products SET ${updates.join(", ")} WHERE id = ? AND environment = ?`,
-        values,
+        `UPDATE g_store_products SET ${updates.join(', ')} WHERE id = ? AND environment = ?`,
+        values
       );
 
       if (result.affectedRows === 0) {
-        throw new GatrixError("Store product not found", 404);
+        throw new GatrixError('Store product not found', 404);
       }
 
       const product = await this.getStoreProductById(id, environment);
@@ -526,12 +502,10 @@ class StoreProductService {
       // Invalidate ETag cache and publish SDK event
       try {
         // Invalidate ETag cache so SDK fetches fresh data
-        await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`,
-        );
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`);
 
         await pubSubService.publishSDKEvent({
-          type: "store_product.updated",
+          type: 'store_product.updated',
           data: {
             id,
             environment: environment,
@@ -540,7 +514,7 @@ class StoreProductService {
           },
         });
       } catch (eventError) {
-        logger.warn("Failed to publish store product SDK event", {
+        logger.warn('Failed to publish store product SDK event', {
           eventError,
           id,
         });
@@ -549,48 +523,40 @@ class StoreProductService {
       return product;
     } catch (error: any) {
       if (error instanceof GatrixError) throw error;
-      if (error.code === "ER_DUP_ENTRY") {
-        throw new GatrixError(
-          "A product with this ID and store already exists",
-          409,
-        );
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new GatrixError('A product with this ID and store already exists', 409);
       }
-      logger.error("Failed to update store product", { error, id, input });
-      throw new GatrixError("Failed to update store product", 500);
+      logger.error('Failed to update store product', { error, id, input });
+      throw new GatrixError('Failed to update store product', 500);
     }
   }
 
   /**
    * Delete a store product
    */
-  static async deleteStoreProduct(
-    id: string,
-    environment: string,
-  ): Promise<void> {
+  static async deleteStoreProduct(id: string, environment: string): Promise<void> {
     const pool = database.getPool();
 
     try {
       // Delete associated tags first (set to empty array)
-      await TagService.setTagsForEntity("store_product", id, []);
+      await TagService.setTagsForEntity('store_product', id, []);
 
       const [result] = await pool.execute<ResultSetHeader>(
-        "DELETE FROM g_store_products WHERE id = ? AND environment = ?",
-        [id, environment],
+        'DELETE FROM g_store_products WHERE id = ? AND environment = ?',
+        [id, environment]
       );
 
       if (result.affectedRows === 0) {
-        throw new GatrixError("Store product not found", 404);
+        throw new GatrixError('Store product not found', 404);
       }
 
       // Invalidate ETag cache and publish SDK event
       try {
         // Invalidate ETag cache so SDK fetches fresh data
-        await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`,
-        );
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`);
 
         await pubSubService.publishSDKEvent({
-          type: "store_product.deleted",
+          type: 'store_product.deleted',
           data: {
             id,
             environment: environment,
@@ -598,25 +564,22 @@ class StoreProductService {
           },
         });
       } catch (eventError) {
-        logger.warn("Failed to publish store product SDK event", {
+        logger.warn('Failed to publish store product SDK event', {
           eventError,
           id,
         });
       }
     } catch (error) {
       if (error instanceof GatrixError) throw error;
-      logger.error("Failed to delete store product", { error, id });
-      throw new GatrixError("Failed to delete store product", 500);
+      logger.error('Failed to delete store product', { error, id });
+      throw new GatrixError('Failed to delete store product', 500);
     }
   }
 
   /**
    * Delete multiple store products
    */
-  static async deleteStoreProducts(
-    ids: string[],
-    environment: string,
-  ): Promise<number> {
+  static async deleteStoreProducts(ids: string[], environment: string): Promise<number> {
     const pool = database.getPool();
 
     if (ids.length === 0) return 0;
@@ -624,26 +587,24 @@ class StoreProductService {
     try {
       // Delete associated tags first (set to empty array)
       for (const id of ids) {
-        await TagService.setTagsForEntity("store_product", id, []);
+        await TagService.setTagsForEntity('store_product', id, []);
       }
 
-      const placeholders = ids.map(() => "?").join(",");
+      const placeholders = ids.map(() => '?').join(',');
       const [result] = await pool.execute<ResultSetHeader>(
         `DELETE FROM g_store_products WHERE id IN (${placeholders}) AND environment = ?`,
-        [...ids, environment],
+        [...ids, environment]
       );
 
       // Invalidate ETag cache and publish SDK events for each deleted product
       if (result.affectedRows > 0) {
         try {
           // Invalidate ETag cache so SDK fetches fresh data
-          await pubSubService.invalidateKey(
-            `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`,
-          );
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`);
 
           for (const id of ids) {
             await pubSubService.publishSDKEvent({
-              type: "store_product.deleted",
+              type: 'store_product.deleted',
               data: {
                 id,
                 environment: environment,
@@ -652,7 +613,7 @@ class StoreProductService {
             });
           }
         } catch (eventError) {
-          logger.warn("Failed to publish store product SDK event", {
+          logger.warn('Failed to publish store product SDK event', {
             eventError,
             ids,
           });
@@ -661,8 +622,8 @@ class StoreProductService {
 
       return result.affectedRows;
     } catch (error) {
-      logger.error("Failed to delete store products", { error, ids });
-      throw new GatrixError("Failed to delete store products", 500);
+      logger.error('Failed to delete store products', { error, ids });
+      throw new GatrixError('Failed to delete store products', 500);
     }
   }
 
@@ -673,7 +634,7 @@ class StoreProductService {
     id: string,
     isActive: boolean,
     updatedBy: number,
-    environment: string,
+    environment: string
   ): Promise<StoreProduct> {
     return this.updateStoreProduct(id, { isActive, updatedBy }, environment);
   }
@@ -685,30 +646,28 @@ class StoreProductService {
     ids: string[],
     isActive: boolean,
     updatedBy: number,
-    environment: string,
+    environment: string
   ): Promise<number> {
     const pool = database.getPool();
 
     if (ids.length === 0) return 0;
 
     try {
-      const placeholders = ids.map(() => "?").join(",");
+      const placeholders = ids.map(() => '?').join(',');
       const [result] = await pool.execute<ResultSetHeader>(
         `UPDATE g_store_products SET isActive = ?, updatedBy = ?, updatedAt = UTC_TIMESTAMP() WHERE id IN (${placeholders}) AND environment = ?`,
-        [isActive ? 1 : 0, updatedBy || null, ...ids, environment],
+        [isActive ? 1 : 0, updatedBy || null, ...ids, environment]
       );
 
       // Invalidate ETag cache and publish SDK events for each updated product
       if (result.affectedRows > 0) {
         try {
           // Invalidate ETag cache so SDK fetches fresh data
-          await pubSubService.invalidateKey(
-            `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`,
-          );
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`);
 
           for (const id of ids) {
             await pubSubService.publishSDKEvent({
-              type: "store_product.updated",
+              type: 'store_product.updated',
               data: {
                 id,
                 environment: environment,
@@ -718,7 +677,7 @@ class StoreProductService {
             });
           }
         } catch (eventError) {
-          logger.warn("Failed to publish store product SDK event", {
+          logger.warn('Failed to publish store product SDK event', {
             eventError,
             ids,
           });
@@ -727,12 +686,12 @@ class StoreProductService {
 
       return result.affectedRows;
     } catch (error) {
-      logger.error("Failed to bulk update active status", {
+      logger.error('Failed to bulk update active status', {
         error,
         ids,
         isActive,
       });
-      throw new GatrixError("Failed to bulk update active status", 500);
+      throw new GatrixError('Failed to bulk update active status', 500);
     }
   }
 
@@ -747,41 +706,35 @@ class StoreProductService {
       targetIsActive: boolean;
       environment: string;
     },
-    updatedBy?: number,
+    updatedBy?: number
   ): Promise<{ affectedCount: number; affectedIds: string[] }> {
     const pool = database.getPool();
     const environment = params.environment;
 
     try {
       // Build WHERE clause
-      const conditions: string[] = ["environment = ?"];
+      const conditions: string[] = ['environment = ?'];
       const queryParams: (string | number | boolean | null)[] = [environment];
 
       if (params.search) {
         conditions.push(
-          "(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ?)",
+          '(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ?)'
         );
         const searchPattern = `%${params.search}%`;
-        queryParams.push(
-          searchPattern,
-          searchPattern,
-          searchPattern,
-          searchPattern,
-          searchPattern,
-        );
+        queryParams.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
       }
 
       if (params.currentIsActive !== undefined) {
-        conditions.push("isActive = ?");
+        conditions.push('isActive = ?');
         queryParams.push(params.currentIsActive ? 1 : 0);
       }
 
-      const whereClause = `WHERE ${conditions.join(" AND ")}`;
+      const whereClause = `WHERE ${conditions.join(' AND ')}`;
 
       // First, get the IDs that will be affected
       const [affectedRows] = await pool.execute<RowDataPacket[]>(
         `SELECT id FROM g_store_products ${whereClause}`,
-        queryParams,
+        queryParams
       );
       const affectedIds = affectedRows.map((row: RowDataPacket) => row.id);
 
@@ -792,20 +745,18 @@ class StoreProductService {
       // Perform the update
       const [result] = await pool.execute<ResultSetHeader>(
         `UPDATE g_store_products SET isActive = ?, updatedBy = ?, updatedAt = UTC_TIMESTAMP() ${whereClause}`,
-        [params.targetIsActive ? 1 : 0, updatedBy || null, ...queryParams],
+        [params.targetIsActive ? 1 : 0, updatedBy || null, ...queryParams]
       );
 
       // Invalidate ETag cache and publish SDK events
       if (result.affectedRows > 0) {
         try {
           // Invalidate ETag cache so SDK fetches fresh data
-          await pubSubService.invalidateKey(
-            `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`,
-          );
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`);
 
           // Publish a batch event instead of individual events for performance
           await pubSubService.publishSDKEvent({
-            type: "store_product.bulk_updated",
+            type: 'store_product.bulk_updated',
             data: {
               count: result.affectedRows,
               environment: environment,
@@ -814,13 +765,13 @@ class StoreProductService {
             },
           });
 
-          logger.info("Published store product bulk update SDK event", {
+          logger.info('Published store product bulk update SDK event', {
             count: result.affectedRows,
             environment: environment,
             isActive: params.targetIsActive,
           });
         } catch (eventError) {
-          logger.warn("Failed to publish store product SDK event", {
+          logger.warn('Failed to publish store product SDK event', {
             eventError,
           });
         }
@@ -828,14 +779,11 @@ class StoreProductService {
 
       return { affectedCount: result.affectedRows, affectedIds };
     } catch (error) {
-      logger.error("Failed to bulk update active status by filter", {
+      logger.error('Failed to bulk update active status by filter', {
         error,
         params,
       });
-      throw new GatrixError(
-        "Failed to bulk update active status by filter",
-        500,
-      );
+      throw new GatrixError('Failed to bulk update active status by filter', 500);
     }
   }
 
@@ -852,39 +800,33 @@ class StoreProductService {
 
     try {
       // Build WHERE clause
-      const conditions: string[] = ["environment = ?"];
+      const conditions: string[] = ['environment = ?'];
       const queryParams: (string | number | boolean | null)[] = [environment];
 
       if (params.search) {
         conditions.push(
-          "(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ?)",
+          '(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ?)'
         );
         const searchPattern = `%${params.search}%`;
-        queryParams.push(
-          searchPattern,
-          searchPattern,
-          searchPattern,
-          searchPattern,
-          searchPattern,
-        );
+        queryParams.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
       }
 
       if (params.isActive !== undefined) {
-        conditions.push("isActive = ?");
+        conditions.push('isActive = ?');
         queryParams.push(params.isActive ? 1 : 0);
       }
 
-      const whereClause = `WHERE ${conditions.join(" AND ")}`;
+      const whereClause = `WHERE ${conditions.join(' AND ')}`;
 
       const [rows] = await pool.execute<RowDataPacket[]>(
         `SELECT COUNT(*) as total FROM g_store_products ${whereClause}`,
-        queryParams,
+        queryParams
       );
 
       return rows[0].total;
     } catch (error) {
-      logger.error("Failed to get count by filter", { error, params });
-      throw new GatrixError("Failed to get count by filter", 500);
+      logger.error('Failed to get count by filter', { error, params });
+      throw new GatrixError('Failed to get count by filter', 500);
     }
   }
 
@@ -895,16 +837,14 @@ class StoreProductService {
   static async previewSync(environment: string): Promise<SyncPreviewResult> {
     try {
       // Get planning data products (unified multi-language file)
-      const planningData =
-        await PlanningDataService.getCashShopLookup(environment);
+      const planningData = await PlanningDataService.getCashShopLookup(environment);
       const planningProducts: CmsCashShopProduct[] = planningData.items || [];
 
       // Get current DB products
       const pool = database.getPool();
-      const [rows] = await pool.execute(
-        "SELECT * FROM g_store_products WHERE environment = ?",
-        [environment],
-      );
+      const [rows] = await pool.execute('SELECT * FROM g_store_products WHERE environment = ?', [
+        environment,
+      ]);
       const dbProducts = rows as StoreProduct[];
 
       // Create maps for comparison - use id as key (productCode can be duplicated)
@@ -930,9 +870,9 @@ class StoreProductService {
         const dbProduct = dbMap.get(cmsProductId);
 
         // Get multi-language values from planning data
-        const nameKo = planningProduct.name?.ko || "";
-        const nameEn = planningProduct.name?.en || "";
-        const nameZh = planningProduct.name?.zh || "";
+        const nameKo = planningProduct.name?.ko || '';
+        const nameEn = planningProduct.name?.en || '';
+        const nameZh = planningProduct.name?.zh || '';
         const descKo = planningProduct.description?.ko || null;
         const descEn = planningProduct.description?.en || null;
         const descZh = planningProduct.description?.zh || null;
@@ -959,21 +899,21 @@ class StoreProductService {
           // Check multi-language name changes
           if (dbProduct.nameKo !== nameKo) {
             changes.push({
-              field: "nameKo",
+              field: 'nameKo',
               oldValue: dbProduct.nameKo,
               newValue: nameKo,
             });
           }
           if (dbProduct.nameEn !== nameEn) {
             changes.push({
-              field: "nameEn",
+              field: 'nameEn',
               oldValue: dbProduct.nameEn,
               newValue: nameEn,
             });
           }
           if (dbProduct.nameZh !== nameZh) {
             changes.push({
-              field: "nameZh",
+              field: 'nameZh',
               oldValue: dbProduct.nameZh,
               newValue: nameZh,
             });
@@ -982,7 +922,7 @@ class StoreProductService {
           // Check productCode (productId) change
           if (dbProduct.productId !== planningProduct.productCode) {
             changes.push({
-              field: "productId",
+              field: 'productId',
               oldValue: dbProduct.productId,
               newValue: planningProduct.productCode,
             });
@@ -990,30 +930,30 @@ class StoreProductService {
 
           if (Number(dbProduct.price) !== planningProduct.price) {
             changes.push({
-              field: "price",
+              field: 'price',
               oldValue: dbProduct.price,
               newValue: planningProduct.price,
             });
           }
 
           // Check multi-language description changes
-          if ((dbProduct.descriptionKo || "") !== (descKo || "")) {
+          if ((dbProduct.descriptionKo || '') !== (descKo || '')) {
             changes.push({
-              field: "descriptionKo",
+              field: 'descriptionKo',
               oldValue: dbProduct.descriptionKo,
               newValue: descKo,
             });
           }
-          if ((dbProduct.descriptionEn || "") !== (descEn || "")) {
+          if ((dbProduct.descriptionEn || '') !== (descEn || '')) {
             changes.push({
-              field: "descriptionEn",
+              field: 'descriptionEn',
               oldValue: dbProduct.descriptionEn,
               newValue: descEn,
             });
           }
-          if ((dbProduct.descriptionZh || "") !== (descZh || "")) {
+          if ((dbProduct.descriptionZh || '') !== (descZh || '')) {
             changes.push({
-              field: "descriptionZh",
+              field: 'descriptionZh',
               oldValue: dbProduct.descriptionZh,
               newValue: descZh,
             });
@@ -1055,8 +995,8 @@ class StoreProductService {
         },
       };
     } catch (error) {
-      logger.error("Failed to preview sync", { error, environment });
-      throw new GatrixError("Failed to preview sync with planning data", 500);
+      logger.error('Failed to preview sync', { error, environment });
+      throw new GatrixError('Failed to preview sync with planning data', 500);
     }
   }
 
@@ -1066,21 +1006,17 @@ class StoreProductService {
   static async applySync(
     environment: string,
     userId?: number,
-    selected?: SelectedSyncItems,
+    selected?: SelectedSyncItems
   ): Promise<SyncApplyResult> {
     const pool = database.getPool();
     const preview = await this.previewSync(environment);
 
     // Filter items based on selection if provided
     const toAddFiltered = selected?.toAdd
-      ? preview.toAdd.filter((item) =>
-          selected.toAdd.includes(item.cmsProductId),
-        )
+      ? preview.toAdd.filter((item) => selected.toAdd.includes(item.cmsProductId))
       : preview.toAdd;
     const toUpdateFiltered = selected?.toUpdate
-      ? preview.toUpdate.filter((item) =>
-          selected.toUpdate.includes(item.cmsProductId),
-        )
+      ? preview.toUpdate.filter((item) => selected.toUpdate.includes(item.cmsProductId))
       : preview.toUpdate;
     const toDeleteFiltered = selected?.toDelete
       ? preview.toDelete.filter((item) => selected.toDelete.includes(item.id))
@@ -1111,9 +1047,9 @@ class StoreProductService {
             item.nameKo,
             item.nameEn,
             item.nameZh,
-            "sdo", // Default store
+            'sdo', // Default store
             item.price,
-            "CNY", // Default currency
+            'CNY', // Default currency
             null, // saleStartAt
             null, // saleEndAt
             item.description, // description (default display description)
@@ -1122,7 +1058,7 @@ class StoreProductService {
             item.descriptionZh,
             null, // metadata
             userId || null,
-          ],
+          ]
         );
         addedCount++;
       }
@@ -1137,14 +1073,14 @@ class StoreProductService {
           // Handle multi-language fields and productId
           if (
             [
-              "nameKo",
-              "nameEn",
-              "nameZh",
-              "descriptionKo",
-              "descriptionEn",
-              "descriptionZh",
-              "price",
-              "productId",
+              'nameKo',
+              'nameEn',
+              'nameZh',
+              'descriptionKo',
+              'descriptionEn',
+              'descriptionZh',
+              'price',
+              'productId',
             ].includes(field)
           ) {
             updates.push(`${field} = ?`);
@@ -1153,33 +1089,29 @@ class StoreProductService {
         }
 
         // Also update productName and description with default language values
-        const nameZhChange = item.changes.find((c) => c.field === "nameZh");
-        const nameKoChange = item.changes.find((c) => c.field === "nameKo");
+        const nameZhChange = item.changes.find((c) => c.field === 'nameZh');
+        const nameKoChange = item.changes.find((c) => c.field === 'nameKo');
         if (nameZhChange || nameKoChange) {
-          updates.push("productName = ?");
-          values.push(nameZhChange?.newValue || nameKoChange?.newValue || "");
+          updates.push('productName = ?');
+          values.push(nameZhChange?.newValue || nameKoChange?.newValue || '');
         }
 
-        const descZhChange = item.changes.find(
-          (c) => c.field === "descriptionZh",
-        );
-        const descKoChange = item.changes.find(
-          (c) => c.field === "descriptionKo",
-        );
+        const descZhChange = item.changes.find((c) => c.field === 'descriptionZh');
+        const descKoChange = item.changes.find((c) => c.field === 'descriptionKo');
         if (descZhChange || descKoChange) {
-          updates.push("description = ?");
+          updates.push('description = ?');
           values.push(descZhChange?.newValue || descKoChange?.newValue || null);
         }
 
         if (updates.length > 0) {
-          updates.push("updatedBy = ?");
+          updates.push('updatedBy = ?');
           values.push(userId || null);
-          updates.push("updatedAt = UTC_TIMESTAMP()");
+          updates.push('updatedAt = UTC_TIMESTAMP()');
           values.push(item.id);
 
           await pool.execute(
-            `UPDATE g_store_products SET ${updates.join(", ")} WHERE id = ?`,
-            values,
+            `UPDATE g_store_products SET ${updates.join(', ')} WHERE id = ?`,
+            values
           );
           updatedCount++;
         }
@@ -1188,15 +1120,13 @@ class StoreProductService {
       // Delete removed products
       for (const item of toDeleteFiltered) {
         // First delete associated tags by setting empty array
-        await TagService.setTagsForEntity("store_product", item.id, []);
+        await TagService.setTagsForEntity('store_product', item.id, []);
         // Then delete the product
-        await pool.execute("DELETE FROM g_store_products WHERE id = ?", [
-          item.id,
-        ]);
+        await pool.execute('DELETE FROM g_store_products WHERE id = ?', [item.id]);
         deletedCount++;
       }
 
-      logger.info("Sync applied successfully", {
+      logger.info('Sync applied successfully', {
         environment,
         addedCount,
         updatedCount,
@@ -1210,8 +1140,8 @@ class StoreProductService {
         deletedCount,
       };
     } catch (error) {
-      logger.error("Failed to apply sync", { error, environment });
-      throw new GatrixError("Failed to apply sync with planning data", 500);
+      logger.error('Failed to apply sync', { error, environment });
+      throw new GatrixError('Failed to apply sync with planning data', 500);
     }
   }
 }

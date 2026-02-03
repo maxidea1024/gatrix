@@ -1,5 +1,5 @@
-import database from "../config/database";
-import logger from "../config/logger";
+import database from '../config/database';
+import logger from '../config/logger';
 
 async function createPasswordResetTable() {
   try {
@@ -20,9 +20,9 @@ async function createPasswordResetTable() {
     `;
 
     await database.query(sql);
-    logger.info("Password reset tokens table created successfully");
+    logger.info('Password reset tokens table created successfully');
   } catch (error) {
-    logger.error("Error creating password reset tokens table:", error);
+    logger.error('Error creating password reset tokens table:', error);
     throw error;
   } finally {
     await database.close();
@@ -31,10 +31,10 @@ async function createPasswordResetTable() {
 
 createPasswordResetTable()
   .then(() => {
-    console.log("Password reset table creation completed");
+    console.log('Password reset table creation completed');
     process.exit(0);
   })
   .catch((error) => {
-    console.error("Password reset table creation failed:", error);
+    console.error('Password reset table creation failed:', error);
     process.exit(1);
   });

@@ -6,13 +6,9 @@
  * NOTE: Game servers register directly to etcd/Redis, not via HTTP API
  */
 
-import { Request, Response } from "express";
-import serviceDiscoveryService from "../services/serviceDiscoveryService";
-import {
-  sendInternalError,
-  sendSuccessResponse,
-  ErrorCodes,
-} from "../utils/apiResponse";
+import { Request, Response } from 'express';
+import serviceDiscoveryService from '../services/serviceDiscoveryService';
+import { sendInternalError, sendSuccessResponse, ErrorCodes } from '../utils/apiResponse';
 
 class ServiceDiscoveryController {
   /**
@@ -22,18 +18,15 @@ class ServiceDiscoveryController {
   async getServices(req: Request, res: Response) {
     try {
       const { type, group } = req.query;
-      const services = await serviceDiscoveryService.getServices(
-        type as string,
-        group as string,
-      );
+      const services = await serviceDiscoveryService.getServices(type as string, group as string);
 
       return sendSuccessResponse(res, services);
     } catch (error) {
       return sendInternalError(
         res,
-        "Failed to get services",
+        'Failed to get services',
         error,
-        ErrorCodes.SERVICE_DISCOVERY_ERROR,
+        ErrorCodes.SERVICE_DISCOVERY_ERROR
       );
     }
   }
@@ -50,9 +43,9 @@ class ServiceDiscoveryController {
     } catch (error) {
       return sendInternalError(
         res,
-        "Failed to get service stats",
+        'Failed to get service stats',
         error,
-        ErrorCodes.SERVICE_DISCOVERY_ERROR,
+        ErrorCodes.SERVICE_DISCOVERY_ERROR
       );
     }
   }
@@ -69,9 +62,9 @@ class ServiceDiscoveryController {
     } catch (error) {
       return sendInternalError(
         res,
-        "Failed to get service types",
+        'Failed to get service types',
         error,
-        ErrorCodes.SERVICE_DISCOVERY_ERROR,
+        ErrorCodes.SERVICE_DISCOVERY_ERROR
       );
     }
   }
