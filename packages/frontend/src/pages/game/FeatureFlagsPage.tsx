@@ -235,6 +235,11 @@ const FeatureFlagsPage: React.FC = () => {
     return filter?.value as string[] | undefined;
   }, [activeFilters]);
 
+  const flagUsageFilter = useMemo(() => {
+    const filter = activeFilters.find((f) => f.key === "flagUsage");
+    return filter?.value as string[] | undefined;
+  }, [activeFilters]);
+
   // Icon helpers for filter options
   const getStatusIcon = (status: string) => {
     const iconProps = { sx: { fontSize: 16 } };
@@ -447,6 +452,13 @@ const FeatureFlagsPage: React.FC = () => {
         if (tagFilter && tagFilter.length > 0) {
           filteredFlags = filteredFlags.filter((f) =>
             tagFilter.some((tag) => f.tags?.includes(tag))
+          );
+        }
+
+        // Filter by flagUsage
+        if (flagUsageFilter && flagUsageFilter.length > 0) {
+          filteredFlags = filteredFlags.filter((f) =>
+            flagUsageFilter.includes(f.flagUsage || "flag")
           );
         }
 
@@ -757,6 +769,7 @@ const FeatureFlagsPage: React.FC = () => {
     flagTypeFilter,
     statusFilter,
     tagFilter,
+    flagUsageFilter,
   ]);
 
   useEffect(() => {
