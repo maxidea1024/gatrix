@@ -66,7 +66,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
       if (onValidation) onValidation(false, errorMsg);
       setInternalError(errorMsg);
     }
-  }, [value, json5Mode, onValidationError, onValidation]);
+  }, [value, json5Mode]);
 
   // Displayed error: external error takes priority, then internal validation error
   const displayError = error || internalError;

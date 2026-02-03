@@ -22,6 +22,7 @@ import {
   Alert,
   Slider,
   Collapse,
+  Chip,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -338,19 +339,12 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             </Typography>
           )}
           {hasChanges && (
-            <Typography
-              variant="caption"
-              sx={{
-                color: 'warning.main',
-                bgcolor: 'warning.light',
-                px: 1,
-                py: 0.25,
-                borderRadius: 1,
-                fontWeight: 500,
-              }}
-            >
-              {t('common.unsavedChanges')}
-            </Typography>
+            <Chip
+              label={t('common.unsavedChanges')}
+              size="small"
+              color="warning"
+              sx={{ fontWeight: 600, height: 20, borderRadius: '12px' }}
+            />
           )}
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -595,7 +589,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                               },
                             })
                           }
-                          onValidation={(error) =>
+                          onValidationError={(error) =>
                             setJsonErrors((prev) => ({ ...prev, [index]: error }))
                           }
                           readOnly={!canManage || isArchived}
@@ -618,11 +612,26 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                           disabled={!canManage || isArchived}
                         />
                       )}
-                      {hasJsonError && (
-                        <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
-                          {jsonErrors[index]}
-                        </Typography>
-                      )}
+                      <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', minHeight: '20px' }}>
+                        {hasJsonError ? (
+                          <Typography variant="caption" color="error" sx={{ display: 'block' }}>
+                            {jsonErrors[index]}
+                          </Typography>
+                        ) : (
+                          (variantType === 'string' || variantType === 'json') &&
+                          (variant.payload?.value || '').length > 0 && (
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ ml: 'auto', display: 'block' }}
+                            >
+                              {t('featureFlags.payloadSize', {
+                                size: new TextEncoder().encode(variant.payload?.value || '').length,
+                              })}
+                            </Typography>
+                          )
+                        )}
+                      </Box>
                     </Box>
                   </Box>
                 </Box>
