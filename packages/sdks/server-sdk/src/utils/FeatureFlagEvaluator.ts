@@ -80,7 +80,8 @@ export class FeatureFlagEvaluator {
     if (strategy.segments && strategy.segments.length > 0) {
       for (const segmentName of strategy.segments) {
         const segment = segmentsMap.get(segmentName);
-        if (!segment || !segment.isActive) continue;
+        // isActive is for UI display only, not for evaluation
+        if (!segment) continue;
 
         if (segment.constraints && segment.constraints.length > 0) {
           const segmentPass = segment.constraints.every((c) => this.evaluateConstraint(c, context));

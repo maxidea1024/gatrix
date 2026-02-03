@@ -954,10 +954,7 @@ export class FeatureFlagService {
           });
           continue;
         }
-        if (!segment.isActive) {
-          // Inactive segment - skip
-          continue;
-        }
+        // isActive is for UI selector display only, not for evaluation
         // All segment constraints must pass
         const segmentPass = segment.constraints.every((c) => this.evaluateConstraint(c, context));
         if (!segmentPass) {

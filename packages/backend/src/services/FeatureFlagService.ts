@@ -930,28 +930,6 @@ class FeatureFlagService {
       );
     }
 
-    // // Don't allow deleting system fields
-    // const systemFields = [
-    //   "userId",
-    //   "sessionId",
-    //   "environmentName",
-    //   "appName",
-    //   "appVersion",
-    //   "country",
-    //   "city",
-    //   "ip",
-    //   "userAgent",
-    //   "currentTime",
-    // ];
-    // if (systemFields.includes(fieldName)) {
-    //   throw new GatrixError(
-    //     `Cannot delete system context field '${fieldName}'`,
-    //     403,
-    //     true,
-    //     ErrorCodes.FORBIDDEN,
-    //   );
-    // }
-
     await FeatureContextFieldModel.delete(fieldName);
   }
 
