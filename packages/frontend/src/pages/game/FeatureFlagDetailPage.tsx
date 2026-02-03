@@ -2213,14 +2213,20 @@ const FeatureFlagDetailPage: React.FC = () => {
                             {/* Playground test button */}
                             <Tooltip title={t("featureFlags.testInPlayground")}>
                               <IconButton
-                                size="small"
-                                color="primary"
+                                size="medium"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setPlaygroundInitialEnvironments([env.environment]);
                                   setPlaygroundOpen(true);
                                 }}
-                                sx={{ mr: 0.5 }}
+                                sx={{
+                                  mr: 1,
+                                  bgcolor: 'primary.main',
+                                  color: 'white',
+                                  '&:hover': {
+                                    bgcolor: 'primary.dark',
+                                  },
+                                }}
                               >
                                 <JoystickIcon fontSize="small" />
                               </IconButton>
