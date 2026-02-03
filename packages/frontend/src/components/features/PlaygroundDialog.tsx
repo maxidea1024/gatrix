@@ -914,7 +914,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({ open, onClose }) =>
                                                                                     />
                                                                                 ) : (
                                                                                     <Typography variant="caption" color="text.disabled">
-                                                                                        {t('playground.noVariant')}
+                                                                                        {t(flagInfo.flagUsage === 'remoteConfig' ? 'playground.noConfig' : 'playground.noVariant')}
                                                                                     </Typography>
                                                                                 )}
                                                                             </Box>
