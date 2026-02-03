@@ -82,6 +82,7 @@ import {
   PowerOff as KillSwitchIcon,
   ReportProblem as StaleIcon,
   Block as BlockIcon,
+  Flag as FlagIcon,
 } from "@mui/icons-material";
 import { useAuth } from "../../contexts/AuthContext";
 import { PERMISSIONS } from "../../types/permissions";
@@ -133,6 +134,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import EnvironmentVariantsEditor, { Variant as EditorVariant } from "../../components/features/EnvironmentVariantsEditor";
 
 // ==================== Types ====================
 
@@ -446,6 +448,10 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [envStrategies, setEnvStrategies] = useState<
     Record<string, Strategy[]>
   >({});
+  // Environment-specific variants - key is environment name, value is array of variants
+  const [envVariants, setEnvVariants] = useState<
+    Record<string, Variant[]>
+  >({});
 
   // Drag and drop sensors for strategy reordering
   const sensors = useSensors(
@@ -622,6 +628,7 @@ const FeatureFlagDetailPage: React.FC = () => {
       if (!targetFlagName || envList.length === 0) return;
 
       const strategiesMap: Record<string, Strategy[]> = {};
+      const variantsMap: Record<string, Variant[]> = {};
       for (const env of envList) {
         try {
           const response = await api.get(`/admin/features/${targetFlagName}`, {
@@ -638,6 +645,9 @@ const FeatureFlagDetailPage: React.FC = () => {
             weightLock: v.weightLock || false,
           }));
 
+          // Store variants separately for environment-specific management
+          variantsMap[env.environment] = flagVariants;
+
           const strategies = (data.strategies || []).map(
             (s: any, index: number) => ({
               ...s,
@@ -650,10 +660,12 @@ const FeatureFlagDetailPage: React.FC = () => {
           strategiesMap[env.environment] = strategies;
         } catch {
           strategiesMap[env.environment] = [];
+          variantsMap[env.environment] = [];
         }
       }
 
       setEnvStrategies(strategiesMap);
+      setEnvVariants(variantsMap);
     },
     [],
   );
@@ -1207,7 +1219,47 @@ const FeatureFlagDetailPage: React.FC = () => {
     }
   };
 
+  // Handler for saving environment-specific variants from EnvironmentVariantsEditor
+  const handleSaveEnvVariants = async (envName: string, variants: EditorVariant[]) => {
+    if (!flag) return;
+
+    try {
+      if (!isCreating) {
+        // Convert frontend Variant format to backend API format
+        const apiVariants = variants.map((v) => ({
+          variantName: v.name,
+          weight: v.weight,
+          payload: v.payload,
+          stickiness: v.stickiness || "default",
+          weightLock: v.weightLock,
+        }));
+        await api.put(
+          `/admin/features/${flag.flagName}/variants`,
+          { variants: apiVariants },
+          {
+            headers: { "x-environment": envName },
+          },
+        );
+        // Reload strategies and variants from server after save
+        await loadEnvStrategies(environments, flag.flagName);
+        enqueueSnackbar(t("featureFlags.variantsSaved"), { variant: "success" });
+      } else {
+        // Update environment-specific variants for create mode
+        setEnvVariants((prev) => ({
+          ...prev,
+          [envName]: variants as Variant[],
+        }));
+        enqueueSnackbar(t("featureFlags.variantsSaved"), { variant: "success" });
+      }
+    } catch (error: any) {
+      enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.variantsSaveFailed"), {
+        variant: "error",
+      });
+    }
+  };
+
   const handleOpenDeleteStrategyConfirm = (
+
     strategyId: string | undefined,
     index: number,
     envName: string,
@@ -1516,6 +1568,32 @@ const FeatureFlagDetailPage: React.FC = () => {
               </Typography>
 
               <Stack spacing={1.5}>
+                {/* Flag Usage (Classification: flag vs remoteConfig) */}
+                {!isCreating && (
+                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {t("featureFlags.flagUsageLabel")}
+                    </Typography>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      {flag.flagUsage === "remoteConfig" ? (
+                        <>
+                          <JsonIcon sx={{ fontSize: 16, color: "secondary.main" }} />
+                          <Typography variant="body2">
+                            {t("featureFlags.flagUsages.remoteConfig")}
+                          </Typography>
+                        </>
+                      ) : (
+                        <>
+                          <FlagIcon sx={{ fontSize: 16, color: "primary.main" }} />
+                          <Typography variant="body2">
+                            {t("featureFlags.flagUsages.flag")}
+                          </Typography>
+                        </>
+                      )}
+                    </Box>
+                  </Box>
+                )}
+
                 {/* Flag Type */}
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Typography variant="body2" color="text.secondary">
@@ -2245,45 +2323,63 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                           <AccordionDetails sx={{ px: 2, pt: 0, pb: 2 }}>
                             {strategies.length === 0 ? (
-                              <Box
-                                sx={{
-                                  py: 4,
-                                  px: 3,
-                                  textAlign: "center",
-                                  border: "2px dashed",
-                                  borderColor: "divider",
-                                  borderRadius: 1,
-                                  bgcolor: "action.hover",
-                                }}
-                              >
-                                <Typography
-                                  variant="body1"
-                                  fontWeight="medium"
-                                  color="text.secondary"
-                                  sx={{ mb: 1 }}
+                              <>
+                                <Box
+                                  sx={{
+                                    py: 4,
+                                    px: 3,
+                                    textAlign: "center",
+                                    border: "2px dashed",
+                                    borderColor: "divider",
+                                    borderRadius: 1,
+                                    bgcolor: "action.hover",
+                                  }}
                                 >
-                                  {t("featureFlags.noStrategiesTitle")}
-                                </Typography>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                  sx={{ mb: 2 }}
-                                >
-                                  {t("featureFlags.noStrategiesDescription")}
-                                </Typography>
-                                {canManage && (
-                                  <Button
-                                    variant="contained"
-                                    startIcon={<AddIcon />}
-                                    onClick={() =>
-                                      handleAddStrategy(env.environment)
-                                    }
-                                    size="small"
+                                  <Typography
+                                    variant="body1"
+                                    fontWeight="medium"
+                                    color="text.secondary"
+                                    sx={{ mb: 1 }}
                                   >
-                                    {t("featureFlags.addFirstStrategy")}
-                                  </Button>
-                                )}
-                              </Box>
+                                    {t("featureFlags.noStrategiesTitle")}
+                                  </Typography>
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ mb: 2 }}
+                                  >
+                                    {t("featureFlags.noStrategiesDescription")}
+                                  </Typography>
+                                  {canManage && (
+                                    <Button
+                                      variant="contained"
+                                      startIcon={<AddIcon />}
+                                      onClick={() =>
+                                        handleAddStrategy(env.environment)
+                                      }
+                                      size="small"
+                                    >
+                                      {t("featureFlags.addFirstStrategy")}
+                                    </Button>
+                                  )}
+                                </Box>
+
+                                {/* Divider between strategies and variants */}
+                                <Divider sx={{ my: 2 }} />
+
+                                {/* Environment-specific Variants Editor */}
+                                <EnvironmentVariantsEditor
+                                  environment={env.environment}
+                                  variants={(envVariants[env.environment] || []) as EditorVariant[]}
+                                  variantType={flag.variantType || "none"}
+                                  flagUsage={flag.flagUsage || "flag"}
+                                  baselinePayload={flag.baselinePayload}
+                                  canManage={canManage}
+                                  isArchived={flag.isArchived}
+                                  onSave={(variants) => handleSaveEnvVariants(env.environment, variants)}
+                                  onGoToPayloadTab={() => setTabValue(1)}
+                                />
+                              </>
                             ) : (
                               <>
                                 <DndContext
@@ -3330,122 +3426,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                       </Box>
                                                     )}
 
-                                                  {/* Variants Bar */}
-                                                  {strategy.variants &&
-                                                    strategy.variants.length >
-                                                    0 && (
-                                                      <Box sx={{ mb: 1 }}>
-                                                        <Paper
-                                                          variant="outlined"
-                                                          sx={{ p: 1.5 }}
-                                                        >
-                                                          <Typography
-                                                            variant="body2"
-                                                            color="text.secondary"
-                                                            sx={{
-                                                              fontWeight: 500,
-                                                              mb: 0.5,
-                                                            }}
-                                                          >
-                                                            {t(
-                                                              "featureFlags.variants",
-                                                            )}{" "}
-                                                            (
-                                                            {
-                                                              strategy.variants
-                                                                .length
-                                                            }
-                                                            )
-                                                          </Typography>
-                                                          <Box
-                                                            sx={{
-                                                              height: 28,
-                                                              display: "flex",
-                                                              overflow:
-                                                                "hidden",
-                                                            }}
-                                                          >
-                                                            {strategy.variants.map(
-                                                              (
-                                                                variant,
-                                                                vIdx,
-                                                              ) => {
-                                                                const colors = [
-                                                                  "#5E35B1",
-                                                                  "#1E88E5",
-                                                                  "#00897B",
-                                                                  "#F4511E",
-                                                                  "#D81B60",
-                                                                  "#3949AB",
-                                                                ];
-                                                                return (
-                                                                  <Tooltip
-                                                                    key={vIdx}
-                                                                    title={`${variant.name}: ${variant.weight}%`}
-                                                                  >
-                                                                    <Box
-                                                                      sx={{
-                                                                        width: `${variant.weight}%`,
-                                                                        bgcolor:
-                                                                          colors[
-                                                                          vIdx %
-                                                                          colors.length
-                                                                          ],
-                                                                        display:
-                                                                          "flex",
-                                                                        alignItems:
-                                                                          "center",
-                                                                        justifyContent:
-                                                                          "center",
-                                                                        color:
-                                                                          "white",
-                                                                        fontSize:
-                                                                          "0.75rem",
-                                                                        fontWeight: 600,
-                                                                        textShadow:
-                                                                          "0 1px 2px rgba(0,0,0,0.3)",
-                                                                      }}
-                                                                    >
-                                                                      {variant.weight >
-                                                                        15 && (
-                                                                          <Box
-                                                                            sx={{
-                                                                              display:
-                                                                                "flex",
-                                                                              flexDirection:
-                                                                                "column",
-                                                                              alignItems:
-                                                                                "center",
-                                                                              lineHeight: 1.2,
-                                                                            }}
-                                                                          >
-                                                                            <span
-                                                                              style={{
-                                                                                fontSize:
-                                                                                  "0.65rem",
-                                                                              }}
-                                                                            >
-                                                                              {
-                                                                                variant.weight
-                                                                              }
-                                                                              %
-                                                                            </span>
-                                                                            <span>
-                                                                              {
-                                                                                variant.name
-                                                                              }
-                                                                            </span>
-                                                                          </Box>
-                                                                        )}
-                                                                    </Box>
-                                                                  </Tooltip>
-                                                                );
-                                                              },
-                                                            )}
-                                                          </Box>
-                                                        </Paper>
-                                                      </Box>
-                                                    )}
                                                 </Box>
                                               </Paper>
                                             )}
@@ -3477,6 +3457,22 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     </Button>
                                   </Box>
                                 )}
+
+                                {/* Divider between strategies and variants */}
+                                <Divider sx={{ my: 2 }} />
+
+                                {/* Environment-specific Variants Editor */}
+                                <EnvironmentVariantsEditor
+                                  environment={env.environment}
+                                  variants={(envVariants[env.environment] || []) as EditorVariant[]}
+                                  variantType={flag.variantType || "none"}
+                                  flagUsage={flag.flagUsage || "flag"}
+                                  baselinePayload={flag.baselinePayload}
+                                  canManage={canManage}
+                                  isArchived={flag.isArchived}
+                                  onSave={(variants) => handleSaveEnvVariants(env.environment, variants)}
+                                  onGoToPayloadTab={() => setTabValue(1)}
+                                />
                               </>
                             )}
                           </AccordionDetails>
@@ -3489,10 +3485,10 @@ const FeatureFlagDetailPage: React.FC = () => {
             </Stack>
           </Box>
         </Box>
-      </TabPanel>
+      </TabPanel >
 
       {/* Payload Tab */}
-      <TabPanel value={tabValue} index={1}>
+      < TabPanel value={tabValue} index={1} >
         <Box sx={{ maxWidth: 800 }}>
           <Paper
             variant="outlined"
@@ -3599,12 +3595,14 @@ const FeatureFlagDetailPage: React.FC = () => {
                   </Select>
                 </FormControl>
 
-                {/* Warning when type is changed (but not when changing to 'none' - that has its own warning) */}
-                {flag.variantType !== originalFlag?.variantType && flag.variantType !== "none" && (
-                  <Alert severity="warning" sx={{ mt: 1 }}>
-                    {t("featureFlags.variantTypeChangeWarning")}
-                  </Alert>
-                )}
+                {/* Warning when type is changed (but not when changing from/to 'none') */}
+                {flag.variantType !== originalFlag?.variantType &&
+                  flag.variantType !== "none" &&
+                  originalFlag?.variantType !== "none" && (
+                    <Alert severity="warning" sx={{ mt: 1 }}>
+                      {t("featureFlags.variantTypeChangeWarning")}
+                    </Alert>
+                  )}
 
                 {/* Additional warning when changing to 'none' from other type */}
                 {flag.variantType === "none" && originalFlag?.variantType && originalFlag.variantType !== "none" && (
@@ -3784,9 +3782,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                           }
                           : prev
                       );
-                      // If variant type changed, reload strategies to reflect payload reset
-                      if (variantTypeChanged) {
-                        await loadStrategiesForEnvironment(editingEnv || selectedEnv);
+                      // If variant type changed, reload strategies and variants to reflect changes
+                      if (variantTypeChanged && environments.length > 0) {
+                        await loadEnvStrategies(environments, flag.flagName);
                       }
                       enqueueSnackbar(t("common.saveSuccess"), {
                         variant: "success",
@@ -3816,10 +3814,10 @@ const FeatureFlagDetailPage: React.FC = () => {
             </Stack>
           </Paper>
         </Box>
-      </TabPanel>
+      </TabPanel >
 
       {/* Metrics Tab */}
-      <TabPanel value={tabValue} index={2}>
+      < TabPanel value={tabValue} index={2} >
         <FeatureFlagMetrics
           flagName={flag.flagName}
           environments={(flag.environments || []).map((e) => ({
@@ -3830,22 +3828,23 @@ const FeatureFlagDetailPage: React.FC = () => {
             flag.environments?.[0]?.environment || "production"
           }
         />
-      </TabPanel>
+      </TabPanel >
 
       {/* Delete Confirmation Dialog */}
-      <ConfirmDeleteDialog
+      < ConfirmDeleteDialog
         open={deleteDialogOpen}
         title={t("featureFlags.deleteConfirmTitle")}
-        description={t("featureFlags.deleteConfirmMessage", {
-          name: flag.flagName,
-        })}
+        description={
+          t("featureFlags.deleteConfirmMessage", {
+            name: flag.flagName,
+          })}
         onConfirm={handleDelete}
         onCancel={() => setDeleteDialogOpen(false)}
         confirmText={t("common.delete")}
       />
 
       {/* Strategy Delete Confirmation Dialog */}
-      <Dialog
+      < Dialog
         open={strategyDeleteConfirm.open}
         onClose={handleCloseDeleteStrategyConfirm}
       >
@@ -3866,10 +3865,10 @@ const FeatureFlagDetailPage: React.FC = () => {
             {t("common.delete")}
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog >
 
       {/* Edit Flag Settings Drawer */}
-      <ResizableDrawer
+      < ResizableDrawer
         open={editFlagDialogOpen}
         onClose={() => setEditFlagDialogOpen(false)}
         title={t("featureFlags.editFlagSettings")}
@@ -4042,10 +4041,10 @@ const FeatureFlagDetailPage: React.FC = () => {
             </Box>
           </>
         )}
-      </ResizableDrawer>
+      </ResizableDrawer >
 
       {/* Strategy Edit Drawer */}
-      <ResizableDrawer
+      < ResizableDrawer
         open={strategyDialogOpen}
         onClose={() => setStrategyDialogOpen(false)}
         title={
@@ -4108,6 +4107,31 @@ const FeatureFlagDetailPage: React.FC = () => {
               {/* General Tab */}
               {strategyTabValue === 0 && (
                 <Stack spacing={3}>
+                  {/* New strategy default disabled notice */}
+                  {(() => {
+                    // Determine if this is a new strategy in disabled state
+                    const isNewStrategy = editingStrategy.id?.startsWith("new-");
+                    const isRolloutStrategy = editingStrategy.name === "flexibleRollout" || editingStrategy.name?.includes("Rollout");
+                    const rolloutValue = editingStrategy.parameters?.rollout ?? 0;
+                    const isDisabled = editingStrategy.disabled !== false; // disabled by default
+                    const hasTargeting = (editingStrategy.constraints?.length || 0) > 0 || (editingStrategy.segments?.length || 0) > 0;
+
+                    // Show notice if:
+                    // - New strategy AND
+                    // - For rollout strategies: disabled or rollout is 0
+                    // - For non-rollout strategies: disabled and no targeting
+                    const shouldShowNotice = isNewStrategy && (
+                      (isRolloutStrategy && (isDisabled || rolloutValue === 0)) ||
+                      (!isRolloutStrategy && isDisabled && !hasTargeting)
+                    );
+
+                    return shouldShowNotice ? (
+                      <Alert severity="info">
+                        {t("featureFlags.newStrategyDefaultDisabledNotice")}
+                      </Alert>
+                    ) : null;
+                  })()}
+
                   {/* Strategy Type */}
                   <FormControl fullWidth>
                     <InputLabel>{t("featureFlags.strategyType")}</InputLabel>
@@ -5278,10 +5302,10 @@ const FeatureFlagDetailPage: React.FC = () => {
             </Box>
           </>
         )}
-      </ResizableDrawer>
+      </ResizableDrawer >
 
       {/* Variant Edit Drawer */}
-      <ResizableDrawer
+      < ResizableDrawer
         open={variantDialogOpen}
         onClose={() => setVariantDialogOpen(false)}
         title={t("featureFlags.editVariant")}
@@ -5341,10 +5365,10 @@ const FeatureFlagDetailPage: React.FC = () => {
             {t("common.save")}
           </Button>
         </Box>
-      </ResizableDrawer>
+      </ResizableDrawer >
 
       {/* Link Add/Edit Dialog */}
-      <Dialog
+      < Dialog
         open={linkDialogOpen}
         onClose={() => setLinkDialogOpen(false)}
         maxWidth="sm"
@@ -5392,10 +5416,10 @@ const FeatureFlagDetailPage: React.FC = () => {
             {t("common.save")}
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog >
 
       {/* Archive/Revive Confirmation Dialog */}
-      <Dialog
+      < Dialog
         open={archiveConfirmOpen}
         onClose={() => setArchiveConfirmOpen(false)}
         maxWidth="xs"
@@ -5425,10 +5449,10 @@ const FeatureFlagDetailPage: React.FC = () => {
             {flag?.isArchived ? t("featureFlags.revive") : t("featureFlags.archive")}
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog >
 
       {/* Stale Confirmation Dialog */}
-      <Dialog
+      < Dialog
         open={staleConfirmOpen}
         onClose={() => setStaleConfirmOpen(false)}
         maxWidth="xs"
@@ -5458,8 +5482,8 @@ const FeatureFlagDetailPage: React.FC = () => {
             {flag?.stale ? t("featureFlags.unmarkStale") : t("featureFlags.markStale")}
           </Button>
         </DialogActions>
-      </Dialog>
-    </Box>
+      </Dialog >
+    </Box >
   );
 };
 

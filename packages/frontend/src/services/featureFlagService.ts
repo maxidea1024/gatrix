@@ -7,7 +7,8 @@ export type FlagType =
   | "experiment"
   | "operational"
   | "killSwitch"
-  | "permission";
+  | "permission"; // Purpose
+export type FlagUsage = 'flag' | 'remoteConfig'; // Classification: Feature Flag vs Remote Config
 export type FlagStatus = "enabled" | "disabled" | "archived";
 
 // Per-environment settings
@@ -24,13 +25,15 @@ export interface FeatureFlag {
   flagName: string;
   displayName?: string;
   description?: string;
-  flagType: FlagType;
+  flagType: FlagType; // Purpose: release, experiment, operational, killSwitch, permission
+  flagUsage: FlagUsage; // Classification: 'flag' = Feature Flag, 'remoteConfig' = Remote Config
   isArchived: boolean;
   isFavorite?: boolean;
   impressionDataEnabled: boolean;
   staleAfterDays?: number;
   stale?: boolean;
   tags?: string[];
+  variantType?: 'none' | 'string' | 'number' | 'json';
   archivedAt?: string;
   createdBy?: number;
   updatedBy?: number;
@@ -48,6 +51,7 @@ export interface FeatureFlagListParams {
   limit?: number;
   search?: string;
   flagType?: FlagType;
+  flagUsage?: FlagUsage;
   isEnabled?: boolean;
   isArchived?: boolean;
   sortBy?: string;
@@ -66,6 +70,8 @@ export interface CreateFeatureFlagInput {
   displayName?: string;
   description?: string;
   flagType?: FlagType;
+  flagUsage?: FlagUsage;
+  variantType?: 'none' | 'string' | 'number' | 'json';
   isEnabled?: boolean;
   impressionDataEnabled?: boolean;
   staleAfterDays?: number;

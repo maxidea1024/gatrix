@@ -74,6 +74,7 @@ import {
   Numbers as NumberIcon,
   DataObject as JsonIcon,
   Block as BlockIcon,
+  ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
 import JsonEditor from "../../components/common/JsonEditor";
 import { useTranslation } from "react-i18next";
@@ -131,12 +132,14 @@ const FeatureFlagsPage: React.FC = () => {
 
   // Create dialog state
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [createMenuAnchor, setCreateMenuAnchor] = useState<null | HTMLElement>(null);
   const [creating, setCreating] = useState(false);
   const [newFlag, setNewFlag] = useState({
     flagName: "",
     displayName: "",
     description: "",
-    flagType: "release" as FlagType,
+    flagType: "release" as "release" | "experiment" | "operational" | "killSwitch" | "permission",
+    flagUsage: "flag" as "flag" | "remoteConfig",
     tags: [] as string[],
     impressionDataEnabled: false,
     variantType: "none" as "none" | "string" | "number" | "json",
@@ -179,6 +182,7 @@ const FeatureFlagsPage: React.FC = () => {
   const defaultColumns: ColumnConfig[] = [
     { id: "flagName", labelKey: "featureFlags.flagName", visible: true },
     { id: "status", labelKey: "featureFlags.status", visible: true },
+    { id: "flagUsage", labelKey: "featureFlags.flagUsage", visible: true },
     { id: "variantType", labelKey: "featureFlags.variantType", visible: true },
     { id: "createdBy", labelKey: "common.createdBy", visible: true },
     { id: "createdAt", labelKey: "featureFlags.createdAt", visible: true },
@@ -285,6 +289,15 @@ const FeatureFlagsPage: React.FC = () => {
             label: t("featureFlags.statusPotentiallyStale"),
             icon: getStatusIcon("potentiallyStale"),
           },
+        ],
+      },
+      {
+        key: "flagUsage",
+        label: t("featureFlags.flagUsage"),
+        type: "multiselect",
+        options: [
+          { value: "flag", label: t("featureFlags.flagUsages.flag") },
+          { value: "remoteConfig", label: t("featureFlags.flagUsages.remoteConfig") },
         ],
       },
       {
@@ -583,7 +596,8 @@ const FeatureFlagsPage: React.FC = () => {
               flagName: flag.flagName,
               displayName: flag.displayName,
               description: flag.description,
-              flagType: flag.flagType,
+              flagUsage: flag.flagUsage,
+              flagType: flag.flagType || "flag",
               tags: flag.tags,
               impressionDataEnabled: flag.impressionDataEnabled,
               variantType: flag.variantType || "string",
@@ -1200,6 +1214,7 @@ const FeatureFlagsPage: React.FC = () => {
         flagName: newFlag.flagName.trim(),
         displayName: newFlag.displayName.trim() || undefined,
         description: newFlag.description.trim(),
+        flagUsage: newFlag.flagUsage,
         flagType: newFlag.flagType,
         tags: newFlag.tags,
         impressionDataEnabled: newFlag.impressionDataEnabled,
@@ -1208,20 +1223,23 @@ const FeatureFlagsPage: React.FC = () => {
         strategies: [],
       });
 
+      const createdFlagName = newFlag.flagName.trim();
       enqueueSnackbar(t("featureFlags.createSuccess"), { variant: "success" });
       setCreateDialogOpen(false);
       setNewFlag({
         flagName: "",
         displayName: "",
         description: "",
-        flagType: "release",
+        flagUsage: "release",
+        flagType: "flag",
         tags: [],
         impressionDataEnabled: false,
         variantType: "none",
         baselinePayload: "",
       });
       setNewFlagBaselinePayloadJsonError(null);
-      loadFlags();
+      // Navigate to the newly created flag's detail page
+      navigate(`/features/${encodeURIComponent(createdFlagName)}`);
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, "featureFlags.createFailed"), {
         variant: "error",
@@ -1231,20 +1249,24 @@ const FeatureFlagsPage: React.FC = () => {
     }
   };
 
-  const handleOpenCreateDialog = () => {
+  const handleOpenCreateDialog = (flagUsage: "flag" | "remoteConfig" = "flag") => {
     // Generate default flag name with timestamp
     const timestamp = Date.now().toString(36).slice(-4);
+    const prefix = flagUsage === "remoteConfig" ? "config" : "new-feature";
     setNewFlag({
-      flagName: `new-feature-${timestamp}`,
+      flagName: `${prefix}-${timestamp}`,
       displayName: "",
       description: "",
       flagType: "release",
+      flagUsage,
       tags: [],
       impressionDataEnabled: false,
-      variantType: "none",
+      // Remote Config requires a variant type, default to string
+      variantType: flagUsage === "remoteConfig" ? "string" : "none",
       baselinePayload: "",
     });
     setNewFlagBaselinePayloadJsonError(null);
+    setCreateMenuAnchor(null);
     setCreateDialogOpen(true);
   };
 
@@ -1339,9 +1361,42 @@ const FeatureFlagsPage: React.FC = () => {
         </Box>
         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
           {canManage && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreateDialog}>
-              {t("featureFlags.createFlag")}
-            </Button>
+            <>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={(e) => setCreateMenuAnchor(e.currentTarget)}
+                endIcon={<ExpandMoreIcon sx={{ ml: -0.5 }} />}
+              >
+                {t("featureFlags.createFlagOrRemoteConfig")}
+              </Button>
+              <Menu
+                anchorEl={createMenuAnchor}
+                open={Boolean(createMenuAnchor)}
+                onClose={() => setCreateMenuAnchor(null)}
+                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                transformOrigin={{ vertical: "top", horizontal: "left" }}
+              >
+                <MenuItem onClick={() => handleOpenCreateDialog("flag")}>
+                  <ListItemIcon>
+                    <FlagIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={t("featureFlags.createFlagOption")}
+                    secondary={t("featureFlags.createFlagSubtitle")}
+                  />
+                </MenuItem>
+                <MenuItem onClick={() => handleOpenCreateDialog("remoteConfig")}>
+                  <ListItemIcon>
+                    <JsonIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={t("featureFlags.createRemoteConfigOption")}
+                    secondary={t("featureFlags.createRemoteConfigSubtitle")}
+                  />
+                </MenuItem>
+              </Menu>
+            </>
           )}
           <Divider orientation="vertical" sx={{ height: 32, mx: 0.5 }} />
           <Tooltip title={t("featureFlags.export")}>
@@ -1565,6 +1620,8 @@ const FeatureFlagsPage: React.FC = () => {
                             return <TableCell key={col.id}>{t("featureFlags.tags")}</TableCell>;
                           case "variantType":
                             return <TableCell key={col.id}>{t("featureFlags.variantType")}</TableCell>;
+                          case "flagUsage":
+                            return <TableCell key={col.id}>{t("featureFlags.flagUsage")}</TableCell>;
                           default:
                             return null;
                         }
@@ -1824,6 +1881,23 @@ const FeatureFlagsPage: React.FC = () => {
                                             ? "info"
                                             : "default"
                                     }
+                                    sx={{ borderRadius: "16px !important" }}
+                                  />
+                                </TableCell>
+                              );
+                            case "flagUsage":
+                              return (
+                                <TableCell key={col.id}>
+                                  <Chip
+                                    icon={
+                                      flag.flagUsage === "remoteConfig"
+                                        ? <JsonIcon fontSize="small" />
+                                        : <FlagIcon fontSize="small" />
+                                    }
+                                    label={t(`featureFlags.flagUsages.${flag.flagUsage || "flag"}`)}
+                                    size="small"
+                                    color={flag.flagUsage === "remoteConfig" ? "secondary" : "primary"}
+                                    sx={{ borderRadius: "16px !important" }}
                                   />
                                 </TableCell>
                               );
@@ -2242,8 +2316,8 @@ const FeatureFlagsPage: React.FC = () => {
       <ResizableDrawer
         open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
-        title={t("featureFlags.createFlag")}
-        subtitle={t("featureFlags.createFlagSubtitle")}
+        title={newFlag.flagUsage === "remoteConfig" ? t("featureFlags.createRemoteConfig") : t("featureFlags.createFlag")}
+        subtitle={newFlag.flagUsage === "remoteConfig" ? t("featureFlags.createRemoteConfigSubtitle") : t("featureFlags.createFlagSubtitle")}
         storageKey="featureFlagCreateDrawerWidth"
         defaultWidth={500}
       >
@@ -2439,6 +2513,11 @@ const FeatureFlagsPage: React.FC = () => {
                   <HelpOutlineIcon fontSize="small" color="action" />
                 </Tooltip>
               </Typography>
+              {newFlag.flagUsage === "remoteConfig" && (
+                <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
+                  {t("featureFlags.remoteConfigRequiresVariantType")}
+                </Typography>
+              )}
               <FormControl size="small" sx={{ minWidth: 200 }}>
                 <Select
                   value={newFlag.variantType}
@@ -2454,7 +2533,7 @@ const FeatureFlagsPage: React.FC = () => {
                     }
                   }}
                 >
-                  <MenuItem value="none">
+                  <MenuItem value="none" disabled={newFlag.flagUsage === "remoteConfig"}>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <BlockIcon sx={{ fontSize: 16, color: "text.disabled" }} />
                       {t("featureFlags.variantTypes.none")}

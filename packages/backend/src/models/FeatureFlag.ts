@@ -4,7 +4,8 @@ import { ulid } from 'ulid';
 
 // ==================== Types ====================
 
-export type FlagType = 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission';
+export type FlagType = 'release' | 'experiment' | 'operational' | 'killSwitch' | 'permission'; // Purpose
+export type FlagUsage = 'flag' | 'remoteConfig'; // Classification: Feature Flag vs Remote Config
 export type PayloadType = 'string' | 'number' | 'boolean' | 'json';
 export type FieldType = 'string' | 'number' | 'boolean' | 'date' | 'semver';
 
@@ -60,7 +61,8 @@ export interface FeatureFlagAttributes {
   flagName: string;
   displayName?: string;
   description?: string;
-  flagType: FlagType;
+  flagType: FlagType; // Purpose: release, experiment, operational, killSwitch, permission
+  flagUsage: FlagUsage; // Classification: 'flag' = Feature Flag, 'remoteConfig' = Remote Config
   isArchived: boolean;
   isFavorite?: boolean;
   archivedAt?: Date;
@@ -69,7 +71,7 @@ export interface FeatureFlagAttributes {
   stale?: boolean;
   tags?: string[];
   links?: { url: string; title?: string }[];
-  variantType?: 'string' | 'number' | 'json';
+  variantType?: 'none' | 'string' | 'number' | 'json';
   baselinePayload?: any; // Payload value when flag evaluates to false
   createdBy: number;
   createdByName?: string; // Joined from g_users
@@ -195,6 +197,7 @@ export class FeatureFlagModel {
     environment: string;
     search?: string;
     flagType?: string;
+    flagUsage?: 'flag' | 'remoteConfig';
     isEnabled?: boolean;
     isArchived?: boolean;
     tags?: string[];
@@ -211,6 +214,7 @@ export class FeatureFlagModel {
         environment,
         search,
         flagType,
+        flagUsage,
         isEnabled,
         isArchived,
         tags,
@@ -248,6 +252,7 @@ export class FeatureFlagModel {
           });
         }
         if (flagType) query.where('f.flagType', flagType);
+        if (flagUsage) query.where('f.flagUsage', flagUsage);
         if (typeof isEnabled === 'boolean') query.where('e.isEnabled', isEnabled);
         if (typeof isArchived === 'boolean') query.where('f.isArchived', isArchived);
         if (tags && tags.length > 0) {
@@ -395,14 +400,14 @@ export class FeatureFlagModel {
         variants,
         environments: envSettings
           ? [
-              {
-                id: envSettings.id,
-                flagId: id,
-                environment,
-                isEnabled: Boolean(envSettings.isEnabled),
-                lastSeenAt: envSettings.lastSeenAt,
-              },
-            ]
+            {
+              id: envSettings.id,
+              flagId: id,
+              environment,
+              isEnabled: Boolean(envSettings.isEnabled),
+              lastSeenAt: envSettings.lastSeenAt,
+            },
+          ]
           : [],
       };
     } catch (error) {
@@ -428,11 +433,12 @@ export class FeatureFlagModel {
         displayName: data.displayName || data.flagName,
         description: data.description || null,
         flagType: data.flagType || 'release',
+        flagUsage: data.flagUsage || 'flag',
         isArchived: false,
         impressionDataEnabled: data.impressionDataEnabled ?? false,
         staleAfterDays: data.staleAfterDays ?? 30,
         tags: data.tags ? JSON.stringify(data.tags) : null,
-        variantType: data.variantType || 'string',
+        variantType: data.variantType || 'none',
         baselinePayload:
           data.baselinePayload !== undefined ? JSON.stringify(data.baselinePayload) : null,
         createdBy: data.createdBy,

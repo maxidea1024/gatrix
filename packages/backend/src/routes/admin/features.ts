@@ -349,13 +349,14 @@ router.get(
     const environment = requireEnvironment(req, res);
     if (!environment) return;
 
-    const { search, flagType, isEnabled, isArchived, tags, page, limit, sortBy, sortOrder } =
+    const { search, flagType, flagUsage, isEnabled, isArchived, tags, page, limit, sortBy, sortOrder } =
       req.query;
 
     const result = await featureFlagService.listFlags({
       environment,
       search: search as string,
       flagType: flagType as string,
+      flagUsage: flagUsage as 'flag' | 'remoteConfig',
       isEnabled: isEnabled === 'true' ? true : isEnabled === 'false' ? false : undefined,
       isArchived: isArchived === 'true' ? true : isArchived === 'false' ? false : undefined,
       tags: tags ? (tags as string).split(',') : undefined,
@@ -750,6 +751,7 @@ router.post(
         displayName: sourceFlag.displayName ? `${sourceFlag.displayName} (Copy)` : undefined,
         description: sourceFlag.description,
         flagType: sourceFlag.flagType || 'release',
+        flagUsage: sourceFlag.flagUsage || 'flag',
         isEnabled: false, // New flags start disabled for safety
         impressionDataEnabled: sourceFlag.impressionDataEnabled ?? false,
         tags: sourceFlag.tags,
@@ -855,6 +857,7 @@ router.post(
             displayName: flagData.displayName,
             description: flagData.description,
             flagType: flagData.flagType || 'release',
+            flagUsage: flagData.flagUsage || 'flag',
             isEnabled: flagData.enabled ?? false,
             impressionDataEnabled: flagData.impressionDataEnabled ?? false,
             tags: flagData.tags,
