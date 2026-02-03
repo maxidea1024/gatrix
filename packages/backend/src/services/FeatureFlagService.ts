@@ -879,7 +879,7 @@ class FeatureFlagService {
       );
     }
 
-    return FeatureSegmentModel.create({
+    const segment = await FeatureSegmentModel.create({
       segmentName: input.segmentName,
       displayName: input.displayName,
       description: input.description,
@@ -888,6 +888,17 @@ class FeatureFlagService {
       tags: input.tags,
       createdBy: userId,
     });
+
+    // Publish segment.created event (segments are global, no environment)
+    await pubSubService.publishSDKEvent({
+      type: "segment.created",
+      data: {
+        id: segment.id,
+        segmentName: segment.segmentName,
+      },
+    });
+
+    return segment;
   }
 
   /**
@@ -908,10 +919,21 @@ class FeatureFlagService {
       );
     }
 
-    return FeatureSegmentModel.update(id, {
+    const updated = await FeatureSegmentModel.update(id, {
       ...input,
       updatedBy: userId,
     });
+
+    // Publish segment.updated event (segments are global, no environment)
+    await pubSubService.publishSDKEvent({
+      type: "segment.updated",
+      data: {
+        id: updated.id,
+        segmentName: updated.segmentName,
+      },
+    });
+
+    return updated;
   }
 
   /**
@@ -940,6 +962,15 @@ class FeatureFlagService {
     }
 
     await FeatureSegmentModel.delete(id);
+
+    // Publish segment.deleted event (segments are global, no environment)
+    await pubSubService.publishSDKEvent({
+      type: "segment.deleted",
+      data: {
+        id: segment.id,
+        segmentName: segment.segmentName,
+      },
+    });
   }
 
   // ==================== Context Fields ====================

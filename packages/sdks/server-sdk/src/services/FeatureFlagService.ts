@@ -229,6 +229,47 @@ export class FeatureFlagService {
   }
 
   /**
+   * Refresh cached flags for ALL cached environments
+   * Used when global changes (like segment updates) affect all flags
+   */
+  async refreshAll(): Promise<void> {
+    if (!this.featureEnabled) {
+      this.logger.warn(
+        "FeatureFlagService.refreshAll() called but feature is disabled",
+      );
+      return;
+    }
+
+    const environments = Array.from(this.cachedFlagsByEnv.keys());
+    if (environments.length === 0) {
+      this.logger.debug("No environments cached, skipping refreshAll");
+      return;
+    }
+
+    this.logger.info("Refreshing feature flags cache for all environments", {
+      count: environments.length,
+      environments,
+    });
+
+    // Also refresh segments since they may have changed
+    await this.refreshSegments();
+
+    // Refresh all environments in parallel
+    await Promise.all(
+      environments.map((env) =>
+        this.listByEnvironment(env).catch((error) => {
+          this.logger.warn("Failed to refresh feature flags for environment", {
+            environment: env,
+            error: error.message,
+          });
+        }),
+      ),
+    );
+
+    this.logger.info("Feature flags cache refreshed for all environments");
+  }
+
+  /**
    * Fetch and cache feature flags for multiple environments (multi-environment mode)
    * Used by Edge server to handle multiple environments
    */

@@ -2154,6 +2154,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         display: "flex",
                                         alignItems: "center",
                                         gap: 1,
+                                        mr: 1,
                                       }}
                                     >
                                       <svg
@@ -2214,6 +2215,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     sx={{
                                       display: "flex",
                                       alignItems: "center",
+                                      mr: 1,
                                     }}
                                   >
                                     <svg
@@ -2221,16 +2223,18 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       height="52"
                                       viewBox="0 0 52 52"
                                     >
-                                      {/* Empty light circle for no metrics */}
+                                      {/* Donut ring for no metrics */}
                                       <circle
                                         cx={26}
                                         cy={26}
-                                        r={24}
-                                        fill={
+                                        r={20}
+                                        fill="none"
+                                        stroke={
                                           theme.palette.mode === "dark"
-                                            ? "rgba(255,255,255,0.05)"
-                                            : "rgba(0,0,0,0.04)"
+                                            ? "rgba(255,255,255,0.08)"
+                                            : "rgba(0,0,0,0.06)"
                                         }
+                                        strokeWidth={6}
                                       />
                                     </svg>
                                   </Box>

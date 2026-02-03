@@ -40,7 +40,10 @@ export type StandardEventType =
   | "feature_flag.changed"
   | "feature_flag.created"
   | "feature_flag.updated"
-  | "feature_flag.deleted";
+  | "feature_flag.deleted"
+  | "segment.created"
+  | "segment.updated"
+  | "segment.deleted";
 
 export interface StandardEventData {
   id?: number | string; // Optional for bulk events that don't have a single id
@@ -62,6 +65,7 @@ export interface StandardEventData {
   // Full object data for direct cache updates (avoiding list refresh)
   clientVersion?: any; // For client_version.created, client_version.updated events
   serviceNotice?: any; // For service_notice.created, service_notice.updated events
+  segmentName?: string; // For segment.created, segment.updated, segment.deleted events
 }
 
 export interface StandardEvent {

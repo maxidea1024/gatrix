@@ -10,7 +10,7 @@ export type FlagType =
   | "operational"
   | "killSwitch"
   | "permission";
-export type PayloadType = "string" | "number" | "boolean" | "json";
+export type PayloadType = "string" | "number" | "json";
 export type FieldType = "string" | "number" | "boolean" | "date" | "semver";
 
 export type ConstraintOperator =

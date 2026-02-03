@@ -79,7 +79,7 @@ export class EventListener {
           this.isConnected = false;
           try {
             this.metrics?.setRedisConnected(false);
-          } catch (_) {}
+          } catch (_) { }
           return;
         }
         // Only log actual connection errors, not retry attempts
@@ -94,7 +94,7 @@ export class EventListener {
         this.isConnected = false;
         try {
           this.metrics?.setRedisConnected(false);
-        } catch (_) {}
+        } catch (_) { }
       });
 
       this.subscriber.on("close", () => {
@@ -103,7 +103,7 @@ export class EventListener {
           this.isConnected = false;
           try {
             this.metrics?.setRedisConnected(false);
-          } catch (_) {}
+          } catch (_) { }
           return;
         }
         this.logger.warn("Subscriber connection closed");
@@ -111,7 +111,7 @@ export class EventListener {
         this.isConnected = false;
         try {
           this.metrics?.setRedisConnected(false);
-        } catch (_) {}
+        } catch (_) { }
       });
 
       // Log reconnection attempts and refresh cache once reconnected
@@ -133,7 +133,7 @@ export class EventListener {
             try {
               this.metrics?.setRedisConnected(true);
               this.metrics?.incRedisReconnect();
-            } catch (_) {}
+            } catch (_) { }
             try {
               await this.reinitializeCache();
             } catch {
@@ -148,7 +148,7 @@ export class EventListener {
       isFirstConnection = false; // Mark first connection complete
       try {
         this.metrics?.setRedisConnected(true);
-      } catch (_) {}
+      } catch (_) { }
 
       // Subscribe to SDK events channel
       await this.subscriber.subscribe(this.CHANNEL_NAME);
@@ -165,7 +165,7 @@ export class EventListener {
             });
             try {
               this.metrics?.incEventReceived(event.type);
-            } catch (_) {}
+            } catch (_) { }
             await this.processEvent(event);
           } catch (error: any) {
             this.logger.error("Failed to parse event message", {
@@ -931,6 +931,40 @@ export class EventListener {
         break;
       }
 
+      case "segment.created":
+      case "segment.updated":
+      case "segment.deleted": {
+        if (features.featureFlag !== true) {
+          this.logger.debug(
+            "Segment event ignored - featureFlag feature is disabled",
+            { event: event.type },
+          );
+          break;
+        }
+        // Segments are global (not environment-specific) and can be used by any flag
+        // When a segment changes, refresh feature flags for ALL environments
+        this.logger.info(
+          "Segment event received, refreshing feature flags for all environments",
+          {
+            type: event.type,
+            segmentId: event.data.id,
+            segmentName: event.data.segmentName,
+          },
+        );
+        try {
+          await this.cacheManager.getFeatureFlagService()?.refreshAll();
+          this.logger.info(
+            "Feature flags cache refreshed for all environments after segment change",
+          );
+        } catch (error: any) {
+          this.logger.error(
+            "Failed to refresh feature flags cache after segment change",
+            { error: error.message },
+          );
+        }
+        break;
+      }
+
       default:
         this.logger.warn("Unknown standard event type", { type: event.type });
     }
@@ -1035,7 +1069,7 @@ export class EventListener {
       this.logger.debug("Event published", { type: event.type });
       try {
         this.metrics?.incEventPublished(event.type);
-      } catch (_) {}
+      } catch (_) { }
     } catch (error: any) {
       this.logger.error("Failed to publish event", {
         type: event.type,
@@ -1059,7 +1093,7 @@ export class EventListener {
     this.isConnected = false;
     try {
       this.metrics?.setRedisConnected(false);
-    } catch (_) {}
+    } catch (_) { }
 
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
