@@ -51,6 +51,7 @@ import {
     Security as PermissionIcon,
     Flag as FlagIcon,
     Tune as RemoteConfigIcon,
+    DataObject as JsonIcon,
     Code as CodeIcon,
     Abc as StringIcon,
     Numbers as NumberIcon,
@@ -833,7 +834,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({ open, onClose }) =>
                                                                     >
                                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                                             {flagInfo.flagUsage === 'remoteConfig' ? (
-                                                                                <RemoteConfigIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                                                                <JsonIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                                                                             ) : (
                                                                                 <FlagIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                                                                             )}
