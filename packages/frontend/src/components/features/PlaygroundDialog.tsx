@@ -132,9 +132,24 @@ interface EvaluationCheck {
 interface PlaygroundDialogProps {
     open: boolean;
     onClose: () => void;
+    /** Pre-select flags for evaluation */
+    initialFlags?: string[];
+    /** Pre-select environments for evaluation */
+    initialEnvironments?: string[];
+    /** Pre-set context values for evaluation */
+    initialContext?: Record<string, any>;
+    /** Auto-execute evaluation when dialog opens */
+    autoExecute?: boolean;
 }
 
-const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({ open, onClose }) => {
+const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
+    open,
+    onClose,
+    initialFlags,
+    initialEnvironments,
+    initialContext,
+    autoExecute = false,
+}) => {
     const { t } = useTranslation();
     const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
@@ -150,6 +165,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({ open, onClose }) =>
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedFlags, setSelectedFlags] = useState<string[]>([]);
     const [availableFlags, setAvailableFlags] = useState<{ flagName: string; displayName?: string }[]>([]);
+    const [autoExecutePending, setAutoExecutePending] = useState(false);;
 
     // Variant popover state
     const [variantPopoverAnchor, setVariantPopoverAnchor] = useState<HTMLElement | null>(null);
@@ -165,8 +181,36 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({ open, onClose }) =>
             loadEnvironments();
             loadContextFields();
             loadAvailableFlags();
+            // Reset state when opening
+            setResults({});
+            setSearchTerm('');
+            // Set initial flags if provided
+            if (initialFlags && initialFlags.length > 0) {
+                setSelectedFlags(initialFlags);
+            } else {
+                setSelectedFlags([]);
+            }
+            // Set initial environments if provided
+            if (initialEnvironments && initialEnvironments.length > 0) {
+                setSelectedEnvironments(initialEnvironments);
+            } else {
+                setSelectedEnvironments([]);
+            }
+            // Set initial context if provided
+            if (initialContext && Object.keys(initialContext).length > 0) {
+                const entries: ContextEntry[] = Object.entries(initialContext).map(([key, value]) => ({
+                    key,
+                    value: String(value),
+                    type: typeof value === 'number' ? 'number' : typeof value === 'boolean' ? 'boolean' : 'string',
+                }));
+                setContextEntries(entries);
+            } else {
+                setContextEntries([]);
+            }
+            // Set auto-execute pending if requested
+            setAutoExecutePending(autoExecute);
         }
-    }, [open]);
+    }, [open, initialFlags, initialEnvironments, initialContext, autoExecute]);
 
     const loadEnvironments = async () => {
         try {
@@ -197,6 +241,13 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({ open, onClose }) =>
             setAvailableFlags([]);
         }
     };
+
+    // Auto-execute when initialFlagName is provided and environments are loaded
+    useEffect(() => {
+        if (autoExecutePending && environments.length > 0 && !loading) {
+            handleEvaluate();
+        }
+    }, [autoExecutePending, environments.length]);
 
     // Add context entry
     const handleAddContextEntry = () => {
@@ -281,6 +332,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({ open, onClose }) =>
     // Evaluate
     const handleEvaluate = async () => {
         setLoading(true);
+        setAutoExecutePending(false);
         try {
             // Add intentional delay for UX testing
             await new Promise((resolve) => setTimeout(resolve, 2000));

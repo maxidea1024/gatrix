@@ -168,6 +168,8 @@ const FeatureFlagsPage: React.FC = () => {
 
   // Playground dialog state
   const [playgroundOpen, setPlaygroundOpen] = useState(false);
+  const [playgroundInitialFlags, setPlaygroundInitialFlags] = useState<string[]>([]);
+  const [playgroundAutoExecute, setPlaygroundAutoExecute] = useState(false);
 
   // Action menu state
   const [actionMenuAnchor, setActionMenuAnchor] = useState<null | HTMLElement>(null);
@@ -2111,6 +2113,20 @@ const FeatureFlagsPage: React.FC = () => {
               </Menu>
             </Box>
 
+            <Button
+              size="small"
+              variant="outlined"
+              color="primary"
+              startIcon={<JoystickIcon />}
+              onClick={() => {
+                setPlaygroundInitialFlags(Array.from(selectedFlags));
+                setPlaygroundAutoExecute(true);
+                setPlaygroundOpen(true);
+              }}
+            >
+              {t("featureFlags.testInPlayground")}
+            </Button>
+
             <Divider orientation="vertical" flexItem />
 
             <IconButton size="small" onClick={() => setSelectedFlags(new Set())}>
@@ -2157,6 +2173,22 @@ const FeatureFlagsPage: React.FC = () => {
             <MetricsIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>{t("featureFlags.goToMetrics")}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (actionMenuFlag) {
+              setPlaygroundInitialFlags([actionMenuFlag.flagName]);
+              setPlaygroundAutoExecute(true);
+              setPlaygroundOpen(true);
+            }
+            handleActionMenuClose();
+          }}
+          disabled={!actionMenuFlag}
+        >
+          <ListItemIcon>
+            <JoystickIcon fontSize="small" color="primary" />
+          </ListItemIcon>
+          <ListItemText>{t("featureFlags.testInPlayground")}</ListItemText>
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleClone} disabled={!actionMenuFlag || actionMenuFlag.isArchived}>
@@ -2871,7 +2903,13 @@ const FeatureFlagsPage: React.FC = () => {
       {/* Playground Dialog */}
       <PlaygroundDialog
         open={playgroundOpen}
-        onClose={() => setPlaygroundOpen(false)}
+        onClose={() => {
+          setPlaygroundOpen(false);
+          setPlaygroundInitialFlags([]);
+          setPlaygroundAutoExecute(false);
+        }}
+        initialFlags={playgroundInitialFlags}
+        autoExecute={playgroundAutoExecute}
       />
     </Box >
   );
