@@ -789,8 +789,8 @@ function evaluateFlagWithDetails(
   const evaluationSteps: any[] = [];
 
   // Step 2: Check if flag is enabled in environment
-  const envSettings = flag.environments?.[0];
-  if (!envSettings?.isEnabled) {
+  // flag.isEnabled is already the correct value for the requested environment (set by getFlag)
+  if (!flag.isEnabled) {
     evaluationSteps.push({
       step: 'ENVIRONMENT_CHECK',
       passed: false,
