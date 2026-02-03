@@ -14,15 +14,7 @@ export type PayloadType = "string" | "number" | "json";
 export type FieldType = "string" | "number" | "boolean" | "date" | "semver";
 
 export type ConstraintOperator =
-  // String operators (legacy)
-  | "eq"
-  | "neq"
-  | "contains"
-  | "startsWith"
-  | "endsWith"
-  | "in"
-  | "notIn"
-  // String operators (prefixed - backend format)
+  // String operators
   | "str_eq"
   | "str_neq"
   | "str_contains"
@@ -30,35 +22,20 @@ export type ConstraintOperator =
   | "str_ends_with"
   | "str_in"
   | "str_not_in"
-  // Number operators (legacy)
-  | "gt"
-  | "gte"
-  | "lt"
-  | "lte"
-  // Number operators (prefixed - backend format)
+  // Number operators
   | "num_eq"
   | "num_gt"
   | "num_gte"
   | "num_lt"
   | "num_lte"
   // Boolean operators
-  | "is"
   | "bool_is"
-  // Date operators (legacy)
-  | "after"
-  | "before"
-  // Date operators (prefixed - backend format)
+  // Date operators
   | "date_gt"
   | "date_gte"
   | "date_lt"
   | "date_lte"
-  // Semver operators (legacy)
-  | "semverEq"
-  | "semverGt"
-  | "semverGte"
-  | "semverLt"
-  | "semverLte"
-  // Semver operators (prefixed - backend format)
+  // Semver operators
   | "semver_eq"
   | "semver_gt"
   | "semver_gte"

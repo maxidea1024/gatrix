@@ -1054,69 +1054,55 @@ export class FeatureFlagService {
       ) || [];
 
     switch (constraint.operator) {
-      // String operators (both legacy and prefixed)
-      case "eq":
+      // String operators
       case "str_eq":
         result = compareValue === targetValue;
         break;
-      case "neq":
       case "str_neq":
         result = compareValue !== targetValue;
         break;
-      case "contains":
       case "str_contains":
         result = compareValue.includes(targetValue);
         break;
-      case "startsWith":
       case "str_starts_with":
         result = compareValue.startsWith(targetValue);
         break;
-      case "endsWith":
       case "str_ends_with":
         result = compareValue.endsWith(targetValue);
         break;
-      case "in":
       case "str_in":
         result = targetValues.includes(compareValue);
         break;
-      case "notIn":
       case "str_not_in":
         result = !targetValues.includes(compareValue);
         break;
       // Number operators
-      case "gt":
-      case "num_gt":
-        result = Number(contextValue) > Number(constraint.value);
-        break;
-      case "gte":
-      case "num_gte":
-        result = Number(contextValue) >= Number(constraint.value);
-        break;
-      case "lt":
-      case "num_lt":
-        result = Number(contextValue) < Number(constraint.value);
-        break;
-      case "lte":
-      case "num_lte":
-        result = Number(contextValue) <= Number(constraint.value);
-        break;
       case "num_eq":
         result = Number(contextValue) === Number(constraint.value);
         break;
+      case "num_gt":
+        result = Number(contextValue) > Number(constraint.value);
+        break;
+      case "num_gte":
+        result = Number(contextValue) >= Number(constraint.value);
+        break;
+      case "num_lt":
+        result = Number(contextValue) < Number(constraint.value);
+        break;
+      case "num_lte":
+        result = Number(contextValue) <= Number(constraint.value);
+        break;
       // Boolean operators
-      case "is":
       case "bool_is":
         result = Boolean(contextValue) === (constraint.value === "true");
         break;
       // Date operators
-      case "after":
       case "date_gt":
         result = new Date(stringValue) > new Date(targetValue);
         break;
       case "date_gte":
         result = new Date(stringValue) >= new Date(targetValue);
         break;
-      case "before":
       case "date_lt":
         result = new Date(stringValue) < new Date(targetValue);
         break;
@@ -1124,23 +1110,18 @@ export class FeatureFlagService {
         result = new Date(stringValue) <= new Date(targetValue);
         break;
       // Semver operators
-      case "semverEq":
       case "semver_eq":
         result = this.compareSemver(stringValue, targetValue) === 0;
         break;
-      case "semverGt":
       case "semver_gt":
         result = this.compareSemver(stringValue, targetValue) > 0;
         break;
-      case "semverGte":
       case "semver_gte":
         result = this.compareSemver(stringValue, targetValue) >= 0;
         break;
-      case "semverLt":
       case "semver_lt":
         result = this.compareSemver(stringValue, targetValue) < 0;
         break;
-      case "semverLte":
       case "semver_lte":
         result = this.compareSemver(stringValue, targetValue) <= 0;
         break;
