@@ -40,13 +40,13 @@ export interface EvaluationResult {
 
 export interface EvaluationReason {
   kind:
-    | "enabled"
-    | "disabled"
-    | "notFound"
-    | "constraintFailed"
-    | "rolloutFailed"
-    | "fallback"
-    | "archived";
+  | "enabled"
+  | "disabled"
+  | "notFound"
+  | "constraintFailed"
+  | "rolloutFailed"
+  | "fallback"
+  | "archived";
   message?: string;
   failedConstraint?: {
     contextName: string;
@@ -320,22 +320,6 @@ export class FeatureEvaluator {
   ): EvaluationResult {
     if (!flag.variants || flag.variants.length === 0) {
       return baseResult;
-    }
-
-    // Check for overrides first
-    for (const variant of flag.variants) {
-      if (variant.overrides && variant.overrides.length > 0) {
-        for (const override of variant.overrides) {
-          const contextValue = String(context[override.contextName] || "");
-          if (override.values.includes(contextValue)) {
-            return {
-              ...baseResult,
-              variant: variant.variantName,
-              payload: this.parsePayload(variant),
-            };
-          }
-        }
-      }
     }
 
     // Calculate variant based on stickiness (use default since stickiness is not per-variant)

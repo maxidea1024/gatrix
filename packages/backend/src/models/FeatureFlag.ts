@@ -57,11 +57,6 @@ export interface Constraint {
   inverted?: boolean;
 }
 
-export interface VariantOverride {
-  contextName: string;
-  values: string[];
-}
-
 // ==================== Interfaces ====================
 
 // Feature Flag - Now GLOBAL (no environment column)
@@ -133,7 +128,6 @@ export interface FeatureVariantAttributes {
   payload?: any;
   payloadType: PayloadType;
   weightLock?: boolean;
-  overrides?: VariantOverride[];
   createdBy: number;
   updatedBy?: number;
   createdAt?: Date;
@@ -842,7 +836,6 @@ export class FeatureVariantModel {
       return variants.map((v: any) => ({
         ...v,
         payload: parseJsonField(v.payload),
-        overrides: parseJsonField<VariantOverride[]>(v.overrides),
       }));
     } catch (error) {
       logger.error("Error finding variants by flag ID:", error);
@@ -862,7 +855,6 @@ export class FeatureVariantModel {
       return variants.map((v: any) => ({
         ...v,
         payload: parseJsonField(v.payload),
-        overrides: parseJsonField<VariantOverride[]>(v.overrides),
       }));
     } catch (error) {
       logger.error("Error finding variants by flag ID and environment:", error);
@@ -884,7 +876,6 @@ export class FeatureVariantModel {
         payload: data.payload ? JSON.stringify(data.payload) : null,
         payloadType: data.payloadType || "json",
         weightLock: data.weightLock || false,
-        overrides: data.overrides ? JSON.stringify(data.overrides) : null,
         createdBy: data.createdBy,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -894,7 +885,6 @@ export class FeatureVariantModel {
       return {
         ...variant,
         payload: parseJsonField(variant.payload),
-        overrides: parseJsonField<VariantOverride[]>(variant.overrides),
       };
     } catch (error) {
       logger.error("Error creating variant:", error);

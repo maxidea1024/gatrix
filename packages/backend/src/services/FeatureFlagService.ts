@@ -91,7 +91,6 @@ export interface CreateVariantInput {
   payload?: any;
   payloadType?: "string" | "number" | "boolean" | "json";
   weightLock?: boolean;
-  overrides?: { contextName: string; values: string[] }[];
 }
 
 export interface CreateSegmentInput {
@@ -264,7 +263,6 @@ class FeatureFlagService {
           weight: variantInput.weight,
           payload: variantInput.payload,
           payloadType: variantInput.payloadType || "json",
-          overrides: variantInput.overrides,
           createdBy: userId,
         });
       }
@@ -832,7 +830,6 @@ class FeatureFlagService {
         payload: variant.payload,
         payloadType: variant.payloadType || "json",
         weightLock: variant.weightLock || false,
-        overrides: variant.overrides,
         createdBy: userId,
       });
       createdVariants.push(created);

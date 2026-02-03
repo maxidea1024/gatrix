@@ -76,11 +76,6 @@ export interface Constraint {
   inverted?: boolean;
 }
 
-export interface VariantOverride {
-  contextName: string;
-  values: string[];
-}
-
 // ==================== Variant ====================
 
 export interface Variant {
