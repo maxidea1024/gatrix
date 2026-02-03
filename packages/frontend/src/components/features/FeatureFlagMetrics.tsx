@@ -103,13 +103,13 @@ const PERIOD_OPTIONS: {
   labelKey: string;
   hours: number;
 }[] = [
-  { value: "1h", labelKey: "featureFlags.metrics.lastHour", hours: 1 },
-  { value: "6h", labelKey: "featureFlags.metrics.last6Hours", hours: 6 },
-  { value: "24h", labelKey: "featureFlags.metrics.last24Hours", hours: 24 },
-  { value: "48h", labelKey: "featureFlags.metrics.last48Hours", hours: 48 },
-  { value: "7d", labelKey: "featureFlags.metrics.last7Days", hours: 168 },
-  { value: "30d", labelKey: "featureFlags.metrics.last30Days", hours: 720 },
-];
+    { value: "1h", labelKey: "featureFlags.metrics.lastHour", hours: 1 },
+    { value: "6h", labelKey: "featureFlags.metrics.last6Hours", hours: 6 },
+    { value: "24h", labelKey: "featureFlags.metrics.last24Hours", hours: 24 },
+    { value: "48h", labelKey: "featureFlags.metrics.last48Hours", hours: 48 },
+    { value: "7d", labelKey: "featureFlags.metrics.last7Days", hours: 168 },
+    { value: "30d", labelKey: "featureFlags.metrics.last30Days", hours: 720 },
+  ];
 
 export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
   flagName,
@@ -305,52 +305,84 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     fetchMetrics();
   }, [fetchMetrics]);
 
-  // Sync state to URL params
+  // Create a stable string representation of environments for dependency
+  const envNamesKey = useMemo(
+    () => environments.map((e) => e.environment).sort().join(','),
+    [environments]
+  );
+
+  // Sync state to URL params - only when values actually change
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
+    let hasChanges = false;
 
     // Environment filter
     const allEnvs = environments.map((e) => e.environment);
+    const envsKey = selectedEnvs.join(',');
+    const currentEnvsParam = searchParams.get('envs') || '';
     if (
       selectedEnvs.length !== allEnvs.length ||
       !selectedEnvs.every((e) => allEnvs.includes(e))
     ) {
-      params.set("envs", selectedEnvs.join(","));
+      if (currentEnvsParam !== envsKey) {
+        params.set('envs', envsKey);
+        hasChanges = true;
+      }
     } else {
-      params.delete("envs");
+      if (currentEnvsParam) {
+        params.delete('envs');
+        hasChanges = true;
+      }
     }
 
     // Period
-    if (period !== "24h") {
-      params.set("period", period);
+    const currentPeriodParam = searchParams.get('period') || '';
+    if (period !== '24h') {
+      if (currentPeriodParam !== period) {
+        params.set('period', period);
+        hasChanges = true;
+      }
     } else {
-      params.delete("period");
+      if (currentPeriodParam) {
+        params.delete('period');
+        hasChanges = true;
+      }
     }
 
     // Group by
-    if (chartGroupBy !== "all") {
-      params.set("groupBy", chartGroupBy);
+    const currentGroupByParam = searchParams.get('groupBy') || '';
+    if (chartGroupBy !== 'all') {
+      if (currentGroupByParam !== chartGroupBy) {
+        params.set('groupBy', chartGroupBy);
+        hasChanges = true;
+      }
     } else {
-      params.delete("groupBy");
+      if (currentGroupByParam) {
+        params.delete('groupBy');
+        hasChanges = true;
+      }
     }
 
     // Variant group by
-    if (variantGroupBy !== "all") {
-      params.set("variantGroupBy", variantGroupBy);
+    const currentVariantGroupByParam = searchParams.get('variantGroupBy') || '';
+    if (variantGroupBy !== 'all') {
+      if (currentVariantGroupByParam !== variantGroupBy) {
+        params.set('variantGroupBy', variantGroupBy);
+        hasChanges = true;
+      }
     } else {
-      params.delete("variantGroupBy");
+      if (currentVariantGroupByParam) {
+        params.delete('variantGroupBy');
+        hasChanges = true;
+      }
     }
 
-    setSearchParams(params, { replace: true });
+    // Only update URL if there are actual changes
+    if (hasChanges) {
+      setSearchParams(params, { replace: true });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    selectedEnvs,
-    period,
-    chartGroupBy,
-    variantGroupBy,
-    environments,
-    setSearchParams,
-  ]);
+  }, [selectedEnvs, period, chartGroupBy, variantGroupBy, envNamesKey]);
 
   // Toggle environment selection (multi-select)
   const handleEnvToggle = (env: string) => {
@@ -390,12 +422,12 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
           total: acc.total + m.yesCount + m.noCount,
           variantCounts: m.variantCounts
             ? Object.entries(m.variantCounts).reduce(
-                (vc, [variant, count]) => ({
-                  ...vc,
-                  [variant]: (vc[variant] || 0) + count,
-                }),
-                acc.variantCounts,
-              )
+              (vc, [variant, count]) => ({
+                ...vc,
+                [variant]: (vc[variant] || 0) + count,
+              }),
+              acc.variantCounts,
+            )
             : acc.variantCounts,
         }),
         {
@@ -412,8 +444,8 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
   const exposurePercentage =
     aggregatedMetrics.total > 0
       ? ((aggregatedMetrics.totalYes / aggregatedMetrics.total) * 100).toFixed(
-          0,
-        )
+        0,
+      )
       : "0";
 
   // Prepare time series data - aggregate by time bucket across environments (for chart)
@@ -1094,7 +1126,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 {t("featureFlags.metrics.requestsInPeriod", {
                   period: t(
                     PERIOD_OPTIONS.find((p) => p.value === period)?.labelKey ||
-                      "",
+                    "",
                   ),
                 })}
               </Typography>
@@ -1379,43 +1411,43 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                             datasets:
                               variantGroupBy === "all"
                                 ? variantTimeSeriesData.variants.map(
-                                    (variant, idx) => ({
-                                      label: variant,
-                                      data: variantTimeSeriesData.data[variant],
-                                      borderColor:
-                                        variantColors[
-                                          idx % variantColors.length
-                                        ],
-                                      backgroundColor:
-                                        variantColors[
-                                          idx % variantColors.length
-                                        ] + "20",
-                                      borderWidth: 2,
-                                      fill: false,
-                                      tension: 0.3,
-                                      pointRadius: 3,
-                                      pointHoverRadius: 5,
-                                    }),
-                                  )
+                                  (variant, idx) => ({
+                                    label: variant,
+                                    data: variantTimeSeriesData.data[variant],
+                                    borderColor:
+                                      variantColors[
+                                      idx % variantColors.length
+                                      ],
+                                    backgroundColor:
+                                      variantColors[
+                                      idx % variantColors.length
+                                      ] + "20",
+                                    borderWidth: 2,
+                                    fill: false,
+                                    tension: 0.3,
+                                    pointRadius: 3,
+                                    pointHoverRadius: 5,
+                                  }),
+                                )
                                 : Object.keys(variantTimeSeriesData.data).map(
-                                    (key, idx) => ({
-                                      label: key,
-                                      data: variantTimeSeriesData.data[key],
-                                      borderColor:
-                                        variantColors[
-                                          idx % variantColors.length
-                                        ],
-                                      backgroundColor:
-                                        variantColors[
-                                          idx % variantColors.length
-                                        ] + "20",
-                                      borderWidth: 2,
-                                      fill: false,
-                                      tension: 0.3,
-                                      pointRadius: 3,
-                                      pointHoverRadius: 5,
-                                    }),
-                                  ),
+                                  (key, idx) => ({
+                                    label: key,
+                                    data: variantTimeSeriesData.data[key],
+                                    borderColor:
+                                      variantColors[
+                                      idx % variantColors.length
+                                      ],
+                                    backgroundColor:
+                                      variantColors[
+                                      idx % variantColors.length
+                                      ] + "20",
+                                    borderWidth: 2,
+                                    fill: false,
+                                    tension: 0.3,
+                                    pointRadius: 3,
+                                    pointHoverRadius: 5,
+                                  }),
+                                ),
                           }}
                           options={{
                             responsive: true,
@@ -1522,7 +1554,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                             borderRadius: "50%",
                                             bgcolor:
                                               variantColors[
-                                                idx % variantColors.length
+                                              idx % variantColors.length
                                               ],
                                           }}
                                         />
@@ -1542,8 +1574,8 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                       variantGroupBy === "all"
                                         ? variantTimeSeriesData.variants
                                         : Object.keys(
-                                            variantTimeSeriesData.data,
-                                          );
+                                          variantTimeSeriesData.data,
+                                        );
                                     const rowTotal = dataKeys.reduce(
                                       (sum, k) =>
                                         sum +
@@ -1559,7 +1591,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                                           <TableCell key={key} align="right">
                                             {(
                                               variantTimeSeriesData.data[key]?.[
-                                                rowIdx
+                                              rowIdx
                                               ] || 0
                                             ).toLocaleString()}
                                           </TableCell>

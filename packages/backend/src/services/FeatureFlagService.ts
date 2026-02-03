@@ -35,11 +35,12 @@ export interface CreateFlagInput {
   displayName?: string;
   description?: string;
   flagType?: 'release' | 'experiment' | 'operational' | 'permission' | 'killSwitch';
+  flagUsage?: 'flag' | 'remoteConfig';
   isEnabled?: boolean;
   impressionDataEnabled?: boolean;
   staleAfterDays?: number;
   tags?: string[];
-  variantType?: 'string' | 'number' | 'json';
+  variantType?: 'none' | 'string' | 'number' | 'json';
   baselinePayload?: any;
   // Optional: create strategies and variants along with the flag
   strategies?: CreateStrategyInput[];
@@ -104,6 +105,7 @@ export interface FlagListQuery {
   environment: string;
   search?: string;
   flagType?: string;
+  flagUsage?: 'flag' | 'remoteConfig';
   isEnabled?: boolean;
   isArchived?: boolean;
   tags?: string[];
@@ -197,21 +199,61 @@ class FeatureFlagService {
       );
     }
 
+    // Remote Config validation
+    const isRemoteConfig = input.flagUsage === 'remoteConfig';
+    if (isRemoteConfig) {
+      // Remote Config must have variantType other than 'none'
+      if (!input.variantType || input.variantType === 'none') {
+        throw new GatrixError(
+          'Remote Config requires a variant type (string, number, or json)',
+          400,
+          true,
+          ErrorCodes.BAD_REQUEST
+        );
+      }
+    }
+
+    // Determine variantType: for feature flags, default to 'none', for remote configs, it's required
+    const variantType = isRemoteConfig
+      ? input.variantType
+      : (input.variantType || 'none');
+
     const flag = await FeatureFlagModel.create({
       environment: input.environment,
       flagName: input.flagName,
       displayName: input.displayName,
       description: input.description,
       flagType: input.flagType || 'release',
+      flagUsage: input.flagUsage || 'flag',
       isEnabled: input.isEnabled ?? false,
       isArchived: false,
       impressionDataEnabled: input.impressionDataEnabled ?? false,
       staleAfterDays: input.staleAfterDays ?? 30,
       tags: input.tags,
-      variantType: input.variantType,
+      variantType,
       baselinePayload: input.baselinePayload,
       createdBy: userId,
     });
+
+    // For Remote Config, auto-create a default variant with 100% weight
+    if (isRemoteConfig && (!input.variants || input.variants.length === 0)) {
+      const defaultPayload =
+        input.variantType === 'number'
+          ? { type: 'number', value: '0' }
+          : input.variantType === 'json'
+            ? { type: 'json', value: '{}' }
+            : { type: 'string', value: '' };
+
+      await FeatureVariantModel.create({
+        flagId: flag.id,
+        environment: input.environment,
+        variantName: 'default',
+        weight: 100,
+        payload: defaultPayload,
+        payloadType: 'json',
+        createdBy: userId,
+      });
+    }
 
     // Create strategies if provided
     if (input.strategies && input.strategies.length > 0) {
@@ -658,7 +700,7 @@ class FeatureFlagService {
     flagName: string,
     variants: CreateVariantInput[],
     userId: number,
-    variantType?: 'string' | 'number' | 'json',
+    variantType?: 'none' | 'string' | 'number' | 'json',
     baselinePayload?: any,
     clearVariantPayloads?: boolean
   ): Promise<FeatureVariantAttributes[]> {
@@ -676,6 +718,41 @@ class FeatureFlagService {
         true,
         ErrorCodes.BAD_REQUEST
       );
+    }
+
+    // Validate no duplicate variant names
+    const variantNames = variants.map((v) => v.variantName.trim().toLowerCase());
+    const hasDuplicates = variantNames.some((name, i) => variantNames.indexOf(name) !== i);
+    if (hasDuplicates) {
+      throw new GatrixError(
+        'Variant names must be unique. Duplicate variant names are not allowed.',
+        400,
+        true,
+        ErrorCodes.BAD_REQUEST
+      );
+    }
+
+    // Remote Config specific validations
+    const isRemoteConfig = (flag as any).flagUsage === 'remoteConfig';
+    if (isRemoteConfig) {
+      // Cannot set variantType to 'none' for Remote Config
+      if (variantType === 'none') {
+        throw new GatrixError(
+          'Remote Config cannot have variant type set to none',
+          400,
+          true,
+          ErrorCodes.BAD_REQUEST
+        );
+      }
+      // Remote Config must have exactly 1 variant
+      if (variants.length !== 1) {
+        throw new GatrixError(
+          'Remote Config must have exactly one variant',
+          400,
+          true,
+          ErrorCodes.BAD_REQUEST
+        );
+      }
     }
 
     // Update variantType and baselinePayload on the flag if provided
