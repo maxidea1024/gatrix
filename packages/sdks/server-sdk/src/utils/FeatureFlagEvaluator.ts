@@ -158,6 +158,15 @@ export class FeatureFlagEvaluator {
             case "str_not_in":
                 result = !targetValues.includes(compareValue);
                 break;
+            case "str_regex":
+                try {
+                    const flags = constraint.caseInsensitive ? "i" : "";
+                    const regex = new RegExp(constraint.value || "", flags);
+                    result = regex.test(stringValue);
+                } catch {
+                    result = false;
+                }
+                break;
             // Number
             case "num_eq":
                 result = Number(contextValue) === Number(constraint.value);

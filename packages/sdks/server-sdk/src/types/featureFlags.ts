@@ -22,6 +22,7 @@ export type ConstraintOperator =
   | "str_ends_with"
   | "str_in"
   | "str_not_in"
+  | "str_regex"
   // Number operators
   | "num_eq"
   | "num_gt"
