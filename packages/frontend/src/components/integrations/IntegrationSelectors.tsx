@@ -11,9 +11,13 @@ import {
     Checkbox,
     FormControlLabel,
     FormGroup,
+    Popover,
     alpha,
 } from '@mui/material';
-import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import {
+    ExpandMore as ExpandMoreIcon,
+    KeyboardArrowDown as ArrowDownIcon,
+} from '@mui/icons-material';
 
 interface EventCategory {
     key: string;
@@ -27,7 +31,7 @@ interface EventSelectorProps {
 }
 
 /**
- * AWS IAM-style event selector with expandable categories
+ * Dropdown-style event selector with accordion categories inside
  */
 export const EventSelector: React.FC<EventSelectorProps> = ({
     selectedEvents,
@@ -35,7 +39,18 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
     eventCategories,
 }) => {
     const { t } = useTranslation();
+    const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
     const [expanded, setExpanded] = useState<string | false>(false);
+
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
     const handleAccordionChange = (panel: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
         setExpanded(isExpanded ? panel : false);
@@ -68,105 +83,169 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
 
     // Format event name for display
     const formatEventName = (event: string): string => {
-        // Try localization first
         const localized = t(`integrations.events.${event}`);
         if (localized !== `integrations.events.${event}`) {
             return localized;
         }
-        // Fallback to formatted event name
         return event.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
     };
 
+    const totalEvents = eventCategories.reduce((sum, c) => sum + c.events.length, 0);
+
     return (
         <Box>
-            {/* Quick actions */}
-            <Box sx={{ mb: 2, display: 'flex', gap: 1 }}>
-                <Button size="small" variant="outlined" onClick={handleSelectAll}>
-                    {t('common.selectAll')}
-                </Button>
-                <Button size="small" variant="outlined" onClick={handleDeselectAll}>
-                    {t('common.deselectAll')}
-                </Button>
-                <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto', alignSelf: 'center' }}>
-                    {t('common.selectedCount', { count: selectedEvents.length })}
-                </Typography>
-            </Box>
+            {/* Dropdown Trigger Button */}
+            <Button
+                variant="outlined"
+                onClick={handleClick}
+                endIcon={<ArrowDownIcon />}
+                sx={{
+                    justifyContent: 'space-between',
+                    minWidth: 250,
+                    textTransform: 'none',
+                }}
+            >
+                {selectedEvents.length === 0
+                    ? t('integrations.selectEvents')
+                    : t('common.selectedCount', { count: selectedEvents.length })}
+            </Button>
 
-            {/* Event categories as accordions */}
-            {eventCategories.map((category) => {
-                const selectedCount = category.events.filter((e) =>
-                    selectedEvents.includes(e)
-                ).length;
-                const allSelected = selectedCount === category.events.length;
-                const indeterminate = selectedCount > 0 && !allSelected;
+            {/* Dropdown Popover */}
+            <Popover
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                PaperProps={{
+                    sx: {
+                        width: 450,
+                        maxHeight: 500,
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                    },
+                }}
+            >
+                {/* Header */}
+                <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', gap: 1, alignItems: 'center' }}>
+                    <Button size="small" variant="outlined" onClick={handleSelectAll}>
+                        {t('common.selectAll')}
+                    </Button>
+                    <Button size="small" variant="outlined" onClick={handleDeselectAll}>
+                        {t('common.deselectAll')}
+                    </Button>
+                    <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto' }}>
+                        {selectedEvents.length}/{totalEvents}
+                    </Typography>
+                </Box>
 
-                return (
-                    <Accordion
-                        key={category.key}
-                        expanded={expanded === category.key}
-                        onChange={handleAccordionChange(category.key)}
-                        sx={{
-                            '&:before': { display: 'none' },
-                            boxShadow: 'none',
-                            border: 1,
-                            borderColor: 'divider',
-                            '&:not(:last-child)': { mb: 1 },
-                            borderRadius: 1,
-                            overflow: 'hidden',
-                        }}
-                    >
-                        <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                            sx={{
-                                bgcolor: selectedCount > 0
-                                    ? (theme) => alpha(theme.palette.primary.main, 0.05)
-                                    : 'transparent',
-                            }}
-                        >
-                            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', pr: 2 }}>
-                                <Checkbox
-                                    checked={allSelected}
-                                    indeterminate={indeterminate}
-                                    onClick={(e) => e.stopPropagation()}
-                                    onChange={(e) => handleCategoryToggle(category, e.target.checked)}
-                                    size="small"
-                                />
-                                <Typography sx={{ fontWeight: 'medium', flexGrow: 1 }}>
-                                    {t(`integrations.eventCategories.${category.key}`)}
-                                </Typography>
-                                <Chip
-                                    label={`${selectedCount}/${category.events.length}`}
-                                    size="small"
-                                    color={selectedCount > 0 ? 'primary' : 'default'}
-                                    variant={selectedCount > 0 ? 'filled' : 'outlined'}
-                                />
-                            </Box>
-                        </AccordionSummary>
-                        <AccordionDetails sx={{ pt: 0, pb: 2 }}>
-                            <FormGroup sx={{ pl: 4 }}>
-                                {category.events.map((event) => (
-                                    <FormControlLabel
-                                        key={event}
-                                        control={
-                                            <Checkbox
-                                                checked={selectedEvents.includes(event)}
-                                                onChange={() => handleEventToggle(event)}
-                                                size="small"
+                {/* Scrollable Content */}
+                <Box sx={{ overflow: 'auto', flex: 1 }}>
+                    {eventCategories.map((category) => {
+                        const selectedCount = category.events.filter((e) =>
+                            selectedEvents.includes(e)
+                        ).length;
+                        const allSelected = selectedCount === category.events.length;
+                        const indeterminate = selectedCount > 0 && !allSelected;
+
+                        return (
+                            <Accordion
+                                key={category.key}
+                                expanded={expanded === category.key}
+                                onChange={handleAccordionChange(category.key)}
+                                disableGutters
+                                elevation={0}
+                                sx={{
+                                    '&:before': { display: 'none' },
+                                    borderBottom: 1,
+                                    borderColor: 'divider',
+                                }}
+                            >
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    sx={{
+                                        bgcolor: selectedCount > 0
+                                            ? (theme) => alpha(theme.palette.primary.main, 0.05)
+                                            : 'transparent',
+                                        '&:hover': { bgcolor: (theme) => alpha(theme.palette.action.hover, 0.5) },
+                                    }}
+                                >
+                                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', pr: 2 }}>
+                                        <Checkbox
+                                            checked={allSelected}
+                                            indeterminate={indeterminate}
+                                            onClick={(e) => e.stopPropagation()}
+                                            onChange={(e) => handleCategoryToggle(category, e.target.checked)}
+                                            size="small"
+                                        />
+                                        <Typography sx={{ flexGrow: 1 }}>
+                                            {t(`integrations.eventCategories.${category.key}`)}
+                                        </Typography>
+                                        <Chip
+                                            label={`${selectedCount}/${category.events.length}`}
+                                            size="small"
+                                            color={selectedCount > 0 ? 'primary' : 'default'}
+                                            variant={selectedCount > 0 ? 'filled' : 'outlined'}
+                                        />
+                                    </Box>
+                                </AccordionSummary>
+                                <AccordionDetails sx={{ pt: 0, pb: 1, bgcolor: 'action.hover' }}>
+                                    <FormGroup sx={{ pl: 4 }}>
+                                        {category.events.map((event) => (
+                                            <FormControlLabel
+                                                key={event}
+                                                control={
+                                                    <Checkbox
+                                                        checked={selectedEvents.includes(event)}
+                                                        onChange={() => handleEventToggle(event)}
+                                                        size="small"
+                                                    />
+                                                }
+                                                label={formatEventName(event)}
+                                                sx={{
+                                                    '& .MuiFormControlLabel-label': { fontSize: '0.875rem' },
+                                                }}
                                             />
-                                        }
-                                        label={formatEventName(event)}
-                                        sx={{
-                                            '& .MuiFormControlLabel-label': {
-                                                fontSize: '0.875rem',
-                                            },
-                                        }}
-                                    />
-                                ))}
-                            </FormGroup>
-                        </AccordionDetails>
-                    </Accordion>
-                );
-            })}
+                                        ))}
+                                    </FormGroup>
+                                </AccordionDetails>
+                            </Accordion>
+                        );
+                    })}
+                </Box>
+
+                {/* Footer */}
+                <Box sx={{ p: 1.5, borderTop: 1, borderColor: 'divider', textAlign: 'right' }}>
+                    <Button variant="contained" size="small" onClick={handleClose}>
+                        {t('common.confirm')}
+                    </Button>
+                </Box>
+            </Popover>
+
+            {/* Selected summary as chips */}
+            {selectedEvents.length > 0 && (
+                <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {eventCategories.map((category) => {
+                        const selectedCount = category.events.filter((e) =>
+                            selectedEvents.includes(e)
+                        ).length;
+                        if (selectedCount === 0) return null;
+                        return (
+                            <Chip
+                                key={category.key}
+                                label={`${t(`integrations.eventCategories.${category.key}`)} (${selectedCount})`}
+                                size="small"
+                                color="primary"
+                                variant="outlined"
+                                onDelete={() => {
+                                    onChange(selectedEvents.filter((e) => !category.events.includes(e)));
+                                }}
+                            />
+                        );
+                    })}
+                </Box>
+            )}
         </Box>
     );
 };
@@ -178,7 +257,7 @@ interface EnvironmentSelectorProps {
 }
 
 /**
- * Tag-style environment selector component with clickable chips
+ * Tag-style environment selector with clickable chips
  */
 export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
     selectedEnvironments,
@@ -195,27 +274,9 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
         }
     };
 
-    const handleSelectAll = () => {
-        onChange(environments.map((e) => e.environment));
-    };
-
-    const handleDeselectAll = () => {
-        onChange([]);
-    };
-
     return (
         <Box>
-            {/* Quick actions */}
-            <Box sx={{ mb: 2, display: 'flex', gap: 1 }}>
-                <Button size="small" variant="outlined" onClick={handleSelectAll}>
-                    {t('common.selectAll')}
-                </Button>
-                <Button size="small" variant="outlined" onClick={handleDeselectAll}>
-                    {t('common.deselectAll')}
-                </Button>
-            </Box>
-
-            {/* Environment chips */}
+            {/* Environment chips as tags */}
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                 {environments.map((env) => {
                     const isSelected = selectedEnvironments.includes(env.environment);
@@ -228,10 +289,10 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
                             onClick={() => handleToggle(env.environment)}
                             sx={{
                                 cursor: 'pointer',
+                                transition: 'all 0.2s',
                                 '&:hover': {
-                                    bgcolor: isSelected
-                                        ? undefined
-                                        : (theme) => alpha(theme.palette.primary.main, 0.1),
+                                    transform: 'scale(1.02)',
+                                    boxShadow: 1,
                                 },
                             }}
                         />
