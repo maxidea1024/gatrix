@@ -25,6 +25,7 @@ import {
   FlagMetric,
 } from '../types/featureFlags';
 import { FeatureFlagError, FeatureFlagErrorCode } from '../utils/errors';
+import { FeatureFlagEvaluator } from '../utils/FeatureFlagEvaluator';
 import murmurhash from 'murmurhash';
 
 export class FeatureFlagService {
@@ -862,40 +863,23 @@ export class FeatureFlagService {
         flagName,
         enabled: false,
         reason: 'not_found',
+        variant: {
+          name: 'disabled',
+          weight: 100,
+          enabled: false,
+          payload: null,
+          payloadType: 'string',
+        },
       };
     }
 
-    // If flag is globally disabled
-    if (!flag.isEnabled) {
-      this.recordMetric(environment, flagName, false);
-      return {
-        flagName,
-        enabled: false,
-        reason: 'disabled',
-      };
-    }
+    // Use the central evaluator for consistency
+    const result = FeatureFlagEvaluator.evaluate(flag, mergedContext, this.cachedSegments);
 
-    // Evaluate strategies with merged context
-    const strategyResult = this.evaluateStrategies(flag.strategies, mergedContext, flag);
+    // Record metrics
+    this.recordMetric(environment, flagName, result.enabled, result.variant?.name);
 
-    if (strategyResult.enabled) {
-      // Select variant using matched strategy's stickiness
-      const variant = this.selectVariant(flag, mergedContext, strategyResult.matchedStrategy);
-      this.recordMetric(environment, flagName, true, variant?.name);
-      return {
-        flagName,
-        enabled: true,
-        variant,
-        reason: strategyResult.reason,
-      };
-    }
-
-    this.recordMetric(environment, flagName, false);
-    return {
-      flagName,
-      enabled: false,
-      reason: strategyResult.reason,
-    };
+    return result;
   }
 
   /**
