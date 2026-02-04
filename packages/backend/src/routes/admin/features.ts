@@ -748,11 +748,12 @@ router.post(
           if (!flag) continue;
 
           // Evaluate the flag
-          let evalResult = evaluateFlagWithDetails(flag, context || {}, segmentsMap);
+          let evalResult = evaluateFlagWithDetails(flag, context || {}, segmentsMap, env);
 
-          // If evaluation result is false, always add disabled variant with baselinePayload
-          if (!evalResult.enabled && !evalResult.variant) {
-            const envSettings = (flag as any).environments?.[0];
+          // Manual override if variant is somehow missing (already handled in evaluateFlagWithDetails now)
+          // But kept for safety
+          if (!evalResult.variant) {
+            const envSettings = flag.environments?.find(e => e.environment === env);
             let payload = envSettings?.baselinePayload;
             let payloadSource: 'environment' | 'flag' | undefined;
 
@@ -763,14 +764,11 @@ router.post(
               payloadSource = 'flag';
             }
 
-            evalResult = {
-              ...evalResult,
-              variant: {
-                name: 'disabled',
-                payload,
-                payloadType: (flag as any).variantType || 'string',
-                payloadSource,
-              },
+            evalResult.variant = {
+              name: evalResult.enabled ? 'default' : 'disabled',
+              payload,
+              payloadType: (flag as any).variantType || 'string',
+              payloadSource,
             };
           }
 
@@ -802,10 +800,11 @@ router.post(
 function evaluateFlagWithDetails(
   flag: any,
   context: Record<string, any>,
-  segmentsMap: Map<string, any>
+  segmentsMap: Map<string, any>,
+  environment?: string
 ): {
   enabled: boolean;
-  variant?: { name: string; payload?: any; payloadType?: string; payloadSource?: string };
+  variant: { name: string; payload?: any; payloadType?: string; payloadSource?: string };
   reason: string;
   reasonDetails?: any;
   evaluationSteps?: any[];
@@ -820,7 +819,19 @@ function evaluateFlagWithDetails(
       passed: false,
       message: 'Flag is disabled in this environment',
     });
-    return { enabled: false, reason: 'FLAG_DISABLED', evaluationSteps };
+    return {
+      enabled: false,
+      reason: 'FLAG_DISABLED',
+      variant: {
+        name: 'disabled',
+        payload: (flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload ?? flag.baselinePayload) ?? null,
+        payloadType: flag.variantType || 'string',
+        payloadSource: flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload !== undefined
+          ? 'environment'
+          : flag.baselinePayload !== undefined ? 'flag' : undefined,
+      },
+      evaluationSteps,
+    };
   }
   evaluationSteps.push({
     step: 'ENVIRONMENT_CHECK',
@@ -837,7 +848,7 @@ function evaluateFlagWithDetails(
       passed: true,
       message: 'No strategies defined - enabled by default',
     });
-    const variant = selectVariantForFlag(flag, context);
+    const variant = selectVariantForFlag(flag, context, undefined, environment);
     return {
       enabled: true,
       variant,
@@ -969,7 +980,7 @@ function evaluateFlagWithDetails(
     evaluationSteps.push(strategyStep);
 
     if (strategyMatched) {
-      const variant = selectVariantForFlag(flag, context, strategy);
+      const variant = selectVariantForFlag(flag, context, strategy, environment);
       return {
         enabled: true,
         variant,
@@ -986,13 +997,35 @@ function evaluateFlagWithDetails(
   }
 
   // No strategy matched
+  const activeStrategies = strategies.filter((s: any) => s.isEnabled);
+  const allStrategiesDisabled = strategies.length > 0 && activeStrategies.length === 0;
+
+  if (allStrategiesDisabled) {
+    const variant = selectVariantForFlag(flag, context, undefined, environment);
+    return {
+      enabled: true,
+      variant,
+      reason: 'ALL_STRATEGIES_DISABLED',
+      evaluationSteps,
+    };
+  }
+
   return {
     enabled: false,
     reason: 'NO_MATCHING_STRATEGY',
     reasonDetails: {
       strategiesCount: strategies.length,
+      activeStrategiesCount: activeStrategies.length,
     },
     evaluationSteps,
+    variant: {
+      name: 'disabled',
+      payload: (flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload ?? flag.baselinePayload) ?? null,
+      payloadType: flag.variantType || 'string',
+      payloadSource: flag.environments?.find((e: any) => e.environment === environment)?.baselinePayload !== undefined
+        ? 'environment'
+        : flag.baselinePayload !== undefined ? 'flag' : undefined,
+    },
   };
 }
 
@@ -1190,13 +1223,35 @@ function calculatePercentage(
 function selectVariantForFlag(
   flag: any,
   context: Record<string, any>,
-  matchedStrategy?: any
-): { name: string; payload?: any; payloadType?: string; payloadSource?: string } | undefined {
+  matchedStrategy?: any,
+  environment?: string
+): { name: string; payload?: any; payloadType?: string; payloadSource?: string } {
+  const envSettings = environment
+    ? flag.environments?.find((e: any) => e.environment === environment)
+    : undefined;
+
+  const baselinePayload = envSettings?.baselinePayload ?? flag.baselinePayload;
+  const baselineSource = envSettings?.baselinePayload !== undefined ? 'environment' : 'flag';
+
   const variants = flag.variants || [];
-  if (variants.length === 0) return undefined;
+  if (variants.length === 0) {
+    return {
+      name: 'default',
+      payload: baselinePayload ?? null,
+      payloadType: flag.variantType || 'string',
+      payloadSource: baselinePayload !== undefined ? baselineSource : undefined,
+    };
+  }
 
   const totalWeight = variants.reduce((sum: number, v: any) => sum + v.weight, 0);
-  if (totalWeight <= 0) return undefined;
+  if (totalWeight <= 0) {
+    return {
+      name: 'default',
+      payload: baselinePayload ?? null,
+      payloadType: flag.variantType || 'string',
+      payloadSource: baselinePayload !== undefined ? baselineSource : undefined,
+    };
+  }
 
   const stickiness = matchedStrategy?.parameters?.stickiness || 'default';
   const percentage = calculatePercentage(context, stickiness, `${flag.flagName}-variant`);
@@ -1208,10 +1263,10 @@ function selectVariantForFlag(
     if (targetWeight <= cumulativeWeight) {
       // Determine payload and its source
       let payload = variant.payload;
-      let payloadSource: 'variant' | 'baseline' = 'variant';
+      let payloadSource: 'variant' | 'environment' | 'flag' = 'variant';
       if (payload === undefined || payload === null) {
-        payload = flag.baselinePayload;
-        payloadSource = 'baseline';
+        payload = baselinePayload;
+        payloadSource = baselineSource as any;
       }
       return {
         name: variant.variantName || variant.name,
@@ -1223,10 +1278,10 @@ function selectVariantForFlag(
   }
   const lastVariant = variants[variants.length - 1];
   let payload = lastVariant.payload;
-  let payloadSource: 'variant' | 'baseline' = 'variant';
+  let payloadSource: 'variant' | 'environment' | 'flag' = 'variant';
   if (payload === undefined || payload === null) {
-    payload = flag.baselinePayload;
-    payloadSource = 'baseline';
+    payload = baselinePayload;
+    payloadSource = baselineSource as any;
   }
   return {
     name: lastVariant.variantName || lastVariant.name,

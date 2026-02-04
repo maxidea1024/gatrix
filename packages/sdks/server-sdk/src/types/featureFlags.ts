@@ -78,6 +78,7 @@ export interface Variant {
   weight: number;
   payload?: any;
   payloadType?: PayloadType;
+  enabled?: boolean;
 }
 
 // ==================== Segment ====================
@@ -139,7 +140,7 @@ export type EvaluationReason =
 export interface EvaluationResult {
   flagName: string;
   enabled: boolean;
-  variant?: Variant;
+  variant: Variant;
   reason: EvaluationReason;
 }
 

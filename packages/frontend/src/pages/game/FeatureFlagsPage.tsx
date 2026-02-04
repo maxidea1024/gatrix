@@ -1431,14 +1431,17 @@ const FeatureFlagsPage: React.FC = () => {
           <Divider orientation="vertical" sx={{ height: 32, mx: 0.5 }} />
           <Tooltip title={t("playground.title")}>
             <IconButton
+              size="small"
               onClick={() => setPlaygroundOpen(true)}
               sx={{
+                width: 36,
+                height: 36,
                 bgcolor: 'primary.main',
                 color: 'primary.contrastText',
                 '&:hover': { bgcolor: 'primary.dark' },
               }}
             >
-              <JoystickIcon />
+              <JoystickIcon sx={{ fontSize: 20 }} />
             </IconButton>
           </Tooltip>
         </Box>

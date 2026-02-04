@@ -21,64 +21,73 @@ export class FeatureFlagEvaluator {
     context: EvaluationContext,
     segmentsMap: Map<string, FeatureSegment>
   ): EvaluationResult {
-    // Default result if disabled or no strategies match
-    let result: EvaluationResult = {
-      flagName: flag.name,
-      enabled: false,
-      reason: 'disabled',
-    };
+    // Basic state
+    let reason: EvaluationReason = 'disabled';
 
-    if (!flag.isEnabled) {
-      // Flag is disabled - will add disabled variant at the end
-      result.reason = 'disabled';
-    } else if (flag.strategies && flag.strategies.length > 0) {
-      // Evaluate strategies
-      for (const strategy of flag.strategies) {
-        if (!strategy.isEnabled) continue;
+    if (flag.isEnabled) {
+      const activeStrategies = flag.strategies?.filter((s) => s.isEnabled) || [];
 
-        if (this.evaluateStrategy(strategy, context, flag, segmentsMap)) {
-          result = {
-            flagName: flag.name,
+      if (activeStrategies.length > 0) {
+        for (const strategy of activeStrategies) {
+          if (this.evaluateStrategy(strategy, context, flag, segmentsMap)) {
+            const variantData = this.selectVariant(flag, context, strategy);
+            const variant: Variant = variantData
+              ? { ...variantData, enabled: true }
+              : {
+                name: 'default',
+                weight: 100,
+                payload: flag.baselinePayload ?? null,
+                payloadType: flag.variantType || 'string',
+                enabled: true,
+              };
+
+            return {
+              flagName: flag.name,
+              enabled: true,
+              reason: 'strategy_match',
+              variant,
+            };
+          }
+        }
+        // If we have strategies but none matched
+        reason = 'default';
+      } else {
+        // No strategies or all strategies are disabled - enabled by default
+        const variantData = this.selectVariant(flag, context);
+        const variant: Variant = variantData
+          ? { ...variantData, enabled: true }
+          : {
+            name: 'default',
+            weight: 100,
+            payload: flag.baselinePayload ?? null,
+            payloadType: flag.variantType || 'string',
             enabled: true,
-            reason: 'strategy_match',
           };
 
-          const variant = this.selectVariant(flag, context, strategy);
-          if (variant) {
-            result.variant = variant;
-          }
-          return result; // Early return for matched strategy
-        }
-      }
-      // No strategy matched
-      result.reason = 'default';
-    } else {
-      // No strategies, enabled by default
-      result = {
-        flagName: flag.name,
-        enabled: true,
-        reason: 'default',
-      };
-      const variant = this.selectVariant(flag, context);
-      if (variant) {
-        result.variant = variant;
-      }
-      return result; // Early return for enabled by default
-    }
-
-    // If evaluation result is false, add disabled variant with baselinePayload
-    if (!result.enabled && !result.variant) {
-      if (flag.baselinePayload !== undefined && flag.baselinePayload !== null) {
-        result.variant = {
-          name: 'disabled',
-          weight: 100,
-          payload: flag.baselinePayload,
-          payloadType: flag.variantType,
+        return {
+          flagName: flag.name,
+          enabled: true,
+          reason: 'default',
+          variant,
         };
       }
+    } else {
+      reason = 'disabled';
     }
 
-    return result;
+    // Default return path (disabled or no strategy matched)
+    return {
+      flagName: flag.name,
+      enabled: false,
+      reason,
+      variant: {
+        name: 'disabled',
+        weight: 100,
+        payload: flag.baselinePayload ?? null,
+        payloadType: flag.variantType || 'string',
+        enabled: false,
+      },
+    };
   }
 
   private static evaluateStrategy(
