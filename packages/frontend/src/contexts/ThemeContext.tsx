@@ -318,6 +318,19 @@ const getTheme = (mode: "light" | "dark", language: string): Theme => {
           },
         },
       },
+      MuiPopover: {
+        defaultProps: {
+          disableScrollLock: true,
+          BackdropProps: {
+            style: {
+              backgroundColor: "transparent",
+              backdropFilter: "none",
+              WebkitBackdropFilter: "none",
+            },
+            invisible: true,
+          },
+        },
+      },
     },
   });
 };

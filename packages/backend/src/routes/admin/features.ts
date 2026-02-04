@@ -898,8 +898,23 @@ function evaluateFlagWithDetails(
               segmentsPassed = false;
             }
           }
+        } else {
+          // Segment exists but has no constraints
+          strategyStep.checks.push({
+            type: 'SEGMENT',
+            name: segmentName,
+            passed: true,
+            message: 'Segment has no constraints - passed',
+          });
         }
       }
+    } else {
+      // No segments defined
+      strategyStep.checks.push({
+        type: 'SEGMENTS_CHECK',
+        passed: true,
+        message: 'No segments defined - passed',
+      });
     }
 
     // Evaluate strategy constraints
@@ -917,23 +932,33 @@ function evaluateFlagWithDetails(
           constraintsPassed = false;
         }
       }
-    }
-
-    // Evaluate rollout
-    let rolloutPassed = true;
-    const rollout = strategy.parameters?.rollout ?? 100;
-    if (rollout < 100) {
-      const stickiness = strategy.parameters?.stickiness || 'default';
-      const groupId = strategy.parameters?.groupId || flag.flagName;
-      const percentage = calculatePercentage(context, stickiness, groupId);
-      rolloutPassed = percentage <= rollout;
+    } else {
+      // No constraints defined
       strategyStep.checks.push({
-        type: 'ROLLOUT',
-        rollout: rollout,
-        percentage: percentage,
-        passed: rolloutPassed,
+        type: 'CONSTRAINTS_CHECK',
+        passed: true,
+        message: 'No constraints defined - passed',
       });
     }
+
+    // Evaluate rollout - always show rollout check
+    let rolloutPassed = true;
+    const rollout = strategy.parameters?.rollout ?? 100;
+    const stickiness = strategy.parameters?.stickiness || 'default';
+    const groupId = strategy.parameters?.groupId || flag.flagName;
+    const percentage = calculatePercentage(context, stickiness, groupId);
+
+    if (rollout < 100) {
+      rolloutPassed = percentage <= rollout;
+    }
+
+    strategyStep.checks.push({
+      type: 'ROLLOUT',
+      rollout: rollout,
+      percentage: percentage,
+      passed: rolloutPassed,
+      message: rollout === 100 ? 'Rollout 100% - all users included' : undefined,
+    });
 
     // Determine if strategy matched
     const strategyMatched = segmentsPassed && constraintsPassed && rolloutPassed;

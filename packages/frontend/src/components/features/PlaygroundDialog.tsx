@@ -42,6 +42,7 @@ import {
     ExpandLess as ExpandLessIcon,
     CheckCircle as TrueIcon,
     Cancel as FalseIcon,
+    RemoveCircleOutline as RemoveCircleOutlineIcon,
     HelpOutline as HelpIcon,
     OpenInNew as OpenInNewIcon,
     RocketLaunch as ReleaseIcon,
@@ -250,6 +251,80 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             handleEvaluate();
         }
     }, [autoExecutePending, environments.length]);
+
+    // Helper function to localize evaluation reason
+    const getLocalizedReason = (reason: string, reasonDetails?: any): string => {
+        // Helper to localize strategy name inline
+        const localizeStrategyName = (name: string): string => {
+            const key = `featureFlags.strategyTypes.${name}`;
+            const localized = t(key);
+            return localized !== key ? localized : name;
+        };
+
+        const reasonMap: Record<string, string> = {
+            'FLAG_DISABLED': t('playground.reasonCodes.flagDisabled'),
+            'NO_STRATEGIES': t('playground.reasonCodes.noStrategies'),
+            'STRATEGY_MATCHED': reasonDetails?.strategyName
+                ? t('playground.reasonCodes.strategyMatched', { name: localizeStrategyName(reasonDetails.strategyName) })
+                : t('playground.reasonCodes.strategyMatchedDefault'),
+            'NO_MATCHING_STRATEGY': t('playground.reasonCodes.noMatchingStrategy'),
+        };
+        return reasonMap[reason] || reason;
+    };
+
+    // Helper function to localize step message
+    const getLocalizedStepMessage = (step: any, envName?: string): string => {
+        const stepType = step.step;
+        const message = step.message;
+
+        // Map messages to localization keys
+        if (stepType === 'ENVIRONMENT_CHECK') {
+            if (message === 'Flag is enabled in this environment') {
+                return envName
+                    ? t('playground.stepMessages.flagEnabledInEnvNamed', { env: envName })
+                    : t('playground.stepMessages.flagEnabledInEnv');
+            }
+            if (message === 'Flag is disabled in this environment') {
+                return envName
+                    ? t('playground.stepMessages.flagDisabledInEnvNamed', { env: envName })
+                    : t('playground.stepMessages.flagDisabledInEnv');
+            }
+        }
+
+        if (stepType === 'STRATEGY_COUNT') {
+            if (message === 'No strategies defined - enabled by default') {
+                return t('playground.stepMessages.noStrategiesDefault');
+            }
+            // Match "N strategy(s) to evaluate"
+            const match = message?.match(/(\d+) strategy\(s\) to evaluate/);
+            if (match) {
+                return t('playground.stepMessages.strategiesToEvaluate', { count: match[1] });
+            }
+        }
+
+        if (stepType === 'STRATEGY_EVALUATION') {
+            if (message === 'Strategy is disabled - skipped') {
+                return t('playground.stepMessages.strategyDisabledSkipped');
+            }
+            if (message === 'All conditions met') {
+                return t('playground.stepMessages.allConditionsMet');
+            }
+            if (message === 'One or more conditions failed') {
+                return t('playground.stepMessages.conditionsFailed');
+            }
+        }
+
+        // Return original message if no localization found
+        return message || '';
+    };
+
+    // Helper function to localize strategy names
+    const getLocalizedStrategyName = (strategyName: string): string => {
+        const key = `featureFlags.strategyTypes.${strategyName}`;
+        const localized = t(key);
+        // If the key doesn't exist, t() returns the key itself
+        return localized !== key ? localized : strategyName;
+    };
 
     // Add context entry
     const handleAddContextEntry = () => {
@@ -1011,25 +1086,22 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     horizontal: 'left',
                 }}
                 disableRestoreFocus
-                disableScrollLock
                 slotProps={{
                     paper: {
                         elevation: 8,
                         sx: { mt: 0.5 }
-                    },
-                    root: {
-                        slotProps: {
-                            backdrop: {
-                                invisible: true
-                            }
-                        }
                     }
                 }}
             >
                 <Box sx={{ p: 2, minWidth: 300, maxWidth: 500 }}>
-                    <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-                        {t('playground.variantPayload')}
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                        <Typography variant="subtitle2" fontWeight={600}>
+                            {t('playground.variantPayload')}
+                        </Typography>
+                        <IconButton size="small" onClick={handleVariantPopoverClose} sx={{ ml: 1 }}>
+                            <CloseIcon fontSize="small" />
+                        </IconButton>
+                    </Box>
 
                     {selectedVariant && (
                         <Stack spacing={1.5}>
@@ -1127,30 +1199,23 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 anchorEl={evaluationPopoverAnchor}
                 onClose={handleEvaluationPopoverClose}
                 anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'center',
-                }}
-                transformOrigin={{
                     vertical: 'top',
                     horizontal: 'center',
                 }}
+                transformOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                }}
                 disableRestoreFocus
-                disableScrollLock
+                marginThreshold={16}
                 slotProps={{
                     paper: {
                         elevation: 8,
-                        sx: { mt: 0.5, maxHeight: '70vh', overflow: 'auto' }
-                    },
-                    root: {
-                        slotProps: {
-                            backdrop: {
-                                invisible: true
-                            }
-                        }
+                        sx: { mb: 0.5, maxHeight: '70vh', overflow: 'auto' }
                     }
                 }}
             >
-                <Box sx={{ p: 2, minWidth: 400, maxWidth: 600 }}>
+                <Box sx={{ p: 2, minWidth: 700, maxWidth: 950 }}>
                     {selectedEvaluation && (
                         <>
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
@@ -1174,22 +1239,142 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                         );
                                     })()}
                                 </Box>
-                                <Chip
-                                    icon={selectedEvaluation.result.enabled ? <TrueIcon /> : <FalseIcon />}
-                                    label={selectedEvaluation.result.enabled ? 'true' : 'false'}
-                                    size="small"
-                                    color={selectedEvaluation.result.enabled ? 'success' : 'error'}
-                                    sx={{ borderRadius: '16px' }}
-                                />
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Chip
+                                        icon={selectedEvaluation.result.enabled ? <TrueIcon /> : <FalseIcon />}
+                                        label={selectedEvaluation.result.enabled ? 'true' : 'false'}
+                                        size="small"
+                                        color={selectedEvaluation.result.enabled ? 'success' : 'error'}
+                                        sx={{ borderRadius: '16px' }}
+                                    />
+                                    <IconButton size="small" onClick={handleEvaluationPopoverClose}>
+                                        <CloseIcon fontSize="small" />
+                                    </IconButton>
+                                </Box>
                             </Box>
 
                             {selectedEvaluation.result.reason && (
                                 <Box sx={{ mb: 2, p: 1.5, bgcolor: 'action.hover', borderRadius: 1 }}>
                                     <Typography variant="body2" color="text.secondary">
-                                        <strong>{t('playground.reason')}:</strong> {selectedEvaluation.result.reason}
+                                        <strong>{t('playground.reason')}:</strong> {getLocalizedReason(selectedEvaluation.result.reason, selectedEvaluation.result.reasonDetails)}
                                     </Typography>
                                 </Box>
                             )}
+
+                            {/* Context Fields Used */}
+                            {contextEntries.length > 0 && (
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                                        {t('playground.usedContext')}:
+                                    </Typography>
+                                    <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 150 }}>
+                                        <Table size="small" stickyHeader>
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'grey.50', width: '40%' }}>
+                                                        {t('playground.contextField')}
+                                                    </TableCell>
+                                                    <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'grey.50' }}>
+                                                        {t('playground.contextValue')}
+                                                    </TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {contextEntries.map((entry, idx) => (
+                                                    <TableRow key={idx} sx={{ '&:last-child td': { borderBottom: 0 } }}>
+                                                        <TableCell sx={{ py: 0.5 }}>
+                                                            <Typography variant="caption" fontWeight={500}>{entry.key}</Typography>
+                                                        </TableCell>
+                                                        <TableCell sx={{ py: 0.5 }}>
+                                                            <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                                                                {entry.value}
+                                                            </Typography>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                </Box>
+                            )}
+                            {contextEntries.length === 0 && (
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                                        {t('playground.usedContext')}:
+                                    </Typography>
+                                    <Typography variant="body2" color="text.disabled" sx={{ fontStyle: 'italic' }}>
+                                        {t('playground.noContextProvided')}
+                                    </Typography>
+                                </Box>
+                            )}
+
+                            {/* Evaluation Summary */}
+                            {selectedEvaluation.result.evaluationSteps && selectedEvaluation.result.evaluationSteps.length > 0 && (() => {
+                                const steps = selectedEvaluation.result.evaluationSteps;
+                                const totalSteps = steps.length;
+                                const passedSteps = steps.filter((s: any) => s.passed === true).length;
+                                const failedSteps = steps.filter((s: any) => s.passed === false).length;
+                                // Total checks = each step counts as 1 check + sub-checks within strategies
+                                const subChecks = steps.reduce((acc: number, s: any) => acc + (s.checks?.length || 0), 0);
+                                const totalChecks = totalSteps + subChecks;
+                                const passedSubChecks = steps.reduce((acc: number, s: any) => acc + (s.checks?.filter((c: any) => c.passed).length || 0), 0);
+                                const passedChecks = passedSteps + passedSubChecks;
+
+                                return (
+                                    <Box sx={{
+                                        mb: 2,
+                                        p: 1.5,
+                                        bgcolor: 'grey.50',
+                                        borderRadius: 1,
+                                        display: 'flex',
+                                        gap: 2,
+                                        flexWrap: 'wrap',
+                                        alignItems: 'center'
+                                    }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {t('playground.summary.totalSteps')}:
+                                            </Typography>
+                                            <Chip label={totalSteps} size="small" sx={{ height: 20, fontSize: '0.7rem' }} />
+                                        </Box>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {t('playground.summary.stepResults')}:
+                                            </Typography>
+                                            <Chip
+                                                label={`${passedSteps} ${t('playground.summary.passed')}`}
+                                                size="small"
+                                                sx={{ height: 20, fontSize: '0.7rem', bgcolor: 'success.100', color: 'success.dark' }}
+                                            />
+                                            {failedSteps > 0 && (
+                                                <Chip
+                                                    label={`${failedSteps} ${t('playground.summary.failed')}`}
+                                                    size="small"
+                                                    sx={{ height: 20, fontSize: '0.7rem', bgcolor: 'error.100', color: 'error.dark' }}
+                                                />
+                                            )}
+                                        </Box>
+                                        {totalChecks > 0 && (
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                <Typography variant="caption" color="text.secondary">
+                                                    {t('playground.summary.totalChecks')}:
+                                                </Typography>
+                                                <Chip
+                                                    label={`${passedChecks}/${totalChecks}`}
+                                                    size="small"
+                                                    sx={{
+                                                        height: 20,
+                                                        fontSize: '0.7rem',
+                                                        fontWeight: 600,
+                                                        bgcolor: passedChecks === totalChecks ? 'success.100' : 'warning.100',
+                                                        color: passedChecks === totalChecks ? 'success.dark' : 'warning.dark'
+                                                    }}
+                                                />
+                                            </Box>
+                                        )}
+                                    </Box>
+                                );
+                            })()}
 
                             {selectedEvaluation.result.evaluationSteps && selectedEvaluation.result.evaluationSteps.length > 0 && (
                                 <Box sx={{
@@ -1202,6 +1387,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     {selectedEvaluation.result.evaluationSteps.map((step: any, stepIdx: number) => {
                                         const isStrategy = step.step === 'STRATEGY_EVALUATION';
                                         const stepBgColor = stepIdx % 2 === 0 ? 'transparent' : 'action.hover';
+                                        const envDisplayName = environments.find(e => e.name === selectedEvaluation.env)?.displayName || selectedEvaluation.env;
 
                                         return (
                                             <Box
@@ -1216,8 +1402,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                     display: 'flex',
                                                     alignItems: 'flex-start',
                                                     p: 1.5,
-                                                    pl: isStrategy ? 3 : 1.5,
-                                                    borderLeft: isStrategy ? 3 : 0,
+                                                    borderLeft: 3,
                                                     borderColor: step.passed === true ? 'success.main' :
                                                         step.passed === false ? 'error.main' : 'grey.400',
                                                 }}>
@@ -1249,46 +1434,217 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                             {step.step === 'ENVIRONMENT_CHECK' && t('playground.steps.environmentCheck')}
                                                             {step.step === 'STRATEGY_COUNT' && t('playground.steps.strategyCount')}
                                                             {step.step === 'STRATEGY_EVALUATION' &&
-                                                                t('playground.steps.strategy', { name: step.strategyName || `#${(step.strategyIndex ?? 0) + 1}` })
+                                                                t('playground.steps.strategy', { name: step.strategyName ? getLocalizedStrategyName(step.strategyName) : `#${(step.strategyIndex ?? 0) + 1}` })
                                                             }
                                                         </Typography>
                                                     </Box>
 
                                                     <Box sx={{ flex: 1 }}>
                                                         <Typography variant="body2" color="text.secondary">
-                                                            {step.message}
+                                                            {getLocalizedStepMessage(step, envDisplayName)}
                                                         </Typography>
 
-                                                        {isStrategy && step.segmentName && (
-                                                            <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                                <Typography variant="caption" color="text.secondary">
-                                                                    {t('playground.segment')}:
-                                                                </Typography>
-                                                                <Chip
-                                                                    label={step.segmentName}
-                                                                    size="small"
-                                                                    variant="outlined"
-                                                                    sx={{ borderRadius: '12px' }}
-                                                                />
-                                                            </Box>
-                                                        )}
-
-                                                        {isStrategy && step.constraintResults && step.constraintResults.length > 0 && (
+                                                        {/* Show detailed checks for strategy evaluation */}
+                                                        {isStrategy && step.checks && step.checks.length > 0 && (
                                                             <Box sx={{ mt: 1.5, pl: 1, borderLeft: 2, borderColor: 'divider' }}>
-                                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                                                                    {t('playground.constraintEvaluation')}:
-                                                                </Typography>
-                                                                <Stack spacing={0.5}>
-                                                                    {step.constraintResults.map((cr: any, crIdx: number) => (
-                                                                        <Box key={crIdx} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                                            {cr.passed ? (
-                                                                                <TrueIcon sx={{ fontSize: 14, color: 'success.main' }} />
-                                                                            ) : (
-                                                                                <FalseIcon sx={{ fontSize: 14, color: 'error.main' }} />
-                                                                            )}
-                                                                            <ConstraintDisplay constraint={cr.constraint} compact />
-                                                                        </Box>
-                                                                    ))}
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                                                    <Typography variant="caption" color="text.secondary">
+                                                                        {t('playground.detailedChecks')}:
+                                                                    </Typography>
+                                                                    {(() => {
+                                                                        const firstFailedIdx = step.checks.findIndex((c: any) => c.passed === false);
+                                                                        const totalCount = step.checks.length;
+                                                                        // Only count checks that were actually evaluated (up to and including first failure)
+                                                                        const evaluatedCount = firstFailedIdx === -1 ? totalCount : firstFailedIdx + 1;
+                                                                        const passedCount = firstFailedIdx === -1 ? totalCount : firstFailedIdx;
+                                                                        const skippedCount = totalCount - evaluatedCount;
+                                                                        const allPassed = passedCount === totalCount;
+                                                                        return (
+                                                                            <>
+                                                                                <Chip
+                                                                                    label={t('playground.checkCountDetail', { passed: passedCount, total: totalCount })}
+                                                                                    size="small"
+                                                                                    sx={{
+                                                                                        height: 18,
+                                                                                        fontSize: '0.65rem',
+                                                                                        fontWeight: 600,
+                                                                                        bgcolor: allPassed ? 'success.100' : 'error.100',
+                                                                                        color: allPassed ? 'success.dark' : 'error.dark',
+                                                                                        '& .MuiChip-label': { px: 1 }
+                                                                                    }}
+                                                                                />
+                                                                                {skippedCount > 0 && (
+                                                                                    <Chip
+                                                                                        label={t('playground.checkSkippedCount', { count: skippedCount })}
+                                                                                        size="small"
+                                                                                        sx={{
+                                                                                            height: 18,
+                                                                                            fontSize: '0.65rem',
+                                                                                            fontWeight: 600,
+                                                                                            bgcolor: 'grey.200',
+                                                                                            color: 'grey.600',
+                                                                                            '& .MuiChip-label': { px: 1 }
+                                                                                        }}
+                                                                                    />
+                                                                                )}
+                                                                            </>
+                                                                        );
+                                                                    })()}
+                                                                </Box>
+                                                                <Stack spacing={0}>
+                                                                    {(() => {
+                                                                        // Find the first failed check index to determine skipped checks
+                                                                        const firstFailedIdx = step.checks.findIndex((c: any) => c.passed === false);
+
+                                                                        return step.checks.map((check: any, checkIdx: number) => {
+                                                                            // Determine if this check was skipped (came after first failure)
+                                                                            const isSkipped = firstFailedIdx !== -1 && checkIdx > firstFailedIdx;
+
+                                                                            // Determine the operator to show before this check
+                                                                            const prevCheck = checkIdx > 0 ? step.checks[checkIdx - 1] : null;
+                                                                            let showOperator = false;
+                                                                            let operatorType: 'AND' | 'OR' | null = null;
+
+                                                                            if (prevCheck) {
+                                                                                // Same type constraints use AND
+                                                                                if (check.type === prevCheck.type) {
+                                                                                    showOperator = true;
+                                                                                    operatorType = 'AND';
+                                                                                }
+                                                                                // Different check categories (segments -> constraints -> rollout)
+                                                                                else if (
+                                                                                    (prevCheck.type === 'SEGMENTS_CHECK' || prevCheck.type === 'SEGMENT' || prevCheck.type === 'SEGMENT_CONSTRAINT') &&
+                                                                                    (check.type === 'CONSTRAINTS_CHECK' || check.type === 'STRATEGY_CONSTRAINT')
+                                                                                ) {
+                                                                                    showOperator = true;
+                                                                                    operatorType = 'AND';
+                                                                                }
+                                                                                else if (
+                                                                                    (prevCheck.type === 'CONSTRAINTS_CHECK' || prevCheck.type === 'STRATEGY_CONSTRAINT') &&
+                                                                                    check.type === 'ROLLOUT'
+                                                                                ) {
+                                                                                    showOperator = true;
+                                                                                    operatorType = 'AND';
+                                                                                }
+                                                                                else if (
+                                                                                    (prevCheck.type === 'SEGMENTS_CHECK' || prevCheck.type === 'SEGMENT' || prevCheck.type === 'SEGMENT_CONSTRAINT') &&
+                                                                                    check.type === 'ROLLOUT'
+                                                                                ) {
+                                                                                    showOperator = true;
+                                                                                    operatorType = 'AND';
+                                                                                }
+                                                                            }
+                                                                            // Map check types to localized labels
+                                                                            let checkLabel = check.type;
+                                                                            if (check.type === 'SEGMENT_CONSTRAINT') {
+                                                                                checkLabel = `${t('playground.checkTypes.segmentConstraint')}: ${check.segment}`;
+                                                                            } else if (check.type === 'STRATEGY_CONSTRAINT') {
+                                                                                checkLabel = t('playground.checkTypes.strategyConstraint');
+                                                                            } else if (check.type === 'ROLLOUT') {
+                                                                                checkLabel = t('playground.checkTypes.rollout');
+                                                                            } else if (check.type === 'SEGMENTS_CHECK') {
+                                                                                checkLabel = t('playground.checkTypes.segmentsCheck');
+                                                                            } else if (check.type === 'CONSTRAINTS_CHECK') {
+                                                                                checkLabel = t('playground.checkTypes.constraintsCheck');
+                                                                            } else if (check.type === 'SEGMENT') {
+                                                                                checkLabel = `${t('playground.checkTypes.segment')}: ${check.name}`;
+                                                                            }
+
+                                                                            return (
+                                                                                <React.Fragment key={checkIdx}>
+                                                                                    {showOperator && operatorType && (
+                                                                                        <Box sx={{
+                                                                                            display: 'flex',
+                                                                                            alignItems: 'center',
+                                                                                            pl: 3,
+                                                                                            my: '-5px',
+                                                                                            position: 'relative',
+                                                                                            zIndex: 1
+                                                                                        }}>
+                                                                                            <Chip
+                                                                                                label={operatorType}
+                                                                                                size="small"
+                                                                                                sx={{
+                                                                                                    height: 18,
+                                                                                                    fontSize: '0.65rem',
+                                                                                                    fontWeight: 700,
+                                                                                                    bgcolor: operatorType === 'AND' ? 'primary.main' : 'secondary.main',
+                                                                                                    color: '#fff',
+                                                                                                    '& .MuiChip-label': { px: 1 }
+                                                                                                }}
+                                                                                            />
+                                                                                        </Box>
+                                                                                    )}
+                                                                                    <Box
+                                                                                        sx={{
+                                                                                            display: 'flex',
+                                                                                            alignItems: 'flex-start',
+                                                                                            gap: 1,
+                                                                                            p: 1,
+                                                                                            borderRadius: 1,
+                                                                                            border: '1px dashed',
+                                                                                            borderColor: isSkipped ? 'grey.400' : check.passed ? 'success.light' : 'error.light',
+                                                                                            bgcolor: isSkipped ? 'grey.100' : check.passed ? 'success.50' : 'error.50',
+                                                                                            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                                                                                            opacity: isSkipped ? 0.7 : 1,
+                                                                                        }}
+                                                                                    >
+                                                                                        <Box sx={{ pt: 0.3, flexShrink: 0 }}>
+                                                                                            {isSkipped ? (
+                                                                                                <RemoveCircleOutlineIcon sx={{ fontSize: 16, color: 'grey.500' }} />
+                                                                                            ) : check.passed ? (
+                                                                                                <TrueIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                                                                                            ) : (
+                                                                                                <FalseIcon sx={{ fontSize: 16, color: 'error.main' }} />
+                                                                                            )}
+                                                                                        </Box>
+                                                                                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                                                            <Typography variant="caption" fontWeight={500} color={isSkipped ? 'text.disabled' : 'text.primary'}>
+                                                                                                {checkLabel}
+                                                                                                {isSkipped && ` (${t('playground.checkSkipped')})`}
+                                                                                            </Typography>
+                                                                                            {check.type === 'ROLLOUT' ? (
+                                                                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                                                                    {check.rollout === 100
+                                                                                                        ? t('playground.checkMessages.rollout100')
+                                                                                                        : t('playground.rolloutDetail', {
+                                                                                                            percentage: check.percentage?.toFixed(1) ?? '?',
+                                                                                                            rollout: check.rollout ?? 100
+                                                                                                        })
+                                                                                                    }
+                                                                                                </Typography>
+                                                                                            ) : check.constraint ? (
+                                                                                                <Box sx={{ mt: 0.5 }}>
+                                                                                                    <ConstraintDisplay constraint={check.constraint} compact />
+                                                                                                    {check.contextValue !== undefined && (
+                                                                                                        <Typography variant="caption" sx={{ display: 'block', mt: 0.25, color: check.passed ? 'success.main' : 'error.main' }}>
+                                                                                                            {t('playground.contextValue')}: <code style={{ fontFamily: 'monospace', backgroundColor: 'rgba(0,0,0,0.1)', padding: '1px 4px', borderRadius: 2 }}>{String(check.contextValue ?? 'undefined')}</code>
+                                                                                                        </Typography>
+                                                                                                    )}
+                                                                                                </Box>
+                                                                                            ) : check.type === 'SEGMENTS_CHECK' ? (
+                                                                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                                                                    {t('playground.checkMessages.noSegments')}
+                                                                                                </Typography>
+                                                                                            ) : check.type === 'CONSTRAINTS_CHECK' ? (
+                                                                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                                                                    {t('playground.checkMessages.noConstraints')}
+                                                                                                </Typography>
+                                                                                            ) : check.type === 'SEGMENT' ? (
+                                                                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                                                                    {check.message === 'Segment has no constraints - passed'
+                                                                                                        ? t('playground.checkMessages.segmentNoConstraints')
+                                                                                                        : check.message === 'Segment not found - skipped'
+                                                                                                            ? t('playground.checkMessages.segmentNotFound')
+                                                                                                            : check.message}
+                                                                                                </Typography>
+                                                                                            ) : null}
+                                                                                        </Box>
+                                                                                    </Box>
+                                                                                </React.Fragment>
+                                                                            );
+                                                                        });
+                                                                    })()}
                                                                 </Stack>
                                                             </Box>
                                                         )}
@@ -1328,13 +1684,13 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     }, null, 2)}
                                     onChange={() => { }}
                                     readOnly
-                                    height={150}
+                                    height={250}
                                 />
                             </Box>
                         </>
                     )}
                 </Box>
-            </Popover>
+            </Popover >
         </>
     );
 };
