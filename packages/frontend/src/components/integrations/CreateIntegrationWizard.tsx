@@ -163,19 +163,21 @@ interface CreateIntegrationWizardProps {
     open: boolean;
     onClose: () => void;
     onSuccess: () => void;
+    initialProvider?: string;
 }
 
 export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = ({
     open,
     onClose,
     onSuccess,
+    initialProvider,
 }) => {
     const { t } = useTranslation();
     const { enqueueSnackbar } = useSnackbar();
 
-    const [activeStep, setActiveStep] = useState(0);
+    const [activeStep, setActiveStep] = useState(initialProvider ? 1 : 0);
     const [providers, setProviders] = useState<ProviderDefinition[]>([]);
-    const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
+    const [selectedProvider, setSelectedProvider] = useState<string | null>(initialProvider || null);
     const [description, setDescription] = useState('');
     const [isEnabled, setIsEnabled] = useState(true);
     const [parameters, setParameters] = useState<Record<string, any>>({});
@@ -194,9 +196,9 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
         if (open) {
             fetchProviders();
             fetchEnvironments();
-            // Reset form
-            setActiveStep(0);
-            setSelectedProvider(null);
+            // Reset form - if initialProvider is set, start at step 1
+            setActiveStep(initialProvider ? 1 : 0);
+            setSelectedProvider(initialProvider || null);
             setDescription('');
             setIsEnabled(true);
             setParameters({});
@@ -204,9 +206,9 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
             setSelectedEnvironments([]);
             setShowSensitive({});
         }
-    }, [open]);
+    }, [open, initialProvider]);
 
-    // Set default parameter values when provider changes (excluding URL fields)
+    // Set default parameter values and description when provider changes
     useEffect(() => {
         if (currentProvider) {
             const defaults: Record<string, any> = {};
@@ -217,6 +219,10 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                 }
             }
             setParameters(defaults);
+
+            // Set default description
+            const providerName = t(currentProvider.displayName);
+            setDescription(`Gatrix ${providerName}`);
         }
     }, [selectedProvider, providers]);
 

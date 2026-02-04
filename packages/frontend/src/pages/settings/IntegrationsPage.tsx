@@ -75,6 +75,7 @@ export const IntegrationsPage: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<Integration | null>(null);
   const [loading, setLoading] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [wizardProvider, setWizardProvider] = useState<string | undefined>(undefined);
 
   const fetchData = async () => {
     try {
@@ -147,7 +148,10 @@ export const IntegrationsPage: React.FC = () => {
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={() => setWizardOpen(true)}
+            onClick={() => {
+              setWizardProvider(undefined);
+              setWizardOpen(true);
+            }}
           >
             {t('integrations.create')}
           </Button>
@@ -184,7 +188,10 @@ export const IntegrationsPage: React.FC = () => {
                     boxShadow: 4,
                   },
                 }}
-                onClick={() => setWizardOpen(true)}
+                onClick={() => {
+                  setWizardProvider(provider.name);
+                  setWizardOpen(true);
+                }}
               >
                 <CardContent>
                   <Box display="flex" alignItems="center" gap={2} mb={1}>
@@ -223,6 +230,7 @@ export const IntegrationsPage: React.FC = () => {
                 borderColor: 'divider',
                 borderRadius: 2,
                 p: 4,
+                minHeight: 150,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -236,7 +244,10 @@ export const IntegrationsPage: React.FC = () => {
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
-                onClick={() => navigate('/settings/integrations/create')}
+                onClick={() => {
+                  setWizardProvider(undefined);
+                  setWizardOpen(true);
+                }}
               >
                 {t('integrations.createFirst')}
               </Button>
@@ -326,6 +337,7 @@ export const IntegrationsPage: React.FC = () => {
         open={wizardOpen}
         onClose={() => setWizardOpen(false)}
         onSuccess={fetchData}
+        initialProvider={wizardProvider}
       />
     </Box>
   );
