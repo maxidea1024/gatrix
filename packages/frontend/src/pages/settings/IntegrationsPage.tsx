@@ -312,9 +312,10 @@ export const IntegrationsPage: React.FC = () => {
         open={!!deleteTarget}
         title={t('integrations.deleteConfirmTitle')}
         message={t('integrations.deleteConfirmMessage', {
-          provider:
+          provider: t(
             providers.find((p) => p.name === deleteTarget?.provider)?.displayName ||
-            deleteTarget?.provider,
+            deleteTarget?.provider || ''
+          ),
         })}
         onConfirm={handleDelete}
         onClose={() => setDeleteTarget(null)}
