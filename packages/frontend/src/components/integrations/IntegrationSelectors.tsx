@@ -3,21 +3,17 @@ import { useTranslation } from 'react-i18next';
 import {
     Box,
     Button,
-    Checkbox,
     Chip,
+    Typography,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
+    Checkbox,
     FormControlLabel,
     FormGroup,
-    Menu,
-    MenuItem,
-    Typography,
-    Divider,
-    ListItemIcon,
-    ListItemText,
+    alpha,
 } from '@mui/material';
-import {
-    ExpandMore as ExpandMoreIcon,
-    Check as CheckIcon,
-} from '@mui/icons-material';
+import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 
 interface EventCategory {
     key: string;
@@ -31,7 +27,7 @@ interface EventSelectorProps {
 }
 
 /**
- * Compact event selector dropdown component
+ * AWS IAM-style event selector with expandable categories
  */
 export const EventSelector: React.FC<EventSelectorProps> = ({
     selectedEvents,
@@ -39,15 +35,10 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
     eventCategories,
 }) => {
     const { t } = useTranslation();
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
+    const [expanded, setExpanded] = useState<string | false>(false);
 
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
+    const handleAccordionChange = (panel: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
+        setExpanded(isExpanded ? panel : false);
     };
 
     const handleEventToggle = (event: string) => {
@@ -58,12 +49,11 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
         }
     };
 
-    const handleCategoryToggle = (category: EventCategory) => {
-        const allSelected = category.events.every((e) => selectedEvents.includes(e));
-        if (allSelected) {
-            onChange(selectedEvents.filter((e) => !category.events.includes(e)));
-        } else {
+    const handleCategoryToggle = (category: EventCategory, checked: boolean) => {
+        if (checked) {
             onChange([...new Set([...selectedEvents, ...category.events])]);
+        } else {
+            onChange(selectedEvents.filter((e) => !category.events.includes(e)));
         }
     };
 
@@ -76,91 +66,107 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
         onChange([]);
     };
 
-    const totalEvents = eventCategories.reduce((sum, c) => sum + c.events.length, 0);
+    // Format event name for display
+    const formatEventName = (event: string): string => {
+        // Try localization first
+        const localized = t(`integrations.events.${event}`);
+        if (localized !== `integrations.events.${event}`) {
+            return localized;
+        }
+        // Fallback to formatted event name
+        return event.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+    };
 
     return (
         <Box>
-            <Button
-                variant="outlined"
-                onClick={handleClick}
-                endIcon={<ExpandMoreIcon />}
-                sx={{ minWidth: 200 }}
-            >
-                {selectedEvents.length === 0
-                    ? t('integrations.selectEvents')
-                    : t('integrations.eventsSelected', { count: selectedEvents.length })}
-            </Button>
-            <Menu
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-                PaperProps={{
-                    sx: { maxHeight: 400, minWidth: 280 },
-                }}
-            >
-                <Box sx={{ px: 2, py: 1, display: 'flex', gap: 1 }}>
-                    <Button size="small" onClick={handleSelectAll}>
-                        {t('integrations.selectAllEvents')}
-                    </Button>
-                    <Button size="small" onClick={handleDeselectAll}>
-                        {t('integrations.deselectAllEvents')}
-                    </Button>
-                </Box>
-                <Divider />
-                {eventCategories.map((category) => {
-                    const selectedCount = category.events.filter((e) =>
-                        selectedEvents.includes(e)
-                    ).length;
-                    const allSelected = selectedCount === category.events.length;
-                    const partialSelected = selectedCount > 0 && !allSelected;
+            {/* Quick actions */}
+            <Box sx={{ mb: 2, display: 'flex', gap: 1 }}>
+                <Button size="small" variant="outlined" onClick={handleSelectAll}>
+                    {t('common.selectAll')}
+                </Button>
+                <Button size="small" variant="outlined" onClick={handleDeselectAll}>
+                    {t('common.deselectAll')}
+                </Button>
+                <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto', alignSelf: 'center' }}>
+                    {t('common.selectedCount', { count: selectedEvents.length })}
+                </Typography>
+            </Box>
 
-                    return (
-                        <Box key={category.key}>
-                            <MenuItem
-                                onClick={() => handleCategoryToggle(category)}
-                                sx={{ py: 1 }}
-                            >
-                                <ListItemIcon>
-                                    <Checkbox
-                                        checked={allSelected}
-                                        indeterminate={partialSelected}
-                                        size="small"
-                                    />
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary={t(`integrations.eventCategories.${category.key}`)}
+            {/* Event categories as accordions */}
+            {eventCategories.map((category) => {
+                const selectedCount = category.events.filter((e) =>
+                    selectedEvents.includes(e)
+                ).length;
+                const allSelected = selectedCount === category.events.length;
+                const indeterminate = selectedCount > 0 && !allSelected;
+
+                return (
+                    <Accordion
+                        key={category.key}
+                        expanded={expanded === category.key}
+                        onChange={handleAccordionChange(category.key)}
+                        sx={{
+                            '&:before': { display: 'none' },
+                            boxShadow: 'none',
+                            border: 1,
+                            borderColor: 'divider',
+                            '&:not(:last-child)': { mb: 1 },
+                            borderRadius: 1,
+                            overflow: 'hidden',
+                        }}
+                    >
+                        <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            sx={{
+                                bgcolor: selectedCount > 0
+                                    ? (theme) => alpha(theme.palette.primary.main, 0.05)
+                                    : 'transparent',
+                            }}
+                        >
+                            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', pr: 2 }}>
+                                <Checkbox
+                                    checked={allSelected}
+                                    indeterminate={indeterminate}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onChange={(e) => handleCategoryToggle(category, e.target.checked)}
+                                    size="small"
                                 />
+                                <Typography sx={{ fontWeight: 'medium', flexGrow: 1 }}>
+                                    {t(`integrations.eventCategories.${category.key}`)}
+                                </Typography>
                                 <Chip
                                     label={`${selectedCount}/${category.events.length}`}
                                     size="small"
-                                    sx={{ ml: 1 }}
+                                    color={selectedCount > 0 ? 'primary' : 'default'}
+                                    variant={selectedCount > 0 ? 'filled' : 'outlined'}
                                 />
-                            </MenuItem>
-                        </Box>
-                    );
-                })}
-            </Menu>
-            {selectedEvents.length > 0 && (
-                <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {eventCategories.map((category) => {
-                        const selectedCount = category.events.filter((e) =>
-                            selectedEvents.includes(e)
-                        ).length;
-                        if (selectedCount === 0) return null;
-                        return (
-                            <Chip
-                                key={category.key}
-                                label={`${t(`integrations.eventCategories.${category.key}`)} (${selectedCount})`}
-                                size="small"
-                                variant="outlined"
-                                onDelete={() => {
-                                    onChange(selectedEvents.filter((e) => !category.events.includes(e)));
-                                }}
-                            />
-                        );
-                    })}
-                </Box>
-            )}
+                            </Box>
+                        </AccordionSummary>
+                        <AccordionDetails sx={{ pt: 0, pb: 2 }}>
+                            <FormGroup sx={{ pl: 4 }}>
+                                {category.events.map((event) => (
+                                    <FormControlLabel
+                                        key={event}
+                                        control={
+                                            <Checkbox
+                                                checked={selectedEvents.includes(event)}
+                                                onChange={() => handleEventToggle(event)}
+                                                size="small"
+                                            />
+                                        }
+                                        label={formatEventName(event)}
+                                        sx={{
+                                            '& .MuiFormControlLabel-label': {
+                                                fontSize: '0.875rem',
+                                            },
+                                        }}
+                                    />
+                                ))}
+                            </FormGroup>
+                        </AccordionDetails>
+                    </Accordion>
+                );
+            })}
         </Box>
     );
 };
@@ -172,7 +178,7 @@ interface EnvironmentSelectorProps {
 }
 
 /**
- * Compact environment selector dropdown component
+ * Tag-style environment selector component with clickable chips
  */
 export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
     selectedEnvironments,
@@ -180,16 +186,6 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
     environments,
 }) => {
     const { t } = useTranslation();
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
-
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
 
     const handleToggle = (env: string) => {
         if (selectedEnvironments.includes(env)) {
@@ -209,66 +205,50 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
 
     return (
         <Box>
-            <Button
-                variant="outlined"
-                onClick={handleClick}
-                endIcon={<ExpandMoreIcon />}
-                sx={{ minWidth: 200 }}
-            >
-                {selectedEnvironments.length === 0
-                    ? t('integrations.allEnvironments')
-                    : t('integrations.environmentsSelected', { count: selectedEnvironments.length })}
-            </Button>
-            <Menu
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-                PaperProps={{
-                    sx: { minWidth: 200 },
-                }}
-            >
-                <Box sx={{ px: 2, py: 1, display: 'flex', gap: 1 }}>
-                    <Button size="small" onClick={handleSelectAll}>
-                        {t('common.selectAll')}
-                    </Button>
-                    <Button size="small" onClick={handleDeselectAll}>
-                        {t('common.deselectAll')}
-                    </Button>
-                </Box>
-                <Divider />
-                {environments.map((env) => (
-                    <MenuItem
-                        key={env.environment}
-                        onClick={() => handleToggle(env.environment)}
-                    >
-                        <ListItemIcon>
-                            {selectedEnvironments.includes(env.environment) && (
-                                <CheckIcon fontSize="small" />
-                            )}
-                        </ListItemIcon>
-                        <ListItemText primary={env.displayName || env.environment} />
-                    </MenuItem>
-                ))}
+            {/* Quick actions */}
+            <Box sx={{ mb: 2, display: 'flex', gap: 1 }}>
+                <Button size="small" variant="outlined" onClick={handleSelectAll}>
+                    {t('common.selectAll')}
+                </Button>
+                <Button size="small" variant="outlined" onClick={handleDeselectAll}>
+                    {t('common.deselectAll')}
+                </Button>
+            </Box>
+
+            {/* Environment chips */}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {environments.map((env) => {
+                    const isSelected = selectedEnvironments.includes(env.environment);
+                    return (
+                        <Chip
+                            key={env.environment}
+                            label={env.displayName || env.environment}
+                            color={isSelected ? 'primary' : 'default'}
+                            variant={isSelected ? 'filled' : 'outlined'}
+                            onClick={() => handleToggle(env.environment)}
+                            sx={{
+                                cursor: 'pointer',
+                                '&:hover': {
+                                    bgcolor: isSelected
+                                        ? undefined
+                                        : (theme) => alpha(theme.palette.primary.main, 0.1),
+                                },
+                            }}
+                        />
+                    );
+                })}
                 {environments.length === 0 && (
-                    <MenuItem disabled>
-                        <ListItemText primary={t('integrations.noEnvironmentsAvailable')} />
-                    </MenuItem>
+                    <Typography variant="body2" color="text.secondary">
+                        {t('integrations.noEnvironmentsAvailable')}
+                    </Typography>
                 )}
-            </Menu>
-            {selectedEnvironments.length > 0 && (
-                <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {selectedEnvironments.map((env) => {
-                        const envData = environments.find((e) => e.environment === env);
-                        return (
-                            <Chip
-                                key={env}
-                                label={envData?.displayName || env}
-                                size="small"
-                                onDelete={() => handleToggle(env)}
-                            />
-                        );
-                    })}
-                </Box>
+            </Box>
+
+            {/* Help text */}
+            {selectedEnvironments.length === 0 && environments.length > 0 && (
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                    {t('integrations.allEnvironmentsHint')}
+                </Typography>
             )}
         </Box>
     );
