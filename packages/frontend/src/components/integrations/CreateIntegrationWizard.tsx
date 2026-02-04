@@ -520,9 +520,22 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                                             alt={t(currentProvider.displayName)}
                                             sx={{ width: 32, height: 32 }}
                                         />
-                                        <Typography variant="h6">{t(currentProvider.displayName)}</Typography>
+                                        <Box>
+                                            <Typography variant="h6">{t(currentProvider.displayName)}</Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {t(currentProvider.description)}
+                                            </Typography>
+                                        </Box>
                                     </Box>
                                 )}
+
+                                <FormControlLabel
+                                    control={
+                                        <Switch checked={isEnabled} onChange={(e) => setIsEnabled(e.target.checked)} />
+                                    }
+                                    label={t('common.enabled')}
+                                    sx={{ mb: 2 }}
+                                />
 
                                 <TextField
                                     fullWidth
@@ -531,14 +544,6 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                                     onChange={(e) => setDescription(e.target.value)}
                                     placeholder={t('integrations.descriptionPlaceholder')}
                                     size="small"
-                                    sx={{ mb: 2 }}
-                                />
-
-                                <FormControlLabel
-                                    control={
-                                        <Switch checked={isEnabled} onChange={(e) => setIsEnabled(e.target.checked)} />
-                                    }
-                                    label={t('common.enabled')}
                                     sx={{ mb: 2 }}
                                 />
 
