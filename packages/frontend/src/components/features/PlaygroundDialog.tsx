@@ -3,7 +3,7 @@
  * Allows testing feature flag evaluation with custom context
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
     Box,
     Typography,
@@ -186,9 +186,17 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     const [flagDetails, setFlagDetails] = useState<any | null>(null);
     const [loadingFlagDetails, setLoadingFlagDetails] = useState(false);
 
+    // Track if initial setup has been done (to prevent re-initialization in embedded mode on parent re-render)
+    const hasInitializedRef = useRef(false);
+
     // Load environments and context fields
     useEffect(() => {
         if (open) {
+            // In embedded mode, only initialize once to prevent state reset on parent re-render
+            if (embedded && hasInitializedRef.current) {
+                return;
+            }
+
             loadEnvironments();
             loadContextFields();
             loadAvailableFlags();
@@ -220,13 +228,21 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             }
             // Set auto-execute pending if requested
             setAutoExecutePending(autoExecute);
+
+            // Mark as initialized
+            hasInitializedRef.current = true;
         }
-    }, [open, initialFlags, initialEnvironments, initialContext, autoExecute]);
+    }, [open, initialFlags, initialEnvironments, initialContext, autoExecute, embedded]);
 
     const loadEnvironments = async () => {
         try {
             const envs = await environmentService.getEnvironments();
-            setEnvironments(envs.filter((e) => !e.isHidden).sort((a, b) => a.displayOrder - b.displayOrder));
+            const filteredEnvs = envs.filter((e) => !e.isHidden).sort((a, b) => a.displayOrder - b.displayOrder);
+            setEnvironments(filteredEnvs);
+            // In embedded mode, auto-select all environments
+            if (embedded && filteredEnvs.length > 0 && selectedEnvironments.length === 0) {
+                setSelectedEnvironments(filteredEnvs.map(e => e.environment));
+            }
         } catch {
             setEnvironments([]);
         }
@@ -563,6 +579,789 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
     const canEvaluate = environments.length > 0;
 
+    // Helper function to get context field type icon
+    const getFieldTypeIcon = (type: string) => {
+        switch (type) {
+            case 'string':
+                return <StringIcon sx={{ fontSize: 16, color: 'info.main' }} />;
+            case 'number':
+                return <NumberIcon sx={{ fontSize: 16, color: 'success.main' }} />;
+            case 'boolean':
+                return <BooleanIcon sx={{ fontSize: 16, color: 'warning.main' }} />;
+            case 'date':
+            case 'datetime':
+                return <DateTimeIcon sx={{ fontSize: 16, color: 'secondary.main' }} />;
+            case 'semver':
+                return <SemverIcon sx={{ fontSize: 16, color: 'primary.main' }} />;
+            default:
+                return <StringIcon sx={{ fontSize: 16, color: 'text.disabled' }} />;
+        }
+    };
+
+    // Shared render function for context fields
+    const renderContextFields = () => {
+        return (
+            <Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Typography variant="body2" color="text.secondary">
+                            {t('playground.contextFields')}
+                        </Typography>
+                        <Tooltip title={t('playground.contextFieldsHelp')}>
+                            <HelpIcon sx={{ fontSize: 16, color: 'text.disabled', cursor: 'help' }} />
+                        </Tooltip>
+                    </Box>
+                    <Button
+                        size="small"
+                        startIcon={<AddIcon />}
+                        onClick={handleAddContextEntry}
+                    >
+                        {t('common.add')}
+                    </Button>
+                </Box>
+
+                {contextEntries.length === 0 ? (
+                    <Alert severity="info" sx={{ mb: 2 }}>
+                        {t('playground.noContextFields')}
+                    </Alert>
+                ) : (
+                    <Stack spacing={1} sx={{ mb: 2 }}>
+                        {contextEntries.map((entry, index) => {
+                            const contextField = getContextFieldByKey(entry.key);
+                            const hasLegalValues = contextField?.legalValues && contextField.legalValues.length > 0;
+                            const fieldType = contextField?.valueType || 'string';
+
+                            // Render value input based on field type
+                            const renderValueInput = () => {
+                                // Boolean type
+                                if (fieldType === 'boolean') {
+                                    return (
+                                        <FormControl size="small" fullWidth>
+                                            <Select
+                                                value={entry.value || 'true'}
+                                                onChange={(e) => handleUpdateContextEntry(index, 'value', e.target.value)}
+                                            >
+                                                <MenuItem value="true">True</MenuItem>
+                                                <MenuItem value="false">False</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    );
+                                }
+
+                                // Date/datetime type
+                                if (fieldType === 'date' || fieldType === 'datetime') {
+                                    return (
+                                        <LocalizedDateTimePicker
+                                            value={entry.value || null}
+                                            onChange={(isoString: string) => handleUpdateContextEntry(index, 'value', isoString)}
+                                        />
+                                    );
+                                }
+
+                                // Legal values - use Select dropdown
+                                if (hasLegalValues) {
+                                    return (
+                                        <FormControl size="small" fullWidth>
+                                            <Select
+                                                value={entry.value || ''}
+                                                onChange={(e) => handleUpdateContextEntry(index, 'value', e.target.value)}
+                                                displayEmpty
+                                            >
+                                                <MenuItem value="" disabled>
+                                                    <em>{t('playground.selectValue')}</em>
+                                                </MenuItem>
+                                                {(contextField?.legalValues || []).map((lv) => (
+                                                    <MenuItem key={lv} value={lv}>{lv}</MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    );
+                                }
+
+                                // Number type
+                                if (fieldType === 'number') {
+                                    return (
+                                        <TextField
+                                            fullWidth
+                                            size="small"
+                                            type="number"
+                                            placeholder="0"
+                                            value={entry.value}
+                                            onChange={(e) => handleUpdateContextEntry(index, 'value', e.target.value)}
+                                        />
+                                    );
+                                }
+
+                                // Default text input
+                                return (
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        placeholder={fieldType === 'semver' ? 'e.g., 1.0.0' : t('playground.enterValue')}
+                                        value={entry.value}
+                                        onChange={(e) => handleUpdateContextEntry(index, 'value', e.target.value)}
+                                    />
+                                );
+                            };
+
+                            // Get used field names for duplicate prevention
+                            const usedFieldNames = contextEntries
+                                .filter((_, idx) => idx !== index)
+                                .map((e) => e.key)
+                                .filter(Boolean);
+
+                            return (
+                                <Paper key={index} variant="outlined" sx={{ p: 1.5 }}>
+                                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                                        {/* Context Field Selector */}
+                                        <FormControl size="small" sx={{ minWidth: 180, flex: '1 1 180px' }}>
+                                            <Select
+                                                value={entry.key}
+                                                onChange={(e) => handleUpdateContextEntry(index, 'key', e.target.value)}
+                                                displayEmpty
+                                                renderValue={(selected) => {
+                                                    if (!selected) {
+                                                        return <em style={{ color: 'gray' }}>{t('playground.selectField')}</em>;
+                                                    }
+                                                    const selectedField = contextFields.find((f) => f.fieldName === selected);
+                                                    return (
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                            {selectedField && getFieldTypeIcon(selectedField.valueType)}
+                                                            {selectedField?.displayName || selected}
+                                                        </Box>
+                                                    );
+                                                }}
+                                            >
+                                                <MenuItem value="" disabled>
+                                                    <em>{t('playground.selectField')}</em>
+                                                </MenuItem>
+                                                {contextFields.map((field) => {
+                                                    const isUsed = usedFieldNames.includes(field.fieldName);
+                                                    return (
+                                                        <MenuItem
+                                                            key={field.fieldName}
+                                                            value={field.fieldName}
+                                                            disabled={isUsed}
+                                                            sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start', py: 1 }}
+                                                        >
+                                                            <Tooltip title={field.valueType}>
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                                                                    {getFieldTypeIcon(field.valueType)}
+                                                                </Box>
+                                                            </Tooltip>
+                                                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                                <Typography variant="body2">
+                                                                    {field.displayName || field.fieldName}
+                                                                    {isUsed && ` (${t('featureFlags.alreadyUsed')})`}
+                                                                </Typography>
+                                                                {field.description && (
+                                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                                        {field.description}
+                                                                    </Typography>
+                                                                )}
+                                                            </Box>
+                                                        </MenuItem>
+                                                    );
+                                                })}
+                                            </Select>
+                                        </FormControl>
+
+                                        {/* Value Input */}
+                                        <Box sx={{ flex: '2 1 200px', minWidth: 150 }}>
+                                            {renderValueInput()}
+                                        </Box>
+
+                                        {/* Delete Button */}
+                                        <Tooltip title={t('common.delete')}>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => handleRemoveContextEntry(index)}
+                                                sx={{
+                                                    width: 32,
+                                                    height: 32,
+                                                    color: 'text.secondary',
+                                                    '&:hover': { bgcolor: 'action.hover', color: 'error.main' },
+                                                }}
+                                            >
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Box>
+                                </Paper>
+                            );
+                        })}
+                    </Stack>
+                )}
+            </Box>
+        );
+    };
+
+    // Shared render function for results table
+    const renderResultsTable = () => {
+        if (Object.keys(results).length === 0) return null;
+
+        // Get list of environments evaluated
+        const evaluatedEnvs = Object.keys(results);
+
+        // Group results by flagName
+        const flagResultsMap: Record<string, Record<string, any>> = {};
+        const flagInfoMap: Record<string, { flagUsage: string; displayName?: string }> = {};
+
+        evaluatedEnvs.forEach((env) => {
+            (filteredResults[env] || []).forEach((result: any) => {
+                if (!flagResultsMap[result.flagName]) {
+                    flagResultsMap[result.flagName] = {};
+                    flagInfoMap[result.flagName] = {
+                        flagUsage: result.flagUsage || 'flag',
+                        displayName: result.displayName,
+                    };
+                }
+                flagResultsMap[result.flagName][env] = result;
+            });
+        });
+
+        const flagNames = Object.keys(flagResultsMap).sort();
+
+        return (
+            <Paper variant="outlined" sx={{ p: embedded ? 1.5 : 2, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: embedded ? 1.5 : 2 }}>
+                    <Typography variant="subtitle1" fontWeight={600}>
+                        {t('playground.results')} ({totalResults})
+                    </Typography>
+                    {/* Hide search in embedded mode (single flag) */}
+                    {!embedded && (
+                        <TextField
+                            size="small"
+                            placeholder={t('common.search')}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            sx={{ width: 200 }}
+                        />
+                    )}
+                </Box>
+
+                <TableContainer component={Paper} variant="outlined">
+                    <Table size="small">
+                        <TableHead>
+                            <TableRow>
+                                {/* Hide flag name column in embedded mode (single flag) */}
+                                {!embedded && <TableCell>{t('featureFlags.flagName')}</TableCell>}
+                                {evaluatedEnvs.map((env) => {
+                                    const envData = environments.find(e => e.environment === env);
+                                    return (
+                                        <TableCell key={env} align="center" sx={{ minWidth: 120 }}>
+                                            <Chip
+                                                label={envData?.displayName || env}
+                                                size="small"
+                                                variant="outlined"
+                                                sx={{
+                                                    borderColor: envData?.color || '#888',
+                                                    color: envData?.color || '#888',
+                                                    borderRadius: '4px',
+                                                    borderWidth: 2,
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: 600
+                                                }}
+                                            />
+                                        </TableCell>
+                                    );
+                                })}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {flagNames.map((flagName) => {
+                                const flagInfo = flagInfoMap[flagName];
+                                const envResults = flagResultsMap[flagName];
+
+                                return (
+                                    <TableRow key={flagName} hover>
+                                        {/* Hide flag name column in embedded mode (single flag) */}
+                                        {!embedded && (
+                                            <TableCell>
+                                                <Box
+                                                    sx={{
+                                                        cursor: 'pointer',
+                                                        '&:hover': { color: 'primary.main' }
+                                                    }}
+                                                    onClick={() => handleFlagClick(flagName)}
+                                                >
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                        {flagInfo.flagUsage === 'remoteConfig' ? (
+                                                            <JsonIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                                        ) : (
+                                                            <FlagIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                                        )}
+                                                        <Typography variant="body2">
+                                                            {flagName}
+                                                        </Typography>
+                                                        <OpenInNewIcon sx={{ fontSize: 12, color: 'text.disabled', ml: 0.5 }} />
+                                                    </Box>
+                                                    {flagInfo.displayName && flagInfo.displayName !== flagName && (
+                                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                            {flagInfo.displayName}
+                                                        </Typography>
+                                                    )}
+                                                </Box>
+                                            </TableCell>
+                                        )}
+                                        {evaluatedEnvs.map((env) => {
+                                            const result = envResults[env];
+                                            if (!result) {
+                                                return (
+                                                    <TableCell key={env} align="center">
+                                                        <Typography variant="caption" color="text.disabled">-</Typography>
+                                                    </TableCell>
+                                                );
+                                            }
+
+                                            const hasDetails = result.evaluationSteps && result.evaluationSteps.length > 0;
+
+                                            return (
+                                                <TableCell key={env} align="center">
+                                                    <Box
+                                                        sx={{
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            alignItems: 'center',
+                                                            gap: 0.5,
+                                                            cursor: hasDetails ? 'pointer' : 'default',
+                                                            '&:hover': hasDetails ? { bgcolor: 'action.hover', borderRadius: 1 } : {},
+                                                            p: 0.5,
+                                                        }}
+                                                        onClick={(e) => {
+                                                            if (hasDetails) {
+                                                                setEvaluationPopoverAnchor(e.currentTarget);
+                                                                setSelectedEvaluation({ flagName, env, result });
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Chip
+                                                            icon={result.enabled ? <TrueIcon /> : <FalseIcon />}
+                                                            label={result.enabled ? 'true' : 'false'}
+                                                            size="small"
+                                                            color={result.enabled ? 'success' : 'error'}
+                                                            sx={{ borderRadius: '16px' }}
+                                                        />
+                                                        {result.variant ? (
+                                                            <Chip
+                                                                label={result.variant.name}
+                                                                size="small"
+                                                                color="secondary"
+                                                                variant="outlined"
+                                                                sx={{
+                                                                    borderRadius: '12px',
+                                                                    fontSize: '0.7rem',
+                                                                    height: 20,
+                                                                    cursor: 'pointer',
+                                                                }}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleVariantClick(e, result.variant);
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <Typography variant="caption" color="text.disabled">
+                                                                {t(flagInfo.flagUsage === 'remoteConfig' ? 'playground.noConfig' : 'playground.noVariant')}
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
+                                                </TableCell>
+                                            );
+                                        })}
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Paper>
+        );
+    };
+    // Helper to render Popovers (shared between embedded and dialog modes)
+    const renderPopovers = () => (
+        <>
+            {/* Variant Payload Popover */}
+            <Popover
+                open={Boolean(variantPopoverAnchor)}
+                anchorEl={variantPopoverAnchor}
+                onClose={handleVariantPopoverClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                }}
+                disableRestoreFocus
+                slotProps={{
+                    paper: {
+                        elevation: 8,
+                        sx: { mt: 0.5 }
+                    }
+                }}
+            >
+                <Box sx={{ p: 2, minWidth: 300, maxWidth: 500 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                        <Typography variant="subtitle2" fontWeight={600}>
+                            {t('playground.variantPayload')}
+                        </Typography>
+                        <IconButton size="small" onClick={handleVariantPopoverClose} sx={{ ml: 1 }}>
+                            <CloseIcon fontSize="small" />
+                        </IconButton>
+                    </Box>
+
+                    {selectedVariant && (
+                        <Stack spacing={1.5}>
+                            <Box>
+                                <Typography variant="caption" color="text.secondary">
+                                    {t('playground.variantName')}
+                                </Typography>
+                                <Typography variant="body2" fontWeight={500}>
+                                    {selectedVariant.name}
+                                </Typography>
+                            </Box>
+                            <Box>
+                                <Typography variant="caption" color="text.secondary">
+                                    {t('playground.payloadType')}
+                                </Typography>
+                                <Typography variant="body2">
+                                    <Chip
+                                        label={selectedVariant.payloadType || 'none'}
+                                        size="small"
+                                        variant="outlined"
+                                        sx={{ borderRadius: '8px', fontSize: '0.75rem' }}
+                                    />
+                                </Typography>
+                            </Box>
+                            <Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+                                    <Typography variant="caption" color="text.secondary">
+                                        {t('playground.payloadValue')}
+                                    </Typography>
+                                    {selectedVariant.payload !== null && selectedVariant.payload !== undefined && (
+                                        <Tooltip title={t('common.copy')}>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => copyToClipboardWithNotification(
+                                                    String(selectedVariant.payload),
+                                                    enqueueSnackbar,
+                                                    t
+                                                )}
+                                            >
+                                                <CopyIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                    )}
+                                </Box>
+                                {selectedVariant.payload === null || selectedVariant.payload === undefined ? (
+                                    <Typography variant="body2" color="text.disabled" fontStyle="italic">
+                                        {t('common.none')}
+                                    </Typography>
+                                ) : (
+                                    <Typography variant="body2" sx={{
+                                        p: 1,
+                                        bgcolor: 'action.hover',
+                                        borderRadius: 1,
+                                        fontFamily: selectedVariant.payloadType === 'string' ? 'inherit' : 'monospace'
+                                    }}>
+                                        {String(selectedVariant.payload)}
+                                    </Typography>
+                                )}
+                            </Box>
+                        </Stack>
+                    )}
+                </Box>
+            </Popover>
+
+            {/* Evaluation Details Popover */}
+            <Popover
+                open={Boolean(evaluationPopoverAnchor)}
+                anchorEl={evaluationPopoverAnchor}
+                onClose={handleEvaluationPopoverClose}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                }}
+                transformOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                }}
+                disableRestoreFocus
+                marginThreshold={16}
+                slotProps={{
+                    paper: {
+                        elevation: 8,
+                        sx: { mb: 0.5, maxHeight: '70vh', overflow: 'auto' }
+                    }
+                }}
+            >
+                <Box sx={{ p: 2, minWidth: 800, maxWidth: 1050 }}>
+                    {selectedEvaluation && (
+                        <>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Typography variant="subtitle1" fontWeight={600}>
+                                        {t('playground.evaluationProcess')}
+                                    </Typography>
+                                    {(() => {
+                                        const envData = environments.find(e => e.environment === selectedEvaluation.env);
+                                        return (
+                                            <Chip
+                                                label={envData?.displayName || selectedEvaluation.env}
+                                                size="small"
+                                                sx={{
+                                                    bgcolor: envData?.color || '#888',
+                                                    color: '#fff',
+                                                    borderRadius: '12px',
+                                                    fontSize: '0.75rem'
+                                                }}
+                                            />
+                                        );
+                                    })()}
+                                </Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Chip
+                                        icon={selectedEvaluation.result.enabled ? <TrueIcon /> : <FalseIcon />}
+                                        label={selectedEvaluation.result.enabled ? 'true' : 'false'}
+                                        size="small"
+                                        color={selectedEvaluation.result.enabled ? 'success' : 'error'}
+                                        sx={{ borderRadius: '16px' }}
+                                    />
+                                    <IconButton size="small" onClick={handleEvaluationPopoverClose}>
+                                        <CloseIcon fontSize="small" />
+                                    </IconButton>
+                                </Box>
+                            </Box>
+
+                            {selectedEvaluation.result.reason && (
+                                <Box sx={{ mb: 2, p: 1.5, bgcolor: 'action.hover', borderRadius: 1 }}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        <strong>{t('playground.reason')}:</strong> {getLocalizedReason(selectedEvaluation.result.reason, selectedEvaluation.result.reasonDetails)}
+                                    </Typography>
+                                </Box>
+                            )}
+
+                            {/* Flag Strategy Structure (Evaluation Blueprint) */}
+                            {loadingFlagDetails ? (
+                                <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <CircularProgress size={16} />
+                                    <Typography variant="caption" color="text.secondary">
+                                        {t('common.loading')}...
+                                    </Typography>
+                                </Box>
+                            ) : flagDetails && (() => {
+                                // Find environment strategies
+                                const envConfig = flagDetails.environments?.find((e: any) => e.environment === selectedEvaluation.env);
+                                const strategies = envConfig?.strategies || [];
+                                const matchedStep = selectedEvaluation.result.evaluationSteps?.find((s: any) => s.matched);
+                                const matchedStrategyId = matchedStep?.strategyId;
+
+                                if (strategies.length === 0) {
+                                    return (
+                                        <Box sx={{ mb: 2, p: 1, bgcolor: 'warning.lighter', borderRadius: 1 }}>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {t('playground.noStrategies')}
+                                            </Typography>
+                                        </Box>
+                                    );
+                                }
+
+                                return (
+                                    <Box sx={{ mb: 2 }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                                            {t('playground.flagStructure')}
+                                        </Typography>
+                                        <Box sx={{
+                                            display: 'grid',
+                                            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                                            gap: 1
+                                        }}>
+                                            {strategies.map((strategy: any, idx: number) => {
+                                                const isMatched = strategy.strategyId === matchedStrategyId;
+                                                const strategyStep = selectedEvaluation.result.evaluationSteps?.find(
+                                                    (s: any) => s.strategyId === strategy.strategyId
+                                                );
+                                                return (
+                                                    <Paper
+                                                        key={strategy.strategyId}
+                                                        variant="outlined"
+                                                        sx={{
+                                                            p: 1,
+                                                            bgcolor: isMatched ? 'success.main' : 'background.default',
+                                                            color: isMatched ? 'white' : 'text.primary',
+                                                            borderColor: isMatched ? 'success.main' : 'divider',
+                                                            borderWidth: isMatched ? 2 : 1,
+                                                            opacity: strategyStep && !strategyStep.matched ? 0.6 : 1
+                                                        }}
+                                                    >
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+                                                            <Typography variant="caption" fontWeight={600} sx={{ opacity: 0.7 }}>
+                                                                #{idx + 1}
+                                                            </Typography>
+                                                            <Typography variant="body2" fontWeight={500} noWrap>
+                                                                {getStrategyDisplayName(strategy.name)}
+                                                            </Typography>
+                                                        </Box>
+                                                        {strategy.name === 'flexibleRollout' && (
+                                                            <Typography variant="caption" sx={{ opacity: 0.8 }}>
+                                                                {strategy.parameters?.rollout}%
+                                                            </Typography>
+                                                        )}
+                                                        {isMatched && (
+                                                            <Box sx={{ mt: 0.5 }}>
+                                                                <Chip
+                                                                    label={t('playground.matched')}
+                                                                    size="small"
+                                                                    sx={{
+                                                                        height: 18,
+                                                                        fontSize: '0.65rem',
+                                                                        bgcolor: 'rgba(255,255,255,0.3)',
+                                                                        color: 'white'
+                                                                    }}
+                                                                />
+                                                            </Box>
+                                                        )}
+                                                    </Paper>
+                                                );
+                                            })}
+                                        </Box>
+                                    </Box>
+                                );
+                            })()}
+
+                            {/* Evaluation Steps */}
+                            {selectedEvaluation.result.evaluationSteps && selectedEvaluation.result.evaluationSteps.length > 0 && (
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                                        {t('playground.evaluationSteps')}
+                                    </Typography>
+                                    <Stack spacing={0.5}>
+                                        {selectedEvaluation.result.evaluationSteps.map((step: any, idx: number) => {
+                                            // Find strategy info - prioritize step.strategyName from API response
+                                            let strategyDisplayName = 'Unknown';
+                                            if (step.strategyName) {
+                                                strategyDisplayName = getStrategyDisplayName(step.strategyName);
+                                            } else if (flagDetails) {
+                                                const envConfig = flagDetails.environments?.find((e: any) => e.environment === selectedEvaluation.env);
+                                                const strategy = envConfig?.strategies?.find((s: any) => s.strategyId === step.strategyId);
+                                                if (strategy) {
+                                                    strategyDisplayName = getStrategyDisplayName(strategy.name);
+                                                }
+                                            }
+
+                                            return (
+                                                <Paper
+                                                    key={idx}
+                                                    variant="outlined"
+                                                    sx={{
+                                                        p: 1,
+                                                        bgcolor: step.matched ? 'success.lighter' : 'background.default',
+                                                        borderColor: step.matched ? 'success.main' : 'divider',
+                                                        borderWidth: step.matched ? 2 : 1,
+                                                        opacity: step.matched ? 1 : 0.7
+                                                    }}
+                                                >
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <Box sx={{
+                                                            width: 20,
+                                                            height: 20,
+                                                            borderRadius: '50%',
+                                                            bgcolor: step.matched ? 'success.main' : 'grey.300',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center'
+                                                        }}>
+                                                            {step.matched ? (
+                                                                <TrueIcon sx={{ fontSize: 14, color: 'white' }} />
+                                                            ) : (
+                                                                <Typography variant="caption" sx={{ color: 'grey.600', fontWeight: 600 }}>
+                                                                    {idx + 1}
+                                                                </Typography>
+                                                            )}
+                                                        </Box>
+                                                        <Box sx={{ flex: 1 }}>
+                                                            <Typography variant="body2" fontWeight={step.matched ? 600 : 400}>
+                                                                {strategyDisplayName}
+                                                            </Typography>
+                                                            {step.reason && (
+                                                                <Typography variant="caption" color="text.secondary">
+                                                                    {getLocalizedReason(step.reason, step.reasonDetails)}
+                                                                </Typography>
+                                                            )}
+                                                        </Box>
+                                                        <Chip
+                                                            label={step.matched ? t('playground.pass') : t('playground.fail')}
+                                                            size="small"
+                                                            color={step.matched ? 'success' : 'default'}
+                                                            sx={{ borderRadius: '8px', fontSize: '0.7rem' }}
+                                                        />
+                                                    </Box>
+                                                </Paper>
+                                            );
+                                        })}
+                                    </Stack>
+                                </Box>
+                            )}
+
+                            {/* Raw JSON toggle */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                <Typography variant="caption" color="text.secondary">
+                                    {t('playground.rawResponse')}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ maxHeight: 300, overflow: 'auto', bgcolor: 'grey.900', borderRadius: 1 }}>
+                                <JsonEditor
+                                    value={JSON.stringify({
+                                        enabled: selectedEvaluation.result.enabled,
+                                        variant: selectedEvaluation.result.variant,
+                                        reason: selectedEvaluation.result.reason,
+                                        reasonDetails: selectedEvaluation.result.reasonDetails,
+                                        evaluationSteps: selectedEvaluation.result.evaluationSteps
+                                    }, null, 2)}
+                                    onChange={() => { }}
+                                    readOnly
+                                    height={300}
+                                />
+                            </Box>
+                        </>
+                    )}
+                </Box>
+            </Popover>
+        </>
+    );
+
+    // Embedded mode: render content without Dialog wrapper
+    if (embedded) {
+        return (
+            <>
+                <Box>
+                    <Stack spacing={1.5}>
+                        {/* Context Fields - Use shared render function */}
+                        {renderContextFields()}
+
+                        {/* Evaluate Button */}
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <Button
+                                variant="contained"
+                                startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <PlayIcon />}
+                                onClick={handleEvaluate}
+                                disabled={!canEvaluate || loading}
+                            >
+                                {loading ? t('playground.evaluating') : t('playground.test')}
+                            </Button>
+                        </Box>
+
+                        {/* Results Table - Use shared render function */}
+                        {renderResultsTable()}
+                    </Stack>
+                </Box>
+                {renderPopovers()}
+            </>
+        );
+    }
+
+
     return (
         <>
             <Dialog
@@ -638,218 +1437,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 </FormHelperText>
                             </Box>
 
-                            {/* Context Fields */}
-                            <Box>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                        <Typography variant="body2" color="text.secondary">
-                                            {t('playground.contextFields')}
-                                        </Typography>
-                                        <Tooltip title={t('playground.contextFieldsHelp')}>
-                                            <HelpIcon sx={{ fontSize: 16, color: 'text.disabled', cursor: 'help' }} />
-                                        </Tooltip>
-                                    </Box>
-                                    <Button
-                                        size="small"
-                                        startIcon={<AddIcon />}
-                                        onClick={handleAddContextEntry}
-                                    >
-                                        {t('common.add')}
-                                    </Button>
-                                </Box>
-
-                                {contextEntries.length === 0 ? (
-                                    <Alert severity="info" sx={{ mb: 2 }}>
-                                        {t('playground.noContextFields')}
-                                    </Alert>
-                                ) : (
-                                    <Stack spacing={1} sx={{ mb: 2 }}>
-                                        {contextEntries.map((entry, index) => {
-                                            const contextField = getContextFieldByKey(entry.key);
-                                            const hasLegalValues = contextField?.legalValues && contextField.legalValues.length > 0;
-                                            const fieldType = contextField?.valueType || 'string';
-
-                                            // Get icon for field type
-                                            const getTypeIcon = (type: string) => {
-                                                switch (type) {
-                                                    case 'string':
-                                                        return <StringIcon sx={{ fontSize: 16, color: 'info.main' }} />;
-                                                    case 'number':
-                                                        return <NumberIcon sx={{ fontSize: 16, color: 'success.main' }} />;
-                                                    case 'boolean':
-                                                        return <BooleanIcon sx={{ fontSize: 16, color: 'warning.main' }} />;
-                                                    case 'date':
-                                                    case 'datetime':
-                                                        return <DateTimeIcon sx={{ fontSize: 16, color: 'secondary.main' }} />;
-                                                    case 'semver':
-                                                        return <SemverIcon sx={{ fontSize: 16, color: 'primary.main' }} />;
-                                                    default:
-                                                        return <StringIcon sx={{ fontSize: 16, color: 'text.disabled' }} />;
-                                                }
-                                            };
-
-                                            // Render value input based on field type
-                                            const renderValueInput = () => {
-                                                // Boolean type
-                                                if (fieldType === 'boolean') {
-                                                    return (
-                                                        <FormControl size="small" fullWidth>
-                                                            <Select
-                                                                value={entry.value || 'true'}
-                                                                onChange={(e) => handleUpdateContextEntry(index, 'value', e.target.value)}
-                                                            >
-                                                                <MenuItem value="true">True</MenuItem>
-                                                                <MenuItem value="false">False</MenuItem>
-                                                            </Select>
-                                                        </FormControl>
-                                                    );
-                                                }
-
-                                                // Date/datetime type
-                                                if (fieldType === 'date' || fieldType === 'datetime') {
-                                                    return (
-                                                        <LocalizedDateTimePicker
-                                                            value={entry.value || null}
-                                                            onChange={(isoString: string) => handleUpdateContextEntry(index, 'value', isoString)}
-                                                        />
-                                                    );
-                                                }
-
-                                                // Legal values - use Select dropdown
-                                                if (hasLegalValues) {
-                                                    return (
-                                                        <FormControl size="small" fullWidth>
-                                                            <Select
-                                                                value={entry.value || ''}
-                                                                onChange={(e) => handleUpdateContextEntry(index, 'value', e.target.value)}
-                                                                displayEmpty
-                                                            >
-                                                                <MenuItem value="" disabled>
-                                                                    <em>{t('playground.selectValue')}</em>
-                                                                </MenuItem>
-                                                                {(contextField?.legalValues || []).map((lv) => (
-                                                                    <MenuItem key={lv} value={lv}>{lv}</MenuItem>
-                                                                ))}
-                                                            </Select>
-                                                        </FormControl>
-                                                    );
-                                                }
-
-                                                // Number type
-                                                if (fieldType === 'number') {
-                                                    return (
-                                                        <TextField
-                                                            fullWidth
-                                                            size="small"
-                                                            type="number"
-                                                            placeholder="0"
-                                                            value={entry.value}
-                                                            onChange={(e) => handleUpdateContextEntry(index, 'value', e.target.value)}
-                                                        />
-                                                    );
-                                                }
-
-                                                // Default text input
-                                                return (
-                                                    <TextField
-                                                        fullWidth
-                                                        size="small"
-                                                        placeholder={fieldType === 'semver' ? 'e.g., 1.0.0' : t('playground.enterValue')}
-                                                        value={entry.value}
-                                                        onChange={(e) => handleUpdateContextEntry(index, 'value', e.target.value)}
-                                                    />
-                                                );
-                                            };
-
-                                            // Get used field names for duplicate prevention
-                                            const usedFieldNames = contextEntries
-                                                .filter((_, idx) => idx !== index)
-                                                .map((e) => e.key)
-                                                .filter(Boolean);
-
-                                            return (
-                                                <Paper key={index} variant="outlined" sx={{ p: 1.5 }}>
-                                                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                                                        {/* Context Field Selector */}
-                                                        <FormControl size="small" sx={{ minWidth: 180, flex: '1 1 180px' }}>
-                                                            <Select
-                                                                value={entry.key}
-                                                                onChange={(e) => handleUpdateContextEntry(index, 'key', e.target.value)}
-                                                                displayEmpty
-                                                                renderValue={(selected) => {
-                                                                    if (!selected) {
-                                                                        return <em style={{ color: 'gray' }}>{t('playground.selectField')}</em>;
-                                                                    }
-                                                                    const selectedField = contextFields.find((f) => f.fieldName === selected);
-                                                                    return (
-                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                                            {selectedField && getTypeIcon(selectedField.valueType)}
-                                                                            {selectedField?.displayName || selected}
-                                                                        </Box>
-                                                                    );
-                                                                }}
-                                                            >
-                                                                <MenuItem value="" disabled>
-                                                                    <em>{t('playground.selectField')}</em>
-                                                                </MenuItem>
-                                                                {contextFields.map((field) => {
-                                                                    const isUsed = usedFieldNames.includes(field.fieldName);
-                                                                    return (
-                                                                        <MenuItem
-                                                                            key={field.fieldName}
-                                                                            value={field.fieldName}
-                                                                            disabled={isUsed}
-                                                                            sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start', py: 1 }}
-                                                                        >
-                                                                            <Tooltip title={field.valueType}>
-                                                                                <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                                                                                    {getTypeIcon(field.valueType)}
-                                                                                </Box>
-                                                                            </Tooltip>
-                                                                            <Box sx={{ flex: 1, minWidth: 0 }}>
-                                                                                <Typography variant="body2">
-                                                                                    {field.displayName || field.fieldName}
-                                                                                    {isUsed && ` (${t('featureFlags.alreadyUsed')})`}
-                                                                                </Typography>
-                                                                                {field.description && (
-                                                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                                                                                        {field.description}
-                                                                                    </Typography>
-                                                                                )}
-                                                                            </Box>
-                                                                        </MenuItem>
-                                                                    );
-                                                                })}
-                                                            </Select>
-                                                        </FormControl>
-
-                                                        {/* Value Input */}
-                                                        <Box sx={{ flex: '2 1 200px', minWidth: 150 }}>
-                                                            {renderValueInput()}
-                                                        </Box>
-
-                                                        {/* Delete Button */}
-                                                        <Tooltip title={t('common.delete')}>
-                                                            <IconButton
-                                                                size="small"
-                                                                onClick={() => handleRemoveContextEntry(index)}
-                                                                sx={{
-                                                                    width: 32,
-                                                                    height: 32,
-                                                                    color: 'text.secondary',
-                                                                    '&:hover': { bgcolor: 'action.hover', color: 'error.main' },
-                                                                }}
-                                                            >
-                                                                <DeleteIcon fontSize="small" />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    </Box>
-                                                </Paper>
-                                            );
-                                        })}
-                                    </Stack>
-                                )}
-                            </Box>
+                            {/* Context Fields - Use shared render function */}
+                            {renderContextFields()}
 
                             {/* Flag Selection (Optional) */}
                             <Box>
@@ -908,194 +1497,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             </Box>
                         </Paper>
 
-                        {/* Results Section */}
-                        {Object.keys(results).length > 0 && (
-                            <Paper variant="outlined" sx={{ p: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                                    <Typography variant="subtitle1" fontWeight={600}>
-                                        {t('playground.results')} ({totalResults})
-                                    </Typography>
-                                    <TextField
-                                        size="small"
-                                        placeholder={t('common.search')}
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        sx={{ width: 250 }}
-                                    />
-                                </Box>
-
-                                {/* Results Table - Flag-based rows with environment columns */}
-                                {(() => {
-                                    // Get list of environments evaluated
-                                    const evaluatedEnvs = Object.keys(results);
-
-                                    // Group results by flagName
-                                    const flagResultsMap: Record<string, Record<string, any>> = {};
-                                    const flagInfoMap: Record<string, { flagUsage: string; displayName?: string }> = {};
-
-                                    evaluatedEnvs.forEach((env) => {
-                                        (filteredResults[env] || []).forEach((result: any) => {
-                                            if (!flagResultsMap[result.flagName]) {
-                                                flagResultsMap[result.flagName] = {};
-                                                flagInfoMap[result.flagName] = {
-                                                    flagUsage: result.flagUsage || 'flag',
-                                                    displayName: result.displayName,
-                                                };
-                                            }
-                                            flagResultsMap[result.flagName][env] = result;
-                                        });
-                                    });
-
-                                    const flagNames = Object.keys(flagResultsMap).sort();
-
-                                    return (
-                                        <TableContainer component={Paper} variant="outlined">
-                                            <Table size="small">
-                                                <TableHead>
-                                                    <TableRow>
-                                                        <TableCell>{t('featureFlags.flagName')}</TableCell>
-                                                        <TableCell sx={{ width: 100 }}>{t('featureFlags.flagUsage')}</TableCell>
-                                                        {evaluatedEnvs.map((env) => {
-                                                            const envData = environments.find(e => e.environment === env);
-                                                            return (
-                                                                <TableCell key={env} align="center" sx={{ minWidth: 120 }}>
-                                                                    <Chip
-                                                                        label={envData?.displayName || env}
-                                                                        size="small"
-                                                                        variant="outlined"
-                                                                        sx={{
-                                                                            borderColor: envData?.color || '#888',
-                                                                            color: envData?.color || '#888',
-                                                                            borderRadius: '4px',
-                                                                            borderWidth: 2,
-                                                                            fontSize: '0.75rem',
-                                                                            fontWeight: 600
-                                                                        }}
-                                                                    />
-                                                                </TableCell>
-                                                            );
-                                                        })}
-                                                    </TableRow>
-                                                </TableHead>
-                                                <TableBody>
-                                                    {flagNames.map((flagName) => {
-                                                        const flagInfo = flagInfoMap[flagName];
-                                                        const envResults = flagResultsMap[flagName];
-
-                                                        return (
-                                                            <TableRow key={flagName} hover>
-                                                                <TableCell>
-                                                                    <Box
-                                                                        sx={{
-                                                                            cursor: 'pointer',
-                                                                            '&:hover': { color: 'primary.main' }
-                                                                        }}
-                                                                        onClick={() => handleFlagClick(flagName)}
-                                                                    >
-                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                            {flagInfo.flagUsage === 'remoteConfig' ? (
-                                                                                <JsonIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                                                            ) : (
-                                                                                <FlagIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                                                            )}
-                                                                            <Typography variant="body2">
-                                                                                {flagName}
-                                                                            </Typography>
-                                                                            <OpenInNewIcon sx={{ fontSize: 12, color: 'text.disabled', ml: 0.5 }} />
-                                                                        </Box>
-                                                                        {flagInfo.displayName && flagInfo.displayName !== flagName && (
-                                                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                                                                                {flagInfo.displayName}
-                                                                            </Typography>
-                                                                        )}
-                                                                    </Box>
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                        {flagInfo.flagUsage === 'remoteConfig' ? (
-                                                                            <RemoteConfigIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                                                        ) : (
-                                                                            <FlagIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                                                        )}
-                                                                        <Typography variant="body2" color="text.secondary">
-                                                                            {flagInfo.flagUsage === 'remoteConfig' ? t('featureFlags.flagUsages.remoteConfig') : t('featureFlags.flagUsages.flag')}
-                                                                        </Typography>
-                                                                    </Box>
-                                                                </TableCell>
-                                                                {evaluatedEnvs.map((env) => {
-                                                                    const result = envResults[env];
-                                                                    if (!result) {
-                                                                        return (
-                                                                            <TableCell key={env} align="center">
-                                                                                <Typography variant="caption" color="text.disabled">-</Typography>
-                                                                            </TableCell>
-                                                                        );
-                                                                    }
-
-                                                                    const hasDetails = result.evaluationSteps && result.evaluationSteps.length > 0;
-
-                                                                    return (
-                                                                        <TableCell key={env} align="center">
-                                                                            <Box
-                                                                                sx={{
-                                                                                    display: 'flex',
-                                                                                    flexDirection: 'column',
-                                                                                    alignItems: 'center',
-                                                                                    gap: 0.5,
-                                                                                    cursor: hasDetails ? 'pointer' : 'default',
-                                                                                    '&:hover': hasDetails ? { bgcolor: 'action.hover', borderRadius: 1 } : {},
-                                                                                    p: 0.5,
-                                                                                }}
-                                                                                onClick={(e) => {
-                                                                                    if (hasDetails) {
-                                                                                        setEvaluationPopoverAnchor(e.currentTarget);
-                                                                                        setSelectedEvaluation({ flagName, env, result });
-                                                                                    }
-                                                                                }}
-                                                                            >
-                                                                                <Chip
-                                                                                    icon={result.enabled ? <TrueIcon /> : <FalseIcon />}
-                                                                                    label={result.enabled ? 'true' : 'false'}
-                                                                                    size="small"
-                                                                                    color={result.enabled ? 'success' : 'error'}
-                                                                                    sx={{ borderRadius: '16px' }}
-                                                                                />
-                                                                                {result.variant ? (
-                                                                                    <Chip
-                                                                                        label={result.variant.name}
-                                                                                        size="small"
-                                                                                        color="secondary"
-                                                                                        variant="outlined"
-                                                                                        sx={{
-                                                                                            borderRadius: '12px',
-                                                                                            fontSize: '0.7rem',
-                                                                                            height: 20,
-                                                                                            cursor: 'pointer',
-                                                                                        }}
-                                                                                        onClick={(e) => {
-                                                                                            e.stopPropagation();
-                                                                                            handleVariantClick(e, result.variant);
-                                                                                        }}
-                                                                                    />
-                                                                                ) : (
-                                                                                    <Typography variant="caption" color="text.disabled">
-                                                                                        {t(flagInfo.flagUsage === 'remoteConfig' ? 'playground.noConfig' : 'playground.noVariant')}
-                                                                                    </Typography>
-                                                                                )}
-                                                                            </Box>
-                                                                        </TableCell>
-                                                                    );
-                                                                })}
-                                                            </TableRow>
-                                                        );
-                                                    })}
-                                                </TableBody>
-                                            </Table>
-                                        </TableContainer>
-                                    );
-                                })()}
-                            </Paper>
-                        )}
+                        {/* Results Section - Use shared render function */}
+                        {renderResultsTable()}
                     </Stack>
                 </DialogContent >
             </Dialog >

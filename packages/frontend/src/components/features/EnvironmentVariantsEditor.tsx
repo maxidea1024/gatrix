@@ -691,7 +691,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                         )}
                       </Box>
                     )}
-                    <Box sx={{ flex: 1 }}>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
                       {variantType === 'json' ? (
                         <JsonEditor
                           value={variant.payload?.value || '{}'}
@@ -753,6 +753,48 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             );
           })}
         </Stack>
+
+        {/* Variant Actions - between variants and fallback */}
+        {canManage && !isArchived && variantCount > 0 && (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mt: 2,
+              pt: 2,
+              borderTop: flagUsage === 'remoteConfig' ? 0 : 1,
+              borderColor: 'divider',
+            }}
+          >
+            {flagUsage !== 'remoteConfig' && (
+              <Button variant="outlined" size="small" startIcon={<AddIcon />} onClick={addVariant}>
+                {t('featureFlags.addVariant')}
+              </Button>
+            )}
+            {flagUsage === 'remoteConfig' && <Box />}
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              {hasChanges && (
+                <Button variant="text" size="small" onClick={handleReset} disabled={saving}>
+                  {t('common.reset')}
+                </Button>
+              )}
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<SaveIcon />}
+                onClick={handleSave}
+                disabled={saving || !hasChanges || hasDuplicateNames || hasJsonErrors}
+              >
+                {saving
+                  ? t('common.saving')
+                  : flagUsage === 'remoteConfig'
+                    ? t('featureFlags.saveConfiguration')
+                    : t('featureFlags.saveVariants')}
+              </Button>
+            </Box>
+          </Box>
+        )}
 
         {/* Fallback Value Section - appears after variants */}
         {onSaveFallbackValue && variantType !== 'none' && (
@@ -817,7 +859,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                   </Tooltip>
                 </Box>
                 {/* Editor */}
-                <Box sx={{ flex: 1 }}>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
                   {variantType === 'json' ? (
                     <JsonEditor
                       value={useEnvOverride ? editingFallback : (typeof baselinePayload === 'string' ? baselinePayload : JSON.stringify(baselinePayload ?? {}, null, 2))}
@@ -878,48 +920,6 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           </Box>
         )}
       </Collapse>
-
-      {/* Actions - only show when expanded */}
-      {canManage && !isArchived && variantCount > 0 && expanded && (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mt: 2,
-            pt: 2,
-            borderTop: flagUsage === 'remoteConfig' ? 0 : 1,
-            borderColor: 'divider',
-          }}
-        >
-          {flagUsage !== 'remoteConfig' && (
-            <Button variant="outlined" size="small" startIcon={<AddIcon />} onClick={addVariant}>
-              {t('featureFlags.addVariant')}
-            </Button>
-          )}
-          {flagUsage === 'remoteConfig' && <Box />}
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            {hasChanges && (
-              <Button variant="text" size="small" onClick={handleReset} disabled={saving}>
-                {t('common.reset')}
-              </Button>
-            )}
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<SaveIcon />}
-              onClick={handleSave}
-              disabled={saving || !hasChanges || hasDuplicateNames || hasJsonErrors}
-            >
-              {saving
-                ? t('common.saving')
-                : flagUsage === 'remoteConfig'
-                  ? t('featureFlags.saveConfiguration')
-                  : t('featureFlags.saveVariants')}
-            </Button>
-          </Box>
-        </Box>
-      )}
     </Paper>
   );
 };

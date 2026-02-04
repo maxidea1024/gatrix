@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Feature Flag Detail Page - Unleash Style Layout
  *
  * Layout:
@@ -7,7 +7,7 @@
  *
  * Tabs: Overview, Metrics, Settings, Event Log
  */
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Box,
@@ -84,6 +84,7 @@ import {
   Block as BlockIcon,
   Flag as FlagIcon,
   SportsEsports as JoystickIcon,
+  Close as CloseIcon,
 } from "@mui/icons-material";
 import { useAuth } from "../../contexts/AuthContext";
 import { PERMISSIONS } from "../../types/permissions";
@@ -138,6 +139,13 @@ import { CSS } from "@dnd-kit/utilities";
 import EnvironmentVariantsEditor, { Variant as EditorVariant } from "../../components/features/EnvironmentVariantsEditor";
 import FeatureFlagAuditLogs from "../../components/features/FeatureFlagAuditLogs";
 import PlaygroundDialog from "../../components/features/PlaygroundDialog";
+
+// Playground panel constants (outside component for stable references)
+const PLAYGROUND_VISIBLE_KEY = 'gatrix.embeddedPlaygroundVisible';
+const PLAYGROUND_WIDTH_KEY = 'gatrix.playgroundPanelWidth';
+const DEFAULT_PLAYGROUND_WIDTH = 300;
+const MIN_PLAYGROUND_WIDTH = 300;
+const MAX_PLAYGROUND_WIDTH = 700;
 
 // ==================== Types ====================
 
@@ -473,6 +481,21 @@ const FeatureFlagDetailPage: React.FC = () => {
   // Playground dialog state
   const [playgroundOpen, setPlaygroundOpen] = useState(false);
   const [playgroundInitialEnvironments, setPlaygroundInitialEnvironments] = useState<string[]>([]);
+  // Embedded playground visibility (for inline testing in overview tab)
+  const [embeddedPlaygroundVisible, setEmbeddedPlaygroundVisibleState] = useState(() => {
+    const saved = localStorage.getItem(PLAYGROUND_VISIBLE_KEY);
+    return saved === 'true';
+  });
+  // Wrapper to update localStorage when visibility changes
+  const setEmbeddedPlaygroundVisible = (visible: boolean) => {
+    setEmbeddedPlaygroundVisibleState(visible);
+    localStorage.setItem(PLAYGROUND_VISIBLE_KEY, visible.toString());
+  };
+  // Embedded playground panel width with localStorage persistence
+  const [playgroundPanelWidth, setPlaygroundPanelWidth] = useState(() => {
+    const saved = localStorage.getItem(PLAYGROUND_WIDTH_KEY);
+    return saved ? Math.min(MAX_PLAYGROUND_WIDTH, Math.max(MIN_PLAYGROUND_WIDTH, parseInt(saved, 10))) : DEFAULT_PLAYGROUND_WIDTH;
+  });
 
   // Drag and drop sensors for strategy reordering
   const sensors = useSensors(
@@ -740,6 +763,62 @@ const FeatureFlagDetailPage: React.FC = () => {
       }
     }
   }, [selectedEnvironment, environments]);
+
+  // ==================== Playground Panel Resize ====================
+
+  const playgroundPanelRef = useRef<HTMLDivElement>(null);
+  const resizeHandleRef = useRef<HTMLDivElement>(null);
+  const currentWidthRef = useRef(playgroundPanelWidth);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    currentWidthRef.current = playgroundPanelWidth;
+  }, [playgroundPanelWidth]);
+
+  // Sync DOM style with state when panel becomes visible
+  // This fixes the issue where inline styles set during resize persist incorrectly
+  useEffect(() => {
+    if (embeddedPlaygroundVisible && playgroundPanelRef.current) {
+      playgroundPanelRef.current.style.width = `${playgroundPanelWidth}px`;
+    }
+  }, [embeddedPlaygroundVisible, playgroundPanelWidth]);
+
+  const handlePlaygroundResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = currentWidthRef.current;
+    let currentWidth = startWidth;
+
+    // Show resize indicator
+    if (resizeHandleRef.current) {
+      resizeHandleRef.current.style.backgroundColor = 'var(--mui-palette-primary-main, #1976d2)';
+    }
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = startX - moveEvent.clientX;
+      currentWidth = Math.min(MAX_PLAYGROUND_WIDTH, Math.max(MIN_PLAYGROUND_WIDTH, startWidth + deltaX));
+      // Update DOM directly without state update
+      if (playgroundPanelRef.current) {
+        playgroundPanelRef.current.style.width = `${currentWidth}px`;
+      }
+    };
+
+    const handleMouseUp = () => {
+      // Reset resize indicator
+      if (resizeHandleRef.current) {
+        resizeHandleRef.current.style.backgroundColor = '';
+      }
+      // Update state and ref
+      currentWidthRef.current = currentWidth;
+      setPlaygroundPanelWidth(currentWidth);
+      localStorage.setItem(PLAYGROUND_WIDTH_KEY, currentWidth.toString());
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, []);
 
   // ==================== Handlers ====================
 
@@ -2112,8 +2191,9 @@ const FeatureFlagDetailPage: React.FC = () => {
           </Box>
 
           {/* Right Main Area - Environment Cards */}
-          <Box sx={{ flex: 1 }}>
-            <Stack spacing={2}>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+
+            <Stack spacing={2} sx={{ minWidth: 0 }}>
               {environments.map((env, envIndex) => {
                 // Get environment-specific isEnabled from flag.environments
                 const envSettings = flag.environments?.find(
@@ -2149,7 +2229,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                         }}
                       />
                       {/* Content */}
-                      <Box sx={{ flex: 1 }}>
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Accordion
                           expanded={isExpanded}
                           onChange={(_, expanded) => {
@@ -2231,28 +2311,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 )}
                               </Box>
                             </Box>
-
-                            {/* Playground test button */}
-                            <Tooltip title={t("featureFlags.testInPlayground")}>
-                              <IconButton
-                                size="medium"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setPlaygroundInitialEnvironments([env.environment]);
-                                  setPlaygroundOpen(true);
-                                }}
-                                sx={{
-                                  mr: 1,
-                                  bgcolor: 'primary.main',
-                                  color: 'white',
-                                  '&:hover': {
-                                    bgcolor: 'primary.dark',
-                                  },
-                                }}
-                              >
-                                <JoystickIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
 
                             {/* Metrics mini pie chart */}
                             {(() => {
@@ -3556,6 +3614,72 @@ const FeatureFlagDetailPage: React.FC = () => {
               })}
             </Stack>
           </Box>
+
+          {/* Right Playground Panel - inline embedded playground */}
+          {!isCreating && embeddedPlaygroundVisible && (
+            <Box
+              ref={playgroundPanelRef}
+              sx={{
+                width: playgroundPanelWidth,
+                flexShrink: 0,
+                position: 'relative',
+                ml: 1,
+              }}
+            >
+              {/* Resize Handle */}
+              <Box
+                ref={resizeHandleRef}
+                onMouseDown={handlePlaygroundResizeStart}
+                sx={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: 6,
+                  cursor: 'col-resize',
+                  bgcolor: 'transparent',
+                  transition: 'background-color 0.2s',
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                  zIndex: 10,
+                }}
+              />
+              <Box
+                sx={{
+                  borderLeft: 1,
+                  borderColor: 'divider',
+                  pl: 1.5,
+                  height: '100%',
+                }}
+              >
+                <Box sx={{ position: 'sticky', top: 16 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <JoystickIcon color="primary" fontSize="small" />
+                      <Typography variant="subtitle1" fontWeight={600}>
+                        {t('playground.title')}
+                      </Typography>
+                    </Box>
+                    <IconButton size="small" onClick={() => setEmbeddedPlaygroundVisible(false)}>
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                    {t('playground.subtitle')}
+                  </Typography>
+                  <Box sx={{ maxHeight: 'calc(100vh - 200px)', overflow: 'auto' }}>
+                    <PlaygroundDialog
+                      open={true}
+                      onClose={() => setEmbeddedPlaygroundVisible(false)}
+                      initialFlags={[flag.flagName]}
+                      embedded={true}
+                    />
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+          )}
         </Box>
       </TabPanel >
 
@@ -5070,6 +5194,39 @@ const FeatureFlagDetailPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog >
+
+      {/* Floating Playground Toggle Button - positioned on right edge, only when panel is hidden */}
+      {!isCreating && flag && !embeddedPlaygroundVisible && (
+        <Tooltip title={t('playground.title')} placement="left">
+          <IconButton
+            onClick={() => setEmbeddedPlaygroundVisible(true)}
+            sx={{
+              position: 'fixed',
+              right: 0,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 1000,
+              width: 40,
+              height: 40,
+              bgcolor: 'background.paper',
+              color: 'primary.main',
+              opacity: 0.7,
+              boxShadow: 3,
+              borderTopRightRadius: 0,
+              borderBottomRightRadius: 0,
+              borderTopLeftRadius: 20,
+              borderBottomLeftRadius: 20,
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                opacity: 1,
+                bgcolor: 'background.paper',
+              },
+            }}
+          >
+            <JoystickIcon />
+          </IconButton>
+        </Tooltip>
+      )}
 
       {/* Playground Dialog */}
       <PlaygroundDialog
