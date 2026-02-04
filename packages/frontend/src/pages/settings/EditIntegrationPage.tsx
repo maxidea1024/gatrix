@@ -222,6 +222,15 @@ export const EditIntegrationPage: React.FC = () => {
   const [logsLoading, setLogsLoading] = useState(false);
   const [testing, setTesting] = useState(false);
 
+  // Initial values for dirty check
+  const [initialValues, setInitialValues] = useState<{
+    description: string;
+    isEnabled: boolean;
+    parameters: Record<string, any>;
+    events: string[];
+    environments: string[];
+  } | null>(null);
+
   useEffect(() => {
     fetchData();
     fetchEnvironments();
@@ -251,6 +260,15 @@ export const EditIntegrationPage: React.FC = () => {
         setParameters(integrationData.parameters || {});
         setSelectedEvents(integrationData.events || []);
         setSelectedEnvironments(integrationData.environments || []);
+
+        // Store initial values for dirty check
+        setInitialValues({
+          description: integrationData.description || '',
+          isEnabled: integrationData.isEnabled,
+          parameters: integrationData.parameters || {},
+          events: integrationData.events || [],
+          environments: integrationData.environments || [],
+        });
       }
     } catch {
       enqueueSnackbar(t('integrations.loadFailed'), { variant: 'error' });
@@ -341,6 +359,19 @@ export const EditIntegrationPage: React.FC = () => {
       }
     }
     return true;
+  };
+
+  // Check if form has been modified
+  const isDirty = (): boolean => {
+    if (!initialValues) return false;
+
+    if (description !== initialValues.description) return true;
+    if (isEnabled !== initialValues.isEnabled) return true;
+    if (JSON.stringify(parameters) !== JSON.stringify(initialValues.parameters)) return true;
+    if (JSON.stringify(selectedEvents.sort()) !== JSON.stringify(initialValues.events.sort())) return true;
+    if (JSON.stringify(selectedEnvironments.sort()) !== JSON.stringify(initialValues.environments.sort())) return true;
+
+    return false;
   };
 
   const handleSave = async () => {
@@ -667,14 +698,11 @@ export const EditIntegrationPage: React.FC = () => {
         </Card>
 
         {/* Save Button */}
-        <Box display="flex" justifyContent="flex-end" mt={3} gap={2}>
-          <Button variant="outlined" onClick={() => navigate('/settings/integrations')}>
-            {t('common.cancel')}
-          </Button>
+        <Box display="flex" justifyContent="flex-end" mt={3}>
           <Button
             variant="contained"
             onClick={handleSave}
-            disabled={saving || !isFormValid()}
+            disabled={saving || !isFormValid() || !isDirty()}
           >
             {saving ? <CircularProgress size={24} /> : t('common.save')}
           </Button>
