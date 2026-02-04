@@ -39,15 +39,12 @@ const SystemSettingsPage: React.FC = () => {
   const tabFromUrl = searchParams.get("tab");
   const initialTab = tabFromUrl ? parseInt(tabFromUrl, 10) : 0;
   const [tab, setTab] = useState(
-    initialTab >= 0 && initialTab <= 3 ? initialTab : 0,
+    initialTab >= 0 && initialTab <= 2 ? initialTab : 0,
   );
 
   // Network settings
   const [admindUrl, setAdmindUrl] = useState("");
 
-  // Integration settings
-  const [slackWebhookUrl, setSlackWebhookUrl] = useState("");
-  const [genericWebhookUrl, setGenericWebhookUrl] = useState("");
 
   // Service Discovery settings
   const [sdConfig, setSdConfig] = useState<ServiceDiscoveryConfig>({
@@ -61,14 +58,10 @@ const SystemSettingsPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const [admind, slack, generic] = await Promise.all([
+        const [admind] = await Promise.all([
           varsService.get("admindUrl"),
-          varsService.get("slackWebhookUrl"),
-          varsService.get("genericWebhookUrl"),
         ]);
         setAdmindUrl(admind || "");
-        setSlackWebhookUrl(slack || "");
-        setGenericWebhookUrl(generic || "");
       } catch (e) {
         // ignore load errors
       }
@@ -126,7 +119,6 @@ const SystemSettingsPage: React.FC = () => {
             sx={{ mb: 2 }}
           >
             <Tab label={t("settings.network.title")} />
-            <Tab label={t("settings.integrations.title")} />
             <Tab label={t("settings.serviceDiscovery.title")} />
             <Tab label={t("settings.kv.title")} />
           </Tabs>
@@ -161,52 +153,8 @@ const SystemSettingsPage: React.FC = () => {
             </>
           )}
 
-          {tab === 1 && (
-            <>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t("settings.integrations.subtitle")}
-              </Typography>
-              <Stack spacing={2} sx={{ maxWidth: 640 }}>
-                <TextField
-                  fullWidth
-                  label={t("settings.integrations.slackWebhook")}
-                  placeholder="https://hooks.slack.com/services/..."
-                  value={slackWebhookUrl}
-                  onChange={(e) => setSlackWebhookUrl(e.target.value)}
-                  helperText={t("settings.integrations.slackWebhookHelp")}
-                />
-                <TextField
-                  fullWidth
-                  label={t("settings.integrations.genericWebhook")}
-                  placeholder="https://your.webhook/endpoint"
-                  value={genericWebhookUrl}
-                  onChange={(e) => setGenericWebhookUrl(e.target.value)}
-                  helperText={t("settings.integrations.genericWebhookHelp")}
-                />
-                {canManage && (
-                  <Stack direction="row" spacing={1}>
-                    <Button
-                      variant="contained"
-                      onClick={async () => {
-                        await varsService.set(
-                          "slackWebhookUrl",
-                          slackWebhookUrl || null,
-                        );
-                        await varsService.set(
-                          "genericWebhookUrl",
-                          genericWebhookUrl || null,
-                        );
-                      }}
-                    >
-                      {t("common.save")}
-                    </Button>
-                  </Stack>
-                )}
-              </Stack>
-            </>
-          )}
 
-          {tab === 2 && (
+          {tab === 1 && (
             <>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {t("settings.serviceDiscovery.subtitle")}
@@ -290,7 +238,7 @@ const SystemSettingsPage: React.FC = () => {
             </>
           )}
 
-          {tab === 3 && <KeyValuePage />}
+          {tab === 2 && <KeyValuePage />}
         </CardContent>
       </Card>
     </Box>
