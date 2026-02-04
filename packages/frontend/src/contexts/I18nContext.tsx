@@ -38,6 +38,11 @@ i18n
     load: "languageOnly",
     debug: false, // Set to true for i18n debugging
 
+    // IMPORTANT: Disable key separator to treat keys as flat strings
+    // This allows "integrations.providers.slack.displayName" to be found directly
+    keySeparator: false,
+    nsSeparator: false,
+
     detection: {
       order: ["localStorage", "navigator", "htmlTag"],
       caches: ["localStorage"],
@@ -82,7 +87,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
       localStorage.setItem("i18nextLng", legacy);
       i18nInstance.changeLanguage(legacy as Language);
     }
-  } catch {}
+  } catch { }
 
   const changeLanguage = async (lang: Language) => {
     // 프론트엔드 언어 변경
