@@ -60,6 +60,7 @@ import {
     Schedule as DateTimeIcon,
     LocalOffer as SemverIcon,
     SportsEsports as JoystickIcon,
+    ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -71,6 +72,7 @@ import api from '../../services/api';
 import ConstraintDisplay from './ConstraintDisplay';
 import LocalizedDateTimePicker from '../common/LocalizedDateTimePicker';
 import JsonEditor from '../common/JsonEditor';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 
 
 interface ContextField {
@@ -1238,7 +1240,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     }
                 }}
             >
-                <Box sx={{ p: 2, minWidth: 700, maxWidth: 950 }}>
+                <Box sx={{ p: 2, minWidth: 800, maxWidth: 1050 }}>
                     {selectedEvaluation && (
                         <>
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
@@ -1338,7 +1340,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                             p: 1.5,
                                                             borderBottom: stratIdx < strategies.length - 1 ? '1px solid' : 'none',
                                                             borderColor: 'divider',
-                                                            bgcolor: isMatched ? 'success.50' : wasEvaluated ? (stepResult?.passed ? 'success.50' : 'error.50') : 'grey.50',
+                                                            bgcolor: isMatched ? 'success.50' : wasEvaluated ? (stepResult?.passed ? 'success.50' : 'error.50') : 'action.hover',
                                                             position: 'relative',
                                                             '&::before': isMatched ? {
                                                                 content: '""',
@@ -1498,7 +1500,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     <Box sx={{
                                         mb: 2,
                                         p: 1.5,
-                                        bgcolor: 'grey.50',
+                                        bgcolor: 'action.hover',
                                         borderRadius: 1,
                                         display: 'flex',
                                         gap: 2,
@@ -1518,13 +1520,17 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                             <Chip
                                                 label={`${passedSteps} ${t('playground.summary.passed')}`}
                                                 size="small"
-                                                sx={{ height: 20, fontSize: '0.7rem', bgcolor: 'success.100', color: 'success.dark' }}
+                                                color="success"
+                                                variant="outlined"
+                                                sx={{ height: 20, fontSize: '0.7rem' }}
                                             />
                                             {failedSteps > 0 && (
                                                 <Chip
                                                     label={`${failedSteps} ${t('playground.summary.failed')}`}
                                                     size="small"
-                                                    sx={{ height: 20, fontSize: '0.7rem', bgcolor: 'error.100', color: 'error.dark' }}
+                                                    color="error"
+                                                    variant="outlined"
+                                                    sx={{ height: 20, fontSize: '0.7rem' }}
                                                 />
                                             )}
                                         </Box>
@@ -1536,12 +1542,12 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                 <Chip
                                                     label={`${passedChecks}/${totalChecks}`}
                                                     size="small"
+                                                    color={passedChecks === totalChecks ? 'success' : 'warning'}
+                                                    variant="outlined"
                                                     sx={{
                                                         height: 20,
                                                         fontSize: '0.7rem',
                                                         fontWeight: 600,
-                                                        bgcolor: passedChecks === totalChecks ? 'success.100' : 'warning.100',
-                                                        color: passedChecks === totalChecks ? 'success.dark' : 'warning.dark'
                                                     }}
                                                 />
                                             </Box>
@@ -1598,7 +1604,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                         )}
                                                     </Box>
 
-                                                    <Box sx={{ width: 140, flexShrink: 0 }}>
+                                                    <Box sx={{ width: 170, flexShrink: 0 }}>
                                                         <Typography
                                                             variant="body2"
                                                             fontWeight={isStrategy ? 600 : 500}
@@ -1757,8 +1763,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                                             p: 1,
                                                                                             borderRadius: 1,
                                                                                             border: '1px dashed',
-                                                                                            borderColor: isSkipped ? 'grey.400' : check.passed ? 'success.light' : 'error.light',
-                                                                                            bgcolor: isSkipped ? 'grey.100' : check.passed ? 'success.50' : 'error.50',
+                                                                                            borderColor: isSkipped ? 'action.disabled' : check.passed ? 'success.light' : 'error.light',
+                                                                                            bgcolor: isSkipped ? 'action.disabledBackground' : check.passed ? 'success.50' : 'error.50',
                                                                                             boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
                                                                                             opacity: isSkipped ? 0.7 : 1,
                                                                                         }}
@@ -1847,9 +1853,30 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
                             {/* Raw Response JSON */}
                             <Box sx={{ mt: 2 }}>
-                                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-                                    {t('playground.rawResponse')}
-                                </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                                    <Typography variant="subtitle2" color="text.secondary">
+                                        {t('playground.rawResponse')}
+                                    </Typography>
+                                    <Tooltip title={t('common.copyToClipboard')}>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => {
+                                                const jsonStr = JSON.stringify({
+                                                    enabled: selectedEvaluation.result.enabled,
+                                                    variant: selectedEvaluation.result.variant,
+                                                    reason: selectedEvaluation.result.reason,
+                                                }, null, 2);
+                                                copyToClipboardWithNotification(
+                                                    jsonStr,
+                                                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                );
+                                            }}
+                                        >
+                                            <CopyIcon fontSize="small" />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Box>
                                 <JsonEditor
                                     value={JSON.stringify({
                                         enabled: selectedEvaluation.result.enabled,
@@ -1858,7 +1885,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     }, null, 2)}
                                     onChange={() => { }}
                                     readOnly
-                                    height={250}
+                                    height={300}
                                 />
                             </Box>
                         </>
