@@ -25,6 +25,7 @@ import {
   Chip,
   Switch,
   Divider,
+  InputAdornment,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -117,8 +118,25 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   const [editingVariants, setEditingVariants] = useState<Variant[]>(initialVariants);
   const [prevVariantsJson, setPrevVariantsJson] = useState(initialVariantsJson);
 
+  const [saving, setSaving] = useState(false);
+  const [savingFallback, setSavingFallback] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [jsonErrors, setJsonErrors] = useState<Record<number, string | null>>({});
+
+  // Ref to preserve expanded state
+  const preserveExpandedRef = React.useRef(false);
+  // Ref to track saving status to prevent state reset during data reload
+  const isSavingRef = React.useRef(false);
+
+  // Sync state if savingRef is true (meaning we just finished saving)
+  useEffect(() => {
+    if (!saving && !savingFallback) {
+      isSavingRef.current = false;
+    }
+  }, [saving, savingFallback]);
+
   // Render-time Status Synchronization (prevents flicker)
-  if (initialVariantsJson !== prevVariantsJson) {
+  if (!isSavingRef.current && initialVariantsJson !== prevVariantsJson) {
     setPrevVariantsJson(initialVariantsJson);
     setEditingVariants(initialVariants);
   }
@@ -126,13 +144,6 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   const hasChanges = useMemo(() => {
     return JSON.stringify(editingVariants) !== initialVariantsJson;
   }, [editingVariants, initialVariantsJson]);
-
-  const [saving, setSaving] = useState(false);
-  const [expanded, setExpanded] = useState(false);
-  const [jsonErrors, setJsonErrors] = useState<Record<number, string | null>>({});
-
-  // Ref to preserve expanded state
-  const preserveExpandedRef = React.useRef(false);
 
   // Effect to handle expansion logic on data reload
   useEffect(() => {
@@ -163,11 +174,14 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
   const [prevOriginalOverride, setPrevOriginalOverride] = useState(originalUseEnvOverride);
   const [prevOriginalFallback, setPrevOriginalFallback] = useState(originalFallbackValue);
-  const [savingFallback, setSavingFallback] = useState(false);
   const [fallbackJsonError, setFallbackJsonError] = useState<string | null>(null);
 
   // Render-time Synchronization
-  if (originalUseEnvOverride !== prevOriginalOverride || originalFallbackValue !== prevOriginalFallback) {
+  if (
+    !isSavingRef.current &&
+    (originalUseEnvOverride !== prevOriginalOverride ||
+      originalFallbackValue !== prevOriginalFallback)
+  ) {
     setPrevOriginalOverride(originalUseEnvOverride);
     setPrevOriginalFallback(originalFallbackValue);
     setUseEnvOverride(originalUseEnvOverride);
@@ -193,17 +207,24 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       }
     }
 
+    isSavingRef.current = true;
     setSavingFallback(true);
     try {
       if (useEnvOverride) {
-        // Save env-specific value
-        const valueToSave = variantType === 'json' ? editingFallback : editingFallback;
+        // Save env-specific value - minify if JSON
+        let valueToSave = editingFallback;
+        if (variantType === 'json') {
+          try {
+            valueToSave = JSON.stringify(JSON.parse(editingFallback));
+          } catch (e) {
+            // Should be caught by validation above
+          }
+        }
         await onSaveFallbackValue(valueToSave, false);
       } else {
         // Clear env-specific, use global
         await onSaveFallbackValue(null, true);
       }
-      setFallbackHasChanges(false);
     } catch (error) {
       // Error handling done by parent
     } finally {
@@ -323,10 +344,30 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     }
 
     try {
+      isSavingRef.current = true;
       setSaving(true);
       // Preserve expanded state so it remains open after data reload
       preserveExpandedRef.current = true;
-      await onSave(editingVariants);
+
+      // Minify JSON payloads before saving
+      const variantsToSave = editingVariants.map((v) => {
+        if (v.payload?.type === 'json' && v.payload.value) {
+          try {
+            return {
+              ...v,
+              payload: {
+                ...v.payload,
+                value: JSON.stringify(JSON.parse(v.payload.value)),
+              },
+            };
+          } catch (e) {
+            return v;
+          }
+        }
+        return v;
+      });
+
+      await onSave(variantsToSave);
     } finally {
       setSaving(false);
     }
@@ -352,26 +393,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           bgcolor: 'action.hover',
         }}
       >
-        <Typography
-          variant="body1"
-          fontWeight="medium"
-          color="text.secondary"
-          sx={{ mb: 1 }}
-        >
+        <Typography variant="body1" fontWeight="medium" color="text.secondary" sx={{ mb: 1 }}>
           {t('featureFlags.variantTypeNoneTitle')}
         </Typography>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ mb: 2 }}
-        >
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           {t('featureFlags.variantTypeNoneCannotAddVariantsText')}
         </Typography>
-        <Button
-          variant="contained"
-          size="small"
-          onClick={onGoToPayloadTab}
-        >
+        <Button variant="contained" size="small" onClick={onGoToPayloadTab}>
           {t('featureFlags.goToPayloadTab')}
         </Button>
       </Box>
@@ -497,12 +525,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                 : t('featureFlags.noVariantsGuide')}
             </Typography>
             {canManage && !isArchived && (
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<AddIcon />}
-                onClick={addVariant}
-              >
+              <Button variant="outlined" size="small" startIcon={<AddIcon />} onClick={addVariant}>
                 {flagUsage === 'remoteConfig'
                   ? t('featureFlags.addConfiguration')
                   : t('featureFlags.addVariant')}
@@ -536,7 +559,8 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             const hasJsonError = jsonErrors[index] !== undefined && jsonErrors[index] !== null;
             // Check for duplicate name
             const isDuplicateName = editingVariants.some(
-              (v, i) => i !== index && v.name.trim().toLowerCase() === variant.name.trim().toLowerCase()
+              (v, i) =>
+                i !== index && v.name.trim().toLowerCase() === variant.name.trim().toLowerCase()
             );
 
             return (
@@ -553,92 +577,91 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                   border: flagUsage === 'remoteConfig' ? 'none' : undefined,
                 }}
               >
-                {flagUsage !== 'remoteConfig' && (
+                {/* Header Row: Name, Weight, Lock, Delete */}
+                {(flagUsage !== 'remoteConfig' || showWeightControls) && (
                   <Box
                     sx={{
                       display: 'flex',
                       alignItems: 'flex-start',
-                      justifyContent: 'space-between',
-                      mb: 2,
+                      gap: 1.5,
+                      mb: 1.5,
                     }}
                   >
                     {/* Variant Name */}
-                    <TextField
-                      size="small"
-                      label={t('featureFlags.variantName')}
-                      value={variant.name}
-                      onChange={(e) => updateVariant(index, { name: e.target.value })}
-                      disabled={!canManage || isArchived}
-                      error={isDuplicateName}
-                      helperText={
-                        isDuplicateName ? t('featureFlags.duplicateVariantName') : undefined
-                      }
-                      sx={{ flex: 1, mr: 2 }}
-                    />
+                    {flagUsage !== 'remoteConfig' && (
+                      <TextField
+                        size="small"
+                        label={t('featureFlags.variantName')}
+                        value={variant.name}
+                        onChange={(e) => updateVariant(index, { name: e.target.value })}
+                        disabled={!canManage || isArchived}
+                        error={isDuplicateName}
+                        helperText={
+                          isDuplicateName ? t('featureFlags.duplicateVariantName') : undefined
+                        }
+                        sx={{ flex: 1 }}
+                      />
+                    )}
 
-                    {/* Delete button - hidden for remoteConfig since it has exactly 1 variant */}
-                    {canManage && !isArchived && (
-                      <IconButton size="small" color="error" onClick={() => removeVariant(index)}>
+                    {/* Weight Controls - only if variantCount > 1 */}
+                    {showWeightControls && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <TextField
+                          size="small"
+                          label={t('featureFlags.weight')}
+                          type="number"
+                          value={variant.weight}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value);
+                            updateVariantWeight(
+                              index,
+                              isNaN(val) ? 0 : val,
+                              variant.weightLock || false
+                            );
+                          }}
+                          disabled={!canManage || isArchived}
+                          sx={{ width: 90 }}
+                          InputProps={{
+                            endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                          }}
+                        />
+                        <Tooltip
+                          title={
+                            isCurrentLocked
+                              ? t('featureFlags.weightLocked')
+                              : t('featureFlags.fixedWeight')
+                          }
+                        >
+                          <IconButton
+                            size="small"
+                            onClick={() => toggleWeightLock(index, !isCurrentLocked)}
+                            disabled={!canManage || isArchived}
+                            sx={{
+                              color: isCurrentLocked ? 'warning.main' : 'action.disabled',
+                              mt: 0.5,
+                            }}
+                          >
+                            {isCurrentLocked ? (
+                              <LockIcon fontSize="small" />
+                            ) : (
+                              <LockOpenIcon fontSize="small" />
+                            )}
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    )}
+
+                    {/* Delete button */}
+                    {flagUsage !== 'remoteConfig' && canManage && !isArchived && (
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => removeVariant(index)}
+                        sx={{ mt: 0.5 }}
+                      >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
                     )}
-                  </Box>
-                )}
-
-                {/* Weight controls */}
-                {showWeightControls && (
-                  <Box sx={{ mb: 2 }}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        mb: 1,
-                      }}
-                    >
-                      <Typography variant="body2" color="text.secondary">
-                        {t('featureFlags.weight')}:
-                      </Typography>
-                      <Typography variant="body2" fontWeight={600}>
-                        {variant.weight}%
-                      </Typography>
-                      {isCurrentLocked && (
-                        <Tooltip title={t('featureFlags.weightLocked')}>
-                          <LockIcon fontSize="small" sx={{ color: 'warning.main' }} />
-                        </Tooltip>
-                      )}
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Slider
-                        value={variant.weight}
-                        onChange={(_, value) =>
-                          updateVariantWeight(index, value as number, variant.weightLock || false)
-                        }
-                        disabled={!canManage || isArchived}
-                        min={0}
-                        max={100}
-                        sx={{ flex: 1 }}
-                      />
-                      {showFixedCheckbox && (
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              size="small"
-                              checked={isCurrentLocked}
-                              onChange={(e) => toggleWeightLock(index, e.target.checked)}
-                              disabled={!canManage || isArchived}
-                              icon={<LockOpenIcon fontSize="small" />}
-                              checkedIcon={<LockIcon fontSize="small" />}
-                            />
-                          }
-                          label={
-                            <Typography variant="caption">
-                              {t('featureFlags.fixedWeight')}
-                            </Typography>
-                          }
-                        />
-                      )}
-                    </Box>
                   </Box>
                 )}
 
@@ -649,9 +672,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                       <Typography variant="body2" color="text.secondary">
                         {t('featureFlags.payload')}
                       </Typography>
-                      {variantType === 'none' ? (
-                        <BlockIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
-                      ) : variantType === 'json' ? (
+                      {variantType === 'json' ? (
                         <JsonIcon sx={{ fontSize: 16, color: 'secondary.main' }} />
                       ) : variantType === 'number' ? (
                         <NumberIcon sx={{ fontSize: 16, color: 'info.main' }} />
@@ -664,9 +685,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                     {flagUsage === 'remoteConfig' && (
                       <Box sx={{ mt: 1, display: 'flex', alignItems: 'center' }}>
-                        {variantType === 'none' ? (
-                          <BlockIcon sx={{ fontSize: 20, color: 'text.disabled' }} />
-                        ) : variantType === 'json' ? (
+                        {variantType === 'json' ? (
                           <JsonIcon sx={{ fontSize: 20, color: 'secondary.main' }} />
                         ) : variantType === 'number' ? (
                           <NumberIcon sx={{ fontSize: 20, color: 'info.main' }} />
@@ -710,7 +729,15 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                           disabled={!canManage || isArchived}
                         />
                       )}
-                      <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', minHeight: '20px' }}>
+                      <Box
+                        sx={{
+                          mt: 0.5,
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'flex-start',
+                          minHeight: '20px',
+                        }}
+                      >
                         {hasJsonError ? (
                           <Typography variant="caption" color="error" sx={{ display: 'block' }}>
                             {jsonErrors[index]}
@@ -781,7 +808,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
         )}
 
         {/* Fallback Value Section - appears after variants */}
-        {onSaveFallbackValue && variantType !== 'none' && (
+        {onSaveFallbackValue && (variantType as string) !== 'none' && (
           <Box sx={{ mt: variantCount > 0 ? 2 : 0 }}>
             {variantCount > 0 && <Divider sx={{ mb: 2 }} />}
             <Box
@@ -825,14 +852,32 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             {/* Input Field - Same editor for both states, with type icon on left */}
             <Box sx={{ mb: 1.5 }}>
               {!useEnvOverride && (
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: 'block', mb: 0.5 }}
+                >
                   {t('featureFlags.usingGlobalDefault')}
                 </Typography>
               )}
               <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                 {/* Type Icon with Tooltip */}
-                <Box sx={{ mt: variantType === 'json' ? 1 : 0.75, display: 'flex', alignItems: 'center' }}>
-                  <Tooltip title={variantType === 'json' ? 'JSON' : variantType === 'number' ? 'Number' : 'String'}>
+                <Box
+                  sx={{
+                    mt: variantType === 'json' ? 1 : 0.75,
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Tooltip
+                    title={
+                      variantType === 'json'
+                        ? 'JSON'
+                        : variantType === 'number'
+                          ? 'Number'
+                          : 'String'
+                    }
+                  >
                     {variantType === 'json' ? (
                       <JsonIcon sx={{ fontSize: 20, color: 'secondary.main' }} />
                     ) : variantType === 'number' ? (
@@ -846,7 +891,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   {variantType === 'json' ? (
                     <JsonEditor
-                      value={useEnvOverride ? editingFallback : (typeof baselinePayload === 'string' ? baselinePayload : JSON.stringify(baselinePayload ?? {}, null, 2))}
+                      value={
+                        useEnvOverride
+                          ? editingFallback
+                          : typeof baselinePayload === 'string'
+                            ? baselinePayload
+                            : JSON.stringify(baselinePayload ?? {}, null, 2)
+                      }
                       onChange={(val) => {
                         if (useEnvOverride) {
                           setEditingFallback(val);
@@ -897,7 +948,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                   onClick={handleSaveFallback}
                   disabled={savingFallback || !fallbackHasChanges || !!fallbackJsonError}
                 >
-                  {savingFallback ? t('common.saving') : t('common.save')}
+                  {savingFallback ? t('common.saving') : t('featureFlags.saveFallbackValue')}
                 </Button>
               </Box>
             )}

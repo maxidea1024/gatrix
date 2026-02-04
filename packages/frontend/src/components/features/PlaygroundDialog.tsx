@@ -32,6 +32,9 @@ import {
   Select,
   MenuItem,
   FormControl,
+  Divider,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -176,6 +179,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     { flagName: string; displayName?: string }[]
   >([]);
   const [autoExecutePending, setAutoExecutePending] = useState(false);
+  const [rememberContext, setRememberContext] = useState<boolean>(() => {
+    return localStorage.getItem('gatrix_playground_remember_context') === 'true';
+  });
 
   // Variant popover state
   const [variantPopoverAnchor, setVariantPopoverAnchor] = useState<HTMLElement | null>(null);
@@ -220,7 +226,22 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       } else {
         setSelectedEnvironments([]);
       }
-      // Set initial context if provided
+      // Load remembered context if enabled
+      if (rememberContext) {
+        const saved = localStorage.getItem('gatrix_playground_saved_context');
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed)) {
+              setContextEntries(parsed);
+            }
+          } catch (e) {
+            console.error('Failed to load saved context', e);
+          }
+        }
+      }
+
+      // Set initial context if provided (overrides remembered)
       if (initialContext && Object.keys(initialContext).length > 0) {
         const entries: ContextEntry[] = Object.entries(initialContext).map(([key, value]) => ({
           key,
@@ -233,16 +254,15 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 : 'string',
         }));
         setContextEntries(entries);
-      } else {
-        setContextEntries([]);
       }
+
       // Set auto-execute pending if requested
       setAutoExecutePending(autoExecute);
 
       // Mark as initialized
       hasInitializedRef.current = true;
     }
-  }, [open, initialFlags, initialEnvironments, initialContext, autoExecute, embedded]);
+  }, [open, initialFlags, initialEnvironments, initialContext, autoExecute, embedded, rememberContext]);
 
   const loadEnvironments = async () => {
     try {
@@ -325,8 +345,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       NO_STRATEGIES: t('playground.reasonCodes.noStrategies'),
       STRATEGY_MATCHED: reasonDetails?.strategyName
         ? t('playground.reasonCodes.strategyMatched', {
-            name: localizeStrategyName(reasonDetails.strategyName),
-          })
+          name: localizeStrategyName(reasonDetails.strategyName),
+        })
         : t('playground.reasonCodes.strategyMatchedDefault'),
       NO_MATCHING_STRATEGY: t('playground.reasonCodes.noMatchingStrategy'),
     };
@@ -389,35 +409,42 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
   // Add context entry
   const handleAddContextEntry = () => {
-    setContextEntries([...contextEntries, { key: '', value: '', type: 'string' }]);
+    const updated: ContextEntry[] = [
+      ...contextEntries,
+      { key: '', value: '', type: 'string' as 'string' },
+    ];
+    setContextEntries(updated);
+    if (rememberContext) {
+      localStorage.setItem('gatrix_playground_saved_context', JSON.stringify(updated));
+    }
   };
 
   // Remove context entry
   const handleRemoveContextEntry = (index: number) => {
-    const newEntries = [...contextEntries];
-    newEntries.splice(index, 1);
-    setContextEntries(newEntries);
+    const updated = contextEntries.filter((_, i) => i !== index);
+    setContextEntries(updated);
+    if (rememberContext) {
+      localStorage.setItem('gatrix_playground_saved_context', JSON.stringify(updated));
+    }
   };
 
   // Update context entry
-  const handleUpdateContextEntry = (
-    index: number,
-    field: 'key' | 'value' | 'type',
-    value: string
-  ) => {
-    const newEntries = [...contextEntries];
-    newEntries[index] = { ...newEntries[index], [field]: value };
+  const handleUpdateContextEntry = (index: number, field: keyof ContextEntry, value: any) => {
+    const updated = [...contextEntries];
+    updated[index] = { ...updated[index], [field]: value };
 
-    // Auto-detect type when key changes
+    // Update type if key changes
     if (field === 'key') {
-      const contextField = contextFields.find((f) => f.fieldName === value);
-      if (contextField) {
-        newEntries[index].type =
-          contextField.valueType === 'datetime' ? 'date' : contextField.valueType;
+      const fieldDef = contextFields.find((f) => f.fieldName === value);
+      if (fieldDef) {
+        updated[index].type = fieldDef.valueType;
       }
     }
 
-    setContextEntries(newEntries);
+    setContextEntries(updated);
+    if (rememberContext) {
+      localStorage.setItem('gatrix_playground_saved_context', JSON.stringify(updated));
+    }
   };
 
   // Get context field by key
@@ -486,6 +513,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
   // Evaluate
   const handleEvaluate = async () => {
+    setResults({});
     setLoading(true);
     setAutoExecutePending(false);
     try {
@@ -638,13 +666,42 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
   const renderContextFields = () => {
     return (
       <Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
-          <Typography variant="body2" color="text.secondary">
-            {t('playground.contextFields')}
-          </Typography>
-          <Tooltip title={t('playground.contextFieldsHelp')}>
-            <HelpIcon sx={{ fontSize: 16, color: 'text.disabled', cursor: 'help' }} />
-          </Tooltip>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Typography variant="body2" color="text.secondary">
+              {t('playground.contextFields')}
+            </Typography>
+            <Tooltip title={t('playground.contextFieldsHelp')}>
+              <HelpIcon sx={{ fontSize: 16, color: 'text.disabled', cursor: 'help' }} />
+            </Tooltip>
+          </Box>
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="small"
+                checked={rememberContext}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setRememberContext(checked);
+                  localStorage.setItem('gatrix_playground_remember_context', String(checked));
+                  if (!checked) {
+                    localStorage.removeItem('gatrix_playground_saved_context');
+                  } else {
+                    localStorage.setItem(
+                      'gatrix_playground_saved_context',
+                      JSON.stringify(contextEntries)
+                    );
+                  }
+                }}
+              />
+            }
+            label={
+              <Typography variant="caption" sx={{ color: 'text.secondary', userSelect: 'none' }}>
+                {t('playground.rememberContext')}
+              </Typography>
+            }
+            sx={{ m: 0 }}
+          />
         </Box>
 
         {contextEntries.length === 0 ? (
@@ -1046,7 +1103,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 }}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleVariantClick(e, result.variant);
+                                  // Clicking variant chip now opens evaluation details instead of a separate popover
+                                  setEvaluationPopoverAnchor(e.currentTarget);
+                                  setSelectedEvaluation({ flagName, env, result });
                                 }}
                               />
                             ) : (
@@ -1231,24 +1290,24 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                               position: 'relative',
                               '&::before': isMatched
                                 ? {
+                                  content: '""',
+                                  position: 'absolute',
+                                  left: 0,
+                                  top: 0,
+                                  bottom: 0,
+                                  width: 4,
+                                  bgcolor: 'success.main',
+                                }
+                                : wasEvaluated && !stepResult?.passed
+                                  ? {
                                     content: '""',
                                     position: 'absolute',
                                     left: 0,
                                     top: 0,
                                     bottom: 0,
                                     width: 4,
-                                    bgcolor: 'success.main',
+                                    bgcolor: 'error.main',
                                   }
-                                : wasEvaluated && !stepResult?.passed
-                                  ? {
-                                      content: '""',
-                                      position: 'absolute',
-                                      left: 0,
-                                      top: 0,
-                                      bottom: 0,
-                                      width: 4,
-                                      bgcolor: 'error.main',
-                                    }
                                   : {},
                             }}
                           >
@@ -1338,6 +1397,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             )}
 
             {/* Context Fields Used */}
+            <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />
             {contextEntries.length > 0 && (
               <Box sx={{ mb: 2 }}>
                 <Typography
@@ -1352,11 +1412,11 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     <TableHead>
                       <TableRow>
                         <TableCell
-                          sx={{ py: 0.5, fontWeight: 600, bgcolor: 'grey.50', width: '40%' }}
+                          sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover', width: '40%' }}
                         >
                           {t('playground.contextField')}
                         </TableCell>
-                        <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'grey.50' }}>
+                        <TableCell sx={{ py: 0.5, fontWeight: 600, bgcolor: 'action.hover' }}>
                           {t('playground.contextValue')}
                         </TableCell>
                       </TableRow>
@@ -1408,6 +1468,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             )}
 
             {/* Evaluation Summary */}
+            <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />
             {selectedEvaluation.result.evaluationSteps &&
               selectedEvaluation.result.evaluationSteps.length > 0 &&
               (() => {
@@ -1494,6 +1555,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 );
               })()}
 
+            <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />
             {selectedEvaluation.result.evaluationSteps &&
               selectedEvaluation.result.evaluationSteps.length > 0 && (
                 <Box
@@ -1790,10 +1852,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                   {check.rollout === 100
                                                     ? t('playground.checkMessages.rollout100')
                                                     : t('playground.rolloutDetail', {
-                                                        percentage:
-                                                          check.percentage?.toFixed(1) ?? '?',
-                                                        rollout: check.rollout ?? 100,
-                                                      })}
+                                                      percentage:
+                                                        check.percentage?.toFixed(1) ?? '?',
+                                                      rollout: check.rollout ?? 100,
+                                                    })}
                                                 </Typography>
                                               ) : check.constraint ? (
                                                 <Box sx={{ mt: 0.5 }}>
@@ -1849,15 +1911,15 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                   sx={{ display: 'block' }}
                                                 >
                                                   {check.message ===
-                                                  'Segment has no constraints - passed'
+                                                    'Segment has no constraints - passed'
                                                     ? t(
-                                                        'playground.checkMessages.segmentNoConstraints'
-                                                      )
+                                                      'playground.checkMessages.segmentNoConstraints'
+                                                    )
                                                     : check.message ===
-                                                        'Segment not found - skipped'
+                                                      'Segment not found - skipped'
                                                       ? t(
-                                                          'playground.checkMessages.segmentNotFound'
-                                                        )
+                                                        'playground.checkMessages.segmentNotFound'
+                                                      )
                                                       : check.message}
                                                 </Typography>
                                               ) : null}
@@ -1893,8 +1955,264 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 </Box>
               )}
 
+            {/* Final Payload View (Integrated Variant View) */}
+            <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />
+            <Box
+              sx={{
+                mt: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                mb: 1,
+              }}
+            >
+              <Typography variant="subtitle2" color="text.secondary">
+                {t('playground.appliedVariant')}
+              </Typography>
+              {selectedEvaluation.result.variant && (
+                <Tooltip title={t('common.copy')}>
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      const payload = selectedEvaluation.result.variant?.payload;
+                      const valueToCopy =
+                        typeof payload === 'object' && payload !== null && 'value' in payload
+                          ? String(payload.value)
+                          : typeof payload === 'object'
+                            ? JSON.stringify(payload)
+                            : String(payload ?? '');
+                      copyToClipboardWithNotification(
+                        valueToCopy,
+                        () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                      );
+                    }}
+                  >
+                    <CopyIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </Box>
+            <Box
+              sx={{
+                p: 2,
+                bgcolor: 'background.paper',
+                borderRadius: 1,
+                border: '1px solid',
+                borderColor: 'divider',
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  mb: 1.5,
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    {selectedEvaluation.result.enabled ? (
+                      <TrueIcon sx={{ fontSize: 18, color: 'success.main' }} />
+                    ) : (
+                      <FalseIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                    )}
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight={700}
+                      color={selectedEvaluation.result.enabled ? 'success.main' : 'error.main'}
+                      sx={{ fontSize: '0.75rem', textTransform: 'uppercase' }}
+                    >
+                      {selectedEvaluation.result.enabled
+                        ? t('common.enabled')
+                        : t('common.disabled')}
+                    </Typography>
+                  </Box>
+
+                  <Divider
+                    orientation="vertical"
+                    flexItem
+                    sx={{ height: 16, my: 'auto', bgcolor: 'divider' }}
+                  />
+
+                  {selectedEvaluation.result.variant ? (
+                    <>
+                      <Typography variant="subtitle2" fontWeight={600} color="text.primary">
+                        {t('playground.appliedVariant')}:{' '}
+                        <span style={{ color: 'var(--mui-palette-secondary-main)' }}>
+                          {selectedEvaluation.result.variant.name}
+                        </span>
+                      </Typography>
+
+                      {selectedEvaluation.result.variant.payloadSource && (
+                        <Chip
+                          label={
+                            selectedEvaluation.result.variant.payloadSource === 'environment'
+                              ? t('playground.payloadSourceEnvironment')
+                              : selectedEvaluation.result.variant.payloadSource === 'flag'
+                                ? t('playground.payloadSourceFlag')
+                                : t('playground.payloadSourceVariant')
+                          }
+                          size="small"
+                          variant="outlined"
+                          sx={{ height: 18, fontSize: '0.65rem', borderStyle: 'dashed' }}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <Typography variant="subtitle2" fontWeight={600} color="text.disabled">
+                      {t('playground.noVariant')}
+                    </Typography>
+                  )}
+                </Box>
+              </Box>
+
+              {selectedEvaluation.result.variant ? (
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                  {(() => {
+                    const payloadType = selectedEvaluation.result.variant?.payloadType;
+                    const iconSx = { fontSize: 20, color: 'text.secondary', mt: 0.3 };
+                    if (payloadType === 'json') return <JsonIcon sx={iconSx} />;
+                    if (payloadType === 'number') return <NumberIcon sx={iconSx} />;
+                    if (payloadType === 'string') return <StringIcon sx={iconSx} />;
+                    return <CodeIcon sx={iconSx} />;
+                  })()}
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    {(() => {
+                      const payload = selectedEvaluation.result.variant?.payload;
+                      const payloadType = selectedEvaluation.result.variant?.payloadType;
+
+                      // If it's the specific Gatrix JSON structure, extract just the value
+                      if (typeof payload === 'object' && payload !== null && 'value' in payload) {
+                        const innerValue = (payload as any).value;
+                        if (payloadType === 'json' || (payload as any).type === 'json') {
+                          return (
+                            <Box
+                              sx={{
+                                p: 1,
+                                bgcolor: 'action.hover',
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                borderRadius: 1,
+                                maxHeight: 200,
+                                overflow: 'auto',
+                              }}
+                            >
+                              <pre
+                                style={{
+                                  margin: 0,
+                                  fontSize: '12px',
+                                  fontFamily: 'monospace',
+                                  color: 'var(--mui-palette-text-primary)',
+                                  whiteSpace: 'pre-wrap',
+                                  wordBreak: 'break-word',
+                                }}
+                              >
+                                {(() => {
+                                  try {
+                                    return JSON.stringify(JSON.parse(innerValue), null, 2);
+                                  } catch {
+                                    return innerValue;
+                                  }
+                                })()}
+                              </pre>
+                            </Box>
+                          );
+                        }
+                        return (
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              p: 1,
+                              bgcolor: 'action.hover',
+                              border: '1px solid',
+                              borderColor: 'divider',
+                              borderRadius: 1,
+                              fontFamily: 'monospace',
+                            }}
+                          >
+                            {innerValue}
+                          </Typography>
+                        );
+                      }
+
+                      // Fallback for other formats
+                      if (payload === undefined || payload === null) {
+                        return (
+                          <Typography variant="body2" color="text.disabled" fontStyle="italic">
+                            {t('common.noValue')}
+                          </Typography>
+                        );
+                      }
+
+                      if (payloadType === 'json') {
+                        return (
+                          <Box
+                            sx={{
+                              p: 1,
+                              bgcolor: 'grey.50',
+                              border: '1px solid',
+                              borderColor: 'grey.200',
+                              borderRadius: 1,
+                              maxHeight: 200,
+                              overflow: 'auto',
+                            }}
+                          >
+                            <pre
+                              style={{
+                                margin: 0,
+                                fontSize: '12px',
+                                fontFamily: 'monospace',
+                                color: 'var(--mui-palette-text-primary)',
+                                whiteSpace: 'pre-wrap',
+                                wordBreak: 'break-word',
+                              }}
+                            >
+                              {JSON.stringify(payload, null, 2)}
+                            </pre>
+                          </Box>
+                        );
+                      }
+
+                      return (
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            p: 1,
+                            bgcolor: 'grey.50',
+                            border: '1px solid',
+                            borderColor: 'grey.200',
+                            borderRadius: 1,
+                            fontFamily: 'monospace',
+                          }}
+                        >
+                          {typeof payload === 'object' ? JSON.stringify(payload) : String(payload)}
+                        </Typography>
+                      );
+                    })()}
+                  </Box>
+                </Box>
+              ) : (
+                <Box
+                  sx={{
+                    p: 2,
+                    textAlign: 'center',
+                    border: '1px dashed',
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    bgcolor: 'background.paper',
+                  }}
+                >
+                  <Typography variant="body2" color="text.disabled">
+                    {t('playground.noVariantDeterminedDesc') || 'No variant determined for this evaluation.'}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+
             {/* Raw Response JSON */}
-            <Box sx={{ mt: 2 }}>
+            <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />
+            <Box sx={{ mt: 1 }}>
               <Box
                 sx={{
                   display: 'flex',
@@ -1941,9 +2259,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   null,
                   2
                 )}
-                onChange={() => {}}
+                onChange={() => { }}
                 readOnly
-                height={300}
+                height={200}
               />
             </Box>
           </>
@@ -2058,7 +2376,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                         selectedVariant.payloadType === 'string' ? 'inherit' : 'monospace',
                     }}
                   >
-                    {String(selectedVariant.payload)}
+                    {typeof selectedVariant.payload === 'object' && selectedVariant.payload !== null
+                      ? JSON.stringify(selectedVariant.payload, null, 2)
+                      : String(selectedVariant.payload)}
                   </Typography>
                 )}
               </Box>
@@ -2303,7 +2623,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     size="small"
                     color={
                       selectedVariant.payloadSource === 'environment' ||
-                      selectedVariant.payloadSource === 'flag'
+                        selectedVariant.payloadSource === 'flag'
                         ? 'info'
                         : 'default'
                     }
@@ -2370,7 +2690,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                         selectedVariant.payloadType === 'string' ? 'inherit' : 'monospace',
                     }}
                   >
-                    {String(selectedVariant.payload)}
+                    {typeof selectedVariant.payload === 'object' && selectedVariant.payload !== null
+                      ? JSON.stringify(selectedVariant.payload, null, 2)
+                      : String(selectedVariant.payload)}
                   </Typography>
                 )}
               </Box>
