@@ -256,8 +256,8 @@ export const IntegrationsPage: React.FC = () => {
                         />
                         <Box>
                           <Typography variant="h6">
-                            {providers.find((p) => p.name === integration.provider)?.displayName ||
-                              integration.provider}
+                            {t(providers.find((p) => p.name === integration.provider)?.displayName ||
+                              integration.provider)}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
                             {integration.description || t('integrations.noDescription')}
