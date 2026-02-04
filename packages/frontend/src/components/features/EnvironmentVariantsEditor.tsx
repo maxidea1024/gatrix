@@ -110,72 +110,45 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   onGoToPayloadTab,
 }) => {
   const { t } = useTranslation();
-  const [editingVariants, setEditingVariants] = useState<Variant[]>([]);
-  const [hasChanges, setHasChanges] = useState(false);
+
+  // --- Variants State & Logic ---
+  const initialVariantsJson = useMemo(() => JSON.stringify(initialVariants), [initialVariants]);
+
+  const [editingVariants, setEditingVariants] = useState<Variant[]>(initialVariants);
+  const [prevVariantsJson, setPrevVariantsJson] = useState(initialVariantsJson);
+
+  // Render-time Status Synchronization (prevents flicker)
+  if (initialVariantsJson !== prevVariantsJson) {
+    setPrevVariantsJson(initialVariantsJson);
+    setEditingVariants(initialVariants);
+  }
+
+  const hasChanges = useMemo(() => {
+    return JSON.stringify(editingVariants) !== initialVariantsJson;
+  }, [editingVariants, initialVariantsJson]);
+
   const [saving, setSaving] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [jsonErrors, setJsonErrors] = useState<Record<number, string | null>>({});
 
-  // Fallback Value state
-  const [useEnvOverride, setUseEnvOverride] = useState(false);
-  const [editingFallback, setEditingFallback] = useState<string>('');
-  const [fallbackHasChanges, setFallbackHasChanges] = useState(false);
-  const [savingFallback, setSavingFallback] = useState(false);
-  const [fallbackJsonError, setFallbackJsonError] = useState<string | null>(null);
-
-  // Ref to preserve expanded state across data reloads
+  // Ref to preserve expanded state
   const preserveExpandedRef = React.useRef(false);
 
-  // Stabilize initialVariants reference to prevent infinite loop
-  const initialVariantsJson = JSON.stringify(initialVariants);
-  const prevInitialVariantsJsonRef = React.useRef<string>('');
-
-  // Initialize editing variants from props - only when initialVariants actually changes (by value)
+  // Effect to handle expansion logic on data reload
   useEffect(() => {
-    if (initialVariantsJson !== prevInitialVariantsJsonRef.current) {
-      prevInitialVariantsJsonRef.current = initialVariantsJson;
-      setEditingVariants(initialVariants);
-      setHasChanges(false);
-      // Restore expanded state if it was preserved
-      if (preserveExpandedRef.current) {
-        setExpanded(true);
-        preserveExpandedRef.current = false;
-      } else if (flagUsage === 'remoteConfig' && initialVariants.length > 0) {
-        // Auto expand for remote config if it has values
-        setExpanded(true);
-      }
+    if (preserveExpandedRef.current) {
+      setExpanded(true);
+      preserveExpandedRef.current = false;
+    } else if (flagUsage === 'remoteConfig' && initialVariants.length > 0) {
+      setExpanded(true);
     }
-  }, [initialVariantsJson, initialVariants, flagUsage]);
+  }, [initialVariantsJson, flagUsage, initialVariants.length]);
 
-  // Check for changes - use useMemo instead of useEffect to avoid render loop
-  const computedHasChanges = useMemo(() => {
-    return JSON.stringify(editingVariants) !== initialVariantsJson;
-  }, [editingVariants, initialVariantsJson]);
+  // --- Fallback State & Logic ---
+  const originalUseEnvOverride = useMemo(() => {
+    return envFallbackValue !== undefined && envFallbackValue !== null;
+  }, [envFallbackValue]);
 
-  // Sync hasChanges state only when computedHasChanges changes
-  useEffect(() => {
-    setHasChanges(computedHasChanges);
-  }, [computedHasChanges]);
-
-  // Initialize fallback value from props
-  useEffect(() => {
-    const hasEnvOverride = envFallbackValue !== undefined && envFallbackValue !== null;
-    setUseEnvOverride(hasEnvOverride);
-
-    // Set initial editing value
-    const initialValue = hasEnvOverride ? envFallbackValue : baselinePayload;
-    if (variantType === 'json') {
-      setEditingFallback(
-        typeof initialValue === 'string' ? initialValue : JSON.stringify(initialValue ?? {}, null, 2)
-      );
-    } else {
-      setEditingFallback(String(initialValue ?? ''));
-    }
-    setFallbackHasChanges(false);
-    setFallbackJsonError(null);
-  }, [envFallbackValue, baselinePayload, variantType]);
-
-  // Check fallback changes
   const originalFallbackValue = useMemo(() => {
     const hasEnvOverride = envFallbackValue !== undefined && envFallbackValue !== null;
     const value = hasEnvOverride ? envFallbackValue : baselinePayload;
@@ -185,15 +158,26 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     return String(value ?? '');
   }, [envFallbackValue, baselinePayload, variantType]);
 
-  const originalUseEnvOverride = useMemo(() => {
-    return envFallbackValue !== undefined && envFallbackValue !== null;
-  }, [envFallbackValue]);
+  const [useEnvOverride, setUseEnvOverride] = useState(originalUseEnvOverride);
+  const [editingFallback, setEditingFallback] = useState(originalFallbackValue);
 
-  useEffect(() => {
-    const valueChanged = editingFallback !== originalFallbackValue;
-    const overrideChanged = useEnvOverride !== originalUseEnvOverride;
-    setFallbackHasChanges(valueChanged || overrideChanged);
-  }, [editingFallback, originalFallbackValue, useEnvOverride, originalUseEnvOverride]);
+  const [prevOriginalOverride, setPrevOriginalOverride] = useState(originalUseEnvOverride);
+  const [prevOriginalFallback, setPrevOriginalFallback] = useState(originalFallbackValue);
+  const [savingFallback, setSavingFallback] = useState(false);
+  const [fallbackJsonError, setFallbackJsonError] = useState<string | null>(null);
+
+  // Render-time Synchronization
+  if (originalUseEnvOverride !== prevOriginalOverride || originalFallbackValue !== prevOriginalFallback) {
+    setPrevOriginalOverride(originalUseEnvOverride);
+    setPrevOriginalFallback(originalFallbackValue);
+    setUseEnvOverride(originalUseEnvOverride);
+    setEditingFallback(originalFallbackValue);
+    setFallbackJsonError(null);
+  }
+
+  const fallbackHasChanges = useMemo(() => {
+    return useEnvOverride !== originalUseEnvOverride || editingFallback !== originalFallbackValue;
+  }, [useEnvOverride, editingFallback, originalUseEnvOverride, originalFallbackValue]);
 
   // Handle save fallback value
   const handleSaveFallback = useCallback(async () => {

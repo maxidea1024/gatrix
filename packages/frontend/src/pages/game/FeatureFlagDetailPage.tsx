@@ -3674,6 +3674,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                       onClose={() => setEmbeddedPlaygroundVisible(false)}
                       initialFlags={[flag.flagName]}
                       embedded={true}
+                      initialFlagDetails={flag}
                     />
                   </Box>
                 </Box>
@@ -3881,15 +3882,20 @@ const FeatureFlagDetailPage: React.FC = () => {
                           {t("featureFlags.jsonError")}
                         </Typography>
                       )}
-                      {!baselinePayloadJsonError && (
-                        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
-                          {t("featureFlags.payloadSize")}: {new TextEncoder().encode(
-                            typeof flag.baselinePayload === "object"
-                              ? JSON.stringify(flag.baselinePayload)
-                              : String(flag.baselinePayload || "")
-                          ).length} bytes
-                        </Typography>
-                      )}
+                      {!baselinePayloadJsonError &&
+                        flag.baselinePayload !== undefined &&
+                        flag.baselinePayload !== null &&
+                        flag.baselinePayload !== "" && (
+                          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+                            {t("featureFlags.payloadSize", {
+                              size: new TextEncoder().encode(
+                                typeof flag.baselinePayload === "object"
+                                  ? JSON.stringify(flag.baselinePayload)
+                                  : String(flag.baselinePayload || "")
+                              ).length,
+                            })}
+                          </Typography>
+                        )}
                     </>
                   ) : flag.variantType === "number" ? (
                     <TextField
@@ -3919,14 +3925,20 @@ const FeatureFlagDetailPage: React.FC = () => {
                           );
                         }}
                       />
-                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
-                        {t("featureFlags.payloadSize")}: {new TextEncoder().encode(String(flag.baselinePayload || "")).length} bytes
-                      </Typography>
+                      {flag.baselinePayload !== undefined &&
+                        flag.baselinePayload !== null &&
+                        flag.baselinePayload !== "" && (
+                          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+                            {t("featureFlags.payloadSize", {
+                              size: new TextEncoder().encode(String(flag.baselinePayload || "")).length,
+                            })}
+                          </Typography>
+                        )}
                     </>
                   )}
 
                   {/* Baseline Payload Required Warning */}
-                  {(flag.baselinePayload === undefined || flag.baselinePayload === null || flag.baselinePayload === "") && (
+                  {(flag.baselinePayload === undefined || flag.baselinePayload === null) && (
                     <Alert severity="info" sx={{ mt: 2 }}>
                       {t("featureFlags.baselinePayloadRequired")}
                     </Alert>
@@ -3997,7 +4009,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                     saving ||
                     (flag.variantType === "json" && baselinePayloadJsonError !== null) ||
                     // Only require payload if variantType is not 'none'
-                    (flag.variantType !== "none" && (flag.baselinePayload === undefined || flag.baselinePayload === null || flag.baselinePayload === "")) ||
+                    (flag.variantType !== "none" && (flag.baselinePayload === undefined || flag.baselinePayload === null)) ||
                     // Disable if nothing changed
                     (flag.variantType === originalFlag?.variantType &&
                       JSON.stringify(flag.baselinePayload) ===

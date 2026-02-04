@@ -2649,13 +2649,15 @@ const FeatureFlagsPage: React.FC = () => {
                         {t("featureFlags.jsonError")}
                       </Typography>
                     )}
-                    {!newFlagBaselinePayloadJsonError && (
+                    {!newFlagBaselinePayloadJsonError && newFlag.baselinePayload !== "" && (
                       <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
-                        {t("featureFlags.payloadSize")}: {new TextEncoder().encode(
-                          typeof newFlag.baselinePayload === "object"
-                            ? JSON.stringify(newFlag.baselinePayload)
-                            : String(newFlag.baselinePayload || "")
-                        ).length} bytes
+                        {t("featureFlags.payloadSize", {
+                          size: new TextEncoder().encode(
+                            typeof newFlag.baselinePayload === "object"
+                              ? JSON.stringify(newFlag.baselinePayload)
+                              : String(newFlag.baselinePayload || "")
+                          ).length,
+                        })}
                       </Typography>
                     )}
                   </>
@@ -2682,9 +2684,13 @@ const FeatureFlagsPage: React.FC = () => {
                         setNewFlag((prev) => ({ ...prev, baselinePayload: e.target.value }));
                       }}
                     />
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
-                      {t("featureFlags.payloadSize")}: {new TextEncoder().encode(String(newFlag.baselinePayload || "")).length} bytes
-                    </Typography>
+                    {newFlag.baselinePayload !== "" && (
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+                        {t("featureFlags.payloadSize", {
+                          size: new TextEncoder().encode(String(newFlag.baselinePayload || "")).length,
+                        })}
+                      </Typography>
+                    )}
                   </>
                 )}
               </Box>
